@@ -109,9 +109,9 @@ To clone e.g. `mynmclicensure/` into `mypharmacy/`:
 ### Environments
 | | Dev | Prod |
 |--|-----|------|
-| **Repo** | `mybackpacc-byte/qacademy-gamma` | `qacademynurseshub-svg/qacademy` |
-| **Branch** | `main` | `production` (mirrors to prod repo) |
-| **Pages URL** | `qacademy-gamma.pages.dev` | `qacademy-bkf.pages.dev` |
+| **Repo** | `mybackpacc-byte/qacademy-gamma` | `mybackpacc-byte/qacademy-gamma` |
+| **Branch** | `main` | `production` |
+| **Pages URL** | `qacademy-gamma.pages.dev` | `qacademynurseshub.pages.dev` |
 | **Supabase** | `zrakjibtxyzoqcdtvpmq` | `qizhyhjeqhaybyddsuni` |
 | **Payments worker** | `qacademy-gamma-payment-workers` | `qacademy-prod-payment-workers` |
 | **Email worker** | `qacademy-email-worker` | `qacademy-prod-email-worker` |

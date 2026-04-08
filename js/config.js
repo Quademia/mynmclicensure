@@ -5,7 +5,7 @@
 // To set up prod: replace the PROD placeholders below with real values.
 // ────────────────────────────────────────────────────────────────
 
-const IS_PROD = window.location.hostname === 'qacademy-bkf.pages.dev';
+const IS_PROD = window.location.hostname === 'qacademynurseshub.pages.dev';
 
 // Supabase
 const SUPABASE_URL = IS_PROD
@@ -18,12 +18,12 @@ const SUPABASE_ANON_KEY = IS_PROD
 
 // Payments Worker
 const PAYMENTS_API_BASE = IS_PROD
-  ? 'https://qacademy-prod-payment-workers.qacademy-nurseshub.workers.dev'
+  ? 'https://qacademy-prod-payment-workers.mybackpacc.workers.dev'
   : 'https://qacademy-gamma-payment-workers.mybackpacc.workers.dev';
 
 // Email Worker
 const EMAIL_WORKER_URL = IS_PROD
-  ? 'https://qacademy-prod-email-worker.qacademy-nurseshub.workers.dev'
+  ? 'https://qacademy-prod-email-worker.mybackpacc.workers.dev'
   : 'https://qacademy-email-worker.mybackpacc.workers.dev';
 
 const EMAIL_SECRET = IS_PROD
