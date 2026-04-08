@@ -112,9 +112,10 @@ table.items-table .stem-cell .stem-text { display: -webkit-box; -webkit-line-cla
 .badge-moderate { background: var(--warn-light); color: var(--warn); }
 .badge-hard { background: var(--danger-light); color: var(--danger); }
 
-/* ── Selection dock ──────────────────────────────────────── */
-.selection-dock { display: flex; gap: 12px; align-items: center; padding: 12px 16px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; margin-top: 12px; flex-wrap: wrap; }
-.selection-dock.has-items { border-color: var(--lib-accent); background: var(--lib-light); }
+/* ── Selection dock (sticky bottom) ─────────────────────── */
+.selection-dock { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 900; gap: 12px; align-items: center; padding: 12px 24px; background: var(--card); border-top: 2px solid var(--line); box-shadow: 0 -4px 16px rgba(0,0,0,.08); flex-wrap: wrap; }
+.selection-dock.visible { display: flex; }
+.selection-dock.has-items { border-top-color: var(--lib-accent); background: var(--lib-light); }
 .selection-count { font-size: 13px; font-weight: 700; flex: 1; }
 
 /* ── Preview drawer ──────────────────────────────────────── */
@@ -260,18 +261,19 @@ table.items-table .stem-cell .stem-text { display: -webkit-box; -webkit-line-cla
         <button id="btnNextPage" onclick="goPage(1)">Next &rarr;</button>
       </div>
 
-      <!-- Selection dock -->
-      <div class="selection-dock" id="selectionDock">
-        <div class="selection-count">
-          <span id="selectedCount">0</span> items selected
-          <span id="selectedInDraft" style="display:none;margin-left:8px;color:var(--muted)">(+<span id="alreadyInDraftCount">0</span> already in draft)</span>
-        </div>
-        <button class="btn sm" onclick="previewSelected()" id="btnPreviewSel" style="display:none">Preview</button>
-        <button class="btn sm lib-add" onclick="addSelectedToDraft()" id="btnAddToDraft" disabled>
-          Add to Draft
-        </button>
-      </div>
     </div>
+  </div>
+
+  <!-- ── Selection dock (sticky bottom) ──────────────────── -->
+  <div class="selection-dock" id="selectionDock">
+    <div class="selection-count">
+      <span id="selectedCount">0</span> items selected
+      <span id="selectedInDraft" style="display:none;margin-left:8px;color:var(--muted)">(+<span id="alreadyInDraftCount">0</span> already in draft)</span>
+    </div>
+    <button class="btn sm" onclick="previewSelected()" id="btnPreviewSel" style="display:none">Preview</button>
+    <button class="btn sm lib-add" onclick="addSelectedToDraft()" id="btnAddToDraft" disabled>
+      Add to Draft
+    </button>
   </div>
 
   <!-- ── Preview drawer ─────────────────────────────────── -->
@@ -485,6 +487,7 @@ async function selectCourse(courseId) {
 function backToCourses() {
   SELECTED_COURSE = null;
   $('itemsSection').classList.remove('visible');
+  $('selectionDock').classList.remove('visible');
   renderCourseGrid();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -711,6 +714,7 @@ function updateSelectionDock() {
   $('btnAddToDraft').disabled = !count || !TARGET_QUIZ;
   $('btnPreviewSel').style.display = count ? '' : 'none';
   dock.classList.toggle('has-items', count > 0);
+  dock.classList.toggle('visible', SELECTED_COURSE !== null);
 
   if (TARGET_QUIZ && DRAFT_SET.size) {
     $('alreadyInDraftCount').textContent = DRAFT_SET.size;
