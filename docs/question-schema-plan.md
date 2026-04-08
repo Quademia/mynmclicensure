@@ -1,6 +1,6 @@
 # Plan: Question Schema Enhancements + Library Rebuild
 
-**Status:** Phase 1 COMPLETE — Phase 2 COMPLETE
+**Status:** Phase 1 COMPLETE — Phase 2 COMPLETE — Phase 3 not started
 **Created:** 2026-04-08
 
 ## Context
@@ -223,6 +223,39 @@ Old refs like `LIB:GP:GP_001` in existing quiz drafts will break once NMC course
 | `db/prod-setup/04_seed_data.sql` | Replace NMC seed rows with academic course rows |
 | `js/myteacher-api.js` | Update getLibraryFilterOptions to include tags |
 | `myteacher/teacher/library.html` | Add tags filter |
+
+---
+
+## Phase 3: Update CSV Import to support new columns (not started)
+
+The CSV import page (`myteacher/teacher/import.html`) was built before Phase 1. It needs updating to support the new columns.
+
+### 3A. Update `ALL_COLS` array (line ~395)
+
+Add `question_ref`, `tags`, `batch_id`, `year_level`, `bloom_level` to the column list.
+
+### 3B. Update `doImport()` payload (line ~668)
+
+Add the new fields to the payload passed to `createBankItem()`:
+- `question_ref` — straight from CSV
+- `tags` — parse comma-separated string into array (e.g. "cardio, exam" → ['cardio', 'exam'])
+- `batch_id` — straight from CSV
+- `year_level` — straight from CSV
+- `bloom_level` — straight from CSV
+
+### 3C. Update CSV template download (line ~414)
+
+Add the new columns to the header and example rows so teachers downloading the template see them.
+
+### 3D. Update AI prompt text (line ~192)
+
+The prompt that teachers copy to AI assistants for converting questions to CSV format needs to mention the new columns and their valid values (especially `bloom_level`: Remember | Understand | Apply | Analyse | Evaluate | Create).
+
+### Files to Modify
+
+| File | Change |
+|---|---|
+| `myteacher/teacher/import.html` | ALL_COLS, doImport payload, template download, AI prompt, instructions section |
 
 ---
 
