@@ -82,7 +82,8 @@ a { color: var(--brand); }
 .items-section { display: none; }
 .items-section.visible { display: block; }
 .items-section-header { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
-.items-section-header .section-title { font-size: 16px; font-weight: 800; flex: 1; }
+.items-section-header .section-title { font-size: 18px; font-weight: 900; color: var(--lib-accent); }
+.items-section-header > div:first-child { flex: 1; }
 .items-filter-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
 .items-filter-bar input, .items-filter-bar select { padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; font-family: inherit; background: var(--card); }
 .items-filter-bar input { min-width: 180px; }
@@ -203,8 +204,11 @@ table.items-table .stem-cell .stem-text { display: -webkit-box; -webkit-line-cla
     <!-- ── Items section (appears after selecting a course) -->
     <div class="items-section" id="itemsSection">
       <div class="items-section-header">
-        <div class="section-title" id="itemsSectionTitle">Questions</div>
-        <button class="btn sm" onclick="backToCourses()">Back to Courses</button>
+        <div>
+          <div class="section-title" id="itemsSectionTitle">Questions</div>
+          <div class="section-subtitle" id="itemsSectionSubtitle" style="font-size:12px;color:var(--muted);margin-top:2px"></div>
+        </div>
+        <button class="btn sm" onclick="backToCourses()">Change Course</button>
         <button class="btn sm" id="btnSelectAll" onclick="toggleSelectAll()">Select All</button>
         <button class="btn sm" id="btnDeselectAll" onclick="deselectAll()">Deselect All</button>
       </div>
@@ -446,15 +450,21 @@ async function selectCourse(courseId) {
   SELECTED_IDS.clear();
   PAGE = 0;
 
-  // Show items section, update title
+  // Show items section, update title + subtitle
   $('itemsSection').classList.add('visible');
   $('itemsSectionTitle').textContent = `${course.title} — Questions`;
+  $('itemsSectionSubtitle').textContent = [course.description, [course.programme, course.faculty, course.year_group].filter(Boolean).join(' · ')].filter(Boolean).join(' — ');
 
-  // Highlight selected card
+  // Highlight selected card and auto-scroll carousel to it
   renderCourseGrid();
+  const activeCard = document.querySelector('.course-card.active');
+  if (activeCard) {
+    activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    setTimeout(updateCarouselArrows, 400);
+  }
 
   // Scroll to items section
-  $('itemsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(() => $('itemsSection').scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
 
   // Load filters and items in parallel
   const [filterOpts] = await Promise.all([
