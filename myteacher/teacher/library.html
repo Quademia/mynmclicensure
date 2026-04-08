@@ -186,6 +186,9 @@ table.items-table .stem-cell .stem-text { display: -webkit-box; -webkit-line-cla
             <option value="TF">True/False</option>
             <option value="SATA">SATA</option>
           </select>
+          <select id="filterTag"><option value="">All tags</option></select>
+          <select id="filterYearLevel"><option value="">All year levels</option></select>
+          <select id="filterBloomLevel"><option value="">All Bloom's levels</option></select>
           <button class="btn sm" onclick="clearFilters()" style="width:100%;margin-top:4px">Clear Filters</button>
         </div>
       </div>
@@ -272,7 +275,7 @@ let COURSES = [];
 let SELECTED_COURSE = null;         // { course_id, items_table, title, ... }
 let ITEMS = [];                     // current page items
 let TOTAL_ITEMS = 0;
-let FILTER_OPTIONS = { maintopics: [], subtopics: [], difficulties: [] };
+let FILTER_OPTIONS = { maintopics: [], subtopics: [], difficulties: [], tags: [], year_levels: [], bloom_levels: [] };
 let SELECTED_IDS = new Set();       // LIB refs selected for adding
 let DRAFT_QUIZZES = [];
 let TARGET_QUIZ = null;             // selected draft quiz row
@@ -323,7 +326,8 @@ function renderCourseList() {
     <div class="course-card${SELECTED_COURSE && SELECTED_COURSE.course_id === c.course_id ? ' active' : ''}"
          data-cid="${esc(c.course_id)}">
       <div class="c-title">${esc(c.title)}</div>
-      <div class="c-meta">${esc(c.course_id)} · ${esc(c.items_table)}</div>
+      <div class="c-meta">${[c.programme, c.faculty, c.year_group].filter(Boolean).map(esc).join(' · ') || esc(c.course_id)}</div>
+      ${c.description ? `<div class="c-desc" style="font-size:11px;color:var(--muted);margin-top:2px">${esc(c.description)}</div>` : ''}
     </div>
   `).join('');
 
@@ -370,6 +374,9 @@ async function loadItems() {
     subtopic: $('filterSubtopic').value,
     difficulty: $('filterDifficulty').value,
     question_type: $('filterType').value,
+    tag: $('filterTag').value,
+    year_level: $('filterYearLevel').value,
+    bloom_level: $('filterBloomLevel').value,
     limit: PAGE_SIZE,
     offset: PAGE * PAGE_SIZE
   };
@@ -461,6 +468,9 @@ function populateFilterDropdowns() {
   fillSelect('filterTopic', FILTER_OPTIONS.maintopics, 'All topics');
   fillSelect('filterSubtopic', FILTER_OPTIONS.subtopics, 'All subtopics');
   fillSelect('filterDifficulty', FILTER_OPTIONS.difficulties, 'All difficulties');
+  fillSelect('filterTag', FILTER_OPTIONS.tags, 'All tags');
+  fillSelect('filterYearLevel', FILTER_OPTIONS.year_levels, 'All year levels');
+  fillSelect('filterBloomLevel', FILTER_OPTIONS.bloom_levels, 'All Bloom\'s levels');
 }
 
 function fillSelect(id, values, allLabel) {
@@ -477,6 +487,9 @@ function clearFilters() {
   $('filterSubtopic').value = '';
   $('filterDifficulty').value = '';
   $('filterType').value = '';
+  $('filterTag').value = '';
+  $('filterYearLevel').value = '';
+  $('filterBloomLevel').value = '';
   PAGE = 0;
   loadItems();
 }
@@ -681,10 +694,9 @@ function bindEvents() {
     clearTimeout(SEARCH_TIMER);
     SEARCH_TIMER = setTimeout(() => { PAGE = 0; loadItems(); }, 350);
   });
-  $('filterTopic').addEventListener('change', () => { PAGE = 0; loadItems(); });
-  $('filterSubtopic').addEventListener('change', () => { PAGE = 0; loadItems(); });
-  $('filterDifficulty').addEventListener('change', () => { PAGE = 0; loadItems(); });
-  $('filterType').addEventListener('change', () => { PAGE = 0; loadItems(); });
+  ['filterTopic','filterSubtopic','filterDifficulty','filterType','filterTag','filterYearLevel','filterBloomLevel'].forEach(id => {
+    $(id).addEventListener('change', () => { PAGE = 0; loadItems(); });
+  });
 
   // Header checkbox
   $('headerCheckbox').addEventListener('change', () => toggleSelectAll());

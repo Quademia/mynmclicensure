@@ -3281,7 +3281,7 @@ async function getLibraryCourses() {
     .from('teacher_library_courses')
     .select('*')
     .eq('status', 'active')
-    .order('sort_order', { ascending: true });
+    .order('title', { ascending: true });
 
   if (error) { console.error('getLibraryCourses:', error); return []; }
   return data || [];
@@ -3295,18 +3295,21 @@ async function getLibraryCourses() {
 // Returns { items, count }
 // Used by: library.html — items table
 // ------------------------------------------------------------
-async function getLibraryItems(tableName, { search = '', maintopic = '', subtopic = '', difficulty = '', question_type = '', limit = 500, offset = 0 } = {}) {
+async function getLibraryItems(tableName, { search = '', maintopic = '', subtopic = '', difficulty = '', question_type = '', tag = '', year_level = '', bloom_level = '', limit = 500, offset = 0 } = {}) {
   if (!tableName) return { items: [], count: 0 };
 
   let query = db
     .from(tableName)
     .select('*', { count: 'exact' });
 
-  if (maintopic) query = query.eq('maintopic', maintopic);
-  if (subtopic)  query = query.eq('subtopic', subtopic);
-  if (difficulty) query = query.eq('difficulty', difficulty);
+  if (maintopic)    query = query.eq('maintopic', maintopic);
+  if (subtopic)     query = query.eq('subtopic', subtopic);
+  if (difficulty)   query = query.eq('difficulty', difficulty);
   if (question_type) query = query.eq('question_type', question_type);
-  if (search) query = query.ilike('stem', `%${search}%`);
+  if (search)       query = query.ilike('stem', `%${search}%`);
+  if (tag)          query = query.contains('tags', [tag]);
+  if (year_level)   query = query.eq('year_level', year_level);
+  if (bloom_level)  query = query.eq('bloom_level', bloom_level);
 
   query = query.range(offset, offset + limit - 1);
 
@@ -3322,26 +3325,32 @@ async function getLibraryItems(tableName, { search = '', maintopic = '', subtopi
 // from a library items table. Used for filter dropdowns.
 // ------------------------------------------------------------
 async function getLibraryFilterOptions(tableName) {
-  if (!tableName) return { maintopics: [], subtopics: [], difficulties: [] };
+  if (!tableName) return { maintopics: [], subtopics: [], difficulties: [], tags: [], year_levels: [], bloom_levels: [] };
 
   // Fetch all items but only the filter columns
   const { data, error } = await db
     .from(tableName)
-    .select('maintopic, subtopic, difficulty');
+    .select('maintopic, subtopic, difficulty, tags, year_level, bloom_level');
 
-  if (error) { console.error('getLibraryFilterOptions:', error); return { maintopics: [], subtopics: [], difficulties: [] }; }
+  if (error) { console.error('getLibraryFilterOptions:', error); return { maintopics: [], subtopics: [], difficulties: [], tags: [], year_levels: [], bloom_levels: [] }; }
 
-  const mt = new Set(), st = new Set(), df = new Set();
+  const mt = new Set(), st = new Set(), df = new Set(), tg = new Set(), yl = new Set(), bl = new Set();
   (data || []).forEach(r => {
-    if (r.maintopic) mt.add(r.maintopic);
-    if (r.subtopic)  st.add(r.subtopic);
-    if (r.difficulty) df.add(r.difficulty);
+    if (r.maintopic)  mt.add(r.maintopic);
+    if (r.subtopic)   st.add(r.subtopic);
+    if (r.difficulty)  df.add(r.difficulty);
+    if (r.year_level)  yl.add(r.year_level);
+    if (r.bloom_level) bl.add(r.bloom_level);
+    (r.tags || []).forEach(t => { if (t) tg.add(t); });
   });
 
   return {
     maintopics:   [...mt].sort(),
     subtopics:    [...st].sort(),
-    difficulties: [...df].sort()
+    difficulties: [...df].sort(),
+    tags:         [...tg].sort(),
+    year_levels:  [...yl].sort(),
+    bloom_levels: [...bl].sort()
   };
 }
 

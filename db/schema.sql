@@ -625,19 +625,73 @@ CREATE INDEX ON teacher_quiz_attempts (status);
 
 -- 5.9 teacher_library_courses
 CREATE TABLE teacher_library_courses (
-  course_id     TEXT NOT NULL PRIMARY KEY,
-  title         TEXT NOT NULL,
-  program_scope TEXT[] NOT NULL DEFAULT '{}',
-  status        TEXT NOT NULL DEFAULT 'active',
-  sort_order    INTEGER NOT NULL DEFAULT 0,
-  created_at    TIMESTAMPTZ DEFAULT NOW(),
-  updated_at    TIMESTAMPTZ DEFAULT NOW(),
-  items_table   TEXT
+  course_id    TEXT NOT NULL PRIMARY KEY,
+  title        TEXT NOT NULL,
+  description  TEXT,
+  programme    TEXT,
+  faculty      TEXT,
+  category     TEXT,
+  year_group   TEXT,
+  tags         TEXT[] NOT NULL DEFAULT '{}',
+  status       TEXT NOT NULL DEFAULT 'active',
+  created_at   TIMESTAMPTZ DEFAULT NOW(),
+  updated_at   TIMESTAMPTZ DEFAULT NOW(),
+  items_table  TEXT
 );
--- items_table: points to the actual items table (e.g. items_gp, items_rn_med)
+-- items_table: points to the library items table (e.g. library_anatomy, library_english)
+-- programme: e.g. 'Nursing', 'Business', 'General'
+-- faculty: e.g. 'Health Sciences', 'Arts', 'Social Sciences'
+-- category: e.g. 'Sciences', 'Languages', 'Commerce'
+-- year_group: e.g. 'Year 1', 'Year 2', 'Postgraduate'
 
 CREATE INDEX ON teacher_library_courses (status);
-CREATE INDEX ON teacher_library_courses (sort_order);
+CREATE INDEX idx_lib_courses_programme ON teacher_library_courses (programme);
+CREATE INDEX idx_lib_courses_faculty ON teacher_library_courses (faculty);
+CREATE INDEX idx_lib_courses_category ON teacher_library_courses (category);
+CREATE INDEX idx_lib_courses_year ON teacher_library_courses (year_group);
+CREATE INDEX idx_lib_courses_tags ON teacher_library_courses USING GIN (tags);
+
+-- 5.9b Library item tables (one per course)
+-- All follow the same schema. Replace library_anatomy with:
+--   library_anatomy, library_physiology, library_english,
+--   library_accounting, library_government (add more as needed)
+
+CREATE TABLE library_anatomy (
+  item_id         TEXT PRIMARY KEY,
+  question_type   TEXT NOT NULL DEFAULT 'MCQ',
+  stem            TEXT NOT NULL,
+  option_a        TEXT, fb_a TEXT,
+  option_b        TEXT, fb_b TEXT,
+  option_c        TEXT, fb_c TEXT,
+  option_d        TEXT, fb_d TEXT,
+  option_e        TEXT, fb_e TEXT,
+  option_f        TEXT, fb_f TEXT,
+  correct         TEXT NOT NULL,
+  rationale       TEXT,
+  rationale_img   TEXT,
+  subject         TEXT,
+  maintopic       TEXT,
+  subtopic        TEXT,
+  difficulty      TEXT,
+  marks           INTEGER NOT NULL DEFAULT 1,
+  shuffle_options BOOLEAN NOT NULL DEFAULT true,
+  question_ref    TEXT,
+  tags            TEXT[] NOT NULL DEFAULT '{}',
+  batch_id        TEXT,
+  year_level      TEXT,
+  bloom_level     TEXT
+);
+-- question_type: MCQ | TF | SATA
+-- bloom_level: Remember | Understand | Apply | Analyse | Evaluate | Create
+-- year_level: e.g. 'Year 1', 'Year 2', 'Level 100', 'Level 200'
+
+CREATE INDEX ON library_anatomy (maintopic);
+CREATE INDEX ON library_anatomy (subtopic);
+CREATE INDEX ON library_anatomy (difficulty);
+CREATE INDEX ON library_anatomy USING GIN (tags);
+CREATE INDEX ON library_anatomy (batch_id);
+CREATE INDEX ON library_anatomy (year_level);
+CREATE INDEX ON library_anatomy (bloom_level);
 
 -- 5.10 teacher_courses
 -- A Course is what a teacher teaches (Pharmacology 1, Anatomy, etc).
