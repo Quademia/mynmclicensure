@@ -157,7 +157,7 @@ table.items-table .stem-cell .stem-text { display: -webkit-box; -webkit-line-cla
 <body>
 <div class="page-wrap">
   <!-- ── NAV ──────────────────────────────────────────────── -->
-  <div id="mtNavHost"></div>
+  <div id="myteacher-nav"></div>
 
   <div class="main-content">
     <!-- ── Top bar ──────────────────────────────────────── -->
@@ -166,7 +166,7 @@ table.items-table .stem-cell .stem-text { display: -webkit-box; -webkit-line-cla
         <div class="page-title">QAcademy Library</div>
         <div style="font-size:12px;color:var(--muted)" id="pageSubtitle">Browse and add questions to your quiz drafts</div>
       </div>
-      <a href="quizzes.html" class="btn sm">&larr; Back to Quizzes</a>
+      <a href="quizzes.html" class="btn sm" id="btnBackToQuizzes" style="display:none">&larr; Back to Quizzes</a>
     </div>
 
     <!-- ── Target quiz selector ─────────────────────────── -->
@@ -652,6 +652,7 @@ function onTargetQuizChange() {
     TARGET_QUIZ = null;
     DRAFT_SET.clear();
     badge.style.display = 'none';
+    $('btnBackToQuizzes').style.display = 'none';
     if (SELECTED_COURSE) renderItemsTable();
     updateSelectionDock();
     return;
@@ -663,6 +664,7 @@ function onTargetQuizChange() {
     DRAFT_SET = new Set(items);
     badge.textContent = `${items.length} items in draft`;
     badge.style.display = '';
+    $('btnBackToQuizzes').style.display = '';
   }
 
   SELECTED_IDS.forEach(ref => { if (DRAFT_SET.has(ref)) SELECTED_IDS.delete(ref); });
