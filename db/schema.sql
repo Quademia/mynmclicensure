@@ -473,15 +473,28 @@ CREATE TABLE teacher_bank_items (
   source_item_id   TEXT,
   imported_at      TIMESTAMPTZ,
   created_at       TIMESTAMPTZ DEFAULT NOW(),
-  updated_at       TIMESTAMPTZ DEFAULT NOW()
+  updated_at       TIMESTAMPTZ DEFAULT NOW(),
+  question_ref     TEXT,
+  tags             TEXT[] NOT NULL DEFAULT '{}',
+  batch_id         TEXT,
+  year_level       TEXT,
+  bloom_level      TEXT
 );
 -- question_type: MCQ | TF | SATA
 -- source_type: TEACHER | IMPORT | QUIZ_INLINE | LIBRARY
+-- question_ref: teacher's own reference code for numbering questions (unique per teacher)
+-- bloom_level: Remember | Understand | Apply | Analyse | Evaluate | Create
+-- year_level: e.g. 'Year 1', 'Year 2', 'Level 100', 'Level 200'
 
 CREATE INDEX ON teacher_bank_items (teacher_id);
 CREATE INDEX ON teacher_bank_items (teacher_id, status);
 CREATE INDEX ON teacher_bank_items (maintopic);
 CREATE INDEX ON teacher_bank_items (source_type);
+CREATE UNIQUE INDEX idx_bank_question_ref ON teacher_bank_items (teacher_id, question_ref) WHERE question_ref IS NOT NULL;
+CREATE INDEX idx_bank_tags ON teacher_bank_items USING GIN (tags);
+CREATE INDEX idx_bank_batch ON teacher_bank_items (batch_id);
+CREATE INDEX idx_bank_year ON teacher_bank_items (year_level);
+CREATE INDEX idx_bank_bloom ON teacher_bank_items (bloom_level);
 
 -- 5.5 teacher_quizzes
 CREATE TABLE teacher_quizzes (
@@ -547,7 +560,11 @@ CREATE TABLE teacher_quiz_items (
   snap_marks           INTEGER NOT NULL DEFAULT 1,
   snap_question_type   TEXT NOT NULL DEFAULT 'MCQ',
   snap_shuffle_options BOOLEAN NOT NULL DEFAULT true,
-  snapped_at           TIMESTAMPTZ DEFAULT NOW()
+  snapped_at           TIMESTAMPTZ DEFAULT NOW(),
+  snap_question_ref    TEXT,
+  snap_tags            TEXT[] NOT NULL DEFAULT '{}',
+  snap_year_level      TEXT,
+  snap_bloom_level     TEXT
 );
 
 CREATE INDEX ON teacher_quiz_items (teacher_quiz_id);

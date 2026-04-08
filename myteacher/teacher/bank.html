@@ -765,6 +765,32 @@ body {
               <option value="">Any</option>
             </select>
           </div>
+        </div>
+        <div class="filter-row-2">
+          <div class="filter-group">
+            <label>Tag</label>
+            <select id="fTag">
+              <option value="">Any</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Year Level</label>
+            <select id="fYearLevelFilter">
+              <option value="">Any</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Bloom's Level</label>
+            <select id="fBloomLevelFilter">
+              <option value="">Any</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Batch</label>
+            <select id="fBatch">
+              <option value="">Any</option>
+            </select>
+          </div>
           <button class="btn btn-ghost btn-sm" onclick="clearFilters()">Clear</button>
         </div>
       </div>
@@ -906,6 +932,48 @@ body {
           <div class="form-group">
             <label>Marks</label>
             <input type="number" id="fMarks" value="1" min="1" />
+          </div>
+        </div>
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label>Question Ref</label>
+            <input type="text" id="fQuestionRef" placeholder="e.g. ANP-Q12" />
+          </div>
+          <div class="form-group">
+            <label>Year Level</label>
+            <select id="fYearLevel">
+              <option value="">— Select —</option>
+              <option value="Year 1">Year 1</option>
+              <option value="Year 2">Year 2</option>
+              <option value="Year 3">Year 3</option>
+              <option value="Year 4">Year 4</option>
+              <option value="Level 100">Level 100</option>
+              <option value="Level 200">Level 200</option>
+              <option value="Level 300">Level 300</option>
+              <option value="Level 400">Level 400</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Bloom's Level</label>
+            <select id="fBloomLevel">
+              <option value="">— Select —</option>
+              <option value="Remember">Remember</option>
+              <option value="Understand">Understand</option>
+              <option value="Apply">Apply</option>
+              <option value="Analyse">Analyse</option>
+              <option value="Evaluate">Evaluate</option>
+              <option value="Create">Create</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Tags <span class="form-hint">(comma-separated)</span></label>
+            <input type="text" id="fTags" placeholder="e.g. final-exam, cardio, needs-review" />
+          </div>
+          <div class="form-group">
+            <label>Batch ID</label>
+            <input type="text" id="fBatchId" placeholder="e.g. BATCH_2026_04" />
           </div>
         </div>
         <label class="check-row">
@@ -1070,7 +1138,7 @@ async function boot() {
     }, 300);
   });
   // All other filters: re-query the server with updated filter state
-  ['fStatus','fDifficulty','fSubject','fMaintopic','fSubtopic'].forEach(id => {
+  ['fStatus','fDifficulty','fSubject','fMaintopic','fSubtopic','fTag','fYearLevelFilter','fBloomLevelFilter','fBatch'].forEach(id => {
     $(id).addEventListener('change', () => { bankPage = 0; loadItems(false); });
   });
 
@@ -1127,18 +1195,30 @@ function applyPickerLayout() {
 async function refreshFilterOptions() {
   const opts = await getBankFilterOptions(TEACHER_ID);
 
-  const subjectSel   = $('fSubject');
-  const maintopicSel = $('fMaintopic');
-  const subtopicSel  = $('fSubtopic');
+  const subjectSel    = $('fSubject');
+  const maintopicSel  = $('fMaintopic');
+  const subtopicSel   = $('fSubtopic');
+  const tagSel        = $('fTag');
+  const yearSel       = $('fYearLevelFilter');
+  const bloomSel      = $('fBloomLevelFilter');
+  const batchSel      = $('fBatch');
 
-  // Preserve current selection
+  // Preserve current selections
   const prevSubject   = subjectSel.value;
   const prevMaintopic = maintopicSel.value;
   const prevSubtopic  = subtopicSel.value;
+  const prevTag       = tagSel.value;
+  const prevYear      = yearSel.value;
+  const prevBloom     = bloomSel.value;
+  const prevBatch     = batchSel.value;
 
-  populateSelect(subjectSel,   opts.subjects,   prevSubject);
-  populateSelect(maintopicSel, opts.maintopics, prevMaintopic);
-  populateSelect(subtopicSel,  opts.subtopics,  prevSubtopic);
+  populateSelect(subjectSel,   opts.subjects,     prevSubject);
+  populateSelect(maintopicSel, opts.maintopics,   prevMaintopic);
+  populateSelect(subtopicSel,  opts.subtopics,    prevSubtopic);
+  populateSelect(tagSel,       opts.tags,         prevTag);
+  populateSelect(yearSel,      opts.year_levels,  prevYear);
+  populateSelect(bloomSel,     opts.bloom_levels, prevBloom);
+  populateSelect(batchSel,     opts.batch_ids,    prevBatch);
 }
 
 function populateSelect(selectEl, values, preserve) {
@@ -1191,22 +1271,30 @@ function loadMoreItems() {
 
 function buildFilters() {
   return {
-    status    : $('fStatus').value     || 'ACTIVE',
-    difficulty: $('fDifficulty').value || '',
-    subject   : $('fSubject').value    || '',
-    maintopic : $('fMaintopic').value  || '',
-    subtopic  : $('fSubtopic').value   || '',
-    keyword   : $('fKeyword').value.trim() || ''
+    status      : $('fStatus').value          || 'ACTIVE',
+    difficulty  : $('fDifficulty').value      || '',
+    subject     : $('fSubject').value         || '',
+    maintopic   : $('fMaintopic').value       || '',
+    subtopic    : $('fSubtopic').value        || '',
+    keyword     : $('fKeyword').value.trim()  || '',
+    tag         : $('fTag').value             || '',
+    year_level  : $('fYearLevelFilter').value || '',
+    bloom_level : $('fBloomLevelFilter').value|| '',
+    batch_id    : $('fBatch').value           || ''
   };
 }
 
 function clearFilters() {
-  $('fKeyword').value    = '';
-  $('fStatus').value     = 'ACTIVE';
-  $('fDifficulty').value = '';
-  $('fSubject').value    = '';
-  $('fMaintopic').value  = '';
-  $('fSubtopic').value   = '';
+  $('fKeyword').value          = '';
+  $('fStatus').value           = 'ACTIVE';
+  $('fDifficulty').value       = '';
+  $('fSubject').value          = '';
+  $('fMaintopic').value        = '';
+  $('fSubtopic').value         = '';
+  $('fTag').value              = '';
+  $('fYearLevelFilter').value  = '';
+  $('fBloomLevelFilter').value = '';
+  $('fBatch').value            = '';
   bankPage = 0;
   loadItems(false);
 }
@@ -1321,6 +1409,10 @@ function renderCard(item) {
         ${statusPill(item.status)}
         ${sourcePill(item.source_type)}
         ${item.marks > 1 ? `<span class="pill">${item.marks} marks</span>` : ''}
+        ${item.question_ref ? `<span class="pill" style="background:var(--accent-bg,#e8f0fe);color:var(--accent,#1a73e8);font-weight:600;">${esc(item.question_ref)}</span>` : ''}
+        ${item.bloom_level ? `<span class="pill">${esc(item.bloom_level)}</span>` : ''}
+        ${item.year_level ? `<span class="pill">${esc(item.year_level)}</span>` : ''}
+        ${(item.tags || []).map(t => `<span class="pill" style="background:#f0f4c3;color:#33691e;">${esc(t)}</span>`).join('')}
         ${breadcrumb(item)}
       </div>
       <div class="q-card-body">
@@ -1480,6 +1572,11 @@ function fillForm(item) {
   $('fDifficultyEditor').value= item.difficulty     || '';
   $('fMarks').value           = item.marks          || 1;
   $('fShuffleOptions').checked= item.shuffle_options !== false;
+  $('fQuestionRef').value     = item.question_ref   || '';
+  $('fTags').value            = (item.tags || []).join(', ');
+  $('fBatchId').value         = item.batch_id       || '';
+  $('fYearLevel').value       = item.year_level     || '';
+  $('fBloomLevel').value      = item.bloom_level    || '';
 
   OPTION_LETTERS.forEach(l => {
     $('opt_'  + l) && ($('opt_' + l).value  = item['option_' + l] || '');
@@ -1512,6 +1609,11 @@ function clearForm() {
   $('fDifficultyEditor').value = '';
   $('fMarks').value            = 1;
   $('fShuffleOptions').checked = true;
+  $('fQuestionRef').value      = '';
+  $('fTags').value             = '';
+  $('fBatchId').value          = '';
+  $('fYearLevel').value        = '';
+  $('fBloomLevel').value       = '';
   $('fCorrectMcq').value       = 'a';
   document.querySelectorAll('#sataCorrectBoxes input').forEach(cb => cb.checked = false);
   OPTION_LETTERS.forEach(l => {
@@ -1708,6 +1810,11 @@ async function saveItem() {
     difficulty     : $('fDifficultyEditor').value       || null,
     marks          : parseInt($('fMarks').value, 10)    || 1,
     shuffle_options: $('fShuffleOptions').checked,
+    question_ref   : $('fQuestionRef').value.trim()     || null,
+    tags           : $('fTags').value.split(',').map(t => t.trim()).filter(Boolean),
+    batch_id       : $('fBatchId').value.trim()         || null,
+    year_level     : $('fYearLevel').value              || null,
+    bloom_level    : $('fBloomLevel').value             || null,
   };
 
   OPTION_LETTERS.forEach(l => {
@@ -1721,7 +1828,10 @@ async function saveItem() {
     result = await createBankItem(TEACHER_ID, payload);
     if (!result.success) {
       $('btnSave').disabled = false;
-      setEditorStatus('Save failed: ' + result.message, 'error');
+      const msg = (result.message || '').includes('idx_bank_question_ref')
+        ? 'Question Ref "' + (payload.question_ref || '') + '" is already used by another question.'
+        : 'Save failed: ' + result.message;
+      setEditorStatus(msg, 'error');
       return;
     }
     currentItemId = result.item.bank_item_id;
@@ -1735,7 +1845,10 @@ async function saveItem() {
     result = await updateBankItem(currentItemId, payload);
     if (!result.success) {
       $('btnSave').disabled = false;
-      setEditorStatus('Save failed: ' + result.message, 'error');
+      const msg = (result.message || '').includes('idx_bank_question_ref')
+        ? 'Question Ref "' + (payload.question_ref || '') + '" is already used by another question.'
+        : 'Save failed: ' + result.message;
+      setEditorStatus(msg, 'error');
       return;
     }
     $('editorMeta').textContent = `${currentItemId} · Just updated`;
