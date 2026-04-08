@@ -187,6 +187,7 @@ table.items-table .stem-cell .stem-text { display: -webkit-box; -webkit-line-cla
         <select id="courseFaculty"><option value="">All faculties</option></select>
         <select id="courseCategory"><option value="">All categories</option></select>
         <select id="courseYearGroup"><option value="">All year groups</option></select>
+        <select id="courseTag"><option value="">All keywords</option></select>
         <button class="btn sm" onclick="clearCourseFilters()">Clear</button>
       </div>
     </div>
@@ -350,11 +351,13 @@ function populateCourseFilterDropdowns() {
   const faculties  = [...new Set(COURSES.map(c => c.faculty).filter(Boolean))].sort();
   const categories = [...new Set(COURSES.map(c => c.category).filter(Boolean))].sort();
   const yearGroups = [...new Set(COURSES.map(c => c.year_group).filter(Boolean))].sort();
+  const courseTags = [...new Set(COURSES.flatMap(c => c.tags || []).filter(Boolean))].sort();
 
   fillSelect('courseProgramme', programmes, 'All programmes');
   fillSelect('courseFaculty',   faculties,  'All faculties');
   fillSelect('courseCategory',   categories, 'All categories');
   fillSelect('courseYearGroup',  yearGroups, 'All year groups');
+  fillSelect('courseTag',        courseTags, 'All keywords');
 }
 
 function applyCourseFilters() {
@@ -363,12 +366,14 @@ function applyCourseFilters() {
   const faculty   = $('courseFaculty').value;
   const category  = $('courseCategory').value;
   const yearGroup = $('courseYearGroup').value;
+  const tag       = $('courseTag').value;
 
   FILTERED_COURSES = COURSES.filter(c => {
     if (programme && c.programme !== programme) return false;
     if (faculty   && c.faculty   !== faculty)   return false;
     if (category  && c.category  !== category)  return false;
     if (yearGroup && c.year_group !== yearGroup) return false;
+    if (tag       && !(c.tags || []).includes(tag)) return false;
     if (search) {
       const haystack = [c.title, c.description, c.programme, c.faculty, c.category, ...(c.tags || [])]
         .filter(Boolean).join(' ').toLowerCase();
@@ -386,6 +391,7 @@ function clearCourseFilters() {
   $('courseFaculty').value = '';
   $('courseCategory').value = '';
   $('courseYearGroup').value = '';
+  $('courseTag').value = '';
   applyCourseFilters();
 }
 
@@ -813,7 +819,7 @@ function bindEvents() {
     clearTimeout(COURSE_SEARCH_TIMER);
     COURSE_SEARCH_TIMER = setTimeout(applyCourseFilters, 250);
   });
-  ['courseProgramme','courseFaculty','courseCategory','courseYearGroup'].forEach(id => {
+  ['courseProgramme','courseFaculty','courseCategory','courseYearGroup','courseTag'].forEach(id => {
     $(id).addEventListener('change', applyCourseFilters);
   });
 
