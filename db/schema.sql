@@ -8,8 +8,9 @@
 --   - When adding a new table, add it here first.
 --   - Run the relevant CREATE/ALTER in Supabase SQL editor.
 --   - All tables use dev_allow_all RLS during build.
---   - 39 tables total (11 core + 3 quiz engine + 11 items
---     + 1 offline packs + 2 messaging + 12 teacher assess)
+--   - 49 tables total (11 core + 3 quiz engine + 11 items
+--     + 1 offline packs + 2 messaging + 12 teacher assess
+--     + 10 library items (library_anatomy, etc) — see section 5.9b)
 -- ============================================================
 
 
@@ -654,7 +655,10 @@ CREATE INDEX idx_lib_courses_tags ON teacher_library_courses USING GIN (tags);
 -- 5.9b Library item tables (one per course)
 -- All follow the same schema. Replace library_anatomy with:
 --   library_anatomy, library_physiology, library_english,
---   library_accounting, library_government (add more as needed)
+--   library_accounting, library_government, library_microbiology,
+--   library_pharmacology, library_sociology, library_surveying,
+--   library_management (add more as needed)
+-- 10 tables total
 
 CREATE TABLE library_anatomy (
   item_id         TEXT PRIMARY KEY,
