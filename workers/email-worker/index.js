@@ -16,7 +16,7 @@ import footerHtml from './templates/footer.html';
 // ── Allowed origins for CORS ────────────────────────────────
 const ALLOWED_ORIGINS = [
   'https://qacademy-gamma.pages.dev',       // dev
-  'https://qacademy-bkf.pages.dev',         // prod
+  'https://qacademynurseshub.pages.dev',     // prod
   'http://localhost'
 ];
 

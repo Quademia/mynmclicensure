@@ -10,8 +10,8 @@ Go to: Authentication → URL Configuration
 
 | Field | Value |
 |-------|-------|
-| Site URL | `https://qacademy-bkf.pages.dev` |
-| Redirect URLs | Add: `https://qacademy-bkf.pages.dev/reset-password.html` |
+| Site URL | `https://qacademynurseshub.pages.dev` |
+| Redirect URLs | Add: `https://qacademynurseshub.pages.dev/reset-password.html` |
 
 ---
 

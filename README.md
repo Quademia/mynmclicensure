@@ -19,9 +19,9 @@ No separate backend server. Everything is JAMstack. Workers are isolated to paym
 ### Environments
 | | Dev | Prod |
 |--|-----|------|
-| **Repo** | `mybackpacc-byte/qacademy-gamma` | `qacademynurseshub-svg/qacademy` |
-| **Pages** | `qacademy-gamma.pages.dev` | `qacademy-bkf.pages.dev` |
-| **Branch** | `main` | `production` → mirrors to prod repo |
+| **Repo** | `mybackpacc-byte/qacademy-gamma` | `mybackpacc-byte/qacademy-gamma` |
+| **Pages** | `qacademy-gamma.pages.dev` | `qacademynurseshub.pages.dev` |
+| **Branch** | `main` | `production` |
 
 `js/config.js` auto-detects dev vs prod by hostname. See `CLONING.md` for full environment details.
 

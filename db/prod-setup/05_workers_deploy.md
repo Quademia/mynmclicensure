@@ -29,8 +29,8 @@ In the **prod repo** (qacademy), create `payments-worker/wrangler.prod.jsonc`:
   },
   "vars": {
     "SUPABASE_URL": "https://qizhyhjeqhaybyddsuni.supabase.co",
-    "APP_BASE_URL": "https://qacademy-bkf.pages.dev",
-    "APP_ORIGIN": "https://qacademy-bkf.pages.dev"
+    "APP_BASE_URL": "https://qacademynurseshub.pages.dev",
+    "APP_ORIGIN": "https://qacademynurseshub.pages.dev"
   },
   "ratelimits": [
     {
