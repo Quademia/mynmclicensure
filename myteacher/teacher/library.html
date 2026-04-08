@@ -46,36 +46,46 @@ a { color: var(--brand); }
 .btn.lib-add { background: var(--lib-accent); color: #fff; border-color: var(--lib-accent); }
 .btn.lib-add:hover { background: #5b21b6; }
 
-/* ── Two-column layout ───────────────────────────────────── */
-.picker-layout { display: grid; grid-template-columns: 280px 1fr; gap: 16px; min-height: calc(100vh - 200px); }
-@media (max-width: 900px) { .picker-layout { grid-template-columns: 1fr; } }
-
-/* ── Left panel ──────────────────────────────────────────── */
-.left-panel { display: flex; flex-direction: column; gap: 12px; }
-.panel-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
-.panel-card h3 { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 10px; }
-.panel-card select, .panel-card input { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; font-family: inherit; margin-bottom: 8px; background: var(--card); }
-.panel-card select:last-child, .panel-card input:last-child { margin-bottom: 0; }
-
-.course-card { padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; margin-bottom: 6px; transition: all .12s ease; }
-.course-card:hover { border-color: var(--lib-accent); background: var(--lib-light); }
-.course-card.active { border-color: var(--lib-accent); background: var(--lib-light); box-shadow: inset 3px 0 0 var(--lib-accent); }
-.course-card .c-title { font-size: 13px; font-weight: 700; }
-.course-card .c-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
 /* ── Target quiz bar ─────────────────────────────────────── */
 .target-bar { display: flex; gap: 10px; align-items: center; padding: 10px 16px; background: var(--lib-light); border: 1px solid rgba(109,40,217,.18); border-radius: 10px; margin-bottom: 12px; flex-wrap: wrap; }
 .target-bar label { font-size: 12px; font-weight: 700; color: var(--lib-accent); white-space: nowrap; }
 .target-bar select { flex: 1; min-width: 200px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; font-family: inherit; }
 .target-bar .badge { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; background: var(--lib-accent); color: #fff; }
 
-/* ── Items table ─────────────────────────────────────────── */
-.right-panel { display: flex; flex-direction: column; }
+/* ── Course filter bar ──────────────────────────────────── */
+.course-filter-bar { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; }
+.course-filter-bar h3 { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 10px; }
+.course-filter-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.course-filter-row input, .course-filter-row select { padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; font-family: inherit; background: var(--card); }
+.course-filter-row input { flex: 1; min-width: 180px; }
+.course-filter-row select { min-width: 130px; }
+
+/* ── Course card grid ───────────────────────────────────── */
+.course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.course-card { padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; cursor: pointer; transition: all .14s ease; background: var(--card); }
+.course-card:hover { border-color: var(--lib-accent); background: var(--lib-light); }
+.course-card.active { border-color: var(--lib-accent); background: var(--lib-light); box-shadow: inset 3px 0 0 var(--lib-accent); }
+.course-card .c-title { font-size: 14px; font-weight: 800; margin-bottom: 4px; }
+.course-card .c-meta { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.course-card .c-desc { font-size: 12px; color: var(--muted); line-height: 1.4; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.course-card .c-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+.course-card .c-tag { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: var(--lib-light); color: var(--lib-accent); }
+.course-count-note { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+
+/* ── Items section ──────────────────────────────────────── */
+.items-section { display: none; }
+.items-section.visible { display: block; }
+.items-section-header { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+.items-section-header .section-title { font-size: 16px; font-weight: 800; flex: 1; }
+.items-filter-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+.items-filter-bar input, .items-filter-bar select { padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; font-family: inherit; background: var(--card); }
+.items-filter-bar input { min-width: 180px; }
+.items-filter-bar select { min-width: 110px; }
+
 .items-header { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
-.items-header input { flex: 1; min-width: 200px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px; font-family: inherit; }
 .items-count { font-size: 12px; color: var(--muted); font-weight: 700; }
 
-.items-table-wrap { flex: 1; overflow: auto; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+.items-table-wrap { overflow: auto; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
 table.items-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 table.items-table th { position: sticky; top: 0; background: var(--soft); text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); border-bottom: 1px solid var(--line); z-index: 2; }
 table.items-table td { padding: 10px 12px; border-bottom: 1px solid var(--soft); vertical-align: top; }
@@ -92,14 +102,13 @@ table.items-table .stem-cell .stem-text { display: -webkit-box; -webkit-line-cla
 .badge-tf { background: #fef3c7; color: #92400e; }
 .badge-sata { background: #ede9fe; color: #6d28d9; }
 .badge-easy { background: var(--ok-light); color: var(--ok); }
-.badge-medium { background: var(--warn-light); color: var(--warn); }
+.badge-moderate { background: var(--warn-light); color: var(--warn); }
 .badge-hard { background: var(--danger-light); color: var(--danger); }
 
 /* ── Selection dock ──────────────────────────────────────── */
 .selection-dock { display: flex; gap: 12px; align-items: center; padding: 12px 16px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; margin-top: 12px; flex-wrap: wrap; }
 .selection-dock.has-items { border-color: var(--lib-accent); background: var(--lib-light); }
 .selection-count { font-size: 13px; font-weight: 700; flex: 1; }
-.selection-count strong { color: var(--lib-accent); }
 
 /* ── Preview drawer ──────────────────────────────────────── */
 .preview-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 1000; }
@@ -140,7 +149,7 @@ table.items-table .stem-cell .stem-text { display: -webkit-box; -webkit-line-cla
 </head>
 <body>
 <div class="page-wrap">
-  <!-- ── NAV (same as other teacher pages) ──────────────── -->
+  <!-- ── NAV ──────────────────────────────────────────────── -->
   <div id="mtNavHost"></div>
 
   <div class="main-content">
@@ -162,85 +171,90 @@ table.items-table .stem-cell .stem-text { display: -webkit-box; -webkit-line-cla
       <span class="badge" id="draftCountBadge" style="display:none">0 items in draft</span>
     </div>
 
-    <!-- ── Two-column picker ────────────────────────────── -->
-    <div class="picker-layout">
+    <!-- ── Course filter bar ────────────────────────────── -->
+    <div class="course-filter-bar">
+      <h3>Find a Course</h3>
+      <div class="course-filter-row">
+        <input type="text" id="courseSearch" placeholder="Search courses..." />
+        <select id="courseProgramme"><option value="">All programmes</option></select>
+        <select id="courseFaculty"><option value="">All faculties</option></select>
+        <select id="courseCategory"><option value="">All categories</option></select>
+        <select id="courseYearGroup"><option value="">All year groups</option></select>
+        <button class="btn sm" onclick="clearCourseFilters()">Clear</button>
+      </div>
+    </div>
 
-      <!-- LEFT: Course selector + Filters -->
-      <div class="left-panel">
-        <div class="panel-card">
-          <h3>Courses</h3>
-          <div id="courseList">
-            <div class="empty-state" style="padding:20px"><div class="empty-state-hint">Loading courses…</div></div>
-          </div>
-        </div>
+    <!-- ── Course card grid ─────────────────────────────── -->
+    <div class="course-count-note" id="courseCountNote"></div>
+    <div class="course-grid" id="courseGrid">
+      <div class="empty-state" style="padding:30px"><div class="empty-state-hint">Loading courses...</div></div>
+    </div>
 
-        <div class="panel-card" id="filterPanel" style="display:none">
-          <h3>Filters</h3>
-          <input type="text" id="filterSearch" placeholder="Search stems…" />
-          <select id="filterTopic"><option value="">All topics</option></select>
-          <select id="filterSubtopic"><option value="">All subtopics</option></select>
-          <select id="filterDifficulty"><option value="">All difficulties</option></select>
-          <select id="filterType">
-            <option value="">All types</option>
-            <option value="MCQ">MCQ</option>
-            <option value="TF">True/False</option>
-            <option value="SATA">SATA</option>
-          </select>
-          <select id="filterTag"><option value="">All tags</option></select>
-          <select id="filterYearLevel"><option value="">All year levels</option></select>
-          <select id="filterBloomLevel"><option value="">All Bloom's levels</option></select>
-          <button class="btn sm" onclick="clearFilters()" style="width:100%;margin-top:4px">Clear Filters</button>
-        </div>
+    <!-- ── Items section (appears after selecting a course) -->
+    <div class="items-section" id="itemsSection">
+      <div class="items-section-header">
+        <div class="section-title" id="itemsSectionTitle">Questions</div>
+        <button class="btn sm" onclick="backToCourses()">Back to Courses</button>
+        <button class="btn sm" id="btnSelectAll" onclick="toggleSelectAll()">Select All</button>
+        <button class="btn sm" id="btnDeselectAll" onclick="deselectAll()">Deselect All</button>
       </div>
 
-      <!-- RIGHT: Items table -->
-      <div class="right-panel">
-        <div class="items-header">
-          <span class="items-count" id="itemsCount">Select a course to browse items</span>
-          <button class="btn sm" id="btnSelectAll" style="display:none" onclick="toggleSelectAll()">Select All</button>
-          <button class="btn sm" id="btnDeselectAll" style="display:none" onclick="deselectAll()">Deselect All</button>
-        </div>
+      <!-- Question-level filters (horizontal) -->
+      <div class="items-filter-bar">
+        <input type="text" id="filterSearch" placeholder="Search stems..." />
+        <select id="filterTopic"><option value="">All topics</option></select>
+        <select id="filterSubtopic"><option value="">All subtopics</option></select>
+        <select id="filterDifficulty"><option value="">All difficulties</option></select>
+        <select id="filterType">
+          <option value="">All types</option>
+          <option value="MCQ">MCQ</option>
+          <option value="TF">True/False</option>
+          <option value="SATA">SATA</option>
+        </select>
+        <select id="filterTag"><option value="">All tags</option></select>
+        <select id="filterYearLevel"><option value="">All year levels</option></select>
+        <select id="filterBloomLevel"><option value="">All Bloom's levels</option></select>
+        <button class="btn sm" onclick="clearFilters()">Clear</button>
+      </div>
 
-        <div class="items-table-wrap" id="itemsTableWrap">
-          <div class="empty-state" id="itemsEmpty">
-            <div class="empty-state-icon">📚</div>
-            <div class="empty-state-text">Select a course to begin</div>
-            <div class="empty-state-hint">Choose a course from the left panel to browse its question library.</div>
-          </div>
-          <table class="items-table" id="itemsTable" style="display:none">
-            <thead>
-              <tr>
-                <th class="cb-cell"><input type="checkbox" id="headerCheckbox" title="Select all on page" /></th>
-                <th style="width:50px">#</th>
-                <th>Stem</th>
-                <th style="width:60px">Type</th>
-                <th style="width:80px">Topic</th>
-                <th style="width:70px">Diff</th>
-                <th style="width:50px">Marks</th>
-                <th style="width:70px"></th>
-              </tr>
-            </thead>
-            <tbody id="itemsBody"></tbody>
-          </table>
-        </div>
+      <div class="items-header">
+        <span class="items-count" id="itemsCount">0 items</span>
+      </div>
 
-        <div class="pagination" id="pagination" style="display:none">
-          <button id="btnPrevPage" onclick="goPage(-1)">&larr; Prev</button>
-          <span class="page-info" id="pageInfo">Page 1</span>
-          <button id="btnNextPage" onclick="goPage(1)">Next &rarr;</button>
-        </div>
+      <div class="items-table-wrap" id="itemsTableWrap">
+        <table class="items-table" id="itemsTable">
+          <thead>
+            <tr>
+              <th class="cb-cell"><input type="checkbox" id="headerCheckbox" title="Select all on page" /></th>
+              <th style="width:50px">#</th>
+              <th>Stem</th>
+              <th style="width:60px">Type</th>
+              <th style="width:80px">Topic</th>
+              <th style="width:70px">Diff</th>
+              <th style="width:50px">Marks</th>
+              <th style="width:70px"></th>
+            </tr>
+          </thead>
+          <tbody id="itemsBody"></tbody>
+        </table>
+      </div>
 
-        <!-- Selection dock -->
-        <div class="selection-dock" id="selectionDock">
-          <div class="selection-count">
-            <span id="selectedCount">0</span> items selected
-            <span id="selectedInDraft" style="display:none;margin-left:8px;color:var(--muted)">(+<span id="alreadyInDraftCount">0</span> already in draft)</span>
-          </div>
-          <button class="btn sm" onclick="previewSelected()" id="btnPreviewSel" style="display:none">Preview</button>
-          <button class="btn sm lib-add" onclick="addSelectedToDraft()" id="btnAddToDraft" disabled>
-            Add to Draft
-          </button>
+      <div class="pagination" id="pagination" style="display:none">
+        <button id="btnPrevPage" onclick="goPage(-1)">&larr; Prev</button>
+        <span class="page-info" id="pageInfo">Page 1</span>
+        <button id="btnNextPage" onclick="goPage(1)">Next &rarr;</button>
+      </div>
+
+      <!-- Selection dock -->
+      <div class="selection-dock" id="selectionDock">
+        <div class="selection-count">
+          <span id="selectedCount">0</span> items selected
+          <span id="selectedInDraft" style="display:none;margin-left:8px;color:var(--muted)">(+<span id="alreadyInDraftCount">0</span> already in draft)</span>
         </div>
+        <button class="btn sm" onclick="previewSelected()" id="btnPreviewSel" style="display:none">Preview</button>
+        <button class="btn sm lib-add" onclick="addSelectedToDraft()" id="btnAddToDraft" disabled>
+          Add to Draft
+        </button>
       </div>
     </div>
   </div>
@@ -272,17 +286,19 @@ const $ = id => document.getElementById(id);
 // ── State ──────────────────────────────────────────────────
 let PROFILE, TEACHER_ID;
 let COURSES = [];
-let SELECTED_COURSE = null;         // { course_id, items_table, title, ... }
-let ITEMS = [];                     // current page items
+let FILTERED_COURSES = [];            // courses after course-level filters
+let SELECTED_COURSE = null;
+let ITEMS = [];
 let TOTAL_ITEMS = 0;
 let FILTER_OPTIONS = { maintopics: [], subtopics: [], difficulties: [], tags: [], year_levels: [], bloom_levels: [] };
-let SELECTED_IDS = new Set();       // LIB refs selected for adding
+let SELECTED_IDS = new Set();
 let DRAFT_QUIZZES = [];
-let TARGET_QUIZ = null;             // selected draft quiz row
-let DRAFT_SET = new Set();          // items already in target draft
+let TARGET_QUIZ = null;
+let DRAFT_SET = new Set();
 let PAGE = 0;
 const PAGE_SIZE = 50;
 let SEARCH_TIMER = null;
+let COURSE_SEARCH_TIMER = null;
 
 
 // ── Boot ───────────────────────────────────────────────────
@@ -292,7 +308,6 @@ async function boot() {
   TEACHER_ID = PROFILE.user_id;
   if (window.mtSetUser) mtSetUser(PROFILE);
 
-  // Load courses and draft quizzes in parallel
   const [courses, drafts] = await Promise.all([
     getLibraryCourses(),
     getDraftQuizzes(TEACHER_ID)
@@ -301,7 +316,8 @@ async function boot() {
   COURSES = courses;
   DRAFT_QUIZZES = drafts;
 
-  renderCourseList();
+  populateCourseFilterDropdowns();
+  applyCourseFilters();
   populateDraftSelector();
 
   // Check URL for target quiz
@@ -314,30 +330,84 @@ async function boot() {
 }
 
 
-// ── Course list ────────────────────────────────────────────
-function renderCourseList() {
-  const box = $('courseList');
-  if (!COURSES.length) {
-    box.innerHTML = '<div class="empty-state" style="padding:20px"><div class="empty-state-hint">No courses available.</div></div>';
+// ── Course-level filtering (client-side) ──────────────────
+function populateCourseFilterDropdowns() {
+  const programmes = [...new Set(COURSES.map(c => c.programme).filter(Boolean))].sort();
+  const faculties  = [...new Set(COURSES.map(c => c.faculty).filter(Boolean))].sort();
+  const categories = [...new Set(COURSES.map(c => c.category).filter(Boolean))].sort();
+  const yearGroups = [...new Set(COURSES.map(c => c.year_group).filter(Boolean))].sort();
+
+  fillSelect('courseProgramme', programmes, 'All programmes');
+  fillSelect('courseFaculty',   faculties,  'All faculties');
+  fillSelect('courseCategory',   categories, 'All categories');
+  fillSelect('courseYearGroup',  yearGroups, 'All year groups');
+}
+
+function applyCourseFilters() {
+  const search    = ($('courseSearch').value || '').trim().toLowerCase();
+  const programme = $('courseProgramme').value;
+  const faculty   = $('courseFaculty').value;
+  const category  = $('courseCategory').value;
+  const yearGroup = $('courseYearGroup').value;
+
+  FILTERED_COURSES = COURSES.filter(c => {
+    if (programme && c.programme !== programme) return false;
+    if (faculty   && c.faculty   !== faculty)   return false;
+    if (category  && c.category  !== category)  return false;
+    if (yearGroup && c.year_group !== yearGroup) return false;
+    if (search) {
+      const haystack = [c.title, c.description, c.programme, c.faculty, c.category, ...(c.tags || [])]
+        .filter(Boolean).join(' ').toLowerCase();
+      if (!haystack.includes(search)) return false;
+    }
+    return true;
+  });
+
+  renderCourseGrid();
+}
+
+function clearCourseFilters() {
+  $('courseSearch').value = '';
+  $('courseProgramme').value = '';
+  $('courseFaculty').value = '';
+  $('courseCategory').value = '';
+  $('courseYearGroup').value = '';
+  applyCourseFilters();
+}
+
+
+// ── Course card grid ──────────────────────────────────────
+function renderCourseGrid() {
+  const grid = $('courseGrid');
+  const note = $('courseCountNote');
+
+  if (!FILTERED_COURSES.length) {
+    note.textContent = '';
+    grid.innerHTML = '<div class="empty-state" style="padding:30px"><div class="empty-state-text">No courses match your filters.</div></div>';
     return;
   }
 
-  box.innerHTML = COURSES.map(c => `
+  const showing = FILTERED_COURSES.length;
+  const total = COURSES.length;
+  note.textContent = showing < total ? `Showing ${showing} of ${total} courses` : `${total} course${total !== 1 ? 's' : ''}`;
+
+  grid.innerHTML = FILTERED_COURSES.map(c => `
     <div class="course-card${SELECTED_COURSE && SELECTED_COURSE.course_id === c.course_id ? ' active' : ''}"
          data-cid="${esc(c.course_id)}">
       <div class="c-title">${esc(c.title)}</div>
-      <div class="c-meta">${[c.programme, c.faculty, c.year_group].filter(Boolean).map(esc).join(' · ') || esc(c.course_id)}</div>
-      ${c.description ? `<div class="c-desc" style="font-size:11px;color:var(--muted);margin-top:2px">${esc(c.description)}</div>` : ''}
+      <div class="c-meta">${[c.programme, c.faculty, c.year_group].filter(Boolean).map(esc).join(' · ')}</div>
+      ${c.description ? `<div class="c-desc">${esc(c.description)}</div>` : ''}
+      ${(c.tags || []).length ? `<div class="c-tags">${(c.tags || []).map(t => `<span class="c-tag">${esc(t)}</span>`).join('')}</div>` : ''}
     </div>
   `).join('');
 
-  box.querySelectorAll('.course-card').forEach(card => {
+  grid.querySelectorAll('.course-card').forEach(card => {
     card.addEventListener('click', () => selectCourse(card.dataset.cid));
   });
 }
 
 
-// ── Select a course ────────────────────────────────────────
+// ── Select a course ───────────────────────────────────────
 async function selectCourse(courseId) {
   const course = COURSES.find(c => c.course_id === courseId);
   if (!course) return;
@@ -346,12 +416,15 @@ async function selectCourse(courseId) {
   SELECTED_IDS.clear();
   PAGE = 0;
 
-  renderCourseList();  // re-render to update active state
-  $('filterPanel').style.display = '';
-  $('itemsEmpty').style.display = 'none';
-  $('itemsTable').style.display = '';
-  $('btnSelectAll').style.display = '';
-  $('btnDeselectAll').style.display = '';
+  // Show items section, update title
+  $('itemsSection').classList.add('visible');
+  $('itemsSectionTitle').textContent = `${course.title} — Questions`;
+
+  // Highlight selected card
+  renderCourseGrid();
+
+  // Scroll to items section
+  $('itemsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   // Load filters and items in parallel
   const [filterOpts] = await Promise.all([
@@ -363,8 +436,15 @@ async function selectCourse(courseId) {
   populateFilterDropdowns();
 }
 
+function backToCourses() {
+  SELECTED_COURSE = null;
+  $('itemsSection').classList.remove('visible');
+  renderCourseGrid();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-// ── Load items with current filters ────────────────────────
+
+// ── Load items with current filters ───────────────────────
 async function loadItems() {
   if (!SELECTED_COURSE) return;
 
@@ -391,7 +471,7 @@ async function loadItems() {
 }
 
 
-// ── Render items table ─────────────────────────────────────
+// ── Render items table ────────────────────────────────────
 function renderItemsTable() {
   const tbody = $('itemsBody');
   $('itemsCount').textContent = `${TOTAL_ITEMS} items in ${SELECTED_COURSE.title}`;
@@ -413,7 +493,7 @@ function renderItemsTable() {
     <tr class="${isSelected ? 'selected' : ''}" data-ref="${esc(ref)}">
       <td class="cb-cell">
         ${inDraft
-          ? '<span style="font-size:11px;color:var(--muted)" title="Already in draft">✓</span>'
+          ? '<span style="font-size:11px;color:var(--muted)" title="Already in draft">&#10003;</span>'
           : `<input type="checkbox" ${isSelected ? 'checked' : ''} data-ref="${esc(ref)}" />`
         }
       </td>
@@ -422,8 +502,8 @@ function renderItemsTable() {
         <div class="stem-text">${esc(item.stem || '')}</div>
       </td>
       <td><span class="badge badge-${typeCls}">${esc(item.question_type || 'MCQ')}</span></td>
-      <td style="font-size:11px;color:var(--muted)">${esc(item.maintopic || '—')}</td>
-      <td>${item.difficulty ? `<span class="badge badge-${diffCls}">${esc(item.difficulty)}</span>` : '—'}</td>
+      <td style="font-size:11px;color:var(--muted)">${esc(item.maintopic || '\u2014')}</td>
+      <td>${item.difficulty ? `<span class="badge badge-${diffCls}">${esc(item.difficulty)}</span>` : '\u2014'}</td>
       <td style="text-align:center">${item.marks || 1}</td>
       <td><button class="btn sm" onclick="previewItem('${esc(item.item_id)}')">Preview</button></td>
     </tr>`;
@@ -440,12 +520,11 @@ function renderItemsTable() {
     });
   });
 
-  // Update header checkbox
   updateHeaderCheckbox();
 }
 
 
-// ── Pagination ─────────────────────────────────────────────
+// ── Pagination ────────────────────────────────────────────
 function renderPagination() {
   const totalPages = Math.ceil(TOTAL_ITEMS / PAGE_SIZE);
   const pag = $('pagination');
@@ -463,7 +542,7 @@ function goPage(dir) {
 }
 
 
-// ── Filter dropdowns ───────────────────────────────────────
+// ── Question-level filter dropdowns ───────────────────────
 function populateFilterDropdowns() {
   fillSelect('filterTopic', FILTER_OPTIONS.maintopics, 'All topics');
   fillSelect('filterSubtopic', FILTER_OPTIONS.subtopics, 'All subtopics');
@@ -495,7 +574,7 @@ function clearFilters() {
 }
 
 
-// ── Target quiz selector ───────────────────────────────────
+// ── Target quiz selector ──────────────────────────────────
 function populateDraftSelector() {
   const sel = $('targetQuiz');
   sel.innerHTML = '<option value="">— Select a draft quiz —</option>' +
@@ -527,7 +606,7 @@ function onTargetQuizChange() {
     TARGET_QUIZ = null;
     DRAFT_SET.clear();
     badge.style.display = 'none';
-    renderItemsTable();
+    if (SELECTED_COURSE) renderItemsTable();
     updateSelectionDock();
     return;
   }
@@ -540,15 +619,14 @@ function onTargetQuizChange() {
     badge.style.display = '';
   }
 
-  // Deselect any that are already in draft
   SELECTED_IDS.forEach(ref => { if (DRAFT_SET.has(ref)) SELECTED_IDS.delete(ref); });
 
-  renderItemsTable();
+  if (SELECTED_COURSE) renderItemsTable();
   updateSelectionDock();
 }
 
 
-// ── Select all / deselect ──────────────────────────────────
+// ── Select all / deselect ─────────────────────────────────
 function toggleSelectAll() {
   const pageRefs = ITEMS.map(item => `LIB:${SELECTED_COURSE.course_id}:${item.item_id}`);
   const allOnPageSelected = pageRefs.every(ref => SELECTED_IDS.has(ref) || DRAFT_SET.has(ref));
@@ -577,7 +655,7 @@ function updateHeaderCheckbox() {
 }
 
 
-// ── Selection dock ─────────────────────────────────────────
+// ── Selection dock ────────────────────────────────────────
 function updateSelectionDock() {
   const dock = $('selectionDock');
   const count = SELECTED_IDS.size;
@@ -586,7 +664,6 @@ function updateSelectionDock() {
   $('btnPreviewSel').style.display = count ? '' : 'none';
   dock.classList.toggle('has-items', count > 0);
 
-  // Show how many are already in draft
   if (TARGET_QUIZ && DRAFT_SET.size) {
     $('alreadyInDraftCount').textContent = DRAFT_SET.size;
     $('selectedInDraft').style.display = '';
@@ -596,25 +673,23 @@ function updateSelectionDock() {
 }
 
 
-// ── Add selected to draft ──────────────────────────────────
+// ── Add selected to draft ─────────────────────────────────
 async function addSelectedToDraft() {
   if (!TARGET_QUIZ || !SELECTED_IDS.size) return;
 
   const refs = [...SELECTED_IDS];
   const btn = $('btnAddToDraft');
   btn.disabled = true;
-  btn.textContent = 'Adding…';
+  btn.textContent = 'Adding\u2026';
 
   const result = await appendToDraftItems(TARGET_QUIZ.teacher_quiz_id, refs);
 
   if (result.success) {
     showToast(`Added ${result.added} item${result.added !== 1 ? 's' : ''} to draft (${result.skipped} skipped). Total: ${result.total}`, 'ok');
 
-    // Update local state
     refs.forEach(ref => DRAFT_SET.add(ref));
     SELECTED_IDS.clear();
 
-    // Update the draft quiz count in dropdown
     TARGET_QUIZ.draft_items_json = { items: [...DRAFT_SET] };
     $('draftCountBadge').textContent = `${result.total} items in draft`;
 
@@ -629,13 +704,13 @@ async function addSelectedToDraft() {
 }
 
 
-// ── Preview ────────────────────────────────────────────────
+// ── Preview ───────────────────────────────────────────────
 function previewItem(itemId) {
   if (!SELECTED_COURSE) return;
   const item = ITEMS.find(i => i.item_id === itemId);
   if (!item) return;
 
-  $('previewTitle').textContent = `${item.item_id} — ${item.question_type || 'MCQ'}`;
+  $('previewTitle').textContent = `${item.item_id} \u2014 ${item.question_type || 'MCQ'}`;
 
   const opts = ['A','B','C','D','E','F'];
   const correctSet = new Set((item.correct || '').split(',').map(s => s.trim().toUpperCase()));
@@ -650,7 +725,7 @@ function previewItem(itemId) {
     html += `
       <div class="preview-option${isCorrect ? ' correct' : ''}">
         <span class="opt-label">${letter}.</span> ${esc(val)}
-        ${isCorrect ? ' <span style="color:var(--ok);font-weight:700">✓</span>' : ''}
+        ${isCorrect ? ' <span style="color:var(--ok);font-weight:700">&#10003;</span>' : ''}
         ${fb ? `<div class="fb">${esc(fb)}</div>` : ''}
       </div>`;
   });
@@ -660,11 +735,13 @@ function previewItem(itemId) {
   }
 
   html += `<div class="preview-meta">
-    <span><b>Subject:</b> ${esc(item.subject || '—')}</span>
-    <span><b>Topic:</b> ${esc(item.maintopic || '—')}</span>
-    <span><b>Subtopic:</b> ${esc(item.subtopic || '—')}</span>
-    <span><b>Difficulty:</b> ${esc(item.difficulty || '—')}</span>
+    <span><b>Subject:</b> ${esc(item.subject || '\u2014')}</span>
+    <span><b>Topic:</b> ${esc(item.maintopic || '\u2014')}</span>
+    <span><b>Subtopic:</b> ${esc(item.subtopic || '\u2014')}</span>
+    <span><b>Difficulty:</b> ${esc(item.difficulty || '\u2014')}</span>
     <span><b>Marks:</b> ${item.marks || 1}</span>
+    ${item.year_level ? `<span><b>Year:</b> ${esc(item.year_level)}</span>` : ''}
+    ${item.bloom_level ? `<span><b>Bloom's:</b> ${esc(item.bloom_level)}</span>` : ''}
   </div>`;
 
   $('previewBody').innerHTML = html;
@@ -672,7 +749,6 @@ function previewItem(itemId) {
 }
 
 function previewSelected() {
-  // Preview first selected item
   if (!SELECTED_IDS.size) return;
   const firstRef = [...SELECTED_IDS][0];
   const parts = firstRef.split(':');
@@ -684,12 +760,21 @@ function closePreview() {
 }
 
 
-// ── Events ─────────────────────────────────────────────────
+// ── Events ────────────────────────────────────────────────
 function bindEvents() {
   // Target quiz change
   $('targetQuiz').addEventListener('change', onTargetQuizChange);
 
-  // Filters
+  // Course-level filters
+  $('courseSearch').addEventListener('input', () => {
+    clearTimeout(COURSE_SEARCH_TIMER);
+    COURSE_SEARCH_TIMER = setTimeout(applyCourseFilters, 250);
+  });
+  ['courseProgramme','courseFaculty','courseCategory','courseYearGroup'].forEach(id => {
+    $(id).addEventListener('change', applyCourseFilters);
+  });
+
+  // Question-level filters
   $('filterSearch').addEventListener('input', () => {
     clearTimeout(SEARCH_TIMER);
     SEARCH_TIMER = setTimeout(() => { PAGE = 0; loadItems(); }, 350);
@@ -713,7 +798,7 @@ function bindEvents() {
 }
 
 
-// ── Utilities ──────────────────────────────────────────────
+// ── Utilities ─────────────────────────────────────────────
 function esc(s) {
   if (!s) return '';
   const d = document.createElement('div');
@@ -731,7 +816,7 @@ function showToast(msg, type) {
 }
 
 
-// ── Init ───────────────────────────────────────────────────
+// ── Init ──────────────────────────────────────────────────
 boot().then(() => bindEvents());
 </script>
 </body>
