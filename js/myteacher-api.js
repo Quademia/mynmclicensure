@@ -520,17 +520,21 @@ async function updateMemberProfile(classId, userId, memberFieldsJson) {
 async function getBankFilterOptions(teacherId) {
   const { data, error } = await db
     .from('teacher_bank_items')
-    .select('subject, maintopic, subtopic')
+    .select('subject, maintopic, subtopic, tags, batch_id, year_level, bloom_level')
     .eq('teacher_id', teacherId)
-    .neq('status', 'ARCHIVED');   // only surface tags from active items
+    .neq('status', 'ARCHIVED');   // only surface values from active items
 
-  if (error) { console.error('getBankFilterOptions:', error); return { subjects: [], maintopics: [], subtopics: [] }; }
+  if (error) { console.error('getBankFilterOptions:', error); return { subjects: [], maintopics: [], subtopics: [], tags: [], batch_ids: [], year_levels: [], bloom_levels: [] }; }
 
-  const subjects   = [...new Set((data || []).map(r => r.subject).filter(Boolean))].sort();
-  const maintopics = [...new Set((data || []).map(r => r.maintopic).filter(Boolean))].sort();
-  const subtopics  = [...new Set((data || []).map(r => r.subtopic).filter(Boolean))].sort();
+  const subjects    = [...new Set((data || []).map(r => r.subject).filter(Boolean))].sort();
+  const maintopics  = [...new Set((data || []).map(r => r.maintopic).filter(Boolean))].sort();
+  const subtopics   = [...new Set((data || []).map(r => r.subtopic).filter(Boolean))].sort();
+  const tags        = [...new Set((data || []).flatMap(r => r.tags || []).filter(Boolean))].sort();
+  const batch_ids   = [...new Set((data || []).map(r => r.batch_id).filter(Boolean))].sort();
+  const year_levels = [...new Set((data || []).map(r => r.year_level).filter(Boolean))].sort();
+  const bloom_levels = [...new Set((data || []).map(r => r.bloom_level).filter(Boolean))].sort();
 
-  return { subjects, maintopics, subtopics };
+  return { subjects, maintopics, subtopics, tags, batch_ids, year_levels, bloom_levels };
 }
 
 
@@ -605,12 +609,17 @@ async function getBankItems(teacherId, filters = {}) {
 // ------------------------------------------------------------
 async function getBankItemsPaginated(teacherId, filters = {}, page = 0, pageSize = 50) {
   const {
-    status     = 'ACTIVE',
-    subject    = '',
-    maintopic  = '',
-    subtopic   = '',
-    difficulty = '',
-    keyword    = ''
+    status      = 'ACTIVE',
+    subject     = '',
+    maintopic   = '',
+    subtopic    = '',
+    difficulty  = '',
+    keyword     = '',
+    question_ref = '',
+    tag         = '',
+    batch_id    = '',
+    year_level  = '',
+    bloom_level = ''
   } = filters;
 
   let query = db
@@ -632,17 +641,27 @@ async function getBankItemsPaginated(teacherId, filters = {}, page = 0, pageSize
       rationale,
       rationale_img,
       source_type,
+      question_ref,
+      tags,
+      batch_id,
+      year_level,
+      bloom_level,
       updated_at
     `, { count: 'exact' })
     .eq('teacher_id', teacherId)
     .order('updated_at', { ascending: false });
 
   if (status && status !== 'ALL') query = query.eq('status', status);
-  if (subject)    query = query.eq('subject',   subject);
-  if (maintopic)  query = query.eq('maintopic', maintopic);
-  if (subtopic)   query = query.eq('subtopic',  subtopic);
-  if (difficulty)  query = query.eq('difficulty', difficulty);
-  if (keyword)    query = query.ilike('stem', `%${keyword}%`);
+  if (subject)      query = query.eq('subject',   subject);
+  if (maintopic)    query = query.eq('maintopic', maintopic);
+  if (subtopic)     query = query.eq('subtopic',  subtopic);
+  if (difficulty)   query = query.eq('difficulty', difficulty);
+  if (keyword)      query = query.ilike('stem', `%${keyword}%`);
+  if (question_ref) query = query.ilike('question_ref', `%${question_ref}%`);
+  if (tag)          query = query.contains('tags', [tag]);
+  if (batch_id)     query = query.eq('batch_id', batch_id);
+  if (year_level)   query = query.eq('year_level', year_level);
+  if (bloom_level)  query = query.eq('bloom_level', bloom_level);
 
   query = query.range(page * pageSize, (page + 1) * pageSize - 1);
 
@@ -718,6 +737,11 @@ async function createBankItem(teacherId, payload) {
     difficulty     : payload.difficulty     || null,
     marks          : payload.marks          || 1,
     shuffle_options: payload.shuffle_options !== undefined ? payload.shuffle_options : true,
+    question_ref   : payload.question_ref   || null,
+    tags           : Array.isArray(payload.tags) ? payload.tags : [],
+    batch_id       : payload.batch_id       || null,
+    year_level     : payload.year_level     || null,
+    bloom_level    : payload.bloom_level    || null,
   };
 
   const { data, error } = await db
@@ -1464,6 +1488,10 @@ async function publishTeacherQuiz(quizId, teacherId) {
       snap_marks         : b.marks || 1,
       snap_question_type : b.question_type || 'MCQ',
       snap_shuffle_options: b.shuffle_options ?? true,
+      snap_question_ref  : b.question_ref || null,
+      snap_tags          : Array.isArray(b.tags) ? b.tags : [],
+      snap_year_level    : b.year_level || null,
+      snap_bloom_level   : b.bloom_level || null,
       snapped_at         : now
     };
   });
@@ -3253,7 +3281,7 @@ async function getLibraryCourses() {
     .from('teacher_library_courses')
     .select('*')
     .eq('status', 'active')
-    .order('sort_order', { ascending: true });
+    .order('title', { ascending: true });
 
   if (error) { console.error('getLibraryCourses:', error); return []; }
   return data || [];
@@ -3267,18 +3295,21 @@ async function getLibraryCourses() {
 // Returns { items, count }
 // Used by: library.html — items table
 // ------------------------------------------------------------
-async function getLibraryItems(tableName, { search = '', maintopic = '', subtopic = '', difficulty = '', question_type = '', limit = 500, offset = 0 } = {}) {
+async function getLibraryItems(tableName, { search = '', maintopic = '', subtopic = '', difficulty = '', question_type = '', tag = '', year_level = '', bloom_level = '', limit = 500, offset = 0 } = {}) {
   if (!tableName) return { items: [], count: 0 };
 
   let query = db
     .from(tableName)
     .select('*', { count: 'exact' });
 
-  if (maintopic) query = query.eq('maintopic', maintopic);
-  if (subtopic)  query = query.eq('subtopic', subtopic);
-  if (difficulty) query = query.eq('difficulty', difficulty);
+  if (maintopic)    query = query.eq('maintopic', maintopic);
+  if (subtopic)     query = query.eq('subtopic', subtopic);
+  if (difficulty)   query = query.eq('difficulty', difficulty);
   if (question_type) query = query.eq('question_type', question_type);
-  if (search) query = query.ilike('stem', `%${search}%`);
+  if (search)       query = query.ilike('stem', `%${search}%`);
+  if (tag)          query = query.contains('tags', [tag]);
+  if (year_level)   query = query.eq('year_level', year_level);
+  if (bloom_level)  query = query.eq('bloom_level', bloom_level);
 
   query = query.range(offset, offset + limit - 1);
 
@@ -3294,26 +3325,32 @@ async function getLibraryItems(tableName, { search = '', maintopic = '', subtopi
 // from a library items table. Used for filter dropdowns.
 // ------------------------------------------------------------
 async function getLibraryFilterOptions(tableName) {
-  if (!tableName) return { maintopics: [], subtopics: [], difficulties: [] };
+  if (!tableName) return { maintopics: [], subtopics: [], difficulties: [], tags: [], year_levels: [], bloom_levels: [] };
 
   // Fetch all items but only the filter columns
   const { data, error } = await db
     .from(tableName)
-    .select('maintopic, subtopic, difficulty');
+    .select('maintopic, subtopic, difficulty, tags, year_level, bloom_level');
 
-  if (error) { console.error('getLibraryFilterOptions:', error); return { maintopics: [], subtopics: [], difficulties: [] }; }
+  if (error) { console.error('getLibraryFilterOptions:', error); return { maintopics: [], subtopics: [], difficulties: [], tags: [], year_levels: [], bloom_levels: [] }; }
 
-  const mt = new Set(), st = new Set(), df = new Set();
+  const mt = new Set(), st = new Set(), df = new Set(), tg = new Set(), yl = new Set(), bl = new Set();
   (data || []).forEach(r => {
-    if (r.maintopic) mt.add(r.maintopic);
-    if (r.subtopic)  st.add(r.subtopic);
-    if (r.difficulty) df.add(r.difficulty);
+    if (r.maintopic)  mt.add(r.maintopic);
+    if (r.subtopic)   st.add(r.subtopic);
+    if (r.difficulty)  df.add(r.difficulty);
+    if (r.year_level)  yl.add(r.year_level);
+    if (r.bloom_level) bl.add(r.bloom_level);
+    (r.tags || []).forEach(t => { if (t) tg.add(t); });
   });
 
   return {
     maintopics:   [...mt].sort(),
     subtopics:    [...st].sort(),
-    difficulties: [...df].sort()
+    difficulties: [...df].sort(),
+    tags:         [...tg].sort(),
+    year_levels:  [...yl].sort(),
+    bloom_levels: [...bl].sort()
   };
 }
 

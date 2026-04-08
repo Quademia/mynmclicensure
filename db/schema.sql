@@ -8,8 +8,9 @@
 --   - When adding a new table, add it here first.
 --   - Run the relevant CREATE/ALTER in Supabase SQL editor.
 --   - All tables use dev_allow_all RLS during build.
---   - 39 tables total (11 core + 3 quiz engine + 11 items
---     + 1 offline packs + 2 messaging + 12 teacher assess)
+--   - 49 tables total (11 core + 3 quiz engine + 11 items
+--     + 1 offline packs + 2 messaging + 12 teacher assess
+--     + 10 library items (library_anatomy, etc) — see section 5.9b)
 -- ============================================================
 
 
@@ -473,15 +474,28 @@ CREATE TABLE teacher_bank_items (
   source_item_id   TEXT,
   imported_at      TIMESTAMPTZ,
   created_at       TIMESTAMPTZ DEFAULT NOW(),
-  updated_at       TIMESTAMPTZ DEFAULT NOW()
+  updated_at       TIMESTAMPTZ DEFAULT NOW(),
+  question_ref     TEXT,
+  tags             TEXT[] NOT NULL DEFAULT '{}',
+  batch_id         TEXT,
+  year_level       TEXT,
+  bloom_level      TEXT
 );
 -- question_type: MCQ | TF | SATA
 -- source_type: TEACHER | IMPORT | QUIZ_INLINE | LIBRARY
+-- question_ref: teacher's own reference code for numbering questions (unique per teacher)
+-- bloom_level: Remember | Understand | Apply | Analyse | Evaluate | Create
+-- year_level: e.g. 'Year 1', 'Year 2', 'Level 100', 'Level 200'
 
 CREATE INDEX ON teacher_bank_items (teacher_id);
 CREATE INDEX ON teacher_bank_items (teacher_id, status);
 CREATE INDEX ON teacher_bank_items (maintopic);
 CREATE INDEX ON teacher_bank_items (source_type);
+CREATE UNIQUE INDEX idx_bank_question_ref ON teacher_bank_items (teacher_id, question_ref) WHERE question_ref IS NOT NULL;
+CREATE INDEX idx_bank_tags ON teacher_bank_items USING GIN (tags);
+CREATE INDEX idx_bank_batch ON teacher_bank_items (batch_id);
+CREATE INDEX idx_bank_year ON teacher_bank_items (year_level);
+CREATE INDEX idx_bank_bloom ON teacher_bank_items (bloom_level);
 
 -- 5.5 teacher_quizzes
 CREATE TABLE teacher_quizzes (
@@ -547,7 +561,11 @@ CREATE TABLE teacher_quiz_items (
   snap_marks           INTEGER NOT NULL DEFAULT 1,
   snap_question_type   TEXT NOT NULL DEFAULT 'MCQ',
   snap_shuffle_options BOOLEAN NOT NULL DEFAULT true,
-  snapped_at           TIMESTAMPTZ DEFAULT NOW()
+  snapped_at           TIMESTAMPTZ DEFAULT NOW(),
+  snap_question_ref    TEXT,
+  snap_tags            TEXT[] NOT NULL DEFAULT '{}',
+  snap_year_level      TEXT,
+  snap_bloom_level     TEXT
 );
 
 CREATE INDEX ON teacher_quiz_items (teacher_quiz_id);
@@ -608,19 +626,76 @@ CREATE INDEX ON teacher_quiz_attempts (status);
 
 -- 5.9 teacher_library_courses
 CREATE TABLE teacher_library_courses (
-  course_id     TEXT NOT NULL PRIMARY KEY,
-  title         TEXT NOT NULL,
-  program_scope TEXT[] NOT NULL DEFAULT '{}',
-  status        TEXT NOT NULL DEFAULT 'active',
-  sort_order    INTEGER NOT NULL DEFAULT 0,
-  created_at    TIMESTAMPTZ DEFAULT NOW(),
-  updated_at    TIMESTAMPTZ DEFAULT NOW(),
-  items_table   TEXT
+  course_id    TEXT NOT NULL PRIMARY KEY,
+  title        TEXT NOT NULL,
+  description  TEXT,
+  programme    TEXT,
+  faculty      TEXT,
+  category     TEXT,
+  year_group   TEXT,
+  tags         TEXT[] NOT NULL DEFAULT '{}',
+  status       TEXT NOT NULL DEFAULT 'active',
+  created_at   TIMESTAMPTZ DEFAULT NOW(),
+  updated_at   TIMESTAMPTZ DEFAULT NOW(),
+  items_table  TEXT
 );
--- items_table: points to the actual items table (e.g. items_gp, items_rn_med)
+-- items_table: points to the library items table (e.g. library_anatomy, library_english)
+-- programme: e.g. 'Nursing', 'Business', 'General'
+-- faculty: e.g. 'Health Sciences', 'Arts', 'Social Sciences'
+-- category: e.g. 'Sciences', 'Languages', 'Commerce'
+-- year_group: e.g. 'Year 1', 'Year 2', 'Postgraduate'
 
 CREATE INDEX ON teacher_library_courses (status);
-CREATE INDEX ON teacher_library_courses (sort_order);
+CREATE INDEX idx_lib_courses_programme ON teacher_library_courses (programme);
+CREATE INDEX idx_lib_courses_faculty ON teacher_library_courses (faculty);
+CREATE INDEX idx_lib_courses_category ON teacher_library_courses (category);
+CREATE INDEX idx_lib_courses_year ON teacher_library_courses (year_group);
+CREATE INDEX idx_lib_courses_tags ON teacher_library_courses USING GIN (tags);
+
+-- 5.9b Library item tables (one per course)
+-- All follow the same schema. Replace library_anatomy with:
+--   library_anatomy, library_physiology, library_english,
+--   library_accounting, library_government, library_microbiology,
+--   library_pharmacology, library_sociology, library_surveying,
+--   library_management (add more as needed)
+-- 10 tables total
+
+CREATE TABLE library_anatomy (
+  item_id         TEXT PRIMARY KEY,
+  question_type   TEXT NOT NULL DEFAULT 'MCQ',
+  stem            TEXT NOT NULL,
+  option_a        TEXT, fb_a TEXT,
+  option_b        TEXT, fb_b TEXT,
+  option_c        TEXT, fb_c TEXT,
+  option_d        TEXT, fb_d TEXT,
+  option_e        TEXT, fb_e TEXT,
+  option_f        TEXT, fb_f TEXT,
+  correct         TEXT NOT NULL,
+  rationale       TEXT,
+  rationale_img   TEXT,
+  subject         TEXT,
+  maintopic       TEXT,
+  subtopic        TEXT,
+  difficulty      TEXT,
+  marks           INTEGER NOT NULL DEFAULT 1,
+  shuffle_options BOOLEAN NOT NULL DEFAULT true,
+  question_ref    TEXT,
+  tags            TEXT[] NOT NULL DEFAULT '{}',
+  batch_id        TEXT,
+  year_level      TEXT,
+  bloom_level     TEXT
+);
+-- question_type: MCQ | TF | SATA
+-- bloom_level: Remember | Understand | Apply | Analyse | Evaluate | Create
+-- year_level: e.g. 'Year 1', 'Year 2', 'Level 100', 'Level 200'
+
+CREATE INDEX ON library_anatomy (maintopic);
+CREATE INDEX ON library_anatomy (subtopic);
+CREATE INDEX ON library_anatomy (difficulty);
+CREATE INDEX ON library_anatomy USING GIN (tags);
+CREATE INDEX ON library_anatomy (batch_id);
+CREATE INDEX ON library_anatomy (year_level);
+CREATE INDEX ON library_anatomy (bloom_level);
 
 -- 5.10 teacher_courses
 -- A Course is what a teacher teaches (Pharmacology 1, Anatomy, etc).

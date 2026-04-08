@@ -101,15 +101,9 @@ INSERT INTO config (key, value, description) VALUES
 
 -- ── Teacher Library Courses ─────────────────────────────────
 
-INSERT INTO teacher_library_courses (course_id, title, program_scope, status, sort_order, items_table) VALUES
-  ('GP',                'General Paper',                                        '{ALL}',    'active', 1,  'items_gp'),
-  ('RN_MED',            'Medicine & Medical Nursing',                           '{RN}',     'active', 2,  'items_rn_med'),
-  ('RN_SURG',           'Surgery & Surgical Nursing',                           '{RN}',     'active', 3,  'items_rn_surg'),
-  ('RM_PED_OBS_HRN',    'Paediatric, Obstetric Anatomy & High-Risk Neonates',  '{RM}',     'active', 4,  'items_rm_ped_obs_hrn'),
-  ('RM_MID',            'Midwifery',                                            '{RM}',     'active', 5,  'items_rm_mid'),
-  ('RPHN_PPHN',         'Principles of Public Health Nursing',                  '{RPHN}',   'active', 6,  'items_rphn_pphn'),
-  ('RPHN_DISEASE_CTRL', 'Principles of Disease Management & Control',           '{RPHN}',   'active', 7,  'items_rphn_disease_ctrl'),
-  ('RMHN_PSYCH_NURS',   'Principles & Practice of Psychiatric Nursing',         '{RMHN}',   'active', 8,  'items_rmhn_psych_nurs'),
-  ('RMHN_PSYCH_PPHARM', 'Psychiatry, Psychopathology & Psychopharmacology',     '{RMHN}',   'active', 9,  'items_rmhn_psych_ppharm'),
-  ('NAC_BASIC_CLIN',    'Basic Clinical Nursing',                               '{NACNAP}', 'active', 10, 'items_nac_basic_clin'),
-  ('NAC_BASIC_PREV',    'Basic Preventive Nursing',                             '{NACNAP}', 'active', 11, 'items_nac_basic_prev');
+INSERT INTO teacher_library_courses (course_id, title, description, programme, faculty, category, year_group, tags, status, items_table) VALUES
+  ('ANATOMY',    'Anatomy',    'Human anatomy questions covering musculoskeletal, cardiovascular, nervous, and organ systems', 'Nursing', 'Health Sciences', 'Sciences', 'Year 1', '{preclinical, health}', 'active', 'library_anatomy'),
+  ('PHYSIOLOGY', 'Physiology', 'Human physiology covering cardiovascular, respiratory, renal, endocrine, and nervous system function', 'Nursing', 'Health Sciences', 'Sciences', 'Year 1', '{preclinical, health}', 'active', 'library_physiology'),
+  ('ENGLISH',    'English',    'English language and literature covering grammar, vocabulary, writing, and literary devices', 'General', 'Arts', 'Languages', 'Year 1', '{language, literacy}', 'active', 'library_english'),
+  ('ACCOUNTING', 'Accounting', 'Financial accounting fundamentals including bookkeeping, financial statements, and analysis', 'Business', 'Business', 'Commerce', 'Year 1', '{finance, business}', 'active', 'library_accounting'),
+  ('GOVERNMENT', 'Government', 'Political systems, constitutional law, elections, and democratic principles', 'General', 'Social Sciences', 'Humanities', 'Year 1', '{politics, civics}', 'active', 'library_government');
