@@ -68,3 +68,4 @@ Day-to-day admin work includes:
 - [06 — Offline Packs](06-offline-packs.md) — how students study without internet
 - [07 — Messaging](07-messaging.md) — how the built-in support chat works
 - [08 — Teacher Assess](08-teacher-assess.md) — how the MyTeacher product works
+- [09 — Teacher Academic Structure](09-teacher-academic-structure.md) — programmes, cohorts, courses, and how quizzes are reused across classes

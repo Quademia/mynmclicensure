@@ -283,7 +283,7 @@ Thread-based messaging system between admin and students.
 | myteacher/teacher/dashboard.html | ✅ Done | Live stats (classes, quizzes, students, attempts), recent activity feed |
 | myteacher/teacher/classes.html | ✅ Done | Full CRUD, join codes, custom fields, members, cohort dropdown, grouped by cohort |
 | myteacher/teacher/bank.html | ✅ Done | MCQ/TF/SATA, image upload, CSV import, filters |
-| myteacher/teacher/quizzes.html | ✅ Done | 4-tab editor, presets, publish with snapshots, clone, archive, release results, SATA scoring policy, mutable settings, library picker, course dropdown |
+| myteacher/teacher/quizzes.html | ✅ Done | 4-tab editor, presets, publish with snapshots, clone, archive, SATA scoring policy, mutable settings, library picker, course dropdown; **two-column Classes tab with per-class schedule + per-class results release** |
 | myteacher/teacher/import.html | ✅ Done | CSV import with validation, duplicate detection, AI help prompt |
 | myteacher/teacher/library.html | ✅ Done | Full-screen library browser, course filters, add to quiz draft |
 | myteacher/teacher/results.html | ✅ Done | Marksheet, item analysis, drawers, CSV export, print |
@@ -380,7 +380,7 @@ Every key is a system key referenced by platform code. Never rename or delete un
 
 ### Teacher Assess (myteacher-api.js)
 - **Quiz CRUD:** `createTeacherQuiz()`, `getTeacherQuiz()`, `getTeacherQuizzes()`, `updateTeacherQuiz()`
-- **Quiz Lifecycle:** `publishTeacherQuiz()`, `archiveTeacherQuiz()`, `cloneTeacherQuiz()`, `releaseQuizResults()`
+- **Quiz Lifecycle:** `publishTeacherQuiz()`, `archiveTeacherQuiz()`, `cloneTeacherQuiz()`, `releaseQuizResults(quizId, classId?)`, `unreleaseQuizResults(quizId, classId?)`, `getQuizClassStats()`
 - **Quiz Relations:** `setQuizClasses()`, `getQuizClasses()`, `removeFromDraftItems()`
 - **Student Quiz:** `startQuizAttempt()`, `saveAttemptProgress()`, `submitQuizAttempt()`
 - **Attempts:** `getAttempt()`, `getAttemptResults()`, `getAttemptReview()`, `getQuizzesForClass()`, `getPublishedQuizWithItems()`
@@ -408,11 +408,18 @@ No unpublish. No unarchive. Clone creates a new DRAFT from any state.
 | Category | Fields | DRAFT | PUBLISHED | ARCHIVED |
 |---|---|---|---|---|
 | **Integrity (scoring)** | `sata_scoring_policy`, `duration_minutes`, `shuffle_questions`, `shuffle_options`, `custom_fields_json`, `draft_items_json` | ✏️ Editable | 🔒 Locked | 🔒 Locked |
-| **Administrative** | `title`, `subject`, `max_attempts`, `open_at`, `close_at` | ✏️ Editable | ✏️ Editable | 🔒 Locked |
+| **Administrative (template defaults)** | `title`, `subject`, `max_attempts`, `open_at`, `close_at` | ✏️ Editable | ✏️ Editable | 🔒 Locked |
 | **Display & Policy** | `results_release_policy`, `show_results`, `show_review`, `score_display_policy`, `pass_threshold_pct`, `grade_bands_json` | ✏️ Editable | ✏️ Editable | ✏️ Editable |
 | **Access** | `access_code` | ✏️ Editable | 🔒 Locked | 🔒 Locked |
 
-**Why?** Integrity fields affect scoring — changing them mid-flight would make some students' scores invalid. Administrative fields are schedule/logistics. Display/policy fields only affect how results are shown, not how scores are calculated.
+**Why?** Integrity fields affect scoring — changing them mid-flight would make some students' scores invalid. Administrative fields are schedule/logistics *template defaults*; the actual window used by each class lives on `teacher_quiz_classes` (see below). Display/policy fields only affect how results are shown, not how scores are calculated.
+
+### Per-class assignment (`teacher_quiz_classes`)
+The link between a quiz and a class carries its own schedule and release state. This is what makes a quiz reusable across cohorts:
+- `open_at`, `close_at` — per-class window. If null, fall back to the quiz template defaults (`quiz.open_at`/`quiz.close_at`).
+- `results_released`, `results_released_at` — per-class release state. Link-only; does **not** fall back to the quiz. A link-level `results_released = true` acts as a **universal override** that makes results visible regardless of policy (enables "Release early" for `AFTER_CLOSE`, or simply "Release now" for `MANUAL`).
+
+Effective gate resolver: `effective_open_at = link.open_at ?? quiz.open_at`, `effective_close_at = link.close_at ?? quiz.close_at`. If neither is set, the quiz has no time limit for that class.
 
 ### Snapshots (frozen at submit time)
 These values are captured from the live quiz onto each attempt's `score_json` at submission, so retroactive teacher changes don't corrupt historical results:
@@ -423,9 +430,10 @@ These values are captured from the live quiz onto each attempt's `score_json` at
 ### Safety Guards
 - **Archive blocked** while students have IN_PROGRESS attempts
 - **Concurrency guard** prevents double-click from creating duplicate attempts
-- **Date validation** enforced: `close_at > open_at`, `AFTER_CLOSE` requires `close_at`
+- **Date validation** enforced: `close_at > open_at` (on both the quiz template and each per-class link), `AFTER_CLOSE` requires `close_at`
 - **Draft deduplication** at publish time (server-side)
-- **Release Results** works on both PUBLISHED and ARCHIVED quizzes (prevents permanent lock)
+- **Release Results** works on both PUBLISHED and ARCHIVED quizzes (prevents permanent lock); releases and revokes are per-class
+- **Clone** does NOT copy class links — a cloned quiz is a fresh template with no assignments
 
 ---
 
@@ -442,7 +450,7 @@ These values are captured from the live quiz onto each attempt's `score_json` at
 - Bulk import questions → use `myteacher/teacher/import.html` (or "Bulk add CSV" button in bank)
 - Browse QAcademy library → use `myteacher/teacher/library.html`
 - Create/publish quizzes → use `myteacher/teacher/quizzes.html`
-- Release quiz results → Publish tab on quiz editor, or "Release Results" button
+- Release quiz results → Classes tab per-class Release/Revoke, or Publish tab "Release for all unreleased" bulk shortcut
 - View quiz analytics → use `myteacher/teacher/results.html`
 
 ---
