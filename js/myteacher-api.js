@@ -1055,6 +1055,10 @@ async function getQuizClasses(quizId) {
       teacher_quiz_id,
       class_id,
       status,
+      open_at,
+      close_at,
+      results_released,
+      results_released_at,
       teacher_classes (
         class_id,
         title,
@@ -1309,50 +1313,78 @@ async function clearDraftItems(quizId) {
 
 
 // ------------------------------------------------------------
-// SET QUIZ CLASSES (atomic replace)
-// Takes the desired set of class IDs for a quiz.
-// Adds missing links, soft-removes extras (status=REMOVED).
-// Re-activates previously removed links if re-selected.
+// SET QUIZ CLASSES (atomic replace + per-class schedule)
+// classAssignments is an array of either:
+//   - class_id strings (back-compat, no schedule)
+//   - { class_id, open_at, close_at } objects
+// open_at / close_at are optional; null means "inherit quiz template".
+// Behaviour:
+//   - Adds new links with their schedule
+//   - Re-activates previously REMOVED links (updating schedule too)
+//   - Updates schedule on already-ACTIVE links if values changed
+//   - Soft-removes (status=REMOVED) any links not in the desired set
 // Used by: quizzes.html Classes tab — Save Links
 // ------------------------------------------------------------
-async function setQuizClasses(quizId, teacherId, classIds) {
+async function setQuizClasses(quizId, teacherId, classAssignments) {
+  // Normalise the input: array of { class_id, open_at, close_at }
+  const desired = (classAssignments || []).map(a => {
+    if (typeof a === 'string') return { class_id: a, open_at: null, close_at: null };
+    return {
+      class_id: a.class_id,
+      open_at : a.open_at  || null,
+      close_at: a.close_at || null
+    };
+  }).filter(a => a.class_id);
+
   // 1. Fetch all current links (including REMOVED for re-activation)
   const { data: existing, error: fetchErr } = await db
     .from('teacher_quiz_classes')
-    .select('tqc_id, class_id, status')
+    .select('tqc_id, class_id, status, open_at, close_at')
     .eq('teacher_quiz_id', quizId);
 
   if (fetchErr) { console.error('setQuizClasses fetch:', fetchErr); return { success: false, message: fetchErr.message }; }
 
   const existingMap = new Map((existing || []).map(r => [r.class_id, r]));
-  const desiredSet  = new Set(classIds);
+  const desiredIds  = new Set(desired.map(d => d.class_id));
   const now         = new Date().toISOString();
 
   const toInsert     = [];
-  const toActivate   = [];
+  const toActivate   = []; // { tqc_id, open_at, close_at }
+  const toUpdate     = []; // { tqc_id, open_at, close_at }
   const toDeactivate = [];
 
-  // 2. Find new and re-activate
-  desiredSet.forEach(classId => {
-    const row = existingMap.get(classId);
+  // 2. Walk desired set: insert new, reactivate removed, update active
+  desired.forEach(d => {
+    const row = existingMap.get(d.class_id);
     if (!row) {
       toInsert.push({
-        tqc_id           : makeQuizClassId(),
-        teacher_quiz_id  : quizId,
-        class_id         : classId,
-        teacher_id       : teacherId,
-        status           : 'ACTIVE',
-        created_at       : now,
-        updated_at       : now
+        tqc_id             : makeQuizClassId(),
+        teacher_quiz_id    : quizId,
+        class_id           : d.class_id,
+        teacher_id         : teacherId,
+        status             : 'ACTIVE',
+        open_at            : d.open_at,
+        close_at           : d.close_at,
+        results_released   : false,
+        results_released_at: null,
+        created_at         : now,
+        updated_at         : now
       });
     } else if (row.status !== 'ACTIVE') {
-      toActivate.push(row.tqc_id);
+      toActivate.push({ tqc_id: row.tqc_id, open_at: d.open_at, close_at: d.close_at });
+    } else {
+      // Already active — update schedule if it changed
+      const openChanged  = (row.open_at  || null) !== d.open_at;
+      const closeChanged = (row.close_at || null) !== d.close_at;
+      if (openChanged || closeChanged) {
+        toUpdate.push({ tqc_id: row.tqc_id, open_at: d.open_at, close_at: d.close_at });
+      }
     }
   });
 
-  // 3. Find removed
+  // 3. Find removed (active links not in desired set)
   (existing || []).forEach(row => {
-    if (row.status === 'ACTIVE' && !desiredSet.has(row.class_id)) {
+    if (row.status === 'ACTIVE' && !desiredIds.has(row.class_id)) {
       toDeactivate.push(row.tqc_id);
     }
   });
@@ -1362,11 +1394,17 @@ async function setQuizClasses(quizId, teacherId, classIds) {
     const { error } = await db.from('teacher_quiz_classes').insert(toInsert);
     if (error) { console.error('setQuizClasses insert:', error); return { success: false, message: error.message }; }
   }
-  if (toActivate.length) {
+  for (const row of toActivate) {
     const { error } = await db.from('teacher_quiz_classes')
-      .update({ status: 'ACTIVE', updated_at: now })
-      .in('tqc_id', toActivate);
+      .update({ status: 'ACTIVE', open_at: row.open_at, close_at: row.close_at, updated_at: now })
+      .eq('tqc_id', row.tqc_id);
     if (error) { console.error('setQuizClasses activate:', error); return { success: false, message: error.message }; }
+  }
+  for (const row of toUpdate) {
+    const { error } = await db.from('teacher_quiz_classes')
+      .update({ open_at: row.open_at, close_at: row.close_at, updated_at: now })
+      .eq('tqc_id', row.tqc_id);
+    if (error) { console.error('setQuizClasses update:', error); return { success: false, message: error.message }; }
   }
   if (toDeactivate.length) {
     const { error } = await db.from('teacher_quiz_classes')
@@ -1375,7 +1413,13 @@ async function setQuizClasses(quizId, teacherId, classIds) {
     if (error) { console.error('setQuizClasses deactivate:', error); return { success: false, message: error.message }; }
   }
 
-  return { success: true, added: toInsert.length, reactivated: toActivate.length, removed: toDeactivate.length };
+  return {
+    success     : true,
+    added       : toInsert.length,
+    reactivated : toActivate.length,
+    updated     : toUpdate.length,
+    removed     : toDeactivate.length
+  };
 }
 
 
@@ -1514,24 +1558,30 @@ async function publishTeacherQuiz(quizId, teacherId) {
 
 // ------------------------------------------------------------
 // RELEASE QUIZ RESULTS
-// For MANUAL policy quizzes — makes results visible to students.
-// Sets results_released=true and timestamps it.
+// Release state lives on teacher_quiz_classes (per-class). If classId
+// is given, releases only that class's link. Otherwise, bulk-releases
+// all ACTIVE links for the quiz.
 // Used by: quizzes.html Publish tab — Release Results button
 // ------------------------------------------------------------
-async function releaseQuizResults(quizId) {
+async function releaseQuizResults(quizId, classId = null) {
   const now = new Date().toISOString();
 
-  const { error } = await db
-    .from('teacher_quizzes')
+  let q = db
+    .from('teacher_quiz_classes')
     .update({
       results_released   : true,
       results_released_at: now,
       updated_at         : now
     })
-    .eq('teacher_quiz_id', quizId);
+    .eq('teacher_quiz_id', quizId)
+    .eq('status', 'ACTIVE');
+
+  if (classId) q = q.eq('class_id', classId);
+
+  const { data, error } = await q.select('tqc_id');
 
   if (error) { console.error('releaseQuizResults:', error); return { success: false, message: error.message }; }
-  return { success: true };
+  return { success: true, released_count: (data || []).length };
 }
 
 
@@ -1543,6 +1593,7 @@ async function releaseQuizResults(quizId) {
 // New access code generated.
 // If source was PUBLISHED, extracts bank_item_ids from
 // snapshot rows into the clone's draft_items_json.
+// Does NOT copy class links — the clone is a fresh template.
 // options: { copySchedule: false }
 // Returns { success, data } (the new quiz row)
 // Used by: quizzes.html — Clone button
@@ -1621,21 +1672,8 @@ async function cloneTeacherQuiz(sourceQuizId, teacherId, { copySchedule = false 
 
   if (error) { console.error('cloneTeacherQuiz:', error); return { success: false, message: error.message }; }
 
-  // 4. Copy class links
-  const links = await getQuizClasses(sourceQuizId);
-  if (links.length) {
-    const linkRows = links.map(l => ({
-      tqc_id          : makeQuizClassId(),
-      teacher_quiz_id : quizId,
-      class_id        : l.class_id,
-      teacher_id      : teacherId,
-      status          : 'ACTIVE',
-      created_at      : now,
-      updated_at      : now
-    }));
-    await db.from('teacher_quiz_classes').insert(linkRows);
-  }
-
+  // NOTE: Class links are intentionally NOT copied. A clone is a fresh
+  // template with no assignments — the teacher re-assigns explicitly.
   return { success: true, data };
 }
 
@@ -1675,6 +1713,20 @@ function makeAttemptId() {
 }
 
 
+// ── Effective quiz window resolver ─────────────────────────
+// Resolves the effective open/close window for a student taking a
+// quiz via a specific class link. Link values override the quiz-level
+// template defaults. Null = always open / never closes.
+function _effectiveQuizWindow(quiz, link) {
+  const q = quiz || {};
+  const l = link || {};
+  return {
+    open_at : (l.open_at  != null ? l.open_at  : q.open_at)  || null,
+    close_at: (l.close_at != null ? l.close_at : q.close_at) || null
+  };
+}
+
+
 // ------------------------------------------------------------
 // GET QUIZZES FOR CLASS (Student)
 // Returns all PUBLISHED quizzes linked to a given class.
@@ -1683,10 +1735,10 @@ function makeAttemptId() {
 // Used by: myteacher/student/my-classes.html Quizzes tab
 // ------------------------------------------------------------
 async function getQuizzesForClass(classId, userId) {
-  // 1. Get quiz links for this class
+  // 1. Get quiz links for this class (with per-class schedule + release)
   const { data: links, error: linkErr } = await db
     .from('teacher_quiz_classes')
-    .select('teacher_quiz_id')
+    .select('teacher_quiz_id, open_at, close_at, results_released, results_released_at')
     .eq('class_id', classId)
     .eq('status', 'ACTIVE');
 
@@ -1694,6 +1746,7 @@ async function getQuizzesForClass(classId, userId) {
   if (!links || !links.length) return [];
 
   const quizIds = links.map(l => l.teacher_quiz_id);
+  const linkMap = new Map(links.map(l => [l.teacher_quiz_id, l]));
 
   // 2. Fetch full quiz rows — only PUBLISHED
   const { data: quizzes, error: qErr } = await db
@@ -1736,11 +1789,25 @@ async function getQuizzesForClass(classId, userId) {
     countMap[r.teacher_quiz_id] = (countMap[r.teacher_quiz_id] || 0) + 1;
   });
 
-  return quizzes.map(q => ({
-    ...q,
-    item_count: countMap[q.teacher_quiz_id] || 0,
-    attempts: attemptMap[q.teacher_quiz_id] || []
-  }));
+  // 6. Resolve effective window + availability state per quiz
+  const now = new Date();
+  return quizzes.map(q => {
+    const link = linkMap.get(q.teacher_quiz_id);
+    const { open_at, close_at } = _effectiveQuizWindow(q, link);
+    let state = 'AVAILABLE';
+    if (open_at  && new Date(open_at)  > now) state = 'NOT_OPEN';
+    if (close_at && new Date(close_at) < now) state = 'CLOSED';
+    return {
+      ...q,
+      effective_open_at        : open_at,
+      effective_close_at       : close_at,
+      link_results_released    : link?.results_released ?? false,
+      link_results_released_at : link?.results_released_at ?? null,
+      state,
+      item_count: countMap[q.teacher_quiz_id] || 0,
+      attempts  : attemptMap[q.teacher_quiz_id] || []
+    };
+  });
 }
 
 
@@ -1793,10 +1860,10 @@ async function startQuizAttempt(userId, quizId, classId, candidateFields = {}) {
   if (!quizData) return { success: false, message: 'Quiz not found or not published.' };
   const { quiz, items } = quizData;
 
-  // 2. Verify class link
+  // 2. Verify class link (including its per-class schedule)
   const { data: link, error: linkErr } = await db
     .from('teacher_quiz_classes')
-    .select('tqc_id')
+    .select('tqc_id, open_at, close_at')
     .eq('teacher_quiz_id', quizId)
     .eq('class_id', classId)
     .eq('status', 'ACTIVE')
@@ -1810,12 +1877,13 @@ async function startQuizAttempt(userId, quizId, classId, candidateFields = {}) {
     return { success: false, message: 'You are not an active member of this class.' };
   }
 
-  // 4. Check open/close window
+  // 4. Check effective open/close window (link overrides quiz template)
+  const { open_at: effOpenAt, close_at: effCloseAt } = _effectiveQuizWindow(quiz, link);
   const now = new Date();
-  if (quiz.open_at && new Date(quiz.open_at) > now) {
-    return { success: false, code: 'NOT_OPEN', message: 'This quiz is not open yet.', open_at: quiz.open_at };
+  if (effOpenAt && new Date(effOpenAt) > now) {
+    return { success: false, code: 'NOT_OPEN', message: 'This quiz is not open yet.', open_at: effOpenAt };
   }
-  if (quiz.close_at && new Date(quiz.close_at) < now) {
+  if (effCloseAt && new Date(effCloseAt) < now) {
     return { success: false, code: 'CLOSED', message: 'This quiz has closed.' };
   }
 
@@ -2375,7 +2443,17 @@ async function getAttemptResults(attemptId, userId) {
     .eq('class_id', attempt.class_id)
     .maybeSingle();
 
-  // 4. Compute results gate
+  // Fetch the class link for effective window + per-class release state
+  const { data: link } = await db
+    .from('teacher_quiz_classes')
+    .select('open_at, close_at, results_released, results_released_at')
+    .eq('teacher_quiz_id', attempt.teacher_quiz_id)
+    .eq('class_id', attempt.class_id)
+    .maybeSingle();
+
+  const { open_at: effOpenAt, close_at: effCloseAt } = _effectiveQuizWindow(quiz, link);
+
+  // 4. Compute results gate (uses effective close + link-level release)
   const now = new Date();
   const policy = quiz.results_release_policy || 'MANUAL';
   let gateMet = false;
@@ -2385,20 +2463,20 @@ async function getAttemptResults(attemptId, userId) {
   if (policy === 'IMMEDIATE') {
     gateMet = true;
   } else if (policy === 'AFTER_CLOSE') {
-    if (!quiz.close_at) {
+    if (!effCloseAt) {
       gateReason = 'MISSING_CLOSE_AT';
-    } else if (new Date(quiz.close_at) > now) {
+    } else if (new Date(effCloseAt) > now) {
       gateReason = 'QUIZ_NOT_CLOSED';
-      availableAt = quiz.close_at;
+      availableAt = effCloseAt;
     } else {
       gateMet = true;
-      availableAt = quiz.close_at;
+      availableAt = effCloseAt;
     }
   } else {
-    // MANUAL
-    if (quiz.results_released) {
+    // MANUAL — link-only state
+    if (link?.results_released) {
       gateMet = true;
-      availableAt = quiz.results_released_at;
+      availableAt = link.results_released_at;
     } else {
       gateReason = 'RESULTS_NOT_RELEASED';
     }
@@ -2499,7 +2577,8 @@ async function getAttemptResults(attemptId, userId) {
       results_release_policy: policy,
       score_display_policy: scorePolicy,
       pass_threshold_pct: (attempt.score_json || {}).pass_threshold_pct ?? quiz.pass_threshold_pct,
-      close_at: quiz.close_at
+      open_at: effOpenAt,
+      close_at: effCloseAt
     },
     attempt_meta: {
       attempt_id: attempt.attempt_id,
@@ -2563,13 +2642,23 @@ async function getAttemptReview(attemptId, userId) {
     return { success: false, code: 'REVIEW_DISABLED', message: 'Review is not enabled for this quiz.' };
   }
 
-  // Check release gate
+  // Fetch the class link for effective window + per-class release state
+  const { data: link } = await db
+    .from('teacher_quiz_classes')
+    .select('open_at, close_at, results_released, results_released_at')
+    .eq('teacher_quiz_id', attempt.teacher_quiz_id)
+    .eq('class_id', attempt.class_id)
+    .maybeSingle();
+
+  const { close_at: effCloseAt } = _effectiveQuizWindow(quiz, link);
+
+  // Check release gate (uses effective close + link-level release)
   const now = new Date();
   const policy = quiz.results_release_policy || 'MANUAL';
   let gateMet = false;
   if (policy === 'IMMEDIATE') gateMet = true;
-  else if (policy === 'AFTER_CLOSE') gateMet = quiz.close_at && new Date(quiz.close_at) <= now;
-  else gateMet = !!quiz.results_released;
+  else if (policy === 'AFTER_CLOSE') gateMet = effCloseAt && new Date(effCloseAt) <= now;
+  else gateMet = !!(link && link.results_released);
 
   if (!gateMet) {
     return { success: false, code: 'RESULTS_NOT_RELEASED', message: 'Results have not been released yet. Review will be available when results are released.' };

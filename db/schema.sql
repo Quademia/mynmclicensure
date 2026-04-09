@@ -512,8 +512,13 @@ CREATE TABLE teacher_quizzes (
   show_review            BOOLEAN NOT NULL DEFAULT false,
   show_results           BOOLEAN NOT NULL DEFAULT true,
   results_release_policy TEXT NOT NULL DEFAULT 'MANUAL',
+  -- NOTE: results_released / results_released_at at quiz level are no longer
+  -- used for gating. Release state lives on teacher_quiz_classes (per-class).
+  -- Kept here for backward compat; remove in a follow-up.
   results_released       BOOLEAN NOT NULL DEFAULT false,
   results_released_at    TIMESTAMPTZ,
+  -- open_at / close_at serve as the default template window. Per-class
+  -- overrides live on teacher_quiz_classes (link.* ?? quiz.*).
   open_at                TIMESTAMPTZ,
   close_at               TIMESTAMPTZ,
   status                 TEXT NOT NULL DEFAULT 'DRAFT',
@@ -572,14 +577,21 @@ CREATE INDEX ON teacher_quiz_items (teacher_quiz_id);
 CREATE INDEX ON teacher_quiz_items (teacher_quiz_id, position);
 
 -- 5.7 teacher_quiz_classes
+-- Assignment row: links a quiz (template) to a class with its own schedule
+-- and release state. open_at/close_at override the quiz-level template
+-- (null = inherit). results_released/_at is link-only (no inheritance).
 CREATE TABLE teacher_quiz_classes (
-  tqc_id          TEXT NOT NULL PRIMARY KEY,
-  teacher_quiz_id TEXT NOT NULL,
-  class_id        TEXT NOT NULL,
-  teacher_id      TEXT NOT NULL,
-  status          TEXT NOT NULL DEFAULT 'ACTIVE',
-  created_at      TIMESTAMPTZ DEFAULT NOW(),
-  updated_at      TIMESTAMPTZ DEFAULT NOW(),
+  tqc_id              TEXT NOT NULL PRIMARY KEY,
+  teacher_quiz_id     TEXT NOT NULL,
+  class_id            TEXT NOT NULL,
+  teacher_id          TEXT NOT NULL,
+  status              TEXT NOT NULL DEFAULT 'ACTIVE',
+  open_at             TIMESTAMPTZ,
+  close_at            TIMESTAMPTZ,
+  results_released    BOOLEAN NOT NULL DEFAULT false,
+  results_released_at TIMESTAMPTZ,
+  created_at          TIMESTAMPTZ DEFAULT NOW(),
+  updated_at          TIMESTAMPTZ DEFAULT NOW(),
   CONSTRAINT unique_quiz_class UNIQUE (teacher_quiz_id, class_id)
 );
 

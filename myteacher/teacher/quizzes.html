@@ -237,6 +237,19 @@ a { color: var(--brand); }
 .cls-empty-link { display: inline-block; margin-top: 12px; font-size: 12px; font-weight: 700; color: var(--brand); text-decoration: none; border: 1px solid var(--brand); padding: 5px 14px; border-radius: 8px; cursor: pointer; }
 .cls-save-footer { display: flex; justify-content: flex-end; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
 .cls-dot-sep { color: var(--line); }
+/* Per-class schedule block (only visible on linked cards) */
+.cls-card-wrap { margin-bottom: 6px; }
+.cls-sched-block { border: 1px solid rgba(6,118,71,.18); border-top: 0; border-radius: 0 0 12px 12px; background: rgba(230,246,239,.55); padding: 10px 14px 12px; margin-top: -7px; position: relative; z-index: 0; }
+.cls-card.cls-linked.cls-has-sched { border-bottom-left-radius: 0; border-bottom-right-radius: 0; margin-bottom: 0; }
+.cls-sched-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.cls-sched-field { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 150px; }
+.cls-sched-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; color: var(--muted); }
+.cls-sched-input { padding: 5px 8px; border: 1px solid var(--line); border-radius: 7px; font-size: 12px; font-family: inherit; background: var(--card); color: var(--ink); }
+.cls-sched-input:focus { border-color: var(--ok); outline: none; }
+.cls-sched-hint { font-size: 10px; color: var(--muted); margin-top: 4px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.cls-sched-hint b { color: var(--ok); font-weight: 700; }
+.cls-sched-clear { font-size: 10px; font-weight: 700; color: var(--brand); cursor: pointer; border: none; background: none; padding: 0; text-decoration: underline; }
+.cls-sched-released { font-size: 10px; font-weight: 700; color: var(--ok); margin-left: auto; }
 
 /* ── Questions tab ───────────────────────────────────────── */
 .q-split { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
@@ -710,22 +723,22 @@ a { color: var(--brand); }
               <div class="settings-panel-head">
                 <div class="settings-panel-icon sni-blue">📅</div>
                 <div>
-                  <div class="settings-panel-title">Schedule</div>
-                  <div class="settings-panel-sub">Set when the quiz opens and closes — both are optional</div>
+                  <div class="settings-panel-title">Default schedule (template)</div>
+                  <div class="settings-panel-sub">Used as the fallback when a class assignment has no window of its own. Per-class schedules live on the Classes tab.</div>
                 </div>
               </div>
               <div class="settings-panel-body">
                 <div class="sf-grid">
                   <div class="form-group">
-                    <label>Open at</label>
+                    <label>Default open at</label>
                     <input type="datetime-local" id="fOpenAt" />
                   </div>
                   <div class="form-group">
-                    <label>Close at</label>
+                    <label>Default close at</label>
                     <input type="datetime-local" id="fCloseAt" />
                   </div>
                 </div>
-                <div class="hint" style="margin-top:12px">If no open date is set the quiz is immediately accessible. If no close date is set it stays open indefinitely.</div>
+                <div class="hint" style="margin-top:12px">Both fields are optional. If a class assignment leaves its window blank, it inherits these values. If none are set, the quiz is always open for that class.</div>
               </div>
               <div class="settings-panel-footer">
                 <button class="btn primary" onclick="saveQuiz()">Save settings</button>
@@ -1066,6 +1079,11 @@ const DRAFT_DEBOUNCE = 700;
 let ALL_TEACHER_CLASSES = [];
 let CLASS_MEMBER_COUNTS = {};
 let LINKED_CLASS_IDS = new Set();
+// Per-class schedule overrides: { [class_id]: { open_at, close_at } }
+// open_at/close_at are ISO strings or null. Null = inherit quiz template.
+let LINKED_CLASS_SCHEDULES = {};
+// Per-class release state (read-only in UI; released via bulk button)
+let LINKED_CLASS_RELEASE = {}; // { [class_id]: { released, released_at } }
 
 // Bank state
 let BANK_RESULTS = [];
@@ -1817,6 +1835,18 @@ async function loadClassesTab() {
 
   const links = await getQuizClasses(SELECTED_ID);
   LINKED_CLASS_IDS = new Set(links.map(l => l.class_id));
+  LINKED_CLASS_SCHEDULES = {};
+  LINKED_CLASS_RELEASE   = {};
+  links.forEach(l => {
+    LINKED_CLASS_SCHEDULES[l.class_id] = {
+      open_at : l.open_at  || null,
+      close_at: l.close_at || null
+    };
+    LINKED_CLASS_RELEASE[l.class_id] = {
+      released   : !!l.results_released,
+      released_at: l.results_released_at || null
+    };
+  });
 
   renderClassesList();
 }
@@ -1853,14 +1883,22 @@ function renderClassesList() {
   const linked   = filtered.filter(c =>  LINKED_CLASS_IDS.has(c.class_id));
   const unlinked = filtered.filter(c => !LINKED_CLASS_IDS.has(c.class_id));
 
+  // Quiz-level template defaults (for "inherit" placeholder text)
+  const qOpenAt  = SELECTED_QUIZ?.open_at  || null;
+  const qCloseAt = SELECTED_QUIZ?.close_at || null;
+  const tmplLabel = (qOpenAt || qCloseAt)
+    ? `Inherits quiz template: ${qOpenAt ? fmtDate(qOpenAt) : '∅'} → ${qCloseAt ? fmtDate(qCloseAt) : '∅'}`
+    : 'Inherits quiz template: always open';
+
   function buildCard(c, isLinked) {
     const count   = CLASS_MEMBER_COUNTS[c.class_id] || 0;
     const colour  = c.colour || '';
     const dotStyle = colour ? `background:${esc(colour)}` : 'background:var(--muted)';
     const subParts = [c.programme, c.academic_year, c.semester].filter(Boolean);
     const subHtml  = subParts.map(p => `<span>${esc(p)}</span>`).join('<span class="cls-dot-sep">·</span>');
-    return `
-    <div class="cls-card${isLinked ? ' cls-linked' : ''}" onclick="clsToggle(this,'${esc(c.class_id)}')">
+    const hasSched = isLinked;
+    const cardHtml = `
+    <div class="cls-card${isLinked ? ' cls-linked' : ''}${hasSched ? ' cls-has-sched' : ''}" onclick="clsToggle(this,'${esc(c.class_id)}')">
       <div class="cls-check${isLinked ? ' cls-checked' : ''}">${isLinked ? '<div class="cls-check-tick">✓</div>' : ''}</div>
       <div class="cls-colour-dot" style="${dotStyle}"></div>
       <div class="cls-card-body">
@@ -1871,6 +1909,42 @@ function renderClassesList() {
         <span class="cls-members-badge">${count} member${count !== 1 ? 's' : ''}</span>
       </div>
     </div>`;
+
+    if (!isLinked) return `<div class="cls-card-wrap">${cardHtml}</div>`;
+
+    // Schedule block — stop propagation so clicks inside don't untoggle the card
+    const sched   = LINKED_CLASS_SCHEDULES[c.class_id] || { open_at: null, close_at: null };
+    const release = LINKED_CLASS_RELEASE[c.class_id]   || { released: false, released_at: null };
+    const openVal  = toLocalDatetime(sched.open_at);
+    const closeVal = toLocalDatetime(sched.close_at);
+    const isInherit = !sched.open_at && !sched.close_at;
+    const releasedBadge = release.released
+      ? `<span class="cls-sched-released">✓ Results released${release.released_at ? ' ' + fmtDate(release.released_at) : ''}</span>`
+      : '';
+    const clearBtn = !isInherit
+      ? `<button type="button" class="cls-sched-clear" onclick="event.stopPropagation(); clsClearSchedule('${esc(c.class_id)}')">Clear (inherit from quiz)</button>`
+      : '';
+
+    const schedHtml = `
+    <div class="cls-sched-block" onclick="event.stopPropagation()">
+      <div class="cls-sched-row">
+        <div class="cls-sched-field">
+          <label class="cls-sched-label">Open at</label>
+          <input type="datetime-local" class="cls-sched-input" id="schedOpen_${esc(c.class_id)}" value="${openVal}" onchange="clsUpdateSchedule('${esc(c.class_id)}','open_at',this.value)" />
+        </div>
+        <div class="cls-sched-field">
+          <label class="cls-sched-label">Close at</label>
+          <input type="datetime-local" class="cls-sched-input" id="schedClose_${esc(c.class_id)}" value="${closeVal}" onchange="clsUpdateSchedule('${esc(c.class_id)}','close_at',this.value)" />
+        </div>
+      </div>
+      <div class="cls-sched-hint">
+        ${isInherit ? esc(tmplLabel) : '<b>Per-class override</b>'}
+        ${clearBtn}
+        ${releasedBadge}
+      </div>
+    </div>`;
+
+    return `<div class="cls-card-wrap">${cardHtml}${schedHtml}</div>`;
   }
 
   let html = '';
@@ -1905,29 +1979,72 @@ function clsToggle(cardEl, classId) {
   const isLinked = LINKED_CLASS_IDS.has(classId);
   if (isLinked) {
     LINKED_CLASS_IDS.delete(classId);
+    delete LINKED_CLASS_SCHEDULES[classId];
+    delete LINKED_CLASS_RELEASE[classId];
   } else {
     LINKED_CLASS_IDS.add(classId);
+    if (!LINKED_CLASS_SCHEDULES[classId]) {
+      LINKED_CLASS_SCHEDULES[classId] = { open_at: null, close_at: null };
+    }
+    if (!LINKED_CLASS_RELEASE[classId]) {
+      LINKED_CLASS_RELEASE[classId] = { released: false, released_at: null };
+    }
   }
+  renderClassesList();
+}
+
+function clsUpdateSchedule(classId, field, localValue) {
+  if (!LINKED_CLASS_SCHEDULES[classId]) {
+    LINKED_CLASS_SCHEDULES[classId] = { open_at: null, close_at: null };
+  }
+  // datetime-local gives "YYYY-MM-DDTHH:mm" in local time — convert to ISO
+  LINKED_CLASS_SCHEDULES[classId][field] = localValue ? new Date(localValue).toISOString() : null;
+}
+
+function clsClearSchedule(classId) {
+  LINKED_CLASS_SCHEDULES[classId] = { open_at: null, close_at: null };
   renderClassesList();
 }
 
 async function saveClassLinks() {
   const ids = [...LINKED_CLASS_IDS];
 
+  // Client-side validation: close_at must be after open_at for each class
+  for (const id of ids) {
+    const s = LINKED_CLASS_SCHEDULES[id] || {};
+    if (s.open_at && s.close_at && new Date(s.close_at) <= new Date(s.open_at)) {
+      const cls = ALL_TEACHER_CLASSES.find(c => c.class_id === id);
+      showToast('Error', `Close date must be after open date for "${cls?.title || id}".`, 'error');
+      return;
+    }
+  }
+
   const btn = $('btnSaveLinks');
   btn.disabled = true;
   btn.textContent = 'Saving…';
 
-  const result = await setQuizClasses(SELECTED_ID, TEACHER_ID, ids);
+  const classAssignments = ids.map(id => {
+    const s = LINKED_CLASS_SCHEDULES[id] || { open_at: null, close_at: null };
+    return { class_id: id, open_at: s.open_at, close_at: s.close_at };
+  });
+
+  const result = await setQuizClasses(SELECTED_ID, TEACHER_ID, classAssignments);
 
   if (!result.success) {
     showToast('Error', result.message || 'Failed to save links.', 'error');
   } else {
-    showToast('Saved', `${result.added} added, ${result.removed} removed, ${result.reactivated} reactivated.`, 'ok');
+    const parts = [];
+    if (result.added)       parts.push(`${result.added} added`);
+    if (result.removed)     parts.push(`${result.removed} removed`);
+    if (result.reactivated) parts.push(`${result.reactivated} reactivated`);
+    if (result.updated)     parts.push(`${result.updated} updated`);
+    showToast('Saved', parts.length ? parts.join(', ') : 'No changes.', 'ok');
     LINKED_CLASS_IDS = new Set(ids);
+    // Refresh link state so schedules reflect what was saved server-side
+    await loadClassesTab();
   }
 
-  btn.disabled = SELECTED_QUIZ?.status !== 'DRAFT';
+  btn.disabled = SELECTED_QUIZ?.status === 'ARCHIVED';
   btn.textContent = 'Save Links';
 }
 
@@ -2639,21 +2756,38 @@ function renderPublishPane() {
   }
 
   function releaseCardHtml() {
-    if (q.results_released) {
-      const relDate = q.results_released_at ? fmtDate(q.results_released_at) : '';
-      return `<div class="release-done">✓ Results released to students${relDate ? ' on ' + relDate : ''}</div>`;
+    // Per-class release state lives on LINKED_CLASS_RELEASE (loaded by Classes tab).
+    const linkedIds = [...LINKED_CLASS_IDS];
+    const total     = linkedIds.length;
+    const releasedCount = linkedIds.filter(id => LINKED_CLASS_RELEASE[id]?.released).length;
+    const allReleased = total > 0 && releasedCount === total;
+
+    if (total === 0) {
+      return `<div class="release-card">
+        <div class="release-card-head">
+          <div class="release-card-title">No classes linked yet</div>
+        </div>
+        <div class="release-card-body">
+          <div class="release-card-sub">Link this quiz to at least one class before releasing results.</div>
+        </div>
+      </div>`;
     }
+
+    if (allReleased) {
+      return `<div class="release-done">✓ Results released to all ${total} linked class${total !== 1 ? 'es' : ''}</div>`;
+    }
+
     const sub = q.results_release_policy === 'MANUAL'
-      ? 'Results policy is set to Manual Release. Students cannot see their scores until you release them.'
-      : `Results policy is set to ${q.results_release_policy}. You can override and release now.`;
+      ? `Results policy is set to Manual Release. Released for ${releasedCount} of ${total} class${total !== 1 ? 'es' : ''}.`
+      : `Results policy is set to ${q.results_release_policy}. Released for ${releasedCount} of ${total} class${total !== 1 ? 'es' : ''}. You can override and bulk-release now.`;
     return `
     <div class="release-card">
       <div class="release-card-head">
-        <div class="release-card-title">Results not yet released</div>
+        <div class="release-card-title">${releasedCount > 0 ? 'Partial release' : 'Results not yet released'}</div>
       </div>
       <div class="release-card-body">
         <div class="release-card-sub">${sub}</div>
-        <button class="btn primary" id="btnRelease" onclick="releaseResults()">Release results to students</button>
+        <button class="btn primary" id="btnRelease" onclick="releaseResults()">Release results to all linked classes</button>
       </div>
     </div>`;
   }
@@ -2673,7 +2807,7 @@ function renderPublishPane() {
     const pubDate = fmt(q.updated_at);
     const clsText = `${LINKED_CLASS_IDS.size} class${LINKED_CLASS_IDS.size !== 1 ? 'es' : ''}`;
     const schedText = (q.open_at || q.close_at)
-      ? ` · Opens ${fmt(q.open_at)} – Closes ${fmt(q.close_at)}`
+      ? ` · Default ${fmt(q.open_at) || '∅'} – ${fmt(q.close_at) || '∅'}`
       : '';
 
     html += `
@@ -2685,8 +2819,7 @@ function renderPublishPane() {
       </div>
     </div>`;
 
-    const showRelease = q.results_release_policy === 'MANUAL' || !q.results_released;
-    if (showRelease) html += releaseCardHtml();
+    html += releaseCardHtml();
 
     html += summaryCard() + publishedActionCard();
 
@@ -2771,13 +2904,17 @@ async function cloneQuiz() {
 }
 
 async function releaseResults() {
-  if (!confirm('Release results to students? This makes all scores visible.')) return;
+  const linkedCount = LINKED_CLASS_IDS.size;
+  if (!linkedCount) { showToast('Error', 'Link at least one class first.', 'error'); return; }
+  if (!confirm(`Release results for all ${linkedCount} linked class${linkedCount !== 1 ? 'es' : ''}? Scores will become visible to their students.`)) return;
 
   const result = await releaseQuizResults(SELECTED_ID);
   if (!result.success) { showToast('Error', result.message, 'error'); return; }
 
-  showToast('Released', 'Results are now visible to students.', 'ok');
+  showToast('Released', `Results released for ${result.released_count} class${result.released_count !== 1 ? 'es' : ''}.`, 'ok');
   SELECTED_QUIZ = await getTeacherQuiz(SELECTED_ID);
+  // Refresh per-class release state so the publish pane reflects it
+  await loadClassesTab();
   renderPublishPane();
 }
 

@@ -774,17 +774,19 @@
       return;
     }
 
-    const now = new Date();
     let html = '<div class="quiz-cards">';
 
     quizzes.forEach(q => {
-      // Determine availability status
-      const isOpen = (!q.open_at || new Date(q.open_at) <= now);
-      const isClosed = (q.close_at && new Date(q.close_at) < now);
+      // Determine availability from the resolved per-class state
+      // (computed in getQuizzesForClass using link overrides + quiz template)
+      const state = q.state || 'AVAILABLE';
+      const effOpenAt = q.effective_open_at ?? q.open_at ?? null;
+      const isOpen   = state !== 'NOT_OPEN';
+      const isClosed = state === 'CLOSED';
       let availBadge = '';
       if (isClosed) {
         availBadge = '<span class="quiz-badge closed">Closed</span>';
-      } else if (!isOpen) {
+      } else if (state === 'NOT_OPEN') {
         availBadge = '<span class="quiz-badge upcoming">Upcoming</span>';
       } else {
         availBadge = '<span class="quiz-badge open">Open</span>';
@@ -825,7 +827,7 @@
       } else if (exhausted) {
         actionHtml = '<span style="font-size:12px; color:var(--text-muted);">All attempts used</span>';
       } else if (!isOpen) {
-        const openDate = formatDate(q.open_at);
+        const openDate = formatDate(effOpenAt);
         actionHtml = `<span style="font-size:12px; color:var(--text-muted);">Opens ${openDate}</span>`;
       }
 
