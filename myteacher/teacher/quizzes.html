@@ -235,21 +235,64 @@ a { color: var(--brand); }
 .cls-empty-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
 .cls-empty-sub { font-size: 12px; color: var(--muted); }
 .cls-empty-link { display: inline-block; margin-top: 12px; font-size: 12px; font-weight: 700; color: var(--brand); text-decoration: none; border: 1px solid var(--brand); padding: 5px 14px; border-radius: 8px; cursor: pointer; }
-.cls-save-footer { display: flex; justify-content: flex-end; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.cls-save-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
 .cls-dot-sep { color: var(--line); }
-/* Per-class schedule block (only visible on linked cards) */
-.cls-card-wrap { margin-bottom: 6px; }
-.cls-sched-block { border: 1px solid rgba(6,118,71,.18); border-top: 0; border-radius: 0 0 12px 12px; background: rgba(230,246,239,.55); padding: 10px 14px 12px; margin-top: -7px; position: relative; z-index: 0; }
-.cls-card.cls-linked.cls-has-sched { border-bottom-left-radius: 0; border-bottom-right-radius: 0; margin-bottom: 0; }
-.cls-sched-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
-.cls-sched-field { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 150px; }
-.cls-sched-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; color: var(--muted); }
-.cls-sched-input { padding: 5px 8px; border: 1px solid var(--line); border-radius: 7px; font-size: 12px; font-family: inherit; background: var(--card); color: var(--ink); }
-.cls-sched-input:focus { border-color: var(--ok); outline: none; }
-.cls-sched-hint { font-size: 10px; color: var(--muted); margin-top: 4px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-.cls-sched-hint b { color: var(--ok); font-weight: 700; }
-.cls-sched-clear { font-size: 10px; font-weight: 700; color: var(--brand); cursor: pointer; border: none; background: none; padding: 0; text-decoration: underline; }
-.cls-sched-released { font-size: 10px; font-weight: 700; color: var(--ok); margin-left: auto; }
+
+/* Two-column layout: left list, right detail panel */
+.cls-tab-grid { display: grid; grid-template-columns: 260px 1fr; gap: 16px; align-items: start; }
+.cls-list-col { min-width: 0; max-height: 620px; overflow-y: auto; padding-right: 4px; }
+.cls-detail-col { min-width: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); padding: 16px; min-height: 420px; }
+
+/* Compact class row for the left list */
+.cls-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); margin-bottom: 5px; cursor: pointer; transition: border-color .12s, background .12s; }
+.cls-row:hover { border-color: rgba(11,122,117,.3); background: var(--soft); }
+.cls-row.cls-row-selected { border-color: var(--brand); background: rgba(11,122,117,.08); box-shadow: inset 3px 0 0 var(--brand); }
+.cls-row.cls-row-linked { border-color: rgba(6,118,71,.25); background: var(--ok-light); }
+.cls-row.cls-row-linked.cls-row-selected { border-color: var(--ok); background: rgba(6,118,71,.12); box-shadow: inset 3px 0 0 var(--ok); }
+.cls-row-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.cls-row-body { flex: 1; min-width: 0; }
+.cls-row-title { font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cls-row.cls-row-linked .cls-row-title { color: #064e38; }
+.cls-row-sub { font-size: 10px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.cls-row-check { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--line); display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--card); font-size: 9px; font-weight: 900; color: transparent; }
+.cls-row-check.cls-row-checked { background: var(--ok); border-color: var(--ok); color: white; }
+.cls-row-check:hover { border-color: var(--ok); }
+
+/* Right-panel sections */
+.cls-detail-header { display: flex; align-items: center; gap: 10px; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--line); }
+.cls-detail-header .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.cls-detail-title { font-size: 15px; font-weight: 800; flex: 1; min-width: 0; }
+.cls-detail-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.cls-detail-members { font-size: 11px; font-weight: 700; background: var(--soft); color: var(--muted); border: 1px solid var(--line); border-radius: 20px; padding: 2px 10px; }
+.cls-detail-section { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; background: var(--card); }
+.cls-detail-section-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); margin-bottom: 8px; }
+.cls-detail-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.cls-detail-field { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 160px; }
+.cls-detail-field label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; color: var(--muted); }
+.cls-detail-field input { padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; font-family: inherit; background: var(--card); color: var(--ink); }
+.cls-detail-field input:focus { border-color: var(--brand); outline: none; }
+.cls-detail-hint { font-size: 10px; color: var(--muted); margin-top: 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.cls-detail-hint b { color: var(--brand); font-weight: 700; }
+.cls-inline-link { font-size: 10px; font-weight: 700; color: var(--brand); cursor: pointer; border: none; background: none; padding: 0; text-decoration: underline; }
+.cls-release-line { font-size: 12px; margin-bottom: 10px; }
+.cls-release-line b { font-weight: 700; }
+.cls-release-line .pill { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; margin-left: 6px; border: 1px solid; }
+.cls-release-line .pill-ok { background: var(--ok-light); color: var(--ok); border-color: rgba(6,118,71,.2); }
+.cls-release-line .pill-warn { background: #fff4d6; color: #8a6200; border-color: rgba(138,98,0,.2); }
+.cls-release-line .pill-muted { background: var(--soft); color: var(--muted); border-color: var(--line); }
+.cls-release-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.cls-stats-row { display: flex; gap: 16px; font-size: 12px; }
+.cls-stats-row .stat { display: flex; align-items: baseline; gap: 6px; }
+.cls-stats-row .stat b { font-size: 16px; font-weight: 800; color: var(--ink); }
+.cls-stats-row .stat span { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .3px; }
+.cls-detail-save { display: flex; justify-content: flex-end; padding-top: 10px; border-top: 1px solid var(--line); }
+.cls-detail-empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+.cls-detail-empty .icon { font-size: 32px; margin-bottom: 10px; }
+.cls-detail-empty-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.cls-list-section-head { display: flex; align-items: center; gap: 6px; margin: 4px 0 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); }
+.cls-list-section-head.linked { color: var(--ok); }
+.cls-list-section-head .count { background: var(--soft); padding: 0 6px; border-radius: 20px; font-size: 9px; border: 1px solid var(--line); }
+.cls-list-section-head.linked .count { background: var(--ok-light); color: var(--ok); border-color: rgba(6,118,71,.2); }
 
 /* ── Questions tab ───────────────────────────────────────── */
 .q-split { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
@@ -822,15 +865,17 @@ a { color: var(--brand); }
         <div class="cls-toolbar">
           <div class="cls-toolbar-left">
             <input type="text" id="classSearch" class="cls-search" placeholder="Search classes…" />
-            <button class="btn sm" id="btnSelectAll">Select all</button>
-            <button class="btn sm" id="btnClearAll">Clear</button>
             <button class="btn sm" id="btnReloadClasses">Reload</button>
           </div>
-          <button class="btn sm primary" id="btnSaveLinks">Save links</button>
+          <button class="btn sm primary" id="btnSaveLinks">Save all</button>
         </div>
-        <div id="classesBox"></div>
+        <div class="cls-tab-grid">
+          <div class="cls-list-col" id="classesListCol"></div>
+          <div class="cls-detail-col" id="classesDetailCol"></div>
+        </div>
         <div class="cls-save-footer">
-          <button class="btn sm primary" onclick="saveClassLinks()">Save links</button>
+          <button class="btn sm" id="btnReleaseAll" onclick="releaseResults()">Release for all unreleased</button>
+          <button class="btn sm primary" onclick="saveClassLinks()">Save all</button>
         </div>
       </div>
 
@@ -1082,8 +1127,14 @@ let LINKED_CLASS_IDS = new Set();
 // Per-class schedule overrides: { [class_id]: { open_at, close_at } }
 // open_at/close_at are ISO strings or null. Null = inherit quiz template.
 let LINKED_CLASS_SCHEDULES = {};
-// Per-class release state (read-only in UI; released via bulk button)
-let LINKED_CLASS_RELEASE = {}; // { [class_id]: { released, released_at } }
+// Per-class release state: { [class_id]: { released, released_at } }
+let LINKED_CLASS_RELEASE = {};
+// Per-class stats: { [class_id]: { members, submitted, in_progress } }
+let QUIZ_CLASS_STATS = {};
+// Currently-selected class in the detail panel (right column)
+let SELECTED_LINK_CLASS_ID = null;
+// Dirty flag for the selected class's right-panel edits
+let CLS_DETAIL_DIRTY = false;
 
 // Bank state
 let BANK_RESULTS = [];
@@ -1827,7 +1878,7 @@ function removeCustomField(idx) {
 
 
 // ================================================================
-// CLASSES TAB
+// CLASSES TAB — two-column layout (list + detail)
 // ================================================================
 async function loadClassesTab() {
   ALL_TEACHER_CLASSES = await getTeacherClasses(TEACHER_ID, { statusFilter: 'ACTIVE' });
@@ -1848,11 +1899,24 @@ async function loadClassesTab() {
     };
   });
 
+  // Per-class stats (members + attempt counts) — used by the right panel
+  QUIZ_CLASS_STATS = await getQuizClassStats(SELECTED_ID);
+
+  // Keep selection if still valid; otherwise pick first linked class
+  if (SELECTED_LINK_CLASS_ID && !LINKED_CLASS_IDS.has(SELECTED_LINK_CLASS_ID)) {
+    SELECTED_LINK_CLASS_ID = null;
+  }
+  if (!SELECTED_LINK_CLASS_ID && LINKED_CLASS_IDS.size) {
+    SELECTED_LINK_CLASS_ID = [...LINKED_CLASS_IDS][0];
+  }
+  CLS_DETAIL_DIRTY = false;
+
   renderClassesList();
+  renderClassDetail();
 }
 
 function renderClassesList() {
-  const box = $('classesBox');
+  const col = $('classesListCol');
   const q = ($('classSearch').value || '').toLowerCase().trim();
   const filtered = q
     ? ALL_TEACHER_CLASSES.filter(c =>
@@ -1862,9 +1926,8 @@ function renderClassesList() {
       )
     : ALL_TEACHER_CLASSES;
 
-  // Empty — no classes at all
   if (!ALL_TEACHER_CLASSES.length) {
-    box.innerHTML = `
+    col.innerHTML = `
       <div class="cls-empty-state">
         <div class="cls-empty-icon">🏫</div>
         <div class="cls-empty-title">No classes yet</div>
@@ -1874,113 +1937,215 @@ function renderClassesList() {
     return;
   }
 
-  // Empty — search returned nothing
   if (!filtered.length) {
-    box.innerHTML = '<div class="hint" style="padding:20px;text-align:center">No classes match your search.</div>';
+    col.innerHTML = '<div class="hint" style="padding:20px;text-align:center">No classes match your search.</div>';
     return;
   }
 
   const linked   = filtered.filter(c =>  LINKED_CLASS_IDS.has(c.class_id));
   const unlinked = filtered.filter(c => !LINKED_CLASS_IDS.has(c.class_id));
 
-  // Quiz-level template defaults (for "inherit" placeholder text)
+  function buildRow(c, isLinked) {
+    const colour   = c.colour || '';
+    const dotStyle = colour ? `background:${esc(colour)}` : 'background:var(--muted)';
+    const subParts = [c.programme, c.academic_year].filter(Boolean);
+    const sub      = subParts.join(' · ');
+    const selected = SELECTED_LINK_CLASS_ID === c.class_id;
+    const cls = ['cls-row'];
+    if (isLinked) cls.push('cls-row-linked');
+    if (selected) cls.push('cls-row-selected');
+    return `
+    <div class="${cls.join(' ')}" onclick="clsSelectClass('${esc(c.class_id)}')">
+      <div class="cls-row-check${isLinked ? ' cls-row-checked' : ''}" onclick="event.stopPropagation(); clsToggleLink('${esc(c.class_id)}')">${isLinked ? '✓' : ''}</div>
+      <div class="cls-row-dot" style="${dotStyle}"></div>
+      <div class="cls-row-body">
+        <div class="cls-row-title">${esc(c.title)}</div>
+        ${sub ? `<div class="cls-row-sub">${esc(sub)}</div>` : ''}
+      </div>
+    </div>`;
+  }
+
+  let html = '';
+  if (linked.length) {
+    html += `<div class="cls-list-section-head linked">Linked <span class="count">${linked.length}</span></div>`;
+    html += linked.map(c => buildRow(c, true)).join('');
+  }
+  if (unlinked.length) {
+    html += `<div class="cls-list-section-head">Not linked <span class="count">${unlinked.length}</span></div>`;
+    html += unlinked.map(c => buildRow(c, false)).join('');
+  }
+  col.innerHTML = html;
+}
+
+function renderClassDetail() {
+  const panel = $('classesDetailCol');
+
+  if (!SELECTED_LINK_CLASS_ID) {
+    panel.innerHTML = `
+      <div class="cls-detail-empty">
+        <div class="icon">👈</div>
+        <div class="cls-detail-empty-title">Select a class on the left</div>
+        <div>Pick a linked class to edit its schedule and results release.<br/>Click an unlinked class to add it and open its settings.</div>
+      </div>`;
+    return;
+  }
+
+  const c = ALL_TEACHER_CLASSES.find(x => x.class_id === SELECTED_LINK_CLASS_ID);
+  if (!c) { panel.innerHTML = ''; return; }
+
+  const isLinked = LINKED_CLASS_IDS.has(c.class_id);
+  const stats    = QUIZ_CLASS_STATS[c.class_id] || { members: CLASS_MEMBER_COUNTS[c.class_id] || 0, submitted: 0, in_progress: 0 };
+  const colour   = c.colour || '';
+  const dotStyle = colour ? `background:${esc(colour)}` : 'background:var(--muted)';
+  const subParts = [c.programme, c.academic_year, c.semester].filter(Boolean);
+  const subLine  = subParts.join(' · ');
+
+  // Schedule section
+  const sched = LINKED_CLASS_SCHEDULES[c.class_id] || { open_at: null, close_at: null };
+  const openVal  = toLocalDatetime(sched.open_at);
+  const closeVal = toLocalDatetime(sched.close_at);
+  const isInherit = !sched.open_at && !sched.close_at;
+
   const qOpenAt  = SELECTED_QUIZ?.open_at  || null;
   const qCloseAt = SELECTED_QUIZ?.close_at || null;
   const tmplLabel = (qOpenAt || qCloseAt)
     ? `Inherits quiz template: ${qOpenAt ? fmtDate(qOpenAt) : '∅'} → ${qCloseAt ? fmtDate(qCloseAt) : '∅'}`
     : 'Inherits quiz template: always open';
 
-  function buildCard(c, isLinked) {
-    const count   = CLASS_MEMBER_COUNTS[c.class_id] || 0;
-    const colour  = c.colour || '';
-    const dotStyle = colour ? `background:${esc(colour)}` : 'background:var(--muted)';
-    const subParts = [c.programme, c.academic_year, c.semester].filter(Boolean);
-    const subHtml  = subParts.map(p => `<span>${esc(p)}</span>`).join('<span class="cls-dot-sep">·</span>');
-    const hasSched = isLinked;
-    const cardHtml = `
-    <div class="cls-card${isLinked ? ' cls-linked' : ''}${hasSched ? ' cls-has-sched' : ''}" onclick="clsToggle(this,'${esc(c.class_id)}')">
-      <div class="cls-check${isLinked ? ' cls-checked' : ''}">${isLinked ? '<div class="cls-check-tick">✓</div>' : ''}</div>
-      <div class="cls-colour-dot" style="${dotStyle}"></div>
-      <div class="cls-card-body">
-        <div class="cls-card-title">${esc(c.title)}</div>
-        ${subParts.length ? `<div class="cls-card-sub">${subHtml}</div>` : ''}
+  // Release section content depends on policy + current state
+  const policy = SELECTED_QUIZ?.results_release_policy || 'MANUAL';
+  const release = LINKED_CLASS_RELEASE[c.class_id] || { released: false, released_at: null };
+  const effCloseAt = sched.close_at || qCloseAt;
+  const now = new Date();
+
+  let policyLabel, statusHtml, actionsHtml;
+  if (policy === 'IMMEDIATE') {
+    policyLabel = 'Immediate';
+    statusHtml  = 'Auto-released on submit <span class="pill pill-ok">✓ Live</span>';
+    actionsHtml = '<div class="hint">No action needed — students see results the moment they submit.</div>';
+  } else if (policy === 'AFTER_CLOSE') {
+    policyLabel = 'After close';
+    if (release.released) {
+      statusHtml = `Released by override${release.released_at ? ' on <b>' + fmtDate(release.released_at) + '</b>' : ''} <span class="pill pill-ok">✓ Released</span>`;
+      actionsHtml = `<button class="btn sm" onclick="clsRevokeRelease('${esc(c.class_id)}')">Revoke override</button>`;
+    } else if (effCloseAt && new Date(effCloseAt) <= now) {
+      statusHtml = `Auto-released on close <b>${fmtDate(effCloseAt)}</b> <span class="pill pill-ok">✓ Released</span>`;
+      actionsHtml = '<div class="hint">Close date has passed — students can already see their results.</div>';
+    } else if (effCloseAt) {
+      statusHtml = `Awaiting close <b>${fmtDate(effCloseAt)}</b> <span class="pill pill-muted">Pending</span>`;
+      actionsHtml = `<button class="btn sm primary" onclick="clsReleaseNow('${esc(c.class_id)}', 'Release results for this class early?')">Release early</button>`;
+    } else {
+      statusHtml = `No close date set <span class="pill pill-warn">Blocked</span>`;
+      actionsHtml = `<div class="hint">Set a close date above, or release manually below.</div><button class="btn sm" onclick="clsReleaseNow('${esc(c.class_id)}', 'Release results for this class now?')">Release now</button>`;
+    }
+  } else {
+    policyLabel = 'Manual';
+    if (release.released) {
+      statusHtml  = `Released${release.released_at ? ' on <b>' + fmtDate(release.released_at) + '</b>' : ''} <span class="pill pill-ok">✓ Released</span>`;
+      actionsHtml = `<button class="btn sm" onclick="clsRevokeRelease('${esc(c.class_id)}')">Revoke release</button>`;
+    } else {
+      statusHtml  = `Not released yet <span class="pill pill-muted">Pending</span>`;
+      actionsHtml = `<button class="btn sm primary" onclick="clsReleaseNow('${esc(c.class_id)}', 'Release results for this class now?')">Release now</button>`;
+    }
+  }
+
+  const linkBanner = !isLinked
+    ? `<div class="cls-detail-section" style="background:#fff8e1;border-color:#f0c854"><div class="hint">This class is not linked to the quiz yet. Click the checkbox on the left, or press Save all to persist the link.</div></div>`
+    : '';
+
+  const saveLabel = CLS_DETAIL_DIRTY ? 'Save changes' : 'Saved';
+  const readOnly = SELECTED_QUIZ?.status === 'ARCHIVED';
+
+  panel.innerHTML = `
+    <div class="cls-detail-header">
+      <div class="dot" style="${dotStyle}"></div>
+      <div style="flex:1;min-width:0;">
+        <div class="cls-detail-title">${esc(c.title)}</div>
+        ${subLine ? `<div class="cls-detail-sub">${esc(subLine)}</div>` : ''}
       </div>
-      <div class="cls-card-right">
-        <span class="cls-members-badge">${count} member${count !== 1 ? 's' : ''}</span>
-      </div>
-    </div>`;
+      <span class="cls-detail-members">${stats.members} member${stats.members !== 1 ? 's' : ''}</span>
+    </div>
 
-    if (!isLinked) return `<div class="cls-card-wrap">${cardHtml}</div>`;
+    ${linkBanner}
 
-    // Schedule block — stop propagation so clicks inside don't untoggle the card
-    const sched   = LINKED_CLASS_SCHEDULES[c.class_id] || { open_at: null, close_at: null };
-    const release = LINKED_CLASS_RELEASE[c.class_id]   || { released: false, released_at: null };
-    const openVal  = toLocalDatetime(sched.open_at);
-    const closeVal = toLocalDatetime(sched.close_at);
-    const isInherit = !sched.open_at && !sched.close_at;
-    const releasedBadge = release.released
-      ? `<span class="cls-sched-released">✓ Results released${release.released_at ? ' ' + fmtDate(release.released_at) : ''}</span>`
-      : '';
-    const clearBtn = !isInherit
-      ? `<button type="button" class="cls-sched-clear" onclick="event.stopPropagation(); clsClearSchedule('${esc(c.class_id)}')">Clear (inherit from quiz)</button>`
-      : '';
-
-    const schedHtml = `
-    <div class="cls-sched-block" onclick="event.stopPropagation()">
-      <div class="cls-sched-row">
-        <div class="cls-sched-field">
-          <label class="cls-sched-label">Open at</label>
-          <input type="datetime-local" class="cls-sched-input" id="schedOpen_${esc(c.class_id)}" value="${openVal}" onchange="clsUpdateSchedule('${esc(c.class_id)}','open_at',this.value)" />
+    <div class="cls-detail-section">
+      <div class="cls-detail-section-label">Schedule (for this class)</div>
+      <div class="cls-detail-row">
+        <div class="cls-detail-field">
+          <label>Open at</label>
+          <input type="datetime-local" id="detailSchedOpen" value="${openVal}" ${readOnly ? 'disabled' : ''} onchange="clsDetailUpdateSchedule('open_at', this.value)" />
         </div>
-        <div class="cls-sched-field">
-          <label class="cls-sched-label">Close at</label>
-          <input type="datetime-local" class="cls-sched-input" id="schedClose_${esc(c.class_id)}" value="${closeVal}" onchange="clsUpdateSchedule('${esc(c.class_id)}','close_at',this.value)" />
+        <div class="cls-detail-field">
+          <label>Close at</label>
+          <input type="datetime-local" id="detailSchedClose" value="${closeVal}" ${readOnly ? 'disabled' : ''} onchange="clsDetailUpdateSchedule('close_at', this.value)" />
         </div>
       </div>
-      <div class="cls-sched-hint">
+      <div class="cls-detail-hint">
         ${isInherit ? esc(tmplLabel) : '<b>Per-class override</b>'}
-        ${clearBtn}
-        ${releasedBadge}
+        ${!isInherit && !readOnly ? `<button type="button" class="cls-inline-link" onclick="clsDetailClearSchedule()">Clear (inherit from quiz)</button>` : ''}
       </div>
-    </div>`;
+    </div>
 
-    return `<div class="cls-card-wrap">${cardHtml}${schedHtml}</div>`;
-  }
+    <div class="cls-detail-section">
+      <div class="cls-detail-section-label">Results release</div>
+      <div class="cls-release-line"><b>Policy:</b> ${policyLabel}</div>
+      <div class="cls-release-line">${statusHtml}</div>
+      ${readOnly ? '<div class="hint">Quiz is archived — release actions disabled.</div>' : `<div class="cls-release-actions">${actionsHtml}</div>`}
+    </div>
 
-  let html = '';
-
-  if (linked.length) {
-    html += `
-    <div class="cls-section">
-      <div class="cls-section-head cls-linked-head">
-        <div class="cls-section-label">Linked</div>
-        <div class="cls-section-count">${linked.length}</div>
-        <div class="hint">Students in these classes will see this quiz</div>
+    <div class="cls-detail-section">
+      <div class="cls-detail-section-label">Stats</div>
+      <div class="cls-stats-row">
+        <div class="stat"><b>${stats.members}</b> <span>Members</span></div>
+        <div class="stat"><b>${stats.submitted}</b> <span>Submitted</span></div>
+        <div class="stat"><b>${stats.in_progress}</b> <span>In progress</span></div>
       </div>
-      ${linked.map(c => buildCard(c, true)).join('')}
-    </div>`;
-  }
+    </div>
 
-  if (unlinked.length) {
-    html += `
-    <div class="cls-section">
-      <div class="cls-section-head">
-        <div class="cls-section-label">Not linked</div>
-        <div class="cls-section-count">${unlinked.length}</div>
-      </div>
-      ${unlinked.map(c => buildCard(c, false)).join('')}
-    </div>`;
-  }
-
-  box.innerHTML = html;
+    <div class="cls-detail-save">
+      <button class="btn sm primary" ${CLS_DETAIL_DIRTY && !readOnly ? '' : 'disabled'} onclick="saveClassLinks()">${saveLabel}</button>
+    </div>
+  `;
 }
 
-function clsToggle(cardEl, classId) {
+// ── Selection / link toggles ───────────────────────────────
+
+function clsSelectClass(classId) {
+  // Dirty check: warn before switching away
+  if (CLS_DETAIL_DIRTY && SELECTED_LINK_CLASS_ID && SELECTED_LINK_CLASS_ID !== classId) {
+    if (!confirm('You have unsaved changes. Discard them and switch classes?')) return;
+    // Discard: reload fresh link state for the current class from the server copy
+    const fresh = LINKED_CLASS_SCHEDULES[SELECTED_LINK_CLASS_ID];
+    if (fresh) {
+      LINKED_CLASS_SCHEDULES[SELECTED_LINK_CLASS_ID] = { ...fresh };
+    }
+    CLS_DETAIL_DIRTY = false;
+  }
+
+  SELECTED_LINK_CLASS_ID = classId;
+
+  // Clicking an unlinked class in the list auto-links it so the teacher can edit
+  if (!LINKED_CLASS_IDS.has(classId)) {
+    LINKED_CLASS_IDS.add(classId);
+    if (!LINKED_CLASS_SCHEDULES[classId]) {
+      LINKED_CLASS_SCHEDULES[classId] = { open_at: null, close_at: null };
+    }
+    if (!LINKED_CLASS_RELEASE[classId]) {
+      LINKED_CLASS_RELEASE[classId] = { released: false, released_at: null };
+    }
+    CLS_DETAIL_DIRTY = true;
+  }
+
+  renderClassesList();
+  renderClassDetail();
+}
+
+function clsToggleLink(classId) {
+  // Toggle the link state from the check icon (explicit link/unlink action)
   const isLinked = LINKED_CLASS_IDS.has(classId);
   if (isLinked) {
     LINKED_CLASS_IDS.delete(classId);
-    delete LINKED_CLASS_SCHEDULES[classId];
-    delete LINKED_CLASS_RELEASE[classId];
+    if (SELECTED_LINK_CLASS_ID === classId) SELECTED_LINK_CLASS_ID = null;
   } else {
     LINKED_CLASS_IDS.add(classId);
     if (!LINKED_CLASS_SCHEDULES[classId]) {
@@ -1989,22 +2154,54 @@ function clsToggle(cardEl, classId) {
     if (!LINKED_CLASS_RELEASE[classId]) {
       LINKED_CLASS_RELEASE[classId] = { released: false, released_at: null };
     }
+    SELECTED_LINK_CLASS_ID = classId;
   }
+  CLS_DETAIL_DIRTY = true;
   renderClassesList();
+  renderClassDetail();
 }
 
-function clsUpdateSchedule(classId, field, localValue) {
-  if (!LINKED_CLASS_SCHEDULES[classId]) {
-    LINKED_CLASS_SCHEDULES[classId] = { open_at: null, close_at: null };
+// ── Right-panel schedule edits ─────────────────────────────
+
+function clsDetailUpdateSchedule(field, localValue) {
+  if (!SELECTED_LINK_CLASS_ID) return;
+  const id = SELECTED_LINK_CLASS_ID;
+  if (!LINKED_CLASS_SCHEDULES[id]) {
+    LINKED_CLASS_SCHEDULES[id] = { open_at: null, close_at: null };
   }
-  // datetime-local gives "YYYY-MM-DDTHH:mm" in local time — convert to ISO
-  LINKED_CLASS_SCHEDULES[classId][field] = localValue ? new Date(localValue).toISOString() : null;
+  LINKED_CLASS_SCHEDULES[id][field] = localValue ? new Date(localValue).toISOString() : null;
+  CLS_DETAIL_DIRTY = true;
+  renderClassDetail();
 }
 
-function clsClearSchedule(classId) {
-  LINKED_CLASS_SCHEDULES[classId] = { open_at: null, close_at: null };
-  renderClassesList();
+function clsDetailClearSchedule() {
+  if (!SELECTED_LINK_CLASS_ID) return;
+  LINKED_CLASS_SCHEDULES[SELECTED_LINK_CLASS_ID] = { open_at: null, close_at: null };
+  CLS_DETAIL_DIRTY = true;
+  renderClassDetail();
 }
+
+// ── Per-class release / revoke ─────────────────────────────
+
+async function clsReleaseNow(classId, confirmMsg) {
+  if (!confirm(confirmMsg || 'Release results for this class?')) return;
+  const result = await releaseQuizResults(SELECTED_ID, classId);
+  if (!result.success) { showToast('Error', result.message || 'Failed to release.', 'error'); return; }
+  showToast('Released', 'Results are now visible to students in this class.', 'ok');
+  await loadClassesTab();
+  renderPublishPane();
+}
+
+async function clsRevokeRelease(classId) {
+  if (!confirm('Revoke the release for this class? Students who have already viewed their results may have seen them.')) return;
+  const result = await unreleaseQuizResults(SELECTED_ID, classId);
+  if (!result.success) { showToast('Error', result.message || 'Failed to revoke.', 'error'); return; }
+  showToast('Revoked', 'Results are no longer visible for this class.', 'ok');
+  await loadClassesTab();
+  renderPublishPane();
+}
+
+// ── Save all links (schedule bundle) ───────────────────────
 
 async function saveClassLinks() {
   const ids = [...LINKED_CLASS_IDS];
@@ -2039,13 +2236,13 @@ async function saveClassLinks() {
     if (result.reactivated) parts.push(`${result.reactivated} reactivated`);
     if (result.updated)     parts.push(`${result.updated} updated`);
     showToast('Saved', parts.length ? parts.join(', ') : 'No changes.', 'ok');
-    LINKED_CLASS_IDS = new Set(ids);
-    // Refresh link state so schedules reflect what was saved server-side
+    CLS_DETAIL_DIRTY = false;
     await loadClassesTab();
+    renderPublishPane();
   }
 
   btn.disabled = SELECTED_QUIZ?.status === 'ARCHIVED';
-  btn.textContent = 'Save Links';
+  btn.textContent = 'Save all';
 }
 
 
@@ -2760,34 +2957,44 @@ function renderPublishPane() {
     const linkedIds = [...LINKED_CLASS_IDS];
     const total     = linkedIds.length;
     const releasedCount = linkedIds.filter(id => LINKED_CLASS_RELEASE[id]?.released).length;
-    const allReleased = total > 0 && releasedCount === total;
+    const policy = q.results_release_policy || 'MANUAL';
 
     if (total === 0) {
       return `<div class="release-card">
-        <div class="release-card-head">
-          <div class="release-card-title">No classes linked yet</div>
-        </div>
+        <div class="release-card-head"><div class="release-card-title">No classes linked yet</div></div>
         <div class="release-card-body">
           <div class="release-card-sub">Link this quiz to at least one class before releasing results.</div>
         </div>
       </div>`;
     }
 
-    if (allReleased) {
-      return `<div class="release-done">✓ Results released to all ${total} linked class${total !== 1 ? 'es' : ''}</div>`;
+    // IMMEDIATE — release flag is irrelevant; students see results on submit
+    if (policy === 'IMMEDIATE') {
+      return `<div class="release-card">
+        <div class="release-card-head"><div class="release-card-title">Auto-release on submit</div></div>
+        <div class="release-card-body">
+          <div class="release-card-sub">Results policy is Immediate — students see their results the moment they submit. Manage per-class schedule on the Classes tab.</div>
+        </div>
+      </div>`;
     }
 
-    const sub = q.results_release_policy === 'MANUAL'
-      ? `Results policy is set to Manual Release. Released for ${releasedCount} of ${total} class${total !== 1 ? 'es' : ''}.`
-      : `Results policy is set to ${q.results_release_policy}. Released for ${releasedCount} of ${total} class${total !== 1 ? 'es' : ''}. You can override and bulk-release now.`;
+    const label = releasedCount === total
+      ? `Released for all ${total} class${total !== 1 ? 'es' : ''}`
+      : `Released for ${releasedCount} of ${total} class${total !== 1 ? 'es' : ''}`;
+    const sub = policy === 'MANUAL'
+      ? 'Manual policy — release results from the Classes tab per class, or use the bulk button.'
+      : 'After-close policy — classes auto-release when their close date passes. Use the Classes tab to release early.';
+
+    const showBulk = releasedCount < total;
     return `
     <div class="release-card">
-      <div class="release-card-head">
-        <div class="release-card-title">${releasedCount > 0 ? 'Partial release' : 'Results not yet released'}</div>
-      </div>
+      <div class="release-card-head"><div class="release-card-title">${label}</div></div>
       <div class="release-card-body">
         <div class="release-card-sub">${sub}</div>
-        <button class="btn primary" id="btnRelease" onclick="releaseResults()">Release results to all linked classes</button>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn" onclick="goToClassesTab()">Manage per-class releases →</button>
+          ${showBulk ? `<button class="btn primary" id="btnRelease" onclick="releaseResults()">Release for all unreleased</button>` : ''}
+        </div>
       </div>
     </div>`;
   }
@@ -2903,15 +3110,25 @@ async function cloneQuiz() {
   $('btnClone').textContent = 'Clone Quiz';
 }
 
+function goToClassesTab() {
+  setActiveTab('classes');
+  // Ensure the Classes tab has fresh state when entered via this shortcut
+  loadClassesTab();
+}
+
 async function releaseResults() {
-  const linkedCount = LINKED_CLASS_IDS.size;
-  if (!linkedCount) { showToast('Error', 'Link at least one class first.', 'error'); return; }
-  if (!confirm(`Release results for all ${linkedCount} linked class${linkedCount !== 1 ? 'es' : ''}? Scores will become visible to their students.`)) return;
+  const unreleasedIds = [...LINKED_CLASS_IDS].filter(id => !LINKED_CLASS_RELEASE[id]?.released);
+  if (!unreleasedIds.length) { showToast('Info', 'All linked classes are already released.', 'ok'); return; }
+  if (!confirm(`Release results for ${unreleasedIds.length} unreleased class${unreleasedIds.length !== 1 ? 'es' : ''}? Scores will become visible to their students.`)) return;
 
-  const result = await releaseQuizResults(SELECTED_ID);
-  if (!result.success) { showToast('Error', result.message, 'error'); return; }
+  // Release each unreleased class individually so we skip already-released ones
+  let count = 0;
+  for (const classId of unreleasedIds) {
+    const r = await releaseQuizResults(SELECTED_ID, classId);
+    if (r.success) count += (r.released_count || 1);
+  }
 
-  showToast('Released', `Results released for ${result.released_count} class${result.released_count !== 1 ? 'es' : ''}.`, 'ok');
+  showToast('Released', `Results released for ${count} class${count !== 1 ? 'es' : ''}.`, 'ok');
   SELECTED_QUIZ = await getTeacherQuiz(SELECTED_ID);
   // Refresh per-class release state so the publish pane reflects it
   await loadClassesTab();
@@ -3000,14 +3217,6 @@ function bindEvents() {
   });
 
   $('btnSaveLinks').addEventListener('click', saveClassLinks);
-  $('btnSelectAll').addEventListener('click', () => {
-    ALL_TEACHER_CLASSES.forEach(c => LINKED_CLASS_IDS.add(c.class_id));
-    renderClassesList();
-  });
-  $('btnClearAll').addEventListener('click', () => {
-    LINKED_CLASS_IDS.clear();
-    renderClassesList();
-  });
   $('btnReloadClasses').addEventListener('click', loadClassesTab);
   let clsSearchTimer = null;
   $('classSearch').addEventListener('input', () => { clearTimeout(clsSearchTimer); clsSearchTimer = setTimeout(renderClassesList, 200); });

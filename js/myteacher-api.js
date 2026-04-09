@@ -1586,6 +1586,85 @@ async function releaseQuizResults(quizId, classId = null) {
 
 
 // ------------------------------------------------------------
+// UNRELEASE QUIZ RESULTS (revoke)
+// Sets results_released=false and clears results_released_at on the
+// target link(s). If classId is given, only that class is revoked;
+// otherwise all ACTIVE links for the quiz are revoked.
+// Used by: quizzes.html Classes tab — per-class Revoke action
+// ------------------------------------------------------------
+async function unreleaseQuizResults(quizId, classId = null) {
+  const now = new Date().toISOString();
+
+  let q = db
+    .from('teacher_quiz_classes')
+    .update({
+      results_released   : false,
+      results_released_at: null,
+      updated_at         : now
+    })
+    .eq('teacher_quiz_id', quizId)
+    .eq('status', 'ACTIVE');
+
+  if (classId) q = q.eq('class_id', classId);
+
+  const { data, error } = await q.select('tqc_id');
+
+  if (error) { console.error('unreleaseQuizResults:', error); return { success: false, message: error.message }; }
+  return { success: true, revoked_count: (data || []).length };
+}
+
+
+// ------------------------------------------------------------
+// GET QUIZ CLASS STATS
+// Returns per-class attempt + member counts for a given quiz.
+// Shape: { [class_id]: { members, submitted, in_progress } }
+// Used by: quizzes.html Classes tab — right-panel stats row
+// ------------------------------------------------------------
+async function getQuizClassStats(quizId) {
+  // 1. Which classes are linked to this quiz?
+  const { data: links, error: linkErr } = await db
+    .from('teacher_quiz_classes')
+    .select('class_id')
+    .eq('teacher_quiz_id', quizId)
+    .eq('status', 'ACTIVE');
+
+  if (linkErr || !links || !links.length) return {};
+
+  const classIds = links.map(l => l.class_id);
+  const stats = {};
+  classIds.forEach(id => { stats[id] = { members: 0, submitted: 0, in_progress: 0 }; });
+
+  // 2. Active member counts per class
+  const { data: members, error: memErr } = await db
+    .from('teacher_class_members')
+    .select('class_id')
+    .in('class_id', classIds)
+    .eq('status', 'ACTIVE');
+
+  if (!memErr && members) {
+    members.forEach(m => { if (stats[m.class_id]) stats[m.class_id].members += 1; });
+  }
+
+  // 3. Attempt counts per class (only for this quiz)
+  const { data: attempts, error: attErr } = await db
+    .from('teacher_quiz_attempts')
+    .select('class_id, status')
+    .eq('teacher_quiz_id', quizId)
+    .in('class_id', classIds);
+
+  if (!attErr && attempts) {
+    attempts.forEach(a => {
+      if (!stats[a.class_id]) return;
+      if (a.status === 'SUBMITTED' || a.status === 'TIMED_OUT') stats[a.class_id].submitted += 1;
+      else if (a.status === 'IN_PROGRESS')                       stats[a.class_id].in_progress += 1;
+    });
+  }
+
+  return stats;
+}
+
+
+// ------------------------------------------------------------
 // CLONE TEACHER QUIZ
 // Creates a new DRAFT from an existing quiz.
 // Copies all settings, grade bands, custom fields.
@@ -2453,14 +2532,18 @@ async function getAttemptResults(attemptId, userId) {
 
   const { open_at: effOpenAt, close_at: effCloseAt } = _effectiveQuizWindow(quiz, link);
 
-  // 4. Compute results gate (uses effective close + link-level release)
+  // 4. Compute results gate (link-level release is a universal override)
   const now = new Date();
   const policy = quiz.results_release_policy || 'MANUAL';
   let gateMet = false;
   let gateReason = '';
   let availableAt = null;
 
-  if (policy === 'IMMEDIATE') {
+  if (link?.results_released) {
+    // Explicit teacher override — always visible regardless of policy
+    gateMet = true;
+    availableAt = link.results_released_at;
+  } else if (policy === 'IMMEDIATE') {
     gateMet = true;
   } else if (policy === 'AFTER_CLOSE') {
     if (!effCloseAt) {
@@ -2473,13 +2556,8 @@ async function getAttemptResults(attemptId, userId) {
       availableAt = effCloseAt;
     }
   } else {
-    // MANUAL — link-only state
-    if (link?.results_released) {
-      gateMet = true;
-      availableAt = link.results_released_at;
-    } else {
-      gateReason = 'RESULTS_NOT_RELEASED';
-    }
+    // MANUAL — no automatic release
+    gateReason = 'RESULTS_NOT_RELEASED';
   }
 
   // 5. Compute display score (respecting policy)
@@ -2652,13 +2730,14 @@ async function getAttemptReview(attemptId, userId) {
 
   const { close_at: effCloseAt } = _effectiveQuizWindow(quiz, link);
 
-  // Check release gate (uses effective close + link-level release)
+  // Check release gate (link-level release is a universal override)
   const now = new Date();
   const policy = quiz.results_release_policy || 'MANUAL';
   let gateMet = false;
-  if (policy === 'IMMEDIATE') gateMet = true;
-  else if (policy === 'AFTER_CLOSE') gateMet = effCloseAt && new Date(effCloseAt) <= now;
-  else gateMet = !!(link && link.results_released);
+  if (link?.results_released)         gateMet = true;
+  else if (policy === 'IMMEDIATE')    gateMet = true;
+  else if (policy === 'AFTER_CLOSE')  gateMet = effCloseAt && new Date(effCloseAt) <= now;
+  // MANUAL without override → gate not met
 
   if (!gateMet) {
     return { success: false, code: 'RESULTS_NOT_RELEASED', message: 'Results have not been released yet. Review will be available when results are released.' };

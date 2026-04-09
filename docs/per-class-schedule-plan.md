@@ -272,4 +272,146 @@ Per-class release buttons in the Classes tab come in a follow-up PR.
 9. **Teacher Classes tab**: schedule pickers pre-fill from saved link data. Edit close_at only → Save Links → refetch shows update applied. Validation: `close_at ≤ open_at` → error toast, no save.
 10. **Regression check**: existing quizzes with only quiz-level schedule still work — all link rows have null schedule fields, fallback resolves to quiz template.
 
-Tools: use `preview_start` → `preview_click` / `preview_fill` / `preview_snapshot` for UI flows; use `mcp__supabase-prod__execute_sql` (read-only) to verify row state between steps.
+Tools: use `preview_start` → `preview_click` / `preview_fill` / `preview_snapshot` for UI flows; use the dev Supabase MCP (`mcp__30f7ad5f-...`) `execute_sql` (read-only) to verify row state between steps.
+
+---
+
+# Phase 2 — Per-class results release dashboard + two-column Classes tab
+
+## Phase 2 context
+
+Phase 1 shipped the per-class schedule and a link-level `results_released` flag. The Publish tab still had a single bulk "Release results to all classes" button — too coarse for a reusable quiz model. Teachers running a quiz across many cohorts need to see release state per class, release early for individual classes, and revoke a mistaken release.
+
+Phase 1 also stacked every linked class vertically with an inline schedule picker under each card. With a release section added too, each card would become a tall block. So Phase 2 **restructures the Classes tab into two columns**: a narrow list of classes on the left, and a detail panel on the right that shows the selected class's schedule + results + stats.
+
+### Phase 2 design decisions (confirmed)
+1. **Two-column layout**. Left = list of classes (linked and unlinked). Right = detail panel for the currently-selected class.
+2. **Release is a universal override.** `link.results_released = true` makes results visible regardless of `results_release_policy`. The policy still drives automatic release behaviour (IMMEDIATE / AFTER_CLOSE), but the flag is a teacher override on top.
+3. **Revoke is allowed.** A "Revoke release" action sets `results_released = false` and clears the timestamp. Confirm dialog warns that students who already viewed results may have seen them.
+4. **Publish tab release card shrinks** to a summary line + a "Manage per-class releases →" link that navigates to the Classes tab. Bulk "Release for all unreleased" button stays as a shortcut.
+5. **IMMEDIATE quizzes** show "Auto-released on submit ✓" in the detail panel. No release button, no DB writes to the flag.
+6. **Single Save button** at the bottom of the detail panel saves both schedule and release-flag edits for the selected class (release is actioned via direct Release / Revoke buttons, not the Save button).
+7. **Per-policy release copy**:
+   - IMMEDIATE → "Auto-released on submit" ✓ (no button)
+   - AFTER_CLOSE before effective close → "Awaiting close · <date>" + [Release early] button
+   - AFTER_CLOSE after effective close → "Auto-released on close <date>" ✓ (no button unless manually flagged, in which case [Revoke override])
+   - MANUAL not released → "Not released yet" + [Release now] button
+   - MANUAL released → "Released on <date>" ✓ + [Revoke release] button
+
+## Implementation
+
+### 1. Backend gate override — `js/myteacher-api.js`
+
+`getAttemptResults` and `getAttemptReview` both add a short-circuit so `link?.results_released === true` satisfies the gate regardless of policy. This means MANUAL releases still work exactly as before, and AFTER_CLOSE releases can now be done early per class.
+
+### 2. `unreleaseQuizResults(quizId, classId = null)` — `js/myteacher-api.js`
+
+Mirror of `releaseQuizResults`. Sets `results_released = false` and clears `results_released_at` on the target link(s). If `classId` is omitted, revokes all active links for the quiz.
+
+### 3. `getQuizClassStats(quizId)` — `js/myteacher-api.js`
+
+Helper returning `{ [class_id]: { members, submitted, in_progress } }` for every class linked to the quiz:
+- `members` from `teacher_class_members` where `status = 'ACTIVE'`
+- `submitted` + `in_progress` from `teacher_quiz_attempts` filtered by the quiz + class
+
+One call, grouped client-side. Used by the right-panel Stats section.
+
+### 4. Classes tab — two-column layout — `myteacher/teacher/quizzes.html`
+
+```
+┌─ Classes tab ────────────────────────────────────────────┐
+│  [search]                                  [ Save all ]  │
+│  ┌───────────────┐  ┌─────────────────────────────────┐  │
+│  │ Linked    (3) │  │  Class A  · Year 2 · Fall 2026  │  │
+│  │ ▸ Class A ✓   │  │                     25 members  │  │
+│  │   Class B ✓   │  │  ─ Schedule ─                   │  │
+│  │   Class C ✓   │  │  Open:  [Apr 15, 08:00]         │  │
+│  │ Not linked (5)│  │  Close: [Apr 22, 17:00]         │  │
+│  │   Class D     │  │  Per-class override · [Clear]   │  │
+│  │   Class E     │  │                                 │  │
+│  │   ...         │  │  ─ Results release ─            │  │
+│  │               │  │  Policy: After close            │  │
+│  │               │  │  Awaiting close Apr 22 · Pending│  │
+│  │               │  │  [Release early]                │  │
+│  │               │  │                                 │  │
+│  │               │  │  ─ Stats ─                      │  │
+│  │               │  │  25 Members · 3 Submitted · 0 IP│  │
+│  │               │  │                                 │  │
+│  │               │  │  [Save changes]                 │  │
+│  └───────────────┘  └─────────────────────────────────┘  │
+│  [Release for all unreleased]              [ Save all ]  │
+└───────────────────────────────────────────────────────────┘
+```
+
+**State additions:**
+- `QUIZ_CLASS_STATS` — loaded by `getQuizClassStats` on `loadClassesTab`
+- `SELECTED_LINK_CLASS_ID` — which class is in the right panel
+- `CLS_DETAIL_DIRTY` — unsaved-changes flag
+
+**Behaviour:**
+- Auto-select the first linked class on load. Empty state if no linked classes.
+- Click a **linked** class row → select it (right panel renders its detail)
+- Click the ✓ check on a linked class → unlink it (`clsToggleLink`)
+- Click an **unlinked** class row → auto-link it AND select it, ready for schedule edit
+- Click the empty check on an unlinked class → link without changing selection
+- Dirty check: switching classes with unsaved schedule edits fires a confirm dialog
+- Per-class Release / Release early / Revoke buttons call `releaseQuizResults(quizId, classId)` / `unreleaseQuizResults` directly and reload the tab
+- Footer `Save all` persists all schedule edits via `setQuizClasses` (the existing per-class schedule bundle)
+- Footer `Release for all unreleased` iterates over classes where `results_released = false` and calls `releaseQuizResults(quizId, classId)` per class (policy-aware — IMMEDIATE classes are skipped implicitly since they're already visible)
+
+### 5. Publish tab release card — `myteacher/teacher/quizzes.html`
+
+`releaseCardHtml` shrinks:
+- No linked classes → "No classes linked yet" banner
+- IMMEDIATE → "Auto-release on submit — students see their results the moment they submit"
+- Otherwise → "Released for X of Y classes" with:
+  - "Manage per-class releases →" button (navigates to Classes tab via `goToClassesTab()`)
+  - "Release for all unreleased" button (hidden once everything is released)
+
+`goToClassesTab()` calls `setActiveTab('classes')` then `loadClassesTab()` to guarantee fresh state.
+
+### 6. Dirty-check UX
+
+The right panel tracks `CLS_DETAIL_DIRTY`. When the teacher clicks a different class on the left:
+- If dirty → confirm "You have unsaved changes. Discard them and switch classes?"
+- On confirm → discard, switch
+- On cancel → stay
+
+The Save button in the detail panel is disabled while `!CLS_DETAIL_DIRTY`. Once saved via `saveClassLinks()`, the dirty flag clears.
+
+### 7. CSS additions / removals
+
+- **Added**: `.cls-tab-grid`, `.cls-list-col`, `.cls-detail-col`, `.cls-row*`, `.cls-detail-section*`, `.cls-release-line`, `.cls-stats-row`, `.cls-list-section-head`, `.cls-detail-empty`
+- **Removed**: `.cls-card-wrap`, `.cls-sched-block`, `.cls-has-sched`, `.cls-sched-row/field/label/input/hint/clear/released` (all superseded by the right-panel detail styles)
+
+## Critical files modified
+
+| File | What changes |
+|---|---|
+| `js/myteacher-api.js` | Gate override in `getAttemptResults` + `getAttemptReview`; new `unreleaseQuizResults`; new `getQuizClassStats` |
+| `myteacher/teacher/quizzes.html` | Classes tab restructured into two columns; right-panel detail with schedule + results + stats; per-class Release / Revoke actions; dirty check; shrunk Publish release card with `goToClassesTab` shortcut; new/removed CSS |
+| `docs/per-class-schedule-plan.md` | This Phase 2 section |
+
+## Out of scope (follow-up)
+
+- Per-class "scheduled release" (release at a future time) — teachers can use AFTER_CLOSE with per-class close_at instead
+- Email/notification when results are released
+- Release history / audit log per class
+- Removing the now-unused quiz-level `results_released` / `results_released_at` columns (deferred)
+
+## Verification
+
+1. **Layout**: Open a published quiz with 2+ linked classes. Classes tab shows two columns. Click between classes on the left — right panel updates.
+2. **Auto-select**: First linked class is selected on first load.
+3. **Schedule edit**: Change a class's Close at → Save all → refetch confirms.
+4. **Inherit button**: Clear override → hint reverts to "Inherits quiz template".
+5. **MANUAL release**: Quiz with MANUAL policy. Right panel shows "Not released yet" + Release now button. Click → toast → row updates to show ✓ Released.
+6. **Revoke**: After release, Revoke button appears. Click → confirm → row reverts.
+7. **AFTER_CLOSE release early**: Quiz with AFTER_CLOSE and a future close. Right panel shows "Awaiting close" + Release early. Click → released before close.
+8. **IMMEDIATE**: Policy IMMEDIATE → "Auto-released on submit ✓", no release button.
+9. **Bulk release**: 2 unreleased classes + 1 released → footer button releases the 2, leaves the 1.
+10. **Publish tab**: Release card shows X of Y released + Manage link + bulk button. Clicking Manage navigates to Classes tab.
+11. **Dirty check**: Edit a class's schedule, click a different class → confirm dialog. Cancel → stays. Accept → discards.
+12. **Regression**: Existing quizzes still open. No console errors. Removed Select all / Clear all buttons don't throw.
+
+Tools: `preview_start` → `preview_click`/`preview_fill`/`preview_snapshot` for UI; dev Supabase MCP (`mcp__30f7ad5f-...`) `execute_sql` read-only to verify row state.
