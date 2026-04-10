@@ -1,6 +1,6 @@
 # Plan: Question Schema Enhancements + Library Rebuild
 
-**Status:** Phase 1 COMPLETE — Phase 2 COMPLETE — Phase 3 not started
+**Status:** Phase 1 COMPLETE — Phase 2 COMPLETE — Phase 3 COMPLETE
 **Created:** 2026-04-08
 
 ## Context
@@ -226,7 +226,7 @@ Old refs like `LIB:GP:GP_001` in existing quiz drafts will break once NMC course
 
 ---
 
-## Phase 3: Update CSV Import to support new columns (not started)
+## Phase 3: Update CSV Import to support new columns (COMPLETE — 2026-04-10)
 
 The CSV import page (`myteacher/teacher/import.html`) was built before Phase 1. It needs updating to support the new columns.
 

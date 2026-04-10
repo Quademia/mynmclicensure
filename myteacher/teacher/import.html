@@ -203,10 +203,15 @@ COLUMN RULES:
 - fb_a through fb_f: Optional feedback for each option (explain why right/wrong)
 - correct: For MCQ = single letter (e.g., A). For TF = A (True) or B (False). For SATA = comma-separated letters (e.g., A,C,E)
 - rationale: Brief explanation of the correct answer
+- question_ref: Teacher's own reference code for the question (e.g. Q1, PHARM-001). Must be unique — no two questions can share the same ref
 - subject, maintopic, subtopic: Categorise each question if possible
 - difficulty: Easy, Medium, or Hard
 - marks: Points per question (default 1, use 2 for SATA)
 - shuffle_options: true (default) or false
+- year_level: Academic level (e.g. Year 1, Year 2, Level 100, Level 200)
+- bloom_level: Must be exactly one of: Remember, Understand, Apply, Analyse, Evaluate, Create
+- tags: Comma-separated labels for categorisation (e.g. "cardio, exam prep")
+- batch_id: Optional batch grouping label (e.g. "Week 3 import")
 
 IMPORTANT:
 - Keep the exact CSV header row from the template
@@ -297,6 +302,7 @@ IMPORTANT:
       <h3 style="font-size:14px;margin:16px 0 8px;color:var(--primary)">Optional Columns</h3>
       <table class="rules-table">
         <tr><th>Column</th><th>Description</th><th>Default</th></tr>
+        <tr><td><code>question_ref</code></td><td>Your own reference code (e.g. Q1, PHARM-001). Must be unique per teacher</td><td>Empty</td></tr>
         <tr><td><code>question_type</code></td><td>MCQ, TF, or SATA</td><td>MCQ</td></tr>
         <tr><td><code>option_c</code> to <code>option_f</code></td><td>Additional answer options (up to 6 total)</td><td>Empty</td></tr>
         <tr><td><code>fb_a</code> to <code>fb_f</code></td><td>Per-option feedback shown after submission</td><td>Empty</td></tr>
@@ -308,6 +314,10 @@ IMPORTANT:
         <tr><td><code>difficulty</code></td><td>Difficulty level (e.g., Easy, Medium, Hard)</td><td>Empty</td></tr>
         <tr><td><code>marks</code></td><td>Points for this question (positive number)</td><td>1</td></tr>
         <tr><td><code>shuffle_options</code></td><td>Shuffle options when presented (true/false)</td><td>true</td></tr>
+        <tr><td><code>year_level</code></td><td>Academic level (e.g. Year 1, Year 2, Level 100)</td><td>Empty</td></tr>
+        <tr><td><code>bloom_level</code></td><td>Bloom's taxonomy: Remember, Understand, Apply, Analyse, Evaluate, or Create</td><td>Empty</td></tr>
+        <tr><td><code>tags</code></td><td>Comma-separated labels (e.g. "cardio, exam prep")</td><td>Empty</td></tr>
+        <tr><td><code>batch_id</code></td><td>Batch grouping label (e.g. "Week 3 import")</td><td>Empty</td></tr>
       </table>
 
       <h3 style="font-size:14px;margin:16px 0 8px;color:var(--primary)">Question Type Rules</h3>
@@ -393,12 +403,13 @@ let ACTIVE_FILTER = 'all';
 // ── Column definitions ──
 const REQUIRED_COLS = ['stem', 'option_a', 'option_b', 'correct'];
 const ALL_COLS = [
-  'question_type', 'stem',
+  'question_ref', 'question_type', 'stem',
   'option_a', 'fb_a', 'option_b', 'fb_b', 'option_c', 'fb_c',
   'option_d', 'fb_d', 'option_e', 'fb_e', 'option_f', 'fb_f',
   'correct', 'rationale', 'rationale_img',
   'subject', 'maintopic', 'subtopic', 'difficulty',
-  'marks', 'shuffle_options'
+  'marks', 'shuffle_options',
+  'year_level', 'bloom_level', 'tags', 'batch_id'
 ];
 
 // ── Toast ──
@@ -413,9 +424,9 @@ function showToast(title, msg, type) {
 // ── CSV Template ──
 function downloadTemplate() {
   const header = ALL_COLS.join(',');
-  const example1 = 'MCQ,"What is the normal heart rate for an adult?","60-100 bpm","","40-60 bpm","","100-150 bpm","","20-40 bpm","","","","","",A,"Normal resting heart rate is 60-100 beats per minute.","",Medicine,"Vital Signs","",Easy,1,true';
-  const example2 = 'SATA,"Which of the following are signs of dehydration? (Select all that apply)","Dry mucous membranes","","Decreased urine output","","Bradycardia","","Sunken eyes","","","","","","A,B,D","Bradycardia is not a sign of dehydration; tachycardia is.","",Medicine,"Fluid Balance","",Medium,2,true';
-  const example3 = 'TF,"The liver is located in the right upper quadrant of the abdomen.",True,"",False,"","","","","","","","","",A,"The liver is primarily located in the right upper quadrant.","",Anatomy,"Abdomen","",Easy,1,true';
+  const example1 = 'Q1,MCQ,"What is the normal heart rate for an adult?","60-100 bpm","","40-60 bpm","","100-150 bpm","","20-40 bpm","","","","","",A,"Normal resting heart rate is 60-100 beats per minute.","",Medicine,"Vital Signs","",Easy,1,true,"Year 1",Remember,"cardio, vital signs",';
+  const example2 = 'Q2,SATA,"Which of the following are signs of dehydration? (Select all that apply)","Dry mucous membranes","","Decreased urine output","","Bradycardia","","Sunken eyes","","","","","","A,B,D","Bradycardia is not a sign of dehydration; tachycardia is.","",Medicine,"Fluid Balance","",Medium,2,true,"Year 2",Apply,"fluids, dehydration",';
+  const example3 = 'Q3,TF,"The liver is located in the right upper quadrant of the abdomen.",True,"",False,"","","","","","","","","",A,"The liver is primarily located in the right upper quadrant.","",Anatomy,"Abdomen","",Easy,1,true,"Year 1",Remember,anatomy,';
   const csv = header + '\n' + example1 + '\n' + example2 + '\n' + example3;
   const blob = new Blob([csv], { type: 'text/csv' });
   const a = document.createElement('a');
@@ -510,6 +521,14 @@ function validateRow(row, idx) {
   if (row.marks !== undefined && row.marks !== '') {
     const m = Number(row.marks);
     if (isNaN(m) || m < 0) errors.push('marks must be a positive number');
+  }
+
+  // Bloom's level (soft warning — still imports)
+  if (row.bloom_level && row.bloom_level.trim()) {
+    const valid = ['Remember', 'Understand', 'Apply', 'Analyse', 'Evaluate', 'Create'];
+    if (!valid.includes(row.bloom_level.trim())) {
+      errors.push(`bloom_level "${row.bloom_level.trim()}" is not standard (expected: ${valid.join(', ')})`);
+    }
   }
 
   return errors;
@@ -623,7 +642,7 @@ function renderTable() {
   const filtered = ACTIVE_FILTER === 'all' ? PARSED_ROWS :
     PARSED_ROWS.filter(r => r.status === ACTIVE_FILTER);
 
-  const displayCols = ['question_type', 'stem', 'option_a', 'option_b', 'correct', 'subject', 'maintopic', 'difficulty', 'marks'];
+  const displayCols = ['question_ref', 'question_type', 'stem', 'option_a', 'option_b', 'correct', 'subject', 'maintopic', 'difficulty', 'marks', 'tags'];
 
   let html = '<table><thead><tr><th>#</th><th>Status</th>';
   displayCols.forEach(c => { html += `<th>${esc(c)}</th>`; });
@@ -690,6 +709,11 @@ async function doImport() {
       marks: marks,
       shuffle_options: shuffle,
       source_type: 'IMPORT',
+      question_ref: r.question_ref || null,
+      tags: r.tags ? r.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+      batch_id: r.batch_id || null,
+      year_level: r.year_level || null,
+      bloom_level: r.bloom_level || null,
     };
 
     const result = await createBankItem(TEACHER_ID, payload);
