@@ -643,7 +643,7 @@ function renderTable() {
   const filtered = ACTIVE_FILTER === 'all' ? PARSED_ROWS :
     PARSED_ROWS.filter(r => r.status === ACTIVE_FILTER);
 
-  const displayCols = ['question_ref', 'question_type', 'stem', 'option_a', 'option_b', 'correct', 'subject', 'maintopic', 'difficulty', 'marks', 'tags'];
+  const displayCols = ['question_ref', 'question_type', 'stem', 'option_a', 'option_b', 'correct', 'subject', 'maintopic', 'difficulty', 'marks', 'tags', 'batch_id'];
 
   let html = '<table><thead><tr><th>#</th><th>Status</th>';
   displayCols.forEach(c => { html += `<th>${esc(c)}</th>`; });
@@ -746,9 +746,9 @@ async function boot() {
   // Back button
   const params = new URLSearchParams(location.search);
   const returnTo = params.get('return_to');
-  const goBack = () => { location.href = returnTo ? decodeURIComponent(returnTo) : MYTEACHER.teacher + '/bank.html'; };
-  $('btnBack').addEventListener('click', goBack);
-  $('btnCancel').addEventListener('click', goBack);
+  $('btnBack').addEventListener('click', () => {
+    location.href = returnTo ? decodeURIComponent(returnTo) : MYTEACHER.teacher + '/bank.html';
+  });
 
   // Template download, instructions & AI prompt copy
   $('btnTemplate').addEventListener('click', downloadTemplate);
@@ -790,14 +790,16 @@ async function boot() {
     renderTable();
   });
 
-  // Re-upload
-  $('btnReupload').addEventListener('click', () => {
+  // Re-upload / Cancel
+  const resetToUpload = () => {
     PARSED_ROWS = [];
     ACTIVE_FILTER = 'all';
     input.value = '';
     $('stepPreview').style.display = 'none';
     $('stepUpload').style.display = '';
-  });
+  };
+  $('btnReupload').addEventListener('click', resetToUpload);
+  $('btnCancel').addEventListener('click', resetToUpload);
 
   // Import
   $('btnImport').addEventListener('click', doImport);
