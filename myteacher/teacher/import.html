@@ -245,6 +245,7 @@ IMPORTANT:
     <div class="preview-table-wrap" id="tableWrap"></div>
     <div style="margin-top:16px;display:flex;gap:10px;align-items:center;justify-content:space-between">
       <div>
+        <button class="btn sm" id="btnCancel">← Cancel</button>
         <button class="btn sm" id="btnReupload">↻ Upload Different File</button>
       </div>
       <div style="display:flex;gap:10px">
@@ -745,9 +746,9 @@ async function boot() {
   // Back button
   const params = new URLSearchParams(location.search);
   const returnTo = params.get('return_to');
-  $('btnBack').addEventListener('click', () => {
-    location.href = returnTo ? decodeURIComponent(returnTo) : MYTEACHER.teacher + '/bank.html';
-  });
+  const goBack = () => { location.href = returnTo ? decodeURIComponent(returnTo) : MYTEACHER.teacher + '/bank.html'; };
+  $('btnBack').addEventListener('click', goBack);
+  $('btnCancel').addEventListener('click', goBack);
 
   // Template download, instructions & AI prompt copy
   $('btnTemplate').addEventListener('click', downloadTemplate);
