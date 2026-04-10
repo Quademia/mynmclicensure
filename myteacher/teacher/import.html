@@ -683,7 +683,8 @@ async function doImport() {
     const r = validRows[i].data;
     const type = (r.question_type || 'MCQ').toUpperCase().trim();
     const marks = Number(r.marks) || 1;
-    const shuffle = r.shuffle_options === undefined || r.shuffle_options === '' || r.shuffle_options === 'true' || r.shuffle_options === '1';
+    const shuffleVal = (r.shuffle_options || '').trim().toLowerCase();
+    const shuffle = type === 'TF' ? false : (shuffleVal === '' || shuffleVal === 'true' || shuffleVal === '1');
 
     const payload = {
       question_type: type,
