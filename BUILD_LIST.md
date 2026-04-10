@@ -117,3 +117,15 @@ Pagination on all admin and student list pages (users, payments, fixed-quizzes, 
 - Standardised error response shapes in mynmclicensure-api.js (ok→success, error→code, added missing messages)
 - User-facing error states verified on all 4 critical flows (login, quiz submission, join class, payment)
 - Moved 4 mynmclicensure-only pages (register, subscribe, payment-confirmation, premium-prep) from root into /mynmclicensure/
+
+### Question Schema Phase 3: CSV Import Update (April 2026)
+- CSV import now supports question_ref, tags, batch_id, year_level, bloom_level columns
+- Reordered columns: question_ref first, new metadata at end
+- Updated template download, AI prompt, and instructions modal with new columns
+- Fixed shuffle_options case-sensitivity bug (TRUE/True/true all work now)
+- TF questions always force shuffle_options to false
+- Added bloom_level validation (rejects invalid values)
+- Full preview table showing all 27 columns with horizontal scroll
+- Cancel button on validation step returns to upload screen
+- Loading overlay with spinner and progress during import
+- Added teacher nav bar to import page
