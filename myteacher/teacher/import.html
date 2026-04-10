@@ -643,7 +643,7 @@ function renderTable() {
   const filtered = ACTIVE_FILTER === 'all' ? PARSED_ROWS :
     PARSED_ROWS.filter(r => r.status === ACTIVE_FILTER);
 
-  const displayCols = ['question_ref', 'question_type', 'stem', 'option_a', 'option_b', 'correct', 'subject', 'maintopic', 'difficulty', 'marks', 'tags', 'batch_id'];
+  const displayCols = ALL_COLS;
 
   let html = '<table><thead><tr><th>#</th><th>Status</th>';
   displayCols.forEach(c => { html += `<th>${esc(c)}</th>`; });
