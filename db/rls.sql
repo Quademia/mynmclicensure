@@ -1105,3 +1105,122 @@ BEGIN
   RETURN jsonb_build_object('allowed', true);
 END;
 $$;
+
+
+-- ────────────────────────────────────────────────────────────
+-- MYTEACHER AUTH TABLES — RLS POLICIES
+-- Mirror of Licensure auth policies. All four tables are
+-- fully separate from the Licensure equivalents.
+-- Helper functions: myteacher_user_id(), myteacher_user_role()
+-- ────────────────────────────────────────────────────────────
+
+-- MYTEACHER HELPER FUNCTIONS
+-- Mirror of auth_user_id() and auth_user_role().
+-- SECURITY DEFINER bypasses RLS to safely read myteacher_users.
+
+CREATE OR REPLACE FUNCTION myteacher_user_id()
+RETURNS TEXT
+LANGUAGE SQL
+SECURITY DEFINER
+STABLE
+AS $$
+  SELECT user_id FROM myteacher_users WHERE auth_id = auth.uid()
+$$;
+
+CREATE OR REPLACE FUNCTION myteacher_user_role()
+RETURNS TEXT
+LANGUAGE SQL
+SECURITY DEFINER
+STABLE
+AS $$
+  SELECT role FROM myteacher_users WHERE auth_id = auth.uid()
+$$;
+
+
+-- 1. myteacher_users
+-- Anon can SELECT any row — needed for email existence check
+-- during registration before the user has a session.
+-- Authenticated users read and update their own row only.
+-- ADMIN reads and updates all rows.
+-- Insert is open — user has no session yet when registering.
+-- No browser DELETE.
+
+ALTER TABLE myteacher_users ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "myteacher_users_select_anon"
+ON myteacher_users FOR SELECT
+TO anon
+USING (true);
+
+CREATE POLICY "myteacher_users_select_own"
+ON myteacher_users FOR SELECT
+TO authenticated
+USING (
+  auth.uid() = auth_id
+  OR myteacher_user_role() = 'ADMIN'
+);
+
+CREATE POLICY "myteacher_users_insert"
+ON myteacher_users FOR INSERT
+WITH CHECK (true);
+
+CREATE POLICY "myteacher_users_update"
+ON myteacher_users FOR UPDATE
+USING (
+  auth.uid() = auth_id
+  OR myteacher_user_role() = 'ADMIN'
+);
+
+
+-- 2. teacher_sessions
+-- Users read, insert, and update their own sessions only.
+-- Ownership checked by joining to myteacher_users via auth.uid() = auth_id.
+-- ADMIN reads all sessions.
+-- No DELETE policy — always set active=FALSE instead.
+
+ALTER TABLE teacher_sessions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "teacher_sessions_select"
+ON teacher_sessions FOR SELECT
+USING (
+  EXISTS (
+    SELECT 1 FROM myteacher_users u
+    WHERE u.auth_id = auth.uid()
+    AND u.user_id = teacher_sessions.user_id
+  )
+  OR myteacher_user_role() = 'ADMIN'
+);
+
+CREATE POLICY "teacher_sessions_insert"
+ON teacher_sessions FOR INSERT
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM myteacher_users u
+    WHERE u.auth_id = auth.uid()
+    AND u.user_id = teacher_sessions.user_id
+  )
+);
+
+CREATE POLICY "teacher_sessions_update"
+ON teacher_sessions FOR UPDATE
+USING (
+  EXISTS (
+    SELECT 1 FROM myteacher_users u
+    WHERE u.auth_id = auth.uid()
+    AND u.user_id = teacher_sessions.user_id
+  )
+);
+
+
+-- 3. teacher_auth_events
+-- Fully locked — RLS enabled, no policies = no browser access.
+-- Only SECURITY DEFINER RPCs can write to this table.
+
+ALTER TABLE teacher_auth_events ENABLE ROW LEVEL SECURITY;
+
+
+-- 4. teacher_reset_requests
+-- Fully locked — RLS enabled, no policies = no browser access.
+-- Only SECURITY DEFINER RPCs can write to this table.
+
+ALTER TABLE teacher_reset_requests ENABLE ROW LEVEL SECURITY;

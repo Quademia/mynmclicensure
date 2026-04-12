@@ -57,6 +57,7 @@ CREATE TABLE products (
 -- kind: PAID | TRIAL | FREE
 
 -- 1.5 users
+-- MyNMC Licensure users only. MyTeacher users are in myteacher_users.
 CREATE TABLE users (
   user_id              TEXT PRIMARY KEY,
   auth_id              UUID,
@@ -837,6 +838,106 @@ CREATE INDEX reset_requests_email_created
 
 CREATE INDEX reset_requests_created
   ON reset_requests (created_utc);
+
+
+-- ────────────────────────────────────────────────────────────
+-- 7. MYTEACHER AUTH TABLES
+-- Mirror of the Licensure auth tables (users, sessions,
+-- auth_events, reset_requests) — fully separate infrastructure.
+-- auth.users (Supabase Auth) stays shared across both products.
+-- ────────────────────────────────────────────────────────────
+
+-- 7.1 myteacher_users
+-- Core identity for all MyTeacher users (teachers + students).
+-- role field differentiates: TEACHER | STUDENT | ADMIN
+-- Teachers also have a row in teacher_profiles (org detail, plan, approval).
+-- signup_source default is 'MYTEACHER' instead of 'SUPABASE_AUTH'.
+CREATE TABLE myteacher_users (
+  user_id              TEXT PRIMARY KEY,
+  auth_id              UUID,
+  username             TEXT,
+  email                TEXT NOT NULL,
+  phone_number         TEXT,
+  name                 TEXT,
+  forename             TEXT,
+  surname              TEXT,
+  program_id           TEXT,
+  cohort               TEXT,
+  level                TEXT,
+  role                 TEXT NOT NULL DEFAULT 'STUDENT',
+  active               BOOLEAN NOT NULL DEFAULT true,
+  avatar_url           TEXT,
+  must_change_password BOOLEAN NOT NULL DEFAULT false,
+  signup_source        TEXT DEFAULT 'MYTEACHER',
+  created_utc          TIMESTAMPTZ DEFAULT NOW(),
+  last_login_utc       TIMESTAMPTZ
+);
+
+CREATE INDEX idx_myteacher_users_auth_id ON myteacher_users(auth_id);
+CREATE INDEX idx_myteacher_users_email   ON myteacher_users(email);
+CREATE INDEX idx_myteacher_users_role    ON myteacher_users(role);
+
+
+-- 7.2 teacher_sessions
+-- Tracks active device sessions for MyTeacher users.
+-- Mirror of sessions. Max 2 active sessions per user.
+-- Never DELETE rows — set active=FALSE on logout.
+CREATE TABLE teacher_sessions (
+  session_id    TEXT PRIMARY KEY,
+  user_id       TEXT NOT NULL,
+  kind          TEXT NOT NULL DEFAULT 'LOGIN',
+  issued_utc    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  expires_utc   TIMESTAMPTZ NOT NULL,
+  last_seen_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  device_label  TEXT,
+  ua_hash       TEXT,
+  ip_hash       TEXT,
+  login_via     TEXT NOT NULL DEFAULT 'EMAIL',
+  active        BOOLEAN NOT NULL DEFAULT true
+);
+
+CREATE INDEX idx_teacher_sessions_user_id ON teacher_sessions(user_id);
+CREATE INDEX idx_teacher_sessions_active  ON teacher_sessions(active);
+
+
+-- 7.3 teacher_auth_events
+-- Logs every login attempt (success + failure) for MyTeacher users.
+-- Mirror of auth_events. Never DELETE rows.
+-- All writes go through RPC (log_myteacher_auth_event) — no direct browser INSERT.
+CREATE TABLE teacher_auth_events (
+  event_id     TEXT PRIMARY KEY,
+  event_type   TEXT NOT NULL,
+  identifier   TEXT NOT NULL,
+  user_id      TEXT,
+  fp_hash      TEXT,
+  ua_hash      TEXT,
+  device_label TEXT,
+  fail_reason  TEXT,
+  created_utc  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_teacher_auth_events_user_id    ON teacher_auth_events(user_id);
+CREATE INDEX idx_teacher_auth_events_identifier ON teacher_auth_events(identifier);
+CREATE INDEX idx_teacher_auth_events_created    ON teacher_auth_events(created_utc);
+
+
+-- 7.4 teacher_reset_requests
+-- Tracks every forgot-password submission for MyTeacher users.
+-- Mirror of reset_requests. All writes go through RPCs — no direct browser INSERT.
+CREATE TABLE teacher_reset_requests (
+  request_id   TEXT PRIMARY KEY,
+  email        TEXT NOT NULL,
+  user_exists  BOOLEAN NOT NULL DEFAULT false,
+  status       TEXT NOT NULL,
+  fp_hash      TEXT,
+  device_label TEXT,
+  used         BOOLEAN NOT NULL DEFAULT false,
+  used_utc     TIMESTAMPTZ,
+  created_utc  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_teacher_reset_requests_email   ON teacher_reset_requests(email);
+CREATE INDEX idx_teacher_reset_requests_created ON teacher_reset_requests(created_utc);
 
 
 -- ────────────────────────────────────────────────────────────
