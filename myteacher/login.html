@@ -154,7 +154,7 @@
   async function _handleAuthSession(session) {
     try {
       const { data: userRow, error: userError } = await db
-        .from('myteacher_users')
+        .from('teacher_users')
         .select('user_id')
         .eq('auth_id', session.user.id)
         .maybeSingle();
@@ -317,7 +317,7 @@
       let userRow = null;
       for (let attempt = 0; attempt < 2; attempt++) {
         const { data: row } = await db
-          .from('myteacher_users')
+          .from('teacher_users')
           .select('user_id')
           .eq('auth_id', data.user.id)
           .maybeSingle();

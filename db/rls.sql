@@ -1116,7 +1116,7 @@ $$;
 
 -- MYTEACHER HELPER FUNCTIONS
 -- Mirror of auth_user_id() and auth_user_role().
--- SECURITY DEFINER bypasses RLS to safely read myteacher_users.
+-- SECURITY DEFINER bypasses RLS to safely read teacher_users.
 
 CREATE OR REPLACE FUNCTION myteacher_user_id()
 RETURNS TEXT
@@ -1124,7 +1124,7 @@ LANGUAGE SQL
 SECURITY DEFINER
 STABLE
 AS $$
-  SELECT user_id FROM myteacher_users WHERE auth_id = auth.uid()
+  SELECT user_id FROM teacher_users WHERE auth_id = auth.uid()
 $$;
 
 CREATE OR REPLACE FUNCTION myteacher_user_role()
@@ -1133,11 +1133,11 @@ LANGUAGE SQL
 SECURITY DEFINER
 STABLE
 AS $$
-  SELECT role FROM myteacher_users WHERE auth_id = auth.uid()
+  SELECT role FROM teacher_users WHERE auth_id = auth.uid()
 $$;
 
 
--- 1. myteacher_users
+-- 1. teacher_users
 -- Anon can SELECT any row — needed for email existence check
 -- during registration before the user has a session.
 -- Authenticated users read and update their own row only.
@@ -1145,27 +1145,27 @@ $$;
 -- Insert is open — user has no session yet when registering.
 -- No browser DELETE.
 
-ALTER TABLE myteacher_users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE teacher_users ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "myteacher_users_select_anon"
-ON myteacher_users FOR SELECT
+CREATE POLICY "teacher_users_select_anon"
+ON teacher_users FOR SELECT
 TO anon
 USING (true);
 
-CREATE POLICY "myteacher_users_select_own"
-ON myteacher_users FOR SELECT
+CREATE POLICY "teacher_users_select_own"
+ON teacher_users FOR SELECT
 TO authenticated
 USING (
   auth.uid() = auth_id
   OR myteacher_user_role() = 'ADMIN'
 );
 
-CREATE POLICY "myteacher_users_insert"
-ON myteacher_users FOR INSERT
+CREATE POLICY "teacher_users_insert"
+ON teacher_users FOR INSERT
 WITH CHECK (true);
 
-CREATE POLICY "myteacher_users_update"
-ON myteacher_users FOR UPDATE
+CREATE POLICY "teacher_users_update"
+ON teacher_users FOR UPDATE
 USING (
   auth.uid() = auth_id
   OR myteacher_user_role() = 'ADMIN'
@@ -1174,7 +1174,7 @@ USING (
 
 -- 2. teacher_sessions
 -- Users read, insert, and update their own sessions only.
--- Ownership checked by joining to myteacher_users via auth.uid() = auth_id.
+-- Ownership checked by joining to teacher_users via auth.uid() = auth_id.
 -- ADMIN reads all sessions.
 -- No DELETE policy — always set active=FALSE instead.
 
@@ -1184,7 +1184,7 @@ CREATE POLICY "teacher_sessions_select"
 ON teacher_sessions FOR SELECT
 USING (
   EXISTS (
-    SELECT 1 FROM myteacher_users u
+    SELECT 1 FROM teacher_users u
     WHERE u.auth_id = auth.uid()
     AND u.user_id = teacher_sessions.user_id
   )
@@ -1195,7 +1195,7 @@ CREATE POLICY "teacher_sessions_insert"
 ON teacher_sessions FOR INSERT
 WITH CHECK (
   EXISTS (
-    SELECT 1 FROM myteacher_users u
+    SELECT 1 FROM teacher_users u
     WHERE u.auth_id = auth.uid()
     AND u.user_id = teacher_sessions.user_id
   )
@@ -1205,7 +1205,7 @@ CREATE POLICY "teacher_sessions_update"
 ON teacher_sessions FOR UPDATE
 USING (
   EXISTS (
-    SELECT 1 FROM myteacher_users u
+    SELECT 1 FROM teacher_users u
     WHERE u.auth_id = auth.uid()
     AND u.user_id = teacher_sessions.user_id
   )

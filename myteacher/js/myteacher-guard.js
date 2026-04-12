@@ -8,14 +8,14 @@
 // Supported roles: STUDENT | TEACHER | ADMIN
 //
 // Mirror of js/guard.js — differences:
-//   - Reads from myteacher_users (not users)
+//   - Reads from teacher_users (not users)
 //   - Reads/writes sessions to teacher_sessions (not sessions)
 //   - Uses mt_session_id in localStorage (not qa_session_id)
 //   - Redirects to /myteacher/login.html on auth failure
 //   - Redirects to /myteacher/router.html on role mismatch
 //
 // TEACHER check is two-level:
-//   1. myteacher_users.role === 'TEACHER'
+//   1. teacher_users.role === 'TEACHER'
 //   2. teacher_profiles.active === true
 // Both must pass. A teacher with active=false is pending/disabled
 // and gets redirected to the access request page.
@@ -105,9 +105,9 @@ async function guardPage(requiredRole = null) {
     return null;
   }
 
-  // ── 2. Get user profile from myteacher_users table ────────
+  // ── 2. Get user profile from teacher_users table ────────
   const { data: profile } = await db
-    .from('myteacher_users')
+    .from('teacher_users')
     .select('*')
     .eq('auth_id', session.user.id)
     .maybeSingle();

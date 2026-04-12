@@ -3024,7 +3024,7 @@ async function getTeacherResultsMarksheet(quizId, classId, opts = {}) {
   const memberIds = (members || []).map(m => m.user_id).filter(Boolean);
   const avatarMap = {};
   if (memberIds.length) {
-    const { data: avatarRows } = await db.from('myteacher_users').select('user_id, avatar_url').in('user_id', memberIds);
+    const { data: avatarRows } = await db.from('teacher_users').select('user_id, avatar_url').in('user_id', memberIds);
     (avatarRows || []).forEach(u => { if (u.avatar_url) avatarMap[u.user_id] = u.avatar_url; });
   }
 
@@ -3749,7 +3749,7 @@ async function getPrograms() {
 
 async function getUserById(userId) {
   const { data: user, error: userError } = await db
-    .from('myteacher_users')
+    .from('teacher_users')
     .select('*')
     .eq('user_id', userId)
     .maybeSingle();
@@ -3798,7 +3798,7 @@ async function getUserById(userId) {
 
 async function updateUserProfile(userId, fields) {
   const { error } = await db
-    .from('myteacher_users')
+    .from('teacher_users')
     .update(fields)
     .eq('user_id', userId);
 

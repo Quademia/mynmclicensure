@@ -90,7 +90,7 @@ function buildDeviceLabel() {
  * shared session-creation logic used by both email/password login
  * and OAuth/magic-link callback flows on MyTeacher.
  *
- * @param {string} userId  - The user's user_id from myteacher_users
+ * @param {string} userId  - The user's user_id from teacher_users
  * @param {string} loginVia - How they signed in: 'EMAIL', 'GOOGLE', or 'MAGIC_LINK'
  * @returns {Promise<string|null>} The new session_id, or null on failure
  */

@@ -258,7 +258,7 @@
     // Role stays STUDENT — teacher role is granted on admin approval.
     // No program_id — MyTeacher users don't need a programme.
     const { error: profileError } = await db
-      .from('myteacher_users')
+      .from('teacher_users')
       .insert({
         user_id:       userId,
         auth_id:       data.user.id,

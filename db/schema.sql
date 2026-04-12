@@ -57,7 +57,7 @@ CREATE TABLE products (
 -- kind: PAID | TRIAL | FREE
 
 -- 1.5 users
--- MyNMC Licensure users only. MyTeacher users are in myteacher_users.
+-- MyNMC Licensure users only. MyTeacher users are in teacher_users.
 CREATE TABLE users (
   user_id              TEXT PRIMARY KEY,
   auth_id              UUID,
@@ -847,12 +847,12 @@ CREATE INDEX reset_requests_created
 -- auth.users (Supabase Auth) stays shared across both products.
 -- ────────────────────────────────────────────────────────────
 
--- 7.1 myteacher_users
+-- 7.1 teacher_users
 -- Core identity for all MyTeacher users (teachers + students).
 -- role field differentiates: TEACHER | STUDENT | ADMIN
 -- Teachers also have a row in teacher_profiles (org detail, plan, approval).
 -- signup_source default is 'MYTEACHER' instead of 'SUPABASE_AUTH'.
-CREATE TABLE myteacher_users (
+CREATE TABLE teacher_users (
   user_id              TEXT PRIMARY KEY,
   auth_id              UUID,
   username             TEXT,
@@ -873,9 +873,9 @@ CREATE TABLE myteacher_users (
   last_login_utc       TIMESTAMPTZ
 );
 
-CREATE INDEX idx_myteacher_users_auth_id ON myteacher_users(auth_id);
-CREATE INDEX idx_myteacher_users_email   ON myteacher_users(email);
-CREATE INDEX idx_myteacher_users_role    ON myteacher_users(role);
+CREATE INDEX idx_teacher_users_auth_id ON teacher_users(auth_id);
+CREATE INDEX idx_teacher_users_email   ON teacher_users(email);
+CREATE INDEX idx_teacher_users_role    ON teacher_users(role);
 
 
 -- 7.2 teacher_sessions

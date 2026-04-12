@@ -516,7 +516,7 @@
 
     // Also update users.role — set to TEACHER on approve, keep on disable
     if (active) {
-      await db.from('myteacher_users')
+      await db.from('teacher_users')
         .update({ role: 'TEACHER' })
         .eq('user_id', teacherId);
     }

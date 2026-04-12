@@ -207,7 +207,7 @@
     if (!session) { window.location.href = '/myteacher/login.html'; return; }
 
     const { data: profile } = await db
-      .from('myteacher_users')
+      .from('teacher_users')
       .select('user_id, forename, name, email, active')
       .eq('auth_id', session.user.id)
       .maybeSingle();

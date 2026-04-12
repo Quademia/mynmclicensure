@@ -79,9 +79,9 @@
       return;
     }
 
-    // 2. Profile from myteacher_users
+    // 2. Profile from teacher_users
     const { data: profile } = await db
-      .from('myteacher_users')
+      .from('teacher_users')
       .select('user_id, role, forename, name, email, active')
       .eq('auth_id', session.user.id)
       .maybeSingle();
