@@ -94,7 +94,7 @@ async function guardPage(requiredRole = null) {
   const { data: { session } } = await db.auth.getSession();
 
   if (!session) {
-    window.location.href = '/login.html';
+    window.location.href = '/mynmclicensure/login.html';
     return null;
   }
 
@@ -106,14 +106,14 @@ async function guardPage(requiredRole = null) {
     .maybeSingle();
 
   if (!profile) {
-    window.location.href = '/login.html';
+    window.location.href = '/mynmclicensure/login.html';
     return null;
   }
 
   // ── 3. Check account is active ────────────────────────────
   if (!profile.active) {
     await db.auth.signOut();
-    window.location.href = '/login.html';
+    window.location.href = '/mynmclicensure/login.html';
     return null;
   }
 
@@ -121,7 +121,7 @@ async function guardPage(requiredRole = null) {
   const sessionValid = await verifySession(profile.user_id);
   if (!sessionValid) {
     await db.auth.signOut();
-    window.location.href = '/login.html';
+    window.location.href = '/mynmclicensure/login.html';
     return null;
   }
 
@@ -140,7 +140,7 @@ async function guardPage(requiredRole = null) {
 
       // First level: role must be TEACHER
       if (profile.role !== 'TEACHER') {
-        window.location.href = '/router.html';
+        window.location.href = '/mynmclicensure/router.html';
         return null;
       }
 
@@ -167,7 +167,7 @@ async function guardPage(requiredRole = null) {
       if (profile.role !== 'STUDENT' && profile.role !== 'TEACHER') {
         // TEACHER can also access student-facing myteacher pages
         // (e.g. /myteacher/student/my-classes.html as a student view)
-        window.location.href = '/router.html';
+        window.location.href = '/mynmclicensure/router.html';
         return null;
       }
       _notifySidebar(profile);
@@ -176,7 +176,7 @@ async function guardPage(requiredRole = null) {
 
     // ── 6c. Any other role mismatch ─────────────────────────
     if (profile.role !== requiredRole) {
-      window.location.href = '/router.html';
+      window.location.href = '/mynmclicensure/router.html';
       return null;
     }
   }
@@ -216,5 +216,5 @@ async function _loadMsgBadge(profile) {
 async function logout() {
   await deactivateCurrentSession();
   await db.auth.signOut();
-  window.location.href = '/login.html';
+  window.location.href = '/mynmclicensure/login.html';
 }

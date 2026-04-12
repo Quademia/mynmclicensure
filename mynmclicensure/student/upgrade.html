@@ -624,7 +624,7 @@
       if (!accessToken) {
         showStatus('error', 'Your session has expired. Please sign in again.');
         setTimeout(() => {
-          window.location.href = '/login.html';
+          window.location.href = '/mynmclicensure/login.html';
         }, 1200);
         return;
       }
@@ -675,7 +675,7 @@
       currentSession = sessionResult?.data?.session || null;
 
       if (!currentSession) {
-        window.location.href = '/login.html';
+        window.location.href = '/mynmclicensure/login.html';
         return;
       }
 

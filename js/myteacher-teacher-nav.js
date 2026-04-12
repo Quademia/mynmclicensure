@@ -385,7 +385,7 @@
   async function signOut() {
     await deactivateCurrentSession();
     await db.auth.signOut();
-    window.location.href = '/login.html';
+    window.location.href = '/myteacher/login.html';
   }
 
   document.getElementById('mtSignOut').addEventListener('click', signOut);
