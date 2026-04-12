@@ -158,6 +158,25 @@
     .join-alert.error { background: rgba(185,28,28,.08); color: #b91c1c; }
     .join-alert.ok { background: rgba(6,118,71,.08); color: #067647; }
     .join-alert.info { background: rgba(37,99,235,.08); color: #2563eb; }
+    .join-helper {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+    .join-signout {
+      margin-top: 8px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+    }
+    .join-signout:hover {
+      color: var(--primary);
+    }
 
     /* Join custom fields area */
     .join-cf { margin-top: 16px; text-align: left; display: none; }
@@ -205,6 +224,8 @@
     <input type="text" class="join-input" id="overlayCode" maxlength="6" placeholder="ABC123" autocomplete="off" />
     <button class="join-btn" id="overlayJoinBtn">Continue</button>
     <div class="join-alert" id="overlayAlert"></div>
+    <p class="join-helper">Ask your teacher for a class code. If you don't have one yet, you can sign out and come back later.</p>
+    <button class="join-signout" onclick="logout()">Sign out</button>
     <!-- Org card (shown after code validated) -->
     <div id="overlayOrgCard" style="display:none"></div>
     <!-- Custom fields area (shown if class requires them) -->
