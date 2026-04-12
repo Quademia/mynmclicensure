@@ -62,6 +62,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/config.js"></script>
+<script src="/myteacher/js/myteacher-auth.js"></script>
 <script>
 
   function setStatus(title, msg) {
@@ -93,6 +94,34 @@
 
     const displayName = profile.forename || profile.name || profile.email || 'Signed in';
     setStatus('Welcome back, ' + displayName, 'Redirecting…');
+
+    // Create session if none exists (covers OAuth + magic link flows)
+    const existingSession = localStorage.getItem('mt_session_id');
+    if (!existingSession) {
+      const provider = session.user.app_metadata?.provider || 'EMAIL';
+      const loginVia = provider === 'google' ? 'GOOGLE'
+                     : provider === 'email'  ? 'MAGIC_LINK'
+                     : 'EMAIL';
+      await createLoginSession(profile.user_id, loginVia);
+    }
+
+    // Check for pending teacher request
+    // A user with role=STUDENT may have registered as a teacher
+    // and be awaiting approval — intercept them here
+    if (profile.role === 'STUDENT') {
+      const { data: pendingTeacher } = await db
+        .from('teacher_profiles')
+        .select('request_status')
+        .eq('teacher_id', profile.user_id)
+        .maybeSingle();
+
+      if (pendingTeacher) {
+        // Has a teacher_profiles row — regardless of status,
+        // send to access-request page
+        window.location.href = '/myteacher/teacher/access-request.html';
+        return;
+      }
+    }
 
     // 3. Route by role
     const role = profile.role;
