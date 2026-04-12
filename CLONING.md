@@ -20,15 +20,23 @@ qacademy-gamma/
     payment-confirmation.html ← Payment callback
     premium-prep.html      ← Premium marketing page
   myteacher/               ← Teacher Assess product
+    js/
+      myteacher-guard.js   ← MyTeacher auth & role guard (mirror of js/guard.js)
+      myteacher-auth.js    ← MyTeacher auth utilities (mirror of js/auth.js)
     admin/                 ← 2 admin pages
     teacher/               ← 9 teacher pages
     student/               ← 5 student pages
-    register.html          ← Teacher registration
+    login.html             ← MyTeacher login
+    forgot-password.html   ← MyTeacher forgot password
+    reset-password.html    ← MyTeacher reset password
+    router.html            ← MyTeacher router (routes by role after login)
+    access-request.html    ← Teacher access request / approval status page
+    register.html          ← Teacher & student registration
   js/
     paths.js               ← CENTRAL PATH CONFIG — edit this to clone
     config.js              ← Environment config (auto-detects dev vs prod)
-    guard.js               ← Auth & role guards
-    auth.js                ← Auth utilities (hashing, fingerprint, event IDs)
+    guard.js               ← Licensure auth & role guards
+    auth.js                ← Licensure auth utilities (hashing, fingerprint, event IDs)
     mynmclicensure-api.js  ← Licensure data layer
     myteacher-api.js       ← Teacher Assess data layer
     mynmclicensure-admin-sidebar.js
@@ -44,7 +52,9 @@ qacademy-gamma/
     prod-setup/            ← Ready-to-run SQL scripts for new environments
   docs/                    ← Reference documentation
   .github/workflows/       ← GitHub Actions (mirror to prod repo)
-  (root HTML)              ← login, forgot-password, reset-password, router, index
+  product-select.html      ← Product selector — root entry point (choose Licensure or MyTeacher)
+  index.html               ← Home / landing page
+  mynmclicensure/          ← also contains: login.html, forgot-password.html, reset-password.html, router.html
 ```
 
 ### Config-driven paths — `js/paths.js`
@@ -591,6 +601,50 @@ CREATE POLICY "dev_allow_all" ON items_gp FOR ALL USING (true) WITH CHECK (true)
 
 Full schema is documented in `db/schema.sql`. Key tables:
 
+#### teacher_users
+```sql
+-- MyTeacher user accounts. Separate from public.users (Licensure).
+-- Supabase Auth (auth.users) is shared — auth_id links the two.
+CREATE TABLE teacher_users (
+  user_id       TEXT PRIMARY KEY,   -- 'U_' + random hex
+  auth_id       UUID REFERENCES auth.users(id),
+  email         TEXT,
+  forename      TEXT,
+  surname       TEXT,
+  name          TEXT,
+  role          TEXT NOT NULL DEFAULT 'STUDENT',  -- STUDENT | TEACHER | ADMIN
+  active        BOOLEAN NOT NULL DEFAULT true,
+  phone_number  TEXT,
+  avatar_url    TEXT,
+  signup_source TEXT,               -- MYTEACHER
+  created_utc   TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+#### teacher_profiles
+```sql
+-- One row per teacher access request. Created on registration or via access-request.html.
+-- request_status: PENDING | APPROVED | REJECTED | DISABLED
+-- active=true only after admin approval (also sets teacher_users.role = 'TEACHER')
+CREATE TABLE teacher_profiles (
+  teacher_id      TEXT PRIMARY KEY REFERENCES teacher_users(user_id),
+  display_name    TEXT,
+  email           TEXT,
+  phone_number    TEXT,
+  organisation    TEXT,
+  role_requested  TEXT,
+  plan_type       TEXT NOT NULL DEFAULT 'FREE',
+  active          BOOLEAN NOT NULL DEFAULT false,
+  request_status  TEXT NOT NULL DEFAULT 'PENDING',
+  request_note    TEXT,
+  request_count   INTEGER NOT NULL DEFAULT 1,
+  requested_at    TIMESTAMPTZ,
+  last_request_at TIMESTAMPTZ,
+  created_at      TIMESTAMPTZ,
+  updated_at      TIMESTAMPTZ
+);
+```
+
 #### teacher_classes
 ```sql
 -- Manages teacher-created classes with join codes
@@ -700,6 +754,8 @@ CREATE POLICY "dev_allow_all" ON messages FOR ALL USING (true) WITH CHECK (true)
 
 ### 3.5 Auth Events & Rate Limiting
 
+Each product has its own auth event and reset request tables — they are fully separate.
+
 #### auth_events
 ```sql
 -- Logs every login attempt (success + failure) for audit trail and rate limiting.
@@ -725,14 +781,41 @@ Rate limit thresholds: 5 failures in 10 minutes → 10-min block, 10 failures in
 
 The migration file `db/migrations/auth_events_and_rate_limit.sql` contains the complete DDL, indexes, RLS, and both RPCs in one runnable block.
 
-### 3.6 RLS
-All 37 tables have proper role-based RLS policies. The complete policy definitions are in `db/rls.sql`.
+**MyTeacher equivalents** — same schema, separate tables:
+- `teacher_auth_events` — same columns as `auth_events`
+- `teacher_reset_requests` — same columns as `reset_requests`
 
-Two SECURITY DEFINER helper functions are required (run these first):
-- `auth_user_role()` — returns the current user's role without causing recursion on the users table
-- `auth_user_id()` — returns the current user's user_id (TEXT) without recursion
+Five SECURITY DEFINER RPCs are required for MyTeacher auth (defined in `db/rls.sql`):
+- `log_mt_auth_event(...)` — inserts into `teacher_auth_events`
+- `check_mt_login_rate_limit(p_identifier, p_fp_hash)` — reads `teacher_auth_events`, same thresholds as Licensure
+- `log_mt_reset_request(...)` — inserts into `teacher_reset_requests`, checks `teacher_users` for email existence
+- `check_mt_reset_rate_limit(p_email)` — reads `teacher_reset_requests`, same threshold (3 per 60 min)
+- `mark_mt_reset_used(p_email)` — updates `teacher_reset_requests`
+
+### 3.6 RLS
+All tables have proper role-based RLS policies. The complete policy definitions are in `db/rls.sql`.
+
+**Licensure helper functions** (run before Licensure RLS policies):
+- `auth_user_role()` — returns the current user's role from `public.users`
+- `auth_user_id()` — returns the current user's user_id (TEXT) from `public.users`
+
+**MyTeacher helper functions** (run before MyTeacher RLS policies):
+- `myteacher_user_role()` — returns the current user's role from `teacher_users`
+- `myteacher_user_id()` — returns the current user's user_id (TEXT) from `teacher_users`
+
+All four functions use `SECURITY DEFINER` to bypass RLS without recursion.
 
 When cloning, run `db/rls.sql` in the Supabase SQL Editor after creating all tables. The file includes all DROP/CREATE statements in the correct order.
+
+### 3.7 Supabase Auth Redirect URLs
+
+In Supabase dashboard → Auth → URL Configuration → Redirect URLs, add all four:
+- `https://yourdomain.com/mynmclicensure/login.html`
+- `https://yourdomain.com/mynmclicensure/reset-password.html`
+- `https://yourdomain.com/myteacher/login.html`
+- `https://yourdomain.com/myteacher/reset-password.html`
+
+These are required for Google OAuth and magic link flows to redirect back to the correct product login page.
 
 ### 3.6 Safe UI Helpers
 `js/utils.js` provides `safeText()` and `safeAvatar()` — use these for any UI that displays user-controlled values. All pages that load a nav/sidebar script must also load `<script src="/js/utils.js"></script>` before it.
@@ -756,12 +839,32 @@ Files are named after the question item_id e.g. `GP_001.jpg`. The `rationale_img
 ---
 
 ## 5. Auth Setup
-- Email/password auth enabled
-- Email confirmation: OFF during build (turn ON before go-live)
-- After registration: `register.html` inserts row into `users` with `role = 'STUDENT'`
+
+Both products share Supabase Auth (`auth.users`) as the login identity layer but have fully separate user tables, session tables, guard/auth JS files, and auth pages.
+
+### MyNMCLicensure
+- User table: `public.users` — `role = 'STUDENT' | 'ADMIN'`
+- Auth pages: `mynmclicensure/login.html`, `forgot-password.html`, `reset-password.html`, `router.html`
+- Guard/auth JS: `js/guard.js`, `js/auth.js`
+- Session key: `qa_session_id` in localStorage
+- After registration: `mynmclicensure/register.html` inserts into `public.users` with `role = 'STUDENT'`
 - Trial subscription auto-assigned on registration based on `program_id`
-- New students who pay via `subscribe.html` get their account created by the Worker via `setup-complete` route after payment
-- Login rate limiting: 5 failed attempts in 10 min → 10-min block, 10 in 24 hr → 24-hr block. All attempts logged to `auth_events` via RPC. Utilities in `js/auth.js`.
+- New students who pay via `subscribe.html` get their account created by the Worker via `setup-complete` route
+
+### MyTeacher
+- User table: `teacher_users` — `role = 'STUDENT' | 'TEACHER' | 'ADMIN'`
+- Auth pages: `myteacher/login.html`, `forgot-password.html`, `reset-password.html`, `router.html`
+- Guard/auth JS: `myteacher/js/myteacher-guard.js`, `myteacher/js/myteacher-auth.js`
+- Session key: `mt_session_id` in localStorage
+- After registration: `myteacher/register.html` inserts into `teacher_users`. Teachers also get a `teacher_profiles` row with `request_status = 'PENDING'` pending admin approval.
+- Teacher approval: admin sets `teacher_profiles.active = true` and `teacher_users.role = 'TEACHER'` via `myteacher/admin/teachers.html`
+- Access request page: `myteacher/access-request.html` — shows status (PENDING/REJECTED/DISABLED) and allows resubmission
+
+### Shared
+- Email/password auth enabled
+- Email confirmation: OFF during build (turn ON before go-live — see Before Going Live Checklist)
+- Root entry point: `product-select.html` — directs users to the correct product login
+- Login rate limiting: 5 failed attempts in 10 min → 10-min block, 10 in 24 hr → 24-hr block. Logged to `auth_events` (Licensure) or `teacher_auth_events` (MyTeacher) via RPC.
 
 ---
 

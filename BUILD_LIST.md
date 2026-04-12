@@ -44,7 +44,7 @@ Important but won't block the free trial. Real user feedback will help prioritis
 ### Product Separation
 - [x] Auth split complete — each product has own user table, session table, guard/auth JS, and auth pages (see docs/sprints/myteacher-clean-split.md)
 - [ ] Rename `public.users` → `licensure_users` (deferred — requires DB migration + full Licensure codebase sweep)
-- [ ] Create MyTeacher auth RPCs: log_mt_auth_event, check_mt_login_rate_limit, log_mt_reset_request, check_mt_reset_rate_limit, mark_mt_reset_used
+- [x] Create MyTeacher auth RPCs: log_mt_auth_event, check_mt_login_rate_limit, log_mt_reset_request, check_mt_reset_rate_limit, mark_mt_reset_used
 - [ ] Add Supabase redirect URL allowlist entries for mynmclicensure/* and myteacher/* (manual — Supabase dashboard)
 
 ### Move Business Logic Server-Side
@@ -122,7 +122,7 @@ Pagination on all admin and student list pages (users, payments, fixed-quizzes, 
 - Moved 4 mynmclicensure-only pages (register, subscribe, payment-confirmation, premium-prep) from root into /mynmclicensure/
 
 ### MyTeacher Clean Split (April 2026)
-Full auth separation between MyTeacher and MyNMCLicensure. New tables: myteacher_users, teacher_sessions, teacher_auth_events, teacher_reset_requests. New JS: myteacher-guard.js, myteacher-auth.js. New pages: myteacher/login, forgot-password, reset-password, router + mynmclicensure equivalents. Root login.html converted to product selector. All 18 MyTeacher pages swapped to myteacher-guard.js. myteacher-api.js, nav files, and register pages updated. Root forgot-password, reset-password, router deleted.
+Full auth separation between MyTeacher and MyNMCLicensure. New tables: teacher_users (originally myteacher_users — renamed post-sprint), teacher_sessions, teacher_auth_events, teacher_reset_requests. New JS: myteacher-guard.js, myteacher-auth.js. New pages: myteacher/login, forgot-password, reset-password, router, access-request + mynmclicensure equivalents. Root login.html converted to product-select.html (product selector entry point). All 18 MyTeacher pages swapped to myteacher-guard.js. myteacher-api.js, nav files, and register pages updated. Root forgot-password, reset-password, router deleted. Post-sprint: teacher_profiles FK/RLS bug fixed, all 5 MyTeacher RPCs created and confirmed, router pending-teacher intercept and OAuth session creation added, access-request.html moved to myteacher/ and boot() rebuilt with full status states.
 
 ### Question Schema Phase 3: CSV Import Update (April 2026)
 - CSV import now supports question_ref, tags, batch_id, year_level, bloom_level columns

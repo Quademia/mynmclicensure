@@ -101,3 +101,21 @@ In the Supabase dashboard → Auth → URL Configuration → Redirect URLs, add:
 - `https://yourdomain.com/myteacher/login.html`
 - `https://yourdomain.com/mynmclicensure/reset-password.html`
 - `https://yourdomain.com/myteacher/reset-password.html`
+
+---
+
+## Post-Sprint Fixes (April 2026)
+
+Issues caught during end-to-end testing after the initial push, all resolved before launch.
+
+| Fix | Detail |
+|-----|--------|
+| **`myteacher_users` renamed to `teacher_users`** | Table renamed in Supabase via `ALTER TABLE`. Helper functions `myteacher_user_id()` and `myteacher_user_role()` updated to query `teacher_users`. All 11 file references updated (rls.sql, schema.sql, guard files, auth pages, api). |
+| **`teachers.html` role update bug** | `setTeacherStatus()` was writing `role: 'TEACHER'` to `public.users` (Licensure table) instead of `teacher_users`. Fixed. |
+| **`teacher_profiles` FK + RLS bug** | FK constraint pointed to `public.users.user_id` instead of `teacher_users.user_id` — blocked all teacher profile inserts silently. RLS INSERT policy also pointed at `public.users`. Both fixed in dev Supabase. |
+| **Router — pending teacher intercept** | Added STUDENT intercept in `myteacher/router.html`: if a STUDENT role user has a `teacher_profiles` row, redirect to `access-request.html` before hitting the student dashboard. |
+| **Router — OAuth/magic link session creation** | `myteacher/router.html` now creates an `mt_session_id` on load if none exists, covering OAuth and magic link login flows that bypass `login.html`. |
+| **Student redirect changed** | Router changed STUDENT destination from `my-classes.html` to `dashboard.html`. |
+| **Student dashboard overlay UX** | Join overlay now shows a helper text ("Ask your teacher for a class code…") and a Sign out link for students with no code. |
+| **All 5 MyTeacher RPCs created** | `log_mt_auth_event`, `check_mt_login_rate_limit`, `log_mt_reset_request`, `check_mt_reset_rate_limit`, `mark_mt_reset_used` — all applied to dev Supabase and documented in `db/rls.sql`. Previously fail-open stubs, now fully wired. |
+| **`access-request.html` moved and rebuilt** | Moved from `myteacher/teacher/access-request.html` to `myteacher/access-request.html`. All 4 redirect references updated. `boot()` rewritten to read `teacher_profiles` on load and show correct state: no row → blank form; PENDING → status card + resubmit button; REJECTED → status card + pre-filled form; DISABLED → disabled message + sign out only; APPROVED/unknown → redirect to router. |
