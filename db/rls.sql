@@ -293,23 +293,23 @@ DROP POLICY IF EXISTS "dev_allow_all" ON teacher_class_members;
 CREATE POLICY "teacher_class_members_select"
 ON teacher_class_members FOR SELECT
 USING (
-  auth_user_role() = 'ADMIN'
-  OR teacher_class_members.user_id = auth_user_id()
-  OR teacher_class_members.teacher_id = auth_user_id()
+  myteacher_user_role() = 'ADMIN'
+  OR teacher_class_members.user_id = myteacher_user_id()
+  OR teacher_class_members.teacher_id = myteacher_user_id()
 );
 
 CREATE POLICY "teacher_class_members_insert"
 ON teacher_class_members FOR INSERT
 WITH CHECK (
-  teacher_class_members.user_id = auth_user_id()
+  teacher_class_members.user_id = myteacher_user_id()
 );
 
 CREATE POLICY "teacher_class_members_update"
 ON teacher_class_members FOR UPDATE
 USING (
-  auth_user_role() = 'ADMIN'
-  OR teacher_class_members.user_id = auth_user_id()
-  OR teacher_class_members.teacher_id = auth_user_id()
+  myteacher_user_role() = 'ADMIN'
+  OR teacher_class_members.user_id = myteacher_user_id()
+  OR teacher_class_members.teacher_id = myteacher_user_id()
 );
 
 
@@ -325,21 +325,21 @@ DROP POLICY IF EXISTS "dev_allow_all" ON teacher_quiz_attempts;
 CREATE POLICY "teacher_quiz_attempts_select"
 ON teacher_quiz_attempts FOR SELECT
 USING (
-  auth_user_role() = 'ADMIN'
-  OR teacher_quiz_attempts.user_id = auth_user_id()
-  OR teacher_quiz_attempts.teacher_id = auth_user_id()
+  myteacher_user_role() = 'ADMIN'
+  OR teacher_quiz_attempts.user_id = myteacher_user_id()
+  OR teacher_quiz_attempts.teacher_id = myteacher_user_id()
 );
 
 CREATE POLICY "teacher_quiz_attempts_insert"
 ON teacher_quiz_attempts FOR INSERT
 WITH CHECK (
-  teacher_quiz_attempts.user_id = auth_user_id()
+  teacher_quiz_attempts.user_id = myteacher_user_id()
 );
 
 CREATE POLICY "teacher_quiz_attempts_update"
 ON teacher_quiz_attempts FOR UPDATE
 USING (
-  teacher_quiz_attempts.user_id = auth_user_id()
+  teacher_quiz_attempts.user_id = myteacher_user_id()
 );
 
 
