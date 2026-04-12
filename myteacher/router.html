@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QAcademy — MyTeacher</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .router-wrap {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+      background: var(--bg, #f8fafc);
+    }
+    .router-header { text-align: center; margin-bottom: 32px; }
+    .router-logo   { width: 56px; height: 56px; margin: 0 auto 14px; }
+    .router-title  { font-size: 26px; font-weight: 800; color: var(--primary, #1e3a5f); margin: 0 0 6px; }
+    .router-sub    { font-size: 14px; color: var(--text-muted, #64748b); margin: 0; }
+
+    .router-status {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--white, #fff);
+      border: 1px solid var(--border, #e2e8f0);
+      border-radius: 12px; padding: 12px 16px;
+      width: 100%; max-width: 400px;
+    }
+    .router-status-text { flex: 1; min-width: 0; }
+    .router-status-title { font-size: 14px; font-weight: 700; color: var(--primary, #1e3a5f); }
+    .router-status-msg   { font-size: 12px; color: var(--text-muted, #64748b); margin-top: 2px; }
+
+    .spinner {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid rgba(30,58,95,0.12);
+      border-top-color: var(--primary, #1e3a5f);
+      animation: spin 0.8s linear infinite; flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div class="router-wrap">
+
+  <div class="router-header">
+    <img src="/images/QAcademy_Logo.png" alt="QAcademy" class="router-logo" />
+    <h1 class="router-title">MyTeacher</h1>
+    <p class="router-sub">Taking you to the right place…</p>
+  </div>
+
+  <div class="router-status" id="statusBar">
+    <div class="spinner" id="spinner"></div>
+    <div class="router-status-text">
+      <div class="router-status-title" id="statusTitle">Checking your session…</div>
+      <div class="router-status-msg"   id="statusMsg">Please wait a moment.</div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/config.js"></script>
+<script>
+
+  function setStatus(title, msg) {
+    document.getElementById('statusTitle').textContent = title || '';
+    document.getElementById('statusMsg').textContent   = msg   || '';
+  }
+
+  async function boot() {
+
+    // 1. Auth session
+    const { data: { session } } = await db.auth.getSession();
+    if (!session) {
+      window.location.href = '/myteacher/login.html';
+      return;
+    }
+
+    // 2. Profile from myteacher_users
+    const { data: profile } = await db
+      .from('myteacher_users')
+      .select('user_id, role, forename, name, email, active')
+      .eq('auth_id', session.user.id)
+      .maybeSingle();
+
+    if (!profile || !profile.active) {
+      await db.auth.signOut();
+      window.location.href = '/myteacher/login.html';
+      return;
+    }
+
+    const displayName = profile.forename || profile.name || profile.email || 'Signed in';
+    setStatus('Welcome back, ' + displayName, 'Redirecting…');
+
+    // 3. Route by role
+    const role = profile.role;
+
+    if (role === 'TEACHER') {
+      // Teachers also need an active teacher_profiles row
+      const { data: teacherProfile } = await db
+        .from('teacher_profiles')
+        .select('active')
+        .eq('teacher_id', profile.user_id)
+        .maybeSingle();
+
+      if (!teacherProfile || !teacherProfile.active) {
+        window.location.href = '/myteacher/teacher/access-request.html';
+        return;
+      }
+
+      window.location.href = '/myteacher/teacher/dashboard.html';
+      return;
+    }
+
+    if (role === 'STUDENT') {
+      window.location.href = '/myteacher/student/my-classes.html';
+      return;
+    }
+
+    if (role === 'ADMIN') {
+      window.location.href = '/myteacher/admin/dashboard.html';
+      return;
+    }
+
+    // Unknown role — send to login
+    setStatus('Unable to route your account.', 'Please contact support.');
+  }
+
+  boot();
+
+</script>
+</body>
+</html>
