@@ -1224,3 +1224,262 @@ ALTER TABLE teacher_auth_events ENABLE ROW LEVEL SECURITY;
 -- Only SECURITY DEFINER RPCs can write to this table.
 
 ALTER TABLE teacher_reset_requests ENABLE ROW LEVEL SECURITY;
+
+
+-- ============================================================
+-- MYTEACHER AUTH RPCs
+-- Mirror of Licensure auth RPCs. Identical logic and thresholds.
+-- auth_events       → teacher_auth_events
+-- reset_requests    → teacher_reset_requests
+-- users (existence) → teacher_users
+-- ============================================================
+
+-- ────────────────────────────────────────────────────────────
+-- RPC: log_mt_auth_event
+-- ────────────────────────────────────────────────────────────
+-- Mirror of log_auth_event. Inserts into teacher_auth_events.
+
+CREATE OR REPLACE FUNCTION log_mt_auth_event(
+  p_event_id     TEXT,
+  p_event_type   TEXT,
+  p_identifier   TEXT,
+  p_user_id      TEXT    DEFAULT NULL,
+  p_fp_hash      TEXT    DEFAULT NULL,
+  p_ua_hash      TEXT    DEFAULT NULL,
+  p_device_label TEXT    DEFAULT NULL,
+  p_fail_reason  TEXT    DEFAULT NULL
+)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  IF p_event_type NOT IN ('LOGIN_SUCCESS', 'LOGIN_FAIL') THEN
+    RAISE EXCEPTION 'Invalid event_type: %', p_event_type;
+  END IF;
+
+  INSERT INTO teacher_auth_events (
+    event_id, event_type, identifier, user_id,
+    fp_hash, ua_hash, device_label, fail_reason
+  ) VALUES (
+    p_event_id,
+    p_event_type,
+    LOWER(TRIM(p_identifier)),
+    p_user_id,
+    p_fp_hash,
+    p_ua_hash,
+    p_device_label,
+    p_fail_reason
+  );
+END;
+$$;
+
+
+-- ────────────────────────────────────────────────────────────
+-- RPC: check_mt_login_rate_limit
+-- ────────────────────────────────────────────────────────────
+-- Mirror of check_login_rate_limit. Reads teacher_auth_events.
+-- Thresholds: 5 failures / 10 min → block; 10 failures / 24 h → block.
+
+CREATE OR REPLACE FUNCTION check_mt_login_rate_limit(
+  p_identifier TEXT,
+  p_fp_hash    TEXT DEFAULT NULL
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_identifier   TEXT := LOWER(TRIM(p_identifier));
+  v_now          TIMESTAMPTZ := NOW();
+  v_10m_ago      TIMESTAMPTZ := v_now - INTERVAL '10 minutes';
+  v_24h_ago      TIMESTAMPTZ := v_now - INTERVAL '24 hours';
+  v_id_short     INT;
+  v_id_long      INT;
+  v_fp_short     INT;
+  v_fp_long      INT;
+  v_oldest_short TIMESTAMPTZ;
+  v_oldest_long  TIMESTAMPTZ;
+  v_retry        INT;
+BEGIN
+  SELECT COUNT(*), MIN(created_utc)
+  INTO v_id_short, v_oldest_short
+  FROM teacher_auth_events
+  WHERE identifier = v_identifier
+    AND event_type = 'LOGIN_FAIL'
+    AND fail_reason != 'RATE_LIMITED'
+    AND created_utc > v_10m_ago;
+
+  SELECT COUNT(*), MIN(created_utc)
+  INTO v_id_long, v_oldest_long
+  FROM teacher_auth_events
+  WHERE identifier = v_identifier
+    AND event_type = 'LOGIN_FAIL'
+    AND fail_reason != 'RATE_LIMITED'
+    AND created_utc > v_24h_ago;
+
+  v_fp_short := 0;
+  v_fp_long  := 0;
+  IF p_fp_hash IS NOT NULL THEN
+    SELECT COUNT(*) INTO v_fp_short
+    FROM teacher_auth_events
+    WHERE fp_hash = p_fp_hash
+      AND event_type = 'LOGIN_FAIL'
+      AND fail_reason != 'RATE_LIMITED'
+      AND created_utc > v_10m_ago;
+
+    SELECT COUNT(*) INTO v_fp_long
+    FROM teacher_auth_events
+    WHERE fp_hash = p_fp_hash
+      AND event_type = 'LOGIN_FAIL'
+      AND fail_reason != 'RATE_LIMITED'
+      AND created_utc > v_24h_ago;
+  END IF;
+
+  IF v_id_long >= 10 OR v_fp_long >= 10 THEN
+    v_retry := GREATEST(
+      EXTRACT(EPOCH FROM (v_oldest_long + INTERVAL '24 hours' - v_now))::INT,
+      60
+    );
+    RETURN jsonb_build_object(
+      'allowed', false,
+      'retry_after_seconds', v_retry,
+      'reason', 'TOO_MANY_ATTEMPTS_24H'
+    );
+  END IF;
+
+  IF v_id_short >= 5 OR v_fp_short >= 5 THEN
+    v_retry := GREATEST(
+      EXTRACT(EPOCH FROM (v_oldest_short + INTERVAL '10 minutes' - v_now))::INT,
+      30
+    );
+    RETURN jsonb_build_object(
+      'allowed', false,
+      'retry_after_seconds', v_retry,
+      'reason', 'TOO_MANY_ATTEMPTS'
+    );
+  END IF;
+
+  RETURN jsonb_build_object('allowed', true);
+END;
+$$;
+
+
+-- ────────────────────────────────────────────────────────────
+-- RPC: log_mt_reset_request
+-- ────────────────────────────────────────────────────────────
+-- Mirror of log_reset_request. Inserts into teacher_reset_requests.
+-- Checks teacher_users for email existence (not public.users).
+
+CREATE OR REPLACE FUNCTION log_mt_reset_request(
+  p_request_id   TEXT,
+  p_email        TEXT,
+  p_status       TEXT,
+  p_fp_hash      TEXT DEFAULT NULL,
+  p_device_label TEXT DEFAULT NULL
+)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_email       TEXT := LOWER(TRIM(p_email));
+  v_user_exists BOOLEAN;
+BEGIN
+  IF p_status NOT IN ('EMAIL_SENT', 'RATE_LIMITED', 'EMAIL_FAILED') THEN
+    RAISE EXCEPTION 'Invalid status: %', p_status;
+  END IF;
+
+  SELECT EXISTS(
+    SELECT 1 FROM teacher_users WHERE LOWER(email) = v_email
+  ) INTO v_user_exists;
+
+  INSERT INTO teacher_reset_requests (
+    request_id, email, user_exists, status,
+    fp_hash, device_label
+  ) VALUES (
+    p_request_id,
+    v_email,
+    v_user_exists,
+    p_status,
+    p_fp_hash,
+    p_device_label
+  );
+END;
+$$;
+
+
+-- ────────────────────────────────────────────────────────────
+-- RPC: check_mt_reset_rate_limit
+-- ────────────────────────────────────────────────────────────
+-- Mirror of check_reset_rate_limit. Reads teacher_reset_requests.
+-- Threshold: 3 requests in 60 minutes → blocked for remainder of window.
+
+CREATE OR REPLACE FUNCTION check_mt_reset_rate_limit(
+  p_email TEXT
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_email   TEXT := LOWER(TRIM(p_email));
+  v_now     TIMESTAMPTZ := NOW();
+  v_60m_ago TIMESTAMPTZ := v_now - INTERVAL '60 minutes';
+  v_count   INT;
+  v_oldest  TIMESTAMPTZ;
+  v_retry   INT;
+BEGIN
+  SELECT COUNT(*), MIN(created_utc)
+  INTO v_count, v_oldest
+  FROM teacher_reset_requests
+  WHERE email = v_email
+    AND status != 'RATE_LIMITED'
+    AND created_utc > v_60m_ago;
+
+  IF v_count >= 3 THEN
+    v_retry := GREATEST(
+      EXTRACT(EPOCH FROM (v_oldest + INTERVAL '60 minutes' - v_now))::INT,
+      60
+    );
+    RETURN jsonb_build_object(
+      'allowed', false,
+      'retry_after_seconds', v_retry,
+      'reason', 'TOO_MANY_RESET_REQUESTS'
+    );
+  END IF;
+
+  RETURN jsonb_build_object('allowed', true);
+END;
+$$;
+
+
+-- ────────────────────────────────────────────────────────────
+-- RPC: mark_mt_reset_used
+-- ────────────────────────────────────────────────────────────
+-- Mirror of mark_reset_used. Updates teacher_reset_requests.
+
+CREATE OR REPLACE FUNCTION mark_mt_reset_used(
+  p_email TEXT
+)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_email TEXT := LOWER(TRIM(p_email));
+BEGIN
+  UPDATE teacher_reset_requests
+  SET used = TRUE,
+      used_utc = NOW()
+  WHERE request_id = (
+    SELECT request_id
+    FROM teacher_reset_requests
+    WHERE email = v_email
+      AND status = 'EMAIL_SENT'
+      AND used = FALSE
+    ORDER BY created_utc DESC
+    LIMIT 1
+  );
+END;
+$$;
