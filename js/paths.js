@@ -15,4 +15,6 @@ const MYTEACHER = {
   admin:   '/myteacher/admin',
   teacher: '/myteacher/teacher',
   student: '/myteacher/student',
+  guard:   '/myteacher/js/myteacher-guard.js',
+  auth:    '/myteacher/js/myteacher-auth.js',
 };

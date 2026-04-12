@@ -3,454 +3,137 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login — QAcademy Nurses Hub</title>
+  <title>QAcademy — Sign In</title>
   <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .selector-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+      background: var(--bg, #f8fafc);
+    }
+    .selector-card {
+      background: var(--white, #fff);
+      border: 1px solid var(--border, #e2e8f0);
+      border-radius: 20px;
+      padding: 40px 32px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 4px 24px rgba(30,58,95,0.08);
+      text-align: center;
+    }
+    .selector-logo {
+      margin-bottom: 24px;
+    }
+    .selector-logo h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary, #1e3a5f);
+      margin: 0 0 4px;
+    }
+    .selector-logo p {
+      font-size: 14px;
+      color: var(--text-muted, #64748b);
+      margin: 0;
+    }
+    .selector-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary, #1e3a5f);
+      margin: 0 0 6px;
+    }
+    .selector-sub {
+      font-size: 14px;
+      color: var(--text-muted, #64748b);
+      margin: 0 0 28px;
+    }
+    .product-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .product-btn {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      border: 1.5px solid var(--border, #e2e8f0);
+      border-radius: 14px;
+      background: var(--white, #fff);
+      cursor: pointer;
+      text-align: left;
+      text-decoration: none;
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+    }
+    .product-btn:hover {
+      border-color: var(--accent, #2d7d72);
+      box-shadow: 0 4px 16px rgba(45,125,114,0.12);
+      transform: translateY(-1px);
+    }
+    .product-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+    .product-text {}
+    .product-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--primary, #1e3a5f);
+      margin: 0 0 3px;
+    }
+    .product-desc {
+      font-size: 12px;
+      color: var(--text-muted, #64748b);
+      margin: 0;
+      line-height: 1.5;
+    }
+    .product-arrow {
+      margin-left: auto;
+      font-size: 18px;
+      color: var(--text-muted, #64748b);
+      flex-shrink: 0;
+    }
+  </style>
 </head>
 <body>
 
-<!-- Signing-in overlay (hidden by default, shown when returning from Google/magic link) -->
-<div class="auth-overlay" id="authOverlay">
-  <div class="auth-overlay-card">
-    <div class="auth-overlay-spinner"></div>
-    <p class="auth-overlay-text" id="overlayText">Signing in...</p>
-  </div>
-</div>
+<div class="selector-wrap">
+  <div class="selector-card">
 
-<div class="auth-wrapper">
-  <div class="auth-card">
-
-    <!-- Logo -->
-    <div class="auth-logo">
+    <div class="selector-logo">
       <h1>QAcademy</h1>
-      <p>Nurses Hub</p>
+      <p>Choose your product to sign in</p>
     </div>
 
-    <!-- Title -->
-    <h2 class="auth-title">Welcome back</h2>
-    <p class="auth-subtitle">Sign in to your account to continue</p>
+    <h2 class="selector-title">Welcome back</h2>
+    <p class="selector-sub">Which product are you signing in to?</p>
 
-    <!-- Error Alert -->
-    <div class="alert alert-error" id="errorAlert"></div>
+    <div class="product-grid">
 
-    <!-- Login Form -->
-    <form id="loginForm">
-      <div class="form-group">
-        <label for="email">Email address</label>
-        <input
-          type="email"
-          id="email"
-          placeholder="you@example.com"
-          required
-          autocomplete="email"
-        />
-      </div>
+      <a class="product-btn" href="/mynmclicensure/login.html">
+        <span class="product-icon">🎓</span>
+        <div class="product-text">
+          <div class="product-name">My NMC Licensure</div>
+          <div class="product-desc">Exam prep for nursing students — courses, quizzes and learning history.</div>
+        </div>
+        <span class="product-arrow">›</span>
+      </a>
 
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          placeholder="Enter your password"
-          required
-          autocomplete="current-password"
-        />
-      </div>
+      <a class="product-btn" href="/myteacher/login.html">
+        <span class="product-icon">📋</span>
+        <div class="product-text">
+          <div class="product-name">MyTeacher</div>
+          <div class="product-desc">Class-based assessment — teachers, students and quiz management.</div>
+        </div>
+        <span class="product-arrow">›</span>
+      </a>
 
-      <div style="text-align:right; margin-bottom:16px;">
-        <a href="/forgot-password.html" style="font-size:13px;">Forgot password?</a>
-      </div>
-
-      <button type="submit" class="btn btn-primary" id="submitBtn">
-        Sign In
-      </button>
-    </form>
-
-    <!-- Divider -->
-    <div class="divider">or</div>
-
-    <!-- Google Sign-In -->
-    <button type="button" class="btn btn-google" id="googleBtn">
-      <svg width="18" height="18" viewBox="0 0 48 48" style="vertical-align:middle; margin-right:8px;">
-        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-        <path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.01 24.01 0 0 0 0 21.56l7.98-6.19z"/>
-        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-      </svg>
-      Sign in with Google
-    </button>
-
-    <!-- Magic Link -->
-    <div class="magic-link-section" id="magicLinkSection">
-      <div class="form-group" style="margin-bottom:8px;">
-        <label for="magicEmail">Or sign in with a magic link</label>
-        <input
-          type="email"
-          id="magicEmail"
-          placeholder="you@example.com"
-          autocomplete="email"
-        />
-      </div>
-      <button type="button" class="btn btn-magic" id="magicBtn">
-        Send magic link
-      </button>
-      <div class="alert alert-success" id="magicSuccess"></div>
-    </div>
-
-    <!-- Footer -->
-    <div class="auth-footer">
-      Don't have an account? <a href="/mynmclicensure/register.html">Register here</a>
-    </div>
-    <div style="text-align:center; margin-top:8px;">
-      <a href="/myteacher/register.html" style="font-size:13px; color:var(--text-muted);">Signing up for MyTeacher? Register here</a>
-    </div>
-    <div style="text-align:center; margin-top:12px;">
-      <a href="/index.html" style="font-size:13px; color:var(--text-muted);">&larr; Back to Home</a>
     </div>
 
   </div>
 </div>
-
-<!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/js/config.js"></script>
-<script src="/js/auth.js"></script>
-<script>
-  // ── Overlay helpers ───���─────────────────────────────────────
-  const overlay = document.getElementById('authOverlay');
-  const overlayText = document.getElementById('overlayText');
-
-  function showOverlay(text) {
-    overlayText.textContent = text;
-    overlay.classList.add('show');
-  }
-  function hideOverlay() {
-    overlay.classList.remove('show');
-  }
-
-  // ── Detect if we're returning from OAuth/magic link ─────────
-  // If the URL has a hash with access_token, the user is coming
-  // back from Google or a magic link. Show the overlay immediately
-  // so they know something is happening.
-  const urlHash = window.location.hash || '';
-  const isOAuthReturn = urlHash.includes('access_token');
-  if (isOAuthReturn) {
-    const isGoogle = urlHash.includes('provider_token');
-    showOverlay(isGoogle ? 'Signing in with Google...' : 'Signing in with magic link...');
-  }
-
-  // ── Handle auth state changes ────────────────────────────────
-  // onAuthStateChange fires when Supabase finishes processing
-  // OAuth/magic-link tokens from the URL hash.
-  //
-  // IMPORTANT: Supabase v2 holds an internal auth lock while
-  // calling this callback. Making DB queries inside the callback
-  // deadlocks because the query needs the auth token from the
-  // same lock. We use setTimeout(fn, 0) to break out of the
-  // lock before doing any DB work.
-  let authHandled = false;
-  let emailLoginInProgress = false;
-
-  db.auth.onAuthStateChange((event, session) => {
-    console.log('[auth] onAuthStateChange:', event, session ? 'has session' : 'no session');
-
-    if (authHandled) return;
-    if (!session) return;
-    if (emailLoginInProgress) return;
-
-    authHandled = true;
-
-    // Defer DB work to next tick so the auth lock is released
-    setTimeout(() => _handleAuthSession(session), 0);
-  });
-
-  async function _handleAuthSession(session) {
-    try {
-      const { data: userRow, error: userError } = await db
-        .from('users')
-        .select('user_id')
-        .eq('auth_id', session.user.id)
-        .maybeSingle();
-
-      console.log('[auth] user lookup:', userRow ? userRow.user_id : 'not found', userError?.message || '');
-
-      if (!userRow) {
-        if (isOAuthReturn) {
-          const identifier = (session.user.email || '').toLowerCase();
-          const fpHash = await buildFpHash();
-          const uaHash = await sha256Hex(navigator.userAgent || '');
-          const deviceLabel = buildDeviceLabel();
-          db.rpc('log_auth_event', {
-            p_event_id:     makeEventId(),
-            p_event_type:   'LOGIN_FAIL',
-            p_identifier:   identifier,
-            p_fp_hash:      fpHash,
-            p_ua_hash:      uaHash,
-            p_device_label: deviceLabel,
-            p_fail_reason:  'NO_ACCOUNT'
-          }).then(() => {}).catch(() => {});
-          console.log('[auth] no account — LOGIN_FAIL logged for', identifier);
-        }
-
-        await db.auth.signOut();
-        hideOverlay();
-        const errorAlert = document.getElementById('errorAlert');
-        errorAlert.textContent = 'No account found for this email. Please register first, then you can sign in with Google or a magic link.';
-        errorAlert.classList.add('show');
-        return;
-      }
-
-      // If not returning from OAuth/magic link, check for existing session
-      if (!isOAuthReturn) {
-        const existingSessionId = localStorage.getItem('qa_session_id');
-        if (existingSessionId) {
-          console.log('[auth] existing session found, redirecting');
-          window.location.href = '/router.html';
-          return;
-        }
-      }
-
-      // Determine login method from the URL hash
-      let loginVia = 'EMAIL';
-      if (urlHash.includes('provider_token')) loginVia = 'GOOGLE';
-      else if (urlHash.includes('type=magiclink')) loginVia = 'MAGIC_LINK';
-
-      console.log('[auth] creating session, loginVia:', loginVia);
-
-      if (!overlay.classList.contains('show')) {
-        showOverlay(loginVia === 'GOOGLE' ? 'Signing in with Google...' : 'Signing in with magic link...');
-      }
-
-      // Log the auth event
-      const identifier = (session.user.email || '').toLowerCase();
-      const fpHash = await buildFpHash();
-      const uaHash = await sha256Hex(navigator.userAgent || '');
-      const deviceLabel = buildDeviceLabel();
-
-      db.rpc('log_auth_event', {
-        p_event_id:     makeEventId(),
-        p_event_type:   'LOGIN_SUCCESS',
-        p_identifier:   identifier,
-        p_user_id:      userRow.user_id,
-        p_fp_hash:      fpHash,
-        p_ua_hash:      uaHash,
-        p_device_label: deviceLabel
-      }).then(() => {}).catch(() => {});
-
-      await createLoginSession(userRow.user_id, loginVia);
-      console.log('[auth] session created, redirecting');
-
-      window.location.href = '/router.html';
-
-    } catch (err) {
-      console.error('[auth] session handler error:', err);
-      hideOverlay();
-      const errorAlert = document.getElementById('errorAlert');
-      errorAlert.textContent = 'Something went wrong during sign-in. Please try again.';
-      errorAlert.classList.add('show');
-    }
-  }
-
-  // Handle login form submission
-  document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const submitBtn = document.getElementById('submitBtn');
-    const errorAlert = document.getElementById('errorAlert');
-
-    // Reset error
-    errorAlert.classList.remove('show');
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Signing in...';
-
-    // Prevent onAuthStateChange from racing with this handler
-    emailLoginInProgress = true;
-
-    // ── Prepare device info for logging ─────────────────────────
-    const identifier = email.toLowerCase();
-    const ua = navigator.userAgent || '';
-    const uaHash = await sha256Hex(ua);
-    const fpHash = await buildFpHash();
-    const deviceLabel = (typeof buildDeviceLabel === 'function')
-      ? buildDeviceLabel()
-      : (ua.includes('Mobile') ? 'Mobile' : 'Desktop');
-
-    // ── Rate limit check ────────────────────────────────────────
-    // Ask the database: "Has this email or device had too many
-    // failed attempts recently?" If yes, block without even
-    // sending the password to Supabase.
-    try {
-      const { data: rl } = await db.rpc('check_login_rate_limit', {
-        p_identifier: identifier,
-        p_fp_hash: fpHash
-      });
-
-      if (rl && !rl.allowed) {
-        // Log the blocked attempt
-        db.rpc('log_auth_event', {
-          p_event_id:     makeEventId(),
-          p_event_type:   'LOGIN_FAIL',
-          p_identifier:   identifier,
-          p_fp_hash:      fpHash,
-          p_ua_hash:      uaHash,
-          p_device_label: deviceLabel,
-          p_fail_reason:  'RATE_LIMITED'
-        }).then(() => {}).catch(() => {});
-
-        emailLoginInProgress = false;
-        const mins = Math.ceil((rl.retry_after_seconds || 60) / 60);
-        errorAlert.textContent = 'Too many failed login attempts. Please try again in ' + mins + ' minute' + (mins === 1 ? '' : 's') + '.';
-        errorAlert.classList.add('show');
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Sign In';
-        return;
-      }
-    } catch (_) {
-      // Fail-open: if rate limit check errors, proceed with login.
-      // Never accidentally lock everyone out.
-      console.warn('Rate limit check failed (proceeding with login):', _);
-    }
-
-    // ── Attempt login with Supabase Auth ────────────────────────
-    const { data, error } = await db.auth.signInWithPassword({
-      email,
-      password
-    });
-    if (error) {
-      // Log the failed attempt (fire-and-forget — don't block UI)
-      db.rpc('log_auth_event', {
-        p_event_id:     makeEventId(),
-        p_event_type:   'LOGIN_FAIL',
-        p_identifier:   identifier,
-        p_fp_hash:      fpHash,
-        p_ua_hash:      uaHash,
-        p_device_label: deviceLabel,
-        p_fail_reason:  'INVALID_CREDENTIALS'
-      }).then(() => {}).catch(() => {});
-
-      emailLoginInProgress = false;
-      errorAlert.textContent = 'Invalid email or password. Please try again.';
-      errorAlert.classList.add('show');
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Sign In';
-      return;
-    }
-
-    // ── Post-login: session + redirect (wrapped in try/catch) ──
-    try {
-      // Look up the users row. If the token hasn't propagated to
-      // PostgREST yet, the RLS check fails and we get null.
-      // Retry once after a short delay to cover that race.
-      let userRow = null;
-      for (let attempt = 0; attempt < 2; attempt++) {
-        const { data: row } = await db
-          .from('users')
-          .select('user_id')
-          .eq('auth_id', data.user.id)
-          .maybeSingle();
-        if (row) { userRow = row; break; }
-        if (attempt === 0) await new Promise(r => setTimeout(r, 500));
-      }
-
-      // Log successful login (fire-and-forget)
-      db.rpc('log_auth_event', {
-        p_event_id:     makeEventId(),
-        p_event_type:   'LOGIN_SUCCESS',
-        p_identifier:   identifier,
-        p_user_id:      userRow ? userRow.user_id : null,
-        p_fp_hash:      fpHash,
-        p_ua_hash:      uaHash,
-        p_device_label: deviceLabel
-      }).then(() => {}).catch(() => {});
-
-      if (!userRow) {
-        await db.auth.signOut();
-        emailLoginInProgress = false;
-        errorAlert.textContent = 'No account found for this email. Please register first.';
-        errorAlert.classList.add('show');
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Sign In';
-        return;
-      }
-
-      await createLoginSession(userRow.user_id, 'EMAIL');
-      window.location.href = '/router.html';
-
-    } catch (err) {
-      console.error('[login] post-login error:', err);
-      emailLoginInProgress = false;
-      errorAlert.textContent = 'Something went wrong during sign-in. Please try again.';
-      errorAlert.classList.add('show');
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Sign In';
-    }
-  });
-
-  // ── Google Sign-In ──────────────────────────────────────────
-  document.getElementById('googleBtn').addEventListener('click', async () => {
-    const errorAlert = document.getElementById('errorAlert');
-    errorAlert.classList.remove('show');
-
-    const { error } = await db.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.origin + '/login.html'
-      }
-    });
-
-    if (error) {
-      errorAlert.textContent = 'Could not start Google sign-in. Please try again.';
-      errorAlert.classList.add('show');
-    }
-    // If no error, the browser redirects to Google automatically.
-    // When Google sends them back to /login.html, the session check
-    // at the top of this page handles the rest.
-  });
-
-  // ── Magic Link ──────────────────────────────────────────────
-  document.getElementById('magicBtn').addEventListener('click', async () => {
-    const magicEmail = document.getElementById('magicEmail').value.trim();
-    const errorAlert = document.getElementById('errorAlert');
-    const magicSuccess = document.getElementById('magicSuccess');
-    const magicBtn = document.getElementById('magicBtn');
-
-    errorAlert.classList.remove('show');
-    magicSuccess.classList.remove('show');
-
-    if (!magicEmail) {
-      errorAlert.textContent = 'Please enter your email address to receive a magic link.';
-      errorAlert.classList.add('show');
-      return;
-    }
-
-    magicBtn.disabled = true;
-    magicBtn.textContent = 'Sending...';
-
-    const { error } = await db.auth.signInWithOtp({
-      email: magicEmail,
-      options: {
-        emailRedirectTo: window.location.origin + '/login.html'
-      }
-    });
-
-    if (error) {
-      errorAlert.textContent = 'Could not send magic link. Please try again.';
-      errorAlert.classList.add('show');
-    } else {
-      magicSuccess.textContent = 'Magic link sent! Check your inbox and click the link to sign in.';
-      magicSuccess.classList.add('show');
-    }
-
-    magicBtn.disabled = false;
-    magicBtn.textContent = 'Send magic link';
-  });
-
-  // Redirect user to the router (central routing page)
-  function redirectByRole() {
-    window.location.href = '/router.html';
-  }
-</script>
 
 </body>
 </html>

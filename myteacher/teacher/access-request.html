@@ -165,7 +165,7 @@
         </div>
         <div class="ar-form-actions">
           <button class="btn-primary" id="btnSubmit" type="button">Submit request</button>
-          <a href="/router.html" class="btn-ghost">Cancel</a>
+          <a href="/myteacher/router.html" class="btn-ghost">Cancel</a>
         </div>
       </div>
 
@@ -176,7 +176,7 @@
   <div class="ar-footer">
     <a href="/myteacher/student/dashboard.html">Go to My Classes</a>
     <span style="color:var(--border)">|</span>
-    <a href="/router.html">Back to home</a>
+    <a href="/myteacher/router.html">Back to home</a>
     <span style="color:var(--border)">|</span>
     <button class="ar-footer-link" id="btnSignOut">Sign out</button>
   </div>
@@ -185,7 +185,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/config.js"></script>
-<script src="/js/guard.js"></script>
+<script src="/myteacher/js/myteacher-guard.js"></script>
 <script src="/js/paths.js"></script>
 <script>
 
@@ -204,10 +204,10 @@
   // is logged in. Role gating for teacher pages happens at guard.js.
   async function boot() {
     const { data: { session } } = await db.auth.getSession();
-    if (!session) { window.location.href = '/login.html'; return; }
+    if (!session) { window.location.href = '/myteacher/login.html'; return; }
 
     const { data: profile } = await db
-      .from('users')
+      .from('myteacher_users')
       .select('user_id, forename, name, email, active')
       .eq('auth_id', session.user.id)
       .maybeSingle();
@@ -215,7 +215,7 @@
     if (!profile || !profile.active) {
       await deactivateCurrentSession();
       await db.auth.signOut();
-      window.location.href = '/login.html';
+      window.location.href = '/myteacher/login.html';
       return;
     }
 
@@ -312,7 +312,7 @@
   byId('btnSignOut').addEventListener('click', async () => {
     await deactivateCurrentSession();
     await db.auth.signOut();
-    window.location.href = '/login.html';
+    window.location.href = '/myteacher/login.html';
   });
 
   boot();

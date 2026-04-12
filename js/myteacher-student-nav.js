@@ -37,7 +37,7 @@
         <!-- Right side -->
         <div class="mt-topbar-right">
           <span class="mt-user-chip" id="mtUserChip"></span>
-          <a href="/router.html" class="mt-btn-switch">⇄ Licensure</a>
+          <a href="/mynmclicensure/login.html" class="mt-btn-switch">⇄ Licensure</a>
           <button class="mt-btn-signout" id="mtSignOut">Sign out</button>
           <button class="mt-hamburger" id="mtHamburger" aria-label="Menu">
             <span></span><span></span><span></span>
@@ -62,7 +62,7 @@
         <a href="${MYTEACHER.student}/my-results.html" class="mt-drawer-link">📊 My Results</a>
         <a href="${MYTEACHER.student}/profile.html"  class="mt-drawer-link">👤 Profile</a>
         <div class="mt-drawer-divider"></div>
-        <a href="/router.html" class="mt-drawer-link">⇄ Switch to Licensure</a>
+        <a href="/mynmclicensure/login.html" class="mt-drawer-link">⇄ Switch to Licensure</a>
         <div class="mt-drawer-divider"></div>
         <button class="mt-drawer-link mt-drawer-signout" id="mtDrawerSignOut">↩ Sign out</button>
       </nav>
@@ -250,7 +250,7 @@
   async function signOut() {
     await deactivateCurrentSession();
     await db.auth.signOut();
-    window.location.href = '/login.html';
+    window.location.href = '/myteacher/login.html';
   }
   document.getElementById('mtSignOut').addEventListener('click', signOut);
   document.getElementById('mtDrawerSignOut').addEventListener('click', signOut);
