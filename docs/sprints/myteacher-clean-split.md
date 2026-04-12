@@ -77,7 +77,7 @@ Key differences from root `js/guard.js` and `js/auth.js`:
 
 | Step | Description | Status |
 |------|-------------|--------|
-| 21 | Fix stragglers: access-request.html, admin/teachers.html, nav JS files | ✅ |
+| 21 | Fix stragglers: access-request.html (moved to myteacher/), admin/teachers.html, nav JS files | ✅ |
 | 22 | Create `mynmclicensure/login.html`, `forgot-password.html`, `reset-password.html`, `router.html` | ✅ |
 | 23 | Update `js/guard.js` + all Licensure pages to use `/mynmclicensure/*` paths | ✅ |
 | 24 | Convert root `login.html` to product selector | ✅ |

@@ -118,7 +118,7 @@
       if (pendingTeacher) {
         // Has a teacher_profiles row — regardless of status,
         // send to access-request page
-        window.location.href = '/myteacher/teacher/access-request.html';
+        window.location.href = '/myteacher/access-request.html';
         return;
       }
     }
@@ -135,7 +135,7 @@
         .maybeSingle();
 
       if (!teacherProfile || !teacherProfile.active) {
-        window.location.href = '/myteacher/teacher/access-request.html';
+        window.location.href = '/myteacher/access-request.html';
         return;
       }
 

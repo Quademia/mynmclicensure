@@ -102,6 +102,19 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* Status info block */
+    .ar-status-row {
+      display: flex; gap: 12px; align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    .ar-status-label {
+      font-size: 12px; font-weight: 700; color: var(--text-muted);
+      min-width: 110px; flex-shrink: 0;
+    }
+    .ar-status-val {
+      font-size: 13px; color: var(--text); line-height: 1.45;
+    }
+
     /* Footer */
     .ar-footer {
       margin-top: 20px; display: flex; gap: 12px;
@@ -134,22 +147,45 @@
   <!-- Card -->
   <div class="ar-card" id="arCard" style="display:none;">
     <div class="ar-card-head">
-      <h2>Request Teacher Access</h2>
-      <p>Fill in your details below. Admin will review and approve your request.</p>
+      <h2 id="arCardTitle">Request Teacher Access</h2>
+      <p id="arCardDesc">Fill in your details below. Admin will review and approve your request.</p>
     </div>
     <div class="ar-card-body">
-
-      <div class="ar-big-title">Tell us about yourself</div>
-      <div class="ar-desc">
-        Once approved, you will be able to create classes, build quizzes,
-        and view results for your students.
-      </div>
 
       <!-- Alert area -->
       <div class="ar-alert" id="arAlert"></div>
 
+      <!-- Status info (PENDING / REJECTED) -->
+      <div id="arStatusInfo" style="display:none;">
+        <div class="ar-status-row">
+          <span class="ar-status-label">Request</span>
+          <span class="ar-status-val" id="arStatusCount">—</span>
+        </div>
+        <div class="ar-status-row">
+          <span class="ar-status-label">Last submitted</span>
+          <span class="ar-status-val" id="arStatusDate">—</span>
+        </div>
+        <div class="ar-status-row">
+          <span class="ar-status-label">Your note</span>
+          <span class="ar-status-val" id="arStatusNote">—</span>
+        </div>
+        <div class="ar-form-actions" id="arResubmitWrap" style="display:none;">
+          <button class="btn-ghost" id="btnRevealForm" type="button">Update and resubmit</button>
+        </div>
+      </div>
+
+      <!-- Disabled message -->
+      <div id="arDisabledMsg" style="display:none;">
+        <p class="ar-desc" style="margin-top:0;">Your account has been disabled. Please contact support.</p>
+      </div>
+
       <!-- Form -->
       <div id="arFormWrap">
+        <div class="ar-big-title">Tell us about yourself</div>
+        <div class="ar-desc">
+          Once approved, you will be able to create classes, build quizzes,
+          and view results for your students.
+        </div>
         <div class="ar-field">
           <label for="reqOrg">Organisation <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
           <input type="text" id="reqOrg" placeholder="e.g. School / Hospital / Training centre" />
@@ -174,10 +210,10 @@
 
   <!-- Footer -->
   <div class="ar-footer">
-    <a href="/myteacher/student/dashboard.html">Go to My Classes</a>
-    <span style="color:var(--border)">|</span>
-    <a href="/myteacher/router.html">Back to home</a>
-    <span style="color:var(--border)">|</span>
+    <a href="/myteacher/student/dashboard.html" id="arFooterClasses">Go to My Classes</a>
+    <span id="arFooterSep1" style="color:var(--border)">|</span>
+    <a href="/myteacher/router.html" id="arFooterHome">Back to home</a>
+    <span id="arFooterSep2" style="color:var(--border)">|</span>
     <button class="ar-footer-link" id="btnSignOut">Sign out</button>
   </div>
 
@@ -199,9 +235,36 @@
     el.className   = 'ar-alert ' + (type || '') + (msg ? ' show' : '');
   }
 
-  // ── Boot — generic session check only ────────────────────
-  // This page does not enforce a role. It only confirms the user
-  // is logged in. Role gating for teacher pages happens at guard.js.
+  function fmtDate(iso) {
+    return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function showState(state) {
+    // state: 'form' | 'status' | 'rejected' | 'disabled'
+    byId('arStatusInfo').style.display  = (state === 'status' || state === 'rejected') ? 'block' : 'none';
+    byId('arFormWrap').style.display    = (state === 'form'   || state === 'rejected') ? 'block' : 'none';
+    byId('arDisabledMsg').style.display = (state === 'disabled') ? 'block' : 'none';
+    // DISABLED: show sign out only, hide footer links
+    const isDisabled = state === 'disabled';
+    byId('arFooterClasses').style.display = isDisabled ? 'none' : '';
+    byId('arFooterSep1').style.display    = isDisabled ? 'none' : '';
+    byId('arFooterHome').style.display    = isDisabled ? 'none' : '';
+    byId('arFooterSep2').style.display    = isDisabled ? 'none' : '';
+  }
+
+  function populateStatus(tp) {
+    byId('arStatusCount').textContent = tp.request_count ? 'Request #' + tp.request_count : '—';
+    byId('arStatusDate').textContent  = tp.last_request_at ? fmtDate(tp.last_request_at) : '—';
+    byId('arStatusNote').textContent  = tp.request_note || '—';
+  }
+
+  function prefillForm(tp) {
+    byId('reqOrg').value   = tp.organisation  || '';
+    byId('reqPhone').value = tp.phone_number  || '';
+    byId('reqNote').value  = tp.request_note  || '';
+  }
+
+  // ── Boot ─────────────────────────────────────────────────
   async function boot() {
     const { data: { session } } = await db.auth.getSession();
     if (!session) { window.location.href = '/myteacher/login.html'; return; }
@@ -223,11 +286,56 @@
     const displayName = profile.forename || profile.name || profile.email || 'there';
     byId('arSub').textContent = `Signed in as ${displayName}`;
 
+    // Load teacher_profiles row to determine which state to show
+    const { data: tp } = await db
+      .from('teacher_profiles')
+      .select('request_status, request_count, last_request_at, request_note, organisation, phone_number')
+      .eq('teacher_id', profile.user_id)
+      .maybeSingle();
+
     byId('arLoading').style.display = 'none';
     byId('arCard').style.display    = 'block';
 
-    // Wire submit button
-    byId('btnSubmit').addEventListener('click', submitRequest);
+    const status = tp ? tp.request_status : null;
+
+    if (!tp) {
+      // No profile row yet — first-time request
+      byId('arCardTitle').textContent = 'Request Teacher Access';
+      byId('arCardDesc').textContent  = 'Fill in your details below. Admin will review and approve your request.';
+      showState('form');
+      byId('btnSubmit').addEventListener('click', submitRequest);
+
+    } else if (status === 'PENDING') {
+      byId('arCardTitle').textContent = 'Your request is pending review';
+      byId('arCardDesc').textContent  = 'Admin will review your request shortly.';
+      populateStatus(tp);
+      byId('arResubmitWrap').style.display = 'block';
+      showState('status');
+      // Reveal form pre-filled when user clicks Update and resubmit
+      byId('btnRevealForm').addEventListener('click', () => {
+        prefillForm(tp);
+        byId('arStatusInfo').style.display = 'none';
+        byId('arFormWrap').style.display   = 'block';
+      });
+      byId('btnSubmit').addEventListener('click', submitRequest);
+
+    } else if (status === 'REJECTED') {
+      byId('arCardTitle').textContent = 'Your request was not approved';
+      byId('arCardDesc').textContent  = 'You can update your details and resubmit below.';
+      populateStatus(tp);
+      prefillForm(tp);
+      showState('rejected');
+      byId('btnSubmit').addEventListener('click', submitRequest);
+
+    } else if (status === 'DISABLED') {
+      byId('arCardTitle').textContent = 'Account disabled';
+      byId('arCardDesc').textContent  = '';
+      showState('disabled');
+
+    } else {
+      // APPROVED or unknown — should not land here; send to router
+      window.location.href = '/myteacher/router.html';
+    }
   }
 
   // ── Submit ────────────────────────────────────────────────

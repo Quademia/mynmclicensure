@@ -153,7 +153,7 @@ async function guardPage(requiredRole = null) {
 
       if (!teacherProfile || !teacherProfile.active) {
         // Has TEACHER role but not yet active — send to access request page
-        window.location.href = '/myteacher/teacher/access-request.html';
+        window.location.href = '/myteacher/access-request.html';
         return null;
       }
 
