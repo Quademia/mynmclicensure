@@ -89,7 +89,7 @@ Key differences from root `js/guard.js` and `js/auth.js`:
 ## What Was NOT Changed This Sprint
 
 - `public.users` table name — still named `users`. Rename to `licensure_users` deferred to a future sprint.
-- MyTeacher RPCs (`log_mt_auth_event`, `check_mt_login_rate_limit`, `log_mt_reset_request`, `check_mt_reset_rate_limit`, `mark_mt_reset_used`) — not yet created. All calls fail-open.
+- MyTeacher RPCs (`log_mt_auth_event`, `check_mt_login_rate_limit`, `log_mt_reset_request`, `check_mt_reset_rate_limit`, `mark_mt_reset_used`) — all 5 now live on both dev and prod Supabase.
 - Supabase Auth redirect URL allowlist — must manually add `mynmclicensure/*` and `myteacher/*` in Supabase dashboard.
 
 ---
@@ -119,3 +119,4 @@ Issues caught during end-to-end testing after the initial push, all resolved bef
 | **Student dashboard overlay UX** | Join overlay now shows a helper text ("Ask your teacher for a class code…") and a Sign out link for students with no code. |
 | **All 5 MyTeacher RPCs created** | `log_mt_auth_event`, `check_mt_login_rate_limit`, `log_mt_reset_request`, `check_mt_reset_rate_limit`, `mark_mt_reset_used` — all applied to dev Supabase and documented in `db/rls.sql`. Previously fail-open stubs, now fully wired. |
 | **`access-request.html` moved and rebuilt** | Moved from `myteacher/teacher/access-request.html` to `myteacher/access-request.html`. All 4 redirect references updated. `boot()` rewritten to read `teacher_profiles` on load and show correct state: no row → blank form; PENDING → status card + resubmit button; REJECTED → status card + pre-filled form; DISABLED → disabled message + sign out only; APPROVED/unknown → redirect to router. |
+| **Prod migration** | 3 users inserted into `teacher_users` (2 approved teachers + 1 admin). All 4 Supabase batches (tables + RLS, RPCs, RLS policy updates, user migration) applied to prod. |
