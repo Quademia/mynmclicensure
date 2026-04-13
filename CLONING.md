@@ -23,6 +23,10 @@ qacademy-gamma/
     js/
       myteacher-guard.js   ← MyTeacher auth & role guard (mirror of js/guard.js)
       myteacher-auth.js    ← MyTeacher auth utilities (mirror of js/auth.js)
+      myteacher-api.js     ← Teacher Assess data layer
+      myteacher-admin-nav.js
+      myteacher-teacher-nav.js
+      myteacher-student-nav.js
     admin/                 ← 2 admin pages
     teacher/               ← 9 teacher pages
     student/               ← 5 student pages
@@ -38,12 +42,8 @@ qacademy-gamma/
     guard.js               ← Licensure auth & role guards
     auth.js                ← Licensure auth utilities (hashing, fingerprint, event IDs)
     mynmclicensure-api.js  ← Licensure data layer
-    myteacher-api.js       ← Teacher Assess data layer
     mynmclicensure-admin-sidebar.js
     mynmclicensure-student-sidebar.js
-    myteacher-admin-nav.js
-    myteacher-teacher-nav.js
-    myteacher-student-nav.js
   payments-worker/         ← Cloudflare Worker (separate deployment)
   workers/email-worker/    ← Cloudflare Worker for transactional emails
   db/

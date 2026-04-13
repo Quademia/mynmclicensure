@@ -2,7 +2,7 @@
 // student-panel.js — Student Overview modal component
 //
 // Usage:  openStudentPanel(userId, teacherId)
-// Requires: db (config.js), myteacher-api.js (getStudentOverview),
+// Requires: db (config.js), /myteacher/js/myteacher-api.js (getStudentOverview),
 //           utils.js (escapeHtml), paths.js (MYTEACHER)
 // ============================================================
 

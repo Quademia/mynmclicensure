@@ -3,7 +3,7 @@
 // Slice 12: Teacher Courses
 //
 // Usage:  initCoursesPanel('containerId', teacherId)
-// Requires: db (config.js), myteacher-api.js, utils.js (escapeHtml)
+// Requires: db (config.js), /myteacher/js/myteacher-api.js, utils.js (escapeHtml)
 // ============================================================
 
 /**
