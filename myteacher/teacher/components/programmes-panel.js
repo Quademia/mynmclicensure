@@ -3,7 +3,7 @@
 // Slice 13: Teacher Programmes
 //
 // Usage:  initProgrammesPanel('containerId', teacherId)
-// Requires: db (config.js), myteacher-api.js, utils.js (escapeHtml)
+// Requires: db (config.js), /myteacher/js/myteacher-api.js, utils.js (escapeHtml)
 // ============================================================
 
 /**

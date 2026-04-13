@@ -39,6 +39,7 @@ qacademy-gamma/
     runner/                ← 2 quiz runner pages
     register.html, subscribe.html, payment-confirmation.html, premium-prep.html
   myteacher/               ← Teacher Assess product
+    js/                    ← MyTeacher-specific JS (guard, auth, api, nav)
     admin/                 ← 2 admin pages
     teacher/               ← 9 teacher pages
     student/               ← 5 student pages
@@ -49,7 +50,6 @@ qacademy-gamma/
     guard.js               ← Auth & role guards
     auth.js                ← Auth utilities (hashing, fingerprint, event IDs)
     mynmclicensure-api.js  ← Licensure data layer
-    myteacher-api.js       ← Teacher Assess data layer
   payments-worker/         ← Cloudflare Worker (payments)
   workers/email-worker/    ← Cloudflare Worker (transactional emails)
   db/                      ← Schema, RLS, migrations, prod setup scripts
@@ -85,7 +85,7 @@ const MYTEACHER = {
 ## Key Conventions
 - Supabase JS CDN uses `supabase` as global variable. Project uses `const db = supabase.createClient(...)` in `js/config.js`. All files reference `db`, never `supabase`.
 - `.maybeSingle()` instead of `.single()` on queries where result might be empty.
-- `js/mynmclicensure-api.js` is the licensure data layer. `js/myteacher-api.js` is the teacher assess data layer. Shared reads go in the relevant API file. Page-specific logic stays in the page file.
+- `js/mynmclicensure-api.js` is the licensure data layer. `myteacher/js/myteacher-api.js` is the teacher assess data layer. Shared reads go in the relevant API file. Page-specific logic stays in the page file.
 - When adding to an API file, provide only the new function block — never a full rewrite.
 - Item IDs are globally unique and course-prefixed: `GP_001`, `RN_MED_001`, etc.
 - **Never hardcode `/mynmclicensure/...` or `/myteacher/...` paths in JavaScript.** Always use `LICENSURE.x` or `MYTEACHER.x` from `js/paths.js`.
@@ -378,7 +378,7 @@ Every key is a system key referenced by platform code. Never rename or delete un
 - `finishAttempt()`, `retakeAttempt()`
 - `getAttemptForReview()`, `getStudentAttempts()`, `getAttemptById()`
 
-### Teacher Assess (myteacher-api.js)
+### Teacher Assess (myteacher/js/myteacher-api.js)
 - **Quiz CRUD:** `createTeacherQuiz()`, `getTeacherQuiz()`, `getTeacherQuizzes()`, `updateTeacherQuiz()`
 - **Quiz Lifecycle:** `publishTeacherQuiz()`, `archiveTeacherQuiz()`, `cloneTeacherQuiz()`, `releaseQuizResults(quizId, classId?)`, `unreleaseQuizResults(quizId, classId?)`, `getQuizClassStats()`
 - **Quiz Relations:** `setQuizClasses()`, `getQuizClasses()`, `removeFromDraftItems()`
@@ -489,8 +489,8 @@ See `db/rls.sql` for the complete policy definitions.
 
 ## XSS Hardening
 Four vulnerable locations patched (innerHTML with user-controlled data):
-- `js/myteacher-teacher-nav.js` — user chip
-- `js/myteacher-student-nav.js` — user chip
+- `myteacher/js/myteacher-teacher-nav.js` — user chip
+- `myteacher/js/myteacher-student-nav.js` — user chip
 - `js/mynmclicensure-student-sidebar.js` — avatar rendering
 - `router.html` — resubmit button onclick
 

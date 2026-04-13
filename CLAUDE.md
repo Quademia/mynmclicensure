@@ -50,7 +50,7 @@ QAcademy Nurses Hub is a web-based LMS for nursing students in Ghana preparing f
 | `js/config.js` | Supabase credentials |
 | `js/guard.js` | Auth and role guards |
 | `js/mynmclicensure-api.js` | Licensure data layer |
-| `js/myteacher-api.js` | Teacher Assess data layer |
+| `myteacher/js/myteacher-api.js` | Teacher Assess data layer |
 
 ## Coding Conventions
 - Supabase JS CDN uses `supabase` as global. Project uses `const db = supabase.createClient(...)` in `js/config.js`. All files reference `db`, never `supabase`.
