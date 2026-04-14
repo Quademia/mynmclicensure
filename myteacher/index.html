@@ -1,134 +1,497 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MyTeacher — QAcademy</title>
-  <style>
-    :root {
-      --primary:    #1e3a5f;
-      --accent:     #2d7d72;
-      --text-muted: #6b7280;
-      --border:     #e5e7eb;
-      --bg:         #f9fafb;
-      --white:      #ffffff;
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--primary);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 32px 16px;
-    }
-    .wrap {
-      max-width: 480px;
-      width: 100%;
-      text-align: center;
-    }
-    .logo {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 20px;
-    }
-    .badge {
-      display: inline-block;
-      background: rgba(45,125,114,0.1);
-      color: var(--accent);
-      font-size: 12px;
-      font-weight: 700;
-      padding: 4px 12px;
-      border-radius: 999px;
-      margin-bottom: 16px;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-    }
-    h1 {
-      font-size: 30px;
-      font-weight: 800;
-      color: var(--primary);
-      margin-bottom: 10px;
-    }
-    .tagline {
-      font-size: 15px;
-      color: var(--text-muted);
-      line-height: 1.6;
-      margin-bottom: 36px;
-    }
-    .btn-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 32px;
-    }
-    .btn-primary {
-      display: block;
-      padding: 14px 24px;
-      background: var(--accent);
-      color: var(--white);
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 700;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-    .btn-primary:hover { background: #245f56; }
-    .btn-secondary {
-      display: block;
-      padding: 14px 24px;
-      background: var(--white);
-      color: var(--primary);
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 700;
-      text-decoration: none;
-      transition: border-color 0.2s;
-    }
-    .btn-secondary:hover { border-color: var(--accent); }
-    .divider {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-bottom: 24px;
-    }
-    .back-link {
-      font-size: 13px;
-      color: var(--text-muted);
-      text-decoration: none;
-    }
-    .back-link:hover { color: var(--primary); }
-    .footer {
-      margin-top: 32px;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyTeacher — QAcademy</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: #1e3a5f;
+    --primary-dark: #142d4c;
+    --primary-light: #edf6f5;
+    --accent: #2d7d72;
+    --accent-dark: #235f56;
+    --success: #16a34a;
+    --danger: #dc2626;
+    --warning: #d97706;
+    --text: #111827;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+    --bg: #f9fafb;
+    --white: #ffffff;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* NAV */
+  nav {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-left { display: flex; align-items: center; gap: 12px; }
+  .nav-logo { height: 32px; width: auto; }
+  .nav-badge {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--primary-light);
+    border: 1px solid #b2d8d4;
+    border-radius: 4px;
+    padding: 2px 8px;
+    letter-spacing: 0.03em;
+  }
+  .nav-back {
+    font-size: 13px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.15s;
+  }
+  .nav-back:hover { color: var(--primary); }
+  .nav-back svg { width: 14px; height: 14px; }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(160deg, var(--primary-dark) 0%, var(--primary) 60%, #1e5a6f 100%);
+    color: var(--white);
+    padding: 5rem 1.5rem 4rem;
+    text-align: center;
+  }
+  .hero-eyebrow {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #7ecdc6;
+    margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 1.25rem;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 span { color: #5dcfc8; }
+  .hero p {
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    color: #c5dde9;
+    max-width: 580px;
+    margin: 0 auto 2.5rem;
+  }
+  .cta-group {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-block;
+    padding: 0.75rem 1.75rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    white-space: nowrap;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--white);
+    border: 2px solid var(--accent);
+  }
+  .btn-primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
+  .btn-outline {
+    background: transparent;
+    color: var(--white);
+    border: 2px solid rgba(255,255,255,0.5);
+  }
+  .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.8); }
+
+  /* TRUST BAR */
+  .trust-bar {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0.875rem 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .trust-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .trust-item svg { color: var(--accent); }
+
+  /* SECTION */
+  section { padding: 4rem 1.5rem; }
+  .section-inner { max-width: 1080px; margin: 0 auto; }
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+  .section-heading {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.015em;
+  }
+  .section-sub {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    max-width: 560px;
+    margin-bottom: 2.5rem;
+  }
+
+  /* FEATURES GRID */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 1.25rem;
+  }
+  .feature-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    transition: box-shadow 0.15s, border-color 0.15s;
+  }
+  .feature-card:hover { border-color: #b2d8d4; box-shadow: 0 4px 16px rgba(45,125,114,0.08); }
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-light);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+  .feature-icon svg { width: 20px; height: 20px; color: var(--accent); }
+  .feature-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 0.4rem;
+  }
+  .feature-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+
+  /* HOW IT WORKS */
+  .how-section { background: var(--white); }
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0;
+    position: relative;
+  }
+  .step {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    position: relative;
+  }
+  .step-num {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--white);
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+  }
+  .step h4 { font-size: 0.95rem; font-weight: 600; color: var(--primary); margin-bottom: 0.35rem; }
+  .step p { font-size: 0.85rem; color: var(--text-muted); }
+
+  /* ROLES */
+  .roles-section { background: var(--bg); }
+  .roles-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+  @media (max-width: 600px) { .roles-grid { grid-template-columns: 1fr; } }
+  .role-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.75rem;
+  }
+  .role-card.teacher { border-top: 3px solid var(--accent); }
+  .role-card.student { border-top: 3px solid var(--primary); }
+  .role-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 0.75rem;
+  }
+  .role-tag.teacher { background: var(--primary-light); color: var(--accent); }
+  .role-tag.student { background: #eff3f8; color: var(--primary); }
+  .role-card h3 { font-size: 1.1rem; font-weight: 600; color: var(--primary); margin-bottom: 0.75rem; }
+  .role-list { list-style: none; }
+  .role-list li {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    padding: 0.3rem 0;
+    padding-left: 1.25rem;
+    position: relative;
+  }
+  .role-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .role-card.student .role-list li::before { background: var(--primary); }
+
+  /* CTA BAND */
+  .cta-band {
+    background: var(--primary);
+    color: var(--white);
+    text-align: center;
+    padding: 4rem 1.5rem;
+  }
+  .cta-band h2 { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; margin-bottom: 0.75rem; }
+  .cta-band p { color: #b0c8d8; margin-bottom: 2rem; font-size: 1.05rem; }
+  .cta-band .cta-group { justify-content: center; }
+
+  /* FOOTER */
+  footer {
+    background: var(--primary-dark);
+    color: #8da8bc;
+    text-align: center;
+    padding: 1.25rem 1.5rem;
+    font-size: 13px;
+    margin-top: auto;
+  }
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <img src="/images/QAcademy_Logo.png" alt="QAcademy" class="logo" />
-    <div class="badge">MyTeacher</div>
-    <h1>Class-based assessment for educators</h1>
-    <p class="tagline">
-      Create classes, build question banks, assign quizzes,
-      and track student results — all in one place.
-    </p>
 
-    <div class="btn-grid">
-      <a href="/myteacher/login.html" class="btn-primary">Log in</a>
-      <a href="/myteacher/register.html" class="btn-secondary">Create an account</a>
-    </div>
-
-    <div class="divider">─────────────────</div>
-    <a href="/index.html" class="back-link">← Back to QAcademy</a>
-
-    <p class="footer">© 2025 QAcademy. All rights reserved.</p>
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <img src="/images/QAcademy_Logo.png" alt="QAcademy" class="nav-logo">
+    <span class="nav-badge">MyTeacher</span>
   </div>
+  <a href="/index.html" class="nav-back">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10 12L6 8l4-4"/>
+    </svg>
+    Back to QAcademy
+  </a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-eyebrow">QAcademy &mdash; MyTeacher</p>
+  <h1>Class-based assessment<br>for <span>educators</span></h1>
+  <p>Build question banks, assign quizzes, and track student performance — all in one platform built for health training institutions.</p>
+  <div class="cta-group">
+    <a href="/myteacher/login.html" class="btn btn-primary">Log in</a>
+    <a href="/myteacher/register.html" class="btn btn-outline">Register</a>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="trust-item">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1l1.9 3.8L14 5.6l-3 2.9.7 4.1L8 10.5l-3.7 2.1.7-4.1-3-2.9 4.1-.8z"/></svg>
+    Built for nursing &amp; health training
+  </div>
+  <div class="trust-item">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="12" height="10" rx="1"/><path d="M5 3V2m6 1V2M2 7h12"/></svg>
+    Timed &amp; scheduled quizzes
+  </div>
+  <div class="trust-item">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8l4 4 8-8"/></svg>
+    MCQ, True/False &amp; SATA question types
+  </div>
+  <div class="trust-item">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
+    Works on mobile
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section>
+  <div class="section-inner">
+    <p class="section-label">Features</p>
+    <h2 class="section-heading">Everything you need to assess and improve</h2>
+    <p class="section-sub">MyTeacher gives educators the tools to run rigorous assessments without the administrative overhead.</p>
+    <div class="features-grid">
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2L3 6v4c0 4.1 3 7.9 7 9 4-1.1 7-4.9 7-9V6l-7-4z"/></svg>
+        </div>
+        <h3>Classes &amp; enrolment</h3>
+        <p>Create classes, share a join code with students, and manage enrolment with an approval flow. Full control over who's in your class.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M7 10h6M7 7h6M7 13h4"/></svg>
+        </div>
+        <h3>Question bank</h3>
+        <p>Author MCQ, True/False, and SATA questions. Import in bulk via CSV or use AI-assisted creation to build your bank faster.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"/><path d="M10 7v3l2.5 2.5"/></svg>
+        </div>
+        <h3>Quiz engine</h3>
+        <p>Set time limits, assign quizzes to specific classes, use access codes, and shuffle questions or answers to reduce copying.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17V7l7-4 7 4v10"/><path d="M8 17v-6h4v6"/></svg>
+        </div>
+        <h3>Results &amp; analytics</h3>
+        <p>View marksheets, run item analysis to identify weak questions, and control when students can see their results — per class.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12v4H4zM4 10h8v4H4z"/></svg>
+        </div>
+        <h3>Academic structure</h3>
+        <p>Organise content by programme, cohort, and course. Mirrors the way health training institutions are actually structured.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="7" r="4"/><path d="M2 17c0-3 2.7-5 6-5s6 2 6 5"/><path d="M15 7c1.7.4 3 2 3 4.5"/></svg>
+        </div>
+        <h3>Student experience</h3>
+        <p>Students join by code, take quizzes on any device, and review their answers once results are released — with no friction.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section">
+  <div class="section-inner">
+    <p class="section-label">How it works</p>
+    <h2 class="section-heading">Up and running in minutes</h2>
+    <p class="section-sub">No training required. If you can send an email, you can run an assessment on MyTeacher.</p>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h4>Register &amp; create a class</h4>
+        <p>Sign up, set up your first class, and share the join code with your students.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h4>Build your question bank</h4>
+        <p>Add questions manually, import via CSV, or let AI help you draft them.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h4>Assign a quiz</h4>
+        <p>Schedule a quiz for your class, set a time limit, and choose your options.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h4>Review the results</h4>
+        <p>See how every student performed and identify which questions need revisiting.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOR TEACHERS & STUDENTS -->
+<section class="roles-section">
+  <div class="section-inner">
+    <p class="section-label">Who it's for</p>
+    <h2 class="section-heading">Built for both sides of the classroom</h2>
+    <p class="section-sub">MyTeacher is designed for the realities of health education in Ghana — on any device, in any bandwidth.</p>
+    <div class="roles-grid">
+      <div class="role-card teacher">
+        <span class="role-tag teacher">Teachers &amp; Lecturers</span>
+        <h3>Run better assessments, faster</h3>
+        <ul class="role-list">
+          <li>Create and reuse question banks across cohorts</li>
+          <li>Assign quizzes with scheduling and access controls</li>
+          <li>View results per student and per question</li>
+          <li>Release results on your own schedule</li>
+          <li>Import questions in bulk via CSV</li>
+          <li>Organise by programme, cohort, and course</li>
+        </ul>
+      </div>
+      <div class="role-card student">
+        <span class="role-tag student">Students</span>
+        <h3>Focus on learning, not logistics</h3>
+        <ul class="role-list">
+          <li>Join classes instantly with a code</li>
+          <li>Take quizzes on your phone or computer</li>
+          <li>See your scores when your teacher releases them</li>
+          <li>Review your answers and correct responses</li>
+          <li>Track your progress across courses</li>
+          <li>No app download needed</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<div class="cta-band">
+  <h2>Ready to get started?</h2>
+  <p>Join educators across Ghana already using MyTeacher for assessments.</p>
+  <div class="cta-group">
+    <a href="/myteacher/register.html" class="btn btn-primary">Create a free account</a>
+    <a href="/myteacher/login.html" class="btn btn-outline">Log in</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  &copy; 2025 QAcademy. All rights reserved.
+</footer>
+
 </body>
 </html>
