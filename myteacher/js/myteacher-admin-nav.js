@@ -35,7 +35,7 @@
         <!-- Right side -->
         <div class="mt-topbar-right">
           <span class="mt-user-chip" id="mtUserChip"></span>
-          <a href="${LICENSURE.admin}/dashboard.html" class="mt-btn-switch">⇄ Licensure Admin</a>
+          <a href="/product-select.html" class="mt-btn-switch">⇄ Licensure Admin</a>
           <button class="mt-btn-signout" id="mtSignOut">Sign out</button>
           <button class="mt-hamburger" id="mtHamburger" aria-label="Menu">
             <span></span><span></span><span></span>
@@ -58,7 +58,7 @@
         <a href="${MYTEACHER.admin}/dashboard.html" class="mt-drawer-link">🏠 Dashboard</a>
         <a href="${MYTEACHER.admin}/teachers.html"  class="mt-drawer-link">👨‍🏫 Teachers</a>
         <div class="mt-drawer-divider"></div>
-        <a href="${LICENSURE.admin}/dashboard.html" class="mt-drawer-link">⇄ Switch to Licensure Admin</a>
+        <a href="/product-select.html" class="mt-drawer-link">⇄ Switch to Licensure Admin</a>
         <div class="mt-drawer-divider"></div>
         <button class="mt-drawer-link mt-drawer-signout" id="mtDrawerSignOut">↩ Sign out</button>
       </nav>
