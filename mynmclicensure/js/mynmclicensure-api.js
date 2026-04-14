@@ -404,7 +404,7 @@ async function assignSubscription(userId, productId, startDate = null) {
 // ------------------------------------------------------------
 function workerBaseUrl() {
   const raw = String(PAYMENTS_API_BASE || '').trim();
-  if (!raw) throw new Error('Missing PAYMENTS_API_BASE in /js/config.js');
+  if (!raw) throw new Error('Missing PAYMENTS_API_BASE in /mynmclicensure/js/config.js');
   return raw.replace(/\/+$/, '');
 }
 
