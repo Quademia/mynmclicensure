@@ -48,9 +48,14 @@ Important but won't block the free trial. Real user feedback will help prioritis
 - [x] Copy utils.js into myteacher/js/utils.js and update all MyTeacher pages to use it
 - [x] Copy css/style.css into myteacher/css/style.css and update all MyTeacher pages to use it
 - [x] Split paths.js — create myteacher/js/paths.js with MYTEACHER constant only, update MyTeacher pages to load it instead of root paths.js
+- [x] Copy all Licensure JS files into mynmclicensure/js/ (api, sidebars, guard, auth, paths, utils)
+- [x] Copy style.css into mynmclicensure/css/ and redirect all Licensure pages
+- [x] Make product-select.html self-contained with inline styles
+- [x] Archive root css/ folder — no active references remain
+- [x] Switch link in MyTeacher topbar updated to point to product-select.html
+- [x] Fixed duplicate guard.js and api.js loads in quiz-builder.html
 - [ ] **Remaining split steps** (deferred):
   - [ ] Rename public.users → licensure_users (requires DB migration + full Licensure codebase sweep)
-  - [ ] Move guard.js and auth.js into mynmclicensure/js/ (do as part of Licensure cleanup sprint)
 
 ### Move Business Logic Server-Side
 - [ ] Look into new stack that offers proper backend — almost all business logic lives in the browser

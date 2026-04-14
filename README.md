@@ -33,33 +33,34 @@ The project is organised into two independent products under a shared root:
 
 ```
 qacademy-gamma/
-  mynmclicensure/          ← NMC Licensure product
+  mynmclicensure/          ← NMC Licensure product (fully self-contained)
+    css/                   ← Licensure stylesheet (style.css)
+    js/                    ← Licensure JS (paths, guard, auth, utils, api, sidebars)
     admin/                 ← 12 admin pages
     student/               ← 16 student pages
     runner/                ← 2 quiz runner pages
-    register.html, subscribe.html, payment-confirmation.html, premium-prep.html
-  myteacher/               ← Teacher Assess product
-    css/                   ← MyTeacher's own stylesheet (style.css)
-    js/                    ← MyTeacher-specific JS (paths, utils, guard, auth, api, nav)
+    login.html, register.html, subscribe.html, etc.
+  myteacher/               ← Teacher Assess product (fully self-contained)
+    css/                   ← MyTeacher stylesheet (style.css)
+    js/                    ← MyTeacher JS (paths, utils, guard, auth, api, nav)
     admin/                 ← 2 admin pages
     teacher/               ← 9 teacher pages
     student/               ← 5 student pages
-    register.html
+    login.html, register.html, etc.
   js/
-    paths.js               ← CENTRAL PATH CONFIG — edit this to clone
-    config.js              ← Environment config (auto-detects dev vs prod)
-    guard.js               ← Auth & role guards
-    auth.js                ← Auth utilities (hashing, fingerprint, event IDs)
-    mynmclicensure-api.js  ← Licensure data layer
+    config.js              ← Supabase credentials (shared — both products load this)
+  archive/
+    css/style.css          ← Original root stylesheet (archived — no active references)
   payments-worker/         ← Cloudflare Worker (payments)
   workers/email-worker/    ← Cloudflare Worker (transactional emails)
   db/                      ← Schema, RLS, migrations, prod setup scripts
-  (root HTML)              ← login, forgot-password, reset-password, router, index
+  product-select.html      ← Product selector (self-contained, inline styles)
+  index.html               ← Home / landing page
 ```
 
 ### Path Configuration
 
-Each product has its own `paths.js`. MyTeacher pages load `myteacher/js/paths.js`; Licensure pages load `js/paths.js`. Both define the same constants — **never hardcode product paths in JS.** Always use the constants:
+Each product has its own `paths.js` inside its `js/` folder. MyTeacher pages load `myteacher/js/paths.js`; Licensure pages load `mynmclicensure/js/paths.js`. Both define the same constants — **never hardcode product paths in JS.** Always use the constants:
 
 ```js
 const LICENSURE = {
@@ -86,7 +87,7 @@ const MYTEACHER = {
 ## Key Conventions
 - Supabase JS CDN uses `supabase` as global variable. Project uses `const db = supabase.createClient(...)` in `js/config.js`. All files reference `db`, never `supabase`.
 - `.maybeSingle()` instead of `.single()` on queries where result might be empty.
-- `js/mynmclicensure-api.js` is the licensure data layer. `myteacher/js/myteacher-api.js` is the teacher assess data layer. Shared reads go in the relevant API file. Page-specific logic stays in the page file.
+- `mynmclicensure/js/mynmclicensure-api.js` is the licensure data layer. `myteacher/js/myteacher-api.js` is the teacher assess data layer. Shared reads go in the relevant API file. Page-specific logic stays in the page file.
 - When adding to an API file, provide only the new function block — never a full rewrite.
 - Item IDs are globally unique and course-prefixed: `GP_001`, `RN_MED_001`, etc.
 - **Never hardcode `/mynmclicensure/...` or `/myteacher/...` paths in JavaScript.** Always use `LICENSURE.x` or `MYTEACHER.x` from the product's `paths.js`.
@@ -492,10 +493,10 @@ See `db/rls.sql` for the complete policy definitions.
 Four vulnerable locations patched (innerHTML with user-controlled data):
 - `myteacher/js/myteacher-teacher-nav.js` — user chip
 - `myteacher/js/myteacher-student-nav.js` — user chip
-- `js/mynmclicensure-student-sidebar.js` — avatar rendering
+- `mynmclicensure/js/mynmclicensure-student-sidebar.js` — avatar rendering
 - `router.html` — resubmit button onclick
 
-Shared helpers: `safeText()` and `safeAvatar()`. Licensure pages use `js/utils.js`; MyTeacher pages use `myteacher/js/utils.js` (own copy). All new UI that displays user data must use these instead of innerHTML.
+Shared helpers: `safeText()` and `safeAvatar()`. Each product has its own copy — Licensure uses `mynmclicensure/js/utils.js`, MyTeacher uses `myteacher/js/utils.js`. All new UI that displays user data must use these instead of innerHTML.
 
 ---
 

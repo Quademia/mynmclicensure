@@ -12,21 +12,30 @@ Technical rebuild guide. Follow end-to-end to recreate the full environment from
 ```
 qacademy-gamma/
   mynmclicensure/          ← NMC Licensure product
+    css/
+      style.css            ← Licensure's own stylesheet
+    js/
+      paths.js             ← Licensure path config (LICENSURE + MYTEACHER constants)
+      config.js            ← Symlink/copy — same Supabase credentials as root
+      guard.js             ← Licensure auth & role guards
+      auth.js              ← Licensure auth utilities (hashing, fingerprint, event IDs)
+      utils.js             ← Licensure's own copy of shared UI utilities
+      mynmclicensure-api.js           ← Licensure data layer
+      mynmclicensure-admin-sidebar.js
+      mynmclicensure-student-sidebar.js
     admin/                 ← 12 admin pages
     student/               ← 16 student pages
     runner/                ← 2 quiz runner pages
-    register.html          ← Student registration
-    subscribe.html         ← Paid subscription flow
-    payment-confirmation.html ← Payment callback
-    premium-prep.html      ← Premium marketing page
+    login.html, forgot-password.html, reset-password.html, router.html
+    register.html, subscribe.html, payment-confirmation.html, premium-prep.html
   myteacher/               ← Teacher Assess product
     css/
-      style.css            ← MyTeacher's own copy of the stylesheet
+      style.css            ← MyTeacher's own stylesheet
     js/
       paths.js             ← MyTeacher path config (MYTEACHER + LICENSURE constants)
       utils.js             ← MyTeacher's own copy of shared UI utilities
-      myteacher-guard.js   ← MyTeacher auth & role guard (mirror of js/guard.js)
-      myteacher-auth.js    ← MyTeacher auth utilities (mirror of js/auth.js)
+      myteacher-guard.js   ← MyTeacher auth & role guard
+      myteacher-auth.js    ← MyTeacher auth utilities
       myteacher-api.js     ← Teacher Assess data layer
       myteacher-admin-nav.js
       myteacher-teacher-nav.js
@@ -34,20 +43,12 @@ qacademy-gamma/
     admin/                 ← 2 admin pages
     teacher/               ← 9 teacher pages
     student/               ← 5 student pages
-    login.html             ← MyTeacher login
-    forgot-password.html   ← MyTeacher forgot password
-    reset-password.html    ← MyTeacher reset password
-    router.html            ← MyTeacher router (routes by role after login)
-    access-request.html    ← Teacher access request / approval status page
-    register.html          ← Teacher & student registration
+    login.html, forgot-password.html, reset-password.html, router.html
+    access-request.html, register.html
   js/
-    paths.js               ← CENTRAL PATH CONFIG — edit this to clone
-    config.js              ← Environment config (auto-detects dev vs prod)
-    guard.js               ← Licensure auth & role guards
-    auth.js                ← Licensure auth utilities (hashing, fingerprint, event IDs)
-    mynmclicensure-api.js  ← Licensure data layer
-    mynmclicensure-admin-sidebar.js
-    mynmclicensure-student-sidebar.js
+    config.js              ← Supabase credentials (shared — both products still load this)
+  archive/
+    css/style.css          ← Original root stylesheet (archived — no active references)
   payments-worker/         ← Cloudflare Worker (separate deployment)
   workers/email-worker/    ← Cloudflare Worker for transactional emails
   db/
@@ -56,14 +57,13 @@ qacademy-gamma/
     prod-setup/            ← Ready-to-run SQL scripts for new environments
   docs/                    ← Reference documentation
   .github/workflows/       ← GitHub Actions (mirror to prod repo)
-  product-select.html      ← Product selector — root entry point (choose Licensure or MyTeacher)
+  product-select.html      ← Product selector — self-contained with inline styles
   index.html               ← Home / landing page
-  mynmclicensure/          ← also contains: login.html, forgot-password.html, reset-password.html, router.html
 ```
 
-### Config-driven paths — `js/paths.js`
+### Config-driven paths
 
-All dynamic URLs are driven by a central config:
+Each product has its own `paths.js` inside its `js/` folder. Both define the same constants:
 
 ```js
 const LICENSURE = {
@@ -95,21 +95,24 @@ window.location.href = LICENSURE.student + '/new-page.html';
 window.location.href = '/mynmclicensure/student/new-page.html';
 ```
 
-Every hardcoded path in JS is one more thing to find-and-replace when cloning. Using the config constants means cloning only requires changing `js/paths.js`. This applies to both products — use `LICENSURE.x` or `MYTEACHER.x` in all JS contexts.
+Every hardcoded path in JS is one more thing to find-and-replace when cloning. Using the config constants means cloning only requires changing the product's own `paths.js`. This applies to both products — use `LICENSURE.x` or `MYTEACHER.x` in all JS contexts.
 
 ### Cloning a product
 
+Each product is now fully self-contained — all JS, CSS, and HTML live inside the product folder. Only `js/config.js` (Supabase credentials) is shared at the root.
+
 To clone e.g. `mynmclicensure/` into `mypharmacy/`:
 
-1. Add new config to `js/paths.js`: `const PHARMACY = { admin: '/mypharmacy/admin', ... }`
-2. Copy the folder: `cp -r mynmclicensure/ mypharmacy/`
-3. Copy & rename JS files: `mynmclicensure-api.js` → `mypharmacy-api.js`, etc.
+1. Copy the entire folder: `cp -r mynmclicensure/ mypharmacy/`
+2. Rename JS files inside `mypharmacy/js/`: `mynmclicensure-api.js` → `mypharmacy-api.js`, etc.
+3. Update `mypharmacy/js/paths.js`: add `const PHARMACY = { admin: '/mypharmacy/admin', ... }`
 4. In the new JS files, replace `LICENSURE` with `PHARMACY`
 5. In the new HTML files, update `<script src>` tags to point to new JS filenames
 6. Find-and-replace hardcoded HTML hrefs: `/mynmclicensure/` → `/mypharmacy/`
 7. Update `router.html` to route to new product dashboards
-8. Add cross-product switch buttons if needed
-9. Grep to confirm no stale old-product paths remain
+8. Add a new button to `product-select.html` for the new product
+9. Add cross-product switch buttons in nav if needed
+10. Grep to confirm no stale old-product paths remain
 
 ---
 
