@@ -1,999 +1,568 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QAcademy Nurses Hub — NMC Exam Prep</title>
-  <link rel="icon" href="/images/QAcademy_Logo.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --primary: #1e3a5f;
-      --primary-dark: #142d4c;
-      --accent: #2d7d72;
-      --accent-dark: #245f56;
-      --primary-light: #edf6f5;
-      --text: #111827;
-      --text-muted: #6b7280;
-      --border: #e5e7eb;
-      --bg: #f9fafb;
-      --white: #ffffff;
-      --radius: 10px;
-      --shadow: 0 4px 16px rgba(30,58,95,0.08);
-      --shadow-md: 0 8px 28px rgba(30,58,95,0.12);
-    }
-
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background: var(--white);
-      color: var(--text);
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    a { text-decoration: none; }
-
-    /* ── AMBIENT BACKGROUND ── */
-    .ambient-bg {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      background:
-        radial-gradient(900px 600px at 10% 15%, rgba(45,125,114,.07), transparent 60%),
-        radial-gradient(800px 560px at 90% 5%,  rgba(30,58,95,.05),   transparent 60%),
-        linear-gradient(160deg, #f8fbfb, #fafcfb 40%, #f8fbfb);
-      pointer-events: none;
-    }
-    .ambient-bg::before {
-      content: '';
-      position: absolute;
-      inset: -25%;
-      background: conic-gradient(from 0deg, rgba(45,125,114,.05), transparent 45%, rgba(30,58,95,.04));
-      filter: blur(55px);
-      animation: ambientSpin 32s linear infinite;
-    }
-    @keyframes ambientSpin { to { transform: rotate(360deg); } }
-
-    .bubble {
-      position: absolute;
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      background: rgba(45,125,114,.12);
-      box-shadow: 0 0 0 5px rgba(45,125,114,.04);
-      animation: bubbleFloat 7s ease-in-out infinite;
-    }
-    .b1 { left: 10%; top: 65%; }
-    .b2 { right: 14%; top: 22%; }
-    .b3 { left: 22%; top: 12%; }
-    .b4 { right: 26%; bottom: 14%; }
-    @keyframes bubbleFloat {
-      0%, 100% { transform: translateY(0); }
-      50%       { transform: translateY(-12px); }
-    }
-
-    /* Reduced motion */
-    @media (prefers-reduced-motion: reduce) {
-      .ambient-bg::before, .bubble { animation: none !important; }
-    }
-
-    /* All page content above ambient bg */
-    .page-wrap { position: relative; z-index: 1; }
-
-    /* ── TOP NAV ── */
-    .topnav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 40px;
-      height: 66px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .topnav-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .topnav-brand img {
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .topnav-brand-text h1 {
-      font-size: 15px;
-      font-weight: 800;
-      color: var(--primary);
-      line-height: 1.2;
-    }
-
-    .topnav-brand-text p {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .topnav-actions {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .topnav-subscribe {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--accent);
-      border-bottom: 1.5px solid transparent;
-      transition: border-color 0.2s;
-      padding: 4px 0;
-    }
-    .topnav-subscribe:hover { border-bottom-color: var(--accent); }
-
-    .btn-outline {
-      padding: 8px 20px;
-      border: 1.5px solid var(--primary);
-      border-radius: var(--radius);
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--primary);
-      background: transparent;
-      cursor: pointer;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      transition: all 0.2s;
-    }
-    .btn-outline:hover {
-      background: var(--primary);
-      color: var(--white);
-    }
-
-    .btn-solid {
-      padding: 8px 20px;
-      border: 1.5px solid var(--accent);
-      border-radius: var(--radius);
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--white);
-      background: var(--accent);
-      cursor: pointer;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      transition: all 0.2s;
-    }
-    .btn-solid:hover {
-      background: var(--accent-dark);
-      border-color: var(--accent-dark);
-    }
-
-    /* ── HERO ── */
-    .hero {
-      background: linear-gradient(140deg, var(--primary-dark) 0%, var(--primary) 55%, #1a5276 100%);
-      padding: 80px 40px 90px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -80px; right: -80px;
-      width: 360px; height: 360px;
-      border-radius: 50%;
-      background: rgba(45,125,114,.18);
-    }
-
-    .hero::after {
-      content: '';
-      position: absolute;
-      bottom: -100px; left: -60px;
-      width: 300px; height: 300px;
-      border-radius: 50%;
-      background: rgba(45,125,114,.12);
-    }
-
-    .hero-logo {
-      width: 80px; height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 24px;
-      border: 3px solid rgba(255,255,255,0.3);
-      position: relative; z-index: 1;
-    }
-
-    .hero h2 {
-      font-size: 42px;
-      font-weight: 800;
-      color: var(--white);
-      line-height: 1.18;
-      max-width: 660px;
-      margin: 0 auto 16px;
-      position: relative; z-index: 1;
-    }
-
-    .hero h2 span { color: #7dd3c8; }
-
-    .hero p {
-      font-size: 17px;
-      color: rgba(255,255,255,0.78);
-      max-width: 500px;
-      margin: 0 auto 32px;
-      position: relative; z-index: 1;
-    }
-
-    .hero-cta {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-      position: relative; z-index: 1;
-    }
-
-    .btn-hero-primary {
-      padding: 14px 32px;
-      background: var(--accent);
-      color: var(--white);
-      border-radius: var(--radius);
-      font-size: 16px;
-      font-weight: 700;
-      border: none;
-      cursor: pointer;
-      transition: background 0.2s;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-    .btn-hero-primary:hover { background: var(--accent-dark); }
-
-    .btn-hero-secondary {
-      padding: 14px 32px;
-      background: transparent;
-      color: var(--white);
-      border-radius: var(--radius);
-      font-size: 16px;
-      font-weight: 600;
-      border: 2px solid rgba(255,255,255,0.45);
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-    .btn-hero-secondary:hover {
-      border-color: var(--white);
-      background: rgba(255,255,255,0.1);
-    }
-
-    .hero-subscribe-link {
-      margin-top: 16px;
-      font-size: 14px;
-      color: rgba(255,255,255,0.6);
-      position: relative; z-index: 1;
-    }
-    .hero-subscribe-link a {
-      color: #fff;
-      font-weight: 700;
-      text-decoration: underline;
-    }
-
-    /* ── SOCIALS STRIP ── */
-    .socials-strip {
-      background: var(--white);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 40px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .socials-strip-label {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-muted);
-    }
-
-    .socials-btns {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .sbtn {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 8px 14px;
-      border-radius: 8px;
-      border: 1px solid rgba(0,0,0,0.1);
-      background: var(--white);
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 700;
-      text-decoration: none;
-      transition: transform 0.15s, box-shadow 0.15s;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      box-shadow: 0 2px 8px rgba(0,0,0,.04);
-    }
-    .sbtn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.1); text-decoration: none; }
-    .sbtn svg { width: 15px; height: 15px; flex-shrink: 0; }
-    .sbtn.teal { border-color: rgba(45,125,114,.22); background: rgba(45,125,114,.05); color: var(--accent); }
-    .sbtn.red  { border-color: rgba(220,38,38,.18); background: rgba(220,38,38,.04); color: #b91c1c; }
-
-    /* ── PATH BLOCK ── */
-    .section { padding: 64px 40px; }
-    .section-label {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 10px;
-    }
-    .section-title {
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--primary);
-      margin-bottom: 8px;
-    }
-    .section-sub {
-      font-size: 15px;
-      color: var(--text-muted);
-      max-width: 600px;
-      margin-bottom: 32px;
-    }
-
-    .path-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-    }
-
-    @media (max-width: 1100px) { .path-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 580px)  { .path-grid { grid-template-columns: 1fr; } }
-
-    .path-card {
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 22px 20px;
-      background: var(--white);
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .path-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
-
-    .path-card.featured {
-      background: linear-gradient(160deg, var(--accent) 0%, var(--accent-dark) 100%);
-      border-color: var(--accent-dark);
-      box-shadow: 0 12px 32px rgba(45,125,114,.28);
-      transform: translateY(-4px);
-    }
-    .path-card.featured:hover { transform: translateY(-6px); }
-
-    .path-icon {
-      font-size: 26px;
-      margin-bottom: 12px;
-    }
-
-    .path-tag {
-      display: inline-block;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 3px 9px;
-      border-radius: 999px;
-      background: var(--primary-light);
-      color: var(--accent);
-      margin-bottom: 10px;
-      width: fit-content;
-    }
-
-    .path-card.featured .path-tag {
-      background: rgba(255,255,255,.2);
-      color: #fff;
-    }
-
-    .path-title {
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--primary);
-      margin-bottom: 8px;
-    }
-
-    .path-card.featured .path-title { color: #fff; }
-
-    .path-blurb {
-      font-size: 13.5px;
-      color: var(--text-muted);
-      line-height: 1.55;
-      flex: 1;
-      margin-bottom: 16px;
-    }
-
-    .path-card.featured .path-blurb { color: rgba(255,255,255,.82); }
-
-    .path-btn {
-      display: block;
-      text-align: center;
-      padding: 11px 16px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 700;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      transition: all 0.2s;
-    }
-
-    .path-btn.teal {
-      background: var(--primary-light);
-      color: var(--accent);
-      border: 1px solid rgba(45,125,114,.2);
-    }
-    .path-btn.teal:hover { background: rgba(45,125,114,.15); }
-
-    .path-btn.white {
-      background: rgba(255,255,255,.18);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,.28);
-    }
-    .path-btn.white:hover { background: rgba(255,255,255,.26); }
-
-    .path-btn.outline {
-      background: transparent;
-      color: var(--primary);
-      border: 1.5px solid var(--border);
-    }
-    .path-btn.outline:hover { background: var(--bg); }
-
-    /* ── NMC EXAM STRUCTURE ── */
-    .nmc-section {
-      background: var(--primary-light);
-      border-top: 1px solid #c5e4e0;
-      border-bottom: 1px solid #c5e4e0;
-      padding: 56px 40px;
-    }
-
-    .exam-chips {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 24px;
-    }
-
-    .exam-chip {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px 18px;
-      box-shadow: 0 2px 8px rgba(30,58,95,.04);
-    }
-
-    .exam-chip-num {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      background: var(--primary);
-      color: #fff;
-      font-size: 12px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-
-    .exam-chip-body { flex: 1; }
-    .exam-chip-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 3px;
-    }
-    .exam-chip-meta {
-      font-size: 12.5px;
-      color: var(--text-muted);
-    }
-    .exam-chip-warn {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 700;
-      color: #92400e;
-      background: #fffbeb;
-      border: 1px solid #fcd34d;
-      border-radius: 4px;
-      padding: 1px 7px;
-      margin-left: 6px;
-    }
-
-    /* ── PROGRAMMES SECTION ── */
-    .programmes-section { padding: 64px 40px; }
-
-    .prog-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 16px;
-      margin-top: 28px;
-    }
-
-    .prog-card {
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
-      background: var(--white);
-      box-shadow: var(--shadow);
-      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-    }
-    .prog-card:hover {
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-md);
-      border-color: rgba(45,125,114,.3);
-    }
-
-    .prog-tag {
-      display: inline-block;
-      background: var(--primary-light);
-      color: var(--accent);
-      font-size: 11px;
-      font-weight: 800;
-      padding: 4px 12px;
-      border-radius: 999px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 12px;
-    }
-
-    .prog-name {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--primary);
-    }
-
-    /* Loading skeleton */
-    .prog-skeleton {
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
-      background: var(--bg);
-    }
-    .skel-line {
-      height: 14px;
-      border-radius: 6px;
-      background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
-      background-size: 200% 100%;
-      animation: skelShimmer 1.5s infinite;
-      margin-bottom: 10px;
-    }
-    .skel-line.short { width: 55%; }
-    @keyframes skelShimmer { to { background-position: -200% 0; } }
-
-    /* ── FEATURES ── */
-    .features-section {
-      padding: 64px 40px;
-      background: var(--bg);
-      border-top: 1px solid var(--border);
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 20px;
-      margin-top: 32px;
-    }
-
-    .feature-card {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 28px 24px;
-      transition: box-shadow 0.2s, border-color 0.2s;
-    }
-    .feature-card:hover {
-      box-shadow: var(--shadow-md);
-      border-color: rgba(45,125,114,.25);
-    }
-
-    .feature-icon {
-      width: 46px; height: 46px;
-      background: var(--primary-light);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      margin-bottom: 16px;
-    }
-
-    .feature-card h4 {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 8px;
-    }
-
-    .feature-card p {
-      font-size: 14px;
-      color: var(--text-muted);
-      line-height: 1.65;
-    }
-
-    /* ── BOTTOM CTA ── */
-    .bottom-cta {
-      background: var(--primary);
-      padding: 72px 40px;
-      text-align: center;
-    }
-
-    .bottom-cta h3 {
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--white);
-      margin-bottom: 12px;
-    }
-
-    .bottom-cta p {
-      font-size: 15px;
-      color: rgba(255,255,255,0.72);
-      margin-bottom: 28px;
-      max-width: 480px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .bottom-cta-sub {
-      margin-top: 18px;
-      font-size: 14px;
-      color: rgba(255,255,255,0.55);
-    }
-    .bottom-cta-sub a {
-      color: #fff;
-      font-weight: 700;
-      text-decoration: underline;
-    }
-
-    /* ── FOOTER ── */
-    .footer {
-      background: var(--primary-dark);
-      padding: 22px 40px;
-      text-align: center;
-    }
-    .footer p {
-      font-size: 13px;
-      color: rgba(255,255,255,0.35);
-    }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-      .topnav { padding: 0 20px; }
-      .hero { padding: 60px 24px 72px; }
-      .hero h2 { font-size: 30px; }
-      .hero p { font-size: 15px; }
-      .socials-strip { padding: 14px 20px; }
-      .section { padding: 48px 24px; }
-      .nmc-section { padding: 48px 24px; }
-      .programmes-section { padding: 48px 24px; }
-      .features-section { padding: 48px 24px; }
-      .bottom-cta { padding: 56px 24px; }
-      .footer { padding: 20px 24px; }
-      .section-title { font-size: 24px; }
-      .topnav-subscribe { display: none; } /* hide on mobile — visible via hero */
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MyNMC Licensure — QAcademy</title>
+<link rel="icon" href="/images/QAcademy_Logo.png"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1e3a5f;--navy-dark:#142d4c;--navy-deep:#0d1f35;
+  --teal:#2d7d72;--teal-light:#3a9e91;--teal-pale:#edf6f5;--teal-mid:#b2d8d4;
+  --text:#111827;--muted:#6b7280;--border:#e5e7eb;--bg:#f9fafb;--white:#fff;
+  --success:#16a34a;--warn:#d97706;--danger:#dc2626;
+  --shadow:0 4px 16px rgba(30,58,95,.08);--shadow-md:0 8px 28px rgba(30,58,95,.13);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;height:auto;display:block}
+
+/* NAV */
+nav{background:rgba(255,255,255,.95);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.nav-brand{display:flex;align-items:center;gap:12px}
+.nav-logo{height:32px;width:auto}
+.nav-divider{width:1px;height:22px;background:var(--border)}
+.nav-brand-text{display:flex;flex-direction:column}
+.nav-brand-name{font-size:13px;font-weight:800;color:var(--navy);line-height:1.2}
+.nav-brand-sub{font-size:11px;color:var(--muted)}
+.nav-actions{display:flex;align-items:center;gap:10px}
+.nav-link{font-size:13px;font-weight:700;color:var(--teal);padding:4px 0;border-bottom:1.5px solid transparent;transition:border-color .15s}
+.nav-link:hover{border-bottom-color:var(--teal)}
+.btn-nav-outline{padding:7px 18px;border:1.5px solid var(--navy);border-radius:7px;font-size:13px;font-weight:700;color:var(--navy);background:transparent;cursor:pointer;transition:all .15s}
+.btn-nav-outline:hover{background:var(--navy);color:var(--white)}
+.btn-nav-solid{padding:7px 18px;border:1.5px solid var(--teal);border-radius:7px;font-size:13px;font-weight:700;color:var(--white);background:var(--teal);cursor:pointer;transition:all .15s}
+.btn-nav-solid:hover{background:var(--teal-light);border-color:var(--teal-light)}
+@media(max-width:680px){.nav-link,.btn-nav-outline{display:none}}
+
+/* HERO */
+.hero{background:var(--navy-deep);color:var(--white);padding:5rem 2rem 0;overflow:hidden;position:relative}
+.hero-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:end}
+@media(max-width:720px){.hero-inner{grid-template-columns:1fr}.hero-vis{display:none}}
+.hero-text{padding-bottom:4rem}
+.hero-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(45,125,114,.2);border:1px solid rgba(93,212,200,.2);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#7ecdc6;margin-bottom:1.5rem}
+.hero-pill-dot{width:7px;height:7px;border-radius:50%;background:#5dcfc8;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@media(prefers-reduced-motion:reduce){.hero-pill-dot{animation:none}}
+.hero h1{font-size:clamp(2.1rem,4.5vw,3.4rem);font-weight:800;line-height:1.1;letter-spacing:-.03em;margin-bottom:1.25rem}
+.hero h1 em{color:#5dcfc8;font-style:normal}
+.hero-sub{font-size:1.1rem;color:#b0c8d8;max-width:480px;margin-bottom:2rem;line-height:1.75}
+.hero-trial-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(22,163,74,.15);border:1px solid rgba(22,163,74,.25);border-radius:6px;padding:6px 14px;font-size:13px;font-weight:700;color:#4ade80;margin-bottom:2rem}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:1.5rem}
+.btn-hero-p{display:inline-block;padding:.85rem 2rem;background:var(--teal);color:var(--white);border-radius:8px;font-size:1rem;font-weight:800;border:2px solid var(--teal);transition:all .15s;letter-spacing:.01em}
+.btn-hero-p:hover{background:var(--teal-light);border-color:var(--teal-light)}
+.btn-hero-g{display:inline-block;padding:.85rem 2rem;background:transparent;color:var(--white);border-radius:8px;font-size:1rem;font-weight:700;border:2px solid rgba(255,255,255,.3);transition:all .15s}
+.btn-hero-g:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.7)}
+.hero-already{font-size:13px;color:rgba(255,255,255,.5)}
+.hero-already a{color:#7ecdc6;font-weight:700}
+.hero-already a:hover{color:var(--white)}
+
+/* SOCIALS */
+.socials-strip{background:var(--white);border-bottom:1px solid var(--border);padding:12px 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.socials-label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.socials-btns{display:flex;gap:8px;flex-wrap:wrap}
+.sbtn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:7px;border:1px solid var(--border);background:var(--white);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.sbtn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.09)}
+.sbtn svg{width:14px;height:14px;flex-shrink:0}
+.sbtn.teal{border-color:rgba(45,125,114,.22);background:rgba(45,125,114,.05);color:var(--teal)}
+.sbtn.red{border-color:rgba(220,38,38,.18);background:rgba(220,38,38,.04);color:#b91c1c}
+
+/* STATS */
+.stats-strip{background:var(--teal);padding:1.25rem 2rem;display:flex;justify-content:center;gap:3rem;flex-wrap:wrap}
+.stat{text-align:center;color:var(--white)}
+.stat-num{font-size:1.75rem;font-weight:800;display:block;letter-spacing:-.02em}
+.stat-lbl{font-size:11px;opacity:.75;letter-spacing:.05em;text-transform:uppercase}
+
+/* SECTIONS */
+.section{padding:5rem 2rem}
+.section-inner{max-width:1100px;margin:0 auto}
+.kicker{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:.5rem}
+.section-h{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800;color:var(--navy);margin-bottom:.75rem;letter-spacing:-.025em}
+.section-sub{font-size:1.05rem;color:var(--muted);max-width:600px;margin-bottom:3rem;line-height:1.7}
+
+/* PATHS */
+.paths-section{background:var(--white);border-bottom:1px solid var(--border)}
+.path-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:960px){.path-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.path-grid{grid-template-columns:1fr}}
+.path-card{border:1px solid var(--border);border-radius:14px;padding:1.5rem;background:var(--white);box-shadow:var(--shadow);display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s}
+.path-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.path-card.featured{background:linear-gradient(155deg,var(--teal) 0%,#1f5f56 100%);border-color:#1f5f56;box-shadow:0 12px 32px rgba(45,125,114,.28);transform:translateY(-4px)}
+.path-card.featured:hover{transform:translateY(-6px)}
+.path-icon-wrap{width:44px;height:44px;border-radius:10px;background:var(--teal-pale);display:flex;align-items:center;justify-content:center;margin-bottom:1rem}
+.path-icon-wrap svg{width:22px;height:22px;color:var(--teal)}
+.path-card.featured .path-icon-wrap{background:rgba(255,255,255,.18)}
+.path-card.featured .path-icon-wrap svg{color:#fff}
+.path-tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:3px 10px;border-radius:999px;background:var(--teal-pale);color:var(--teal);margin-bottom:.75rem;width:fit-content}
+.path-card.featured .path-tag{background:rgba(255,255,255,.18);color:#fff}
+.path-title{font-size:15px;font-weight:800;color:var(--navy);margin-bottom:.5rem}
+.path-card.featured .path-title{color:#fff}
+.path-blurb{font-size:13.5px;color:var(--muted);line-height:1.6;flex:1;margin-bottom:1.25rem}
+.path-card.featured .path-blurb{color:rgba(255,255,255,.8)}
+.path-btn{display:block;text-align:center;padding:10px 16px;border-radius:8px;font-size:13.5px;font-weight:700;transition:all .15s}
+.path-btn.teal{background:var(--teal-pale);color:var(--teal);border:1px solid rgba(45,125,114,.2)}
+.path-btn.teal:hover{background:rgba(45,125,114,.15)}
+.path-btn.white{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.28)}
+.path-btn.white:hover{background:rgba(255,255,255,.28)}
+.path-btn.outline{background:transparent;color:var(--navy);border:1.5px solid var(--border)}
+.path-btn.outline:hover{background:var(--bg)}
+
+/* PROGRAMMES */
+.prog-section{background:var(--teal-pale);border-top:1px solid #c5e4e0;border-bottom:1px solid #c5e4e0}
+.prog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:2rem}
+.prog-card{border:1px solid #c5e4e0;border-radius:12px;padding:1.25rem 1.5rem;background:var(--white);box-shadow:0 2px 8px rgba(30,58,95,.05);transition:transform .2s,box-shadow .2s,border-color .2s}
+.prog-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:var(--teal-mid)}
+.prog-badge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:3px 10px;border-radius:999px;background:var(--teal-pale);color:var(--teal);border:1px solid var(--teal-mid);margin-bottom:.6rem}
+.prog-name{font-size:14px;font-weight:700;color:var(--navy)}
+.prog-skel{border:1px solid #dce9e7;border-radius:12px;padding:1.25rem 1.5rem;background:var(--white)}
+.skel{height:13px;border-radius:5px;background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;margin-bottom:8px}
+.skel.s{width:45%}
+@keyframes shimmer{to{background-position:-200% 0}}
+
+/* EXAM STRUCTURE */
+.exam-section{background:var(--white)}
+.exam-chips{display:flex;flex-direction:column;gap:10px;margin-top:2rem}
+.exam-chip{display:flex;align-items:flex-start;gap:14px;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;box-shadow:0 2px 8px rgba(30,58,95,.04);transition:border-color .15s}
+.exam-chip:hover{border-color:var(--teal-mid)}
+.exam-num{width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.exam-chip-body h4{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:3px}
+.exam-chip-body p{font-size:13px;color:var(--muted)}
+.exam-warn{display:inline-block;font-size:11px;font-weight:700;color:#92400e;background:#fffbeb;border:1px solid #fcd34d;border-radius:4px;padding:1px 7px;margin-left:6px}
+
+/* FEATURES */
+.features-section{background:var(--bg);border-top:1px solid var(--border)}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;margin-top:2rem}
+.feat-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:1.75rem;display:flex;gap:1rem;align-items:flex-start;transition:box-shadow .2s,border-color .2s}
+.feat-card:hover{box-shadow:var(--shadow-md);border-color:var(--teal-mid)}
+.feat-icon{width:42px;height:42px;border-radius:10px;background:var(--teal-pale);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.feat-icon svg{width:20px;height:20px;color:var(--teal)}
+.feat-card h4{font-size:14px;font-weight:800;color:var(--navy);margin-bottom:.3rem}
+.feat-card p{font-size:13.5px;color:var(--muted);line-height:1.65}
+
+/* HOW IT WORKS */
+.how-section{background:var(--white);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+@media(max-width:720px){.steps{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:420px){.steps{grid-template-columns:1fr}}
+.step{padding:2rem 1.5rem;border-right:1px solid var(--border)}
+.step:last-child,.step:nth-child(4){border-right:none}
+@media(max-width:720px){.step:nth-child(2){border-right:none}.step:nth-child(3){border-right:1px solid var(--border)}.step:nth-child(odd){border-right:1px solid var(--border)}.step{border-bottom:1px solid var(--border)}.step:last-child{border-bottom:none}}
+.step-n{width:36px;height:36px;border-radius:50%;background:var(--navy);color:#fff;font-size:.9rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:1rem}
+.step h4{font-size:.95rem;font-weight:700;color:var(--navy);margin-bottom:.4rem}
+.step p{font-size:.875rem;color:var(--muted);line-height:1.65}
+
+/* CTA BAND */
+.cta-band{background:var(--navy);color:var(--white);padding:5rem 2rem;text-align:center;position:relative;overflow:hidden}
+.cta-band::before{content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:700px;height:700px;border-radius:50%;border:1px solid rgba(93,212,200,.06)}
+.cta-band::after{content:'';position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:450px;height:450px;border-radius:50%;border:1px solid rgba(93,212,200,.05)}
+.cta-band h2{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800;margin-bottom:.75rem;position:relative}
+.cta-band p{color:#b0c8d8;margin-bottom:2.5rem;font-size:1.05rem;position:relative}
+.cta-row-c{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative}
+.cta-sub{margin-top:1.25rem;font-size:13px;color:rgba(255,255,255,.45);position:relative}
+.cta-sub a{color:#7ecdc6;font-weight:700}
+
+footer{background:var(--navy-dark);color:#5a7a94;text-align:center;padding:1.5rem 2rem;font-size:13px;margin-top:auto;display:flex;flex-direction:column;gap:6px}
+footer a{color:var(--muted);font-size:13px}
+footer a:hover{color:var(--white)}
+</style>
 </head>
 <body>
 
-  <!-- Ambient background -->
-  <div class="ambient-bg" aria-hidden="true">
-    <span class="bubble b1"></span>
-    <span class="bubble b2"></span>
-    <span class="bubble b3"></span>
-    <span class="bubble b4"></span>
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <img src="/images/QAcademy_Logo.png" alt="QAcademy" class="nav-logo">
+    <div class="nav-divider"></div>
+    <div class="nav-brand-text">
+      <span class="nav-brand-name">QAcademy</span>
+      <span class="nav-brand-sub">NMC Licensure Prep</span>
+    </div>
   </div>
+  <div class="nav-actions">
+    <a href="/myteacher/index.html" class="nav-link">MyTeacher</a>
+    <a href="/mynmclicensure/subscribe.html" class="nav-link">Subscribe</a>
+    <a href="/product-select.html"><button class="btn-nav-outline">Sign In</button></a>
+    <a href="/mynmclicensure/register.html"><button class="btn-nav-solid">Register Free</button></a>
+  </div>
+</nav>
 
-  <div class="page-wrap">
-
-    <!-- ── TOP NAV ── -->
-    <nav class="topnav">
-      <div class="topnav-brand">
-        <img src="/images/QAcademy_Logo.png" alt="QAcademy Logo" />
-        <div class="topnav-brand-text">
-          <h1>QAcademy</h1>
-          <p>Nurses Hub</p>
-        </div>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-pill"><span class="hero-pill-dot"></span>NMC Ghana Exam Prep</div>
+      <h1>Pass your NMC exam.<br>Study smarter with <em>confidence.</em></h1>
+      <p class="hero-sub">Ghana's dedicated practice platform for nursing licensure candidates — quizzes, rationales, mock exams, and progress tracking built around your programme.</p>
+      <div class="hero-trial-badge">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1l1.9 3.8L14 5.6l-3 2.9.7 4.1L8 10.5l-3.7 2.1.7-4.1-3-2.9 4.1-.8z"/></svg>
+        Free trial access on registration — no payment needed to start
       </div>
-      <div class="topnav-actions">
-        <a href="/myteacher/register.html" class="topnav-subscribe">MyTeacher</a>
-        <a href="/mynmclicensure/subscribe.html" class="topnav-subscribe">Subscribe</a>
-        <a href="/product-select.html"><button class="btn-outline">Sign In</button></a>
-        <a href="/mynmclicensure/register.html"><button class="btn-solid">Register Free</button></a>
+      <div class="cta-row">
+        <a href="/mynmclicensure/register.html" class="btn-hero-p">Create Free Account</a>
+        <a href="/product-select.html" class="btn-hero-g">Sign In</a>
       </div>
-    </nav>
-
-    <!-- ── HERO ── -->
-    <section class="hero">
-      <img src="/images/QAcademy_Logo.png" alt="QAcademy" class="hero-logo" />
-      <h2>Study smarter. Pass your NMC exam <span>with confidence.</span></h2>
-      <p>Ghana's dedicated practice platform for nursing licensure candidates.</p>
-      <div class="hero-cta">
-        <a href="/mynmclicensure/register.html"><button class="btn-hero-primary">Create Free Account</button></a>
-        <a href="/product-select.html"><button class="btn-hero-secondary">Sign In</button></a>
-      </div>
-      <p class="hero-subscribe-link">
-        Already registered? <a href="/mynmclicensure/subscribe.html">Subscribe to paid access →</a>
-      </p>
-    </section>
-
-    <!-- ── SOCIALS STRIP ── -->
-    <div class="socials-strip">
-      <span class="socials-strip-label">Follow us &amp; stay updated</span>
-      <div class="socials-btns">
-
-        <a class="sbtn teal" href="https://t.me/QAcademynurseshub" target="_blank" rel="noopener" aria-label="Telegram">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.03 15.47 8.9 19.1c.3 0 .44-.13.6-.28l1.44-1.38 2.99 2.2c.55.3.94.14 1.09-.51l1.98-9.32c.18-.84-.3-1.17-.86-.96L4.9 11.2c-.82.32-.8.78-.14.99l3.48 1.09 8.08-5.11-7.3 7.3z"/></svg>
-          Telegram
-        </a>
-
-        <a class="sbtn teal" href="https://www.whatsapp.com/channel/0029Vb6ActpBA1ewCfBmAF3O" target="_blank" rel="noopener" aria-label="WhatsApp">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 3.9A9.9 9.9 0 0 0 12.06 2C6.55 2 2 6.55 2 12.06c0 1.77.46 3.46 1.25 4.93L2 22l5.13-1.2a9.9 9.9 0 0 0 4.93 1.25C17.55 22 22 17.45 22 11.94A9.9 9.9 0 0 0 20 3.9Zm-7.94 16.1a8.1 8.1 0 0 1-4.13-1.14l-.3-.18-3.04.7.65-2.96-.2-.31a8.16 8.16 0 1 1 7.02 3.89Zm4.65-6.14c-.25-.12-1.48-.73-1.7-.81-.22-.08-.38-.12-.54.12-.16.25-.62.81-.76.98-.14.16-.28.18-.53.06-.25-.12-1.05-.39-2-1.24-.74-.66-1.24-1.48-1.38-1.73-.14-.25-.02-.39.1-.51.1-.1.25-.28.37-.41.12-.14.16-.23.24-.39.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.4-.41-.54-.42h-.46c-.16 0-.42.06-.64.3-.22.25-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.14 3.64.58.25 1.04.4 1.4.51.59.19 1.12.16 1.54.1.47-.07 1.48-.6 1.69-1.17.21-.57.21-1.06.15-1.17-.06-.1-.23-.16-.48-.28Z"/></svg>
-          WhatsApp
-        </a>
-
-        <a class="sbtn teal" href="https://www.tiktok.com/@qacademynurses" target="_blank" rel="noopener" aria-label="TikTok">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.2 2h2.12c.14 1.3.78 2.38 1.78 3.18.9.7 1.96 1.1 3.1 1.18v2.14c-1.77-.02-3.46-.6-4.88-1.64v7.27a6.93 6.93 0 1 1-6.93-6.93c.25 0 .5.02.74.05v2.2a4.73 4.73 0 1 0 4.73 4.73V2Z"/></svg>
-          TikTok
-        </a>
-
-        <a class="sbtn red" href="https://www.youtube.com/@QAcademyNursesHub" target="_blank" rel="noopener" aria-label="YouTube">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.6 3.6 12 3.6 12 3.6s-7.6 0-9.4.5A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.8.5 9.4.5 9.4.5s7.6 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8ZM9.6 15.5V8.5L15.9 12l-6.3 3.5Z"/></svg>
-          YouTube
-        </a>
-
-      </div>
+      <p class="hero-already">Already registered? <a href="/mynmclicensure/subscribe.html">Subscribe to full access →</a></p>
     </div>
 
-    <!-- ── CHOOSE YOUR PATH ── -->
-    <section class="section" style="background: var(--white); border-bottom: 1px solid var(--border);">
-      <div style="max-width: 1100px; margin: 0 auto;">
-        <p class="section-label">Where do you start?</p>
-        <h2 class="section-title">Choose your path</h2>
-        <p class="section-sub">Whether you're new or returning, find the right door for you.</p>
+    <!-- HERO VISUAL — quiz UI mockup -->
+    <div class="hero-vis">
+      <svg width="100%" viewBox="0 0 460 380" xmlns="http://www.w3.org/2000/svg">
+        <!-- device shell -->
+        <rect x="0" y="0" width="460" height="380" rx="14" fill="#0d1f35"/>
+        <!-- browser bar -->
+        <rect x="0" y="0" width="460" height="38" rx="14" fill="#1a2e48"/>
+        <rect x="0" y="20" width="460" height="18" fill="#1a2e48"/>
+        <circle cx="20" cy="19" r="5" fill="#dc2626" opacity=".65"/>
+        <circle cx="36" cy="19" r="5" fill="#d97706" opacity=".65"/>
+        <circle cx="52" cy="19" r="5" fill="#16a34a" opacity=".65"/>
+        <rect x="76" y="10" width="210" height="16" rx="8" fill="#142d4c"/>
+        <text x="181" y="22" font-size="9" fill="#4a7a9b" text-anchor="middle" font-family="sans-serif">mynmclicensure.qacademy.gh</text>
 
-        <div class="path-grid">
+        <!-- sidebar -->
+        <rect x="0" y="38" width="96" height="342" fill="#142d4c"/>
+        <text x="48" y="68" font-size="8.5" fill="#4a7a9b" text-anchor="middle" font-family="sans-serif" font-weight="600">Dashboard</text>
+        <rect x="10" y="76" width="76" height="24" rx="5" fill="#1e3a5f"/>
+        <text x="48" y="91" font-size="8" fill="#5dcfc8" text-anchor="middle" font-family="sans-serif" font-weight="700">Practice Quiz</text>
+        <text x="48" y="116" font-size="8" fill="#4a7a9b" text-anchor="middle" font-family="sans-serif">Mock Exams</text>
+        <text x="48" y="136" font-size="8" fill="#4a7a9b" text-anchor="middle" font-family="sans-serif">History</text>
+        <text x="48" y="156" font-size="8" fill="#4a7a9b" text-anchor="middle" font-family="sans-serif">Download</text>
+        <rect x="10" y="330" width="76" height="28" rx="6" fill="#2d7d72" opacity=".2"/>
+        <rect x="10" y="330" width="76" height="28" rx="6" fill="none" stroke="#2d7d72" stroke-width="1"/>
+        <text x="48" y="348" font-size="8" fill="#5dcfc8" text-anchor="middle" font-family="sans-serif" font-weight="700">Subscribe ↑</text>
 
-          <!-- Free Trial -->
-          <div class="path-card">
-            <div class="path-icon">🎓</div>
-            <span class="path-tag">New student</span>
-            <div class="path-title">Start Free Trial</div>
-            <p class="path-blurb">New here? Register for free and get immediate trial access to start practising. No payment needed to begin.</p>
-            <a href="/mynmclicensure/register.html" class="path-btn teal">Create Free Account</a>
-          </div>
+        <!-- main panel -->
+        <!-- header row -->
+        <rect x="108" y="46" width="340" height="30" rx="0" fill="#0d1f35"/>
+        <text x="118" y="65" font-size="9" fill="#b0c8d8" font-family="sans-serif" font-weight="700">Registered General Nursing · Anatomy &amp; Physiology</text>
+        <!-- timer + progress -->
+        <rect x="108" y="76" width="340" height="22" fill="#1a2e48"/>
+        <text x="118" y="91" font-size="8" fill="#4a7a9b" font-family="sans-serif">Question 14 of 30</text>
+        <!-- progress bar -->
+        <rect x="200" y="84" width="160" height="7" rx="3" fill="#142d4c"/>
+        <rect x="200" y="84" width="74" height="7" rx="3" fill="#2d7d72"/>
+        <!-- timer -->
+        <text x="390" y="91" font-size="8" fill="#5dcfc8" font-family="sans-serif" text-anchor="end">⏱ 22:14</text>
 
-          <!-- Subscribe — featured -->
-          <div class="path-card featured">
-            <div class="path-icon">⭐</div>
-            <span class="path-tag">Recommended</span>
-            <div class="path-title">Subscribe to Full Access</div>
-            <p class="path-blurb">Ready to go all in? Pay for a paid product and unlock full platform access — quizzes, builder, downloads, Telegram and more.</p>
-            <a href="/mynmclicensure/subscribe.html" class="path-btn white">Subscribe Now</a>
-          </div>
+        <!-- question card -->
+        <rect x="108" y="104" width="340" height="264" rx="0" fill="#1e3a5f"/>
+        <rect x="118" y="112" width="60" height="16" rx="4" fill="#2d7d72" opacity=".25"/>
+        <rect x="118" y="112" width="60" height="16" rx="4" fill="none" stroke="#2d7d72" stroke-width="1"/>
+        <text x="148" y="123" font-size="8" fill="#5dcfc8" text-anchor="middle" font-family="sans-serif" font-weight="700">MCQ</text>
+        <text x="192" y="123" font-size="8" fill="#4a7a9b" font-family="sans-serif">Anatomy · Medium</text>
 
-          <!-- Sign In -->
-          <div class="path-card">
-            <div class="path-icon">🔑</div>
-            <span class="path-tag">Returning student</span>
-            <div class="path-title">Sign In</div>
-            <p class="path-blurb">Already have an account? Sign in to access your dashboard, continue quizzes, and check your learning history.</p>
-            <a href="/product-select.html" class="path-btn outline">Sign In to Portal</a>
-          </div>
+        <!-- question text -->
+        <text x="118" y="144" font-size="8.5" fill="#e5e7eb" font-family="sans-serif">The sinoatrial (SA) node is located in which chamber</text>
+        <text x="118" y="156" font-size="8.5" fill="#e5e7eb" font-family="sans-serif">of the heart, and what is its primary function?</text>
 
-          <!-- Upgrade -->
-          <div class="path-card">
-            <div class="path-icon">🔄</div>
-            <span class="path-tag">Existing subscriber</span>
-            <div class="path-title">Upgrade / Extend</div>
-            <p class="path-blurb">Your subscription is expiring or you want to add a new product? Log in and go to your account to extend or upgrade.</p>
-            <a href="/mynmclicensure/student/upgrade.html" class="path-btn outline">Upgrade My Access</a>
-          </div>
+        <!-- options -->
+        <rect x="118" y="166" width="310" height="26" rx="5" fill="#142d4c"/>
+        <circle cx="131" cy="179" r="5" fill="none" stroke="#4a7a9b" stroke-width="1.5"/>
+        <text x="143" y="183" font-size="8" fill="#9ab0c2" font-family="sans-serif">A.  Left atrium — pumps oxygenated blood to the body</text>
 
+        <rect x="118" y="197" width="310" height="26" rx="5" fill="#1a4060"/>
+        <rect x="118" y="197" width="310" height="26" rx="5" fill="none" stroke="#2d7d72" stroke-width="1"/>
+        <circle cx="131" cy="210" r="5" fill="#2d7d72"/>
+        <circle cx="131" cy="210" r="2.5" fill="#fff"/>
+        <text x="143" y="214" font-size="8" fill="#ffffff" font-family="sans-serif">B.  Right atrium — initiates the electrical impulse</text>
+        <rect x="390" y="200" width="32" height="18" rx="4" fill="#16a34a" opacity=".18"/>
+        <text x="406" y="212" font-size="7.5" fill="#4ade80" text-anchor="middle" font-family="sans-serif" font-weight="700">✓ Ans</text>
+
+        <rect x="118" y="228" width="310" height="26" rx="5" fill="#142d4c"/>
+        <circle cx="131" cy="241" r="5" fill="none" stroke="#4a7a9b" stroke-width="1.5"/>
+        <text x="143" y="245" font-size="8" fill="#9ab0c2" font-family="sans-serif">C.  Left ventricle — controls heart rate</text>
+
+        <rect x="118" y="259" width="310" height="26" rx="5" fill="#142d4c"/>
+        <circle cx="131" cy="272" r="5" fill="none" stroke="#4a7a9b" stroke-width="1.5"/>
+        <text x="143" y="276" font-size="8" fill="#9ab0c2" font-family="sans-serif">D.  Bundle of His — relays signals between chambers</text>
+
+        <!-- rationale card -->
+        <rect x="118" y="294" width="310" height="64" rx="6" fill="#0d1f35"/>
+        <rect x="118" y="294" width="4" height="64" rx="2" fill="#5dcfc8"/>
+        <text x="130" y="309" font-size="7.5" fill="#7ecdc6" font-family="sans-serif" font-weight="700">Rationale</text>
+        <text x="130" y="323" font-size="7.5" fill="#9ab0c2" font-family="sans-serif">The SA node sits in the wall of the right atrium and acts as</text>
+        <text x="130" y="335" font-size="7.5" fill="#9ab0c2" font-family="sans-serif">the heart's natural pacemaker, firing 60–100 impulses/min.</text>
+        <rect x="356" y="345" width="68" height="10" rx="2" fill="#142d4c"/>
+        <text x="390" y="353" font-size="7" fill="#4a7a9b" text-anchor="middle" font-family="sans-serif">Next question →</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIALS -->
+<div class="socials-strip">
+  <span class="socials-label">Follow &amp; stay updated</span>
+  <div class="socials-btns">
+    <a class="sbtn teal" href="https://t.me/QAcademynurseshub" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M9.03 15.47 8.9 19.1c.3 0 .44-.13.6-.28l1.44-1.38 2.99 2.2c.55.3.94.14 1.09-.51l1.98-9.32c.18-.84-.3-1.17-.86-.96L4.9 11.2c-.82.32-.8.78-.14.99l3.48 1.09 8.08-5.11-7.3 7.3z"/></svg>
+      Telegram
+    </a>
+    <a class="sbtn teal" href="https://www.whatsapp.com/channel/0029Vb6ActpBA1ewCfBmAF3O" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 3.9A9.9 9.9 0 0 0 12.06 2C6.55 2 2 6.55 2 12.06c0 1.77.46 3.46 1.25 4.93L2 22l5.13-1.2a9.9 9.9 0 0 0 4.93 1.25C17.55 22 22 17.45 22 11.94A9.9 9.9 0 0 0 20 3.9Zm-7.94 16.1a8.1 8.1 0 0 1-4.13-1.14l-.3-.18-3.04.7.65-2.96-.2-.31a8.16 8.16 0 1 1 7.02 3.89Zm4.65-6.14c-.25-.12-1.48-.73-1.7-.81-.22-.08-.38-.12-.54.12-.16.25-.62.81-.76.98-.14.16-.28.18-.53.06-.25-.12-1.05-.39-2-1.24-.74-.66-1.24-1.48-1.38-1.73-.14-.25-.02-.39.1-.51.1-.1.25-.28.37-.41.12-.14.16-.23.24-.39.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.4-.41-.54-.42h-.46c-.16 0-.42.06-.64.3-.22.25-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.14 3.64.58.25 1.04.4 1.4.51.59.19 1.12.16 1.54.1.47-.07 1.48-.6 1.69-1.17.21-.57.21-1.06.15-1.17-.06-.1-.23-.16-.48-.28Z"/></svg>
+      WhatsApp
+    </a>
+    <a class="sbtn teal" href="https://www.tiktok.com/@qacademynurses" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M16.2 2h2.12c.14 1.3.78 2.38 1.78 3.18.9.7 1.96 1.1 3.1 1.18v2.14c-1.77-.02-3.46-.6-4.88-1.64v7.27a6.93 6.93 0 1 1-6.93-6.93c.25 0 .5.02.74.05v2.2a4.73 4.73 0 1 0 4.73 4.73V2Z"/></svg>
+      TikTok
+    </a>
+    <a class="sbtn red" href="https://www.youtube.com/@QAcademyNursesHub" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.6 3.6 12 3.6 12 3.6s-7.6 0-9.4.5A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.8.5 9.4.5 9.4.5s7.6 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8ZM9.6 15.5V8.5L15.9 12l-6.3 3.5Z"/></svg>
+      YouTube
+    </a>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="stat"><span class="stat-num">5</span><span class="stat-lbl">Programmes</span></div>
+  <div class="stat"><span class="stat-num">460+</span><span class="stat-lbl">Practice questions</span></div>
+  <div class="stat"><span class="stat-num">2</span><span class="stat-lbl">Quiz modes</span></div>
+  <div class="stat"><span class="stat-num">Free</span><span class="stat-lbl">Trial on signup</span></div>
+  <div class="stat"><span class="stat-num">PDF</span><span class="stat-lbl">Offline packs</span></div>
+</div>
+
+<!-- CHOOSE YOUR PATH -->
+<section class="section paths-section">
+  <div class="section-inner">
+    <p class="kicker">Get started</p>
+    <h2 class="section-h">Where do you start?</h2>
+    <p class="section-sub">Whether you're new or returning, find the right door for you.</p>
+    <div class="path-grid">
+
+      <div class="path-card">
+        <div class="path-icon-wrap">
+          <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 7v5c0 4.4 3.3 8.5 9 10 5.7-1.5 9-5.6 9-10V7l-9-5z"/></svg>
+        </div>
+        <span class="path-tag">New student</span>
+        <div class="path-title">Start Free Trial</div>
+        <p class="path-blurb">Register for free and get instant trial access. No payment needed — start practising today.</p>
+        <a href="/mynmclicensure/register.html" class="path-btn teal">Create Free Account</a>
+      </div>
+
+      <div class="path-card featured">
+        <div class="path-icon-wrap">
+          <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 2l2.1 4.2L18 7.4l-3.5 3.4.8 4.8L11 13.3l-4.3 2.3.8-4.8L4 7.4l4.9-.7z"/></svg>
+        </div>
+        <span class="path-tag">Recommended</span>
+        <div class="path-title">Subscribe to Full Access</div>
+        <p class="path-blurb">Unlock all quizzes, mock exams, PDF downloads, and your Telegram study community.</p>
+        <a href="/mynmclicensure/subscribe.html" class="path-btn white">Subscribe Now</a>
+      </div>
+
+      <div class="path-card">
+        <div class="path-icon-wrap">
+          <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="16" height="9" rx="2"/><path d="M7 11V7a4 4 0 0 1 8 0v4"/></svg>
+        </div>
+        <span class="path-tag">Returning student</span>
+        <div class="path-title">Sign In</div>
+        <p class="path-blurb">Already have an account? Sign in to your dashboard, continue quizzes, and check your history.</p>
+        <a href="/product-select.html" class="path-btn outline">Sign In to Portal</a>
+      </div>
+
+      <div class="path-card">
+        <div class="path-icon-wrap">
+          <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h5"/><path d="M19.4 9A9 9 0 0 0 5.6 5.6L4 9m14 9v-5h-5"/><path d="M3.6 14a9 9 0 0 0 13.8 3.4L19 14"/></svg>
+        </div>
+        <span class="path-tag">Existing subscriber</span>
+        <div class="path-title">Extend / Upgrade</div>
+        <p class="path-blurb">Subscription expiring or want to add a new product? Log in and go to your account to upgrade.</p>
+        <a href="/mynmclicensure/student/upgrade.html" class="path-btn outline">Upgrade My Access</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PROGRAMMES — dynamic from Supabase -->
+<section class="section prog-section">
+  <div class="section-inner">
+    <p class="kicker">Supported programmes</p>
+    <h2 class="section-h">All NMC nursing programmes covered</h2>
+    <p class="section-sub">Register with your programme and the platform tailors all content — quizzes, courses, and mock exams — to match your licensure pathway.</p>
+    <div class="prog-grid" id="progGrid">
+      <div class="prog-skel"><div class="skel s"></div><div class="skel"></div></div>
+      <div class="prog-skel"><div class="skel s"></div><div class="skel"></div></div>
+      <div class="prog-skel"><div class="skel s"></div><div class="skel"></div></div>
+      <div class="prog-skel"><div class="skel s"></div><div class="skel"></div></div>
+      <div class="prog-skel"><div class="skel s"></div><div class="skel"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- EXAM STRUCTURE -->
+<section class="section exam-section">
+  <div class="section-inner" style="max-width:860px">
+    <p class="kicker">About the exam</p>
+    <h2 class="section-h">How the NMC Ghana licensure exam is structured</h2>
+    <p class="section-sub" style="margin-bottom:0">Most programmes are assessed through <strong>five parts</strong>: two programme-specific MCQ papers, a shared General Paper, a practical skills exam, and a written care study. Some pathways — commonly NAC/NAP — often do <strong>not</strong> include the written care study.</p>
+    <div class="exam-chips">
+      <div class="exam-chip">
+        <div class="exam-num">1</div>
+        <div class="exam-chip-body"><h4>Part 1 — Core MCQs (programme paper)</h4><p>Typically 180 MCQs · 3 hours</p></div>
+      </div>
+      <div class="exam-chip">
+        <div class="exam-num">2</div>
+        <div class="exam-chip-body"><h4>Part 2 — Core MCQs (programme paper)</h4><p>Typically 180 MCQs · 3 hours</p></div>
+      </div>
+      <div class="exam-chip">
+        <div class="exam-num">3</div>
+        <div class="exam-chip-body"><h4>Part 3 — General Paper (shared MCQs, all programmes)</h4><p>Typically 100 MCQs · 1 hr 30 min</p></div>
+      </div>
+      <div class="exam-chip">
+        <div class="exam-num">4</div>
+        <div class="exam-chip-body"><h4>Part 4 — Practical Exam (skills &amp; competence)</h4><p>Stations / procedures · technique + safety</p></div>
+      </div>
+      <div class="exam-chip">
+        <div class="exam-num">5</div>
+        <div class="exam-chip-body">
+          <h4>Part 5 — Care Study / Care Plan (written clinical application)</h4>
+          <p>Completed during clinical posting <span class="exam-warn">Exception: often not required for NAC/NAP</span></p>
         </div>
       </div>
-    </section>
+    </div>
+    <p style="margin-top:14px;font-size:12.5px;color:var(--muted)">Exact practical stations and care study deadlines are set during clinical posting and communicated by your school or the NMC.</p>
+  </div>
+</section>
 
-    <!-- ── NMC EXAM STRUCTURE ── -->
-    <section class="nmc-section">
-      <div style="max-width: 860px; margin: 0 auto;">
-        <p class="section-label">About the exam</p>
-        <h2 class="section-title">How the NMC Ghana licensure exam is structured</h2>
-        <p class="section-sub" style="margin-bottom: 0;">
-          Most programmes are assessed through <strong>five parts</strong>: two programme-specific MCQ papers, a shared General Paper, a practical skills exam, and a written care study. Some pathways — commonly NAC/NAP — often do <strong>not</strong> include the written care study.
-        </p>
+<!-- FEATURES -->
+<section class="section features-section">
+  <div class="section-inner">
+    <p class="kicker">What you get</p>
+    <h2 class="section-h">Everything you need to pass your NMC exam</h2>
+    <div class="features-grid">
 
-        <div class="exam-chips">
-
-          <div class="exam-chip">
-            <div class="exam-chip-num">1</div>
-            <div class="exam-chip-body">
-              <div class="exam-chip-title">Part 1 — Core MCQs (programme paper)</div>
-              <div class="exam-chip-meta">Typically 180 MCQs · 3 hours</div>
-            </div>
-          </div>
-
-          <div class="exam-chip">
-            <div class="exam-chip-num">2</div>
-            <div class="exam-chip-body">
-              <div class="exam-chip-title">Part 2 — Core MCQs (programme paper)</div>
-              <div class="exam-chip-meta">Typically 180 MCQs · 3 hours</div>
-            </div>
-          </div>
-
-          <div class="exam-chip">
-            <div class="exam-chip-num">3</div>
-            <div class="exam-chip-body">
-              <div class="exam-chip-title">Part 3 — General Paper (shared MCQs, all programmes)</div>
-              <div class="exam-chip-meta">Typically 100 MCQs · 1 hr 30 min</div>
-            </div>
-          </div>
-
-          <div class="exam-chip">
-            <div class="exam-chip-num">4</div>
-            <div class="exam-chip-body">
-              <div class="exam-chip-title">Part 4 — Practical Exam (skills &amp; competence)</div>
-              <div class="exam-chip-meta">Stations / procedures · technique + safety</div>
-            </div>
-          </div>
-
-          <div class="exam-chip">
-            <div class="exam-chip-num">5</div>
-            <div class="exam-chip-body">
-              <div class="exam-chip-title">Part 5 — Care Study / Care Plan (written clinical application)</div>
-              <div class="exam-chip-meta">
-                Completed during clinical posting
-                <span class="exam-chip-warn">Exception: often not required for NAC/NAP</span>
-              </div>
-            </div>
-          </div>
-
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M7 10h6M7 7h4"/></svg>
         </div>
-
-        <p style="margin-top: 16px; font-size: 12.5px; color: var(--text-muted);">
-          Exact practical stations and care study deadlines are set during clinical posting and communicated by your school or the NMC.
-        </p>
-      </div>
-    </section>
-
-    <!-- ── PROGRAMMES ── (dynamic from Supabase) -->
-    <section class="programmes-section">
-      <div style="max-width: 1100px; margin: 0 auto;">
-        <p class="section-label">Supported programmes</p>
-        <h2 class="section-title">All NMC nursing programmes covered</h2>
-        <p class="section-sub">QAcademy supports all major NMC licensing programmes in Ghana. Select your programme when you register and the platform tailors your content accordingly.</p>
-
-        <!-- Rendered by JS below -->
-        <div class="prog-grid" id="progGrid">
-          <!-- Loading skeletons -->
-          <div class="prog-skeleton"><div class="skel-line short"></div><div class="skel-line"></div></div>
-          <div class="prog-skeleton"><div class="skel-line short"></div><div class="skel-line"></div></div>
-          <div class="prog-skeleton"><div class="skel-line short"></div><div class="skel-line"></div></div>
-          <div class="prog-skeleton"><div class="skel-line short"></div><div class="skel-line"></div></div>
-          <div class="prog-skeleton"><div class="skel-line short"></div><div class="skel-line"></div></div>
+        <div>
+          <h4>Practice quizzes &amp; quiz builder</h4>
+          <p>Custom quiz builder lets you target specific topics and concepts, up to 50 questions per session. Fixed quizzes also available.</p>
         </div>
       </div>
-    </section>
 
-    <!-- ── FEATURES ── -->
-    <section class="features-section">
-      <div style="max-width: 1100px; margin: 0 auto;">
-        <p class="section-label">Why QAcademy</p>
-        <h2 class="section-title">Everything you need to pass your NMC exam</h2>
-
-        <div class="features-grid">
-
-          <div class="feature-card">
-            <div class="feature-icon">📝</div>
-            <h4>Practice Quizzes</h4>
-            <p>Hundreds of exam-style questions across all subjects. Fixed quizzes and a custom quiz builder to target your weak areas.</p>
-          </div>
-
-          <div class="feature-card">
-            <div class="feature-icon">⏱️</div>
-            <h4>Timed Exam Mode</h4>
-            <p>Simulate real exam conditions with timed quizzes. Build the speed and confidence you need on exam day.</p>
-          </div>
-
-          <div class="feature-card">
-            <div class="feature-icon">📊</div>
-            <h4>Track Your Progress</h4>
-            <p>Full learning history with scores, time taken, and detailed answer reviews. See exactly where you need to improve.</p>
-          </div>
-
-          <div class="feature-card">
-            <div class="feature-icon">📥</div>
-            <h4>Study Offline</h4>
-            <p>Download question packs as PDF to study anywhere — even without internet access.</p>
-          </div>
-
-          <div class="feature-card">
-            <div class="feature-icon">🎯</div>
-            <h4>Instant Feedback</h4>
-            <p>Every question comes with detailed rationale and per-option explanations so you learn from every attempt.</p>
-          </div>
-
-          <div class="feature-card">
-            <div class="feature-icon">✈️</div>
-            <h4>Telegram Community</h4>
-            <p>Get access to dedicated Telegram study groups for your programme when you subscribe.</p>
-          </div>
-
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"/><path d="M10 7v3l2.5 2.5"/></svg>
+        </div>
+        <div>
+          <h4>Timed exam simulation</h4>
+          <p>Two modes: instant practice with immediate feedback, or timed mode to simulate real exam conditions and build speed.</p>
         </div>
       </div>
-    </section>
 
-    <!-- ── BOTTOM CTA ── -->
-    <section class="bottom-cta">
-      <h3>Ready to start preparing?</h3>
-      <p>Join hundreds of nursing students already using QAcademy to prepare for their NMC exams.</p>
-      <a href="/mynmclicensure/register.html"><button class="btn-hero-primary">Create Your Free Account</button></a>
-      <p class="bottom-cta-sub">
-        Already registered? <a href="/mynmclicensure/subscribe.html">Subscribe to paid access →</a>
-      </p>
-    </section>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17V7l7-4 7 4v10"/><path d="M8 17v-6h4v6"/></svg>
+        </div>
+        <div>
+          <h4>Learning history &amp; tracking</h4>
+          <p>Full attempt log with scores, time, and answer reviews. Resume sessions, retake quizzes, and see exactly where you need work.</p>
+        </div>
+      </div>
 
-    <!-- ── FOOTER ── -->
-    <footer class="footer">
-      <p><a href="/index.html" style="font-size:13px; color:#6b7280; text-decoration:none;">← Back to QAcademy</a></p>
-      <p>&copy; 2026 QAcademy Nurses Hub. All rights reserved.</p>
-    </footer>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l2 2 4-4"/><rect x="3" y="5" width="14" height="12" rx="2"/><path d="M7 5V3h6v2"/></svg>
+        </div>
+        <div>
+          <h4>Detailed question rationales</h4>
+          <p>Every question includes a full explanation and per-option reasoning — so each attempt is a learning opportunity, not just a score.</p>
+        </div>
+      </div>
 
-  </div><!-- /page-wrap -->
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8z"/><polyline points="12 2 12 8 18 8"/><line x1="8" y1="13" x2="12" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>
+        </div>
+        <div>
+          <h4>Offline PDF packs</h4>
+          <p>Download question packs to study anywhere — even when you don't have internet access. Available to subscribers.</p>
+        </div>
+      </div>
 
-  <!-- Supabase (for programmes fetch) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/mynmclicensure/js/config.js"></script>
-  <script>
-    // ── Load programmes dynamically from Supabase ──────────────
-    // Uses the same `db` client from config.js (never `supabase` directly)
-    // Adding a new programme = insert a row in the `programs` table.
-    // No code change needed here.
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2L3 6v4c0 4.1 3 7.9 7 9 4-1.1 7-4.9 7-9V6l-7-4z"/></svg>
+        </div>
+        <div>
+          <h4>Telegram study community</h4>
+          <p>Subscribe and get access to a dedicated Telegram group for your programme — study tips, discussions, and peer support.</p>
+        </div>
+      </div>
 
-    async function loadProgrammes() {
-      const grid = document.getElementById('progGrid');
+    </div>
+  </div>
+</section>
 
-      try {
-        const { data: programs, error } = await db
-          .from('programs')
-          .select('program_id, program_name')
-          .order('program_id');
+<!-- HOW IT WORKS -->
+<section class="section how-section">
+  <div class="section-inner">
+    <p class="kicker">How it works</p>
+    <h2 class="section-h">Studying on QAcademy in 4 steps</h2>
+    <p class="section-sub">Simple by design. Get to practising in minutes.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <h4>Register free</h4>
+        <p>Create your account, select your NMC programme, and get instant trial access — no card required.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <h4>Choose a quiz</h4>
+        <p>Pick a fixed quiz, build a custom one, or go for a timed mock exam. Your content is tailored to your programme.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <h4>Learn from every answer</h4>
+        <p>After each question, read the rationale — understand why an answer is right, not just that it is.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">4</div>
+        <h4>Track and improve</h4>
+        <p>Your history shows every attempt. Review weak areas, retake targeted quizzes, and watch your scores climb.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-        if (error || !programs || programs.length === 0) {
-          // Graceful fallback — hide section if no data
-          grid.innerHTML = '<p style="color:var(--text-muted); font-size:14px;">Programmes loading...</p>';
-          return;
-        }
+<!-- CTA BAND -->
+<div class="cta-band">
+  <h2>Ready to start preparing?</h2>
+  <p>Join hundreds of nursing students across Ghana already using QAcademy for their NMC exam prep.</p>
+  <div class="cta-row-c">
+    <a href="/mynmclicensure/register.html" class="btn-hero-p">Create Your Free Account</a>
+    <a href="/mynmclicensure/subscribe.html" class="btn-hero-g">View Subscription Plans</a>
+  </div>
+  <p class="cta-sub">Already registered? <a href="/mynmclicensure/subscribe.html">Subscribe to paid access →</a></p>
+</div>
 
-        grid.innerHTML = programs.map(p => `
-          <div class="prog-card">
-            <span class="prog-tag">${p.program_id}</span>
-            <div class="prog-name">${p.program_name}</div>
-          </div>
-        `).join('');
+<!-- FOOTER -->
+<footer>
+  <a href="/index.html">← Back to QAcademy</a>
+  <span>&copy; 2026 QAcademy Nurses Hub. All rights reserved.</span>
+</footer>
 
-      } catch (err) {
-        // Silent fail — don't break the page if Supabase is unreachable
-        grid.innerHTML = '<p style="color:var(--text-muted); font-size:14px;">Programmes loading...</p>';
-      }
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/mynmclicensure/js/config.js"></script>
+<script>
+async function loadProgrammes(){
+  const grid=document.getElementById('progGrid');
+  try{
+    const{data:programs,error}=await db.from('programs').select('program_id,program_name').order('program_id');
+    if(error||!programs||programs.length===0){
+      grid.innerHTML='<p style="color:var(--muted);font-size:14px">Programmes loading…</p>';return;
     }
-
-    loadProgrammes();
-  </script>
-
+    grid.innerHTML=programs.map(p=>`
+      <div class="prog-card">
+        <span class="prog-badge">${p.program_id}</span>
+        <div class="prog-name">${p.program_name}</div>
+      </div>`).join('');
+  }catch(e){
+    grid.innerHTML='<p style="color:var(--muted);font-size:14px">Programmes loading…</p>';
+  }
+}
+loadProgrammes();
+</script>
 </body>
 </html>
