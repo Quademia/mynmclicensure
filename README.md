@@ -39,7 +39,8 @@ qacademy-gamma/
     runner/                ← 2 quiz runner pages
     register.html, subscribe.html, payment-confirmation.html, premium-prep.html
   myteacher/               ← Teacher Assess product
-    js/                    ← MyTeacher-specific JS (guard, auth, api, nav)
+    css/                   ← MyTeacher's own stylesheet (style.css)
+    js/                    ← MyTeacher-specific JS (paths, utils, guard, auth, api, nav)
     admin/                 ← 2 admin pages
     teacher/               ← 9 teacher pages
     student/               ← 5 student pages
@@ -56,9 +57,9 @@ qacademy-gamma/
   (root HTML)              ← login, forgot-password, reset-password, router, index
 ```
 
-### Path Configuration — `js/paths.js`
+### Path Configuration
 
-All dynamic URLs are driven by a central config. **Never hardcode product paths in JS.** Always use the constants:
+Each product has its own `paths.js`. MyTeacher pages load `myteacher/js/paths.js`; Licensure pages load `js/paths.js`. Both define the same constants — **never hardcode product paths in JS.** Always use the constants:
 
 ```js
 const LICENSURE = {
@@ -88,7 +89,7 @@ const MYTEACHER = {
 - `js/mynmclicensure-api.js` is the licensure data layer. `myteacher/js/myteacher-api.js` is the teacher assess data layer. Shared reads go in the relevant API file. Page-specific logic stays in the page file.
 - When adding to an API file, provide only the new function block — never a full rewrite.
 - Item IDs are globally unique and course-prefixed: `GP_001`, `RN_MED_001`, etc.
-- **Never hardcode `/mynmclicensure/...` or `/myteacher/...` paths in JavaScript.** Always use `LICENSURE.x` or `MYTEACHER.x` from `js/paths.js`.
+- **Never hardcode `/mynmclicensure/...` or `/myteacher/...` paths in JavaScript.** Always use `LICENSURE.x` or `MYTEACHER.x` from the product's `paths.js`.
 
 ---
 
@@ -494,7 +495,7 @@ Four vulnerable locations patched (innerHTML with user-controlled data):
 - `js/mynmclicensure-student-sidebar.js` — avatar rendering
 - `router.html` — resubmit button onclick
 
-New shared helpers in `js/utils.js`: `safeText()` and `safeAvatar()`. All new UI that displays user data must use these instead of innerHTML.
+Shared helpers: `safeText()` and `safeAvatar()`. Licensure pages use `js/utils.js`; MyTeacher pages use `myteacher/js/utils.js` (own copy). All new UI that displays user data must use these instead of innerHTML.
 
 ---
 

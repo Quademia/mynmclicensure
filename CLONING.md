@@ -20,7 +20,11 @@ qacademy-gamma/
     payment-confirmation.html ← Payment callback
     premium-prep.html      ← Premium marketing page
   myteacher/               ← Teacher Assess product
+    css/
+      style.css            ← MyTeacher's own copy of the stylesheet
     js/
+      paths.js             ← MyTeacher path config (MYTEACHER + LICENSURE constants)
+      utils.js             ← MyTeacher's own copy of shared UI utilities
       myteacher-guard.js   ← MyTeacher auth & role guard (mirror of js/guard.js)
       myteacher-auth.js    ← MyTeacher auth utilities (mirror of js/auth.js)
       myteacher-api.js     ← Teacher Assess data layer

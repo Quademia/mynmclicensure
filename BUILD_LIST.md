@@ -45,12 +45,12 @@ Important but won't block the free trial. Real user feedback will help prioritis
 - [x] Auth split complete — each product has own user table, session table, guard/auth JS, and auth pages (see docs/sprints/myteacher-clean-split.md)
 - [x] MyTeacher JS files moved into myteacher/js/ — myteacher-api.js, myteacher-teacher-nav.js, myteacher-student-nav.js, myteacher-admin-nav.js
 - [x] Create MyTeacher auth RPCs: log_mt_auth_event, check_mt_login_rate_limit, log_mt_reset_request, check_mt_reset_rate_limit, mark_mt_reset_used
-- [ ] **NEXT SESSION — CONTINUING SPLIT** — remaining steps to make MyTeacher fully independent:
-  - [ ] Copy utils.js into myteacher/js/utils.js and update all MyTeacher pages to use it
-  - [ ] Copy css/style.css into myteacher/css/style.css and update all MyTeacher pages to use it (design sprint)
-  - [ ] Split paths.js — create myteacher/js/paths.js with MYTEACHER constant only, update MyTeacher pages to load it instead of root paths.js
-  - [ ] Rename public.users → licensure_users (deferred — requires DB migration + full Licensure codebase sweep)
-  - [ ] Move guard.js and auth.js into mynmclicensure/js/ (deferred — do as part of Licensure cleanup sprint)
+- [x] Copy utils.js into myteacher/js/utils.js and update all MyTeacher pages to use it
+- [x] Copy css/style.css into myteacher/css/style.css and update all MyTeacher pages to use it
+- [x] Split paths.js — create myteacher/js/paths.js with MYTEACHER constant only, update MyTeacher pages to load it instead of root paths.js
+- [ ] **Remaining split steps** (deferred):
+  - [ ] Rename public.users → licensure_users (requires DB migration + full Licensure codebase sweep)
+  - [ ] Move guard.js and auth.js into mynmclicensure/js/ (do as part of Licensure cleanup sprint)
 
 ### Move Business Logic Server-Side
 - [ ] Look into new stack that offers proper backend — almost all business logic lives in the browser
