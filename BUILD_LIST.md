@@ -54,8 +54,18 @@ Important but won't block the free trial. Real user feedback will help prioritis
 - [x] Archive root css/ folder — no active references remain
 - [x] Switch link in MyTeacher topbar updated to point to product-select.html
 - [x] Fixed duplicate guard.js and api.js loads in quiz-builder.html
+- [x] Split config.js into product-local copies (mynmclicensure/js/ and myteacher/js/)
+- [x] Archive root js/ folder — js/ no longer exists at root
+- [x] Archive root css/ folder — css/ no longer exists at root
+- [x] Move Licensure landing page into mynmclicensure/index.html
+- [x] Create clean company root index.html — no product dependency
+- [x] Create MyTeacher landing page — myteacher/index.html
+- [x] All three landing pages link back to root consistently
 - [ ] **Remaining split steps** (deferred):
   - [ ] Rename public.users → licensure_users (requires DB migration + full Licensure codebase sweep)
+  - [ ] Move email worker references into product-local scope
+  - [ ] Move payments worker references into mynmclicensure scope only
+  - [ ] Rename payments worker to qacademy-licensure-payment-worker
 
 ### Move Business Logic Server-Side
 - [ ] Look into new stack that offers proper backend — almost all business logic lives in the browser

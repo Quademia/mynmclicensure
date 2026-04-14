@@ -11,29 +11,31 @@ Technical rebuild guide. Follow end-to-end to recreate the full environment from
 
 ```
 qacademy-gamma/
-  mynmclicensure/          ← NMC Licensure product
+  mynmclicensure/          ← NMC Licensure product (fully self-contained)
     css/
-      style.css            ← Licensure's own stylesheet
+      style.css            ← Licensure stylesheet
     js/
+      config.js            ← Licensure config (Supabase, payments, email worker)
       paths.js             ← Licensure path config (LICENSURE + MYTEACHER constants)
-      config.js            ← Symlink/copy — same Supabase credentials as root
       guard.js             ← Licensure auth & role guards
       auth.js              ← Licensure auth utilities (hashing, fingerprint, event IDs)
-      utils.js             ← Licensure's own copy of shared UI utilities
+      utils.js             ← Licensure UI utilities (safeText, escapeHtml, safeAvatar)
       mynmclicensure-api.js           ← Licensure data layer
       mynmclicensure-admin-sidebar.js
       mynmclicensure-student-sidebar.js
     admin/                 ← 12 admin pages
     student/               ← 16 student pages
     runner/                ← 2 quiz runner pages
+    index.html             ← Licensure landing page (loads Supabase for programmes)
     login.html, forgot-password.html, reset-password.html, router.html
     register.html, subscribe.html, payment-confirmation.html, premium-prep.html
-  myteacher/               ← Teacher Assess product
+  myteacher/               ← Teacher Assess product (fully self-contained)
     css/
-      style.css            ← MyTeacher's own stylesheet
+      style.css            ← MyTeacher stylesheet
     js/
+      config.js            ← MyTeacher config (Supabase, email worker — no payments)
       paths.js             ← MyTeacher path config (MYTEACHER + LICENSURE constants)
-      utils.js             ← MyTeacher's own copy of shared UI utilities
+      utils.js             ← MyTeacher UI utilities (safeText, escapeHtml, safeAvatar)
       myteacher-guard.js   ← MyTeacher auth & role guard
       myteacher-auth.js    ← MyTeacher auth utilities
       myteacher-api.js     ← Teacher Assess data layer
@@ -43,12 +45,12 @@ qacademy-gamma/
     admin/                 ← 2 admin pages
     teacher/               ← 9 teacher pages
     student/               ← 5 student pages
+    index.html             ← MyTeacher landing page (self-contained, no DB)
     login.html, forgot-password.html, reset-password.html, router.html
     access-request.html, register.html
-  js/
-    config.js              ← Supabase credentials (shared — both products still load this)
-  archive/
-    css/style.css          ← Original root stylesheet (archived — no active references)
+  archive/                 ← Orphaned files from pre-separation era
+    js/                    ← 8 archived JS files (config, auth, guard, paths, utils, api, sidebars)
+    css/style.css          ← Original root stylesheet
   payments-worker/         ← Cloudflare Worker (separate deployment)
   workers/email-worker/    ← Cloudflare Worker for transactional emails
   db/
@@ -57,9 +59,11 @@ qacademy-gamma/
     prod-setup/            ← Ready-to-run SQL scripts for new environments
   docs/                    ← Reference documentation
   .github/workflows/       ← GitHub Actions (mirror to prod repo)
-  product-select.html      ← Product selector — self-contained with inline styles
-  index.html               ← Home / landing page
+  index.html               ← Company hub — links to both products (self-contained, no DB)
+  product-select.html      ← Sign-in product selector (self-contained, no DB)
 ```
+
+> **Note:** Root `js/` and `css/` folders no longer exist. Each product is fully self-contained — all JS, CSS, config, and HTML live inside the product folder. The root has no product dependencies. The `archive/` folder holds all orphaned files safely for reference.
 
 ### Config-driven paths
 
