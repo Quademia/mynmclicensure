@@ -51,7 +51,7 @@ qacademy-gamma/
   archive/                 ← Orphaned files from pre-separation era
     js/                    ← 8 archived JS files (config, auth, guard, paths, utils, api, sidebars)
     css/style.css          ← Original root stylesheet
-  payments-worker/         ← Cloudflare Worker (separate deployment)
+  mynmclicensure/workers/payment-worker/ ← Licensure payment worker (Cloudflare)
   mynmclicensure/workers/email-worker/   ← Licensure email worker (Cloudflare)
   myteacher/workers/email-worker/        ← MyTeacher email worker (Cloudflare)
   db/
@@ -125,7 +125,7 @@ To clone e.g. `mynmclicensure/` into `mypharmacy/`:
 - **Frontend:** Vanilla HTML / CSS / JS — no build step
 - **Hosting:** Cloudflare Pages (auto-deploys on push)
 - **Database & Auth:** Supabase (free tier)
-- **Payments:** Paystack — Cloudflare Worker deployed at `payments-worker/`
+- **Payments:** Paystack — Cloudflare Worker deployed at `mynmclicensure/workers/payment-worker/`
 - **Emails:** Resend API — two Cloudflare Workers deployed at `mynmclicensure/workers/email-worker/` and `myteacher/workers/email-worker/` (one per product)
 
 ### Environments
@@ -135,7 +135,7 @@ To clone e.g. `mynmclicensure/` into `mypharmacy/`:
 | **Branch** | `main` | `production` |
 | **Pages URL** | `qacademy-gamma.pages.dev` | `qacademynurseshub.pages.dev` |
 | **Supabase** | `zrakjibtxyzoqcdtvpmq` | `qizhyhjeqhaybyddsuni` |
-| **Payments worker** | `qacademy-gamma-payment-workers` | `qacademy-prod-payment-workers` |
+| **Payment worker** | `qacademy-dev-licensure-payment-worker` | `qacademy-licensure-payment-worker` |
 | **Licensure email worker** | `qacademy-dev-licensure-email-worker` | `qacademy-licensure-email-worker` |
 | **MyTeacher email worker** | `qacademy-dev-myteacher-email-worker` | `qacademy-myteacher-email-worker` |
 
@@ -164,20 +164,32 @@ To clone e.g. `mynmclicensure/` into `mypharmacy/`:
 1. Connect GitHub repo to Cloudflare Pages
 2. No build command — root directory `/`, output directory `/`
 
-### Payments Worker (Cloudflare Worker)
-The worker lives in `payments-worker/` and is deployed separately from the frontend.
+### Payment Worker (Cloudflare Worker)
 
-1. `cd payments-worker`
-2. `npm install`
-3. `npx wrangler deploy`
+The worker lives in `mynmclicensure/workers/payment-worker/` and is deployed separately from the frontend.
 
-Required environment variables (set in Cloudflare Workers dashboard → Settings → Variables):
+1. `cd mynmclicensure/workers/payment-worker`
+2. `npx wrangler deploy` (dev) or `npx wrangler deploy --config wrangler.prod.jsonc` (prod)
+
+There are no npm dependencies — the worker uses only Workers globals, so no `npm install` step is needed.
+
+Worker names:
+| Environment | Name |
+|---|---|
+| Dev | `qacademy-dev-licensure-payment-worker` |
+| Prod | `qacademy-licensure-payment-worker` |
+
+Required secrets (set in Cloudflare Workers dashboard → Settings → Variables and Secrets):
 | Variable | Description |
 |---|---|
-| `SUPABASE_URL` | Your Supabase project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (not anon key) |
 | `PAYSTACK_SECRET_KEY` | Paystack secret key from dashboard |
-| `APP_BASE_URL` | e.g. `https://qacademy-gamma.pages.dev` |
+
+Required vars (already in wrangler.jsonc / wrangler.prod.jsonc — no manual setup needed):
+| Variable | Description |
+|---|---|
+| `SUPABASE_URL` | Supabase project URL |
+| `APP_BASE_URL` | Pages URL — used to build callback URLs |
 | `APP_ORIGIN` | Same as APP_BASE_URL — used for CORS |
 
 Worker routes:
@@ -189,6 +201,9 @@ Worker routes:
 | `/payments/setup-complete` | POST | Create account for student who paid before registering |
 
 Payment status flow: `INIT → PAID → ACTIVATED` (or `SETUP_REQUIRED` if no account yet)
+
+All three payment pages (`subscribe.html`, `upgrade.html`, `payment-confirmation.html`) read
+`PAYMENTS_API_BASE` from `mynmclicensure/js/config.js` — no per-file URL needed.
 
 ### Rate Limiting
 The worker uses Cloudflare's built-in rate limiting.
@@ -204,8 +219,6 @@ If cloning to a new worker account, the namespace_id can stay as "1001" — it i
 ### Setup Token Lifetime
 Tokens issued during SETUP_REQUIRED expire after 48 hours.
 Admin can refresh a token by clicking "Retry Activation" on the payment row in the admin payments panel, then copying the fresh setup link.
-
-All three payment pages (`subscribe.html`, `upgrade.html`, `payment-confirmation.html`) read `PAYMENTS_API_BASE` from `js/config.js` — no per-file URL needed.
 
 ### Email Workers (Cloudflare Workers)
 

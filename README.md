@@ -10,7 +10,7 @@ QAcademy Nurses Hub is a web-based learning management system for nursing studen
 | Frontend | Vanilla HTML / CSS / JS — no build step |
 | Hosting | Cloudflare Pages |
 | Database & Auth | Supabase (free tier) |
-| Payments | Paystack — Cloudflare Worker (`payments-worker/`) |
+| Payments | Paystack — Cloudflare Worker (`mynmclicensure/workers/payment-worker/`) |
 | Emails | Resend API — Cloudflare Workers (`mynmclicensure/workers/email-worker/`, `myteacher/workers/email-worker/`) |
 | Messaging | Built-in thread-based system (Supabase) |
 
@@ -51,7 +51,7 @@ qacademy-gamma/
     config.js              ← Supabase credentials (shared — both products load this)
   archive/
     css/style.css          ← Original root stylesheet (archived — no active references)
-  payments-worker/         ← Cloudflare Worker (payments)
+  mynmclicensure/workers/payment-worker/ ← Licensure payment worker (Cloudflare)
   mynmclicensure/workers/email-worker/   ← Licensure email worker (Cloudflare)
   myteacher/workers/email-worker/        ← MyTeacher email worker (Cloudflare)
   db/                      ← Schema, RLS, migrations, prod setup scripts
@@ -138,7 +138,7 @@ const MYTEACHER = {
 - `attempts` table
 - `config` table with 5 keys
 - Supabase Storage: `rationale-images` bucket created, public policy set
-- **Payments — Cloudflare Worker** (`payments-worker/`) fully deployed:
+- **Payments — Cloudflare Worker** (`mynmclicensure/workers/payment-worker/`) fully deployed:
   - `POST /payments/init-public` — new student pays before having an account
   - `POST /payments/init-upgrade` — existing logged-in student upgrades
   - `GET /payments/verify` — confirms payment with Paystack, activates subscription

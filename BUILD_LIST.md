@@ -62,10 +62,10 @@ Important but won't block the free trial. Real user feedback will help prioritis
 - [x] Create MyTeacher landing page — myteacher/index.html
 - [x] All three landing pages link back to root consistently
 - [x] Move email worker references into product-local scope (split into mynmclicensure/workers/email-worker/ and myteacher/workers/email-worker/, archived old shared workers/)
+- [x] Move payments worker into mynmclicensure scope (mynmclicensure/workers/payment-worker/, archived old payments-worker/)
+- [x] Rename payments worker to qacademy-licensure-payment-worker (dev: qacademy-dev-licensure-payment-worker)
 - [ ] **Remaining split steps** (deferred):
   - [ ] Rename public.users → licensure_users (requires DB migration + full Licensure codebase sweep)
-  - [ ] Move payments worker references into mynmclicensure scope only
-  - [ ] Rename payments worker to qacademy-licensure-payment-worker
 
 ### Move Business Logic Server-Side
 - [ ] Look into new stack that offers proper backend — almost all business logic lives in the browser

@@ -12,8 +12,8 @@ const SUPABASE_ANON_KEY = IS_PROD
   : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpyYWtqaWJ0eHl6b3FjZHR2cG1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MDcyODAsImV4cCI6MjA4ODk4MzI4MH0.saSEaK1IkbP03rfVvuwFpXQlLtAdKLIig9V7UwO7a2po';
 
 const PAYMENTS_API_BASE = IS_PROD
-  ? 'https://qacademy-prod-payment-workers.mybackpacc.workers.dev'
-  : 'https://qacademy-gamma-payment-workers.mybackpacc.workers.dev';
+  ? 'https://qacademy-licensure-payment-worker.mybackpacc.workers.dev'
+  : 'https://qacademy-dev-licensure-payment-worker.mybackpacc.workers.dev';
 
 const EMAIL_WORKER_URL = IS_PROD
   ? 'https://qacademy-licensure-email-worker.mybackpacc.workers.dev'
