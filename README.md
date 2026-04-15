@@ -11,7 +11,7 @@ QAcademy Nurses Hub is a web-based learning management system for nursing studen
 | Hosting | Cloudflare Pages |
 | Database & Auth | Supabase (free tier) |
 | Payments | Paystack — Cloudflare Worker (`payments-worker/`) |
-| Emails | Resend API — Cloudflare Worker (`workers/email-worker/`) |
+| Emails | Resend API — Cloudflare Workers (`mynmclicensure/workers/email-worker/`, `myteacher/workers/email-worker/`) |
 | Messaging | Built-in thread-based system (Supabase) |
 
 No separate backend server. Everything is JAMstack. Workers are isolated to payments and emails only.
@@ -52,7 +52,8 @@ qacademy-gamma/
   archive/
     css/style.css          ← Original root stylesheet (archived — no active references)
   payments-worker/         ← Cloudflare Worker (payments)
-  workers/email-worker/    ← Cloudflare Worker (transactional emails)
+  mynmclicensure/workers/email-worker/   ← Licensure email worker (Cloudflare)
+  myteacher/workers/email-worker/        ← MyTeacher email worker (Cloudflare)
   db/                      ← Schema, RLS, migrations, prod setup scripts
   product-select.html      ← Product selector (self-contained, inline styles)
   index.html               ← Home / landing page

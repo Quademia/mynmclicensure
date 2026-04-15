@@ -52,7 +52,8 @@ qacademy-gamma/
     js/                    ← 8 archived JS files (config, auth, guard, paths, utils, api, sidebars)
     css/style.css          ← Original root stylesheet
   payments-worker/         ← Cloudflare Worker (separate deployment)
-  workers/email-worker/    ← Cloudflare Worker for transactional emails
+  mynmclicensure/workers/email-worker/   ← Licensure email worker (Cloudflare)
+  myteacher/workers/email-worker/        ← MyTeacher email worker (Cloudflare)
   db/
     schema.sql             ← Single source of truth for all 42 tables
     rls.sql                ← All RLS policies + helper functions
@@ -125,7 +126,7 @@ To clone e.g. `mynmclicensure/` into `mypharmacy/`:
 - **Hosting:** Cloudflare Pages (auto-deploys on push)
 - **Database & Auth:** Supabase (free tier)
 - **Payments:** Paystack — Cloudflare Worker deployed at `payments-worker/`
-- **Emails:** Resend API — Cloudflare Worker deployed at `workers/email-worker/`
+- **Emails:** Resend API — two Cloudflare Workers deployed at `mynmclicensure/workers/email-worker/` and `myteacher/workers/email-worker/` (one per product)
 
 ### Environments
 | | Dev | Prod |
@@ -135,7 +136,8 @@ To clone e.g. `mynmclicensure/` into `mypharmacy/`:
 | **Pages URL** | `qacademy-gamma.pages.dev` | `qacademynurseshub.pages.dev` |
 | **Supabase** | `zrakjibtxyzoqcdtvpmq` | `qizhyhjeqhaybyddsuni` |
 | **Payments worker** | `qacademy-gamma-payment-workers` | `qacademy-prod-payment-workers` |
-| **Email worker** | `qacademy-email-worker` | `qacademy-prod-email-worker` |
+| **Licensure email worker** | `qacademy-dev-licensure-email-worker` | `qacademy-licensure-email-worker` |
+| **MyTeacher email worker** | `qacademy-dev-myteacher-email-worker` | `qacademy-myteacher-email-worker` |
 
 `js/config.js` auto-detects the environment by checking `window.location.hostname` — same code works on both.
 
@@ -205,38 +207,49 @@ Admin can refresh a token by clicking "Retry Activation" on the payment row in t
 
 All three payment pages (`subscribe.html`, `upgrade.html`, `payment-confirmation.html`) read `PAYMENTS_API_BASE` from `js/config.js` — no per-file URL needed.
 
-### Email Worker (Cloudflare Worker)
-The worker lives in `workers/email-worker/` and is deployed separately from the frontend.
+### Email Workers (Cloudflare Workers)
 
-1. `cd workers/email-worker`
-2. `npx wrangler deploy`
+Each product has its own email worker deployed separately.
 
-Required environment variables (set in Cloudflare Workers dashboard → Settings → Variables):
-| Variable | Description |
+#### MyNMC Licensure Email Worker
+Location: `mynmclicensure/workers/email-worker/`
+
+1. `cd mynmclicensure/workers/email-worker`
+2. `npx wrangler deploy` (dev) or `npx wrangler deploy --config wrangler.prod.jsonc` (prod)
+
+Handles events: `WELCOME_STUDENT`, `SUBSCRIPTION_ASSIGNED`, `SUBSCRIPTION_REVOKED`, `PAYMENT_SETUP_REQUIRED`
+
+Worker names:
+| Environment | Name |
 |---|---|
-| `RESEND_API_KEY` | Resend API key — create at resend.com (Sending access only) |
-| `EMAIL_SECRET` | Shared secret — must match EMAIL_SECRET in js/config.js |
+| Dev | `qacademy-dev-licensure-email-worker` |
+| Prod | `qacademy-licensure-email-worker` |
 
-Supported events:
-| Event | Trigger location | Who receives it |
-|---|---|---|
-| `WELCOME_STUDENT` | register.html — after successful registration | Student |
-| `WELCOME_TEACHER` | myteacher/admin/teachers.html — after teacher approval | Teacher |
-| `SUBSCRIPTION_ASSIGNED` | mynmclicensure/admin/subscriptions.html — after manual subscription assign | Student |
-| `SUBSCRIPTION_REVOKED` | mynmclicensure/admin/subscriptions.html — after subscription revoke | Student |
-| `PAYMENT_SETUP_REQUIRED` | mynmclicensure/admin/payments.html — after retry activation returns SETUP_REQUIRED | Student |
-| `CLASS_JOIN_APPROVED` | myteacher/teacher/classes.html — after teacher approves join request | Student |
-| `CLASS_JOIN_APPROVED` | myteacher/student/my-classes.html — after direct join (no approval needed) | Student |
+#### MyTeacher Email Worker
+Location: `myteacher/workers/email-worker/`
 
-CORS: Worker only accepts requests from APP_BASE_URL. Update the allowed origin in index.js if the domain changes.
+1. `cd myteacher/workers/email-worker`
+2. `npx wrangler deploy` (dev) or `npx wrangler deploy --config wrangler.prod.jsonc` (prod)
 
-From address: QAcademy Educational Consult <noreply@qacademynurses.com>
-Templates live in: workers/email-worker/templates/
+Handles events: `WELCOME_TEACHER`, `CLASS_JOIN_APPROVED`
 
-Shared footer: `workers/email-worker/templates/footer.html`
-Injected into every email via `{{footer}}` placeholder in `index.js`.
-Social link placeholders (`{{socialTiktok}}`, `{{socialTelegram}}`, `{{socialWhatsapp}}`)
-are resolved in `index.js` — update the URLs there when real links are available.
+Worker names:
+| Environment | Name |
+|---|---|
+| Dev | `qacademy-dev-myteacher-email-worker` |
+| Prod | `qacademy-myteacher-email-worker` |
+
+#### Secrets (set on both workers)
+```bash
+npx wrangler secret put RESEND_API_KEY
+npx wrangler secret put EMAIL_SECRET
+```
+EMAIL_SECRET must match the value in each product's `js/config.js`.
+
+#### Shared settings
+- From address: QAcademy Educational Consult <noreply@qacademynurses.com>
+- Footer template: `templates/footer.html` in each worker folder
+- CORS: each worker accepts requests from both dev and prod Pages origins
 
 ### Email & SMTP Setup
 

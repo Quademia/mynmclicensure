@@ -16,8 +16,8 @@ const PAYMENTS_API_BASE = IS_PROD
   : 'https://qacademy-gamma-payment-workers.mybackpacc.workers.dev';
 
 const EMAIL_WORKER_URL = IS_PROD
-  ? 'https://qacademy-prod-email-worker.mybackpacc.workers.dev'
-  : 'https://qacademy-email-worker.mybackpacc.workers.dev';
+  ? 'https://qacademy-licensure-email-worker.mybackpacc.workers.dev'
+  : 'https://qacademy-dev-licensure-email-worker.mybackpacc.workers.dev';
 
 const EMAIL_SECRET = IS_PROD
   ? '4b6a430591e24e96a571553a0a17ab2cbea84ac50d804cfaa85ef193734258a3'

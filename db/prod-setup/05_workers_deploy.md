@@ -73,53 +73,51 @@ You need this URL for `config.js` (PAYMENTS_API_BASE prod value).
 
 ---
 
-## 2. Email Worker
+## 2. Licensure Email Worker
 
-The dev email worker already accepts the prod origin (updated ALLOWED_ORIGINS).
-Both dev and prod sites can share the same email worker since:
-- It sends via Resend (shared account)
-- CORS now allows both origins
-- The EMAIL_SECRET is checked per-request
-
-**If you want a separate prod email worker instead:**
-
-### Step 1: Create config
-In the prod repo, create `workers/email-worker/wrangler.prod.jsonc`:
-```jsonc
-{
-  "name": "qacademy-prod-email-worker",
-  "main": "index.js",
-  "compatibility_date": "2024-01-01"
-}
-```
-
-### Step 2: Deploy
+### Step 1: Deploy
 ```bash
-cd workers/email-worker
+cd mynmclicensure/workers/email-worker
 npx wrangler deploy --config wrangler.prod.jsonc
 ```
 
-### Step 3: Set secrets
+### Step 2: Set secrets
 ```bash
 npx wrangler secret put RESEND_API_KEY --config wrangler.prod.jsonc
-# Paste the PROD Resend API key (the second key you created)
-
 npx wrangler secret put EMAIL_SECRET --config wrangler.prod.jsonc
-# Generate a new secret: run this in terminal:
-#   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-# Paste the output. This value must also go into config.js as the prod EMAIL_SECRET.
 ```
 
-### Step 4: Note the worker URL
-After deploy, note the URL for `config.js` (EMAIL_WORKER_URL prod value).
+### Step 3: Note the worker URL
+URL will be: `https://qacademy-licensure-email-worker.mybackpacc.workers.dev`
+Confirm this matches `EMAIL_WORKER_URL` prod value in `mynmclicensure/js/config.js`.
 
 ---
 
-## 3. Update config.js
+## 3. MyTeacher Email Worker
 
-After deploying both workers, update `js/config.js` with the real URLs:
-- Replace `PROD_PAYMENTS_WORKER_URL_HERE` with the payments worker URL
-- Replace `PROD_EMAIL_WORKER_URL_HERE` with the email worker URL (or keep the dev URL if sharing)
-- Replace `PROD_EMAIL_SECRET_HERE` with the prod email secret
+### Step 1: Deploy
+```bash
+cd myteacher/workers/email-worker
+npx wrangler deploy --config wrangler.prod.jsonc
+```
+
+### Step 2: Set secrets
+```bash
+npx wrangler secret put RESEND_API_KEY --config wrangler.prod.jsonc
+npx wrangler secret put EMAIL_SECRET --config wrangler.prod.jsonc
+```
+
+### Step 3: Note the worker URL
+URL will be: `https://qacademy-myteacher-email-worker.mybackpacc.workers.dev`
+Confirm this matches `EMAIL_WORKER_URL` prod value in `myteacher/js/config.js`.
+
+---
+
+## 4. Update config.js
+
+After deploying all three workers, confirm the URLs in each product's `config.js` match the deployed workers:
+- `mynmclicensure/js/config.js` — `PAYMENTS_API_BASE` and `EMAIL_WORKER_URL` (prod values)
+- `myteacher/js/config.js` — `EMAIL_WORKER_URL` (prod value)
+- Set `EMAIL_SECRET` in each `config.js` to the value used when running `wrangler secret put EMAIL_SECRET` for that product's worker
 
 Then commit, push to main, merge to production, and the mirror will update the prod repo.

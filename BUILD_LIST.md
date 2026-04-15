@@ -61,9 +61,9 @@ Important but won't block the free trial. Real user feedback will help prioritis
 - [x] Create clean company root index.html — no product dependency
 - [x] Create MyTeacher landing page — myteacher/index.html
 - [x] All three landing pages link back to root consistently
+- [x] Move email worker references into product-local scope (split into mynmclicensure/workers/email-worker/ and myteacher/workers/email-worker/, archived old shared workers/)
 - [ ] **Remaining split steps** (deferred):
   - [ ] Rename public.users → licensure_users (requires DB migration + full Licensure codebase sweep)
-  - [ ] Move email worker references into product-local scope
   - [ ] Move payments worker references into mynmclicensure scope only
   - [ ] Rename payments worker to qacademy-licensure-payment-worker
 
