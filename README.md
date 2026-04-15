@@ -462,9 +462,10 @@ These values are captured from the live quiz onto each attempt's `score_json` at
 | Role | Email | Notes |
 |---|---|---|
 | ADMIN | mybackpacc@gmail.com | role=ADMIN |
-| TEACHER | samquatleumas@gmail.com | role=TEACHER (corrected from STUDENT during Sprint 1) |
 | STUDENT | Albert Owusu-Ansah | role=STUDENT (corrected from TEACHER during Sprint 1), RN / L300 / 2024 cohort / TRIAL |
 | STUDENT | Justice Asiamah | RM / L100 / 2023 cohort / TRIAL |
+
+> Note: `samquatleumas@gmail.com` was previously listed here as a TEACHER test account. It was wiped from dev Supabase during email-worker smoke testing (April 2026) so the address could be used to register a fresh account and verify the `WELCOME_STUDENT` email path.
 
 ---
 
