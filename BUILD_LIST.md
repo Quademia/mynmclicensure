@@ -64,8 +64,35 @@ Important but won't block the free trial. Real user feedback will help prioritis
 - [x] Move email worker references into product-local scope (split into mynmclicensure/workers/email-worker/ and myteacher/workers/email-worker/, archived old shared workers/)
 - [x] Move payments worker into mynmclicensure scope (mynmclicensure/workers/payment-worker/, archived old payments-worker/)
 - [x] Rename payments worker to qacademy-licensure-payment-worker (dev: qacademy-dev-licensure-payment-worker)
-- [ ] **Remaining split steps** (deferred):
-  - [ ] Rename public.users → licensure_users (requires DB migration + full Licensure codebase sweep)
+
+**Code-level product separation is complete.** All remaining "separation" work is database hygiene — see "Licensure Table Renaming" below.
+
+### Licensure Table Renaming (own initiative — sprint-sized)
+
+When MyTeacher was carved out, every new MyTeacher table got a `teacher_` prefix (`teacher_users`, `teacher_classes`, `teacher_quizzes`, etc.). Licensure tables kept their original generic names from the pre-split era (`users`, `sessions`, `subscriptions`, `payments`, `quizzes`, `attempts`, etc.), so the schema is asymmetric — Licensure looks like "the default" and MyTeacher looks like "the addon." This initiative renames every Licensure table to a `licensure_` prefix so both products read symmetrically in the schema.
+
+**Why it's a sprint, not an afternoon:**
+- Foreign keys across dozens of tables need updating
+- All RLS policies in `db/rls.sql` reference table names in subqueries and need rewriting
+- All RPCs (`log_auth_event`, `check_login_rate_limit`, `auth_user_role`, `auth_user_id`, etc.) embed table names in SQL bodies — drop and recreate
+- ~80–100 `db.from('users')`-style call sites in `mynmclicensure-api.js`, `guard.js`, `auth.js`, sidebars, and pages — every one must change
+- `db/schema.sql` and all four `db/prod-setup/*.sql` bootstrap scripts get rewritten
+- Migration runs twice: dev Supabase first, smoke-test, then prod
+- Any missed call site silently breaks at runtime ("table does not exist") only when a real user hits it
+
+**Decisions to make before starting:**
+- [ ] Naming convention — `licensure_users` (matches `teacher_users`) or `lic_users` (shorter)?
+- [ ] Scope — every Licensure table, or only the core identity tables (`users`, `sessions`, `auth_events`, `reset_requests`)?
+- [ ] Compatibility window — use a transitional `CREATE VIEW users AS SELECT * FROM licensure_users` so old code keeps working during the sweep, or big-bang cutover?
+- [ ] Cutover style — single migration on a quiet day, or rolling table-by-table
+
+**Tables in scope (full list, for sizing):**
+`users`, `sessions`, `auth_events`, `reset_requests`, `subscriptions`, `payments`, `programs`, `courses`, `products`, `quizzes`, `attempts`, `items_*` (11 tables), `announcements`, `messages_threads`, `messages`, `config`, `offline_packs`, `user_notice_state`
+
+**Pick this up only when:**
+- No active feature work is mid-flight on Licensure
+- Dev Supabase is in a known-good state for testing
+- You have a clear window to deploy and smoke-test before real users hit prod
 
 ### Move Business Logic Server-Side
 - [ ] Look into new stack that offers proper backend — almost all business logic lives in the browser
