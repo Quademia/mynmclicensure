@@ -941,6 +941,46 @@ CREATE INDEX idx_teacher_reset_requests_created ON teacher_reset_requests(create
 
 
 -- ────────────────────────────────────────────────────────────
+-- 5.12 MyTeacher FK constraints
+-- ────────────────────────────────────────────────────────────
+-- Declared here (after teacher_users exists) rather than inline
+-- on each table definition. Both teacher_id and user_id columns
+-- on MyTeacher content tables reference teacher_users, NOT the
+-- Licensure users table — MyTeacher has its own identity table
+-- since the auth split.
+
+ALTER TABLE teacher_bank_items
+  ADD CONSTRAINT teacher_bank_items_teacher_id_fkey
+  FOREIGN KEY (teacher_id) REFERENCES teacher_users(user_id);
+
+ALTER TABLE teacher_classes
+  ADD CONSTRAINT teacher_classes_teacher_id_fkey
+  FOREIGN KEY (teacher_id) REFERENCES teacher_users(user_id);
+
+ALTER TABLE teacher_class_members
+  ADD CONSTRAINT teacher_class_members_teacher_id_fkey
+  FOREIGN KEY (teacher_id) REFERENCES teacher_users(user_id);
+ALTER TABLE teacher_class_members
+  ADD CONSTRAINT teacher_class_members_user_id_fkey
+  FOREIGN KEY (user_id) REFERENCES teacher_users(user_id);
+
+ALTER TABLE teacher_quizzes
+  ADD CONSTRAINT teacher_quizzes_teacher_id_fkey
+  FOREIGN KEY (teacher_id) REFERENCES teacher_users(user_id);
+
+ALTER TABLE teacher_quiz_classes
+  ADD CONSTRAINT teacher_quiz_classes_teacher_id_fkey
+  FOREIGN KEY (teacher_id) REFERENCES teacher_users(user_id);
+
+ALTER TABLE teacher_quiz_attempts
+  ADD CONSTRAINT teacher_quiz_attempts_teacher_id_fkey
+  FOREIGN KEY (teacher_id) REFERENCES teacher_users(user_id);
+ALTER TABLE teacher_quiz_attempts
+  ADD CONSTRAINT teacher_quiz_attempts_user_id_fkey
+  FOREIGN KEY (user_id) REFERENCES teacher_users(user_id);
+
+
+-- ────────────────────────────────────────────────────────────
 -- 6. RLS (dev mode — replace before go-live)
 -- ────────────────────────────────────────────────────────────
 -- Apply to every table above:
