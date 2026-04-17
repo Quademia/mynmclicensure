@@ -33,9 +33,21 @@ Newest session on top.
   - Rebuild `db/prod-setup/01_tables.sql` from `db/schema.sql` — currently stale, missing the MyTeacher auth-split tables and FK block. Do before next prod bootstrap.
 - **SESSIONS.md** — created this file (and renamed to uppercase for consistency).
 
-- **Prod mirror applied** ✓ — both migrations (`fix_teacher_rls_helper_functions`, `fix_teacher_fk_to_teacher_users`) applied to prod Supabase (`qizhyhjeqhaybyddsuni`). Prod was actually missing the teacher_id/user_id FKs entirely (never had referential integrity on those columns), so the FK migration acted as a pure add. Verified: 0 bad policies, 0 bad FKs, 8 good FKs. Prod + dev now fully in sync on identity layer.
+- **Prod mirror applied** ✓ — both migrations (`fix_teacher_rls_helper_functions`, `fix_teacher_fk_to_teacher_users`) applied to prod Supabase (`qizhyhjeqhaybyddsuni`). Prod was actually missing the teacher_id/user_id FKs entirely (never had referential integrity on those columns), so the FK migration acted as a pure add. Verified: 0 bad policies, 0 bad FKs, 8 good FKs.
+- **Prod Cloudflare workers deployed** ✓ — all three prod workers now live: `qacademy-licensure-email-worker`, `qacademy-myteacher-email-worker`, `qacademy-licensure-payment-worker`. User set secrets via Cloudflare dashboard.
+- **`main` merged to `production` branch** ✓ — fast-forward only, 39 commits + subsequent fixes. Cloudflare Pages now serves the post-split code.
+- **Prod smoke test — 6 of 7 steps pass** ✓ (skipped step 7 payment flow — identical to dev, no prod test card needed):
+  1. Licensure login all three methods ✓
+  2. MyTeacher login all three roles ✓
+  3. Licensure registration → WELCOME_STUDENT email ✓
+  4. MyTeacher teacher registration → admin approval → WELCOME_TEACHER email ✓
+  5. Programme/cohort/course/class creation (validates today's RLS + FK fixes) ✓
+  6. Student join by code → teacher approval → CLASS_JOIN_APPROVED email → student sees class ✓
+- **Prod-specific fixes surfaced during smoke test:**
+  - **createClass cohort_id drop** — `myteacher-api.js` `createClass()` had an allowlist of opts fields to copy into the insert row; `cohort_id` was missing. Classes saved with null cohort_id regardless of user selection. One-line fix.
+  - **Missing PostgREST FKs (7 of them)** — `add_missing_teacher_fks_part2.sql`. Prod was missing every parent-child FK on teacher_ tables (class_id, teacher_quiz_id refs) that dev had. This blocked PostgREST nested-select embeds (`.select('teacher_classes(...)')`) used across the app, including the student "my classes" page. Zero orphans, added directly. Required `NOTIFY pgrst, 'reload schema'` post-apply.
 
 ### Next session
-- **Resume MyTeacher feature audit** (paused earlier at user's request — one-thing-at-a-time).
+- **Resume MyTeacher feature audit** (paused earlier at user's request — one-thing-at-a-time). Re-test feature by feature systematically — we found 2 latent bugs today in one smoke pass, there are almost certainly more in less-travelled flows (quiz publish, quiz attempt, results, bank import, etc).
 - **Launch blockers from BUILD_LIST** — remove test accounts (MANUAL_TEST rows), email confirmation flow (5 items), custom domain on Cloudflare, question bank content review.
-- **Stale `db/prod-setup/01_tables.sql`** — rebuild from schema.sql when there's a window.
+- **Stale `db/prod-setup/01_tables.sql`** — rebuild from schema.sql when there's a window. Today's discoveries prove this file is a real liability — every missing declaration is a time bomb for fresh prod bootstraps.
