@@ -167,6 +167,7 @@ async function createClass(teacherId, title, customFieldsJson, opts = {}) {
   if (opts.start_date)    row.start_date    = opts.start_date;
   if (opts.end_date)      row.end_date      = opts.end_date;
   if (opts.colour)        row.colour        = opts.colour;
+  if (opts.cohort_id)     row.cohort_id     = opts.cohort_id;
 
   const { data, error } = await db
     .from('teacher_classes')
