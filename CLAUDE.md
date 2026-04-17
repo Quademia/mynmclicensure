@@ -1,8 +1,6 @@
 # CLAUDE.md — QAcademy Nurses Hub
 
-Read and follow `AGENTS.md` for all shared rules, conventions, and session routines.
 
-This file contains only Claude Code specific notes.
 
 ## Claude-Specific
 - This file is auto-loaded by Claude Code at session start.
@@ -23,10 +21,11 @@ QAcademy Nurses Hub is a web-based LMS for nursing students in Ghana preparing f
 
 ### Start
 1. Pull latest from git
-2. Read `BUILD_LIST.md` for current priorities
-3. Scan recent commits (`git log --oneline -10`) — another assistant may have pushed changes
-4. Read `README.md` for project context if needed
-5. Read `db/schema.sql` if working on anything database-related
+2. Read Sessions.md to remeber prevoius work
+3. Read `BUILD_LIST.md` for current priorities
+4. Scan recent commits (`git log --oneline -10`) — another assistant may have pushed changes
+5. Read `README.md` for project context if needed
+6. Read `db/schema.sql` if working on anything database-related
 
 ### End
 1. Commit all work with clear commit messages
@@ -34,23 +33,13 @@ QAcademy Nurses Hub is a web-based LMS for nursing students in Ghana preparing f
 3. Update `BUILD_LIST.md` if items were completed or new ones discovered
 4. Update `README.md` if new pages, features, or conventions were added
 5. Update Product.md where appropraite.
+6. update sessions.md
 
 ## Working With Me
 - I have no coding experience. Before writing or pushing any code, explain the rationale — what the code does, why it's structured that way, and what it changes. Do not assume I can read code.
 - Always push directly to main. No PRs or feature branches.
 
-## Key Files
-| File | Purpose |
-|---|---|
-| `README.md` | Full project docs, stack, conventions, page reference |
-| `BUILD_LIST.md` | Current priorities (5-sprint hardening plan) |
-| `CLONING.md` | Technical rebuild guide |
-| `db/schema.sql` | Single source of truth for all 36 database tables |
-| `js/paths.js` | Central path config — never hardcode product paths in JS |
-| `js/config.js` | Supabase credentials |
-| `js/guard.js` | Auth and role guards |
-| `js/mynmclicensure-api.js` | Licensure data layer |
-| `myteacher/js/myteacher-api.js` | Teacher Assess data layer |
+
 
 ## Coding Conventions
 - Supabase JS CDN uses `supabase` as global. Project uses `const db = supabase.createClient(...)` in `js/config.js`. All files reference `db`, never `supabase`.
@@ -74,7 +63,4 @@ QAcademy Nurses Hub is a web-based LMS for nursing students in Ghana preparing f
 - Do not add features, refactor, or "improve" beyond what was asked.
 - When editing, only touch what needs to change. Don't clean up surrounding code.
 
-## Multiple AI Assistants
-This repo is worked on by both Claude Code and ChatGPT (and potentially others). Each checks the other's recent commits at session start.
-- `CLAUDE.md` — Claude Code specific instructions (auto-loaded by Claude)
-- `AGENTS.md` — shared instructions for all assistants (this file)
+
