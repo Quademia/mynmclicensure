@@ -979,6 +979,34 @@ ALTER TABLE teacher_quiz_attempts
   ADD CONSTRAINT teacher_quiz_attempts_user_id_fkey
   FOREIGN KEY (user_id) REFERENCES teacher_users(user_id);
 
+-- Parent-child links (required for referential integrity AND
+-- for PostgREST nested select embeds across these tables)
+ALTER TABLE teacher_profiles
+  ADD CONSTRAINT teacher_profiles_teacher_id_fkey
+  FOREIGN KEY (teacher_id) REFERENCES teacher_users(user_id) ON DELETE CASCADE;
+
+ALTER TABLE teacher_class_members
+  ADD CONSTRAINT teacher_class_members_class_id_fkey
+  FOREIGN KEY (class_id) REFERENCES teacher_classes(class_id);
+
+ALTER TABLE teacher_quiz_attempts
+  ADD CONSTRAINT teacher_quiz_attempts_class_id_fkey
+  FOREIGN KEY (class_id) REFERENCES teacher_classes(class_id);
+ALTER TABLE teacher_quiz_attempts
+  ADD CONSTRAINT teacher_quiz_attempts_teacher_quiz_id_fkey
+  FOREIGN KEY (teacher_quiz_id) REFERENCES teacher_quizzes(teacher_quiz_id);
+
+ALTER TABLE teacher_quiz_classes
+  ADD CONSTRAINT teacher_quiz_classes_class_id_fkey
+  FOREIGN KEY (class_id) REFERENCES teacher_classes(class_id);
+ALTER TABLE teacher_quiz_classes
+  ADD CONSTRAINT teacher_quiz_classes_teacher_quiz_id_fkey
+  FOREIGN KEY (teacher_quiz_id) REFERENCES teacher_quizzes(teacher_quiz_id);
+
+ALTER TABLE teacher_quiz_items
+  ADD CONSTRAINT teacher_quiz_items_teacher_quiz_id_fkey
+  FOREIGN KEY (teacher_quiz_id) REFERENCES teacher_quizzes(teacher_quiz_id);
+
 
 -- ────────────────────────────────────────────────────────────
 -- 6. RLS (dev mode — replace before go-live)
