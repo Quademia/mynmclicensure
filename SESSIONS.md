@@ -33,7 +33,9 @@ Newest session on top.
   - Rebuild `db/prod-setup/01_tables.sql` from `db/schema.sql` — currently stale, missing the MyTeacher auth-split tables and FK block. Do before next prod bootstrap.
 - **SESSIONS.md** — created this file (and renamed to uppercase for consistency).
 
+- **Prod mirror applied** ✓ — both migrations (`fix_teacher_rls_helper_functions`, `fix_teacher_fk_to_teacher_users`) applied to prod Supabase (`qizhyhjeqhaybyddsuni`). Prod was actually missing the teacher_id/user_id FKs entirely (never had referential integrity on those columns), so the FK migration acted as a pure add. Verified: 0 bad policies, 0 bad FKs, 8 good FKs. Prod + dev now fully in sync on identity layer.
+
 ### Next session
-- **Prod mirror of the two fixes** — apply `fix_teacher_rls_helper_functions.sql` and `fix_teacher_fk_to_teacher_users.sql` to prod Supabase (`qizhyhjeqhaybyddsuni`). Before applying FK migration to prod: verify all affected tables have zero orphan rows (same check I ran on dev) — prod has real legacy data, so orphans are possible and would block the FK creation.
 - **Resume MyTeacher feature audit** (paused earlier at user's request — one-thing-at-a-time).
+- **Launch blockers from BUILD_LIST** — remove test accounts (MANUAL_TEST rows), email confirmation flow (5 items), custom domain on Cloudflare, question bank content review.
 - **Stale `db/prod-setup/01_tables.sql`** — rebuild from schema.sql when there's a window.
