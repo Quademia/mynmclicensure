@@ -15,6 +15,7 @@ These must be done before real users touch the platform.
 - [ ] Set up custom domain on Cloudflare
 - [ ] Remove test accounts (MANUAL_TEST rows)
 - [ ] Review and clean up question bank content
+- [ ] **Swap Paystack secret on prod payment worker from TEST → LIVE key.** Currently prod uses Paystack test keys, so no real customer can complete a payment. Live key must be set via Cloudflare dashboard on `qacademy-licensure-payment-worker` before real users arrive.
 
 ### Email Confirmation (on hold — required before real users)
 - [ ] Turn on email confirmation in Supabase Auth

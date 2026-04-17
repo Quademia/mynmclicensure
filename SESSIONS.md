@@ -36,16 +36,19 @@ Newest session on top.
 - **Prod mirror applied** ✓ — both migrations (`fix_teacher_rls_helper_functions`, `fix_teacher_fk_to_teacher_users`) applied to prod Supabase (`qizhyhjeqhaybyddsuni`). Prod was actually missing the teacher_id/user_id FKs entirely (never had referential integrity on those columns), so the FK migration acted as a pure add. Verified: 0 bad policies, 0 bad FKs, 8 good FKs.
 - **Prod Cloudflare workers deployed** ✓ — all three prod workers now live: `qacademy-licensure-email-worker`, `qacademy-myteacher-email-worker`, `qacademy-licensure-payment-worker`. User set secrets via Cloudflare dashboard.
 - **`main` merged to `production` branch** ✓ — fast-forward only, 39 commits + subsequent fixes. Cloudflare Pages now serves the post-split code.
-- **Prod smoke test — 6 of 7 steps pass** ✓ (skipped step 7 payment flow — identical to dev, no prod test card needed):
+- **Prod smoke test — all 7 steps pass** ✓:
   1. Licensure login all three methods ✓
   2. MyTeacher login all three roles ✓
   3. Licensure registration → WELCOME_STUDENT email ✓
   4. MyTeacher teacher registration → admin approval → WELCOME_TEACHER email ✓
   5. Programme/cohort/course/class creation (validates today's RLS + FK fixes) ✓
   6. Student join by code → teacher approval → CLASS_JOIN_APPROVED email → student sees class ✓
+  7. Licensure payment flow: Paystack init → checkout → webhook → activation → SUBSCRIPTION_ASSIGNED email ✓. Also tested admin grant/revoke emails ✓ and retry activation ✓ (after bug fix below).
 - **Prod-specific fixes surfaced during smoke test:**
   - **createClass cohort_id drop** — `myteacher-api.js` `createClass()` had an allowlist of opts fields to copy into the insert row; `cohort_id` was missing. Classes saved with null cohort_id regardless of user selection. One-line fix.
   - **Missing PostgREST FKs (7 of them)** — `add_missing_teacher_fks_part2.sql`. Prod was missing every parent-child FK on teacher_ tables (class_id, teacher_quiz_id refs) that dev had. This blocked PostgREST nested-select embeds (`.select('teacher_classes(...)')`) used across the app, including the student "my classes" page. Zero orphans, added directly. Required `NOTIFY pgrst, 'reload schema'` post-apply.
+  - **retryActivation worker URL** — admin payments page read the worker URL from the DB `config` table (`payments_worker_url`), not from `config.js`. DB row was stale pointing to a worker that no longer exists. Refactored `retryActivation()` to use `PAYMENTS_API_BASE` directly (single source of truth), removed the DB config row from dev + prod, and dropped it from `prod-setup/04_seed_data.sql`. Dev had the same stale URL — never noticed because retry wasn't exercised during dev smoke.
+- **Paystack launch blocker flagged on BUILD_LIST** — prod payment worker is currently using Paystack TEST keys (revealed during step 7). Must swap to LIVE keys via Cloudflare dashboard before real customers arrive.
 
 ### Next session
 - **Resume MyTeacher feature audit** (paused earlier at user's request — one-thing-at-a-time). Re-test feature by feature systematically — we found 2 latent bugs today in one smoke pass, there are almost certainly more in less-travelled flows (quiz publish, quiz attempt, results, bank import, etc).
