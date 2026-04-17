@@ -622,6 +622,18 @@ ON teacher_library_courses FOR UPDATE
 USING (auth_user_role() = 'ADMIN');
 
 
+-- 16b. teacher_library_* item tables (10 tables)
+-- Each of the 10 teacher_library_X item tables (anatomy, physiology,
+-- english, accounting, government, microbiology, pharmacology,
+-- sociology, surveying, management) has one permissive SELECT policy:
+--   "Anyone can read teacher_library_X" — role public, qual: true
+-- No INSERT/UPDATE/DELETE policies (admin seeds via backend SQL).
+--
+-- TODO: tighten SELECT to "auth.uid() IS NOT NULL" for consistency
+-- with teacher_library_courses. Low priority — library content is
+-- not secret. Logged on BUILD_LIST.
+
+
 -- ────────────────────────────────────────────────────────────
 -- GROUP B (remaining): STUDENT-OWNED DATA
 -- ────────────────────────────────────────────────────────────

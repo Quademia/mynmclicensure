@@ -5,6 +5,44 @@ Newest session on top.
 
 ---
 
+## Session — 2026-04-17 (Claude Web + Claude Desktop)
+
+### Done
+- **Library tables rename** — 10 tables renamed `library_X` → `teacher_library_X`
+  (accounting, anatomy, english, government, management, microbiology,
+  pharmacology, physiology, sociology, surveying). Migration:
+  `db/migrations/rename_library_tables_to_teacher_library.sql`. Applied to
+  dev + prod. Both smoke-tested (teacher library page loads, course detail
+  queries hit renamed tables and return 200).
+- **RLS policies renamed** alongside the tables (`Anyone can read library_X`
+  → `Anyone can read teacher_library_X`) — metadata-only, no behaviour change.
+- **Prod library seed** — copied 100 sample questions (10 per table) from
+  dev → prod so prod smoke tests have realistic content.
+- **Repo updates**: `db/schema.sql` section 5.9b, `db/rls.sql` new 16b
+  documentation comment, `db/prod-setup/04_seed_data.sql` items_table
+  values, `docs/question-schema-plan.md` examples. Skipped stale
+  `db/prod-setup/01_tables.sql` + `03_rls.sql` (separate rebuild task).
+- **Zero code changes needed** because `resolveLibraryRefs()` in
+  `myteacher-api.js` reads `items_table` dynamically from the catalogue.
+
+### Surfaced during this session
+- `04_seed_data.sql` has only 5 `teacher_library_courses` rows; dev + prod
+  have 10. Seed file drifted from reality — logged on BUILD_LIST.
+- 10 library item tables allow unauthenticated SELECT; `teacher_library_courses`
+  does not. Inconsistency logged on BUILD_LIST.
+
+### Next session — priority 1
+- **Resume MyTeacher feature audit** — re-test feature by feature systematically.
+  Yesterday's smoke pass surfaced 5 latent bugs; less-travelled flows (quiz
+  publish, quiz attempt, results, bank import) almost certainly have more.
+- **Launch blockers from BUILD_LIST** — remove test accounts (MANUAL_TEST rows),
+  email confirmation flow (5 items), custom domain on Cloudflare, question bank
+  content review, Paystack TEST→LIVE keys.
+- **Stale `db/prod-setup/01_tables.sql` + `03_rls.sql`** — rebuild from
+  `schema.sql` + `rls.sql` when there's a window.
+
+---
+
 ## Session — 2026-04-17 (Claude Code)
 
 ### Done

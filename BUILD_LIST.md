@@ -43,6 +43,8 @@ Important but won't block the free trial. Real user feedback will help prioritis
 - [ ] users.username — wire up or drop
 - [ ] README and CLONING files need updating to reflect current folder structure and My Teacher naming
 - [ ] `db/prod-setup/01_tables.sql` is stale — missing all MyTeacher auth-split tables (teacher_users, teacher_sessions, teacher_auth_events, teacher_reset_requests) and the MyTeacher FK block. Rebuild from `db/schema.sql` before the next prod bootstrap.
+- [ ] **Teacher library courses seed drift** — `db/prod-setup/04_seed_data.sql` only seeds 5 teacher_library_courses rows (ANATOMY, PHYSIOLOGY, ENGLISH, ACCOUNTING, GOVERNMENT) but dev + prod both have 10 (+ MICROBIOLOGY, PHARMACOLOGY, SOCIOLOGY, MANAGEMENT, SURVEYING). Seed file drifted from reality. Low urgency (prod already correct) but needs fixing before next fresh bootstrap.
+- [ ] **Tighten library item table SELECT policy** — the 10 `teacher_library_X` tables allow unauthenticated SELECT (role `public`, qual `true`). `teacher_library_courses` requires `auth.uid() IS NOT NULL`. Align for consistency. Library content isn't secret so low priority, but cheap: 10 policy drops + recreates.
 
 ### Product Separation
 - [x] Auth split complete — each product has own user table, session table, guard/auth JS, and auth pages (see docs/sprints/myteacher-clean-split.md)
