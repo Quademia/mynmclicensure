@@ -162,14 +162,14 @@ USING (
 CREATE POLICY "teacher_profiles_insert"
 ON teacher_profiles FOR INSERT
 WITH CHECK (
-  teacher_profiles.teacher_id = auth_user_id()
+  teacher_profiles.teacher_id = myteacher_user_id()
 );
 
 CREATE POLICY "teacher_profiles_update"
 ON teacher_profiles FOR UPDATE
 USING (
-  teacher_profiles.teacher_id = auth_user_id()
-  OR auth_user_role() = 'ADMIN'
+  teacher_profiles.teacher_id = myteacher_user_id()
+  OR myteacher_user_role() = 'ADMIN'
 );
 
 
@@ -184,20 +184,20 @@ DROP POLICY IF EXISTS "dev_allow_all" ON teacher_bank_items;
 CREATE POLICY "teacher_bank_items_select"
 ON teacher_bank_items FOR SELECT
 USING (
-  teacher_bank_items.teacher_id = auth_user_id()
-  OR auth_user_role() = 'ADMIN'
+  teacher_bank_items.teacher_id = myteacher_user_id()
+  OR myteacher_user_role() = 'ADMIN'
 );
 
 CREATE POLICY "teacher_bank_items_insert"
 ON teacher_bank_items FOR INSERT
 WITH CHECK (
-  teacher_bank_items.teacher_id = auth_user_id()
+  teacher_bank_items.teacher_id = myteacher_user_id()
 );
 
 CREATE POLICY "teacher_bank_items_update"
 ON teacher_bank_items FOR UPDATE
 USING (
-  teacher_bank_items.teacher_id = auth_user_id()
+  teacher_bank_items.teacher_id = myteacher_user_id()
 );
 
 
@@ -213,22 +213,22 @@ DROP POLICY IF EXISTS "dev_allow_all" ON teacher_classes;
 CREATE POLICY "teacher_classes_select"
 ON teacher_classes FOR SELECT
 USING (
-  auth_user_role() = 'ADMIN'
-  OR teacher_classes.teacher_id = auth_user_id()
+  myteacher_user_role() = 'ADMIN'
+  OR teacher_classes.teacher_id = myteacher_user_id()
   OR auth.uid() IS NOT NULL
 );
 
 CREATE POLICY "teacher_classes_insert"
 ON teacher_classes FOR INSERT
 WITH CHECK (
-  teacher_classes.teacher_id = auth_user_id()
+  teacher_classes.teacher_id = myteacher_user_id()
 );
 
 CREATE POLICY "teacher_classes_update"
 ON teacher_classes FOR UPDATE
 USING (
-  teacher_classes.teacher_id = auth_user_id()
-  OR auth_user_role() = 'ADMIN'
+  teacher_classes.teacher_id = myteacher_user_id()
+  OR myteacher_user_role() = 'ADMIN'
 );
 
 
@@ -245,8 +245,8 @@ DROP POLICY IF EXISTS "dev_allow_all" ON teacher_quizzes;
 CREATE POLICY "teacher_quizzes_select"
 ON teacher_quizzes FOR SELECT
 USING (
-  auth_user_role() = 'ADMIN'
-  OR teacher_quizzes.teacher_id = auth_user_id()
+  myteacher_user_role() = 'ADMIN'
+  OR teacher_quizzes.teacher_id = myteacher_user_id()
   OR (
     teacher_quizzes.status = 'PUBLISHED'
     AND EXISTS (
@@ -254,7 +254,7 @@ USING (
       JOIN teacher_class_members m
         ON m.class_id = tqc.class_id
       WHERE tqc.teacher_quiz_id = teacher_quizzes.teacher_quiz_id
-      AND m.user_id = auth_user_id()
+      AND m.user_id = myteacher_user_id()
       AND m.status = 'ACTIVE'
     )
   )
@@ -263,15 +263,75 @@ USING (
 CREATE POLICY "teacher_quizzes_insert"
 ON teacher_quizzes FOR INSERT
 WITH CHECK (
-  teacher_quizzes.teacher_id = auth_user_id()
+  teacher_quizzes.teacher_id = myteacher_user_id()
 );
 
 CREATE POLICY "teacher_quizzes_update"
 ON teacher_quizzes FOR UPDATE
 USING (
-  teacher_quizzes.teacher_id = auth_user_id()
-  OR auth_user_role() = 'ADMIN'
+  teacher_quizzes.teacher_id = myteacher_user_id()
+  OR myteacher_user_role() = 'ADMIN'
 );
+
+
+-- 6a. teacher_programmes / teacher_cohorts / teacher_courses
+-- Academic structure owned by the teacher.
+-- Teachers read and write their own rows only.
+-- Admin reads all. No browser DELETE — archive via status.
+
+DROP POLICY IF EXISTS "dev_allow_all" ON teacher_programmes;
+
+CREATE POLICY "teacher_programmes_select" ON teacher_programmes
+  FOR SELECT USING (
+    teacher_id = myteacher_user_id()
+    OR myteacher_user_role() = 'ADMIN'
+  );
+
+CREATE POLICY "teacher_programmes_insert" ON teacher_programmes
+  FOR INSERT WITH CHECK (
+    teacher_id = myteacher_user_id()
+  );
+
+CREATE POLICY "teacher_programmes_update" ON teacher_programmes
+  FOR UPDATE USING (
+    teacher_id = myteacher_user_id()
+  );
+
+DROP POLICY IF EXISTS "dev_allow_all" ON teacher_cohorts;
+
+CREATE POLICY "teacher_cohorts_select" ON teacher_cohorts
+  FOR SELECT USING (
+    teacher_id = myteacher_user_id()
+    OR myteacher_user_role() = 'ADMIN'
+  );
+
+CREATE POLICY "teacher_cohorts_insert" ON teacher_cohorts
+  FOR INSERT WITH CHECK (
+    teacher_id = myteacher_user_id()
+  );
+
+CREATE POLICY "teacher_cohorts_update" ON teacher_cohorts
+  FOR UPDATE USING (
+    teacher_id = myteacher_user_id()
+  );
+
+DROP POLICY IF EXISTS "dev_allow_all" ON teacher_courses;
+
+CREATE POLICY "teacher_courses_select" ON teacher_courses
+  FOR SELECT USING (
+    teacher_id = myteacher_user_id()
+    OR myteacher_user_role() = 'ADMIN'
+  );
+
+CREATE POLICY "teacher_courses_insert" ON teacher_courses
+  FOR INSERT WITH CHECK (
+    teacher_id = myteacher_user_id()
+  );
+
+CREATE POLICY "teacher_courses_update" ON teacher_courses
+  FOR UPDATE USING (
+    teacher_id = myteacher_user_id()
+  );
 
 
 -- ────────────────────────────────────────────────────────────
@@ -779,12 +839,12 @@ DROP POLICY IF EXISTS "dev_allow_all" ON teacher_quiz_items;
 CREATE POLICY "teacher_quiz_items_select"
 ON teacher_quiz_items FOR SELECT
 USING (
-  auth_user_role() = 'ADMIN'
+  myteacher_user_role() = 'ADMIN'
   OR EXISTS (
     SELECT 1 FROM teacher_quizzes q
     WHERE q.teacher_quiz_id = teacher_quiz_items.teacher_quiz_id
     AND (
-      q.teacher_id = auth_user_id()
+      q.teacher_id = myteacher_user_id()
       OR q.status = 'PUBLISHED'
     )
   )
@@ -796,7 +856,7 @@ WITH CHECK (
   EXISTS (
     SELECT 1 FROM teacher_quizzes q
     WHERE q.teacher_quiz_id = teacher_quiz_items.teacher_quiz_id
-    AND q.teacher_id = auth_user_id()
+    AND q.teacher_id = myteacher_user_id()
   )
 );
 
@@ -806,7 +866,7 @@ USING (
   EXISTS (
     SELECT 1 FROM teacher_quizzes q
     WHERE q.teacher_quiz_id = teacher_quiz_items.teacher_quiz_id
-    AND q.teacher_id = auth_user_id()
+    AND q.teacher_id = myteacher_user_id()
   )
 );
 
@@ -822,12 +882,12 @@ DROP POLICY IF EXISTS "dev_allow_all" ON teacher_quiz_classes;
 CREATE POLICY "teacher_quiz_classes_select"
 ON teacher_quiz_classes FOR SELECT
 USING (
-  auth_user_role() = 'ADMIN'
-  OR teacher_quiz_classes.teacher_id = auth_user_id()
+  myteacher_user_role() = 'ADMIN'
+  OR teacher_quiz_classes.teacher_id = myteacher_user_id()
   OR EXISTS (
     SELECT 1 FROM teacher_class_members m
     WHERE m.class_id = teacher_quiz_classes.class_id
-    AND m.user_id = auth_user_id()
+    AND m.user_id = myteacher_user_id()
     AND m.status = 'ACTIVE'
   )
 );
@@ -835,13 +895,13 @@ USING (
 CREATE POLICY "teacher_quiz_classes_insert"
 ON teacher_quiz_classes FOR INSERT
 WITH CHECK (
-  teacher_quiz_classes.teacher_id = auth_user_id()
+  teacher_quiz_classes.teacher_id = myteacher_user_id()
 );
 
 CREATE POLICY "teacher_quiz_classes_update"
 ON teacher_quiz_classes FOR UPDATE
 USING (
-  teacher_quiz_classes.teacher_id = auth_user_id()
+  teacher_quiz_classes.teacher_id = myteacher_user_id()
 );
 
 
@@ -872,15 +932,33 @@ USING (
 -- user to read active class rows, which also covers the
 -- join_code lookup flow students need.
 
--- LESSON 3: Always use auth_user_id() and auth_user_role()
--- instead of subqueries inside policies
--- Problem: Subqueries inside policies that read the users table
--- risk recursion or performance issues.
--- Solution: Use the two SECURITY DEFINER helper functions for
--- all identity and role checks inside policies:
---   auth_user_id()   → returns current user's user_id (TEXT)
---   auth_user_role() → returns current user's role (TEXT)
--- These are safe, efficient, and reusable across all policies.
+-- LESSON 3: Always use the right helper pair for the table's product
+-- Problem: Subqueries inside policies that read users tables
+-- risk recursion or performance issues. Worse, after the
+-- MyTeacher/Licensure auth split, each product has its OWN
+-- identity table, so the wrong helper silently returns NULL
+-- for users who only exist in the other table (RLS 42501).
+--
+-- Two helper pairs (both SECURITY DEFINER):
+--   Licensure (reads public.users → identity in public.users):
+--     auth_user_id()       → user_id of caller
+--     auth_user_role()     → role of caller
+--
+--   MyTeacher (reads teacher_users → identity in teacher_users):
+--     myteacher_user_id()   → user_id of caller
+--     myteacher_user_role() → role of caller
+--
+-- Rule: match the helper pair to the table's owning product.
+--   Any table with a `teacher_` prefix → myteacher_user_*
+--   All other tables (users, subscriptions, payments, quizzes,
+--   attempts, items_*, messages, etc.) → auth_user_*
+--
+-- Historical note: pre-split, only auth_user_* existed. After
+-- the MyTeacher split, 26 policies on 9 teacher_ tables were
+-- migrated to myteacher_user_* helpers (see
+-- db/migrations/fix_teacher_rls_helper_functions.sql).
+-- Bug was latent because legacy test admins had dual rows in
+-- both identity tables; fresh single-table users exposed it.
 
 -- LESSON 4: Test accounts with fake auth_ids
 -- Problem: Seed test accounts (U_TEST101 to U_TEST110) were

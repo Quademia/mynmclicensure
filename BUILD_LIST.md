@@ -35,6 +35,7 @@ Important but won't block the free trial. Real user feedback will help prioritis
 - [ ] Stats bar on learning-history reflects loaded page only — needs separate count query for true totals
 
 ### Code Cleanup
+- [ ] Harden `teacher_classes_select` — currently allows any logged-in user to read active class rows so students can look up classes by join_code. Move `getClassByJoinCode()` to a SECURITY DEFINER RPC and tighten the policy to teacher-or-admin-or-member only.
 - [ ] Consolidate escapeHtml() and safeText() in utils.js
 - [ ] Revisit session expiry length (currently 7 days)
 - [ ] users.last_login_utc — wire up or drop
