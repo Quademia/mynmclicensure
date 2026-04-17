@@ -220,7 +220,7 @@ Old refs like `LIB:GP:GP_001` in existing quiz drafts will break once NMC course
 | File | Change |
 |---|---|
 | `db/schema.sql` | Add teacher_library_* table definitions, update teacher_library_courses comments |
-| `db/prod-setup/04_seed_data.sql` | Replace NMC seed rows with academic course rows |
+| `db/seed_data.sql` | Replace NMC seed rows with academic course rows |
 | `js/myteacher-api.js` | Update getLibraryFilterOptions to include tags |
 | `myteacher/teacher/library.html` | Add tags filter |
 

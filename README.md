@@ -54,7 +54,7 @@ qacademy-gamma/
   mynmclicensure/workers/payment-worker/ ← Licensure payment worker (Cloudflare)
   mynmclicensure/workers/email-worker/   ← Licensure email worker (Cloudflare)
   myteacher/workers/email-worker/        ← MyTeacher email worker (Cloudflare)
-  db/                      ← Schema, RLS, migrations, prod setup scripts
+  db/                      ← Schema, RLS, seed data, migrations, setup runbooks (see db/README.md)
   product-select.html      ← Product selector (self-contained, inline styles)
   index.html               ← Home / landing page
 ```

@@ -5,6 +5,40 @@ Newest session on top.
 
 ---
 
+## Session — 2026-04-17 (db/ consolidation — Claude Web + Claude Desktop)
+
+### Audit findings (Phase 1)
+- **01_tables.sql** was fully redundant with schema.sql — zero objects in 01 that schema.sql didn't already have. 01 was missing: all MyTeacher auth-split tables, the section 5.12 FK block, teacher_config, all 10 `teacher_library_*` item tables, and carried a pre-reshape `teacher_library_courses` stub that would have collided with seed data.
+- **02_functions_triggers.sql** was missing all 7 MyTeacher auth functions added post-split (myteacher_user_id/role, log_mt_*, check_mt_*, mark_mt_*). It uniquely held 2 live objects: the `offline_packs` auto-timestamp function + trigger (active, must move) and 2 test helpers `tq_item_option_letters` / `tq_student_item_result` (confirmed unreferenced anywhere in the repo — safe to drop).
+- **03_rls.sql** carried the "wrong RLS helper" landmine: 26 policies on 9 MyTeacher content tables using `auth_user_*` instead of `myteacher_user_*`. Yesterday's `fix_teacher_rls_helper_functions.sql` migration fixed this in live DBs and in rls.sql, but 03 was never back-ported. Fresh bootstrap from 03 would have broken every new teacher signup.
+
+### Done (Phase 2, all 9 steps)
+- **Backfilled rls.sql with 40 ALTER TABLE ENABLE ROW LEVEL SECURITY statements** — one for every table with a policy block (4 more than the initial audit estimate of 36; the gap was sections 6a + 23 being multi-table blocks). Interleaved above each section's first DROP POLICY.
+- **Moved non-RLS `offline_packs` trigger + function into rls.sql** under a new "NON-RLS FUNCTIONS & TRIGGERS" section at the bottom, with a docblock explaining why it lives there (single SQL file per bootstrap step).
+- **Dropped 2 dead test helpers** (`tq_item_option_letters`, `tq_student_item_result`).
+- **Fixed teacher_library_courses seed drift** — added MICROBIOLOGY, PHARMACOLOGY, SOCIOLOGY, MANAGEMENT, SURVEYING to seed_data.sql (values pulled from live prod so they match exactly).
+- **Deleted** `db/prod-setup/01_tables.sql`, `02_functions_triggers.sql`, `03_rls.sql`.
+- **Moved** `db/prod-setup/04_seed_data.sql` → `db/seed_data.sql` (promoted to root for bootstrap order clarity).
+- **Renamed** `db/prod-setup/` → `db/setup/`, dropped number prefixes on the two markdown runbooks (now `workers_deploy.md` + `supabase_auth_storage.md`).
+- **Added** `db/README.md` — short entry-point doc covering file roles, bootstrap sequence, and the "every migration gets back-ported to schema.sql/rls.sql" convention.
+- **Updated cross-references** in CLAUDE.md, README.md, CLONING.md, BUILD_LIST.md, docs/question-schema-plan.md. Left SESSIONS.md historical entries untouched (they accurately describe what existed at the time).
+- **Removed** 2 obsolete BUILD_LIST items (`01_tables.sql` stale rebuild, teacher_library_courses seed drift).
+
+### Mental-model shift
+Fresh Supabase bootstrap is now **3 SQL pastes + 2 markdown checklists**:
+1. `db/schema.sql`
+2. `db/rls.sql`
+3. `db/seed_data.sql`
+4. `db/setup/workers_deploy.md` + `db/setup/supabase_auth_storage.md`
+
+Source-of-truth layer: `db/schema.sql` + `db/rls.sql` + `db/seed_data.sql`. Audit-history layer: `db/migrations/`. One home per concern, zero silent drift surface.
+
+### Next session — priority 1
+- **Resume MyTeacher feature audit** — re-test feature by feature systematically. Yesterday's smoke pass surfaced 5 latent bugs; less-travelled flows (quiz publish, quiz attempt, results, bank import) almost certainly have more.
+- **Launch blockers from BUILD_LIST** — remove test accounts (MANUAL_TEST rows), email confirmation flow (5 items), custom domain on Cloudflare, question bank content review, Paystack TEST→LIVE keys.
+
+---
+
 ## Session — 2026-04-17 (Claude Web + Claude Desktop)
 
 ### Done

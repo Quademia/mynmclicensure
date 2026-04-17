@@ -55,9 +55,12 @@ qacademy-gamma/
   mynmclicensure/workers/email-worker/   ← Licensure email worker (Cloudflare)
   myteacher/workers/email-worker/        ← MyTeacher email worker (Cloudflare)
   db/
-    schema.sql             ← Single source of truth for all 42 tables
-    rls.sql                ← All RLS policies + helper functions
-    prod-setup/            ← Ready-to-run SQL scripts for new environments
+    schema.sql             ← Single source of truth for every CREATE TABLE + index + FK
+    rls.sql                ← All RLS policies, helper functions, non-RLS triggers
+    seed_data.sql          ← Reference / catalogue rows (programs, courses, library courses, etc.)
+    migrations/            ← Historical one-shot SQL files — audit trail, not re-run on bootstrap
+    setup/                 ← Markdown runbooks for Cloudflare workers + Supabase dashboard steps
+    README.md              ← Bootstrap sequence + mental model
   docs/                    ← Reference documentation
   .github/workflows/       ← GitHub Actions (mirror to prod repo)
   index.html               ← Company hub — links to both products (self-contained, no DB)
@@ -154,8 +157,9 @@ To clone e.g. `mynmclicensure/` into `mypharmacy/`:
 
 ### Supabase
 1. Create a new Supabase project
-2. Run the 4 SQL scripts in `db/prod-setup/` in order (01 → 04) in the SQL Editor
-3. Update `js/config.js` with the project URL and anon key (in the IS_PROD ternary)
+2. In the SQL Editor, run the 3 bootstrap SQL files in order: `db/schema.sql`, then `db/rls.sql`, then `db/seed_data.sql`
+3. Follow the markdown runbooks in `db/setup/` for Auth + Storage dashboard settings
+4. Update `js/config.js` with the project URL and anon key (in the IS_PROD ternary)
 
 > The Supabase JS CDN uses `supabase` as its global. We use `db` everywhere.
 > `js/config.js` uses hostname detection — no need for separate config files per environment.

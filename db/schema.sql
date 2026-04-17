@@ -420,7 +420,7 @@ CREATE TABLE teacher_classes (
   start_date         DATE,
   end_date           DATE,
   colour             TEXT,
-  cohort_id          TEXT REFERENCES teacher_cohorts(cohort_id)
+  cohort_id          TEXT
 );
 -- status: ACTIVE | ARCHIVED
 
@@ -504,7 +504,7 @@ CREATE TABLE teacher_quizzes (
   teacher_id             TEXT NOT NULL,
   title                  TEXT NOT NULL,
   subject                TEXT,
-  course_id              TEXT REFERENCES teacher_courses(course_id),
+  course_id              TEXT,
   preset                 TEXT NOT NULL DEFAULT 'EXAM',
   duration_minutes       INTEGER NOT NULL DEFAULT 0,
   shuffle_questions      BOOLEAN NOT NULL DEFAULT false,
@@ -1018,6 +1018,17 @@ ALTER TABLE teacher_quiz_classes
 ALTER TABLE teacher_quiz_items
   ADD CONSTRAINT teacher_quiz_items_teacher_quiz_id_fkey
   FOREIGN KEY (teacher_quiz_id) REFERENCES teacher_quizzes(teacher_quiz_id);
+
+-- Forward-ref FKs deferred here because teacher_cohorts and
+-- teacher_courses are defined later in the file (5.11 / 5.10)
+-- than teacher_classes and teacher_quizzes (5.2 / 5.5).
+ALTER TABLE teacher_classes
+  ADD CONSTRAINT teacher_classes_cohort_id_fkey
+  FOREIGN KEY (cohort_id) REFERENCES teacher_cohorts(cohort_id);
+
+ALTER TABLE teacher_quizzes
+  ADD CONSTRAINT teacher_quizzes_course_id_fkey
+  FOREIGN KEY (course_id) REFERENCES teacher_courses(course_id);
 
 
 -- ────────────────────────────────────────────────────────────
