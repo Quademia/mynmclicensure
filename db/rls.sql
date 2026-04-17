@@ -580,6 +580,29 @@ ON config FOR DELETE
 USING (auth_user_role() = 'ADMIN');
 
 
+-- 15a. teacher_config
+-- MyTeacher mirror of config. Any logged-in user reads;
+-- only MyTeacher admins write.
+
+DROP POLICY IF EXISTS "dev_allow_all" ON teacher_config;
+
+CREATE POLICY "teacher_config_select"
+ON teacher_config FOR SELECT
+USING (auth.uid() IS NOT NULL);
+
+CREATE POLICY "teacher_config_insert"
+ON teacher_config FOR INSERT
+WITH CHECK (myteacher_user_role() = 'ADMIN');
+
+CREATE POLICY "teacher_config_update"
+ON teacher_config FOR UPDATE
+USING (myteacher_user_role() = 'ADMIN');
+
+CREATE POLICY "teacher_config_delete"
+ON teacher_config FOR DELETE
+USING (myteacher_user_role() = 'ADMIN');
+
+
 -- 16. teacher_library_courses
 -- Teachers and admins can read
 -- Admin writes only (no browser writes currently)

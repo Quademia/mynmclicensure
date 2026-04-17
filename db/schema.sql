@@ -940,6 +940,18 @@ CREATE INDEX idx_teacher_reset_requests_email   ON teacher_reset_requests(email)
 CREATE INDEX idx_teacher_reset_requests_created ON teacher_reset_requests(created_utc);
 
 
+-- 5.11a teacher_config
+-- MyTeacher runtime-tunable UX settings (future use — builder
+-- bounds, runner behaviour, import caps, etc). Mirror of the
+-- Licensure `config` table. Do NOT put worker URLs here —
+-- those live in myteacher/js/config.js with hostname detection.
+CREATE TABLE teacher_config (
+  key         TEXT PRIMARY KEY,
+  value       TEXT NOT NULL,
+  description TEXT
+);
+
+
 -- ────────────────────────────────────────────────────────────
 -- 5.12 MyTeacher FK constraints
 -- ────────────────────────────────────────────────────────────
