@@ -2,8 +2,6 @@
 -- PROD SETUP — Script 4 of 4: Seed Reference Data
 -- Paste this into the prod Supabase SQL Editor and run.
 -- Seeds reference/catalogue data only — NO users, NO test data.
--- IMPORTANT: Update payments_worker_url value below to the
--- prod payments worker URL after deploying it.
 -- ============================================================
 
 -- ── Programs ────────────────────────────────────────────────
@@ -87,7 +85,9 @@ INSERT INTO products (product_id, name, kind, status, courses_included, price_mi
   ('NAC_BASIC_PREV_ONLY',    'Basic Preventive Nursing Standalone Access',                                   'PAID', 'active', '{NAC_BASIC_PREV}',    5900, 'GHS', 365, '{JUKJGHOIU8ILUL}');
 
 -- ── Config ──────────────────────────────────────────────────
--- NOTE: payments_worker_url needs updating to the prod worker URL
+-- Runtime-tunable UX limits. The payments worker URL is NOT here —
+-- it lives in mynmclicensure/js/config.js as PAYMENTS_API_BASE
+-- (single source of truth, picked by hostname).
 
 INSERT INTO config (key, value, description) VALUES
   ('runner_questions_per_page',    '1',  'Number of questions shown per page in both instant and timed runners'),
@@ -96,8 +96,7 @@ INSERT INTO config (key, value, description) VALUES
   ('builder_default_questions',    '40', 'Default max questions allowed by builder.'),
   ('builder_minutes_per_question', '1',  'Controls minutes per question for builder'),
   ('offline_max_questions',        '100','Max questions allowed per offline pack'),
-  ('offline_packs_per_course',     '5',  'Max packs per course per subscription period'),
-  ('payments_worker_url',          'PROD_PAYMENTS_WORKER_URL_HERE', 'Deployed Cloudflare Worker base URL for payment routes');
+  ('offline_packs_per_course',     '5',  'Max packs per course per subscription period');
 
 -- ── Teacher Library Courses ─────────────────────────────────
 

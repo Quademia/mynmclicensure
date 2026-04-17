@@ -399,7 +399,6 @@
 
 let allProducts    = [];   // for filter dropdown + revenue
 let allPrograms    = [];   // for filter dropdown
-let workerUrl      = '';   // from config table
 let selectedRef    = null; // currently open panel reference
 
 // Pagination & filter state
@@ -425,14 +424,14 @@ async function init() {
   document.getElementById('adminName').textContent =
     profile.name || profile.forename || profile.email;
 
-  // Load config for worker URL, products and programmes in parallel
-  const [config, products, programs] = await Promise.all([
-    getConfig(),
+  // Load products and programmes in parallel
+  // Worker URL comes from PAYMENTS_API_BASE in mynmclicensure/js/config.js —
+  // single source of truth across all payment calls.
+  const [products, programs] = await Promise.all([
     getAllProducts(),
     getPrograms()
   ]);
 
-  workerUrl  = (config.payments_worker_url || '').trim().replace(/\/+$/, '');
   allProducts = products;
   allPrograms = programs;
 
@@ -784,17 +783,11 @@ async function retryActivation(reference) {
   const wrnEl = document.getElementById('panelWarn');
   [errEl, sucEl, wrnEl].forEach(el => el.classList.remove('show'));
 
-  if (!workerUrl) {
-    errEl.textContent = 'Worker URL not configured in config table (payments_worker_url).';
-    errEl.classList.add('show');
-    return;
-  }
-
   btn.disabled = true;
   btn.textContent = 'Retrying…';
 
   try {
-    const res = await fetch(`${workerUrl}/payments/verify?reference=${encodeURIComponent(reference)}`);
+    const res = await fetch(`${PAYMENTS_API_BASE}/payments/verify?reference=${encodeURIComponent(reference)}`);
     const data = await res.json().catch(() => null);
 
     if (!res.ok || !data?.ok) {
