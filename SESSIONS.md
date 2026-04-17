@@ -49,8 +49,22 @@ Newest session on top.
   - **Missing PostgREST FKs (7 of them)** — `add_missing_teacher_fks_part2.sql`. Prod was missing every parent-child FK on teacher_ tables (class_id, teacher_quiz_id refs) that dev had. This blocked PostgREST nested-select embeds (`.select('teacher_classes(...)')`) used across the app, including the student "my classes" page. Zero orphans, added directly. Required `NOTIFY pgrst, 'reload schema'` post-apply.
   - **retryActivation worker URL** — admin payments page read the worker URL from the DB `config` table (`payments_worker_url`), not from `config.js`. DB row was stale pointing to a worker that no longer exists. Refactored `retryActivation()` to use `PAYMENTS_API_BASE` directly (single source of truth), removed the DB config row from dev + prod, and dropped it from `prod-setup/04_seed_data.sql`. Dev had the same stale URL — never noticed because retry wasn't exercised during dev smoke.
 - **Paystack launch blocker flagged on BUILD_LIST** — prod payment worker is currently using Paystack TEST keys (revealed during step 7). Must swap to LIVE keys via Cloudflare dashboard before real customers arrive.
+- **`teacher_config` table added** (`db/migrations/add_teacher_config_table.sql`) — empty MyTeacher mirror of the Licensure `config` table. Any logged-in user can SELECT, only MyTeacher admins can write. Future feature migrations will add their own keys. Applied to dev + prod.
 
-### Next session
-- **Resume MyTeacher feature audit** (paused earlier at user's request — one-thing-at-a-time). Re-test feature by feature systematically — we found 2 latent bugs today in one smoke pass, there are almost certainly more in less-travelled flows (quiz publish, quiz attempt, results, bank import, etc).
-- **Launch blockers from BUILD_LIST** — remove test accounts (MANUAL_TEST rows), email confirmation flow (5 items), custom domain on Cloudflare, question bank content review.
-- **Stale `db/prod-setup/01_tables.sql`** — rebuild from schema.sql when there's a window. Today's discoveries prove this file is a real liability — every missing declaration is a time bomb for fresh prod bootstraps.
+### Next session — priority 1
+- **Library tables rename** — `library_X` → `teacher_library_X` for all 10 library_* tables (accounting, anatomy, english, government, management, microbiology, pharmacology, physiology, sociology, surveying). All tables empty on dev + prod (verified), so pure DDL rename + update `teacher_library_courses.items_table` seed values. **Zero code changes needed** because `resolveLibraryRefs()` in myteacher-api.js reads table names dynamically from the DB column, not from a JS constant. Steps:
+  1. Create migration `db/migrations/rename_library_tables_to_teacher_library.sql`
+  2. `ALTER TABLE library_X RENAME TO teacher_library_X` × 10
+  3. `UPDATE teacher_library_courses SET items_table = REPLACE(items_table, 'library_', 'teacher_library_')`
+  4. `NOTIFY pgrst, 'reload schema'`
+  5. Apply to dev, then prod
+  6. Update `db/schema.sql` (section 5.9b — CREATE TABLE library_anatomy + 9 sibling comments)
+  7. Update `db/rls.sql` (RLS policies on the library_* tables)
+  8. Update `db/prod-setup/04_seed_data.sql` (seed row `items_table` values)
+  9. Update `docs/question-schema-plan.md` examples
+  10. SKIP `db/prod-setup/01_tables.sql` + `03_rls.sql` — already stale, need full rebuild as a separate task
+
+### Next session — other
+- **Resume MyTeacher feature audit** — re-test feature by feature systematically. Today's smoke pass surfaced 5 latent bugs; less-travelled flows (quiz publish, quiz attempt, results, bank import) almost certainly have more.
+- **Launch blockers from BUILD_LIST** — remove test accounts (MANUAL_TEST rows), email confirmation flow (5 items), custom domain on Cloudflare, question bank content review, Paystack TEST→LIVE keys.
+- **Stale `db/prod-setup/01_tables.sql` + `03_rls.sql`** — rebuild from `schema.sql` + `rls.sql` when there's a window. Today's discoveries prove these files are a real liability — every missing declaration is a time bomb for fresh prod bootstraps.
