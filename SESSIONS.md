@@ -5,6 +5,49 @@ Newest session on top.
 
 ---
 
+## Session — 2026-04-18 (Licensure question-bank inventory — Claude Code)
+
+### Focus
+Shifted attention to MyNMCLicensure launch readiness. Inventoried prod `items_*` tables to understand question-bank state before any content work.
+
+### Prod `items_*` inventory
+11 tables, **5,280 questions total**. Schema uniform (25 cols). Per-table set-coverage against user's target set sizes (GP=100/set, all others=180/set):
+
+| Course | Rows | Sets available | Gap |
+|---|---:|---|---:|
+| GP | 600 | 6 sets of 100 | ✓ |
+| RN_MED | 900 | 5 sets of 180 | ✓ |
+| RN_SURG | 900 | 5 sets of 180 | ✓ |
+| RM_PED_OBS_HRN | 1,080 | 6 sets of 180 | ✓ |
+| **RM_MID** | **540** | **3 sets of 180** | **+360 to reach 5 sets** |
+| RMHN_PSYCH_NURS | 360 | 2 sets of 180 | (target tbd) |
+| RMHN_PSYCH_PPHARM | 360 | 2 sets of 180 | (target tbd) |
+| NAC_BASIC_CLIN | 180 | 1 set | (target tbd) |
+| NAC_BASIC_PREV | 180 | 1 set | (target tbd) |
+| RPHN_PPHN | 180 | 1 set | (target tbd) |
+| **RPHN_DISEASE_CTRL** | **0** | **empty** | **course is `status='active'` — broken for RPHN students** |
+
+### Observations
+- 99.94% MCQ / 0.06% SATA (only 3 SATA rows in the entire bank of 5,280).
+- Data hygiene good: **zero null rationales**, **zero null batch_id** — every question traceable to an import batch and has an explanation.
+- Difficulty spread: 46% Easy / 40% Moderate / 14% Hard.
+- `items_gp` has **149 distinct `subject` values** (others have 1–2) — cross-cutting course, but worth a normalisation pass for typos/inconsistencies at some point.
+
+### Blocker surfaced — source material gap
+User does not currently have NMC Ghana midwifery syllabus, WHO maternal/newborn PDFs, Ghana Standard Treatment Guidelines, or a reference midwifery textbook (Myles etc). **Any questions generated without authoritative sources would be plausible-but-unverified — not shippable** for a licensure prep platform. Session ended here so user can try to collect materials between sessions.
+
+No code changes, no commits beyond this docs update.
+
+### Next session — priority 1
+Confirm what source material is now in hand. **Minimum viable bundle:** NMC Ghana midwifery syllabus + 2–3 WHO maternal/newborn guideline PDFs (antenatal, intrapartum, postnatal, MCPC) + Ghana STG obstetric sections. Free sources listed in-chat this session. Once those land, build a topic-weighted plan for the +360 Midwifery gap.
+
+### Next session — other
+- **`items_rphn_disease_ctrl` empty-but-active** — holding fix: flip course `status` to `'inactive'` so RPHN cohort doesn't see a broken course at launch. Proper fix: seed questions.
+- **Set-size targets** for RMHN / NACNAP / RPHN — decide whether those courses also need the "5 sets" standard or can launch with current volume.
+- **Remaining Launch Blockers** — email confirmation flow (5 items), MANUAL_TEST account cleanup, custom domain, Paystack TEST→LIVE key swap.
+
+---
+
 ## Session — 2026-04-17 (db/ consolidation — Claude Web + Claude Desktop)
 
 ### Audit findings (Phase 1)

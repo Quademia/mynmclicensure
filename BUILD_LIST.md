@@ -15,6 +15,9 @@ These must be done before real users touch the platform.
 - [ ] Set up custom domain on Cloudflare
 - [ ] Remove test accounts (MANUAL_TEST rows)
 - [ ] Review and clean up question bank content
+- [ ] **`items_rphn_disease_ctrl` empty but course `status='active'`** — RPHN cohort would see a broken course at launch. Holding fix: flip status to `'inactive'`. Proper fix: seed questions (blocked on source material).
+- [ ] **RM_MID question-bank gap** — 540 questions, 3 sets of 180. Target is 5 sets per course → needs +360 questions. Blocked on acquiring NMC Ghana midwifery syllabus + WHO/GHS reference PDFs before authoring can start.
+- [ ] **Set-size targets for RMHN / NACNAP / RPHN courses** — decide whether to hold to "5 sets of 180" for these too (currently 1–2 sets each) or launch with current volume.
 - [ ] **Swap Paystack secret on prod payment worker from TEST → LIVE key.** Currently prod uses Paystack test keys, so no real customer can complete a payment. Live key must be set via Cloudflare dashboard on `qacademy-licensure-payment-worker` before real users arrive.
 
 ### Email Confirmation (on hold — required before real users)
