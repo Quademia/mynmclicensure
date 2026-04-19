@@ -25,6 +25,9 @@ Newest session on top.
 - First build session: initialise Next.js + hello-world deploy to prove
   Cloudflare Workers + OpenNext pipeline
 
+### Update (later same day)
+- MyNclex Next.js scaffold + OpenNext + `--webpack` workaround committed; hello-world deployed to dev Worker at https://qacademy-dev-mynclex.mybackpacc.workers.dev (HTTP 200).
+
 ---
 
 ## Session — 2026-04-18 (Licensure question-bank inventory — Claude Code)
