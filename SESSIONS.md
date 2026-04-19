@@ -5,6 +5,28 @@ Newest session on top.
 
 ---
 
+## Session — 2026-04-19 (MyNclex scope + skeleton — Claude Web)
+
+### Done
+- Scope settled: MyNclex = QAcademy-owned NCLEX-RN bank + vetted-tutor
+  programmes layer. v1 deferrals documented (CAT, NGN, public tutor
+  signup, payment splits, sibling migrations).
+- Stack locked: Next.js 16 + OpenNext + Cloudflare Workers + Supabase
+  (shared) + @supabase/ssr.
+- Repo placement: `mynclex/` folder inside qacademy-gamma, deployed as
+  own Worker watching only that path. Monorepo today, mentally three
+  repos. Table prefix `nclex_`.
+- Skeleton created: `mynclex/CLAUDE.md` + folder structure (app, lib,
+  public, db/migrations, workers) with .gitkeep placeholders.
+- No code, no build config yet. Design phase begins next.
+
+### Next session
+- Return with visual designs / artefacts from design phase
+- First build session: initialise Next.js + hello-world deploy to prove
+  Cloudflare Workers + OpenNext pipeline
+
+---
+
 ## Session — 2026-04-18 (Licensure question-bank inventory — Claude Code)
 
 ### Focus
