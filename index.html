@@ -107,9 +107,10 @@ main{
 
 /* ── PRODUCT CARDS ── */
 .products{
-  display:grid;grid-template-columns:1fr 1fr;gap:1rem;
-  width:100%;max-width:700px;margin-bottom:1.75rem;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;
+  width:100%;max-width:1080px;margin-bottom:1.75rem;
 }
+@media(max-width:920px){.products{grid-template-columns:1fr 1fr;max-width:700px}}
 @media(max-width:580px){.products{grid-template-columns:1fr}}
 
 .product-card{
