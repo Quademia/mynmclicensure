@@ -2,9 +2,15 @@
 *Last updated: April 2026*
 
 ## What This Is
-QAcademy Nurses Hub is a web-based learning management system for nursing students in Ghana preparing for NMC licensure exams. It serves five programmes: RN, RM, RPHN, RMHN, and NACNAP.
+QAcademy Nurses Hub is a web-based learning management system for nursing students. It houses three products under one repo:
+- **MyNMCLicensure** — NMC Ghana licensure exam prep (5 programmes: RN, RM, RPHN, RMHN, NACNAP)
+- **MyTeacher** — class-based assessment for teachers and institutions
+- **MyNclex** — NCLEX-RN exam prep for internationally-trained nurses (design/build phase, launching 2026)
+
+The first two run on the legacy vanilla-JS + Cloudflare Pages stack. MyNclex is the first product on the new Next.js + Cloudflare Workers stack; MyNMCLicensure and MyTeacher will migrate to it later, one at a time.
 
 ## Stack
+### Legacy products (MyNMCLicensure, MyTeacher)
 | Layer | Technology |
 |---|---|
 | Frontend | Vanilla HTML / CSS / JS — no build step |
@@ -14,9 +20,24 @@ QAcademy Nurses Hub is a web-based learning management system for nursing studen
 | Emails | Resend API — Cloudflare Workers (`mynmclicensure/workers/email-worker/`, `myteacher/workers/email-worker/`) |
 | Messaging | Built-in thread-based system (Supabase) |
 
-No separate backend server. Everything is JAMstack. Workers are isolated to payments and emails only.
+Workers are isolated to payments and emails only; business logic otherwise lives in the browser guarded by Supabase RLS.
+
+### MyNclex (new stack)
+| Layer | Technology |
+|---|---|
+| Frontend / SSR | Next.js 16 (App Router) + React 19 + TypeScript + Tailwind 4 |
+| Hosting | Cloudflare Workers via `@opennextjs/cloudflare` (OpenNext) |
+| Database & Auth | Supabase (shared instance, `nclex_*`-prefixed tables) |
+| Auth bridge | `@supabase/ssr` for cookie-based server-side sessions |
+| Payments | Paystack (worker TBD when payments come in scope) |
+| Emails | Resend via a dedicated MyNclex worker (TBD) |
+
+Server Components + Route Handlers run business logic server-side; the browser gets rendered HTML. RLS is kept as a defence-in-depth backstop, not the primary gate.
+
+**Known workaround:** MyNclex builds pass `--webpack` to `next build` because `@opennextjs/cloudflare` 1.19.x doesn't yet support Turbopack's chunk layout. Drop the flag once OpenNext adds Turbopack support. See `mynclex/CLAUDE.md` → "Known Workarounds".
 
 ### Environments
+Legacy products (Pages):
 | | Dev | Prod |
 |--|-----|------|
 | **Repo** | `mybackpacc-byte/qacademy-gamma` | `mybackpacc-byte/qacademy-gamma` |
@@ -25,11 +46,16 @@ No separate backend server. Everything is JAMstack. Workers are isolated to paym
 
 `js/config.js` auto-detects dev vs prod by hostname. See `CLONING.md` for full environment details.
 
+MyNclex (Worker):
+| | Dev | Prod |
+|--|-----|------|
+| **Worker** | `qacademy-dev-mynclex.mybackpacc.workers.dev` | not yet deployed |
+
 ---
 
 ## Project Structure
 
-The project is organised into two independent products under a shared root:
+The project is organised into three independent products under a shared root. The first two are vanilla-JS (same hosting); MyNclex is a self-contained Next.js app deployed as its own Cloudflare Worker:
 
 ```
 qacademy-gamma/
@@ -47,17 +73,31 @@ qacademy-gamma/
     teacher/               ← 9 teacher pages
     student/               ← 5 student pages
     login.html, register.html, etc.
+  mynclex/                 ← MyNclex (NCLEX-RN) — Next.js app, own Cloudflare Worker
+    CLAUDE.md              ← MyNclex scope, stack, non-negotiables (incl. extraction rule)
+    app/                   ← Next.js App Router pages (landing page + landing.css + icon.png)
+    components/            ← Reusable React components (empty — build phase)
+    lib/                   ← Supabase client helpers, utilities (empty — build phase)
+    public/                ← Static assets (qacademy-logo.png)
+    db/                    ← MyNclex-specific schema + migrations (nclex_* prefixed)
+    workers/               ← Dedicated MyNclex workers (email, etc. — TBD)
+    docs/                  ← product-plan.md (living scope/TBD doc)
+    next.config.ts, wrangler.jsonc, open-next.config.ts, package.json
   js/
-    config.js              ← Supabase credentials (shared — both products load this)
+    config.js              ← Supabase credentials (shared — legacy products load this)
   archive/
     css/style.css          ← Original root stylesheet (archived — no active references)
   mynmclicensure/workers/payment-worker/ ← Licensure payment worker (Cloudflare)
   mynmclicensure/workers/email-worker/   ← Licensure email worker (Cloudflare)
   myteacher/workers/email-worker/        ← MyTeacher email worker (Cloudflare)
   db/                      ← Schema, RLS, seed data, migrations, setup runbooks (see db/README.md)
-  product-select.html      ← Product selector (self-contained, inline styles)
-  index.html               ← Home / landing page
+  images/QAcademy_Logo.png ← Master QAcademy logo (legacy products reference directly)
+  product-select.html      ← Product selector (includes MyNclex with "Launching 2026" pill)
+  index.html               ← Home / landing page (three-product grid)
 ```
+
+### MyNclex isolation rules
+MyNclex never imports code from `mynmclicensure/` or `myteacher/` (or vice versa). All MyNclex database objects are prefixed `nclex_`. `mynclex/` must remain portable to its own repo + own Supabase project at any time — see `mynclex/CLAUDE.md` for the full "extraction test" discipline.
 
 ### Path Configuration
 

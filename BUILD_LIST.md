@@ -101,9 +101,11 @@ When MyTeacher was carved out, every new MyTeacher table got a `teacher_` prefix
 - You have a clear window to deploy and smoke-test before real users hit prod
 
 ### Move Business Logic Server-Side
-- [ ] Look into new stack that offers proper backend — almost all business logic lives in the browser
-- [ ] DB transactions for multi-step ops (quiz publish, subscription assign)
-- [ ] Create Supabase RPCs or worker endpoints for admin bulk ops, subscription assignment, quiz publish, result release
+- [x] Look into new stack that offers proper backend — **decided April 2026**: Next.js 16 + OpenNext + Cloudflare Workers + Supabase (shared Postgres + Auth) + `@supabase/ssr`. First product on the new stack is MyNclex (`mynclex/` folder). MyNMCLicensure and MyTeacher migrate one at a time later.
+- [ ] Migrate MyNMCLicensure to the new stack (one product at a time, no data migration — tables already isolated)
+- [ ] Migrate MyTeacher to the new stack
+- [ ] DB transactions for multi-step ops (quiz publish, subscription assign) — still relevant for the legacy products until they migrate
+- [ ] Create Supabase RPCs or worker endpoints for admin bulk ops, subscription assignment, quiz publish, result release — bridge solutions on the legacy stack; new stack handles these server-side natively
 - [ ] Correlation IDs on key flows (payment, join, publish, submission)
 - [ ] Explore moving config from the front end
 

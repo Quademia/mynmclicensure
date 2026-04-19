@@ -25,8 +25,59 @@ Newest session on top.
 - First build session: initialise Next.js + hello-world deploy to prove
   Cloudflare Workers + OpenNext pipeline
 
-### Update (later same day)
-- MyNclex Next.js scaffold + OpenNext + `--webpack` workaround committed; hello-world deployed to dev Worker at https://qacademy-dev-mynclex.mybackpacc.workers.dev (HTTP 200).
+### Update — same day, build session (Claude Code)
+Design phase produced a full launching-2026 landing page, so we
+ran the full first-build sequence in one sitting:
+
+- **Scaffold** — `create-next-app` (App Router, TS, Tailwind, ESLint,
+  flat layout). Cloudflare bits added manually to mirror `qacademy-beta-b`:
+  `wrangler.jsonc`, `open-next.config.ts`, `@opennextjs/cloudflare` +
+  `wrangler` deps, `cf:build`/`cf:dev`/`cf:deploy` scripts.
+  - `c3` and `create-cloudflare` failed due to TTY requirements in the
+    bash tool — fell back to `create-next-app` direct + manual Cloudflare
+    wiring.
+- **Turbopack workaround** — Next.js 16 defaults to Turbopack for
+  production; `@opennextjs/cloudflare` 1.19.x doesn't yet handle Turbopack
+  chunk layout (`ChunkLoadError` at first SSR request). Fixed by passing
+  `--webpack` to both `build` and `cf:build`. Documented in
+  `mynclex/CLAUDE.md` (Known Workarounds) and `docs/product-plan.md` (TBD).
+- **First deploy** — `qacademy-dev-mynclex` Worker, named per sibling
+  convention (`qacademy-dev-{product}[-{purpose}]`). Live at
+  https://qacademy-dev-mynclex.mybackpacc.workers.dev (HTTP 200).
+- **Landing page translated** — HTML design → JSX in `app/page.tsx`
+  (client component for `onSubmit`), full CSS in `app/landing.css`
+  verbatim, Inter (weights 300–800) via `next/font/google` in `layout.tsx`,
+  metadata updated. Footer `<a>` dropped to plain text per scope.
+- **H1 wrap fix** — Added `white-space: nowrap` to the `h1` rule after
+  observing browsers break at the hyphen in `MyNclex-RN` on wider
+  viewports where the clamped font-size approached the 620px hero
+  container.
+- **Site integration** — Added MyNclex-RN card to `index.html` (third
+  product card, pulse-line SVG icon, "Launching 2026" status pill, links
+  to dev Worker) and to `product-select.html` (third sign-in button with
+  the same pill). Introduced `.card-tag-status` (index) and
+  `.product-status-pill` (product-select) CSS classes.
+- **Responsive grid** — `.products` grid bumped to `repeat(3, 1fr)` with
+  `max-width: 1080px` on desktop so all three cards sit on one row above
+  920px. 920px breakpoint drops back to 2-column; 580px to 1-column.
+- **Logo assets** — Copied `images/QAcademy_Logo.png` (989 KB) to
+  `mynclex/public/qacademy-logo.png` to preserve the extraction
+  discipline (`mynclex/` must stay portable to its own repo + own
+  Supabase project later).
+- **Favicon** — Replaced the scaffolded Next.js "N" `favicon.ico` with a
+  256×256 PNG derived from the QAcademy logo (one-off resize via `sharp`
+  as a temporary devDep; `sharp` uninstalled after). `<link rel="icon">`
+  auto-injected by Next.js App Router icon convention.
+
+Commits (newest last): `faeff31`, `0102e71`, `516e792`, `5850b7b`,
+`c497f92`, `7f3ff2c`, `a5233cf`.
+
+### Next session
+- Design-phase artefacts for post-launch MyNclex screens (auth, bank,
+  tutored programmes) — feed into `mynclex/docs/product-plan.md` TBDs
+- First real feature slice: wire `@supabase/ssr` + `nclex_*` table plan
+- Watch for `@opennextjs/cloudflare` release that supports Turbopack; drop
+  `--webpack` once available
 
 ---
 
