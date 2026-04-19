@@ -5,6 +5,16 @@ Newest session on top.
 
 ---
 
+## Session — 2026-04-19 (MyNclex planning — Claude Web)
+
+Product-planning session for MyNclex. Roles, Journey Tracker,
+Programme Structure, Tutor Onboarding, and Pricing all settled in
+`mynclex/docs/product-plan.md`. MyNclex now has its own product-
+local session log at `mynclex/SESSIONS.md` — detailed MyNclex
+entries live there going forward.
+
+---
+
 ## Session — 2026-04-19 (MyNclex scope + skeleton — Claude Web)
 
 ### Done
