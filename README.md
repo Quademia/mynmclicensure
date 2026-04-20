@@ -81,7 +81,7 @@ qacademy-gamma/
     public/                ← Static assets (qacademy-logo.png)
     db/                    ← MyNclex-specific schema + migrations (nclex_* prefixed)
     workers/               ← Dedicated MyNclex workers (email, etc. — TBD)
-    docs/                  ← product-plan.md (living scope/TBD doc)
+    docs/                  ← product-plan/ (main.md + per-topic deep-dives)
     next.config.ts, wrangler.jsonc, open-next.config.ts, package.json
   js/
     config.js              ← Supabase credentials (shared — legacy products load this)

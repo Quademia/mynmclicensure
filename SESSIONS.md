@@ -84,7 +84,7 @@ Commits (newest last): `faeff31`, `0102e71`, `516e792`, `5850b7b`,
 
 ### Next session
 - Design-phase artefacts for post-launch MyNclex screens (auth, bank,
-  tutored programmes) — feed into `mynclex/docs/product-plan.md` TBDs
+  tutored programmes) — feed into `mynclex/docs/product-plan/main.md` TBDs
 - First real feature slice: wire `@supabase/ssr` + `nclex_*` table plan
 - Watch for `@opennextjs/cloudflare` release that supports Turbopack; drop
   `--webpack` once available
