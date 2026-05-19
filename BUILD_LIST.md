@@ -15,6 +15,9 @@ These must be done before real users touch the platform.
 - [ ] Set up custom domain on Cloudflare
 - [ ] Remove test accounts (MANUAL_TEST rows)
 - [ ] Review and clean up question bank content
+- [ ] **`items_rphn_disease_ctrl` empty but course `status='active'`** — RPHN cohort would see a broken course at launch. Holding fix: flip status to `'inactive'`. Proper fix: seed questions (blocked on source material).
+- [ ] **RM_MID question-bank gap** — 540 questions, 3 sets of 180. Target is 5 sets per course → needs +360 questions. Blocked on acquiring NMC Ghana midwifery syllabus + WHO/GHS reference PDFs before authoring can start.
+- [ ] **Set-size targets for RMHN / NACNAP / RPHN courses** — decide whether to hold to "5 sets of 180" for these too (currently 1–2 sets each) or launch with current volume.
 - [ ] **Swap Paystack secret on prod payment worker from TEST → LIVE key.** Currently prod uses Paystack test keys, so no real customer can complete a payment. Live key must be set via Cloudflare dashboard on `qacademy-licensure-payment-worker` before real users arrive.
 
 ### Email Confirmation (on hold — required before real users)
@@ -42,7 +45,7 @@ Important but won't block the free trial. Real user feedback will help prioritis
 - [ ] users.last_login_utc — wire up or drop
 - [ ] users.username — wire up or drop
 - [ ] README and CLONING files need updating to reflect current folder structure and My Teacher naming
-- [ ] `db/prod-setup/01_tables.sql` is stale — missing all MyTeacher auth-split tables (teacher_users, teacher_sessions, teacher_auth_events, teacher_reset_requests) and the MyTeacher FK block. Rebuild from `db/schema.sql` before the next prod bootstrap.
+- [ ] **Tighten library item table SELECT policy** — the 10 `teacher_library_X` tables allow unauthenticated SELECT (role `public`, qual `true`). `teacher_library_courses` requires `auth.uid() IS NOT NULL`. Align for consistency. Library content isn't secret so low priority, but cheap: 10 policy drops + recreates.
 
 ### Product Separation
 - [x] Auth split complete — each product has own user table, session table, guard/auth JS, and auth pages (see docs/sprints/myteacher-clean-split.md)
@@ -79,7 +82,7 @@ When MyTeacher was carved out, every new MyTeacher table got a `teacher_` prefix
 - All RLS policies in `db/rls.sql` reference table names in subqueries and need rewriting
 - All RPCs (`log_auth_event`, `check_login_rate_limit`, `auth_user_role`, `auth_user_id`, etc.) embed table names in SQL bodies — drop and recreate
 - ~80–100 `db.from('users')`-style call sites in `mynmclicensure-api.js`, `guard.js`, `auth.js`, sidebars, and pages — every one must change
-- `db/schema.sql` and all four `db/prod-setup/*.sql` bootstrap scripts get rewritten
+- `db/schema.sql`, `db/rls.sql`, and `db/seed_data.sql` all get rewritten
 - Migration runs twice: dev Supabase first, smoke-test, then prod
 - Any missed call site silently breaks at runtime ("table does not exist") only when a real user hits it
 
@@ -98,9 +101,11 @@ When MyTeacher was carved out, every new MyTeacher table got a `teacher_` prefix
 - You have a clear window to deploy and smoke-test before real users hit prod
 
 ### Move Business Logic Server-Side
-- [ ] Look into new stack that offers proper backend — almost all business logic lives in the browser
-- [ ] DB transactions for multi-step ops (quiz publish, subscription assign)
-- [ ] Create Supabase RPCs or worker endpoints for admin bulk ops, subscription assignment, quiz publish, result release
+- [x] Look into new stack that offers proper backend — **decided April 2026**: Next.js 16 + OpenNext + Cloudflare Workers + Supabase (shared Postgres + Auth) + `@supabase/ssr`. First product on the new stack is MyNclex (`mynclex/` folder). MyNMCLicensure and MyTeacher migrate one at a time later.
+- [ ] Migrate MyNMCLicensure to the new stack (one product at a time, no data migration — tables already isolated)
+- [ ] Migrate MyTeacher to the new stack
+- [ ] DB transactions for multi-step ops (quiz publish, subscription assign) — still relevant for the legacy products until they migrate
+- [ ] Create Supabase RPCs or worker endpoints for admin bulk ops, subscription assignment, quiz publish, result release — bridge solutions on the legacy stack; new stack handles these server-side natively
 - [ ] Correlation IDs on key flows (payment, join, publish, submission)
 - [ ] Explore moving config from the front end
 

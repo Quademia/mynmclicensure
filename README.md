@@ -1,10 +1,15 @@
 # QAcademy Nurses Hub — README
-*Last updated: April 2026*
+*Last updated: May 2026*
 
 ## What This Is
-QAcademy Nurses Hub is a web-based learning management system for nursing students in Ghana preparing for NMC licensure exams. It serves five programmes: RN, RM, RPHN, RMHN, and NACNAP.
+QAcademy Nurses Hub is a web-based learning management system for nursing students. It houses two products under one repo:
+- **MyNMCLicensure** — NMC Ghana licensure exam prep (5 programmes: RN, RM, RPHN, RMHN, NACNAP)
+- **MyTeacher** — class-based assessment for teachers and institutions
+
+A third product, **MyNclex** (NCLEX-RN exam prep for internationally-trained nurses), used to live in `mynclex/` inside this repo but has been **decoupled into its own repository** at [QAcademy-Nurses/mynclex](https://github.com/QAcademy-Nurses/mynclex). It runs on a new Next.js 16 + Cloudflare Workers stack (SSR via `@opennextjs/cloudflare`, `@supabase/ssr` for cookie auth, `nclex_*`-prefixed tables in its own Supabase project). MyNMCLicensure and MyTeacher will eventually migrate onto the same/similar stack, one at a time.
 
 ## Stack
+### Legacy products (MyNMCLicensure, MyTeacher)
 | Layer | Technology |
 |---|---|
 | Frontend | Vanilla HTML / CSS / JS — no build step |
@@ -14,7 +19,7 @@ QAcademy Nurses Hub is a web-based learning management system for nursing studen
 | Emails | Resend API — Cloudflare Workers (`mynmclicensure/workers/email-worker/`, `myteacher/workers/email-worker/`) |
 | Messaging | Built-in thread-based system (Supabase) |
 
-No separate backend server. Everything is JAMstack. Workers are isolated to payments and emails only.
+Workers are isolated to payments and emails only; business logic otherwise lives in the browser guarded by Supabase RLS.
 
 ### Environments
 | | Dev | Prod |
@@ -29,7 +34,7 @@ No separate backend server. Everything is JAMstack. Workers are isolated to paym
 
 ## Project Structure
 
-The project is organised into two independent products under a shared root:
+The project is organised into two independent vanilla-JS products under a shared root, deployed together to the same Cloudflare Pages site:
 
 ```
 qacademy-gamma/
@@ -47,16 +52,15 @@ qacademy-gamma/
     teacher/               ← 9 teacher pages
     student/               ← 5 student pages
     login.html, register.html, etc.
-  js/
-    config.js              ← Supabase credentials (shared — both products load this)
   archive/
     css/style.css          ← Original root stylesheet (archived — no active references)
   mynmclicensure/workers/payment-worker/ ← Licensure payment worker (Cloudflare)
   mynmclicensure/workers/email-worker/   ← Licensure email worker (Cloudflare)
   myteacher/workers/email-worker/        ← MyTeacher email worker (Cloudflare)
-  db/                      ← Schema, RLS, migrations, prod setup scripts
-  product-select.html      ← Product selector (self-contained, inline styles)
-  index.html               ← Home / landing page
+  db/                      ← Schema, RLS, seed data, migrations, setup runbooks (see db/README.md)
+  images/QAcademy_Logo.png ← Master QAcademy logo (legacy products reference directly)
+  product-select.html      ← Product selector (Licensure + MyTeacher, plus an external link to the standalone MyNclex Worker)
+  index.html               ← Home / landing page (product grid; the MyNclex card links out to its own deployed Worker)
 ```
 
 ### Path Configuration

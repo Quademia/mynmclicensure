@@ -43,6 +43,8 @@ $$;
 -- No browser DELETE.
 -- Worker uses service role key — bypasses RLS.
 
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON users;
 
 CREATE POLICY "users_select"
@@ -72,6 +74,8 @@ USING (
 -- Admins read all rows and can insert/update from browser.
 -- All other writes go through worker (service role, bypasses RLS).
 -- No browser DELETE.
+
+ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "dev_allow_all" ON subscriptions;
 
@@ -115,6 +119,8 @@ USING (
 -- All writes go through worker (service role, bypasses RLS).
 -- Students cannot read payment rows at all.
 
+ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON payments;
 
 CREATE POLICY "payments_select"
@@ -151,6 +157,8 @@ $$;
 -- Teachers update their own row; admins update any row.
 -- No browser DELETE.
 
+ALTER TABLE teacher_profiles ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON teacher_profiles;
 
 CREATE POLICY "teacher_profiles_select"
@@ -178,6 +186,8 @@ USING (
 -- Admin reads all
 -- No DELETE — items are soft-archived via status = 'ARCHIVED'
 -- No student access — students see snapshots in teacher_quiz_items
+
+ALTER TABLE teacher_bank_items ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "dev_allow_all" ON teacher_bank_items;
 
@@ -207,6 +217,8 @@ USING (
 -- (covers student join_code lookup and class card display).
 -- Admins read all.
 -- No browser DELETE.
+
+ALTER TABLE teacher_classes ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "dev_allow_all" ON teacher_classes;
 
@@ -239,6 +251,8 @@ USING (
 -- teacher_class_members — no circular reference here).
 -- Admins read all.
 -- No browser DELETE (archive = UPDATE status to ARCHIVED).
+
+ALTER TABLE teacher_quizzes ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "dev_allow_all" ON teacher_quizzes;
 
@@ -279,6 +293,8 @@ USING (
 -- Teachers read and write their own rows only.
 -- Admin reads all. No browser DELETE — archive via status.
 
+ALTER TABLE teacher_programmes ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON teacher_programmes;
 
 CREATE POLICY "teacher_programmes_select" ON teacher_programmes
@@ -297,6 +313,8 @@ CREATE POLICY "teacher_programmes_update" ON teacher_programmes
     teacher_id = myteacher_user_id()
   );
 
+ALTER TABLE teacher_cohorts ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON teacher_cohorts;
 
 CREATE POLICY "teacher_cohorts_select" ON teacher_cohorts
@@ -314,6 +332,8 @@ CREATE POLICY "teacher_cohorts_update" ON teacher_cohorts
   FOR UPDATE USING (
     teacher_id = myteacher_user_id()
   );
+
+ALTER TABLE teacher_courses ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "dev_allow_all" ON teacher_courses;
 
@@ -348,6 +368,8 @@ CREATE POLICY "teacher_courses_update" ON teacher_courses
 -- own profile fields). Admins update any.
 -- No browser DELETE.
 
+ALTER TABLE teacher_class_members ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON teacher_class_members;
 
 CREATE POLICY "teacher_class_members_select"
@@ -379,6 +401,8 @@ USING (
 -- (teacher_id is directly on this table).
 -- Admins read all.
 -- No browser DELETE.
+
+ALTER TABLE teacher_quiz_attempts ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "dev_allow_all" ON teacher_quiz_attempts;
 
@@ -412,6 +436,8 @@ USING (
 -- Admins read and update all threads.
 -- No browser DELETE.
 
+ALTER TABLE messages_threads ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON messages_threads;
 
 CREATE POLICY "messages_threads_select"
@@ -440,6 +466,8 @@ USING (
 -- threads (verified via messages_threads ownership).
 -- Admins read, insert, and update all messages.
 -- No browser DELETE.
+
+ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "dev_allow_all" ON messages;
 
@@ -485,6 +513,8 @@ USING (
 -- Public SELECT (needed before login on register + index page)
 -- Admin INSERT and UPDATE only
 
+ALTER TABLE programs ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON programs;
 
 CREATE POLICY "programs_select"
@@ -503,6 +533,8 @@ USING (auth_user_role() = 'ADMIN');
 -- 12. courses
 -- Any logged-in user can read
 -- Admin writes only
+
+ALTER TABLE courses ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "dev_allow_all" ON courses;
 
@@ -523,6 +555,8 @@ USING (auth_user_role() = 'ADMIN');
 -- Any logged-in user can read (unused but keep open for future)
 -- Admin writes only
 
+ALTER TABLE levels ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON levels;
 
 CREATE POLICY "levels_select"
@@ -542,6 +576,8 @@ USING (auth_user_role() = 'ADMIN');
 -- Any logged-in user can read
 -- Admin writes only
 
+ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON products;
 
 CREATE POLICY "products_select"
@@ -560,6 +596,8 @@ USING (auth_user_role() = 'ADMIN');
 -- 15. config
 -- Any logged-in user can read
 -- Admin INSERT, UPDATE, and DELETE
+
+ALTER TABLE config ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "dev_allow_all" ON config;
 
@@ -584,6 +622,8 @@ USING (auth_user_role() = 'ADMIN');
 -- MyTeacher mirror of config. Any logged-in user reads;
 -- only MyTeacher admins write.
 
+ALTER TABLE teacher_config ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON teacher_config;
 
 CREATE POLICY "teacher_config_select"
@@ -607,6 +647,8 @@ USING (myteacher_user_role() = 'ADMIN');
 -- Teachers and admins can read
 -- Admin writes only (no browser writes currently)
 
+ALTER TABLE teacher_library_courses ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON teacher_library_courses;
 
 CREATE POLICY "teacher_library_courses_select"
@@ -622,6 +664,18 @@ ON teacher_library_courses FOR UPDATE
 USING (auth_user_role() = 'ADMIN');
 
 
+-- 16b. teacher_library_* item tables (10 tables)
+-- Each of the 10 teacher_library_X item tables (anatomy, physiology,
+-- english, accounting, government, microbiology, pharmacology,
+-- sociology, surveying, management) has one permissive SELECT policy:
+--   "Anyone can read teacher_library_X" — role public, qual: true
+-- No INSERT/UPDATE/DELETE policies (admin seeds via backend SQL).
+--
+-- TODO: tighten SELECT to "auth.uid() IS NOT NULL" for consistency
+-- with teacher_library_courses. Low priority — library content is
+-- not secret. Logged on BUILD_LIST.
+
+
 -- ────────────────────────────────────────────────────────────
 -- GROUP B (remaining): STUDENT-OWNED DATA
 -- ────────────────────────────────────────────────────────────
@@ -630,6 +684,8 @@ USING (auth_user_role() = 'ADMIN');
 -- Students read and write their own rows
 -- Admin reads all (stats on fixed-quizzes + mock-exams pages)
 -- No browser DELETE
+
+ALTER TABLE attempts ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "dev_allow_all" ON attempts;
 
@@ -658,6 +714,8 @@ USING (
 -- Admin reads all
 -- No browser DELETE (packs are deactivated not deleted)
 
+ALTER TABLE offline_packs ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON offline_packs;
 
 CREATE POLICY "offline_packs_select"
@@ -684,6 +742,8 @@ USING (
 -- Students read and upsert their own rows
 -- Admin reads all (announcement engagement stats)
 -- No browser DELETE
+
+ALTER TABLE user_notice_state ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "dev_allow_all" ON user_notice_state;
 
@@ -715,6 +775,8 @@ USING (
 -- Any logged-in user can read
 -- Admin full CRUD
 
+ALTER TABLE announcements ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON announcements;
 
 CREATE POLICY "announcements_select"
@@ -738,6 +800,8 @@ USING (auth_user_role() = 'ADMIN');
 -- Any logged-in user can read
 -- Admin full CRUD
 
+ALTER TABLE quizzes ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON quizzes;
 
 CREATE POLICY "quizzes_select"
@@ -756,6 +820,8 @@ USING (auth_user_role() = 'ADMIN');
 -- 22. mock_quizzes
 -- Any logged-in user can read
 -- Admin full CRUD
+
+ALTER TABLE mock_quizzes ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "dev_allow_all" ON mock_quizzes;
 
@@ -781,11 +847,15 @@ USING (auth_user_role() = 'ADMIN');
 --   items_rmhn_psych_nurs, items_rmhn_psych_ppharm,
 --   items_nac_basic_clin, items_nac_basic_prev
 
+ALTER TABLE items_gp ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON items_gp;
 CREATE POLICY "items_gp_select" ON items_gp FOR SELECT USING (auth.uid() IS NOT NULL);
 CREATE POLICY "items_gp_insert" ON items_gp FOR INSERT WITH CHECK (auth_user_role() = 'ADMIN');
 CREATE POLICY "items_gp_update" ON items_gp FOR UPDATE USING (auth_user_role() = 'ADMIN');
 CREATE POLICY "items_gp_delete" ON items_gp FOR DELETE USING (auth_user_role() = 'ADMIN');
+
+ALTER TABLE items_rn_med ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "dev_allow_all" ON items_rn_med;
 CREATE POLICY "items_rn_med_select" ON items_rn_med FOR SELECT USING (auth.uid() IS NOT NULL);
@@ -793,11 +863,15 @@ CREATE POLICY "items_rn_med_insert" ON items_rn_med FOR INSERT WITH CHECK (auth_
 CREATE POLICY "items_rn_med_update" ON items_rn_med FOR UPDATE USING (auth_user_role() = 'ADMIN');
 CREATE POLICY "items_rn_med_delete" ON items_rn_med FOR DELETE USING (auth_user_role() = 'ADMIN');
 
+ALTER TABLE items_rn_surg ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON items_rn_surg;
 CREATE POLICY "items_rn_surg_select" ON items_rn_surg FOR SELECT USING (auth.uid() IS NOT NULL);
 CREATE POLICY "items_rn_surg_insert" ON items_rn_surg FOR INSERT WITH CHECK (auth_user_role() = 'ADMIN');
 CREATE POLICY "items_rn_surg_update" ON items_rn_surg FOR UPDATE USING (auth_user_role() = 'ADMIN');
 CREATE POLICY "items_rn_surg_delete" ON items_rn_surg FOR DELETE USING (auth_user_role() = 'ADMIN');
+
+ALTER TABLE items_rm_ped_obs_hrn ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "dev_allow_all" ON items_rm_ped_obs_hrn;
 CREATE POLICY "items_rm_ped_obs_hrn_select" ON items_rm_ped_obs_hrn FOR SELECT USING (auth.uid() IS NOT NULL);
@@ -805,11 +879,15 @@ CREATE POLICY "items_rm_ped_obs_hrn_insert" ON items_rm_ped_obs_hrn FOR INSERT W
 CREATE POLICY "items_rm_ped_obs_hrn_update" ON items_rm_ped_obs_hrn FOR UPDATE USING (auth_user_role() = 'ADMIN');
 CREATE POLICY "items_rm_ped_obs_hrn_delete" ON items_rm_ped_obs_hrn FOR DELETE USING (auth_user_role() = 'ADMIN');
 
+ALTER TABLE items_rm_mid ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON items_rm_mid;
 CREATE POLICY "items_rm_mid_select" ON items_rm_mid FOR SELECT USING (auth.uid() IS NOT NULL);
 CREATE POLICY "items_rm_mid_insert" ON items_rm_mid FOR INSERT WITH CHECK (auth_user_role() = 'ADMIN');
 CREATE POLICY "items_rm_mid_update" ON items_rm_mid FOR UPDATE USING (auth_user_role() = 'ADMIN');
 CREATE POLICY "items_rm_mid_delete" ON items_rm_mid FOR DELETE USING (auth_user_role() = 'ADMIN');
+
+ALTER TABLE items_rphn_pphn ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "dev_allow_all" ON items_rphn_pphn;
 CREATE POLICY "items_rphn_pphn_select" ON items_rphn_pphn FOR SELECT USING (auth.uid() IS NOT NULL);
@@ -817,11 +895,15 @@ CREATE POLICY "items_rphn_pphn_insert" ON items_rphn_pphn FOR INSERT WITH CHECK 
 CREATE POLICY "items_rphn_pphn_update" ON items_rphn_pphn FOR UPDATE USING (auth_user_role() = 'ADMIN');
 CREATE POLICY "items_rphn_pphn_delete" ON items_rphn_pphn FOR DELETE USING (auth_user_role() = 'ADMIN');
 
+ALTER TABLE items_rphn_disease_ctrl ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON items_rphn_disease_ctrl;
 CREATE POLICY "items_rphn_disease_ctrl_select" ON items_rphn_disease_ctrl FOR SELECT USING (auth.uid() IS NOT NULL);
 CREATE POLICY "items_rphn_disease_ctrl_insert" ON items_rphn_disease_ctrl FOR INSERT WITH CHECK (auth_user_role() = 'ADMIN');
 CREATE POLICY "items_rphn_disease_ctrl_update" ON items_rphn_disease_ctrl FOR UPDATE USING (auth_user_role() = 'ADMIN');
 CREATE POLICY "items_rphn_disease_ctrl_delete" ON items_rphn_disease_ctrl FOR DELETE USING (auth_user_role() = 'ADMIN');
+
+ALTER TABLE items_rmhn_psych_nurs ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "dev_allow_all" ON items_rmhn_psych_nurs;
 CREATE POLICY "items_rmhn_psych_nurs_select" ON items_rmhn_psych_nurs FOR SELECT USING (auth.uid() IS NOT NULL);
@@ -829,17 +911,23 @@ CREATE POLICY "items_rmhn_psych_nurs_insert" ON items_rmhn_psych_nurs FOR INSERT
 CREATE POLICY "items_rmhn_psych_nurs_update" ON items_rmhn_psych_nurs FOR UPDATE USING (auth_user_role() = 'ADMIN');
 CREATE POLICY "items_rmhn_psych_nurs_delete" ON items_rmhn_psych_nurs FOR DELETE USING (auth_user_role() = 'ADMIN');
 
+ALTER TABLE items_rmhn_psych_ppharm ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON items_rmhn_psych_ppharm;
 CREATE POLICY "items_rmhn_psych_ppharm_select" ON items_rmhn_psych_ppharm FOR SELECT USING (auth.uid() IS NOT NULL);
 CREATE POLICY "items_rmhn_psych_ppharm_insert" ON items_rmhn_psych_ppharm FOR INSERT WITH CHECK (auth_user_role() = 'ADMIN');
 CREATE POLICY "items_rmhn_psych_ppharm_update" ON items_rmhn_psych_ppharm FOR UPDATE USING (auth_user_role() = 'ADMIN');
 CREATE POLICY "items_rmhn_psych_ppharm_delete" ON items_rmhn_psych_ppharm FOR DELETE USING (auth_user_role() = 'ADMIN');
 
+ALTER TABLE items_nac_basic_clin ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "dev_allow_all" ON items_nac_basic_clin;
 CREATE POLICY "items_nac_basic_clin_select" ON items_nac_basic_clin FOR SELECT USING (auth.uid() IS NOT NULL);
 CREATE POLICY "items_nac_basic_clin_insert" ON items_nac_basic_clin FOR INSERT WITH CHECK (auth_user_role() = 'ADMIN');
 CREATE POLICY "items_nac_basic_clin_update" ON items_nac_basic_clin FOR UPDATE USING (auth_user_role() = 'ADMIN');
 CREATE POLICY "items_nac_basic_clin_delete" ON items_nac_basic_clin FOR DELETE USING (auth_user_role() = 'ADMIN');
+
+ALTER TABLE items_nac_basic_prev ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "dev_allow_all" ON items_nac_basic_prev;
 CREATE POLICY "items_nac_basic_prev_select" ON items_nac_basic_prev FOR SELECT USING (auth.uid() IS NOT NULL);
@@ -856,6 +944,8 @@ CREATE POLICY "items_nac_basic_prev_delete" ON items_nac_basic_prev FOR DELETE U
 -- Teachers write (INSERT, DELETE) their own quiz snapshots
 -- Students and teachers read (quiz taking, review, results)
 -- Admin reads all
+
+ALTER TABLE teacher_quiz_items ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "dev_allow_all" ON teacher_quiz_items;
 
@@ -899,6 +989,8 @@ USING (
 -- Students read links for their classes (to see assigned quizzes)
 -- Teachers read their own links
 -- Admin reads all
+
+ALTER TABLE teacher_quiz_classes ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "dev_allow_all" ON teacher_quiz_classes;
 
@@ -1584,3 +1676,28 @@ BEGIN
   );
 END;
 $$;
+
+
+-- ────────────────────────────────────────────────────────────
+-- NON-RLS FUNCTIONS & TRIGGERS
+-- ────────────────────────────────────────────────────────────
+-- General DB objects that aren't RLS-related but live here so
+-- the bootstrap sequence (schema.sql → rls.sql → seed_data.sql)
+-- captures every non-table object in one file.
+-- ────────────────────────────────────────────────────────────
+
+-- offline_packs: auto-touch updated_utc on every UPDATE
+CREATE OR REPLACE FUNCTION set_offline_packs_updated_utc()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  NEW.updated_utc = NOW();
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trg_offline_packs_updated_utc
+  BEFORE UPDATE ON offline_packs
+  FOR EACH ROW
+  EXECUTE FUNCTION set_offline_packs_updated_utc();

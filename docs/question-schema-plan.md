@@ -5,12 +5,12 @@
 
 ## Context
 
-MyTeacher's question bank (`teacher_bank_items`) needs three new fields: `question_ref` (teacher's own reference code for numbering questions), `tags` (freeform labels), and `batch_id` (upload batch tracking). The shared library currently borrows NMC Licensure `items_*` tables — this is temporary and needs replacing with dedicated library tables (`library_anatomy`, `library_physiology`, etc.) decoupled from NMC. Both systems get the new columns. Phased rollout.
+MyTeacher's question bank (`teacher_bank_items`) needs three new fields: `question_ref` (teacher's own reference code for numbering questions), `tags` (freeform labels), and `batch_id` (upload batch tracking). The shared library currently borrows NMC Licensure `items_*` tables — this is temporary and needs replacing with dedicated library tables (`teacher_library_anatomy`, `teacher_library_physiology`, etc.) decoupled from NMC. Both systems get the new columns. Phased rollout.
 
 ### Key Decisions Made
 - NMC and MyTeacher question schemas stay separate — no alignment needed
-- Library keeps the one-table-per-course pattern (e.g. `library_anatomy`) — not a single unified table
-- `teacher_library_courses.items_table` stays — it just points to new `library_*` tables instead of NMC `items_*`
+- Library keeps the one-table-per-course pattern (e.g. `teacher_library_anatomy`) — not a single unified table
+- `teacher_library_courses.items_table` stays — it just points to new `teacher_library_*` tables instead of NMC `items_*`
 - `question_ref` is unique per teacher (two teachers can independently use the same ref code)
 - `tags` is a TEXT[] array column (not a junction table)
 - Library content is admin-managed only — teachers browse and copy, they don't contribute
@@ -99,10 +99,10 @@ No `batch_id` on snapshots — batch is an organisational concept, not a questio
 
 ### 2A. Library Table Template
 
-Each new course gets a table like `library_anatomy`:
+Each new course gets a table like `teacher_library_anatomy`:
 
 ```sql
-CREATE TABLE library_anatomy (
+CREATE TABLE teacher_library_anatomy (
   item_id         TEXT PRIMARY KEY,
   question_type   TEXT NOT NULL DEFAULT 'MCQ',
   stem            TEXT NOT NULL,
@@ -130,13 +130,13 @@ CREATE TABLE library_anatomy (
 -- year_level: e.g. 'Year 1', 'Year 2', 'Level 100', 'Level 200'
 -- bloom_level: Remember | Understand | Apply | Analyse | Evaluate | Create
 
-CREATE INDEX ON library_anatomy (maintopic);
-CREATE INDEX ON library_anatomy (subtopic);
-CREATE INDEX ON library_anatomy (difficulty);
-CREATE INDEX ON library_anatomy USING GIN (tags);
-CREATE INDEX ON library_anatomy (batch_id);
-CREATE INDEX ON library_anatomy (year_level);
-CREATE INDEX ON library_anatomy (bloom_level);
+CREATE INDEX ON teacher_library_anatomy (maintopic);
+CREATE INDEX ON teacher_library_anatomy (subtopic);
+CREATE INDEX ON teacher_library_anatomy (difficulty);
+CREATE INDEX ON teacher_library_anatomy USING GIN (tags);
+CREATE INDEX ON teacher_library_anatomy (batch_id);
+CREATE INDEX ON teacher_library_anatomy (year_level);
+CREATE INDEX ON teacher_library_anatomy (bloom_level);
 ```
 
 Compared to NMC `items_*` tables, library tables add: `question_ref`, `tags`, `batch_id`, `year_level`, `bloom_level`. Also `marks` is INTEGER (not NUMERIC).
@@ -179,13 +179,13 @@ INSERT INTO teacher_library_courses
   (course_id, title, description, programme, faculty, category, year_group, tags, status, items_table)
 VALUES
   ('ANATOMY', 'Anatomy', 'Human anatomy questions', 'Nursing', 'Health Sciences', 'Sciences', 'Year 1',
-   '{preclinical}', 'active', 'library_anatomy'),
+   '{preclinical}', 'active', 'teacher_library_anatomy'),
   ('PHYSIOLOGY', 'Physiology', 'Human physiology questions', 'Nursing', 'Health Sciences', 'Sciences', 'Year 1',
-   '{preclinical}', 'active', 'library_physiology');
+   '{preclinical}', 'active', 'teacher_library_physiology');
   -- add more as needed
 ```
 
-`items_table` column stays — it still points to the table name, just new `library_*` tables instead of NMC `items_*`.
+`items_table` column stays — it still points to the table name, just new `teacher_library_*` tables instead of NMC `items_*`.
 
 ### 2C. API Changes
 
@@ -219,8 +219,8 @@ Old refs like `LIB:GP:GP_001` in existing quiz drafts will break once NMC course
 ### Phase 2
 | File | Change |
 |---|---|
-| `db/schema.sql` | Add library_* table definitions, update teacher_library_courses comments |
-| `db/prod-setup/04_seed_data.sql` | Replace NMC seed rows with academic course rows |
+| `db/schema.sql` | Add teacher_library_* table definitions, update teacher_library_courses comments |
+| `db/seed_data.sql` | Replace NMC seed rows with academic course rows |
 | `js/myteacher-api.js` | Update getLibraryFilterOptions to include tags |
 | `myteacher/teacher/library.html` | Add tags filter |
 
@@ -270,9 +270,9 @@ The prompt that teachers copy to AI assistants for converting questions to CSV f
 6. Preview the bank page — verify ref badges and tag chips render
 
 ### Phase 2
-1. Create library_anatomy table in Supabase
+1. Create teacher_library_anatomy table in Supabase
 2. Insert test items
-3. Add row to teacher_library_courses pointing to library_anatomy
+3. Add row to teacher_library_courses pointing to teacher_library_anatomy
 4. Browse library page — verify items load with filters
 5. Add library item to quiz draft — verify LIB: ref resolves
 6. Publish quiz — verify snapshot captures library item

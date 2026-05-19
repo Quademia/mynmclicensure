@@ -1,3 +1,11 @@
 .claude/
 .wrangler/
 node_modules/
+
+# mynclex — Next.js app inside the monorepo
+mynclex/node_modules/
+mynclex/.next/
+mynclex/.open-next/
+mynclex/.wrangler/
+mynclex/.env.local
+mynclex/.dev.vars

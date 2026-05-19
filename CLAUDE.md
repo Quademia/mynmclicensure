@@ -25,7 +25,7 @@ QAcademy Nurses Hub is a web-based LMS for nursing students in Ghana preparing f
 3. Read `BUILD_LIST.md` for current priorities
 4. Scan recent commits (`git log --oneline -10`) — another assistant may have pushed changes
 5. Read `README.md` for project context if needed
-6. Read `db/schema.sql` if working on anything database-related
+6. Read `db/README.md` (entry point), then `db/schema.sql` + `db/rls.sql` if working on anything database-related
 
 ### End
 1. Commit all work with clear commit messages

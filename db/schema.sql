@@ -10,7 +10,7 @@
 --   - All tables use dev_allow_all RLS during build.
 --   - 49 tables total (11 core + 3 quiz engine + 11 items
 --     + 1 offline packs + 2 messaging + 12 teacher assess
---     + 10 library items (library_anatomy, etc) — see section 5.9b)
+--     + 10 library items (teacher_library_anatomy, etc) — see section 5.9b)
 -- ============================================================
 
 
@@ -420,7 +420,7 @@ CREATE TABLE teacher_classes (
   start_date         DATE,
   end_date           DATE,
   colour             TEXT,
-  cohort_id          TEXT REFERENCES teacher_cohorts(cohort_id)
+  cohort_id          TEXT
 );
 -- status: ACTIVE | ARCHIVED
 
@@ -504,7 +504,7 @@ CREATE TABLE teacher_quizzes (
   teacher_id             TEXT NOT NULL,
   title                  TEXT NOT NULL,
   subject                TEXT,
-  course_id              TEXT REFERENCES teacher_courses(course_id),
+  course_id              TEXT,
   preset                 TEXT NOT NULL DEFAULT 'EXAM',
   duration_minutes       INTEGER NOT NULL DEFAULT 0,
   shuffle_questions      BOOLEAN NOT NULL DEFAULT false,
@@ -652,7 +652,7 @@ CREATE TABLE teacher_library_courses (
   updated_at   TIMESTAMPTZ DEFAULT NOW(),
   items_table  TEXT
 );
--- items_table: points to the library items table (e.g. library_anatomy, library_english)
+-- items_table: points to the library items table (e.g. teacher_library_anatomy, teacher_library_english)
 -- programme: e.g. 'Nursing', 'Business', 'General'
 -- faculty: e.g. 'Health Sciences', 'Arts', 'Social Sciences'
 -- category: e.g. 'Sciences', 'Languages', 'Commerce'
@@ -666,14 +666,14 @@ CREATE INDEX idx_lib_courses_year ON teacher_library_courses (year_group);
 CREATE INDEX idx_lib_courses_tags ON teacher_library_courses USING GIN (tags);
 
 -- 5.9b Library item tables (one per course)
--- All follow the same schema. Replace library_anatomy with:
---   library_anatomy, library_physiology, library_english,
---   library_accounting, library_government, library_microbiology,
---   library_pharmacology, library_sociology, library_surveying,
---   library_management (add more as needed)
+-- All follow the same schema. Replace teacher_library_anatomy with:
+--   teacher_library_anatomy, teacher_library_physiology, teacher_library_english,
+--   teacher_library_accounting, teacher_library_government, teacher_library_microbiology,
+--   teacher_library_pharmacology, teacher_library_sociology, teacher_library_surveying,
+--   teacher_library_management (add more as needed)
 -- 10 tables total
 
-CREATE TABLE library_anatomy (
+CREATE TABLE teacher_library_anatomy (
   item_id         TEXT PRIMARY KEY,
   question_type   TEXT NOT NULL DEFAULT 'MCQ',
   stem            TEXT NOT NULL,
@@ -702,13 +702,13 @@ CREATE TABLE library_anatomy (
 -- bloom_level: Remember | Understand | Apply | Analyse | Evaluate | Create
 -- year_level: e.g. 'Year 1', 'Year 2', 'Level 100', 'Level 200'
 
-CREATE INDEX ON library_anatomy (maintopic);
-CREATE INDEX ON library_anatomy (subtopic);
-CREATE INDEX ON library_anatomy (difficulty);
-CREATE INDEX ON library_anatomy USING GIN (tags);
-CREATE INDEX ON library_anatomy (batch_id);
-CREATE INDEX ON library_anatomy (year_level);
-CREATE INDEX ON library_anatomy (bloom_level);
+CREATE INDEX ON teacher_library_anatomy (maintopic);
+CREATE INDEX ON teacher_library_anatomy (subtopic);
+CREATE INDEX ON teacher_library_anatomy (difficulty);
+CREATE INDEX ON teacher_library_anatomy USING GIN (tags);
+CREATE INDEX ON teacher_library_anatomy (batch_id);
+CREATE INDEX ON teacher_library_anatomy (year_level);
+CREATE INDEX ON teacher_library_anatomy (bloom_level);
 
 -- 5.10 teacher_courses
 -- A Course is what a teacher teaches (Pharmacology 1, Anatomy, etc).
@@ -1018,6 +1018,17 @@ ALTER TABLE teacher_quiz_classes
 ALTER TABLE teacher_quiz_items
   ADD CONSTRAINT teacher_quiz_items_teacher_quiz_id_fkey
   FOREIGN KEY (teacher_quiz_id) REFERENCES teacher_quizzes(teacher_quiz_id);
+
+-- Forward-ref FKs deferred here because teacher_cohorts and
+-- teacher_courses are defined later in the file (5.11 / 5.10)
+-- than teacher_classes and teacher_quizzes (5.2 / 5.5).
+ALTER TABLE teacher_classes
+  ADD CONSTRAINT teacher_classes_cohort_id_fkey
+  FOREIGN KEY (cohort_id) REFERENCES teacher_cohorts(cohort_id);
+
+ALTER TABLE teacher_quizzes
+  ADD CONSTRAINT teacher_quizzes_course_id_fkey
+  FOREIGN KEY (course_id) REFERENCES teacher_courses(course_id);
 
 
 -- ────────────────────────────────────────────────────────────

@@ -107,9 +107,10 @@ main{
 
 /* ── PRODUCT CARDS ── */
 .products{
-  display:grid;grid-template-columns:1fr 1fr;gap:1rem;
-  width:100%;max-width:700px;margin-bottom:1.75rem;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;
+  width:100%;max-width:1080px;margin-bottom:1.75rem;
 }
+@media(max-width:920px){.products{grid-template-columns:1fr 1fr;max-width:700px}}
 @media(max-width:580px){.products{grid-template-columns:1fr}}
 
 .product-card{
@@ -151,6 +152,13 @@ main{
   text-transform:uppercase;color:#5dcfc8;
   background:rgba(45,125,114,.15);border:1px solid rgba(45,125,114,.25);
   border-radius:4px;padding:2px 8px;margin-bottom:.65rem;width:fit-content;
+}
+.card-tag-status{
+  display:inline-block;font-size:10px;font-weight:800;letter-spacing:.08em;
+  text-transform:uppercase;color:#3ca295;
+  background:rgba(45,125,114,.12);border:1px solid rgba(45,125,114,.35);
+  border-radius:999px;padding:2px 10px;margin:0 0 .65rem .5rem;width:fit-content;
+  vertical-align:middle;
 }
 .product-card h2{font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:.4rem;letter-spacing:-.015em}
 .product-card>p{font-size:.875rem;color:rgba(255,255,255,.5);line-height:1.65;flex:1;margin-bottom:1.25rem}
@@ -288,6 +296,27 @@ footer{
       </ul>
       <div class="card-cta">
         Go to MyTeacher
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </div>
+    </a>
+
+    <a href="https://qacademy-dev-mynclex.mybackpacc.workers.dev" class="product-card" target="_blank" rel="noopener">
+      <div class="card-icon">
+        <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 11h-3l-2 6-4-12-2 6H3"/>
+        </svg>
+      </div>
+      <span class="card-tag">For students</span><span class="card-tag-status">Launching 2026</span>
+      <h2>MyNclex-RN</h2>
+      <p>NCLEX-RN exam prep for internationally-trained nurses.</p>
+      <ul class="card-features">
+        <li>Full NCLEX-RN question bank</li>
+        <li>Live tutor-led sessions</li>
+        <li>Structured study programmes</li>
+        <li>Practice questions with rationales</li>
+      </ul>
+      <div class="card-cta">
+        Learn more
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
       </div>
     </a>
