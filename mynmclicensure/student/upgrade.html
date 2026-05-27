@@ -288,6 +288,28 @@
       opacity:.7;
       cursor:not-allowed;
     }
+
+    /* Paused-banner panel — shown when PAID_PAUSED feature flag is on. */
+    .paused-panel{
+      display:none;
+      border:2px solid var(--brand);
+      background:#ecfdf5;
+      border-radius:12px;
+      padding:28px 24px;
+      text-align:center;
+    }
+    .paused-panel h2{ margin:0 0 10px; font-size:1.05rem; color:var(--brand-dark); }
+    .paused-panel p{ margin:0 0 18px; color:var(--text-muted, #64748b); max-width:520px; margin-left:auto; margin-right:auto; }
+    .paused-panel .btn-trial{
+      display:inline-block;
+      padding:12px 22px;
+      background:var(--brand);
+      color:#fff;
+      border-radius:8px;
+      text-decoration:none;
+      font-weight:700;
+    }
+    .paused-panel .btn-trial:hover{ background:var(--brand-dark); }
   </style>
 </head>
 <body>
@@ -322,7 +344,7 @@
           </div>
         </div>
 
-        <div class="panel">
+        <div class="panel" id="paidPanel">
           <h2>Choose a paid product</h2>
           <p>
             Trial products are hidden here automatically, so this page only shows real paid options.
@@ -350,6 +372,13 @@
             <a class="btn btn-secondary" href="/mynmclicensure/student/dashboard.html">Back to Dashboard</a>
           </div>
         </div>
+
+        <!-- Paused-state panel. Shown when PAID_PAUSED is true; hides #paidPanel above. -->
+        <div class="paused-panel" id="pausedPanel">
+          <h2>Paid upgrades are paused at the moment.</h2>
+          <p>Your existing access is unaffected and continues until its expiry. New upgrades and extensions will reopen later.</p>
+          <a class="btn-trial" href="/mynmclicensure/student/dashboard.html">Back to dashboard</a>
+        </div>
       </div>
 
     </div>
@@ -366,6 +395,14 @@
      * PAYMENTS_API_BASE is provided by /mynmclicensure/js/config.js
      ************************************************************/
 
+    // Single-flag freeze: when true, the right "Choose a paid product"
+    // panel is hidden and replaced by a paused banner. The left
+    // "Your current subscriptions" panel stays visible so existing
+    // customers can still see their status. Server-side gate (archived
+    // products) refuses payment init regardless. Flip to false when
+    // re-opening paid plans.
+    const PAID_PAUSED = true;
+
     const els = {
       userPill: document.getElementById('userPill'),
       statusBox: document.getElementById('statusBox'),
@@ -373,8 +410,15 @@
       subsEmpty: document.getElementById('subsEmpty'),
       productSelect: document.getElementById('productSelect'),
       priceValue: document.getElementById('priceValue'),
-      payBtn: document.getElementById('payBtn')
+      payBtn: document.getElementById('payBtn'),
+      paidPanel: document.getElementById('paidPanel'),
+      pausedPanel: document.getElementById('pausedPanel')
     };
+
+    if (PAID_PAUSED) {
+      els.paidPanel.style.display = 'none';
+      els.pausedPanel.style.display = 'block';
+    }
 
     let currentProfile = null;
     let currentSession = null;
@@ -680,6 +724,13 @@
       }
 
       renderUserPill(currentProfile);
+
+      if (PAID_PAUSED) {
+        // Right panel is hidden — only the subscriptions panel renders.
+        // Skip paid-product fetch + listeners; nothing to bind them to.
+        await loadActiveSubscriptions(currentProfile.user_id);
+        return;
+      }
 
       await Promise.all([
         loadActiveSubscriptions(currentProfile.user_id),

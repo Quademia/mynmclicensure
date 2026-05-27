@@ -164,6 +164,28 @@ nav{background:rgba(255,255,255,.95);backdrop-filter:blur(12px);-webkit-backdrop
 footer{background:var(--navy-dark);color:#5a7a94;text-align:center;padding:1.5rem 2rem;font-size:13px;margin-top:auto;display:flex;flex-direction:column;gap:6px}
 footer a{color:var(--muted);font-size:13px}
 footer a:hover{color:var(--white)}
+
+/* Paused-CTA pattern — visible but unclickable. Used while paid
+   plans are temporarily off. Native title tooltip on hover; the
+   pill below carries the message for mobile / touch users. */
+.is-paused{
+  opacity:.5 !important;
+  cursor:not-allowed !important;
+  pointer-events:none !important;
+  filter:grayscale(0.4);
+}
+.paused-pill{
+  display:inline-block;
+  margin-top:8px;
+  padding:6px 12px;
+  background:#ecfdf5;
+  border:1px solid #a7f3d0;
+  border-radius:999px;
+  font-size:12px;
+  color:#065f46;
+  text-decoration:none;
+}
+.paused-pill a{ color:inherit; font-weight:700; text-decoration:underline; }
 </style>
 </head>
 <body>
@@ -180,7 +202,7 @@ footer a:hover{color:var(--white)}
   </div>
   <div class="nav-actions">
     <a href="/myteacher/index.html" class="nav-link">MyTeacher</a>
-    <a href="/mynmclicensure/subscribe.html" class="nav-link">Subscribe</a>
+    <a href="/mynmclicensure/subscribe.html" class="nav-link is-paused" aria-disabled="true" title="Paid plans are paused at the moment. Start with the free trial.">Subscribe</a>
     <a href="/product-select.html"><button class="btn-nav-outline">Sign In</button></a>
     <a href="/mynmclicensure/register.html"><button class="btn-nav-solid">Register Free</button></a>
   </div>
@@ -201,7 +223,7 @@ footer a:hover{color:var(--white)}
         <a href="/mynmclicensure/register.html" class="btn-hero-p">Create Free Account</a>
         <a href="/product-select.html" class="btn-hero-g">Sign In</a>
       </div>
-      <p class="hero-already">Already registered? <a href="/mynmclicensure/subscribe.html">Subscribe to full access →</a></p>
+      <p class="hero-already">Already registered? <a href="/mynmclicensure/subscribe.html" class="is-paused" aria-disabled="true" title="Paid plans are paused at the moment. Start with the free trial.">Subscribe to full access →</a></p>
     </div>
 
     <!-- HERO VISUAL — quiz UI mockup -->
@@ -345,7 +367,8 @@ footer a:hover{color:var(--white)}
         <span class="path-tag">Recommended</span>
         <div class="path-title">Subscribe to Full Access</div>
         <p class="path-blurb">Unlock all quizzes, mock exams, PDF downloads, and your Telegram study community.</p>
-        <a href="/mynmclicensure/subscribe.html" class="path-btn white">Subscribe Now</a>
+        <a href="/mynmclicensure/subscribe.html" class="path-btn white is-paused" aria-disabled="true" title="Paid plans are paused at the moment. Start with the free trial.">Subscribe Now</a>
+        <div class="paused-pill">Paused — <a href="/mynmclicensure/register.html">start free trial →</a></div>
       </div>
 
       <div class="path-card">
@@ -365,7 +388,8 @@ footer a:hover{color:var(--white)}
         <span class="path-tag">Existing subscriber</span>
         <div class="path-title">Extend / Upgrade</div>
         <p class="path-blurb">Subscription expiring or want to add a new product? Log in and go to your account to upgrade.</p>
-        <a href="/mynmclicensure/student/upgrade.html" class="path-btn outline">Upgrade My Access</a>
+        <a href="/mynmclicensure/student/upgrade.html" class="path-btn outline is-paused" aria-disabled="true" title="Paid upgrades are paused at the moment. Existing access is unaffected.">Upgrade My Access</a>
+        <div class="paused-pill">Paused — your current access is unaffected.</div>
       </div>
 
     </div>
@@ -531,9 +555,9 @@ footer a:hover{color:var(--white)}
   <p>Join hundreds of nursing students across Ghana already using QAcademy for their NMC exam prep.</p>
   <div class="cta-row-c">
     <a href="/mynmclicensure/register.html" class="btn-hero-p">Create Your Free Account</a>
-    <a href="/mynmclicensure/subscribe.html" class="btn-hero-g">View Subscription Plans</a>
+    <a href="/mynmclicensure/subscribe.html" class="btn-hero-g is-paused" aria-disabled="true" title="Paid plans are paused at the moment. Start with the free trial.">View Subscription Plans</a>
   </div>
-  <p class="cta-sub">Already registered? <a href="/mynmclicensure/subscribe.html">Subscribe to paid access →</a></p>
+  <p class="cta-sub">Already registered? <a href="/mynmclicensure/subscribe.html" class="is-paused" aria-disabled="true" title="Paid plans are paused at the moment. Start with the free trial.">Subscribe to paid access →</a></p>
 </div>
 
 <!-- FOOTER -->
