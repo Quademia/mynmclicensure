@@ -187,6 +187,28 @@
     .btn:hover{ transform:translateY(-1px) }
     .btn:disabled{ opacity:.6; cursor:not-allowed; transform:none }
 
+    /* Paused-CTA pattern — visible but unclickable. The pill below
+       carries the message for mobile/touch users who don't get the
+       native title tooltip. */
+    .btn.is-paused{
+      opacity:.55;
+      cursor:not-allowed;
+      pointer-events:none;
+      filter:grayscale(0.4);
+      transform:none;
+    }
+    .paused-pill{
+      display:none;
+      margin-top:10px;
+      padding:8px 12px;
+      background:#ecfdf5;
+      border:1px solid #a7f3d0;
+      border-radius:8px;
+      font-size:13px;
+      color:#065f46;
+    }
+    .paused-pill a{ color:inherit; font-weight:700; text-decoration:underline; }
+
     .btn-primary{
       background:var(--brand);
       color:#fff;
@@ -547,6 +569,10 @@
             <button class="btn btn-primary" id="startBtn" type="button">Choose Programme</button>
             <a class="btn btn-secondary" href="/mynmclicensure/register.html">Free Trial Instead</a>
           </div>
+          <div class="paused-pill" id="pausedPill">
+            Premium Prep is paused at the moment.
+            <a href="/mynmclicensure/register.html">Start the free trial</a> instead.
+          </div>
         </div>
       </div>
     </section>
@@ -652,6 +678,14 @@
   <script>
     const PREP_SUFFIX = '_2026_PREP';
 
+    // Single-flag freeze: when true, the Choose Programme button is
+    // disabled (visible but unclickable + tooltip + inline pill below)
+    // and both step panels stay hidden. Free Trial CTA continues to
+    // work since it points at register.html. Server-side gate
+    // (archived products) refuses payment init regardless. Flip to
+    // false when re-opening paid plans.
+    const PAID_PAUSED = true;
+
     const state = {
       programs: [],
       premiumPrograms: [],
@@ -659,6 +693,21 @@
     };
 
     const $ = (id) => document.getElementById(id);
+
+    if (PAID_PAUSED) {
+      const start = $('startBtn');
+      start.classList.add('is-paused');
+      start.setAttribute('aria-disabled', 'true');
+      start.setAttribute('title', 'Paid Premium Prep is paused. Start with the free trial instead.');
+      $('pausedPill').style.display = 'block';
+      $('panelPrograms').classList.remove('on');
+      $('panelPrograms').style.display = 'none';
+      $('panelDetails').style.display = 'none';
+      // Neutralize the hero price + note so we don't render "—" and
+      // "No premium prep products available" which would look broken.
+      $('heroPrice').textContent = '—';
+      $('heroNote').textContent = 'Premium Prep is paused at the moment.';
+    }
 
     function loaderOn(){ $('loader').classList.add('on'); }
     function loaderOff(){ $('loader').classList.remove('on'); }
@@ -1054,7 +1103,11 @@ function workerBase(){
       }
     });
 
-    boot();
+    // When paid is paused the step panels are hidden — no need to
+    // fetch programmes + products. Skip boot() entirely.
+    if (!PAID_PAUSED) {
+      boot();
+    }
   </script>
 </body>
 </html>

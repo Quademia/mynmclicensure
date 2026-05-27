@@ -288,6 +288,29 @@
     }
 
     .footerLinks a:hover{ text-decoration:underline; }
+
+    /* Paused-banner panel — shown when PAID_PAUSED feature flag is on. */
+    .paused-panel{
+      display:none;
+      border:2px solid var(--brand);
+      background:#ecfdf5;
+      border-radius:12px;
+      padding:28px 24px;
+      text-align:center;
+      margin:24px 0;
+    }
+    .paused-panel h2{ margin:0 0 10px; font-size:1.15rem; color:var(--brand-dark); }
+    .paused-panel p{ margin:0 0 18px; color:var(--muted); max-width:520px; margin-left:auto; margin-right:auto; }
+    .paused-panel .btn-trial{
+      display:inline-block;
+      padding:12px 22px;
+      background:var(--brand);
+      color:#fff;
+      border-radius:8px;
+      text-decoration:none;
+      font-weight:700;
+    }
+    .paused-panel .btn-trial:hover{ background:var(--brand-dark); }
   </style>
 </head>
 <body>
@@ -311,7 +334,14 @@
 
       <div class="banner" id="banner"></div>
 
-      <div class="grid">
+      <!-- Paused-state panel. Shown when PAID_PAUSED is true; hides the grid below. -->
+      <div class="paused-panel" id="pausedPanel">
+        <h2>Paid plans are paused at the moment.</h2>
+        <p>Start with the free trial — no card required. You can come back here when paid plans reopen.</p>
+        <a class="btn-trial" href="/mynmclicensure/register.html">Start free trial →</a>
+      </div>
+
+      <div class="grid" id="paidGrid">
         <div class="panel">
           <h2>Your payment details</h2>
           <p>Keep this form short. No account is created here before payment.</p>
@@ -394,6 +424,12 @@
   <script>
     // PAYMENTS_API_BASE is provided by /mynmclicensure/js/config.js
 
+    // Single-flag freeze: when true, the page hides the paid form and
+    // shows the paused panel instead. Server-side gate (archived
+    // products) refuses payment init regardless. Flip to false when
+    // re-opening paid plans.
+    const PAID_PAUSED = true;
+
     const els = {
       signedInBox: document.getElementById('signedInBox'),
       banner: document.getElementById('banner'),
@@ -403,8 +439,18 @@
       product: document.getElementById('product'),
       priceValue: document.getElementById('priceValue'),
       priceMeta: document.getElementById('priceMeta'),
-      payBtn: document.getElementById('payBtn')
+      payBtn: document.getElementById('payBtn'),
+      paidGrid: document.getElementById('paidGrid'),
+      pausedPanel: document.getElementById('pausedPanel')
     };
+
+    if (PAID_PAUSED) {
+      // Show the paused panel; hide the paid form grid and the
+      // "use the upgrade page" cross-reference (upgrade is paused too).
+      els.pausedPanel.style.display = 'block';
+      els.paidGrid.style.display = 'none';
+      els.signedInBox.style.display = 'none';
+    }
 
     let programs = [];
     let paidProducts = [];
@@ -630,6 +676,12 @@
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
+      if (PAID_PAUSED) {
+        // Skip every data fetch + listener — the paused panel is the
+        // only thing visible. Reduces noise in Network + console.
+        return;
+      }
+
       els.email.value = String(localStorage.getItem('qa_last_email') || '').trim();
       els.phone.value = String(localStorage.getItem('qa_last_phone') || '').trim();
 
