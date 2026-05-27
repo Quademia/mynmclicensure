@@ -49,6 +49,7 @@
         <select id="program" required>
           <option value="">Loading programmes...</option>
         </select>
+        <div id="trialHint" style="display:none; margin-top:6px; padding:8px 10px; background:#f0f9ff; border:1px solid #bae6fd; border-radius:6px; font-size:13px; color:#075985;"></div>
       </div>
 
       <div class="form-group">
@@ -86,7 +87,12 @@
 
 // ── Load programmes from DB into dropdown ───────────────
 // Also stores trial_product_id on each option as a data attribute
-// so we can read it on form submit without a second DB call
+// so we can read it on form submit without a second DB call.
+// Trial durations are batched-fetched once and stashed on each option
+// as data-trial-days so the on-change hint shows the actual length
+// the student is about to receive.
+const trialDurationByProductId = new Map();
+
 async function loadPrograms() {
     const programs = await getPrograms();
     const select = document.getElementById('program');
@@ -96,14 +102,48 @@ async function loadPrograms() {
         return;
     }
 
+    // Batch-fetch durations for every trial product referenced by the
+    // programme list. One round trip; cached client-side for the
+    // dropdown's change handler.
+    const trialIds = programs.map(p => p.trial_product_id).filter(Boolean);
+    if (trialIds.length > 0) {
+        const { data: trials } = await db
+            .from('products')
+            .select('product_id, duration_days')
+            .in('product_id', trialIds);
+        (trials || []).forEach(t => {
+            trialDurationByProductId.set(t.product_id, t.duration_days);
+        });
+    }
+
     select.innerHTML = '<option value="">Select your programme</option>';
     programs.forEach(p => {
-        select.innerHTML += `<option 
-            value="${p.program_id}" 
-            data-trial="${p.trial_product_id || ''}">
+        const trialDays = trialDurationByProductId.get(p.trial_product_id) || '';
+        select.innerHTML += `<option
+            value="${p.program_id}"
+            data-trial="${p.trial_product_id || ''}"
+            data-trial-days="${trialDays}">
             ${p.program_name}
         </option>`;
     });
+
+    // Wire the change handler now that options exist.
+    select.addEventListener('change', updateTrialHint);
+}
+
+// Toggle the trial-duration hint based on the selected programme.
+// Reads data-trial-days off the option so duration changes in the DB
+// take effect on the next page load with no code edit.
+function updateTrialHint() {
+    const select = document.getElementById('program');
+    const hint = document.getElementById('trialHint');
+    const days = select.selectedOptions[0]?.dataset?.trialDays;
+    if (days && Number(days) > 0) {
+        hint.textContent = `You'll get a ${days}-day free trial — no card required.`;
+        hint.style.display = 'block';
+    } else {
+        hint.style.display = 'none';
+    }
 }
 
   // ── Secure ID helper ────────────────────────────────────
