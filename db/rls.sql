@@ -433,7 +433,8 @@ USING (
 
 -- 9. messages_threads
 -- Students read, insert, and update their own threads.
--- Admins read and update all threads.
+-- Admins read, insert, and update all threads (admin-initiated
+-- threads + bulk send).
 -- No browser DELETE.
 
 ALTER TABLE messages_threads ENABLE ROW LEVEL SECURITY;
@@ -450,7 +451,8 @@ USING (
 CREATE POLICY "messages_threads_insert"
 ON messages_threads FOR INSERT
 WITH CHECK (
-  messages_threads.user_id = auth_user_id()
+  auth_user_role() = 'ADMIN'
+  OR messages_threads.user_id = auth_user_id()
 );
 
 CREATE POLICY "messages_threads_update"

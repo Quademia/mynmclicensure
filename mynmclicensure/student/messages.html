@@ -87,6 +87,8 @@
 .bubble { padding: 8px 12px; border-radius: 14px; font-size: 13px; line-height: 1.45; word-wrap: break-word; white-space: pre-wrap; }
 .bubble.student { background: var(--accent, #2d7d72); color: #fff; border-bottom-right-radius: 4px; }
 .bubble.admin { background: var(--primary-light, #edf6f5); color: var(--primary); border-bottom-left-radius: 4px; }
+.bubble a { color: inherit; text-decoration: underline; font-weight: 600; word-break: break-all; }
+.bubble.student a { color: #fff; }
 
 .msg-time { font-size: 10px; color: var(--text-muted); margin-top: 2px; padding: 0 36px; }
 .msg-group.student .msg-time { text-align: right; }
@@ -469,7 +471,7 @@ function renderMessages(msgs) {
 
     groupHtml += `<div class="msg-row">
       <div class="msg-avatar ${avClass}">${initial}</div>
-      <div class="bubble ${sender}">${esc(m.body_text)}</div>
+      <div class="bubble ${sender}">${linkify(m.body_text)}</div>
     </div>`;
 
     // Show timestamp on last message in group or if next message is different sender/date
@@ -715,6 +717,18 @@ function esc(s) {
   const d = document.createElement('div');
   d.textContent = s;
   return d.innerHTML;
+}
+
+// Escapes text first (XSS-safe), then turns plain http(s) URLs into
+// clickable links. Only matched URLs become anchors; all other text
+// stays escaped. Trailing sentence punctuation is kept outside the link.
+function linkify(s) {
+  return esc(s).replace(/(https?:\/\/[^\s<]+)/g, (url) => {
+    const m = url.match(/^(.*?)([.,!?)\]]*)$/);
+    const link = m ? m[1] : url;
+    const tail = m ? m[2] : '';
+    return `<a href="${link}" target="_blank" rel="noopener noreferrer">${link}</a>${tail}`;
+  });
 }
 
 function formatRefText(raw) {

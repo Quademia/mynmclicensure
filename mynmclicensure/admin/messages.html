@@ -94,6 +94,7 @@
 .feed-name.admin-name { color: var(--accent); }
 .feed-time { font-size: 10px; color: var(--text-muted); }
 .feed-body { font-size: 13px; line-height: 1.5; color: var(--text); padding-left: 34px; white-space: pre-wrap; word-wrap: break-word; }
+.feed-body a { color: var(--primary); text-decoration: underline; font-weight: 600; word-break: break-all; }
 .feed-msg.is-admin { border-left: 3px solid var(--accent); padding-left: 12px; margin-left: 0; }
 .feed-msg.is-admin .feed-body { padding-left: 34px; }
 
@@ -797,7 +798,7 @@ function renderMessages(msgs, thread) {
         <span class="${nameClass}">${senderName}</span>
         <span class="feed-time">${formatTimeShort(m.created_at)}</span>
       </div>
-      <div class="feed-body">${esc(m.body_text)}</div>
+      <div class="feed-body">${linkify(m.body_text)}</div>
     </div>`;
   });
 
@@ -1267,6 +1268,18 @@ function esc(s) {
   const d = document.createElement('div');
   d.textContent = s;
   return d.innerHTML;
+}
+
+// Escapes text first (XSS-safe), then turns plain http(s) URLs into
+// clickable links. Only matched URLs become anchors; all other text
+// stays escaped. Trailing sentence punctuation is kept outside the link.
+function linkify(s) {
+  return esc(s).replace(/(https?:\/\/[^\s<]+)/g, (url) => {
+    const m = url.match(/^(.*?)([.,!?)\]]*)$/);
+    const link = m ? m[1] : url;
+    const tail = m ? m[2] : '';
+    return `<a href="${link}" target="_blank" rel="noopener noreferrer">${link}</a>${tail}`;
+  });
 }
 
 function formatRefText(raw) {
