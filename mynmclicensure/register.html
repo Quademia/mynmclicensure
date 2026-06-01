@@ -5,8 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Register — QAcademy Nurses Hub</title>
   <link rel="stylesheet" href="/mynmclicensure/css/style.css" />
+  <style>
+    #creatingOverlay { display:none; position:fixed; inset:0; z-index:9999;
+      background:rgba(255,255,255,0.92); align-items:center; justify-content:center;
+      flex-direction:column; gap:14px; }
+    #creatingOverlay.show { display:flex; }
+    .reg-spinner { width:44px; height:44px; border:4px solid #e0e7ef;
+      border-top-color:#0ea5e9; border-radius:50%; animation:regspin .7s linear infinite; }
+    @keyframes regspin { to { transform:rotate(360deg); } }
+    #creatingOverlay .reg-msg { font-size:14px; font-weight:600; color:#075985; }
+  </style>
 </head>
 <body>
+
+<div id="creatingOverlay">
+  <div class="reg-spinner"></div>
+  <div class="reg-msg">Creating your account…</div>
+</div>
 
 <div class="auth-wrapper">
   <div class="auth-card">
@@ -297,6 +312,7 @@ async function loadSchools() {
 
     submitBtn.disabled = true;
     submitBtn.textContent = 'Creating account...';
+    document.getElementById('creatingOverlay').classList.add('show');
 
     // ── Step 1: Create Supabase Auth account ────────────
     const { data, error } = await db.auth.signUp({ email, password });
@@ -306,6 +322,7 @@ async function loadSchools() {
       errorAlert.classList.add('show');
       submitBtn.disabled = false;
       submitBtn.textContent = 'Create Account';
+      document.getElementById('creatingOverlay').classList.remove('show');
       return;
     }
 
@@ -336,6 +353,7 @@ async function loadSchools() {
       errorAlert.classList.add('show');
       submitBtn.disabled = false;
       submitBtn.textContent = 'Create Account';
+      document.getElementById('creatingOverlay').classList.remove('show');
       return;
     }
 
