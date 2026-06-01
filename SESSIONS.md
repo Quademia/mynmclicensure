@@ -62,6 +62,41 @@ Newest session on top.
     currently a 404 until that page is built.
 - Released to production via PR #19 (merge commit `17c0c8d`).
 
+### Also done — signup data capture + onboarding UX (same session)
+- **`schools` reference table** seeded with the **141 NMC-accredited
+  institutions** (scraped + parsed from nmc.gov.gh/web/online-accreditation):
+  name, region (16 canonical), ownership (State/Private), programmes
+  (RGN/RM/… codes). Public-readable (anon SELECT) so it loads on the
+  pre-auth register page. Migration + `db/schools_seed.json` recorded.
+- **Register form now captures** (all required): WhatsApp number →
+  `users.phone_number`; School → `users.school_id` (strict pick from the
+  141, grouped by region) with a "not listed" escape → `users.school_other`;
+  "How did you hear about us?" → `users.referral_source` (dropdown +
+  Other free-text). `signup_source` left untouched (it's provenance:
+  self-signup vs admin vs paid — NOT a marketing-source field).
+- **Profile page:** students can view/edit their School (Academic panel),
+  same picker + escape. Phone was already editable.
+- **Onboarding UX for non-tech students:** signup spinner overlay; a
+  "remember your email & password" confirm step before account creation;
+  a calm success screen (shows their email + the 3 sign-in options:
+  password / Google / magic link) replacing the fast auto-redirect; a
+  neutral 3-ways guidance note on login (no email pre-fill — deliberately
+  not pushing the password method).
+- **Rolled out to production safely:** prod DB migration applied +
+  verified FIRST (141 schools, anon read, 3 new user cols), THEN code
+  released via PR #20 (merge `202d820`). Confirmed with a real prod test
+  signup (captured correctly), then deleted the test account by ID.
+  Real students are already registering through the new flow (count
+  ticked 628 → 634 during the session).
+
+### Context discovered (2)
+- The "600 users" wave was essentially **one day (May 31: 535 signups)** —
+  a single shared link going viral, not gradual growth. The system was
+  NOT capturing acquisition source (hence the new `referral_source`).
+- Login already supports **3 methods**: email+password, Google OAuth,
+  and magic link (passwordless). Email confirmation is OFF — the welcome
+  email is informational, not an activation gate.
+
 ### Next session
 - Optional: make Bulk Send filters honest for the current audience —
   relabel/align the Subscription Kind options (Free→Trial reality) and/or
