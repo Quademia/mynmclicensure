@@ -183,12 +183,28 @@
     .preview-card {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       padding: 12px 14px;
       border: 1px solid var(--border);
       border-radius: var(--radius);
       margin-bottom: 8px;
-      gap: 12px;
+      gap: 10px;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+      transition: border-color 0.12s, background 0.12s, transform 0.12s;
+    }
+    .preview-card:hover {
+      border-color: var(--accent);
+      background: rgba(30,58,95,0.03);
+      transform: translateX(2px);
+    }
+    .preview-card > div:first-child { flex: 1 1 auto; min-width: 0; }
+    .preview-card::after {
+      content: '\203A';
+      flex-shrink: 0;
+      font-size: 20px;
+      line-height: 1;
+      color: var(--text-muted);
     }
     .preview-card:last-child { margin-bottom: 0; }
     .preview-card-title { font-size: 14px; font-weight: 600; color: var(--primary); }
@@ -480,13 +496,13 @@
       area.innerHTML = visible.slice(0, 3).map(q => {
         const avail = getQuizAvailability(q);
         const badgeLabel = avail === 'ACTIVE' ? 'Active' : 'Upcoming';
-        return `<div class="preview-card">
+        return `<a class="preview-card" href="${LICENSURE.student}/fixed-quizzes.html?course=${encodeURIComponent(courseId)}">
           <div>
             <div class="preview-card-title">${esc(q.title)}</div>
             <div class="preview-card-meta">${q.n} questions${q.time_limit_sec ? ' · ' + Math.round(q.time_limit_sec/60) + ' min' : ''}</div>
           </div>
           <span class="preview-badge ${avail}">${badgeLabel}</span>
-        </div>`;
+        </a>`;
       }).join('') + `<a class="view-all-link" href="${LICENSURE.student}/fixed-quizzes.html?course=${encodeURIComponent(courseId)}">View all fixed quizzes →</a>`;
     } catch (e) {
       area.innerHTML = '<div style="color:var(--text-muted); font-size:13px;">Could not load fixed quizzes.</div>';
@@ -514,13 +530,13 @@
         let schedule = '';
         if (avail === 'UPCOMING' && q.publish_at) schedule = 'Opens ' + fmtDate(q.publish_at);
         if (avail === 'ACTIVE' && q.unpublish_at) schedule = 'Closes ' + fmtDate(q.unpublish_at);
-        return `<div class="preview-card">
+        return `<a class="preview-card" href="${LICENSURE.student}/mock-exams.html?course=${encodeURIComponent(courseId)}">
           <div>
             <div class="preview-card-title">${esc(q.title)}</div>
             <div class="preview-card-meta">${q.n} questions${schedule ? ' · ' + schedule : ''}</div>
           </div>
           <span class="preview-badge ${avail}">${badgeLabel}</span>
-        </div>`;
+        </a>`;
       }).join('') + `<a class="view-all-link" href="${LICENSURE.student}/mock-exams.html?course=${encodeURIComponent(courseId)}">View all mock exams →</a>`;
     } catch (e) {
       area.innerHTML = '<div style="color:var(--text-muted); font-size:13px;">Could not load mock exams.</div>';
