@@ -46,6 +46,8 @@
       <a href="${S}/portal-guide.html">❓ Portal Guide</a>
       <a href="${S}/messages.html">💬 Messages <span id="sidebarMsgBadge" class="sidebar-msg-badge" style="display:none;"></span></a>
   <a href="${S}/telegram.html">✈️ Telegram</a>
+      <a href="https://www.whatsapp.com/channel/0029Vb6ActpBA1ewCfBmAF3O" target="_blank" rel="noopener">📲 WhatsApp Channel</a>
+      <a href="https://t.me/QAcademynurseshub" target="_blank" rel="noopener">📣 Telegram Channel</a>
 
       <a href="/myteacher/student/dashboard.html">📝 Teacher Assess</a>
 
