@@ -43,6 +43,25 @@ Newest session on top.
   resolves to 0. `program_id` IS populated (RN 331, RM 280, RPHN 14,
   NACNAP 2, RMHN 1).
 
+### Also done — student UI (same session)
+- **Course page preview cards now clickable.** The Fixed Quizzes / Mock
+  Exams sections show a 3-card preview but the cards weren't clickable,
+  so students didn't realise it was a preview. Wrapped each card in a
+  link to that course's full list (same target as "View all") with a
+  pointer/hover/`›` chevron affordance. `student/course.html`.
+- **WhatsApp + Telegram join prompts.** To capture the free-signup wave
+  into the broadcast channels: a "📣 Stay connected" card on the student
+  dashboard (Join WhatsApp / Join Telegram, brand-coloured, new tab) +
+  two channel links in the student sidebar. Reuses the landing-page
+  channel URLs (WhatsApp `…/channel/0029Vb6ActpBA1ewCfBmAF3O`, Telegram
+  `t.me/QAcademynurseshub`). `student/dashboard.html` +
+  `js/mynmclicensure-student-sidebar.js`.
+  - NB: the existing `✈️ Telegram` sidebar link points to a (not-yet-built)
+    `telegram.html` — that's a **future premium-subscriber** page, NOT the
+    public channel, and was left untouched. The sidebar Telegram link is
+    currently a 404 until that page is built.
+- Released to production via PR #19 (merge commit `17c0c8d`).
+
 ### Next session
 - Optional: make Bulk Send filters honest for the current audience —
   relabel/align the Subscription Kind options (Free→Trial reality) and/or
