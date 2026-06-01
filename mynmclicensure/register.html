@@ -45,11 +45,40 @@
       </div>
 
       <div class="form-group">
+        <label for="phone">WhatsApp Number</label>
+        <input type="tel" id="phone" placeholder="e.g. 024 123 4567" required autocomplete="tel" inputmode="tel" />
+      </div>
+
+      <div class="form-group">
         <label for="program">Programme</label>
         <select id="program" required>
           <option value="">Loading programmes...</option>
         </select>
         <div id="trialHint" style="display:none; margin-top:6px; padding:8px 10px; background:#f0f9ff; border:1px solid #bae6fd; border-radius:6px; font-size:13px; color:#075985;"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="school">School</label>
+        <select id="school" required>
+          <option value="">Loading schools...</option>
+        </select>
+        <input type="text" id="schoolOther" placeholder="Type your school's name" style="display:none; margin-top:8px;" />
+      </div>
+
+      <div class="form-group">
+        <label for="referral">How did you hear about us?</label>
+        <select id="referral" required>
+          <option value="">Select one</option>
+          <option>WhatsApp group</option>
+          <option>A friend / colleague</option>
+          <option>TikTok</option>
+          <option>Facebook</option>
+          <option>Instagram</option>
+          <option>School / lecturer</option>
+          <option>Google search</option>
+          <option value="__OTHER__">Other</option>
+        </select>
+        <input type="text" id="referralOther" placeholder="Tell us how" style="display:none; margin-top:8px;" />
       </div>
 
       <div class="form-group">
@@ -146,6 +175,49 @@ function updateTrialHint() {
     }
 }
 
+// ── Load schools from DB into dropdown (grouped by region) ──
+// Strict pick from the NMC-accredited list, with an "isn't listed"
+// escape that reveals a free-text box.
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function loadSchools() {
+  const select = document.getElementById('school');
+  const { data: schools, error } = await db
+    .from('schools')
+    .select('id, name, region')
+    .eq('active', true)
+    .order('region', { ascending: true })
+    .order('name', { ascending: true });
+
+  if (error || !schools || !schools.length) {
+    select.innerHTML = '<option value="">Could not load schools</option>';
+    return;
+  }
+
+  let html = '<option value="">Select your school</option>';
+  let region = '';
+  schools.forEach(s => {
+    if (s.region !== region) {
+      if (region) html += '</optgroup>';
+      html += `<optgroup label="${escHtml(s.region)}">`;
+      region = s.region;
+    }
+    html += `<option value="${s.id}">${escHtml(s.name)}</option>`;
+  });
+  if (region) html += '</optgroup>';
+  html += '<option value="__OTHER__">My school isn\'t listed</option>';
+  select.innerHTML = html;
+
+  select.addEventListener('change', () => {
+    const other = select.value === '__OTHER__';
+    const box = document.getElementById('schoolOther');
+    box.style.display = other ? 'block' : 'none';
+    if (!other) box.value = '';
+  });
+}
+
   // ── Secure ID helper ────────────────────────────────────
   function makeSecureId(prefix, byteLength = 8) {
     const bytes = crypto.getRandomValues(new Uint8Array(byteLength));
@@ -167,6 +239,11 @@ function updateTrialHint() {
     const surname         = document.getElementById('surname').value.trim();
     const email           = document.getElementById('email').value.trim();
     const program_id      = document.getElementById('program').value;
+    const phone           = document.getElementById('phone').value.trim();
+    const schoolVal       = document.getElementById('school').value;
+    const schoolOther     = document.getElementById('schoolOther').value.trim();
+    const referralVal     = document.getElementById('referral').value;
+    const referralOther   = document.getElementById('referralOther').value.trim();
     const password        = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
     const submitBtn       = document.getElementById('submitBtn');
@@ -186,6 +263,34 @@ function updateTrialHint() {
 
     if (!program_id) {
       errorAlert.textContent = 'Please select your programme.';
+      errorAlert.classList.add('show');
+      return;
+    }
+
+    if (phone.replace(/\D/g, '').length < 9) {
+      errorAlert.textContent = 'Please enter a valid WhatsApp number.';
+      errorAlert.classList.add('show');
+      return;
+    }
+
+    if (!schoolVal) {
+      errorAlert.textContent = 'Please select your school.';
+      errorAlert.classList.add('show');
+      return;
+    }
+    if (schoolVal === '__OTHER__' && !schoolOther) {
+      errorAlert.textContent = "Please type your school's name.";
+      errorAlert.classList.add('show');
+      return;
+    }
+
+    if (!referralVal) {
+      errorAlert.textContent = 'Please tell us how you heard about us.';
+      errorAlert.classList.add('show');
+      return;
+    }
+    if (referralVal === '__OTHER__' && !referralOther) {
+      errorAlert.textContent = 'Please tell us how you heard about us.';
       errorAlert.classList.add('show');
       return;
     }
@@ -217,9 +322,13 @@ function updateTrialHint() {
         surname:       surname,
         name:          forename + ' ' + surname,
         program_id:    program_id,
-        role:          'STUDENT',
-        active:        true,
-        signup_source: 'SUPABASE_AUTH'
+        role:            'STUDENT',
+        active:          true,
+        signup_source:   'SUPABASE_AUTH',
+        phone_number:    phone,
+        school_id:       schoolVal === '__OTHER__' ? null : Number(schoolVal),
+        school_other:    schoolVal === '__OTHER__' ? schoolOther : null,
+        referral_source: referralVal === '__OTHER__' ? referralOther : referralVal
       });
 
     if (profileError) {
@@ -300,8 +409,17 @@ if (trialProductId) {
 
   });
 
-  // Load programmes on page load
+  // Load programmes + schools on page load
   loadPrograms();
+  loadSchools();
+
+  // Reveal the "Other" text box when chosen in the referral dropdown
+  document.getElementById('referral').addEventListener('change', (e) => {
+    const other = e.target.value === '__OTHER__';
+    const box = document.getElementById('referralOther');
+    box.style.display = other ? 'block' : 'none';
+    if (!other) box.value = '';
+  });
 
 </script>
 
