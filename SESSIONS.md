@@ -5,6 +5,55 @@ Newest session on top.
 
 ---
 
+## Session — 2026-06-01 (Licensure messaging — bulk send fix + clickable links — Claude Code)
+
+### Done
+- **Bug: admin Bulk Send reported "sent to 0".** Root cause was the
+  `messages_threads` INSERT RLS policy — `WITH CHECK (user_id =
+  auth_user_id())` with no ADMIN exception. Admin-initiated threads
+  (New Thread + every Bulk Send recipient) are owned by the *student*,
+  so RLS rejected every insert (42501). Recipient resolution (a SELECT)
+  worked, but no threads were created → count 0. messages_threads /
+  messages were empty in prod (admin messaging had never succeeded).
+- **Fix:** added `auth_user_role() = 'ADMIN'` bypass, matching the
+  sibling select/update + messages_insert policies. Applied to
+  gamma-dev and gamma-prod databases directly (MCP); recorded in
+  `db/rls.sql` + `db/migrations/fix_messages_threads_insert_admin_bypass.sql`.
+  Verified both ways (admin can create a thread for a student; a student
+  is still blocked from creating threads for others) via rolled-back
+  transactions on both DBs.
+- **Welcome blast.** Sam bulk-sent a welcome message to all 628
+  students, then refined the copy (asks: how they heard about QAcademy,
+  their school, any help needed; + WhatsApp channel invite). Rewrote the
+  body in place on prod — one `UPDATE messages SET body_text=… WHERE
+  sender_role='admin'` (629 rows; guarded so it can never overwrite a
+  student reply; 0 replies existed).
+- **Clickable links.** Message bodies were rendered with `esc()`, so the
+  WhatsApp URL showed as plain text. Added an XSS-safe `linkify()`
+  (escape first, then anchor only http(s) URLs) to both
+  `student/messages.html` and `admin/messages.html`, with link styling.
+- **Released** to production via PR #18 (main → production merge commit
+  `bf9f9fb`), following the established release pattern.
+
+### Context discovered
+- Free-access signups are stored as **TRIAL** subscriptions (627 of 628;
+  1 PAID, 0 FREE) with **no level/cohort** set. So three of the five
+  Bulk Send filters (Level, Cohort, and the "Free" kind) are effectively
+  dead for the current audience, and the "Free" option is a trap that
+  resolves to 0. `program_id` IS populated (RN 331, RM 280, RPHN 14,
+  NACNAP 2, RMHN 1).
+
+### Next session
+- Optional: make Bulk Send filters honest for the current audience —
+  relabel/align the Subscription Kind options (Free→Trial reality) and/or
+  warn when a filter would zero-out the recipient list.
+- Optional: clean up the untracked `payments-worker/` folder (only a
+  stray `package-lock.json`).
+- The odd count (629 threads vs 628 students) — one extra thread, not
+  yet investigated.
+
+---
+
 ## Session — 2026-04-19 (MyNclex planning — Claude Web)
 
 Product-planning session for MyNclex. Roles, Journey Tracker,
