@@ -5,8 +5,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Register — QAcademy Nurses Hub</title>
   <link rel="stylesheet" href="/mynmclicensure/css/style.css" />
+  <style>
+    #creatingOverlay { display:none; position:fixed; inset:0; z-index:9999;
+      background:rgba(255,255,255,0.92); align-items:center; justify-content:center;
+      flex-direction:column; gap:14px; }
+    #creatingOverlay.show { display:flex; }
+    .reg-spinner { width:44px; height:44px; border:4px solid #e0e7ef;
+      border-top-color:#0ea5e9; border-radius:50%; animation:regspin .7s linear infinite; }
+    @keyframes regspin { to { transform:rotate(360deg); } }
+    #creatingOverlay .reg-msg { font-size:14px; font-weight:600; color:#075985; }
+
+    /* Confirm modal + success screen */
+    .reg-modal-overlay, .reg-success-overlay { display:none; position:fixed; inset:0; z-index:10000;
+      background:rgba(15,23,42,0.55); align-items:center; justify-content:center; padding:20px; overflow-y:auto; }
+    .reg-modal-overlay.show, .reg-success-overlay.show { display:flex; }
+    .reg-modal, .reg-success-card { background:#fff; border-radius:14px; padding:24px; max-width:440px; width:100%;
+      box-shadow:0 10px 40px rgba(0,0,0,0.2); }
+    .reg-modal h3 { margin:0 0 8px; color:var(--primary,#1e3a5f); font-size:18px; }
+    .reg-modal p { margin:0 0 8px; font-size:14px; color:#334155; line-height:1.5; }
+    .reg-modal-email { background:#f1f5f9; padding:8px 10px; border-radius:8px; word-break:break-all; }
+    .reg-modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:16px; flex-wrap:wrap; }
+    .reg-success-card { text-align:center; max-width:480px; }
+    .reg-success-check { width:56px; height:56px; border-radius:50%; background:#dcfce7; color:#15803d;
+      display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:bold; margin:0 auto 12px; }
+    .reg-success-card h2 { margin:0 0 10px; color:var(--primary,#1e3a5f); }
+    .reg-success-card p { font-size:14px; color:#334155; margin:0 0 8px; line-height:1.5; }
+    .reg-success-card .se-email { font-size:15px; word-break:break-all; }
+    .reg-success-sub { color:#64748b; font-size:13px; }
+    .reg-success-ways { text-align:left; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px;
+      padding:14px 16px; margin:16px 0; }
+    .reg-success-ways .ways-title { font-weight:700; color:var(--primary,#1e3a5f); margin:0 0 8px; font-size:13px; }
+    .reg-success-ways ul { margin:0; padding-left:18px; }
+    .reg-success-ways li { font-size:13px; color:#334155; margin-bottom:6px; line-height:1.45; }
+    .reg-success-btn { display:inline-block; margin-top:4px; text-decoration:none; }
+  </style>
 </head>
 <body>
+
+<div id="creatingOverlay">
+  <div class="reg-spinner"></div>
+  <div class="reg-msg">Creating your account…</div>
+</div>
+
+<!-- Touchpoint 1: confirm before creating -->
+<div id="createConfirmModal" class="reg-modal-overlay">
+  <div class="reg-modal">
+    <h3>Almost done! 👏</h3>
+    <p>Please remember the <strong>email</strong> and <strong>password</strong> you just entered — you'll need them every time you sign in.</p>
+    <p class="reg-modal-email">Your email: <strong id="confirmEmailLabel"></strong></p>
+    <div class="reg-modal-actions">
+      <button type="button" class="btn" id="cancelCreateBtn">Go back</button>
+      <button type="button" class="btn btn-primary" id="confirmCreateBtn">Create my account</button>
+    </div>
+  </div>
+</div>
+
+<!-- Touchpoint 2: success screen -->
+<div id="successScreen" class="reg-success-overlay">
+  <div class="reg-success-card">
+    <div class="reg-success-check">&#10003;</div>
+    <h2>Your account is ready!</h2>
+    <p>Your sign-in email is:<br><strong class="se-email" id="successEmail"></strong></p>
+    <p class="reg-success-sub">We've also sent a welcome email to that address.</p>
+    <div class="reg-success-ways">
+      <p class="ways-title">3 ways to sign in next time:</p>
+      <ul>
+        <li><strong>Password</strong> — the one you just created.</li>
+        <li><strong>Google</strong> — if you used a Gmail address, just tap "Sign in with Google".</li>
+        <li><strong>Magic link</strong> — forgot your password? Get a link sent to your email and tap it. No password needed.</li>
+      </ul>
+    </div>
+    <a class="btn btn-primary reg-success-btn" href="/mynmclicensure/login.html">Go to Sign In &rarr;</a>
+  </div>
+</div>
 
 <div class="auth-wrapper">
   <div class="auth-card">
@@ -45,11 +116,40 @@
       </div>
 
       <div class="form-group">
+        <label for="phone">WhatsApp Number</label>
+        <input type="tel" id="phone" placeholder="e.g. 024 123 4567" required autocomplete="tel" inputmode="tel" />
+      </div>
+
+      <div class="form-group">
         <label for="program">Programme</label>
         <select id="program" required>
           <option value="">Loading programmes...</option>
         </select>
         <div id="trialHint" style="display:none; margin-top:6px; padding:8px 10px; background:#f0f9ff; border:1px solid #bae6fd; border-radius:6px; font-size:13px; color:#075985;"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="school">School</label>
+        <select id="school" required>
+          <option value="">Loading schools...</option>
+        </select>
+        <input type="text" id="schoolOther" placeholder="Type your school's name" style="display:none; margin-top:8px;" />
+      </div>
+
+      <div class="form-group">
+        <label for="referral">How did you hear about us?</label>
+        <select id="referral" required>
+          <option value="">Select one</option>
+          <option>WhatsApp group</option>
+          <option>A friend / colleague</option>
+          <option>TikTok</option>
+          <option>Facebook</option>
+          <option>Instagram</option>
+          <option>School / lecturer</option>
+          <option>Google search</option>
+          <option value="__OTHER__">Other</option>
+        </select>
+        <input type="text" id="referralOther" placeholder="Tell us how" style="display:none; margin-top:8px;" />
       </div>
 
       <div class="form-group">
@@ -92,6 +192,7 @@
 // as data-trial-days so the on-change hint shows the actual length
 // the student is about to receive.
 const trialDurationByProductId = new Map();
+let createConfirmed = false;  // set true once the "remember your details" modal is confirmed
 
 async function loadPrograms() {
     const programs = await getPrograms();
@@ -146,6 +247,49 @@ function updateTrialHint() {
     }
 }
 
+// ── Load schools from DB into dropdown (grouped by region) ──
+// Strict pick from the NMC-accredited list, with an "isn't listed"
+// escape that reveals a free-text box.
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function loadSchools() {
+  const select = document.getElementById('school');
+  const { data: schools, error } = await db
+    .from('schools')
+    .select('id, name, region')
+    .eq('active', true)
+    .order('region', { ascending: true })
+    .order('name', { ascending: true });
+
+  if (error || !schools || !schools.length) {
+    select.innerHTML = '<option value="">Could not load schools</option>';
+    return;
+  }
+
+  let html = '<option value="">Select your school</option>';
+  let region = '';
+  schools.forEach(s => {
+    if (s.region !== region) {
+      if (region) html += '</optgroup>';
+      html += `<optgroup label="${escHtml(s.region)}">`;
+      region = s.region;
+    }
+    html += `<option value="${s.id}">${escHtml(s.name)}</option>`;
+  });
+  if (region) html += '</optgroup>';
+  html += '<option value="__OTHER__">My school isn\'t listed</option>';
+  select.innerHTML = html;
+
+  select.addEventListener('change', () => {
+    const other = select.value === '__OTHER__';
+    const box = document.getElementById('schoolOther');
+    box.style.display = other ? 'block' : 'none';
+    if (!other) box.value = '';
+  });
+}
+
   // ── Secure ID helper ────────────────────────────────────
   function makeSecureId(prefix, byteLength = 8) {
     const bytes = crypto.getRandomValues(new Uint8Array(byteLength));
@@ -167,6 +311,11 @@ function updateTrialHint() {
     const surname         = document.getElementById('surname').value.trim();
     const email           = document.getElementById('email').value.trim();
     const program_id      = document.getElementById('program').value;
+    const phone           = document.getElementById('phone').value.trim();
+    const schoolVal       = document.getElementById('school').value;
+    const schoolOther     = document.getElementById('schoolOther').value.trim();
+    const referralVal     = document.getElementById('referral').value;
+    const referralOther   = document.getElementById('referralOther').value.trim();
     const password        = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
     const submitBtn       = document.getElementById('submitBtn');
@@ -190,8 +339,45 @@ function updateTrialHint() {
       return;
     }
 
+    if (phone.replace(/\D/g, '').length < 9) {
+      errorAlert.textContent = 'Please enter a valid WhatsApp number.';
+      errorAlert.classList.add('show');
+      return;
+    }
+
+    if (!schoolVal) {
+      errorAlert.textContent = 'Please select your school.';
+      errorAlert.classList.add('show');
+      return;
+    }
+    if (schoolVal === '__OTHER__' && !schoolOther) {
+      errorAlert.textContent = "Please type your school's name.";
+      errorAlert.classList.add('show');
+      return;
+    }
+
+    if (!referralVal) {
+      errorAlert.textContent = 'Please tell us how you heard about us.';
+      errorAlert.classList.add('show');
+      return;
+    }
+    if (referralVal === '__OTHER__' && !referralOther) {
+      errorAlert.textContent = 'Please tell us how you heard about us.';
+      errorAlert.classList.add('show');
+      return;
+    }
+
+    // Touchpoint 1: pause so they note their email + password before we create the account
+    if (!createConfirmed) {
+      document.getElementById('confirmEmailLabel').textContent = email;
+      document.getElementById('createConfirmModal').classList.add('show');
+      return;
+    }
+    createConfirmed = false;
+
     submitBtn.disabled = true;
     submitBtn.textContent = 'Creating account...';
+    document.getElementById('creatingOverlay').classList.add('show');
 
     // ── Step 1: Create Supabase Auth account ────────────
     const { data, error } = await db.auth.signUp({ email, password });
@@ -201,6 +387,7 @@ function updateTrialHint() {
       errorAlert.classList.add('show');
       submitBtn.disabled = false;
       submitBtn.textContent = 'Create Account';
+      document.getElementById('creatingOverlay').classList.remove('show');
       return;
     }
 
@@ -217,9 +404,13 @@ function updateTrialHint() {
         surname:       surname,
         name:          forename + ' ' + surname,
         program_id:    program_id,
-        role:          'STUDENT',
-        active:        true,
-        signup_source: 'SUPABASE_AUTH'
+        role:            'STUDENT',
+        active:          true,
+        signup_source:   'SUPABASE_AUTH',
+        phone_number:    phone,
+        school_id:       schoolVal === '__OTHER__' ? null : Number(schoolVal),
+        school_other:    schoolVal === '__OTHER__' ? schoolOther : null,
+        referral_source: referralVal === '__OTHER__' ? referralOther : referralVal
       });
 
     if (profileError) {
@@ -227,6 +418,7 @@ function updateTrialHint() {
       errorAlert.classList.add('show');
       submitBtn.disabled = false;
       submitBtn.textContent = 'Create Account';
+      document.getElementById('creatingOverlay').classList.remove('show');
       return;
     }
 
@@ -265,10 +457,6 @@ if (trialProductId) {
     }
 }
 
-    // ── Step 4: Success ──────────────────────────────────
-    successAlert.textContent = 'Account created! Redirecting to login...';
-    successAlert.classList.add('show');
-
     // ── Step 5: Send welcome email (fire-and-forget) ────
     try {
       const programText = document.getElementById('program').selectedOptions[0]?.textContent?.trim() || '';
@@ -294,14 +482,34 @@ if (trialProductId) {
     // state — avoids onAuthStateChange deadlock from the signUp session
     await db.auth.signOut();
 
-    setTimeout(() => {
-      window.location.href = '/mynmclicensure/login.html';
-    }, 2000);
+    // ── Step 4: Success screen (touchpoint 2) ───────────
+    document.getElementById('creatingOverlay').classList.remove('show');
+    document.getElementById('successEmail').textContent = email;
+    document.getElementById('successScreen').classList.add('show');
 
   });
 
-  // Load programmes on page load
+  // Load programmes + schools on page load
   loadPrograms();
+  loadSchools();
+
+  // Touchpoint 1 modal buttons
+  document.getElementById('confirmCreateBtn').addEventListener('click', () => {
+    document.getElementById('createConfirmModal').classList.remove('show');
+    createConfirmed = true;
+    document.getElementById('registerForm').requestSubmit();
+  });
+  document.getElementById('cancelCreateBtn').addEventListener('click', () => {
+    document.getElementById('createConfirmModal').classList.remove('show');
+  });
+
+  // Reveal the "Other" text box when chosen in the referral dropdown
+  document.getElementById('referral').addEventListener('change', (e) => {
+    const other = e.target.value === '__OTHER__';
+    const box = document.getElementById('referralOther');
+    box.style.display = other ? 'block' : 'none';
+    if (!other) box.value = '';
+  });
 
 </script>
 

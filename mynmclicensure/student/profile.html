@@ -281,6 +281,14 @@
             <div class="profile-value" id="valProgramme">—</div>
           </div>
           <div class="profile-row">
+            <div class="profile-label">School</div>
+            <div class="profile-value" id="valSchool">—</div>
+            <div class="profile-input">
+              <select id="inpSchool"><option value="">Loading…</option></select>
+              <input type="text" id="inpSchoolOther" placeholder="Type your school's name" style="display:none; margin-top:8px;" />
+            </div>
+          </div>
+          <div class="profile-row">
             <div class="profile-label">Level</div>
             <div class="profile-value" id="valLevel">—</div>
             <div class="profile-input">
@@ -351,6 +359,7 @@
   let programs   = [];
   let toastTimer = null;
   let pendingAvatarFile = null;
+  let schools = [];
 
   const byId = id => document.getElementById(id);
 
@@ -359,13 +368,18 @@
     PROFILE = await guardPage('STUDENT');
     if (!PROFILE) return;
 
-    const [userData, programData] = await Promise.all([
+    const [userData, programData, schoolData] = await Promise.all([
       getUserById(PROFILE.user_id),
-      getPrograms()
+      getPrograms(),
+      db.from('schools').select('id, name, region').eq('active', true)
+        .order('region', { ascending: true }).order('name', { ascending: true })
+        .then(r => r.data || [])
     ]);
 
     fullUser = userData;
     programs = programData;
+    schools  = schoolData;
+    populateSchoolPicker();
 
     if (!fullUser) {
       showToast('Error', 'Could not load profile.', 'error');
@@ -376,6 +390,35 @@
     renderAcademic();
     renderSubscription();
     bindEvents();
+  }
+
+  // ── School picker (grouped by region, strict + escape) ──
+  function escHtml(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function populateSchoolPicker() {
+    const select = byId('inpSchool');
+    if (!schools.length) { select.innerHTML = '<option value="">Could not load schools</option>'; return; }
+    let html = '<option value="">— Select —</option>';
+    let region = '';
+    schools.forEach(s => {
+      if (s.region !== region) {
+        if (region) html += '</optgroup>';
+        html += `<optgroup label="${escHtml(s.region)}">`;
+        region = s.region;
+      }
+      html += `<option value="${s.id}">${escHtml(s.name)}</option>`;
+    });
+    if (region) html += '</optgroup>';
+    html += '<option value="__OTHER__">My school isn\'t listed</option>';
+    select.innerHTML = html;
+
+    select.addEventListener('change', () => {
+      const other = select.value === '__OTHER__';
+      byId('inpSchoolOther').style.display = other ? 'block' : 'none';
+      if (!other) byId('inpSchoolOther').value = '';
+    });
   }
 
   // ── Render: Personal ───────────────────────────────────
@@ -414,6 +457,23 @@
 
     byId('inpLevel').value  = fullUser.level  || '';
     byId('inpCohort').value = fullUser.cohort || '';
+
+    // School: display name (or the free-text 'other'), and set edit inputs
+    const sch = schools.find(s => String(s.id) === String(fullUser.school_id));
+    byId('valSchool').textContent = sch ? sch.name : (fullUser.school_other || '—');
+    if (fullUser.school_id) {
+      byId('inpSchool').value = String(fullUser.school_id);
+      byId('inpSchoolOther').value = '';
+      byId('inpSchoolOther').style.display = 'none';
+    } else if (fullUser.school_other) {
+      byId('inpSchool').value = '__OTHER__';
+      byId('inpSchoolOther').value = fullUser.school_other;
+      byId('inpSchoolOther').style.display = 'block';
+    } else {
+      byId('inpSchool').value = '';
+      byId('inpSchoolOther').value = '';
+      byId('inpSchoolOther').style.display = 'none';
+    }
   }
 
   // ── Render: Subscription ───────────────────────────────
@@ -514,15 +574,26 @@
       const level  = byId('inpLevel').value;
       const cohort = byId('inpCohort').value.trim();
 
-      const res = await updateUserProfile(PROFILE.user_id, { level, cohort });
+      const schoolSel   = byId('inpSchool').value;
+      const schoolOther = byId('inpSchoolOther').value.trim();
+      if (schoolSel === '__OTHER__' && !schoolOther) {
+        showToast('Validation', "Please type your school's name.", 'error');
+        return;
+      }
+      const school_id    = schoolSel === '__OTHER__' ? null : (schoolSel ? Number(schoolSel) : null);
+      const school_other = schoolSel === '__OTHER__' ? schoolOther : null;
+
+      const res = await updateUserProfile(PROFILE.user_id, { level, cohort, school_id, school_other });
 
       if (!res.success) {
         showToast('Error', res.message, 'error');
         return;
       }
 
-      fullUser.level  = level;
-      fullUser.cohort = cohort;
+      fullUser.level        = level;
+      fullUser.cohort       = cohort;
+      fullUser.school_id    = school_id;
+      fullUser.school_other = school_other;
 
       byId('academicPanel').classList.remove('editing');
       renderAcademic();

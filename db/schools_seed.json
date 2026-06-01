@@ -1,0 +1,1260 @@
+[
+ {
+  "name": "University of Ghana, Legon, Accra",
+  "programmes": [
+   "RGN",
+   "RCN",
+   "RMN",
+   "RM",
+   "PN"
+  ],
+  "ownership": "State",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Valley View University, Oyibi, Accra",
+  "programmes": [
+   "RGN",
+   "RMN",
+   "RM"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Central University College, Miotso",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "St. Karol Sch. of Nursing, Weija, Accra",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Pentecost University College, Sowutuom Accra",
+  "programmes": [
+   "RGN",
+   "RM"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "West End University College, Weija Accra",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Nursing & Midwifery Training School ,Korle-Bu, Accra",
+  "programmes": [
+   "RGN",
+   "RM"
+  ],
+  "ownership": "State",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Nursing & Midwifery Training School, 37Military, Accra.",
+  "programmes": [
+   "RGN",
+   "RM"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Western Hills School of Nursing, Accra.",
+  "programmes": [
+   "RGN",
+   "NAC"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Nightingale School of Nursing, Accra.",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Narh Bita College , Tema",
+  "programmes": [
+   "RGN",
+   "RM",
+   "NAC"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Nurses Training College, Pantang.",
+  "programmes": [
+   "RMN"
+  ],
+  "ownership": "State",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Nursing & Midwifery Training College, Pantang.",
+  "programmes": [
+   "RM",
+   "NAC"
+  ],
+  "ownership": "State",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Nursing & Midwifery Training College, Teshie.",
+  "programmes": [
+   "RGN",
+   "RM",
+   "NAC"
+  ],
+  "ownership": "State",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Martin Luther Health Training School,",
+  "programmes": [
+   "NAC"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Family Health University College School of Nursing and Midwifery, Teshie- Nungua, Accra",
+  "programmes": [
+   "RGN",
+   "RM",
+   "NAC"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Health Concern Ghana, Accra",
+  "programmes": [
+   "NAC"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Nyaniba Health Assistant Training School, Tema",
+  "programmes": [
+   "NAC"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Ophthalmic Nursing School, Korle-Bu",
+  "programmes": [
+   "OPN"
+  ],
+  "ownership": "State",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Critical Care Nursing & Peri Operative Nursing School",
+  "programmes": [
+   "CCN",
+   "PON"
+  ],
+  "ownership": "State",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Public Health Nurses Training School, Korle-Bu",
+  "programmes": [
+   "RCN",
+   "PHN"
+  ],
+  "ownership": "State",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Golden Sunbeam International College of Science and Technology, Ayikuma-Accra",
+  "programmes": [],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Ghana Christian University College, Adenta-Accra",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Wisconsin International University College, Accra",
+  "programmes": [
+   "RGN",
+   "RCN",
+   "RM"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Oak City International College Madina-Accra",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Knutsford University College",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "KNUST, Kumasi",
+  "programmes": [
+   "RGN",
+   "RM",
+   "EN"
+  ],
+  "ownership": "State",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Presby University College Agogo",
+  "programmes": [
+   "RGN",
+   "RM",
+   "MID"
+  ],
+  "ownership": "Private",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Christian Service University College ,Kumasi",
+  "programmes": [
+   "RGN",
+   "RM"
+  ],
+  "ownership": "Private",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Garden City University College, Kumasi (Dip. & BSc)",
+  "programmes": [
+   "RGN",
+   "RM"
+  ],
+  "ownership": "Private",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Presby Nursing and Midwifery Training College , Agogo",
+  "programmes": [
+   "RGN",
+   "RM"
+  ],
+  "ownership": "State",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Nursing & Midwifery Training College , Kumasi",
+  "programmes": [
+   "RGN",
+   "RM",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Ashanti"
+ },
+ {
+  "name": "SDA Nurses Training College, ,Kwadaso",
+  "programmes": [
+   "RGN",
+   "RM"
+  ],
+  "ownership": "State",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Premier School of Nursing, Moshie Zongo-Kumasi",
+  "programmes": [
+   "RGN",
+   "RM",
+   "NAC"
+  ],
+  "ownership": "Private",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Nursing and Midwifery Training College,Ashanti Mampong",
+  "programmes": [
+   "RGN",
+   "RM",
+   "NAC",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Nursing and Midwifery Training College, Maase Offinso",
+  "programmes": [
+   "RGN",
+   "RM"
+  ],
+  "ownership": "State",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Midwifery Training School Jaachie Pramso",
+  "programmes": [
+   "RM",
+   "MID",
+   "RGN"
+  ],
+  "ownership": "State",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Samlee Nursing and Midwifery Training College, Kumasi",
+  "programmes": [
+   "NAC",
+   "MID"
+  ],
+  "ownership": "Private",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Community Health Nurses Training School Fomena",
+  "programmes": [
+   "RCN",
+   "NAP",
+   "MID"
+  ],
+  "ownership": "Private",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Nurses Training College, Kokofu",
+  "programmes": [
+   "RGN",
+   "NAC"
+  ],
+  "ownership": "State",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Nursing and Midwifery Training College, Tepa",
+  "programmes": [
+   "RGN",
+   "RM",
+   "NAC"
+  ],
+  "ownership": "State",
+  "region": "Ashanti"
+ },
+ {
+  "name": "ENT Nurses Training School, Kumasi",
+  "programmes": [
+   "ENT"
+  ],
+  "ownership": "State",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Abot College of Health Sciences and Technology, Kumasi",
+  "programmes": [],
+  "ownership": "Private",
+  "region": "Ashanti"
+ },
+ {
+  "name": "College of Integrated Healthcare, Obuasi",
+  "programmes": [
+   "RM"
+  ],
+  "ownership": "Private",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Ghana Baptist University College, Kumasi",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Royal Ann College of Health, Kumasi",
+  "programmes": [
+   "RGN",
+   "RM"
+  ],
+  "ownership": "Private",
+  "region": "Ashanti"
+ },
+ {
+  "name": "SDA Midwifery Training College, Asamang",
+  "programmes": [
+   "RM",
+   "MID",
+   "RGN"
+  ],
+  "ownership": "State",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Neumann College, Kumasi",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Withrow College",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Manaata School of Midwifery, Kumasi",
+  "programmes": [
+   "RM"
+  ],
+  "ownership": "Private",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Royal Nursing College",
+  "programmes": [
+   "RGN",
+   "RM"
+  ],
+  "ownership": "Private",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Methodist University College, Wenchi (DIP.)",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Bono"
+ },
+ {
+  "name": "Catholic University College ,Fiapre",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Bono"
+ },
+ {
+  "name": "Nursing and Midwifery Training College, Sunyani",
+  "programmes": [
+   "RGN",
+   "RM",
+   "NAC"
+  ],
+  "ownership": "State",
+  "region": "Bono"
+ },
+ {
+  "name": "Holy Family Nursing and Midwifery Training College ,Berekum",
+  "programmes": [
+   "RGN",
+   "RM",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Bono"
+ },
+ {
+  "name": "Nursing and Midwifery Training School,Dormaa Ahenkro",
+  "programmes": [
+   "RGN",
+   "RM",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Bono"
+ },
+ {
+  "name": "Nurses Training College, Seikwa",
+  "programmes": [
+   "RGN",
+   "NAC"
+  ],
+  "ownership": "State",
+  "region": "Bono"
+ },
+ {
+  "name": "Nurses’ Training College, Sampa",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "State",
+  "region": "Bono"
+ },
+ {
+  "name": "Nurses Training College, Techiman Krobo",
+  "programmes": [
+   "RGN",
+   "NAP"
+  ],
+  "ownership": "State",
+  "region": "Bono East"
+ },
+ {
+  "name": "Holy Family NMTC, Kenten, Techiman",
+  "programmes": [
+   "RGN",
+   "RM",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Bono East"
+ },
+ {
+  "name": "Anglican University College of Technology, Nkoranza",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Bono East"
+ },
+ {
+  "name": "Midwifery Training College, yeji",
+  "programmes": [
+   "RM",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Bono East"
+ },
+ {
+  "name": "Midwifery Training School, Goaso",
+  "programmes": [
+   "RM",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Ahafo"
+ },
+ {
+  "name": "Community Health Nurses Training School, Tanoso",
+  "programmes": [
+   "RCN",
+   "NAP",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Ahafo"
+ },
+ {
+  "name": "College of Nursing, Ntotroso",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "State",
+  "region": "Ahafo"
+ },
+ {
+  "name": "Nursing Training College, Kwapong",
+  "programmes": [
+   "RGN",
+   "NAC"
+  ],
+  "ownership": "State",
+  "region": "Ahafo"
+ },
+ {
+  "name": "Nursing and Midwifery Training College, Dadiesoaba",
+  "programmes": [
+   "RGN",
+   "NAC"
+  ],
+  "ownership": "State",
+  "region": "Ahafo"
+ },
+ {
+  "name": "Presbyterian Midwifery Training College, Duayaw-Nkwanta",
+  "programmes": [
+   "RM"
+  ],
+  "ownership": "State",
+  "region": "Ahafo"
+ },
+ {
+  "name": "Nursing and Midwifery Training College-,Koforidua",
+  "programmes": [
+   "RGN",
+   "RM"
+  ],
+  "ownership": "State",
+  "region": "Eastern"
+ },
+ {
+  "name": "Holy Family Nurses Training College, Nkawkaw",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "State",
+  "region": "Eastern"
+ },
+ {
+  "name": "Nursing and Midwifery Training School, Atibie",
+  "programmes": [
+   "RGN",
+   "RM",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Eastern"
+ },
+ {
+  "name": "Community Health Nurses Training School, Akim Oda",
+  "programmes": [
+   "RCN",
+   "NAP",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Eastern"
+ },
+ {
+  "name": "Nurses Training College, Osiem",
+  "programmes": [
+   "RGN",
+   "NAC"
+  ],
+  "ownership": "State",
+  "region": "Eastern"
+ },
+ {
+  "name": "Nursing and Midwifery Training College, Afosu",
+  "programmes": [
+   "RGN",
+   "RM",
+   "NAC",
+   "MID"
+  ],
+  "ownership": "Private",
+  "region": "Eastern"
+ },
+ {
+  "name": "VRA College of Nursing, Akosombo",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Eastern"
+ },
+ {
+  "name": "Hopkins Health Training Institute, Akim Oda",
+  "programmes": [
+   "RGN",
+   "MID"
+  ],
+  "ownership": "Private",
+  "region": "Eastern"
+ },
+ {
+  "name": "All Nations university College",
+  "programmes": [
+   "RGN",
+   "RM"
+  ],
+  "ownership": "Private",
+  "region": "Eastern"
+ },
+ {
+  "name": "Nursing and Midwifery Training College, Odumase-Krobo",
+  "programmes": [
+   "NAP"
+  ],
+  "ownership": "State",
+  "region": "Eastern"
+ },
+ {
+  "name": "University of Health &Allied Sciences, Ho",
+  "programmes": [
+   "RGN",
+   "RCN",
+   "RM"
+  ],
+  "ownership": "State",
+  "region": "Volta"
+ },
+ {
+  "name": "Nurses Training College, Ho",
+  "programmes": [
+   "RGN",
+   "RCN",
+   "NAP"
+  ],
+  "ownership": "State",
+  "region": "Volta"
+ },
+ {
+  "name": "Midwifery Training School, Hohoe",
+  "programmes": [
+   "RM",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Volta"
+ },
+ {
+  "name": "Nurses Training College, Keta",
+  "programmes": [
+   "RGN",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Volta"
+ },
+ {
+  "name": "Modal College, Sgakope (Dip. & BSc)",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Volta"
+ },
+ {
+  "name": "Midwifery Training School, Kete Krachi",
+  "programmes": [
+   "RM",
+   "MID",
+   "NAC"
+  ],
+  "ownership": "State",
+  "region": "Oti"
+ },
+ {
+  "name": "University of Cape Coast",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "State",
+  "region": "Central"
+ },
+ {
+  "name": "KAAF University College, Kasoa",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Central"
+ },
+ {
+  "name": "Nursing and Midwifery Training College Cape Coast",
+  "programmes": [
+   "RGN",
+   "RM",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Central"
+ },
+ {
+  "name": "Nurses Training College, Ankaful, Cape Coast",
+  "programmes": [
+   "RMN",
+   "RCMN"
+  ],
+  "ownership": "State",
+  "region": "Central"
+ },
+ {
+  "name": "Community Health Nurses Training College, Winneba",
+  "programmes": [
+   "RCN",
+   "NAP"
+  ],
+  "ownership": "State",
+  "region": "Central"
+ },
+ {
+  "name": "Nursing and Midwifery Training College, Twifo Praso",
+  "programmes": [
+   "RGN",
+   "RCN",
+   "RM",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Central"
+ },
+ {
+  "name": "Nursing and Midwifery Training College, Dunkwa -On-Offin",
+  "programmes": [
+   "RGN",
+   "RM",
+   "NAC",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Central"
+ },
+ {
+  "name": "BIMAKS College of Business and Health Sciences, Agona Swedru",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Central"
+ },
+ {
+  "name": "Godfery Memorial Midwifery Training School, Apam",
+  "programmes": [
+   "MID"
+  ],
+  "ownership": "Private",
+  "region": "Central"
+ },
+ {
+  "name": "Nursing and Midwifery Training College Sekondi",
+  "programmes": [
+   "RGN",
+   "RM"
+  ],
+  "ownership": "State",
+  "region": "Western"
+ },
+ {
+  "name": "Midwifery Training School, Tarkwa",
+  "programmes": [
+   "RGN",
+   "RM",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Western"
+ },
+ {
+  "name": "Nursing and Midwifery Training College, Asakrangwa",
+  "programmes": [
+   "RGN",
+   "RM",
+   "NAC",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Western"
+ },
+ {
+  "name": "Community Health Nurses Training College, Esiama",
+  "programmes": [
+   "RCN",
+   "NAP",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Western"
+ },
+ {
+  "name": "Nursing and Midwifery Training College, Asanta",
+  "programmes": [
+   "RGN",
+   "RM",
+   "NAC",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Western"
+ },
+ {
+  "name": "Porters College, SON",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Western"
+ },
+ {
+  "name": "Bibiani College of Health Science",
+  "programmes": [
+   "RCN"
+  ],
+  "ownership": "State",
+  "region": "Western North"
+ },
+ {
+  "name": "Nursing and Midwifery Training College, Sefwi Wiawso",
+  "programmes": [
+   "RGN",
+   "NAC"
+  ],
+  "ownership": "State",
+  "region": "Western North"
+ },
+ {
+  "name": "College of Health , Sefwi Asafo",
+  "programmes": [
+   "RCN"
+  ],
+  "ownership": "State",
+  "region": "Western North"
+ },
+ {
+  "name": "University for Development Studies, Tamale",
+  "programmes": [
+   "RGN",
+   "RM",
+   "EN"
+  ],
+  "ownership": "State",
+  "region": "Northern"
+ },
+ {
+  "name": "Nursing and Midwifery Training School, Tamale",
+  "programmes": [
+   "RGN",
+   "RM",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Northern"
+ },
+ {
+  "name": "Community Health Nurses Training School, Tamale",
+  "programmes": [
+   "RCN",
+   "NAP"
+  ],
+  "ownership": "State",
+  "region": "Northern"
+ },
+ {
+  "name": "Midwifery Training School, Gushegu",
+  "programmes": [
+   "RM",
+   "NAC",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Northern"
+ },
+ {
+  "name": "Technical University College, Tamale (BSC & DIP)",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Northern"
+ },
+ {
+  "name": "New Life College, Tamale",
+  "programmes": [
+   "RM"
+  ],
+  "ownership": "Private",
+  "region": "Northern"
+ },
+ {
+  "name": "Nursing and Midwifery Training College, Yendi",
+  "programmes": [
+   "RGN",
+   "RMN",
+   "NAC"
+  ],
+  "ownership": "State",
+  "region": "North East"
+ },
+ {
+  "name": "College of Nursing and Midwifery, Nalerigu",
+  "programmes": [
+   "RGN",
+   "RM",
+   "NAC"
+  ],
+  "ownership": "State",
+  "region": "North East"
+ },
+ {
+  "name": "Community Health Nurses Training School, Bole",
+  "programmes": [
+   "RCN",
+   "NAP",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Savannah"
+ },
+ {
+  "name": "Nursing and Midwifery Training College, Kpembe",
+  "programmes": [
+   "RGN",
+   "RM",
+   "NAC",
+   "NAP"
+  ],
+  "ownership": "State",
+  "region": "Savannah"
+ },
+ {
+  "name": "Nurses Training College, Damongo",
+  "programmes": [
+   "RGN",
+   "NAC"
+  ],
+  "ownership": "State",
+  "region": "Savannah"
+ },
+ {
+  "name": "Nurses Training College Bolgatanga",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "State",
+  "region": "Upper East"
+ },
+ {
+  "name": "Presbyterian Nurses Training College, Bawku",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "State",
+  "region": "Upper East"
+ },
+ {
+  "name": "Nursing and Midwifery Training College, Zuarungu",
+  "programmes": [
+   "RGN",
+   "NAC"
+  ],
+  "ownership": "State",
+  "region": "Upper East"
+ },
+ {
+  "name": "Midwifery Training School, Bolgatanga",
+  "programmes": [
+   "RM"
+  ],
+  "ownership": "State",
+  "region": "Upper East"
+ },
+ {
+  "name": "Community Health Nurses Training College, Navrongo",
+  "programmes": [
+   "RCN",
+   "NAP"
+  ],
+  "ownership": "State",
+  "region": "Upper East"
+ },
+ {
+  "name": "Nurses Training College, Jirapa",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "State",
+  "region": "Upper West"
+ },
+ {
+  "name": "Midwifery Training School, Jirapa.",
+  "programmes": [
+   "RM",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Upper West"
+ },
+ {
+  "name": "Midwifery Training School, Tumu",
+  "programmes": [
+   "RM",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Upper West"
+ },
+ {
+  "name": "Midwifery Training School, Nandom",
+  "programmes": [
+   "RM",
+   "MID"
+  ],
+  "ownership": "State",
+  "region": "Upper West"
+ },
+ {
+  "name": "Community Health Nurses Training School, Jirapa",
+  "programmes": [
+   "RCN",
+   "NAP"
+  ],
+  "ownership": "State",
+  "region": "Upper West"
+ },
+ {
+  "name": "Nurses Training College, Wa.",
+  "programmes": [
+   "RGN",
+   "NAC"
+  ],
+  "ownership": "State",
+  "region": "Upper West"
+ },
+ {
+  "name": "Nurses Training College, Lawra",
+  "programmes": [
+   "RGN",
+   "NAC"
+  ],
+  "ownership": "State",
+  "region": "Upper West"
+ },
+ {
+  "name": "Rans-Elliot School of Nursing, Korofidua",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Eastern"
+ },
+ {
+  "name": "Margret Marguart Catholic Nursing Training College, Kpando",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Volta"
+ },
+ {
+  "name": "Flosam Institute of Nursing, Midwifery and Allied Health Sciences, Suhum",
+  "programmes": [
+   "PHN"
+  ],
+  "ownership": "Private",
+  "region": "Eastern"
+ },
+ {
+  "name": "Islamic Nursing Trainging School, Accra",
+  "programmes": [
+   "RGN",
+   "PHN"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Mieazah College of Health, Kumasi",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Wisconsin International University College, Kumasi Campus",
+  "programmes": [
+   "RGN",
+   "RM",
+   "PHN"
+  ],
+  "ownership": "Private",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Amen College of Health Science, Kumasi",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Ashanti"
+ },
+ {
+  "name": "Valley View University, Techiman",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Bono East"
+ },
+ {
+  "name": "University of Energy and Natural Resources, Sunyani",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "State",
+  "region": "Bono"
+ },
+ {
+  "name": "College of Community Health Nursing, Nkanchina/Kpandai",
+  "programmes": [
+   "NAP"
+  ],
+  "ownership": "State",
+  "region": "Savannah"
+ },
+ {
+  "name": "FOUNTAINHEAD CHRISTIAN COLLEGE, TEMA",
+  "programmes": [
+   "RGN (BSc)"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "HERITAGE CHRISTIAN COLLEGE, AMASAMAN",
+  "programmes": [
+   "RGN (BSc)"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "RIVER VIEW COLLEGE, WEIJA",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "VALLEY VIEW UNIVERSITY, KUMASI",
+  "programmes": [
+   "RGN (BSc)"
+  ],
+  "ownership": "Private",
+  "region": "Ashanti"
+ },
+ {
+  "name": "St. Mary's College of Health",
+  "programmes": [
+   "RGN"
+  ],
+  "ownership": "Private",
+  "region": "Greater Accra"
+ },
+ {
+  "name": "Holy Eucharist University College, Half Assini",
+  "programmes": [
+   "RGN (BSc)"
+  ],
+  "ownership": "Private",
+  "region": "Western"
+ }
+]
