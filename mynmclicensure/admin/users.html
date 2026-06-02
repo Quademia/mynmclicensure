@@ -523,6 +523,7 @@
   let isLoading = false;
   let searchTimer = null;
   let currentUser = null;   // user currently open in panel
+  let schoolsById = {};     // id -> { name, region } for the detail drawer
 
   // ── Init ───────────────────────────────────────────────
   async function init() {
@@ -537,6 +538,10 @@
     programs.forEach(p => {
       programFilter.innerHTML += `<option value="${p.program_id}">${p.program_name}</option>`;
     });
+
+    // Load schools (id -> name/region) for the detail drawer
+    const { data: schools } = await db.from('schools').select('id, name, region');
+    (schools || []).forEach(s => { schoolsById[s.id] = s; });
 
     // Load products into assign subscription dropdown (from api.js)
     const products = await getProducts();
@@ -685,23 +690,48 @@
     document.getElementById('panelName').textContent =
       user.name || (user.forename + ' ' + user.surname) || user.email;
 
+    // School: resolve name + region from the loaded map; fall back to the
+    // free-text "not listed" value the student typed.
+    const sch = user.school_id ? schoolsById[user.school_id] : null;
+    const schoolText = sch
+      ? `${escapeHtml(sch.name)} <span style="color:var(--text-muted); font-weight:400;">(${escapeHtml(sch.region)})</span>`
+      : (user.school_other
+          ? `${escapeHtml(user.school_other)} <span style="color:var(--text-muted); font-weight:400;">(not listed)</span>`
+          : '—');
+
     // Profile section
     document.getElementById('panelProfile').innerHTML = `
       <div class="detail-row">
         <span class="detail-label">Full Name</span>
-        <span class="detail-value">${user.name || '—'}</span>
+        <span class="detail-value">${escapeHtml(user.name || '—')}</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">Email</span>
-        <span class="detail-value">${user.email}</span>
+        <span class="detail-value">${escapeHtml(user.email || '—')}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Phone / WhatsApp</span>
+        <span class="detail-value">${user.phone_number ? escapeHtml(user.phone_number) : '—'}</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">Programme</span>
         <span class="detail-value">${user.program_id || '—'}</span>
       </div>
       <div class="detail-row">
+        <span class="detail-label">School</span>
+        <span class="detail-value">${schoolText}</span>
+      </div>
+      <div class="detail-row">
         <span class="detail-label">Level</span>
         <span class="detail-value">${user.level || '—'}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Cohort</span>
+        <span class="detail-value">${user.cohort ? escapeHtml(String(user.cohort)) : '—'}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Referral source</span>
+        <span class="detail-value">${user.referral_source ? escapeHtml(user.referral_source) : '—'}</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">Role</span>
