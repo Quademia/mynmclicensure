@@ -206,6 +206,9 @@
   .avatar-img, .avatar-initials { width: 64px; height: 64px; font-size: 22px; }
 }
 
+/* highlight fields that still need filling (from the dashboard nudge) */
+.needs-input { border-color: #f59e0b !important; box-shadow: 0 0 0 3px rgba(245,158,11,0.18) !important; }
+
 </style>
 </head>
 <body>
@@ -390,6 +393,16 @@
     renderAcademic();
     renderSubscription();
     bindEvents();
+
+    // Arriving from the dashboard "complete your profile" nudge:
+    // open the relevant panels in edit mode and highlight what's missing.
+    if (new URLSearchParams(location.search).get('complete') === '1') {
+      const phoneEmpty  = !(fullUser.phone_number && String(fullUser.phone_number).trim());
+      const schoolEmpty = !(fullUser.school_id || (fullUser.school_other && String(fullUser.school_other).trim()));
+      if (phoneEmpty)  { enterEdit('personalPanel'); byId('inpPhone').classList.add('needs-input'); }
+      if (schoolEmpty) { enterEdit('academicPanel'); byId('inpSchool').classList.add('needs-input'); }
+      byId(phoneEmpty ? 'personalPanel' : 'academicPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   // ── School picker (grouped by region, strict + escape) ──
