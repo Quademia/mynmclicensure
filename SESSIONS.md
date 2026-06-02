@@ -97,7 +97,39 @@ Newest session on top.
   and magic link (passwordless). Email confirmation is OFF — the welcome
   email is informational, not an activation gate.
 
+### Also done — login redesign + profile nudge + admin drawer (into 2026-06-02)
+- **Login redesign (both products), from a Claude Design V1 prototype.**
+  Fixed the confusing magic-link: it's now a **button → popup** ("Sign in
+  without a password" → email → Send → "Check your inbox"), no stray
+  second email box on the card. Licensure keeps the blue "3 ways" info
+  box; MyTeacher has none. Faint photo banner at the top fading to white
+  (Licensure = clinical nursing photo `login-bg-1`; MyTeacher = exam-hall
+  `login-bg-2`). Placeholder "+" badge dropped (repo logo is a non-
+  transparent RGB PNG — unsuitable for a white card). All existing auth
+  wiring preserved on both (password+rate-limit+logging, Google, magic
+  link). `mynmclicensure/login.html`, `myteacher/login.html`.
+  - Uploaded source photos were 2 MB PNGs → compressed with `sharp` to
+    ~58–64 KB JPEGs; raw PNGs deleted. (sharp lives in the *mynclex*
+    repo's node_modules, not gamma's — run image scripts from there.)
+- **Profile-completion nudge.** Slim one-line amber strip on the student
+  dashboard (kept light so mobile doesn't get busy) shown only when
+  phone OR school is missing; deep-links to `profile.html?complete=1`
+  which auto-opens the relevant panels in edit mode + highlights the
+  empty fields. Self-clears when complete; "x" hides for the session.
+  Targets the ~600 pre-update signups; invisible to new (complete) users.
+- **Admin → Users detail drawer** now surfaces the new fields: Phone/
+  WhatsApp, School (resolved to name + region from the schools table,
+  with "not listed" fallback), Cohort, Referral source.
+- All released to prod (PRs #21 login, #22 nudge; admin drawer pending in
+  this final release).
+
 ### Next session
+- **Admin Users filters** (designed, not yet built): add Region (via
+  school_id→region map), Referral source, Account status, and Profile-
+  complete/incomplete filters — all server-side in `getUsers()`. Then a
+  bigger follow-up: Subscription kind/status (Trial/Paid/Expired) which
+  needs a subscriptions→products join. (Skip per-school [141 too many],
+  Cohort/Level [~null for current users].)
 - Optional: make Bulk Send filters honest for the current audience —
   relabel/align the Subscription Kind options (Free→Trial reality) and/or
   warn when a filter would zero-out the recipient list.
