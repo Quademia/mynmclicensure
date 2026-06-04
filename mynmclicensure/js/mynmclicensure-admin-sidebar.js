@@ -26,6 +26,7 @@
       <a href="${A}/announcements.html">📢 Announcements</a>
       <a href="${A}/fixed-quizzes.html">📝 Fixed Quizzes</a>
       <a href="${A}/mock-exams.html">🎯 Mock Exams</a>
+      <a href="${A}/attempts.html">📊 Attempts</a>
       <a href="${A}/question-bank.html">🗂️ Question Bank</a>
       <a href="${A}/messages.html">💬 Messages <span id="adminMsgBadge" class="admin-msg-badge" style="display:none;"></span></a>
       <a href="${A}/config.html">⚙️ Config</a>

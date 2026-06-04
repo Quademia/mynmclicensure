@@ -41,7 +41,7 @@ qacademy-gamma/
   mynmclicensure/          ← NMC Licensure product (fully self-contained)
     css/                   ← Licensure stylesheet (style.css)
     js/                    ← Licensure JS (paths, guard, auth, utils, api, sidebars)
-    admin/                 ← 12 admin pages
+    admin/                 ← 13 admin pages
     student/               ← 16 student pages
     runner/                ← 2 quiz runner pages
     login.html, register.html, subscribe.html, etc.

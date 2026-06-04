@@ -5,6 +5,36 @@ Newest session on top.
 
 ---
 
+## Session — 2026-06-04 (Admin Attempts analytics page — Claude Code)
+
+### Done
+- **New admin page `mynmclicensure/admin/attempts.html`** — a read-only
+  view of all student quiz/exam attempts. Headline counts (total all-time
+  / today / last 7 days / last 30 days); an **analytics window** selector
+  (Today / 7d / 30d / All time / custom From–To) driving: window summary
+  (attempts · completed · avg score · pass rate ≥70%), breakdowns **by
+  type** (mock / fixed / practice / retake) + **by status** (completed /
+  in-progress / abandoned), an **attempts-per-day** bar strip, **top-10
+  quizzes + top-10 students**, and a filterable/searchable/paginated
+  **table** with a click-through **detail drawer**.
+- Reads via the existing admin RLS (`attempts_select` already grants
+  ADMIN). **View-only — no DB change, no migration.** Lightweight column
+  fetch (skips `answers_json`/`item_ids`), capped at 5,000 rows per window
+  to avoid the unbounded loads the older admin pages do.
+- 3 read-only API helpers appended to `mynmclicensure-api.js`:
+  `getAttemptsWindow`, `countAttempts`, `getAttemptById`.
+- Added **"📊 Attempts"** to the admin sidebar (between Mock Exams and
+  Question Bank). README admin-page count 12 → 13.
+
+### Next / notes
+- **Confirm the pass threshold** — set to **70%** (the runner grades ≥70
+  "good", ≥50 "needs practice"; no hard pass constant exists). Labelled
+  "(≥70%)"; change the `PASS_PCT` constant if a different mark is wanted.
+- Deferred (not built): delete / void / reset actions (would need a
+  server-side write path + RLS), CSV export, per-course/quiz rollups.
+
+---
+
 ## Session — 2026-06-01 (Licensure messaging — bulk send fix + clickable links — Claude Code)
 
 ### Done
