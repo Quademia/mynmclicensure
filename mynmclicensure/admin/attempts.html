@@ -68,9 +68,9 @@
 
     /* ── Per-day trend ───────────────────────────────────── */
     .trend-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
-    .trend-bars { display: flex; align-items: flex-end; gap: 4px; height: 120px; margin-top: 8px; }
-    .trend-day { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; min-width: 0; }
-    .trend-day .td-bar { width: 100%; max-width: 26px; background: var(--accent); border-radius: 4px 4px 0 0; min-height: 2px; transition: height .2s; }
+    .trend-bars { display: flex; align-items: flex-end; gap: 4px; height: 150px; margin-top: 8px; }
+    .trend-day { flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; min-width: 0; }
+    .trend-day .td-bar { width: 100%; max-width: 26px; background: var(--accent); border-radius: 4px 4px 0 0; min-height: 3px; transition: height .2s; }
     .trend-day .td-bar:hover { opacity: 0.8; }
     .trend-day .td-lbl { font-size: 9px; color: var(--text-muted); white-space: nowrap; transform: rotate(-45deg); transform-origin: center; height: 26px; }
     .trend-empty { color: var(--text-muted); font-size: 13px; padding: 24px 0; text-align: center; }
@@ -468,12 +468,13 @@ function renderTrend() {
   if (!days.length) { bars.innerHTML = '<div class="trend-empty">No attempts in this window.</div>'; return; }
 
   const max = Math.max(...days.map(d => byDay[d]));
+  const CHART_PX = 116; // usable bar height in px (rest of .trend-bars holds the rotated labels)
   bars.innerHTML = days.map(d => {
     const n = byDay[d];
-    const h = Math.round((n / max) * 100);
+    const h = Math.max(3, Math.round((n / max) * CHART_PX));
     const lbl = d.slice(5); // MM-DD
     return `<div class="trend-day" title="${d}: ${n} attempt${n !== 1 ? 's' : ''}">
-      <div class="td-bar" style="height:${h}%"></div>
+      <div class="td-bar" style="height:${h}px"></div>
       <div class="td-lbl">${lbl}</div>
     </div>`;
   }).join('');
