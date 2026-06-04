@@ -2812,3 +2812,54 @@ async function searchStudentsForMessaging(query) {
     || (u.email || '').toLowerCase().includes(term)
   );
 }
+
+
+// ------------------------------------------------------------
+// ATTEMPTS — ADMIN ANALYTICS (read-only)
+// Powers admin/attempts.html. Admin reads all attempts via RLS
+// (auth_user_role() = 'ADMIN'). Uses a lightweight column set —
+// never selects answers_json / item_ids (large blobs) for the
+// list/stats; ts_iso is indexed. The detail drawer fetches the
+// full row on demand. View-only: no writes here.
+// ------------------------------------------------------------
+
+const ATTEMPT_LIST_COLS =
+  'attempt_id, user_id, quiz_id, course_id, mode, source, status, ' +
+  'score_raw, score_total, score_pct, time_taken_s, n, display_label, ts_iso';
+
+// Attempts within [fromISO, toISO). Either bound may be null = open.
+// Newest first, capped to `cap` rows so an "All time" fetch can't run
+// away. Returns { attempts, capped } (capped = the cap was hit).
+async function getAttemptsWindow(fromISO = null, toISO = null, cap = 5000) {
+  let q = db.from('attempts')
+    .select(ATTEMPT_LIST_COLS)
+    .order('ts_iso', { ascending: false })
+    .limit(cap);
+  if (fromISO) q = q.gte('ts_iso', fromISO);
+  if (toISO)   q = q.lt('ts_iso', toISO);
+
+  const { data, error } = await q;
+  if (error) { console.error('getAttemptsWindow:', error); return { attempts: [], capped: false }; }
+  return { attempts: data || [], capped: (data || []).length >= cap };
+}
+
+// Exact count of attempts within [fromISO, toISO). Cheap (head only).
+async function countAttempts(fromISO = null, toISO = null) {
+  let q = db.from('attempts').select('attempt_id', { count: 'exact', head: true });
+  if (fromISO) q = q.gte('ts_iso', fromISO);
+  if (toISO)   q = q.lt('ts_iso', toISO);
+
+  const { count, error } = await q;
+  if (error) { console.error('countAttempts:', error); return 0; }
+  return count || 0;
+}
+
+// Full single attempt (incl. answers_json) for the detail drawer.
+async function getAttemptById(attemptId) {
+  const { data, error } = await db.from('attempts')
+    .select('*')
+    .eq('attempt_id', attemptId)
+    .maybeSingle();
+  if (error) { console.error('getAttemptById:', error); return null; }
+  return data;
+}

@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Attempts — QAcademy Admin</title>
+  <link rel="stylesheet" href="/mynmclicensure/css/style.css" />
+  <style>
+    /* ── Top Nav ─────────────────────────────────────────── */
+    .top-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .user-menu { display: flex; align-items: center; gap: 12px; }
+    .logout-btn { font-size: 13px; color: var(--text-muted); cursor: pointer; background: none; border: none; font-family: 'Inter', sans-serif; }
+    .logout-btn:hover { color: var(--danger); }
+
+    /* ── Buttons ─────────────────────────────────────────── */
+    .btn { padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: 'Inter', sans-serif; transition: opacity 0.15s; }
+    .btn:hover { opacity: 0.88; }
+    .btn-primary { background: var(--accent); color: var(--white); }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
+    .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+    /* ── Section heading ─────────────────────────────────── */
+    .section-title { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 28px 0 12px; }
+
+    /* ── KPI cards ───────────────────────────────────────── */
+    .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .kpi { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+    .kpi .kpi-val { font-size: 26px; font-weight: 700; color: var(--primary); line-height: 1; }
+    .kpi .kpi-lbl { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+    .kpi.accent .kpi-val { color: var(--accent); }
+
+    /* ── Period bar ──────────────────────────────────────── */
+    .period-bar {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;
+      padding: 14px 16px; background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius); margin-bottom: 18px;
+    }
+    .preset-group { display: inline-flex; gap: 3px; background: #f1f5f9; border-radius: 6px; padding: 3px; }
+    .preset-group button {
+      border: none; background: transparent; font-family: 'Inter', sans-serif; font-size: 12.5px;
+      font-weight: 600; color: var(--text-muted); padding: 6px 12px; border-radius: 5px; cursor: pointer;
+    }
+    .preset-group button:hover { color: var(--primary); }
+    .preset-group button.active { background: var(--white); color: var(--accent); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+    .period-field { display: flex; flex-direction: column; gap: 4px; }
+    .period-field label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+    .period-field input { padding: 6px 9px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-family: 'Inter', sans-serif; color: var(--primary); }
+    .period-note { margin-left: auto; font-size: 12px; color: var(--text-muted); align-self: center; }
+    .period-note strong { color: var(--primary); }
+
+    /* ── Breakdown cards ─────────────────────────────────── */
+    .break-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .break-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+    .break-card h4 { font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 12px; }
+    .break-line { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; font-size: 13px; }
+    .break-line:last-child { margin-bottom: 0; }
+    .break-line .bl-label { min-width: 110px; color: var(--text-muted); }
+    .break-line .bl-bar { flex: 1; height: 8px; background: #f1f5f9; border-radius: 999px; overflow: hidden; }
+    .break-line .bl-fill { display: block; height: 100%; border-radius: 999px; background: var(--accent); }
+    .break-line .bl-fill.mock { background: #6366f1; }
+    .break-line .bl-fill.fixed { background: #0ea5e9; }
+    .break-line .bl-fill.builder { background: #10b981; }
+    .break-line .bl-fill.retake { background: #f59e0b; }
+    .break-line .bl-fill.completed { background: #15803d; }
+    .break-line .bl-fill.in_progress { background: #f59e0b; }
+    .break-line .bl-fill.abandoned { background: #94a3b8; }
+    .break-line .bl-num { min-width: 44px; text-align: right; font-weight: 700; color: var(--primary); }
+
+    /* ── Per-day trend ───────────────────────────────────── */
+    .trend-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+    .trend-bars { display: flex; align-items: flex-end; gap: 4px; height: 120px; margin-top: 8px; }
+    .trend-day { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; min-width: 0; }
+    .trend-day .td-bar { width: 100%; max-width: 26px; background: var(--accent); border-radius: 4px 4px 0 0; min-height: 2px; transition: height .2s; }
+    .trend-day .td-bar:hover { opacity: 0.8; }
+    .trend-day .td-lbl { font-size: 9px; color: var(--text-muted); white-space: nowrap; transform: rotate(-45deg); transform-origin: center; height: 26px; }
+    .trend-empty { color: var(--text-muted); font-size: 13px; padding: 24px 0; text-align: center; }
+
+    /* ── Top lists ───────────────────────────────────────── */
+    .top-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .top-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+    .top-card h4 { font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 10px; }
+    .top-item { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .top-item:last-child { border-bottom: none; }
+    .top-item .ti-rank { color: var(--text-muted); min-width: 18px; font-size: 12px; }
+    .top-item .ti-name { flex: 1; color: var(--primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .top-item .ti-sub { font-size: 11px; color: var(--text-muted); }
+    .top-item .ti-count { font-weight: 700; color: var(--accent); }
+
+    /* ── Filters Bar ─────────────────────────────────────── */
+    .filters-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-bottom: 16px; padding: 16px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); }
+    .filter-group { display: flex; flex-direction: column; gap: 4px; }
+    .filter-group label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+    .filter-group input, .filter-group select { padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-family: 'Inter', sans-serif; color: var(--primary); min-width: 140px; }
+    .filter-actions { display: flex; gap: 8px; align-items: flex-end; margin-left: auto; }
+
+    /* ── Table ───────────────────────────────────────────── */
+    .table-wrapper { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .table-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); }
+    .table-header h3 { font-size: 15px; font-weight: 700; color: var(--primary); }
+    .result-count { font-size: 13px; color: var(--text-muted); }
+    table { width: 100%; border-collapse: collapse; }
+    thead th { text-align: left; padding: 10px 16px; font-size: 12px; font-weight: 600; color: var(--text-muted); background: #f8fafc; border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.04em; }
+    tbody td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #f8fafc; cursor: pointer; }
+
+    /* ── Chips ───────────────────────────────────────────── */
+    .chip { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+    .chip.mock { background: #eef2ff; color: #4f46e5; }
+    .chip.fixed { background: #e0f2fe; color: #0369a1; }
+    .chip.builder { background: #dcfce7; color: #15803d; }
+    .chip.retake { background: #fef3c7; color: #92400e; }
+    .chip.completed { background: #dcfce7; color: #15803d; }
+    .chip.in_progress { background: #fef9c3; color: #854d0e; }
+    .chip.abandoned { background: #f1f5f9; color: #64748b; }
+
+    /* ── Pagination ──────────────────────────────────────── */
+    .pager { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 14px; font-size: 13px; color: var(--text-muted); }
+    .pager button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .empty-state { padding: 48px 24px; text-align: center; color: var(--text-muted); font-size: 14px; }
+    .cap-note { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; border-radius: 6px; padding: 8px 12px; font-size: 12px; margin-bottom: 14px; }
+
+    /* ── Detail modal ────────────────────────────────────── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.5); display: none; align-items: center; justify-content: center; z-index: 100; padding: 24px; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: var(--white); border-radius: 12px; width: 100%; max-width: 560px; max-height: 88vh; display: flex; flex-direction: column; overflow: hidden; }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+    .modal-head h3 { font-size: 15px; font-weight: 700; color: var(--primary); }
+    .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); line-height: 1; }
+    .modal-body { padding: 20px; overflow-y: auto; }
+    .detail-row { display: flex; gap: 10px; margin-bottom: 11px; font-size: 13px; }
+    .detail-label { font-weight: 600; color: var(--text-muted); min-width: 130px; flex-shrink: 0; }
+    .detail-value { color: var(--primary); word-break: break-word; }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+  <div id="sidebar"></div>
+
+  <main class="main-content">
+
+    <!-- Top Nav -->
+    <div class="top-nav">
+      <div class="page-header" style="margin-bottom:0">
+        <h1>Attempts</h1>
+        <p>See and analyse students' quiz &amp; exam attempts</p>
+      </div>
+      <div class="user-menu">
+        <span style="font-size:14px; font-weight:500;" id="adminName"></span>
+        <button class="logout-btn" onclick="logout()">Sign out</button>
+      </div>
+    </div>
+
+    <!-- Headline KPIs (cheap counts) -->
+    <div class="kpi-row">
+      <div class="kpi accent"><div class="kpi-val" id="kpiTotal">…</div><div class="kpi-lbl">Total attempts (all time)</div></div>
+      <div class="kpi"><div class="kpi-val" id="kpiToday">…</div><div class="kpi-lbl">Today</div></div>
+      <div class="kpi"><div class="kpi-val" id="kpiWeek">…</div><div class="kpi-lbl">Last 7 days</div></div>
+      <div class="kpi"><div class="kpi-val" id="kpiMonth">…</div><div class="kpi-lbl">Last 30 days</div></div>
+    </div>
+
+    <!-- Period selector -->
+    <div class="section-title">Analytics window</div>
+    <div class="period-bar">
+      <div class="preset-group" id="presetGroup">
+        <button data-preset="today" onclick="setPreset('today')">Today</button>
+        <button data-preset="7d" onclick="setPreset('7d')">Last 7 days</button>
+        <button data-preset="30d" class="active" onclick="setPreset('30d')">Last 30 days</button>
+        <button data-preset="all" onclick="setPreset('all')">All time</button>
+      </div>
+      <div class="period-field">
+        <label>From</label>
+        <input type="date" id="customFrom" onchange="setCustom()" />
+      </div>
+      <div class="period-field">
+        <label>To</label>
+        <input type="date" id="customTo" onchange="setCustom()" />
+      </div>
+      <div class="period-note">Showing: <strong id="windowLabel">Last 30 days</strong></div>
+    </div>
+
+    <!-- Window summary -->
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-val" id="winTotal">…</div><div class="kpi-lbl">Attempts in window</div></div>
+      <div class="kpi"><div class="kpi-val" id="winCompleted">…</div><div class="kpi-lbl">Completed</div></div>
+      <div class="kpi"><div class="kpi-val" id="winAvg">…</div><div class="kpi-lbl">Avg score (completed)</div></div>
+      <div class="kpi"><div class="kpi-val" id="winPass">…</div><div class="kpi-lbl">Pass rate (≥70%)</div></div>
+    </div>
+
+    <!-- Breakdowns -->
+    <div class="section-title">Breakdown</div>
+    <div class="break-row">
+      <div class="break-card">
+        <h4>By type</h4>
+        <div id="breakType"></div>
+      </div>
+      <div class="break-card">
+        <h4>By status</h4>
+        <div id="breakStatus"></div>
+      </div>
+    </div>
+
+    <!-- Trend -->
+    <div class="section-title">Attempts per day</div>
+    <div class="trend-card"><div class="trend-bars" id="trendBars"></div></div>
+
+    <!-- Top lists -->
+    <div class="section-title">Most active</div>
+    <div class="top-row">
+      <div class="top-card"><h4>Top quizzes &amp; exams</h4><div id="topQuizzes"></div></div>
+      <div class="top-card"><h4>Top students</h4><div id="topStudents"></div></div>
+    </div>
+
+    <!-- Attempts table -->
+    <div class="section-title">All attempts in window</div>
+
+    <div class="filters-bar">
+      <div class="filter-group">
+        <label>Search student / quiz</label>
+        <input type="text" id="fSearch" placeholder="Name, email or title…" oninput="applyFilters()" />
+      </div>
+      <div class="filter-group">
+        <label>Type</label>
+        <select id="fType" onchange="applyFilters()">
+          <option value="">All types</option>
+          <option value="mock">Mock exam</option>
+          <option value="fixed">Fixed quiz</option>
+          <option value="builder">Practice</option>
+          <option value="retake">Retake</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Status</label>
+        <select id="fStatus" onchange="applyFilters()">
+          <option value="">All statuses</option>
+          <option value="completed">Completed</option>
+          <option value="in_progress">In progress</option>
+          <option value="abandoned">Abandoned</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Mode</label>
+        <select id="fMode" onchange="applyFilters()">
+          <option value="">All modes</option>
+          <option value="instant">Practice (instant)</option>
+          <option value="timed">Exam (timed)</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Course</label>
+        <select id="fCourse" onchange="applyFilters()"><option value="">All courses</option></select>
+      </div>
+      <div class="filter-actions">
+        <button class="btn btn-ghost" onclick="clearFilters()">Clear</button>
+      </div>
+    </div>
+
+    <div id="capNote"></div>
+
+    <div class="table-wrapper">
+      <div class="table-header">
+        <h3>Attempts</h3>
+        <span class="result-count" id="resultCount">Loading…</span>
+      </div>
+      <div id="tableArea"><div class="empty-state">Loading attempts…</div></div>
+      <div class="pager" id="pager" style="display:none;">
+        <button class="btn btn-ghost btn-sm" id="prevBtn" onclick="changePage(-1)">← Prev</button>
+        <span id="pageInfo"></span>
+        <button class="btn btn-ghost btn-sm" id="nextBtn" onclick="changePage(1)">Next →</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Detail modal -->
+<div class="modal-overlay" id="detailModal" onclick="if(event.target===this) closeDetail()">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Attempt detail</h3>
+      <button class="modal-close" onclick="closeDetail()">×</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+  </div>
+</div>
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/mynmclicensure/js/config.js"></script>
+<script src="/mynmclicensure/js/guard.js"></script>
+<script src="/mynmclicensure/js/paths.js"></script>
+<script src="/mynmclicensure/js/mynmclicensure-admin-sidebar.js"></script>
+<script src="/mynmclicensure/js/mynmclicensure-api.js"></script>
+<script>
+
+// ── Config ─────────────────────────────────────────────────────
+const PASS_PCT  = 70;   // pass threshold for the "Pass rate" stat — confirm with product
+const PAGE_SIZE = 50;
+const DAY_MS    = 86400000;
+
+// ── State ──────────────────────────────────────────────────────
+let windowAttempts = [];     // raw rows in the current window (newest first)
+let filtered       = [];     // after table filters
+let page           = 0;
+let activePreset   = '30d';
+let userMap        = {};     // user_id → { name, email, ... }
+let courseMap      = {};     // course_id → title
+let quizTitleMap   = {};     // quiz_id → title (fixed + mock)
+
+// ── Init ───────────────────────────────────────────────────────
+async function initPage() {
+  const profile = await guardPage('ADMIN');
+  if (!profile) return;
+  document.getElementById('adminName').textContent = profile.forename || profile.name || profile.email;
+
+  // Reference maps (courses + quiz/mock titles) — loaded once.
+  const [courses, quizzes, mocks] = await Promise.all([
+    getAllCourses(), getAllQuizzes(), getAllMockQuizzes()
+  ]);
+  courses.forEach(c => { courseMap[c.course_id] = c.title; });
+  (quizzes || []).forEach(q => { quizTitleMap[q.quiz_id] = q.title; });
+  (mocks   || []).forEach(q => { quizTitleMap[q.quiz_id] = q.title; });
+
+  const courseSel = document.getElementById('fCourse');
+  courses.forEach(c => { courseSel.innerHTML += `<option value="${c.course_id}">${escapeHtml(c.title)}</option>`; });
+
+  loadHeadlineKpis();   // independent cheap counts
+  loadWindow();         // default window (30d)
+}
+
+// ── Headline KPIs (exact counts) ───────────────────────────────
+async function loadHeadlineKpis() {
+  const [total, today, week, month] = await Promise.all([
+    countAttempts(),
+    countAttempts(startOfTodayISO()),
+    countAttempts(isoNDaysAgo(7)),
+    countAttempts(isoNDaysAgo(30)),
+  ]);
+  document.getElementById('kpiTotal').textContent = fmtNum(total);
+  document.getElementById('kpiToday').textContent = fmtNum(today);
+  document.getElementById('kpiWeek').textContent  = fmtNum(week);
+  document.getElementById('kpiMonth').textContent = fmtNum(month);
+}
+
+// ── Window selection ───────────────────────────────────────────
+function setPreset(p) {
+  activePreset = p;
+  document.querySelectorAll('#presetGroup button').forEach(b => b.classList.toggle('active', b.dataset.preset === p));
+  document.getElementById('customFrom').value = '';
+  document.getElementById('customTo').value = '';
+  loadWindow();
+}
+
+function setCustom() {
+  const from = document.getElementById('customFrom').value;
+  const to   = document.getElementById('customTo').value;
+  if (!from && !to) return;
+  activePreset = 'custom';
+  document.querySelectorAll('#presetGroup button').forEach(b => b.classList.remove('active'));
+  loadWindow();
+}
+
+function currentWindow() {
+  if (activePreset === 'today') return { fromISO: startOfTodayISO(), toISO: null, label: 'Today' };
+  if (activePreset === '7d')    return { fromISO: isoNDaysAgo(7),   toISO: null, label: 'Last 7 days' };
+  if (activePreset === '30d')   return { fromISO: isoNDaysAgo(30),  toISO: null, label: 'Last 30 days' };
+  if (activePreset === 'all')   return { fromISO: null, toISO: null, label: 'All time' };
+  // custom
+  const from = document.getElementById('customFrom').value;
+  const to   = document.getElementById('customTo').value;
+  const fromISO = from ? new Date(from + 'T00:00:00').toISOString() : null;
+  // include the whole "to" day → exclusive upper bound = next midnight
+  const toISO = to ? new Date(new Date(to + 'T00:00:00').getTime() + DAY_MS).toISOString() : null;
+  const label = (from || '…') + ' → ' + (to || 'now');
+  return { fromISO, toISO, label };
+}
+
+async function loadWindow() {
+  const win = currentWindow();
+  document.getElementById('windowLabel').textContent = win.label;
+  document.getElementById('tableArea').innerHTML = '<div class="empty-state">Loading attempts…</div>';
+
+  const { attempts, capped } = await getAttemptsWindow(win.fromISO, win.toISO);
+  windowAttempts = attempts;
+
+  // Resolve student names for the rows in view.
+  const ids = [...new Set(attempts.map(a => a.user_id))];
+  const users = await getUsersByIds(ids);
+  userMap = {};
+  users.forEach(u => { userMap[u.user_id] = u; });
+
+  document.getElementById('capNote').innerHTML = capped
+    ? `<div class="cap-note">Showing the most recent 5,000 attempts for this window. Narrow the dates for a complete view.</div>`
+    : '';
+
+  renderSummary();
+  renderBreakdowns();
+  renderTrend();
+  renderTopLists();
+  page = 0;
+  applyFilters();
+}
+
+// ── Summary cards ──────────────────────────────────────────────
+function renderSummary() {
+  const total = windowAttempts.length;
+  const completed = windowAttempts.filter(a => a.status === 'completed');
+  const avg = completed.length
+    ? Math.round(completed.reduce((s, a) => s + (Number(a.score_pct) || 0), 0) / completed.length)
+    : null;
+  const passed = completed.filter(a => (Number(a.score_pct) || 0) >= PASS_PCT).length;
+  const passRate = completed.length ? Math.round((passed / completed.length) * 100) : null;
+
+  document.getElementById('winTotal').textContent     = fmtNum(total);
+  document.getElementById('winCompleted').textContent = fmtNum(completed.length);
+  document.getElementById('winAvg').textContent       = avg == null ? '—' : avg + '%';
+  document.getElementById('winPass').textContent      = passRate == null ? '—' : passRate + '%';
+}
+
+// ── Breakdowns (by type, by status) ────────────────────────────
+function renderBreakdowns() {
+  const total = windowAttempts.length || 1;
+
+  const types = [
+    { key: 'mock',    label: 'Mock exam' },
+    { key: 'fixed',   label: 'Fixed quiz' },
+    { key: 'builder', label: 'Practice' },
+    { key: 'retake',  label: 'Retake' },
+  ];
+  document.getElementById('breakType').innerHTML = types.map(t => {
+    const n = windowAttempts.filter(a => a.source === t.key).length;
+    return breakLine(t.label, n, Math.round((n / total) * 100), t.key);
+  }).join('');
+
+  const statuses = [
+    { key: 'completed',   label: 'Completed' },
+    { key: 'in_progress', label: 'In progress' },
+    { key: 'abandoned',   label: 'Abandoned' },
+  ];
+  document.getElementById('breakStatus').innerHTML = statuses.map(s => {
+    const n = windowAttempts.filter(a => a.status === s.key).length;
+    return breakLine(s.label, n, Math.round((n / total) * 100), s.key);
+  }).join('');
+}
+
+function breakLine(label, n, pct, cls) {
+  return `
+    <div class="break-line">
+      <span class="bl-label">${label}</span>
+      <span class="bl-bar"><span class="bl-fill ${cls}" style="width:${pct}%"></span></span>
+      <span class="bl-num">${fmtNum(n)}</span>
+    </div>`;
+}
+
+// ── Per-day trend (last 30 days present in window) ─────────────
+function renderTrend() {
+  const byDay = {};
+  windowAttempts.forEach(a => {
+    const d = new Date(a.ts_iso);
+    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    byDay[key] = (byDay[key] || 0) + 1;
+  });
+  const days = Object.keys(byDay).sort().slice(-30);
+  const bars = document.getElementById('trendBars');
+
+  if (!days.length) { bars.innerHTML = '<div class="trend-empty">No attempts in this window.</div>'; return; }
+
+  const max = Math.max(...days.map(d => byDay[d]));
+  bars.innerHTML = days.map(d => {
+    const n = byDay[d];
+    const h = Math.round((n / max) * 100);
+    const lbl = d.slice(5); // MM-DD
+    return `<div class="trend-day" title="${d}: ${n} attempt${n !== 1 ? 's' : ''}">
+      <div class="td-bar" style="height:${h}%"></div>
+      <div class="td-lbl">${lbl}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Top lists ──────────────────────────────────────────────────
+function renderTopLists() {
+  // Top quizzes/exams by attempt count
+  const quizCounts = {};
+  windowAttempts.forEach(a => {
+    const key = a.quiz_id || ('label::' + (a.display_label || 'Practice / custom'));
+    quizCounts[key] = quizCounts[key] || { count: 0, sample: a };
+    quizCounts[key].count++;
+  });
+  const topQ = Object.entries(quizCounts).sort((a, b) => b[1].count - a[1].count).slice(0, 10);
+  document.getElementById('topQuizzes').innerHTML = topQ.length
+    ? topQ.map(([key, v], i) => `
+        <div class="top-item">
+          <span class="ti-rank">${i + 1}</span>
+          <span class="ti-name" title="${escapeHtml(quizTitle(v.sample))}">${escapeHtml(quizTitle(v.sample))}
+            <span class="ti-sub">· ${typeLabel(v.sample.source)}</span></span>
+          <span class="ti-count">${fmtNum(v.count)}</span>
+        </div>`).join('')
+    : '<div class="empty-state" style="padding:16px;">No data.</div>';
+
+  // Top students by attempt count
+  const studentCounts = {};
+  windowAttempts.forEach(a => { studentCounts[a.user_id] = (studentCounts[a.user_id] || 0) + 1; });
+  const topS = Object.entries(studentCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  document.getElementById('topStudents').innerHTML = topS.length
+    ? topS.map(([uid, count], i) => `
+        <div class="top-item">
+          <span class="ti-rank">${i + 1}</span>
+          <span class="ti-name" title="${escapeHtml(studentEmail(uid))}">${escapeHtml(studentName(uid))}</span>
+          <span class="ti-count">${fmtNum(count)}</span>
+        </div>`).join('')
+    : '<div class="empty-state" style="padding:16px;">No data.</div>';
+}
+
+// ── Table (filtered + paginated client-side) ───────────────────
+function applyFilters() {
+  const search = document.getElementById('fSearch').value.toLowerCase().trim();
+  const type   = document.getElementById('fType').value;
+  const status = document.getElementById('fStatus').value;
+  const mode   = document.getElementById('fMode').value;
+  const course = document.getElementById('fCourse').value;
+
+  filtered = windowAttempts.filter(a => {
+    if (type && a.source !== type) return false;
+    if (status && a.status !== status) return false;
+    if (mode && a.mode !== mode) return false;
+    if (course && a.course_id !== course) return false;
+    if (search) {
+      const hay = (studentName(a.user_id) + ' ' + studentEmail(a.user_id) + ' ' + quizTitle(a)).toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  page = 0;
+  renderTable();
+}
+
+function clearFilters() {
+  ['fSearch','fType','fStatus','fMode','fCourse'].forEach(id => { document.getElementById(id).value = ''; });
+  applyFilters();
+}
+
+function renderTable() {
+  const area = document.getElementById('tableArea');
+  document.getElementById('resultCount').textContent = `${fmtNum(filtered.length)} attempt${filtered.length !== 1 ? 's' : ''}`;
+
+  if (!filtered.length) {
+    area.innerHTML = '<div class="empty-state">No attempts match your filters.</div>';
+    document.getElementById('pager').style.display = 'none';
+    return;
+  }
+
+  const start = page * PAGE_SIZE;
+  const rows = filtered.slice(start, start + PAGE_SIZE).map(a => `
+    <tr onclick="openDetail('${a.attempt_id}')">
+      <td>
+        <div style="font-weight:600;">${escapeHtml(studentName(a.user_id))}</div>
+        <div style="font-size:11px; color:var(--text-muted);">${escapeHtml(studentEmail(a.user_id))}</div>
+      </td>
+      <td><span class="chip ${a.source}">${typeLabel(a.source)}</span></td>
+      <td>${escapeHtml(quizTitle(a))}</td>
+      <td style="font-size:12px; color:var(--text-muted);">${escapeHtml(courseMap[a.course_id] || a.course_id)}</td>
+      <td style="font-size:12px;">${a.mode === 'timed' ? 'Exam' : 'Practice'}</td>
+      <td><span class="chip ${a.status}">${statusLabel(a.status)}</span></td>
+      <td style="font-weight:600;">${a.status === 'completed' && a.score_pct != null ? Math.round(a.score_pct) + '%' : '—'}</td>
+      <td>${a.n ?? '—'}</td>
+      <td style="font-size:12px; color:var(--text-muted);">${fmtDuration(a.time_taken_s)}</td>
+      <td style="font-size:12px; color:var(--text-muted);">${fmtDateTime(a.ts_iso)}</td>
+    </tr>`).join('');
+
+  area.innerHTML = `
+    <table>
+      <thead><tr>
+        <th>Student</th><th>Type</th><th>Quiz / exam</th><th>Course</th>
+        <th>Mode</th><th>Status</th><th>Score</th><th>Qs</th><th>Time</th><th>When</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+
+  const pages = Math.ceil(filtered.length / PAGE_SIZE);
+  document.getElementById('pager').style.display = pages > 1 ? 'flex' : 'none';
+  document.getElementById('pageInfo').textContent = `Page ${page + 1} of ${pages}`;
+  document.getElementById('prevBtn').disabled = page === 0;
+  document.getElementById('nextBtn').disabled = page >= pages - 1;
+}
+
+function changePage(d) {
+  const pages = Math.ceil(filtered.length / PAGE_SIZE);
+  page = Math.max(0, Math.min(pages - 1, page + d));
+  renderTable();
+  window.scrollTo({ top: document.querySelector('.table-wrapper').offsetTop - 20, behavior: 'smooth' });
+}
+
+// ── Detail modal ───────────────────────────────────────────────
+async function openDetail(attemptId) {
+  const modal = document.getElementById('detailModal');
+  const body = document.getElementById('detailBody');
+  body.innerHTML = '<div class="empty-state">Loading…</div>';
+  modal.classList.add('show');
+
+  const a = await getAttemptById(attemptId);
+  if (!a) { body.innerHTML = '<div class="empty-state">Could not load this attempt.</div>'; return; }
+
+  let answerCount = '—';
+  try { const arr = JSON.parse(a.answers_json || '[]'); if (Array.isArray(arr)) answerCount = arr.length; } catch (e) {}
+
+  const score = (a.status === 'completed' && a.score_pct != null)
+    ? `${a.score_raw ?? '—'} / ${a.score_total ?? '—'} (${Math.round(a.score_pct)}%)`
+    : '—';
+
+  body.innerHTML = `
+    ${detailRow('Student', escapeHtml(studentName(a.user_id)))}
+    ${detailRow('Email', escapeHtml(studentEmail(a.user_id)))}
+    ${detailRow('Type', typeLabel(a.source))}
+    ${detailRow('Quiz / exam', escapeHtml(quizTitle(a)))}
+    ${detailRow('Course', escapeHtml(courseMap[a.course_id] || a.course_id))}
+    ${detailRow('Mode', a.mode === 'timed' ? 'Exam (timed)' : 'Practice (instant)')}
+    ${detailRow('Status', statusLabel(a.status))}
+    ${detailRow('Score', score)}
+    ${detailRow('Questions', a.n ?? '—')}
+    ${detailRow('Answers recorded', answerCount)}
+    ${detailRow('Time taken', fmtDuration(a.time_taken_s))}
+    ${detailRow('Time allowed', a.duration_min ? a.duration_min + ' min' : '—')}
+    ${detailRow('Started', fmtDateTime(a.ts_iso))}
+    ${a.origin_attempt_id ? detailRow('Retake of', a.origin_attempt_id) : ''}
+    ${detailRow('Attempt ID', a.attempt_id)}
+  `;
+}
+
+function detailRow(label, value) {
+  return `<div class="detail-row"><span class="detail-label">${label}</span><span class="detail-value">${value}</span></div>`;
+}
+
+function closeDetail() { document.getElementById('detailModal').classList.remove('show'); }
+
+// ── Resolution helpers ─────────────────────────────────────────
+function studentName(uid) {
+  const u = userMap[uid];
+  if (!u) return uid || '—';
+  return u.name || ((u.forename || '') + ' ' + (u.surname || '')).trim() || u.email || uid;
+}
+function studentEmail(uid) { return (userMap[uid] && userMap[uid].email) || ''; }
+function quizTitle(a) {
+  if (a.quiz_id && quizTitleMap[a.quiz_id]) return quizTitleMap[a.quiz_id];
+  if (a.display_label) return a.display_label;
+  return a.source === 'builder' ? 'Practice (custom)' : (a.quiz_id || '—');
+}
+
+// ── Format helpers ─────────────────────────────────────────────
+function typeLabel(src) {
+  return { mock: 'Mock exam', fixed: 'Fixed quiz', builder: 'Practice', retake: 'Retake' }[src] || src;
+}
+function statusLabel(s) {
+  return { completed: 'Completed', in_progress: 'In progress', abandoned: 'Abandoned' }[s] || s;
+}
+function fmtNum(n) { return (n || 0).toLocaleString(); }
+function fmtDuration(s) {
+  if (s == null) return '—';
+  const m = Math.floor(s / 60), sec = s % 60;
+  return m > 0 ? `${m}m ${sec}s` : `${sec}s`;
+}
+function fmtDateTime(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+    + ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+}
+function startOfTodayISO() {
+  const d = new Date(); d.setHours(0, 0, 0, 0); return d.toISOString();
+}
+function isoNDaysAgo(n) { return new Date(Date.now() - n * DAY_MS).toISOString(); }
+function escapeHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Start ──────────────────────────────────────────────────────
+initPage();
+
+</script>
+</body>
+</html>
