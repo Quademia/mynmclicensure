@@ -1,6 +1,9 @@
 # CLAUDE.md — QAcademy Nurses Hub
 
-
+> ⚠ **This repo was split three ways on 2026-08-23.** Read
+> [`SPLIT.md`](SPLIT.md) before doing anything structural — it records
+> what is now separate, and (more importantly) the five things that are
+> still shared between the products despite the split.
 
 ## Claude-Specific
 - This file is auto-loaded by Claude Code at session start.

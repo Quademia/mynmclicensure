@@ -8,6 +8,11 @@ QAcademy Nurses Hub is a web-based learning management system for nursing studen
 
 A third product, **MyNclex** (NCLEX-RN exam prep for internationally-trained nurses), used to live in `mynclex/` inside this repo but has been **decoupled into its own repository** at [QAcademy-Nurses/mynclex](https://github.com/QAcademy-Nurses/mynclex). It runs on a new Next.js 16 + Cloudflare Workers stack (SSR via `@opennextjs/cloudflare`, `@supabase/ssr` for cookie auth, `nclex_*`-prefixed tables in its own Supabase project). MyNMCLicensure and MyTeacher will eventually migrate onto the same/similar stack, one at a time.
 
+> ⚠ **This repo was split three ways on 2026-08-23** — MyNMCLicensure and
+> MyTeacher each got their own repo in the `Quademia` org, and this one
+> stays as the live original. See [`SPLIT.md`](SPLIT.md) for what is now
+> separate, what is still shared, and what each copy still has to do.
+
 ## Stack
 ### Legacy products (MyNMCLicensure, MyTeacher)
 | Layer | Technology |
