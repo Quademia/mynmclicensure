@@ -213,5 +213,8 @@ except the addition of this file.
   every fix has three plausible homes and two of them reach nobody —
   so whatever the answer, it should be written here rather than decided
   fresh under pressure each time.
-- gamma's 24 stale `claude/*` session branches were left in place here.
-  They were deleted from the two copies, where they mean nothing.
+- gamma's ~24 stale `claude/*` session branches exist **only in the
+  local checkout on Sam's machine** — they were never pushed to origin,
+  so they did not travel to the copies and there was nothing to clean
+  up there. Each copy received exactly two branches: `main` and
+  `production`. Tidying the local ones is still worth doing here.
