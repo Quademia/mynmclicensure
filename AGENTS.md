@@ -300,15 +300,19 @@ gives one hard rule and two habits:
 Local dev requires `.env.local` (git-ignored):
 
 ```
-NEXT_PUBLIC_SUPABASE_URL=...            gamma DEV project
-NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-SUPABASE_SERVICE_ROLE_KEY=...           server only
-PAYSTACK_SECRET_KEY=sk_test_...
-RESEND_API_KEY=...
+NEXT_PUBLIC_SUPABASE_URL=...            gamma DEV project (public)
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...       (public)
 APP_ORIGIN=http://localhost:3000
+EMAIL_FROM=MyNMCLicensure <noreply@quademia.com>
+DB_URL=postgresql://...                 migration runner; Supabase → Connect → Session pooler
+SUPABASE_SERVICE_ROLE_KEY=...           server only (from slice 2)
+PAYSTACK_SECRET_KEY=sk_test_...         (from slice 9)
+RESEND_API_KEY=...                      (from slice 10)
 ```
 
-Prod values are Cloudflare Worker secrets set with `wrangler secret
-put`. The database connection strings for the migration runner are
-GitHub repository secrets (`DB_URL_DEV`, `DB_URL_PROD`), never in the
-repo.
+The two public values also live in `wrangler.jsonc` `vars` and in the
+build step of both deploy workflows (three places, one truth). Prod
+secrets are Cloudflare Worker secrets set with `wrangler secret put`.
+The database connection strings for the migration runner are GitHub
+repository secrets (`DB_URL_DEV`, `DB_URL_PROD`), never in the repo and
+never in a chat.

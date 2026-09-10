@@ -1,0 +1,38 @@
+name: Apply migrations to prod Supabase
+
+on:
+  push:
+    branches:
+      - prod
+
+# One migration job at a time. A second push waits rather than racing.
+concurrency:
+  group: prod-migrations
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    name: Apply db/migrations to the prod project (licensure schema)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm clean-install
+
+      # Same runner as migrate-dev.yml, pointed at prod. The prod project
+      # is LIVE for the legacy site and MyTeacher; the runner touches only
+      # the licensure schema, and a migration that names anything outside
+      # it is a plan violation (AGENTS.md rule #7).
+      - name: Apply pending migrations
+        run: npm run db:migrate
+        env:
+          DB_URL: ${{ secrets.DB_URL_PROD }}

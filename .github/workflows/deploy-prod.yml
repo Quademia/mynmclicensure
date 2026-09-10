@@ -1,0 +1,46 @@
+name: Deploy prod Worker (workspace CF)
+
+on:
+  push:
+    branches:
+      - prod
+
+# One deploy at a time. If a second push lands while one is in flight,
+# the new one waits rather than racing.
+concurrency:
+  group: prod-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy licensure-prod to workspace CF
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm clean-install
+
+      # ⚠ BUILD-TIME, NOT RUNTIME — see the note in deploy-dev.yml. And
+      # these are the PROD values, matching `env.prod` in wrangler.jsonc,
+      # not the top-level dev ones: the build step carries no `--env prod`
+      # (only the deploy below does), so nothing else would pick them up.
+      - name: Build OpenNext bundle
+        run: npm run cf:build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://qizhyhjeqhaybyddsuni.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpemh5aGplcWhheWJ5ZGRzdW5pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NzIyNDIsImV4cCI6MjA5MTE0ODI0Mn0.LT9m3GoBgJ8eas2jFJzrhAjDJ2gsrlDSkYthLAffv_U
+
+      - name: Deploy to workspace CF
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN_PROD }}
+          command: deploy --env prod

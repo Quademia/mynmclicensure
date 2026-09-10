@@ -1,0 +1,71 @@
+{
+  // This file tells Cloudflare Workers how to run our Next.js app.
+  // "main" points to the OpenNext worker entry point.
+  "name": "licensure-dev",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2024-09-23",
+  "compatibility_flags": ["nodejs_compat"],
+  // Account pinning — the same split as MyNclex: the top-level account_id
+  // is the personal CF account that owns every dev Worker; env.prod's is
+  // the workspace account (qacademynurses) that owns paid prod Workers and
+  // the quademia.com zone. wrangler refuses to deploy if the logged-in
+  // account does not match. IDs are identifiers, not secrets.
+  "account_id": "e745e37017141bd5dfa1183b5dc1aa48",
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  // Public Supabase values — safe to commit; they ship to every browser and
+  // RLS is what protects the data. These are GAMMA's projects (rebuild.md
+  // D2): the rebuilt product shares them with the legacy site and with
+  // MyTeacher, and owns only the `licensure` schema inside them.
+  //
+  // ⚠ RUNTIME BINDINGS ONLY, AND THAT IS NOT ENOUGH ON ITS OWN. Cloudflare
+  // hands these to the Worker per request, which covers server-side reads.
+  // But `NEXT_PUBLIC_*` is substituted into the BROWSER bundle while
+  // `next build` runs — so each one is ALSO listed in the `env:` block of
+  // the build step in .github/workflows/deploy-dev.yml and deploy-prod.yml.
+  // Two places, one truth, nothing keeping them in step: change a public
+  // value here and change it there too. (MyNclex, 2026-08-08.)
+  //
+  // Server-side SECRETS (SUPABASE_SERVICE_ROLE_KEY, PAYSTACK_SECRET_KEY,
+  // RESEND_API_KEY) are NOT here — `wrangler secret put`, per Worker. A
+  // dashboard "Variable" is wiped by the next deploy; a Secret is not.
+  "vars": {
+    "NEXT_PUBLIC_SUPABASE_URL": "https://zrakjibtxyzoqcdtvpmq.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpyYWtqaWJ0eHl6b3FjZHR2cG1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MDcyODAsImV4cCI6MjA4ODk4MzI4MH0.saSEaK1IkbP03rfVvuwFpXQlLtAdKLIg9V7UwO7a2po",
+    // Where a link inside an email points (appOrigin(), slice 10). Read
+    // server-side at runtime, so deliberately NOT a NEXT_PUBLIC_* name: no
+    // build-step entry, no rebuild to change. Unset falls back to prod.
+    "APP_ORIGIN": "https://licensure-dev.mybackpacc.workers.dev",
+    // The From line on every email. Printed on each message, so not a
+    // secret. Same value in both environments; RESEND_API_KEY separates
+    // dev from prod. The sender domain is decided with the DNS slice.
+    "EMAIL_FROM": "MyNMCLicensure <noreply@quademia.com>"
+  },
+  "env": {
+    "prod": {
+      "name": "licensure-prod",
+      "account_id": "38efec172a6a35b1928ffbd96003c21d",
+      // ⚠ NO CUSTOM DOMAIN UNTIL CUTOVER (rebuild.md §11 step 1). The
+      // moment a `routes` block with `custom_domain: true` exists here,
+      // the next prod deploy creates the DNS record for
+      // licensure.quademia.com on the zone and opens the door. Until then
+      // prod answers only on its workers.dev address, for testing. At
+      // cutover add:
+      //   "routes": [{ "pattern": "licensure.quademia.com", "custom_domain": true }],
+      // and flip `workers_dev` to false in the same commit — declaring a
+      // route silently flips workers_dev's default to false anyway
+      // (MyNclex, 2026-08-09), so say it rather than inherit it.
+      "workers_dev": true,
+      "vars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "https://qizhyhjeqhaybyddsuni.supabase.co",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpemh5aGplcWhheWJ5ZGRzdW5pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NzIyNDIsImV4cCI6MjA5MTE0ODI0Mn0.LT9m3GoBgJ8eas2jFJzrhAjDJ2gsrlDSkYthLAffv_U",
+        // ⚠ Changes to https://licensure.quademia.com at cutover, in the
+        // same commit as the routes block above.
+        "APP_ORIGIN": "https://licensure-prod.qacademynurses.workers.dev",
+        "EMAIL_FROM": "MyNMCLicensure <noreply@quademia.com>"
+      }
+    }
+  }
+}

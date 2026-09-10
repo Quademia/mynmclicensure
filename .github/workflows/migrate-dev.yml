@@ -1,0 +1,41 @@
+name: Apply migrations to dev Supabase
+
+on:
+  push:
+    branches:
+      - main
+
+# One migration job at a time. A second push waits rather than racing.
+concurrency:
+  group: dev-migrations
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    name: Apply db/migrations to the dev project (licensure schema)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm clean-install
+
+      # This repo's OWN runner (scripts/db-migrate.mjs), not the Supabase
+      # CLI: the project is shared with the legacy site and with MyTeacher,
+      # and the CLI's tracker is one per project. Ours records only in
+      # licensure.migrations. See rebuild.md §6.5 and db/README.md.
+      #
+      # DB_URL_DEV is a repository secret: the dev project's Postgres
+      # connection string (Supabase → Connect → Session pooler URI).
+      - name: Apply pending migrations
+        run: npm run db:migrate
+        env:
+          DB_URL: ${{ secrets.DB_URL_DEV }}

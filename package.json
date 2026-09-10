@@ -1,0 +1,38 @@
+{
+  "name": "mynmclicensure",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build --webpack",
+    "start": "next start",
+    "lint": "eslint",
+    "lint:check": "node scripts/lint-baseline.mjs",
+    "lint:staged": "node scripts/lint-baseline.mjs --staged",
+    "lint:baseline": "node scripts/lint-baseline.mjs --update",
+    "db:migrate": "node scripts/db-migrate.mjs",
+    "db:status": "node scripts/db-migrate.mjs --status",
+    "cf:build": "npx @opennextjs/cloudflare build -- --webpack",
+    "cf:dev": "npx @opennextjs/cloudflare build -- --webpack && wrangler dev",
+    "cf:deploy": "npx @opennextjs/cloudflare build -- --webpack && wrangler deploy"
+  },
+  "dependencies": {
+    "@opennextjs/cloudflare": "1.19.6",
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.49.0",
+    "next": "16.2.4",
+    "postgres": "^3.4.5",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "wrangler": "^4.83.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "esbuild": "0.27.3",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.4",
+    "typescript": "^5"
+  }
+}
