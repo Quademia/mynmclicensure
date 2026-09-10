@@ -663,6 +663,7 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 |---|---|
 | 0 Repo reshape | ✅ 2026-09-10 |
 | 1 Scaffold | ✅ 2026-09-10 (deploy half proven when the GitHub secrets exist) |
+| 1c One Cloudflare account | ✅ 2026-09-10 |
 | 2 Auth and shell | ⬜ |
 | 3 Catalogue and config | ⬜ |
 | 4 Question bank | ⬜ |
