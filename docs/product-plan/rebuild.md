@@ -178,7 +178,7 @@ is preserved.
 | Storage buckets | `licensure-gh-rationale-images` (global namespace, so the prefix stays) |
 | RPCs | legacy names inside the schema: `licensure_gh.check_login_rate_limit` … |
 | Migration tracker | `licensure_gh.migrations` |
-| Cloudflare Workers | `licensure-dev` (personal account), `licensure-prod` (workspace account) — same split as MyNclex |
+| Cloudflare Workers | `licensure-dev` and `licensure-prod`, both on the workspace account (qacademynurses), which owns the `quademia.com` zone — one account, one plan fee (1c, 2026-09-10) |
 | Hostnames | dev: the Worker's `workers.dev` URL; prod: **`licensure.quademia.com`** (settled in MyNclex `domain-and-identity.md`) |
 | Brand strings | **Quademia**, never QAcademy, in anything a reader sees (`AGENTS.md`). The sender becomes `Quademia <noreply@…>`; the domain is decided with the DNS slice |
 | Money | `GHS 350`, via a `formatMinor()` copy; never `₵` |

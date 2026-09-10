@@ -5,12 +5,14 @@
   "main": ".open-next/worker.js",
   "compatibility_date": "2024-09-23",
   "compatibility_flags": ["nodejs_compat"],
-  // Account pinning — the same split as MyNclex: the top-level account_id
-  // is the personal CF account that owns every dev Worker; env.prod's is
-  // the workspace account (qacademynurses) that owns paid prod Workers and
-  // the quademia.com zone. wrangler refuses to deploy if the logged-in
-  // account does not match. IDs are identifiers, not secrets.
-  "account_id": "e745e37017141bd5dfa1183b5dc1aa48",
+  // Account pinning — ONE Cloudflare account for both Workers: the
+  // workspace account (qacademynurses), which owns the quademia.com zone
+  // and so is the only account prod can sit on (a Worker takes a custom
+  // hostname only inside the zone's account). Dev sits beside it because
+  // the plan fee is per account, so a second account is a second fee
+  // (BUILD_LIST 1c, 2026-09-10). wrangler refuses to deploy if the
+  // logged-in account does not match. IDs are identifiers, not secrets.
+  "account_id": "38efec172a6a35b1928ffbd96003c21d",
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
@@ -37,7 +39,7 @@
     // Where a link inside an email points (appOrigin(), slice 10). Read
     // server-side at runtime, so deliberately NOT a NEXT_PUBLIC_* name: no
     // build-step entry, no rebuild to change. Unset falls back to prod.
-    "APP_ORIGIN": "https://licensure-dev.mybackpacc.workers.dev",
+    "APP_ORIGIN": "https://licensure-dev.qacademynurses.workers.dev",
     // The From line on every email. Printed on each message, so not a
     // secret. Same value in both environments; RESEND_API_KEY separates
     // dev from prod. The sender domain is decided with the DNS slice.
