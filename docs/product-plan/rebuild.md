@@ -193,7 +193,7 @@ Both products run in the same Supabase project during the rebuild:
 |---|---|---|
 | project ref | `zrakjibtxyzoqcdtvpmq` | `qizhyhjeqhaybyddsuni` |
 | old product | `public.*` (bare names) + `public.teacher_*` | same |
-| new product | `licensure.*` | same |
+| new product | `licensure_gh.*` | same |
 
 `auth.users` is shared by everything in the project. That is what makes
 D7 a step with a filter, not a bulk delete.
