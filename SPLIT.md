@@ -194,27 +194,37 @@ Per-repo cleanup, none of it done on 2026-08-23:
 
 # PART 2 — THIS REPO (edit freely; expected to diverge)
 
-**This repo is:** `mybackpacc-byte/qacademy-gamma` — the original.
+**This repo is:** `Quademia/mynmclicensure` — the MyNMCLicensure copy.
 
-**Role:** the live one. Serves both products at
-`qacademynurseshub.pages.dev` and keeps doing so until each product's
-own deployment is standing. Nothing here was changed by the split
-except the addition of this file.
+**Role:** the home of the **rebuilt** MyNMCLicensure, on the MyNclex
+stack. Nothing here is live; gamma keeps serving the old product until
+cutover. The old tree is kept under `legacy/` as the reference and is
+deleted at cutover. The plan is `docs/product-plan/rebuild.md`.
 
 **Done since the split:**
 
 | Date | What |
 |---|---|
-| 2026-08-23 | this file added; the two copies mirrored to `Quademia/mynmclicensure` and `Quademia/myteacher` |
+| 2026-08-23 | mirrored from gamma `main` @ `d35fdfe` |
+| 2026-09-10 | cloned locally by Codex; the rebuild planned (Claude); record files rebuilt to the MyNclex shape; this Part 2 corrected — until today it still said "this repo is gamma" |
 
-**Open for this repo:**
+**Per-repo cleanup from Part 1 — superseded, not done.** The rebuild
+replaces it: the deletions happen in rebuild slice 0 as part of moving
+the old tree to `legacy/`; the `IS_PROD` hostname rewrite is moot
+because the new app has no hostname switch; the own Cloudflare
+deployment is a Worker, not a Pages project, and comes with slice 1.
 
-- Decide how long gamma stays the thing that deploys. While it does,
-  every fix has three plausible homes and two of them reach nobody —
-  so whatever the answer, it should be written here rather than decided
-  fresh under pressure each time.
-- gamma's ~24 stale `claude/*` session branches exist **only in the
-  local checkout on Sam's machine** — they were never pushed to origin,
-  so they did not travel to the copies and there was nothing to clean
-  up there. Each copy received exactly two branches: `main` and
-  `production`. Tidying the local ones is still worth doing here.
+**What is still shared, and how this repo treats it:**
+
+- The Supabase project pair — **stays shared, by decision** (D2 in the
+  plan). This product owns the Postgres schema `licensure` and touches
+  nothing in `public` or `teacher_*`.
+- `auth.users` — shared. Cutover deletes only the logins that belong to
+  no MyTeacher user (plan §11).
+- `db/` — this repo's `db/` describes the `licensure` schema only, with
+  its own migration runner and tracker; the shared-tracker hazard in
+  Part 1 is avoided rather than solved.
+- `EMAIL_SECRET` — dies with the email worker; the rebuilt product
+  sends from the server.
+
+**Open for this repo:** see `BUILD_LIST.md`.
