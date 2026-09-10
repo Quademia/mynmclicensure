@@ -30,6 +30,7 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ✅ 1 Scaffold — Next app, Workers, deploy + migrate workflows, schema `licensure_gh`, runner — 2026-09-10
 - ⬜ 1b First dev deploy — needs the four GitHub secrets (CF tokens, DB_URL_DEV/PROD)
 - ⬜ 1c One Cloudflare account — both Workers on the workspace account, to cut the second plan fee; before 1b
+- ✅ (unplanned) Release branch named `production` — two prod workflows and the docs retargeted — 2026-09-10
 - ⬜ 2 Auth and shell — three login doors, register, reset, sessions, gates, sidebars, drawer
 - ⬜ 3 Catalogue and config — programmes, courses, levels, products, config; public pages
 - ⬜ 4 Question bank — eleven item tables, CSV import, images, entitlement policy, content copy
