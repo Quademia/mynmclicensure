@@ -22,7 +22,8 @@ code sits in this repo under `legacy/` as the reference until cutover.
   slice, ticked with a date when built.
 - **The log:** [`SESSIONS.md`](SESSIONS.md) (index) and
   [`sessions/`](sessions/) (detail).
-- **The feature specs:** [`docs/product/`](docs/product/) `00–07`.
+- **The feature specs:** [`docs/product-plan/`](docs/product-plan/)
+  `00–07`, beside the plan.
 - **How this repo came to be:** [`SPLIT.md`](SPLIT.md).
 
 ## Stack

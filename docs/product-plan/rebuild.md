@@ -87,7 +87,8 @@ priority order when they disagree:
 1. **The code in `legacy/mynmclicensure/`** — pages, `js/*-api.js`,
    `guard.js`, `auth.js`, the two Workers. Behaviour is what the code
    does.
-2. **`docs/product/00-overview.md` … `07-messaging.md`** — the feature
+2. **`docs/product-plan/00-overview.md` … `07-messaging.md`**, plus
+   `mock-exams-reference.md` — the feature
    specs. Where a doc contradicts the code, the code wins and the
    disagreement is noted in the session log. Known ones: doc 02 lists a
    `CANCELLED` subscription status that no code knows (statuses are
@@ -146,9 +147,9 @@ mynmclicensure/                       (repo root — flat, no src/)
     schema.sql  rls.sql  seed/  migrations/  README.md
   scripts/                            lint-baseline.mjs, db-migrate.mjs
   docs/
-    product/00–07                     the feature specs (kept)
-    product-plan/rebuild.md           this file
-    sprints/                          gamma-era, kept for history
+    product-plan/                     flat (decided 2026-09-10): rebuild.md, the specs
+                                      00–07, mock-exams-reference.md, and the gamma-era
+                                      renaming-plan.md + myteacher-clean-split.md
   sessions/                           period logs
   legacy/                             the whole old tree, read-only, deleted at cutover
   public/                             images (QAcademy_Logo.png → the Quademia mark, see AGENTS)
@@ -435,7 +436,7 @@ feature; a user cannot tell.
 | 10 | Student sidebar → `telegram.html`, a page that does not exist | Drop the item. (The two external Telegram/WhatsApp channel links stay.) |
 | 11 | `runner_questions_per_page` seeded 2 in `schema.sql`, 1 in `seed_data.sql`; `offline_packs_per_course` seeds 5 while the code falls back to 3 | The live prod row is the truth and is what §6.6 copies. Code fallbacks are set **equal to the seed** so a missing row cannot change behaviour |
 | 12 | `guard.js` TEACHER branch and `router.html`'s "everything else goes to student" | The TEACHER role is MyTeacher's and left with the April split. Roles here are STUDENT and ADMIN; any other value is refused at login, not routed |
-| 13 | `docs/product/02` `CANCELLED` status | Doc corrected when slice 8 lands |
+| 13 | `docs/product-plan/02` `CANCELLED` status | Doc corrected when slice 8 lands |
 | 14 | `legacy/archive/` (diverged old copies of the JS) and the empty `workers/`, `payments-worker/` at root | Deleted in slice 0 |
 
 ## 10. Authentication and access, as rebuilt

@@ -31,7 +31,8 @@ The inventory with dates is `BUILD_LIST.md`. Build what Sam asks for in
 the session; nothing more.
 
 ⭐ **The rebuild adds no user-visible feature and no new mechanism.**
-Behaviour is transcribed from `legacy/` and `docs/product/00–07`. Where
+Behaviour is transcribed from `legacy/` and the feature specs
+`docs/product-plan/00–07`. Where
 the two disagree, the code wins. An internal shape may change only where
 `rebuild.md` §8 lists it *and* Sam has ticked it with a date. A defect
 listed in `rebuild.md` §9 is fixed inside the slice that rebuilds its
@@ -62,7 +63,9 @@ stack and the source of the plumbing. MyTeacher follows later.
 - `db/` — schema, RLS, seeds, migrations for the `licensure` schema.
 - `scripts/` — the lint baseline and the migration runner.
 - `public/` — static assets.
-- `docs/` — `product/00–07` (the feature specs), `product-plan/` (the rebuild plan).
+- `docs/product-plan/` — flat: the rebuild plan, the feature specs
+  `00–07`, the mock-exams reference, and the gamma-era plans kept for
+  history. One folder until there is a reason to separate.
 - `sessions/` — period logs. `legacy/` — the old product, read-only.
 
 Layout is **flat**: no `src/` wrapper. This only means the folders
