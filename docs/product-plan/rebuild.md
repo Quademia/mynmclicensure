@@ -512,7 +512,7 @@ session; the first ⬜ in `BUILD_LIST.md` is the candidate, not the rule.
 Each slice ends with Sam testing it on `localhost:3000`, then the dev
 Worker after merge. "Done when" is the test.
 
-**0 — Repo reshape.** Move `mynmclicensure/`, `db/`, `docs/sprints/`,
+**0 — Repo reshape.** Move `mynmclicensure/`, `db/`,
 `images/`, `index.html`, `product-select.html`, `CLONING.md` into
 `legacy/`; delete `myteacher/`, `archive/`, root `workers/`,
 `payments-worker/`, `docs/product/08–09`. Correct `SPLIT.md` Part 2 is
