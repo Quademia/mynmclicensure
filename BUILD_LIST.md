@@ -2,7 +2,7 @@
 
 **Status: MVP complete — preparing for free trial launch (May 2026)**
 
-Last updated: April 2026
+Last updated: 2026-09-10 (local clone recorded)
 
 ---
 
@@ -101,6 +101,7 @@ When MyTeacher was carved out, every new MyTeacher table got a `teacher_` prefix
 - You have a clear window to deploy and smoke-test before real users hit prod
 
 ### Move Business Logic Server-Side
+- [x] Cloned `Quademia/mynmclicensure` locally to `C:\Users\confi\Quademia\mynmclicensure` — 2026-09-10 (Codex). Verified origin, main tracking origin/main, clean working tree, and remote production branch.
 - [x] Look into new stack that offers proper backend — **decided April 2026**: Next.js 16 + OpenNext + Cloudflare Workers + Supabase (shared Postgres + Auth) + `@supabase/ssr`. First product on the new stack is MyNclex (`mynclex/` folder). MyNMCLicensure and MyTeacher migrate one at a time later.
 - [ ] Migrate MyNMCLicensure to the new stack (one product at a time, no data migration — tables already isolated)
 - [ ] Migrate MyTeacher to the new stack
