@@ -648,7 +648,7 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 
 | Slice | Date |
 |---|---|
-| 0 Repo reshape | ⬜ |
+| 0 Repo reshape | ✅ 2026-09-10 |
 | 1 Scaffold | ⬜ |
 | 2 Auth and shell | ⬜ |
 | 3 Catalogue and config | ⬜ |
