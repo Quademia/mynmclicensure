@@ -6,8 +6,9 @@ rebuild is, what it is not, and in what order it is built. The slice
 ladder at the end is mirrored line-for-line in `BUILD_LIST.md`; a slice
 is ticked in both places in the same commit.
 
-Codex executes this plan. Claude plans and reviews. Anything this
-document does not say, the executor asks Sam rather than guesses.
+Claude and Codex both build from this plan, one agent per session.
+Anything this document does not say, the agent in session asks Sam
+rather than guesses.
 
 ---
 
@@ -36,7 +37,7 @@ reopen one only with Sam, and record the reopening here.
 | D5 | **No data migration.** Users, subscriptions, payments, attempts, messages, packs: none of it moves. Every gamma user is a free user. | Move users with password hashes | Nothing to preserve; a clean start is simpler and safer |
 | D6 | **The question bank and catalogue seeds ARE copied.** Eleven item tables, programmes, courses, products, config, schools. | — | The product opens empty otherwise |
 | D7 | **Cutover deletes the old logins**, restricted to accounts that belong only to MyNMCLicensure. MyTeacher shares the login table and must not lose a user. | Let old users sign in and get a fresh profile | Simpler; nobody is owed continuity |
-| D8 | **Claude plans and reviews; Codex builds.** Both work in this repo; both read and write the same record files (`AGENTS.md`, `BUILD_LIST.md`, `SESSIONS.md`, `sessions/`). | — | — |
+| D8 | **Claude and Codex both build, one agent per session.** Both work in the same clone and read and write the same record files (`AGENTS.md`, `BUILD_LIST.md`, `SESSIONS.md`, `sessions/`); the plan is edited by whichever agent is in session, on Sam's go-ahead. | Claude plans, Codex executes (the first framing) | Both are agents; the only real constraint is that a shared working tree admits one at a time |
 | D9 | **Record files take the MyNclex shape**: rules in `AGENTS.md`, one-line index in `SESSIONS.md`, monthly logs in `sessions/`, one-line inventory in `BUILD_LIST.md`, specs in `docs/`. | The old gamma shape (a status paragraph per item) | It went stale; the MyNclex shape has held |
 
 ## 3. The boundary: stack versus product

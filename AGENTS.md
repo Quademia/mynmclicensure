@@ -263,18 +263,25 @@ slice on the branch.
 
 ## Two assistants, one repo
 
-Claude plans and reviews; Codex builds. Both read and write the same
-record files, so:
+Claude and Codex both build here, as equals. Both work in the same
+clone, so both see the same branches and the same working tree. That
+gives one hard rule and two habits:
 
+- **One agent per session, one session at a time.** Two agents editing
+  the same working tree at once sweep up each other's half-written
+  changes. A session ends merged to `main`, or its log entry says why
+  not; the next session, whichever agent runs it, starts from there.
 - Start of session: `git fetch --prune`, read `SESSIONS.md` and the head
   of the latest period file, `BUILD_LIST.md`, `git log --oneline -10`,
-  and `git branch --no-merged main` — the other assistant may have left
-  a branch unmerged.
-- The session log entry is the handoff. Write it so the other assistant
-  can pick up from it without this conversation.
-- The plan (`rebuild.md`) is edited by Claude, on Sam's go-ahead. Codex
-  logs a disagreement with the plan in the session entry and asks Sam;
-  it does not edit the plan.
+  and `git branch --no-merged main` — the other agent may have left a
+  branch unmerged. Pick it up from its log entry, continue it or leave
+  it; never overwrite it.
+- The session log entry is the handoff. Write it so the other agent
+  can pick up from it without this conversation, and name yourself in it.
+- The plan (`rebuild.md`) is edited by whichever agent is in session,
+  only on Sam's go-ahead, and the edit is logged. A disagreement with
+  the plan goes in the session entry and to Sam; it is not resolved by
+  quietly building something else.
 
 ## Files To Read at Session Start
 

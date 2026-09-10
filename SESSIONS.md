@@ -22,7 +22,7 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
-- 2026-09-10 — the rebuild is planned: like for like onto the MyNclex stack, in this repo, in the `licensure` schema; Claude plans, Codex builds
+- 2026-09-10 — the rebuild is planned: like for like onto the MyNclex stack, in this repo, in the `licensure` schema; both agents build, one per session
   - ↳ D1–D9 · stack vs product boundary · schema not prefix · own migration runner, not the CLI tracker · workers → Server Actions · §8 shape candidates · §9 five defects + dead code · cutover deletes licensure-only logins · 16 slices
 
 ## 2026-04 to 2026-06 — [sessions/2026-04-to-06.md](sessions/2026-04-to-06.md) — the gamma era
