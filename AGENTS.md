@@ -123,7 +123,7 @@ above sit at the repo root; the audience grouping inside them is kept.
 
 1. **Everything this product owns lives in the `licensure_gh` schema.**
    Tables, RPCs, policies, the migration tracker. Storage buckets are
-   global, so they carry a `licensure-` prefix. Nothing is created in
+   global, so they carry a `licensure-gh-` prefix. Nothing is created in
    `public`. This is the extraction mechanism: the day the product gets
    its own Supabase project, `pg_dump --schema=licensure_gh` is the move.
    Every Supabase client is created with `db: { schema: 'licensure_gh' }`.
