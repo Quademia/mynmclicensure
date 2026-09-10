@@ -79,7 +79,11 @@ async function main() {
   }
 
   const files = listMigrationFiles();
-  const sql = postgres(url, { max: 1, prepare: false, ssl: 'require' });
+  // onnotice: the first migration repeats the bootstrap's CREATE ... IF NOT
+  // EXISTS on purpose (so db/ describes everything in the schema), and
+  // Postgres answers each with a NOTICE "already exists, skipping". Those
+  // are not failures; keep the output to what changed.
+  const sql = postgres(url, { max: 1, prepare: false, ssl: 'require', onnotice: () => {} });
 
   try {
     // Bootstrap: the schema and the tracker must exist before we can ask
