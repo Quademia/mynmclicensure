@@ -27,7 +27,8 @@ list it replaces is in git history and in `qacademy-gamma`.
 ### [rebuild.md](docs/product-plan/rebuild.md)
 
 - ✅ 0 Repo reshape — old tree to `legacy/`, MyTeacher and residue deleted — 2026-09-10
-- ⬜ 1 Scaffold — Next app, Workers, deploy + migrate workflows, schema `licensure_gh`, runner
+- ✅ 1 Scaffold — Next app, Workers, deploy + migrate workflows, schema `licensure_gh`, runner — 2026-09-10
+- ⬜ 1b First dev deploy — needs the four GitHub secrets (CF tokens, DB_URL_DEV/PROD)
 - ⬜ 2 Auth and shell — three login doors, register, reset, sessions, gates, sidebars, drawer
 - ⬜ 3 Catalogue and config — programmes, courses, levels, products, config; public pages
 - ⬜ 4 Question bank — eleven item tables, CSV import, images, entitlement policy, content copy

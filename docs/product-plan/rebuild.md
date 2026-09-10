@@ -1,7 +1,7 @@
 # MyNMCLicensure — the rebuild plan
 
 Written 2026-09-10 by Claude, from a planning session with Sam. Status:
-**planned, not started.** This is the one document that says what the
+**in build — slices 0 and 1 done 2026-09-10.** This is the one document that says what the
 rebuild is, what it is not, and in what order it is built. The slice
 ladder at the end is mirrored line-for-line in `BUILD_LIST.md`; a slice
 is ticked in both places in the same commit.
@@ -69,7 +69,8 @@ are how the stack works, not how a product works. Copy, do not import
   tracker and cannot be shared with another repo on the same project.
 - `scripts/lint-baseline.mjs`, `.eslint-baseline.json`,
   `.githooks/pre-commit`, `eslint.config.mjs`, `tsconfig.json`,
-  `next.config.ts`, `open-next.config.ts`, `postcss.config.mjs`.
+  `next.config.ts`, `open-next.config.ts`. No Tailwind, no PostCSS: the
+  stylesheet is the product's own (§3.2).
 - The shell primitives that carry no product meaning: the cookie
   refresh middleware, the `(app)/layout.tsx` auth boundary, the
   `AppShell` frame with a `mobileNav` slot, the toast and confirm-dialog
@@ -661,7 +662,7 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | Slice | Date |
 |---|---|
 | 0 Repo reshape | ✅ 2026-09-10 |
-| 1 Scaffold | ⬜ |
+| 1 Scaffold | ✅ 2026-09-10 (deploy half proven when the GitHub secrets exist) |
 | 2 Auth and shell | ⬜ |
 | 3 Catalogue and config | ⬜ |
 | 4 Question bank | ⬜ |
