@@ -14,7 +14,7 @@ should stay rich.
   **Under 250 characters. Keywords, not sentences.**
 - **One blank line between sessions.**
 - **Merge and release status do NOT go here.** `git log origin/main` and
-  `origin/prod` are the truth.
+  `origin/production` are the truth.
 - **Everything else goes in the period file.**
 - **Name the assistant** in the period-file entry, not here.
 

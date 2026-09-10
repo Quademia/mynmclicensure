@@ -3,7 +3,7 @@ name: Deploy prod Worker (workspace CF)
 on:
   push:
     branches:
-      - prod
+      - production
 
 # One deploy at a time. If a second push lands while one is in flight,
 # the new one waits rather than racing.

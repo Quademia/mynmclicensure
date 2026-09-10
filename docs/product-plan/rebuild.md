@@ -64,7 +64,7 @@ are how the stack works, not how a product works. Copy, do not import
 - Resend, sent from Server Actions. Paystack, initialised and verified
   from Server Actions. Both of gamma's Workers retire (§7).
 - GitHub Actions: `deploy-dev.yml` on push to `main`, `deploy-prod.yml`
-  on push to `prod`. A migration workflow of this repo's own (§6.5) —
+  on push to `production`. A migration workflow of this repo's own (§6.5) —
   **not** MyNclex's `migrate-prod.yml`, which drives the Supabase CLI
   tracker and cannot be shared with another repo on the same project.
 - `scripts/lint-baseline.mjs`, `.eslint-baseline.json`,
@@ -270,7 +270,7 @@ So this repo brings a small runner, `scripts/db-migrate.mjs`:
   name, applied_at)`, each in its own transaction, and records it.
 - Never touches `supabase_migrations.*`.
 - Run by `migrate-dev.yml` on push to `main` and `migrate-prod.yml` on
-  push to `prod`, before the deploy workflow. Locally: `npm run db:migrate`.
+  push to `production`, before the deploy workflow. Locally: `npm run db:migrate`.
 
 The first migration creates the schema and the tracker. `db/schema.sql`
 and `db/rls.sql` stay as the readable statement of the current shape,

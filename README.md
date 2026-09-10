@@ -40,7 +40,7 @@ code sits in this repo under `legacy/` as the reference until cutover.
 
 | | dev | prod |
 |---|---|---|
-| Branch | `main` | `prod` |
+| Branch | `main` | `production` |
 | Worker | `licensure-dev` | `licensure-prod` → `licensure.quademia.com` |
 | Supabase | `zrakjibtxyzoqcdtvpmq` | `qizhyhjeqhaybyddsuni` |
 

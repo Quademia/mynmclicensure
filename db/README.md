@@ -32,7 +32,7 @@ npm run db:migrate    apply pending
 the tracker table `licensure_gh.migrations` if absent, and applies each
 pending file in a transaction that also records it. In CI,
 `migrate-dev.yml` runs it on every push to `main` and `migrate-prod.yml` on
-every push to `prod`, with `DB_URL_DEV` / `DB_URL_PROD` as repository
+every push to `production`, with `DB_URL_DEV` / `DB_URL_PROD` as repository
 secrets.
 
 **Why not `supabase db push`.** The CLI records in the project's single

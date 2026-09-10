@@ -3,7 +3,7 @@ name: Apply migrations to prod Supabase
 on:
   push:
     branches:
-      - prod
+      - production
 
 # One migration job at a time. A second push waits rather than racing.
 concurrency:

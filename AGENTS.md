@@ -201,15 +201,17 @@ Two long-lived branches on the remote:
 - **`main`** — stable. Session work merges here after Sam tests it
   locally and explicitly approves. A push to `main` deploys
   `licensure-dev` and applies migrations to the dev project.
-- **`prod`** — released. `main` merges into `prod` as a GitHub pull
-  request with a merge commit, only on Sam's explicit approval. A push
-  to `prod` applies migrations to the prod project, then deploys
-  `licensure-prod`.
+- **`production`** — released. `main` merges into `production` as a
+  GitHub pull request with a merge commit, only on Sam's explicit
+  approval. A push to `production` applies migrations to the prod
+  project, then deploys `licensure-prod`. The branch predates the
+  rebuild; its older commits are the gamma-era site's release history
+  and are kept as history.
 
 Each session works on a short-lived branch named for the assistant and
 the session (`codex/<slug>` or `claude/<slug>`), committing freely
 there. Nobody pushes directly to `main`; nobody merges to `main` or
-`prod` without Sam's yes in the session.
+`production` without Sam's yes in the session.
 
 **Per-session loop:**
 
@@ -293,7 +295,7 @@ gives one hard rule and two habits:
 - `BUILD_LIST.md`.
 - `docs/product-plan/rebuild.md` §2, §3, §12 at least.
 - `git fetch --prune`, `git log --oneline -10`, the tips of `origin/main`
-  and `origin/prod`, `git branch --no-merged main`.
+  and `origin/production`, `git branch --no-merged main`.
 
 ## Environment variables
 
