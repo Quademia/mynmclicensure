@@ -30,10 +30,10 @@ export async function middleware(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      // The product's tables live in the `licensure` schema (AGENTS.md
+      // The product's tables live in the `licensure_gh` schema (AGENTS.md
       // rule #1). Middleware only touches auth, but every client in the
       // repo is created the same way so none is ever pointed at `public`.
-      db: { schema: 'licensure' },
+      db: { schema: 'licensure_gh' },
       cookies: {
         getAll() {
           return request.cookies.getAll();

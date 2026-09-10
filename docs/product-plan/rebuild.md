@@ -31,7 +31,7 @@ reopen one only with Sam, and record the reopening here.
 | # | Decision | Alternative rejected | Why |
 |---|---|---|---|
 | D1 | **Rebuild inside this repo** (`Quademia/mynmclicensure`). Old tree moves to `legacy/`. | A fresh repo | The history is here and costs nothing to keep |
-| D2 | **Stay on gamma's Supabase project pair.** The rebuilt product gets its own Postgres **schema** named `licensure`; the old product keeps `public`. | Own Supabase project per product | Right in principle, but each extra project is paid compute; not until the products earn it. A schema is the cheapest real separation and dumps out cleanly later |
+| D2 | **Stay on gamma's Supabase project pair.** The rebuilt product gets its own Postgres **schema** named `licensure_gh`; the old product keeps `public`. | Own Supabase project per product | Right in principle, but each extra project is paid compute; not until the products earn it. A schema is the cheapest real separation and dumps out cleanly later |
 | D3 | **Everything is rebuilt.** No feature is dropped. Priority order is decided after this plan, per slice. | A trimmed first release | No rush; the product is already complete and the audience knows it |
 | D4 | **Like-for-like.** No new user-visible feature, no new mechanism the user can see. Internal shape may change only where §8 lists it and Sam has ticked it. | Adopt MyNclex's runner, bank shape, catalogue | MyNMCLicensure and MyNclex are different products for different people. Only the stack is shared |
 | D5 | **No data migration.** Users, subscriptions, payments, attempts, messages, packs: none of it moves. Every gamma user is a free user. | Move users with password hashes | Nothing to preserve; a clean start is simpler and safer |
@@ -39,6 +39,7 @@ reopen one only with Sam, and record the reopening here.
 | D7 | **Cutover deletes the old logins**, restricted to accounts that belong only to MyNMCLicensure. MyTeacher shares the login table and must not lose a user. | Let old users sign in and get a fresh profile | Simpler; nobody is owed continuity |
 | D8 | **Claude and Codex both build, one agent per session.** Both work in the same clone and read and write the same record files (`AGENTS.md`, `BUILD_LIST.md`, `SESSIONS.md`, `sessions/`); the plan is edited by whichever agent is in session, on Sam's go-ahead. | Claude plans, Codex executes (the first framing) | Both are agents; the only real constraint is that a shared working tree admits one at a time |
 | D9 | **Record files take the MyNclex shape**: rules in `AGENTS.md`, one-line index in `SESSIONS.md`, monthly logs in `sessions/`, one-line inventory in `BUILD_LIST.md`, specs in `docs/`. | The old gamma shape (a status paragraph per item) | It went stale; the MyNclex shape has held |
+| D10 | **The schema is named for the country, not the profession: `licensure_gh`.** (Sam, 2026-09-10, before any migration ran.) | `licensure` (no country); `nmc_gh` (the regulator) | "NMC" does not identify Ghana — the UK's regulator is also the NMC. A second profession (teacher licensure) is another *programme* inside the product, so the schema must not say nursing; a second country is the axis that does not fit inside the data, so the schema does say Ghana. The brand "MyNMCLicensure" is the thing that would change, and a brand is cheap to change; a schema name is not |
 
 ## 3. The boundary: stack versus product
 
@@ -59,7 +60,7 @@ are how the stack works, not how a product works. Copy, do not import
   `client.ts`, per-request clients, `getUser()` never `getSession()`,
   `force-dynamic` on authenticated pages, service role only on the
   server. **One addition for this repo:** every client is created with
-  `db: { schema: 'licensure' }`.
+  `db: { schema: 'licensure_gh' }`.
 - Resend, sent from Server Actions. Paystack, initialised and verified
   from Server Actions. Both of gamma's Workers retire (§7).
 - GitHub Actions: `deploy-dev.yml` on push to `main`, `deploy-prod.yml`
@@ -171,11 +172,11 @@ is preserved.
 
 | Thing | Name |
 |---|---|
-| Postgres schema | `licensure` |
-| Tables | the legacy names, unchanged, inside the schema: `licensure.users`, `licensure.items_gp` … |
-| Storage buckets | `licensure-rationale-images` (global namespace, so the prefix stays) |
-| RPCs | legacy names inside the schema: `licensure.check_login_rate_limit` … |
-| Migration tracker | `licensure.migrations` |
+| Postgres schema | `licensure_gh` |
+| Tables | the legacy names, unchanged, inside the schema: `licensure_gh.users`, `licensure_gh.items_gp` … |
+| Storage buckets | `licensure-gh-rationale-images` (global namespace, so the prefix stays) |
+| RPCs | legacy names inside the schema: `licensure_gh.check_login_rate_limit` … |
+| Migration tracker | `licensure_gh.migrations` |
 | Cloudflare Workers | `licensure-dev` (personal account), `licensure-prod` (workspace account) — same split as MyNclex |
 | Hostnames | dev: the Worker's `workers.dev` URL; prod: **`licensure.quademia.com`** (settled in MyNclex `domain-and-identity.md`) |
 | Brand strings | **Quademia**, never QAcademy, in anything a reader sees (`AGENTS.md`). The sender becomes `Quademia <noreply@…>`; the domain is decided with the DNS slice |
@@ -199,15 +200,15 @@ D7 a step with a filter, not a bulk delete.
 ### 6.2 Exposing the schema (both projects, dashboard, once)
 
 Supabase's API serves only schemas listed under **Settings → API →
-Exposed schemas**. Add `licensure` on dev and on prod, and add it to
+Exposed schemas**. Add `licensure_gh` on dev and on prod, and add it to
 the "Extra search path" too. Then every server and browser client is
-created with `db: { schema: 'licensure' }`. ⚠ Forgetting the dashboard
+created with `db: { schema: 'licensure_gh' }`. ⚠ Forgetting the dashboard
 step fails with "relation does not exist" on every query and nothing
 in the repo can fix it — it goes in `db/README.md` as the first line.
 
 ### 6.3 Tables — moved name for name
 
-Create in `licensure`, from `legacy/db/schema.sql`, with the same
+Create in `licensure_gh`, from `legacy/db/schema.sql`, with the same
 columns and defaults: `programs`, `courses`, `levels`, `products`,
 `users`, `schools`, `subscriptions`, `payments`, `announcements`,
 `user_notice_state`, `config`, `quizzes`, `mock_quizzes`, `attempts`,
@@ -245,7 +246,7 @@ Server Actions and Server Components do, as the signed-in user. So:
   gate that loads a course's items, AND, because the app layer is not
   the floor, by a SELECT policy on each `items_*` table that checks an
   active subscription covering the course. The check is one function,
-  `licensure.user_has_course(course_id)`, called by eleven policies.
+  `licensure_gh.user_has_course(course_id)`, called by eleven policies.
 - Every tutor/admin-side read still names its scope in the query
   (`AGENTS.md` workaround "RLS is the floor, not the filter").
 
@@ -264,7 +265,7 @@ So this repo brings a small runner, `scripts/db-migrate.mjs`:
   (`YYYYMMDDHHMMSS_name.sql`, the MyNclex convention).
 - Connects with the project's Postgres connection string (a repo secret
   per environment: `DB_URL_DEV`, `DB_URL_PROD`).
-- Applies each file not yet recorded in `licensure.migrations(version,
+- Applies each file not yet recorded in `licensure_gh.migrations(version,
   name, applied_at)`, each in its own transaction, and records it.
 - Never touches `supabase_migrations.*`.
 - Run by `migrate-dev.yml` on push to `main` and `migrate-prod.yml` on
@@ -281,13 +282,13 @@ it, one statement per table, run once on dev and once on prod at the
 slice that needs it:
 
 ```sql
-insert into licensure.items_gp select * from public.items_gp;
+insert into licensure_gh.items_gp select * from public.items_gp;
 -- × 11 item tables, then programs, courses, levels, products, config, schools
 ```
 
 Verify by row count and by `md5(string_agg(item_id || stem, '|' order
 by item_id))` on both sides. Rationale images: copy the storage objects
-from the old bucket into `licensure-rationale-images` and rewrite the
+from the old bucket into `licensure-gh-rationale-images` and rewrite the
 URLs in `rationale_img` in the same step. Two content facts carried
 from gamma's build list, not for the rebuild to fix: `items_rphn_disease_ctrl`
 is empty while its course is active; `items_rm_mid` is short of its
@@ -357,7 +358,7 @@ Behaviour that must survive exactly:
   past expiry to EXPIRED and returns the count.
 - **Rate limit**: 5 requests per 60 seconds per IP on the four public
   payment actions, none on admin ones. gamma used a Cloudflare binding;
-  under OpenNext the plain answer is a small `licensure.rate_limits`
+  under OpenNext the plain answer is a small `licensure_gh.rate_limits`
   counter behind a SECURITY DEFINER RPC, the same shape as the login
   limiter. **Fail open** if the check itself errors, as legacy does.
 - **Auth for admin actions** is `requireAdmin()` from `lib/access` — the
@@ -524,7 +525,7 @@ deleted.
 `package.json`, configs, `middleware.ts`, `lib/supabase/`, the lint
 baseline and hook, `wrangler.jsonc` (`licensure-dev` / `licensure-prod`),
 `deploy-dev.yml`, `deploy-prod.yml`, `.env.local` template in
-`README.md`. `db/`: first migration creating schema `licensure` and the
+`README.md`. `db/`: first migration creating schema `licensure_gh` and the
 tracker; `scripts/db-migrate.mjs`; `migrate-dev.yml`, `migrate-prod.yml`.
 Dashboard: expose the schema on both projects. A placeholder home page.
 *Done when* `npm run dev` serves it, a push to `main` deploys
@@ -644,6 +645,16 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 - It does not carry gamma's post-launch wish list. Items from the old
   `BUILD_LIST.md` that still apply after the rebuild are listed in the
   new `BUILD_LIST.md` under *Carried from gamma*, as ⬜ or ⏸ lines.
+- It does not design for a second profession or a second country, but
+  it must not design *against* them (D10). A second profession — teacher
+  licensure, say — is a **programme**: its own courses, item tables and
+  products, everything else shared; nothing in the rebuild may assume
+  "nursing" outside programme data and the brand strings. A second
+  country — Nigeria, Kenya, the UK — is a **separate decision** (one app
+  with a country column, or a clone with its own schema `licensure_ng`
+  and its own domain); the rebuild takes no position, and nothing in it
+  may assume Ghana outside the schema name, the currency and the
+  catalogue seeds.
 
 ## 14. Ladder
 

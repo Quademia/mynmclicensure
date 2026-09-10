@@ -1,10 +1,10 @@
-# db/ — the `licensure` schema
+# db/ — the `licensure_gh` schema
 
 ⚠ **Read this line first.** The product's tables live in a Postgres schema
-named `licensure`, inside gamma's shared Supabase project (dev
+named `licensure_gh`, inside gamma's shared Supabase project (dev
 `zrakjibtxyzoqcdtvpmq`, prod `qizhyhjeqhaybyddsuni`). Supabase's API serves
 only the schemas listed under **Settings → API → Exposed schemas**. If
-`licensure` is not listed there, every query from the app fails with
+`licensure_gh` is not listed there, every query from the app fails with
 "relation does not exist", and nothing in this repo can fix it. Add it on
 dev now and on prod before the first prod deploy. Add it to **Extra search
 path** in the same settings block as well.
@@ -29,7 +29,7 @@ npm run db:migrate    apply pending
 ```
 
 `scripts/db-migrate.mjs` connects with `DB_URL`, bootstraps the schema and
-the tracker table `licensure.migrations` if absent, and applies each
+the tracker table `licensure_gh.migrations` if absent, and applies each
 pending file in a transaction that also records it. In CI,
 `migrate-dev.yml` runs it on every push to `main` and `migrate-prod.yml` on
 every push to `prod`, with `DB_URL_DEV` / `DB_URL_PROD` as repository
@@ -39,7 +39,7 @@ secrets.
 tracker and refuses to run when it disagrees with the files on disk. This
 project is shared with the legacy site and MyTeacher; MyNclex's repo shows
 what happens when a project's tracker is owned by one repo — a second repo
-cannot push. Ours records only in `licensure.migrations`, so any number of
+cannot push. Ours records only in `licensure_gh.migrations`, so any number of
 repos can each own a schema in one project. ⚠ The MCP `apply_migration`
 tool stamps the CLI tracker too; do not use it here. `execute_sql` for
 *reading* is fine.
@@ -54,7 +54,7 @@ in a chat.
 
 ## Rules
 
-- Everything in `licensure`. A migration that names `public.*` or
+- Everything in `licensure_gh`. A migration that names `public.*` or
   `teacher_*` is a plan violation (AGENTS.md rule #7), except the read-only
   content copy and the cutover scripts, which say so in their header.
 - One migration, one intent, one file. Name it for the intent.

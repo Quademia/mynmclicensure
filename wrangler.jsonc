@@ -18,7 +18,7 @@
   // Public Supabase values — safe to commit; they ship to every browser and
   // RLS is what protects the data. These are GAMMA's projects (rebuild.md
   // D2): the rebuilt product shares them with the legacy site and with
-  // MyTeacher, and owns only the `licensure` schema inside them.
+  // MyTeacher, and owns only the `licensure_gh` schema inside them.
   //
   // ⚠ RUNTIME BINDINGS ONLY, AND THAT IS NOT ENOUGH ON ITS OWN. Cloudflare
   // hands these to the Worker per request, which covers server-side reads.

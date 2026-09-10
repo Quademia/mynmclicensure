@@ -5,7 +5,7 @@
 //
 // AGENTS.md rule #4: create per request (this function is called per
 // request), never at module scope; never call getSession() on the server.
-// AGENTS.md rule #1: every client is pointed at the `licensure` schema.
+// AGENTS.md rule #1: every client is pointed at the `licensure_gh` schema.
 // The schema must be listed under Exposed schemas on the Supabase project
 // (dashboard → Settings → API) or every query fails with "relation does
 // not exist" — see db/README.md.
@@ -18,7 +18,7 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { createClient as createPlainClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
-export const LICENSURE_SCHEMA = 'licensure';
+export const LICENSURE_SCHEMA = 'licensure_gh';
 
 export async function createClient() {
   const cookieStore = await cookies();
@@ -50,7 +50,7 @@ export async function createClient() {
 // Service-role client — bypasses RLS. Per-request creation, no module-scope
 // cache, matching createClient() above. The return type is inferred: the
 // library's `SupabaseClient` default is typed to the `public` schema, and
-// an explicit annotation would refuse a client pointed at `licensure`.
+// an explicit annotation would refuse a client pointed at `licensure_gh`.
 export function createServiceRoleClient() {
   return createPlainClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

@@ -32,7 +32,7 @@ code sits in this repo under `legacy/` as the reference until cutover.
 |---|---|
 | App | Next.js 16 + TypeScript + React 19, App Router |
 | Hosting | Cloudflare Workers via `@opennextjs/cloudflare` |
-| Database + Auth + Storage | Supabase — gamma's project pair, this product in the `licensure` schema |
+| Database + Auth + Storage | Supabase — gamma's project pair, this product in the `licensure_gh` schema |
 | Payments | Paystack, from Server Actions |
 | Email | Resend, from Server Actions |
 

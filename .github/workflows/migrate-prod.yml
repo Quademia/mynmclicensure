@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   migrate:
-    name: Apply db/migrations to the prod project (licensure schema)
+    name: Apply db/migrations to the prod project (licensure_gh schema)
     runs-on: ubuntu-latest
 
     steps:
@@ -30,7 +30,7 @@ jobs:
 
       # Same runner as migrate-dev.yml, pointed at prod. The prod project
       # is LIVE for the legacy site and MyTeacher; the runner touches only
-      # the licensure schema, and a migration that names anything outside
+      # the licensure_gh schema, and a migration that names anything outside
       # it is a plan violation (AGENTS.md rule #7).
       - name: Apply pending migrations
         run: npm run db:migrate

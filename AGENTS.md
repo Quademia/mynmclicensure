@@ -45,7 +45,7 @@ in §9, log it and ask; do not fix it silently.
 - Deployed to Cloudflare Workers via `@opennextjs/cloudflare`
 - Supabase for Postgres + Auth + Storage — **gamma's project pair,
   shared with the legacy product and with MyTeacher.** This product owns
-  the Postgres schema **`licensure`** and nothing outside it.
+  the Postgres schema **`licensure_gh`** and nothing outside it.
 - `@supabase/ssr` for cookie-based server-side auth
 - Resend for email — **sent from the app itself** (Server Actions),
   never from a separate worker. There is no `workers/` folder.
@@ -60,7 +60,7 @@ stack and the source of the plumbing. MyTeacher follows later.
 - `components/` — visual pieces, grouped by domain (`shell/`, `nav/<audience>/`).
 - `lib/` — logic, grouped by domain (`access/`, `auth/`, `attempts/`, `payments/`, …).
 - `styles/` — all CSS, a top-level sibling of `app/`.
-- `db/` — schema, RLS, seeds, migrations for the `licensure` schema.
+- `db/` — schema, RLS, seeds, migrations for the `licensure_gh` schema.
 - `scripts/` — the lint baseline and the migration runner.
 - `public/` — static assets.
 - `docs/product-plan/` — flat: the rebuild plan, the feature specs
@@ -121,12 +121,12 @@ above sit at the repo root; the audience grouping inside them is kept.
 
 ## Non-Negotiable Rules
 
-1. **Everything this product owns lives in the `licensure` schema.**
+1. **Everything this product owns lives in the `licensure_gh` schema.**
    Tables, RPCs, policies, the migration tracker. Storage buckets are
    global, so they carry a `licensure-` prefix. Nothing is created in
    `public`. This is the extraction mechanism: the day the product gets
-   its own Supabase project, `pg_dump --schema=licensure` is the move.
-   Every Supabase client is created with `db: { schema: 'licensure' }`.
+   its own Supabase project, `pg_dump --schema=licensure_gh` is the move.
+   Every Supabase client is created with `db: { schema: 'licensure_gh' }`.
    The schema must be listed under Exposed schemas on both projects
    (dashboard) — see `db/README.md`.
 2. **No imports from sibling products.** Never import from
@@ -190,7 +190,7 @@ above sit at the repo root; the audience grouping inside them is kept.
   `node_modules/lightningcss/`, delete `.next`, restart.
 - **Migrations are applied by this repo's own runner**
   (`npm run db:migrate`, `scripts/db-migrate.mjs`), recorded in
-  `licensure.migrations`. Never `supabase db push`, never the MCP
+  `licensure_gh.migrations`. Never `supabase db push`, never the MCP
   `apply_migration` — both stamp the project's shared tracker, which
   this repo does not own.
 

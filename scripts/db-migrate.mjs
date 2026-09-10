@@ -1,13 +1,13 @@
 // scripts/db-migrate.mjs
 //
-// This repo's own migration runner for the `licensure` schema.
+// This repo's own migration runner for the `licensure_gh` schema.
 //
 // WHY NOT THE SUPABASE CLI. `supabase db push` records what it applied in
 // the project's single tracker (supabase_migrations.schema_migrations) and
 // refuses to run when that tracker disagrees with the files on disk. Our
 // Supabase project is shared: the legacy site, MyTeacher and (later) the
 // MyTeacher rebuild all live in it. Two repos cannot share one tracker, so
-// this repo keeps its own — licensure.migrations — and never touches the
+// this repo keeps its own — licensure_gh.migrations — and never touches the
 // CLI's. See rebuild.md §6.5. ⚠ Never run `supabase db push` or the MCP
 // `apply_migration` against this project from this repo; both stamp the
 // shared tracker (AGENTS.md, Known Workarounds).
@@ -18,7 +18,7 @@
 //   - Connects with DB_URL (env, or .env.local when unset — never both
 //     halves of a secret in the repo).
 //   - Bootstraps the schema and the tracker if absent (idempotent).
-//   - Applies each file not yet in licensure.migrations, EACH IN ITS OWN
+//   - Applies each file not yet in licensure_gh.migrations, EACH IN ITS OWN
 //     TRANSACTION, and records it in the same transaction. A failing file
 //     leaves the database as it was before that file and stops the run.
 //   - Never re-applies a recorded version; never edits a file's record.
@@ -38,7 +38,7 @@ import { dirname, join } from 'node:path';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 const migrationsDir = join(repoRoot, 'db', 'migrations');
-const SCHEMA = 'licensure';
+const SCHEMA = 'licensure_gh';
 const statusOnly = process.argv.includes('--status') || process.argv.includes('--dry-run');
 
 function loadDotEnvLocal() {

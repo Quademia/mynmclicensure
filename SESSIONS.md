@@ -22,8 +22,8 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
-- 2026-09-10 — the rebuild planned (like for like, MyNclex stack only, `licensure` schema), slice 0 done, docs flattened, the stack installed on a branch
-  - ↳ D1–D9 · schema not prefix · own migration runner · workers → Server Actions · §8 + §9 lists · legacy/ 85 renames · product-plan flat, no history/ · no MyNclex UI · db:migrate waits on DB_URL + exposed schema · Next 16.2.4 CVE
+- 2026-09-10 — the rebuild planned (like for like, MyNclex stack only, `licensure_gh` schema), slice 0 done, docs flattened, the stack installed on a branch
+  - ↳ D1–D10 · schema `licensure_gh` (country, not profession) · own migration runner · workers → Server Actions · §8 + §9 lists · legacy/ 85 renames · product-plan flat · no MyNclex UI · db:migrate waits on DB_URL + exposed schema · Next 16.2.4 CVE
 
 ## 2026-04 to 2026-06 — [sessions/2026-04-to-06.md](sessions/2026-04-to-06.md) — the gamma era
 

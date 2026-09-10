@@ -217,11 +217,11 @@ deployment is a Worker, not a Pages project, and comes with slice 1.
 **What is still shared, and how this repo treats it:**
 
 - The Supabase project pair — **stays shared, by decision** (D2 in the
-  plan). This product owns the Postgres schema `licensure` and touches
+  plan). This product owns the Postgres schema `licensure_gh` and touches
   nothing in `public` or `teacher_*`.
 - `auth.users` — shared. Cutover deletes only the logins that belong to
   no MyTeacher user (plan §11).
-- `db/` — this repo's `db/` describes the `licensure` schema only, with
+- `db/` — this repo's `db/` describes the `licensure_gh` schema only, with
   its own migration runner and tracker; the shared-tracker hazard in
   Part 1 is avoided rather than solved.
 - `EMAIL_SECRET` — dies with the email worker; the rebuilt product
