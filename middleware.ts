@@ -70,7 +70,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  const shouldBounce = AUTH_FORBIDDEN_PATHS.includes(path);
+  // GET only: a Server Action posted to /login by the page that just
+  // finished a Google or magic-link return arrives WITH a user, and must
+  // reach the action rather than be bounced.
+  const shouldBounce = request.method === 'GET' && AUTH_FORBIDDEN_PATHS.includes(path);
   if (shouldBounce && user) {
     const routerUrl = request.nextUrl.clone();
     routerUrl.pathname = '/router';

@@ -1,0 +1,134 @@
+/* styles/base.css
+ *
+ * The product's tokens and reset, transcribed from
+ * legacy/mynmclicensure/css/style.css (Variables + Reset + body + a).
+ * Loaded once from app/layout.tsx. The Inter font comes from next/font in
+ * that layout rather than the legacy @import, so the CSS variable
+ * --font-inter is set there.
+ *
+ * Plus the toast (lib/toast/toast.tsx), which every surface uses.
+ */
+
+:root {
+  --primary: #1e3a5f;
+  --primary-dark: #142d4c;
+  --primary-light: #edf6f5;
+  --accent: #2d7d72;
+  --success: #16a34a;
+  --danger: #dc2626;
+  --warning: #d97706;
+  --text: #111827;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --bg: #f9fafb;
+  --white: #ffffff;
+  --radius: 8px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-inter), 'Inter', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* --- Toast (UI convention #1) --- */
+.app-toast {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 20000;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: min(440px, calc(100vw - 48px));
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--white);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.11);
+  font-size: 13px;
+  line-height: 1.45;
+  animation: app-toast-in 180ms ease-out;
+}
+
+@keyframes app-toast-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.app-toast-error {
+  color: var(--danger);
+  border: 1px solid #fecaca;
+  border-left: 4px solid var(--danger);
+}
+.app-toast-success {
+  color: #065f46;
+  border: 1px solid #bbf7d0;
+  border-left: 4px solid var(--success);
+}
+.app-toast-info {
+  color: #075985;
+  border: 1px solid #bae6fd;
+  border-left: 4px solid #0ea5e9;
+}
+
+.app-toast-icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--white);
+  background: currentColor;
+}
+.app-toast-error .app-toast-icon   { background: var(--danger); }
+.app-toast-success .app-toast-icon { background: var(--success); }
+.app-toast-info .app-toast-icon    { background: #0ea5e9; }
+
+.app-toast-message {
+  flex: 1;
+  color: inherit;
+}
+
+.app-toast-close {
+  flex: none;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+}
+.app-toast-close:hover { color: var(--text); }
+
+@media (max-width: 768px) {
+  .app-toast {
+    top: 12px;
+    right: 12px;
+    left: 12px;
+    max-width: none;
+  }
+}
