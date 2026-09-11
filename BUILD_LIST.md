@@ -31,7 +31,8 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ⬜ 1b First dev deploy — secrets set 2026-09-10; proven by the first green push to main
 - ✅ 1c One Cloudflare account — both Workers on the workspace account, one plan fee — 2026-09-10
 - ✅ (unplanned) Release branch named `production` — two prod workflows and the docs retargeted — 2026-09-10
-- ⬜ 2 Auth and shell — three login doors, register, reset, sessions, gates, sidebars, drawer
+- ⬜ 2a Auth — tables incl. `programs`, login (three doors), register, forgot, reset, router, logout, gates
+- ⬜ 2b Shell — topbar, footer, both sidebars, phone drawer, two placeholder dashboards
 - ⬜ 3 Catalogue and config — programmes, courses, levels, products, config; public pages
 - ⬜ 4 Question bank — eleven item tables, CSV import, images, entitlement policy, content copy
 - ⬜ 5 Fixed quizzes and mock exams — admin pages, availability state machine, student lists
@@ -49,11 +50,11 @@ list it replaces is in git history and in `qacademy-gamma`.
 
 ### Decisions still open in rebuild.md
 
-- ⬜ §8 S1 user primary key — keep `U_` ids, add the FK
+- ✅ §8 S1 user primary key — keep `U_` ids, add the FK — 2026-09-11
 - ⬜ §8 S3 attempts blobs → JSONB / arrays
-- ⬜ §8 S4 foreign keys on licensure tables
-- ⬜ §8 S6 populate `sessions.ip_hash`
-- ⬜ §9 #8 `must_change_password` — build the gate or drop the column
+- ✅ §8 S4 foreign keys on licensure tables — 2026-09-11, as each table lands
+- ✅ §8 S6 populate `sessions.ip_hash` — 2026-09-11
+- ✅ §9 #8 `must_change_password` — left as it is, no gate, column carried — 2026-09-11
 
 ## Carried from gamma
 

@@ -404,12 +404,12 @@ not a decision.
 
 | # | Candidate | Legacy | Recommendation | Decision |
 |---|---|---|---|---|
-| S1 | User primary key | `users.user_id TEXT 'U_…'` + nullable `auth_id UUID`, no FK to `auth.users` | Keep `U_` ids (every table and every id in a support conversation uses them) but add the FK and make `auth_id` NOT NULL UNIQUE. A missing link is a bug, not a state | ☐ |
+| S1 | User primary key | `users.user_id TEXT 'U_…'` + nullable `auth_id UUID`, no FK to `auth.users` | Keep `U_` ids (every table and every id in a support conversation uses them) but add the FK and make `auth_id` NOT NULL UNIQUE. A missing link is a bug, not a state | ✅ Sam, 2026-09-11. Slice 2 |
 | S2 | Eleven item tables | one table per course, identical shape | Keep eleven. The CSV importer, the bank page and the offline-pack picker are all written per table; one table is a bigger transcription for no visible gain | ☐ |
 | S3 | `attempts.answers_json`, `attempts.item_ids` | TEXT blobs | JSONB / TEXT[] — free under Postgres, lets the review page query rather than parse | ☐ |
-| S4 | Foreign keys | none on licensure tables | Add them where the legacy data would satisfy them (subscriptions→users, products; attempts→users; payments→products; messages→threads). Refuse orphans at the floor | ☐ |
+| S4 | Foreign keys | none on licensure tables | Add them where the legacy data would satisfy them (subscriptions→users, products; attempts→users; payments→products; messages→threads). Refuse orphans at the floor | ✅ Sam, 2026-09-11, for `sessions → users` (slice 2). The rest as each table lands |
 | S5 | `config` table | live-editable key/value read on every page | Keep, exactly. An admin can change runner and builder tunables without a deploy, and that is a feature they have today. Read through one `lib/config/` accessor with the legacy fallbacks | keep (D4) |
-| S6 | `sessions.ip_hash` | column exists, never written (browser cannot see the IP) | Write it now that the server can. Same column, finally populated | ☐ |
+| S6 | `sessions.ip_hash` | column exists, never written (browser cannot see the IP) | Write it now that the server can. Same column, finally populated | ✅ Sam, 2026-09-11. Slice 2 |
 
 ## 9. Carried defects and dead code — dispositions
 
@@ -428,12 +428,13 @@ feature; a user cannot tell.
 | 5 | Session cap kicks the oldest session **without** the not-expired filter the count uses; can leave three live | `auth.js` `createLoginSession` | The kick query filters `active AND expires_utc > now`, same as the count. Slice 2 |
 | 6 | Two different `buildDeviceLabel()` definitions; last script loaded wins | `auth.js`, `guard.js` | One implementation (`lib/auth/device-label.ts`); the `auth.js` version is the one users actually got, so its labels are kept. Slice 2 |
 | 7 | Login rate-limit and reset rate-limit checks fail **open** on error | `login.html`, `forgot-password.html` | **Kept.** Legacy chose availability over lockout; changing it is a policy change, not a defect fix. Noted for Sam |
+| 15 | `users_update` policy has no `WITH CHECK`; a signed-in user can set their own row to `role = 'ADMIN'` | `db/rls.sql` | Found in the slice 2 inventory (2026-09-11). Reaches no user on the new stack (the browser never writes tables), but the floor is the floor. Sam: close it. The new policy's `WITH CHECK` refuses a change of `role`, `active`, `user_id`, `auth_id` by a non-admin. Slice 2 |
 
 **Dead things — remove or decide**
 
 | # | Item | Disposition |
 |---|---|---|
-| 8 | `users.must_change_password` — set by nothing, read by nothing, only cleared on reset | ☐ Sam: build the gate (force reset on next login) or drop the column. Recommendation: drop; it was never a feature |
+| 8 | `users.must_change_password` — set by nothing, read by nothing, only cleared on reset | **Left as it is** (Sam, 2026-09-11): the column is carried, the reset page clears it as legacy does, no gate is built. A gate would be a new feature; dropping it is tidying that can wait until after the rebuild |
 | 9 | `config.builder_default_questions` — seeded, read by no page | Drop from the seed. If an admin row exists it is harmless |
 | 10 | Student sidebar → `telegram.html`, a page that does not exist | Drop the item. (The two external Telegram/WhatsApp channel links stay.) |
 | 11 | `runner_questions_per_page` seeded 2 in `schema.sql`, 1 in `seed_data.sql`; `offline_packs_per_course` seeds 5 while the code falls back to 3 | The live prod row is the truth and is what §6.6 copies. Code fallbacks are set **equal to the seed** so a missing row cannot change behaviour |
@@ -471,9 +472,9 @@ rules. Moved to the server.
   auth signup → profile (`signup_source = 'SUPABASE_AUTH'`, school or
   `school_other`, referral) → trial subscription from
   `programs.trial_product_id` (`source = 'SELF_TRIAL_SIGNUP'`,
-  `source_ref = user_id`) → welcome email → sign out → "check your
-  email / now log in" screen. The confirm-your-email modal gate stays.
-  Rollback per defect 4.
+  `source_ref = user_id`; added in slice 8) → welcome email (added in
+  slice 10) → sign out → "check your email / now log in" screen. The
+  confirm-your-email modal gate stays. Rollback per defect 4.
 - **Password reset**: request → neutral "if that email is registered"
   message; the reset page waits for the recovery event with the 5-second
   fallback (the MyNclex `reset-password` page is the worked reference
@@ -534,10 +535,18 @@ Dashboard: expose the schema on both projects. A placeholder home page.
 dev.
 
 **2 — Auth and shell.** Tables `users`, `schools`, `sessions`,
-`auth_events`, `reset_requests` and their RPCs. Login (three doors),
-register, forgot, reset, `/router`, logout. `lib/access` gates. The
-topbar, footer, both sidebars with every legacy menu item (minus §9 #10),
-the phone drawer. `styles/` started. *Done when* a new account can
+`auth_events`, `reset_requests` and their RPCs, plus `programs` (moved up
+from slice 3 on 2026-09-11: the register page's programme dropdown reads
+it; the five rows are copied). Login (three doors), register, forgot,
+reset, `/router`, logout. `lib/access` gates. The topbar, footer, both
+sidebars with every legacy menu item (minus §9 #10 and the "Teacher
+Assess" link, which is MyTeacher's and left with the April split), the
+phone drawer. `styles/` started. Built in two sessions (Sam,
+2026-09-11): **2a** the tables, the five auth pages, the gates, logout;
+**2b** the shell, both sidebars, the drawer, the two placeholder
+dashboards. The trial grant waits for slice 8 (`products`,
+`subscriptions`) and the welcome email for slice 10; registration
+succeeds without them. *Done when* (at the end of 2b) a new account can
 register with school + referral, log in on two devices, be kicked on the
 third, reset a password, and an admin lands on an empty admin dashboard.
 
@@ -664,7 +673,8 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 0 Repo reshape | ✅ 2026-09-10 |
 | 1 Scaffold | ✅ 2026-09-10 (deploy half proven when the GitHub secrets exist) |
 | 1c One Cloudflare account | ✅ 2026-09-10 |
-| 2 Auth and shell | ⬜ |
+| 2a Auth | ⬜ |
+| 2b Shell | ⬜ |
 | 3 Catalogue and config | ⬜ |
 | 4 Question bank | ⬜ |
 | 5 Fixed quizzes and mock exams | ⬜ |
