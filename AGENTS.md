@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-09-10. Rules for **any** assistant working in this
+Last updated: 2026-09-11. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What is built and
@@ -188,6 +188,19 @@ above sit at the repo root; the audience grouping inside them is kept.
   `next dev` then 500s every page. Copy
   `node_modules/lightningcss-win32-x64-msvc/*.node` into
   `node_modules/lightningcss/`, delete `.next`, restart.
+- **A `<form action={fn}>` resets its fields after the action returns**
+  (React 19). When the fields must survive — a submit that only opens a
+  confirm step — use a plain `onSubmit` + `new FormData(form)`.
+- **A Server Component cannot clear cookies.** A gate that must sign
+  someone out redirects to `/logout?via=gate` (a Route Handler); a
+  `signOut()` in the component is silently swallowed and the auth
+  cookie bounces the browser straight back.
+- **The middleware's "signed-in user leaves /login" bounce is GET-only.**
+  A Server Action posted to /login (finishing a Google or magic-link
+  return) arrives WITH a user and must reach the action.
+- **A desktop-app worktree has no `node_modules`** — `npm ci` in it —
+  and gets a COPY of `.env.local` when created; a key added to the
+  main checkout's file later must be copied across by hand.
 - **Migrations are applied by this repo's own runner**
   (`npm run db:migrate`, `scripts/db-migrate.mjs`), recorded in
   `licensure_gh.migrations`. Never `supabase db push`, never the MCP

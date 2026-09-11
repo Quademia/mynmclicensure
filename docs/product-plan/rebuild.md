@@ -1,7 +1,7 @@
 # MyNMCLicensure — the rebuild plan
 
 Written 2026-09-10 by Claude, from a planning session with Sam. Status:
-**in build — slices 0 and 1 done 2026-09-10.** This is the one document that says what the
+**in build — slices 0 and 1 done 2026-09-10; slice 2 (2a + 2b) done 2026-09-11.** This is the one document that says what the
 rebuild is, what it is not, and in what order it is built. The slice
 ladder at the end is mirrored line-for-line in `BUILD_LIST.md`; a slice
 is ticked in both places in the same commit.
@@ -673,10 +673,10 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | Slice | Date |
 |---|---|
 | 0 Repo reshape | ✅ 2026-09-10 |
-| 1 Scaffold | ✅ 2026-09-10 (deploy half proven when the GitHub secrets exist) |
+| 1 Scaffold | ✅ 2026-09-10 (deploy proven green 2026-09-11) |
 | 1c One Cloudflare account | ✅ 2026-09-10 |
-| 2a Auth | ⬜ |
-| 2b Shell | ⬜ |
+| 2a Auth | ✅ 2026-09-11 |
+| 2b Shell | ✅ 2026-09-11 |
 | 3 Catalogue and config | ⬜ |
 | 4 Question bank | ⬜ |
 | 5 Fixed quizzes and mock exams | ⬜ |

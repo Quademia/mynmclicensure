@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-11 — slice 2 built: auth (2a) and shell (2b); 1b proven green; Telegram gate queued as slice 17
+  - ↳ programs into 2 · S1/S4/S6 ticked · §9 #8 left · #15 users_update WITH CHECK · implicit-flow links for magic/reset · cap 2 kicks oldest live · no footer in legacy · Telegram not dead · email doors untested by Sam
+
 - 2026-09-10 — 1c done: both Workers on the workspace Cloudflare account; the four GitHub secrets set; §6.1 names licensure_gh
   - ↳ dev account_id + workers.dev origin follow prod · one token, two CF secrets · 1b ticks on the first green push to main · prod Exposed schemas done · Workers are created by the first deploy · no server
 

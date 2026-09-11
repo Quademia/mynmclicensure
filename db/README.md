@@ -14,8 +14,8 @@ path** in the same settings block as well.
 | Path | Role |
 |---|---|
 | `migrations/` | The only thing that changes the database. `YYYYMMDDHHMMSS_name.sql`, applied in name order, each once, each in its own transaction. Immutable once applied anywhere. |
-| `schema.sql` | *(from slice 2)* The readable statement of the current tables — regenerated whenever a migration changes them. Never applied directly. |
-| `rls.sql` | *(from slice 2)* The readable statement of the current policies. Same discipline. |
+| `schema.sql` | The readable statement of the current tables — regenerated whenever a migration changes them. Never applied directly. |
+| `rls.sql` | The readable statement of the current policies and the SECURITY DEFINER functions. Same discipline. |
 | `seed/` | *(from slice 3)* Dev seeds. |
 | `cutover/` | *(slice 16)* The one-day scripts: content copy, old-login deletion. Run by hand, output pasted into the session log. |
 
@@ -54,6 +54,10 @@ in a chat.
 
 ## Rules
 
+- The content copy (rebuild.md §6.6) lives INSIDE the migration that
+  creates the table, as a guarded `insert … select from public.<table>`
+  (see `20260911010000_auth_tables.sql` for programs and schools), so
+  each environment is filled by its own run.
 - Everything in `licensure_gh`. A migration that names `public.*` or
   `teacher_*` is a plan violation (AGENTS.md rule #7), except the read-only
   content copy and the cutover scripts, which say so in their header.

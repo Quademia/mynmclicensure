@@ -28,11 +28,11 @@ list it replaces is in git history and in `qacademy-gamma`.
 
 - ✅ 0 Repo reshape — old tree to `legacy/`, MyTeacher and residue deleted — 2026-09-10
 - ✅ 1 Scaffold — Next app, Workers, deploy + migrate workflows, schema `licensure_gh`, runner — 2026-09-10
-- ⬜ 1b First dev deploy — secrets set 2026-09-10; proven by the first green push to main
+- ✅ 1b First dev deploy — deploy-dev + migrate-dev green, licensure-dev live — 2026-09-11
 - ✅ 1c One Cloudflare account — both Workers on the workspace account, one plan fee — 2026-09-10
 - ✅ (unplanned) Release branch named `production` — two prod workflows and the docs retargeted — 2026-09-10
-- ⬜ 2a Auth — tables incl. `programs`, login (three doors), register, forgot, reset, router, logout, gates
-- ⬜ 2b Shell — topbar, footer, both sidebars, phone drawer, two placeholder dashboards
+- ✅ 2a Auth — tables incl. `programs`, login (three doors), register, forgot, reset, router, logout, gates — 2026-09-11
+- ✅ 2b Shell — page header, both sidebars, phone drawer, placeholder dashboards; no footer (legacy has none) — 2026-09-11
 - ⬜ 3 Catalogue and config — programmes, courses, levels, products, config; public pages
 - ⬜ 4 Question bank — eleven item tables, CSV import, images, entitlement policy, content copy
 - ⬜ 5 Fixed quizzes and mock exams — admin pages, availability state machine, student lists
