@@ -47,6 +47,7 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ⬜ 14 Admin home — dashboard counts, users drawer, attempts analytics
 - ⬜ 15 Phone pass — student at 375px, admin navigable at 768px
 - ⬜ 16 Cutover — DNS, live keys, content re-copy, old logins deleted, `legacy/` removed
+- ⬜ 17 Telegram gate — Connect page, link codes, bot Worker on the DB, allowlist from subscriptions; after 8
 
 ### Decisions still open in rebuild.md
 

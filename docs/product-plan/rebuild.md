@@ -436,7 +436,7 @@ feature; a user cannot tell.
 |---|---|---|
 | 8 | `users.must_change_password` — set by nothing, read by nothing, only cleared on reset | **Left as it is** (Sam, 2026-09-11): the column is carried, the reset page clears it as legacy does, no gate is built. A gate would be a new feature; dropping it is tidying that can wait until after the rebuild |
 | 9 | `config.builder_default_questions` — seeded, read by no page | Drop from the seed. If an admin row exists it is harmless |
-| 10 | Student sidebar → `telegram.html`, a page that does not exist | Drop the item. (The two external Telegram/WhatsApp channel links stay.) |
+| 10 | Student sidebar → `telegram.html`, a page that does not exist | **Not dead — never rebuilt** (Sam, 2026-09-11). The Sheets-era product had a working TelegramGate: a Connect Telegram page issued a 10-minute link code, the bot's Cloudflare Worker (still on the workspace account) checked it against five sheet tables (groups, allowlist, link_codes, telegram_links, audit) and admitted the student to the groups their subscription allowed. The first rebuild moved none of it; only the sidebar link, `products.telegram_group_keys`, the admin field and the portal-guide text survived. Rebuilt as **slice 17** (§12) after slice 8. Until then the menu item exists in `lib/nav/student.ts` but is not rendered, so the sidebar has no dead link. The two external channel links stay. |
 | 11 | `runner_questions_per_page` seeded 2 in `schema.sql`, 1 in `seed_data.sql`; `offline_packs_per_course` seeds 5 while the code falls back to 3 | The live prod row is the truth and is what §6.6 copies. Code fallbacks are set **equal to the seed** so a missing row cannot change behaviour |
 | 12 | `guard.js` TEACHER branch and `router.html`'s "everything else goes to student" | The TEACHER role is MyTeacher's and left with the April split. Roles here are STUDENT and ADMIN; any other value is refused at login, not routed |
 | 13 | `docs/product-plan/02` `CANCELLED` status | Doc corrected when slice 8 lands |
@@ -640,6 +640,8 @@ phone.
 
 **16 — Cutover** (§11). Not ticked until run.
 
+**17 — Telegram gate** (added 2026-09-11, §9 #10). The Sheets-era feature, rebuilt on this stack: five tables in `licensure_gh` replacing the sheets (groups, allowlist, link_codes, telegram_links, audit); the Connect Telegram page (spec: git history, commit 737237c, "Add Connect Telegram HTML page", 712 lines) issuing a 10-minute `QK-` link code; the bot Worker (spec: the Apps Script in history, "Telegram_By_Worker-DEV", 1,322 lines) pointed at the database; the allowlist kept in step with active subscriptions and `products.telegram_group_keys`; the sidebar item shown. Needs slice 8. *Done when* a paid student links a Telegram account with a code and is admitted to their product's groups, and a lapsed one is refused.
+
 Slices 3–7 need nothing from 8–14 and can run in any order after 2.
 Slices 8 → 9 → 10 are a chain. 11, 12, 13 are independent of each
 other and of 8–10. 14 needs 6 and 8. 15 last but one.
@@ -689,3 +691,4 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 14 Admin home | ⬜ |
 | 15 Phone pass | ⬜ |
 | 16 Cutover | ⬜ |
+| 17 Telegram gate | ⬜ |
