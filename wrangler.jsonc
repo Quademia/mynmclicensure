@@ -40,6 +40,11 @@
     // server-side at runtime, so deliberately NOT a NEXT_PUBLIC_* name: no
     // build-step entry, no rebuild to change. Unset falls back to prod.
     "APP_ORIGIN": "https://licensure-dev.qacademynurses.workers.dev",
+    // The Quademia parent site — the landing page's "Back to Quademia"
+    // link (parentSiteOrigin(), slice 3). Per environment, same shape as
+    // APP_ORIGIN: dev points at the dev parent site. Unset falls back to
+    // the prod address in the code.
+    "PARENT_SITE_ORIGIN": "https://quademia-parent-site-dev.mybackpacc.workers.dev",
     // The From line on every email. Printed on each message, so not a
     // secret. Same value in both environments; RESEND_API_KEY separates
     // dev from prod. The sender domain is decided with the DNS slice.
@@ -66,6 +71,9 @@
         // ⚠ Changes to https://licensure.quademia.com at cutover, in the
         // same commit as the routes block above.
         "APP_ORIGIN": "https://licensure-prod.qacademynurses.workers.dev",
+        // ⬜ PARENT_SITE_ORIGIN: the prod parent-site address is not
+        // known yet (2026-09-11); the code falls back to
+        // https://quademia.com until it is set here.
         "EMAIL_FROM": "MyNMCLicensure <noreply@quademia.com>"
       }
     }
