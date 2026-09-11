@@ -1,13 +1,13 @@
 -- db/schema.sql — the readable statement of the current tables in `licensure_gh`.
 -- Regenerated from db/migrations/ whenever a migration changes a table.
 -- NEVER applied directly; the migrations are what run (db/README.md).
--- Last regenerated: 2026-09-11, after 20260911010000_auth_tables.sql.
+-- Last regenerated: 2026-09-11, after 20260911150000_catalogue_tables.sql.
 
 -- ── programs (moved up from slice 3: the register page's dropdown) ─────
 create table if not exists programs (
   program_id       text primary key,
   program_name     text not null,
-  trial_product_id text
+  trial_product_id text references products (product_id)  -- S4 (slice 3; products is created below)
 );
 
 -- ── schools (legacy migration add_schools_and_signup_capture.sql) ──────
@@ -99,3 +99,39 @@ create table if not exists reset_requests (
 create index if not exists reset_requests_email_created on reset_requests (email, created_utc);
 create index if not exists reset_requests_created       on reset_requests (created_utc);
 
+-- ── courses (slice 3) ──────────────────────────────────────────────────
+create table if not exists courses (
+  course_id     text primary key,
+  title         text not null,
+  program_scope text[] not null,
+  status        text not null default 'active',   -- active | draft | archived
+  page_slug     text
+);
+
+-- ── levels (slice 3; unused, kept as legacy) ───────────────────────────
+create table if not exists levels (
+  level_id   text primary key,
+  label      text not null,
+  created_at timestamptz default now()
+);
+
+-- ── products (slice 3) ─────────────────────────────────────────────────
+create table if not exists products (
+  product_id          text primary key,
+  name                text not null,
+  kind                text not null default 'PAID',     -- PAID | TRIAL | FREE
+  status              text not null default 'active',   -- active | archived
+  courses_included    text[] not null,
+  price_minor         integer not null,
+  currency            text not null default 'GHS',
+  duration_days       integer not null,
+  telegram_group_keys text[]
+);
+
+-- ── config (slice 3) ───────────────────────────────────────────────────
+create table if not exists config (
+  key         text primary key,
+  value       text not null,
+  description text,
+  updated_at  timestamptz default now()
+);

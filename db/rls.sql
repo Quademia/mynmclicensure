@@ -1,7 +1,7 @@
 -- db/rls.sql — the readable statement of the current policies and the
 -- SECURITY DEFINER functions in `licensure_gh`. Regenerated from
 -- db/migrations/ whenever a migration changes one. NEVER applied directly.
--- Last regenerated: 2026-09-11, after 20260911010000_auth_tables.sql.
+-- Last regenerated: 2026-09-11, after 20260911150000_catalogue_tables.sql.
 
 -- ── helper functions for the policies ──────────────────────────────────
 -- SECURITY DEFINER so a policy on users can ask about users without
@@ -302,3 +302,49 @@ using (user_id = auth_user_id() or auth_user_role() = 'ADMIN');
 
 -- auth_events, reset_requests: RLS on, no policies. Functions only.
 
+
+-- ── slice 3: catalogue and config ──────────────────────────────────────
+alter table courses  enable row level security;
+alter table levels   enable row level security;
+alter table products enable row level security;
+alter table config   enable row level security;
+
+-- programs: admin writes (the Courses & Programmes page).
+create policy programs_insert on programs for insert
+with check (auth_user_role() = 'ADMIN');
+create policy programs_update on programs for update
+using (auth_user_role() = 'ADMIN');
+
+-- courses: any signed-in user reads; admin writes.
+create policy courses_select on courses for select
+using (auth.uid() is not null);
+create policy courses_insert on courses for insert
+with check (auth_user_role() = 'ADMIN');
+create policy courses_update on courses for update
+using (auth_user_role() = 'ADMIN');
+
+-- levels: any signed-in user reads; admin writes.
+create policy levels_select on levels for select
+using (auth.uid() is not null);
+create policy levels_insert on levels for insert
+with check (auth_user_role() = 'ADMIN');
+create policy levels_update on levels for update
+using (auth_user_role() = 'ADMIN');
+
+-- products: readable before login (the public Premium Prep page); admin writes.
+create policy products_select on products for select
+using (true);
+create policy products_insert on products for insert
+with check (auth_user_role() = 'ADMIN');
+create policy products_update on products for update
+using (auth_user_role() = 'ADMIN');
+
+-- config: any signed-in user reads; admin insert, update AND delete.
+create policy config_select on config for select
+using (auth.uid() is not null);
+create policy config_insert on config for insert
+with check (auth_user_role() = 'ADMIN');
+create policy config_update on config for update
+using (auth_user_role() = 'ADMIN');
+create policy config_delete on config for delete
+using (auth_user_role() = 'ADMIN');
