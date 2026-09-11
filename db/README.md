@@ -16,7 +16,7 @@ path** in the same settings block as well.
 | `migrations/` | The only thing that changes the database. `YYYYMMDDHHMMSS_name.sql`, applied in name order, each once, each in its own transaction. Immutable once applied anywhere. |
 | `schema.sql` | The readable statement of the current tables — regenerated whenever a migration changes them. Never applied directly. |
 | `rls.sql` | The readable statement of the current policies and the SECURITY DEFINER functions. Same discipline. |
-| `seed/` | *(from slice 3)* Dev seeds. |
+| `seed/` | *(not yet needed)* The content copies live inside the migrations that create their tables (rule below); a `seed/` folder appears only if dev ever needs rows prod does not have. |
 | `cutover/` | *(slice 16)* The one-day scripts: content copy, old-login deletion. Run by hand, output pasted into the session log. |
 
 ## How migrations are applied

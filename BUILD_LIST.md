@@ -33,7 +33,8 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ✅ (unplanned) Release branch named `production` — two prod workflows and the docs retargeted — 2026-09-10
 - ✅ 2a Auth — tables incl. `programs`, login (three doors), register, forgot, reset, router, logout, gates — 2026-09-11
 - ✅ 2b Shell — page header, both sidebars, phone drawer, placeholder dashboards; no footer (legacy has none) — 2026-09-11
-- ⬜ 3 Catalogue and config — programmes, courses, levels, products, config; public pages
+- ✅ 3 Catalogue and config — courses, levels, products, config + copy; admin Products / Courses / Config; landing, Premium Prep — 2026-09-11
+- ⬜ (unplanned) Paid-plan pause switch lifted for testing 2026-09-11; decide before cutover whether prod launches paused
 - ⬜ 4 Question bank — eleven item tables, CSV import, images, entitlement policy, content copy
 - ⬜ 5 Fixed quizzes and mock exams — admin pages, availability state machine, student lists
 - ⬜ 6 Runner, attempts, builder — shared core, instant + timed, resume, review, retake

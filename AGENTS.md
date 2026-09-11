@@ -318,6 +318,7 @@ Local dev requires `.env.local` (git-ignored):
 NEXT_PUBLIC_SUPABASE_URL=...            gamma DEV project (public)
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...       (public)
 APP_ORIGIN=http://localhost:3000
+PARENT_SITE_ORIGIN=...                  the DEV parent site; the landing page's "Back to Quademia" link (from slice 3)
 EMAIL_FROM=MyNMCLicensure <noreply@quademia.com>
 DB_URL=postgresql://...                 migration runner; Supabase → Connect → Session pooler
 SUPABASE_SERVICE_ROLE_KEY=...           server only (from slice 2)
@@ -326,8 +327,10 @@ RESEND_API_KEY=...                      (from slice 10)
 ```
 
 The two public values also live in `wrangler.jsonc` `vars` and in the
-build step of both deploy workflows (three places, one truth). Prod
-secrets are Cloudflare Worker secrets set with `wrangler secret put`.
+build step of both deploy workflows (three places, one truth).
+`APP_ORIGIN` and `PARENT_SITE_ORIGIN` are server-side and per
+environment: `.env.local` plus the two `vars` blocks of `wrangler.jsonc`.
+Prod secrets are Cloudflare Worker secrets set with `wrangler secret put`.
 The database connection strings for the migration runner are GitHub
 repository secrets (`DB_URL_DEV`, `DB_URL_PROD`), never in the repo and
 never in a chat.

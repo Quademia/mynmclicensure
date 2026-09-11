@@ -677,7 +677,7 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 1c One Cloudflare account | ✅ 2026-09-10 |
 | 2a Auth | ✅ 2026-09-11 |
 | 2b Shell | ✅ 2026-09-11 |
-| 3 Catalogue and config | ⬜ |
+| 3 Catalogue and config | ✅ 2026-09-11 |
 | 4 Question bank | ⬜ |
 | 5 Fixed quizzes and mock exams | ⬜ |
 | 6 Runner, attempts, builder | ⬜ |
