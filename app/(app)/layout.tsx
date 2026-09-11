@@ -8,6 +8,7 @@
 
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import '@/styles/shell.css';
 
 export const dynamic = 'force-dynamic';
 

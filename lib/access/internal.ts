@@ -17,6 +17,7 @@
 // So the gate sends the browser through /logout?via=gate, a Route
 // Handler, which can clear cookies and then lands on /login.
 
+import { cache } from 'react';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { findProfileByAuthId } from '@/lib/auth/profile';
@@ -25,7 +26,9 @@ import type { AuthGateResult } from './types';
 
 export const GATE_SIGNOUT_PATH = '/logout?via=gate';
 
-export async function loadGate(): Promise<AuthGateResult> {
+// cache(): one lookup per request however many callers — the audience
+// layout and the page both call a gate.
+export const loadGate = cache(async function loadGate(): Promise<AuthGateResult> {
   const supabase = await createClient();
 
   const {
@@ -41,4 +44,4 @@ export async function loadGate(): Promise<AuthGateResult> {
   if (!live) redirect(GATE_SIGNOUT_PATH);
 
   return { supabase, user, profile };
-}
+});
