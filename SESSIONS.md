@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-12 — slice 3 tested by Sam and passed; dev catalogue cleaned; prod parent-site address set; "After the rebuild" list started
+  - ↳ PARENT_SITE_ORIGIN prod = quademia.com · NEWPROGRAM + two test products deleted on dev · 32 products active · Premium Prep never linked in legacy · sub-slices go in rebuild.md not feature docs · slice 4 next
+
 - 2026-09-11 — slice 3 built: catalogue and config tables with content copy, admin Products / Courses / Config, the landing page and Premium Prep
   - ↳ umbrella pages not rebuilt · paused switch lifted · _2026_PREP rule carried · S4 trial_product_id FK · PARENT_SITE_ORIGIN dev set, prod open · untested by Sam, next session · RN_2026_PREP left active on dev
 

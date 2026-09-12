@@ -72,3 +72,12 @@ rebuild work; listed so they are not lost.
 - ⏸ Admin create user; sessions / auth-events / reset-request audits — new features, after
 - ⏸ Student analytics, notifications, search, sequential runner mode — new features, after
 - ⏸ Paystack LIVE key on prod — waits on the company / Paystack-account decision
+
+## After the rebuild
+
+Product changes spotted while transcribing `legacy/`. None is built
+during the rebuild (AGENTS.md ⭐: no new user-visible feature). One
+line each, with the slice that surfaced it; Sam orders them once
+cutover is done.
+
+- ⬜ A link to Premium Prep from the landing page — legacy never linked it; the page was shared by address only (slice 3, 2026-09-12)

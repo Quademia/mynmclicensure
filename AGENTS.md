@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-09-11. Rules for **any** assistant working in this
+Last updated: 2026-09-12. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What is built and
@@ -28,7 +28,10 @@ product is still the vanilla-JS site served from the `qacademy-gamma`
 repo; its code sits here under `legacy/` as the reference. The plan,
 the decisions and the slice ladder are `docs/product-plan/rebuild.md`.
 The inventory with dates is `BUILD_LIST.md`. Build what Sam asks for in
-the session; nothing more.
+the session; nothing more. A slice that needs splitting is split in
+`rebuild.md` §12 (a "done when" per part) and §14, then `BUILD_LIST.md`,
+in one commit — never in the feature docs `00–07`, which describe the
+legacy product and are not build plans (Sam, 2026-09-12).
 
 ⭐ **The rebuild adds no user-visible feature and no new mechanism.**
 Behaviour is transcribed from `legacy/` and the feature specs
