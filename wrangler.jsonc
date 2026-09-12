@@ -71,9 +71,10 @@
         // ⚠ Changes to https://licensure.quademia.com at cutover, in the
         // same commit as the routes block above.
         "APP_ORIGIN": "https://licensure-prod.qacademynurses.workers.dev",
-        // ⬜ PARENT_SITE_ORIGIN: the prod parent-site address is not
-        // known yet (2026-09-11); the code falls back to
-        // https://quademia.com until it is set here.
+        // The prod parent site (Sam, 2026-09-12). Same value as the code's
+        // fallback in lib/site/parent-site.ts; written here so the truth
+        // is declared, not inherited.
+        "PARENT_SITE_ORIGIN": "https://quademia.com",
         "EMAIL_FROM": "MyNMCLicensure <noreply@quademia.com>"
       }
     }
