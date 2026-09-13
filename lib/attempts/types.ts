@@ -92,3 +92,5 @@ export type ActionResult = { ok: true } | { ok: false; error: string };
 export type SpawnResult = { ok: true; attemptId: string } | { ok: false; error: string };
 
 export type FinishResult = { ok: true; score: Score } | { ok: false; error: string };
+
+export type TimedStartResult = { ok: true; startedIso: string } | { ok: false; error: string };

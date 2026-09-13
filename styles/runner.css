@@ -15,6 +15,23 @@
  */
 
 .runner { background: var(--bg); color: var(--primary); min-height: 100vh; font-family: inherit; }
+
+/* Timed mode (6b): legacy timer, warning thresholds and time-up notice. */
+.runner .timer-bar { display: flex; align-items: center; justify-content: space-between; padding: 6px 16px 10px; gap: 10px; }
+.runner .timer-display { display: flex; align-items: center; gap: 8px; }
+.runner .timer-icon { font-size: 14px; }
+.runner .timer-value { font-size: 18px; font-weight: 800; color: white; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; transition: color 0.3s; }
+.runner .timer-value.amber { color: #fbbf24; }
+.runner .timer-value.red { color: #f87171; animation: runner-timer-pulse 0.8s infinite; }
+@keyframes runner-timer-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.runner .timer-label { font-size: 11px; color: rgba(255,255,255,0.55); font-weight: 600; }
+.runner .timer-progress-wrap { flex: 1; height: 4px; background: rgba(255,255,255,0.15); border-radius: 999px; overflow: hidden; }
+.runner .timer-progress-fill { height: 100%; border-radius: 999px; background: rgba(255,255,255,0.6); transition: width 1s linear, background 0.3s; }
+.runner .timer-progress-fill.amber { background: #fbbf24; }
+.runner .timer-progress-fill.red { background: #f87171; }
+.runner .pre-chip.warning { background: #fef3c7; color: #92400e; }
+.runner .timeup-banner { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: var(--danger); font-weight: 600; margin-bottom: 16px; text-align: center; }
+@media (max-width: 640px) { .runner .timer-label { display: none; } }
 .runner * { box-sizing: border-box; }
 
 /* ── Loader ── */

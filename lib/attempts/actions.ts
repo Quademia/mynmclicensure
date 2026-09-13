@@ -12,8 +12,7 @@
 // Sam 2026-09-13); the browser's numbers are not written.
 //
 // Not here yet, by slice: spawnFixedAttempt / spawnMockAttempt,
-// retakeAttempt and abandon (5b); markTimedAttemptStarted and
-// saveTimedAttemptProgress (6b).
+// retakeAttempt and abandon (5b).
 
 'use server';
 
@@ -36,6 +35,8 @@ import {
   type BuilderMeta,
   type FinishResult,
   type SpawnResult,
+  type TimedStartResult,
+  type Attempt,
 } from './types';
 
 function fail(error: string): { ok: false; error: string } {
@@ -129,6 +130,58 @@ export async function saveAttemptProgress(attemptId: string, answers: AnswerReco
   return { ok: true };
 }
 
+// ── timed start / progress (6b) ────────────────────────────────────────
+// NULL time_taken_s means not started. Stamp once, then read back the
+// stored start (another tab may have won the conditional update).
+export async function markTimedAttemptStarted(attemptId: string): Promise<TimedStartResult> {
+  const { supabase, profile } = await requireStudent();
+  const { error } = await supabase.from('attempts')
+    .update({ ts_iso: new Date().toISOString(), time_taken_s: 0 })
+    .eq('attempt_id', attemptId)
+    .eq('user_id', profile.user_id)
+    .eq('mode', 'timed')
+    .eq('status', 'in_progress')
+    .is('time_taken_s', null);
+  if (error) return fail(error.message);
+
+  const { data, error: readError } = await supabase.from('attempts')
+    .select('ts_iso, time_taken_s')
+    .eq('attempt_id', attemptId)
+    .eq('user_id', profile.user_id)
+    .eq('mode', 'timed')
+    .eq('status', 'in_progress')
+    .maybeSingle();
+  if (readError) return fail(readError.message);
+  if (!data?.ts_iso || data.time_taken_s === null) return fail('We could not start your exam properly. Please try again.');
+  return { ok: true, startedIso: data.ts_iso };
+}
+
+function timedElapsed(attempt: Attempt, questionCount: number): number {
+  if (attempt.time_taken_s === null || !attempt.ts_iso) return 0;
+  const elapsed = Math.max(0, Math.floor((Date.now() - new Date(attempt.ts_iso).getTime()) / 1000));
+  return Math.min((attempt.duration_min || questionCount) * 60, elapsed);
+}
+
+export async function saveTimedAttemptProgress(attemptId: string, answers: AnswerRecord[]): Promise<ActionResult> {
+  const { supabase, profile } = await requireStudent();
+  const { data, error: readError } = await supabase.from('attempts').select('*')
+    .eq('attempt_id', attemptId).eq('user_id', profile.user_id)
+    .eq('mode', 'timed').eq('status', 'in_progress').maybeSingle();
+  if (readError) return fail(readError.message);
+  if (!data) return fail('This exam is no longer in progress.');
+  const attempt = data as Attempt;
+  // Leaving the preflight must not accidentally start the clock.
+  if (attempt.time_taken_s === null) return { ok: true };
+  const { data: saved, error } = await supabase.from('attempts')
+    .update({ answers_json: JSON.stringify(answers), time_taken_s: timedElapsed(attempt, attempt.n) })
+    .eq('attempt_id', attemptId).eq('user_id', profile.user_id)
+    .eq('mode', 'timed').eq('status', 'in_progress')
+    .select('attempt_id').maybeSingle();
+  if (error) return fail(error.message);
+  if (!saved) return fail('This exam is no longer in progress.');
+  return { ok: true };
+}
+
 // ── finishAttempt (submit) ─────────────────────────────────────────────
 // Records the final answers, the score and the time taken; sets
 // completed. The score is the server's.
@@ -156,10 +209,12 @@ export async function finishAttempt(attemptId: string, answers: AnswerRecord[], 
       score_raw: score.raw,
       score_total: score.total,
       score_pct: score.pct,
-      time_taken_s: timeTakenS,
+      time_taken_s: attempt.mode === 'timed' ? timedElapsed(attempt, items.length) : timeTakenS,
       status: 'completed',
     })
-    .eq('attempt_id', attemptId);
+    .eq('attempt_id', attemptId)
+    .eq('user_id', profile.user_id)
+    .eq('status', 'in_progress');
   if (error) return fail(error.message);
   return { ok: true, score };
 }

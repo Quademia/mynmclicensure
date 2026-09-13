@@ -25,10 +25,11 @@
 
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
-import { finishAttempt, saveAttemptProgress } from '@/lib/attempts/actions';
+import { finishAttempt, markTimedAttemptStarted, saveAttemptProgress, saveTimedAttemptProgress } from '@/lib/attempts/actions';
+import { RunnerError } from './runner-error';
 import {
   buildAnswersJson,
   computeScore,
@@ -135,6 +136,12 @@ export function QuizRunner({
   const [status, setStatus] = useState('Initialising…');
   const [saving, setSaving] = useState<string>('');
   const startedAtRef = useRef<number | null>(null);
+  const startingRef = useRef(false);
+  const finishingRef = useRef(false);
+  const totalSeconds = (attempt.duration_min || items.length) * 60;
+  const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
+  const [timeUp, setTimeUp] = useState(false);
+  const [startError, setStartError] = useState('');
   const headerRef = useRef<HTMLDivElement>(null);
 
   // legacy buildShufCache: the option order per item, once per attempt.
@@ -177,7 +184,11 @@ export function QuizRunner({
       } else {
         setPhase('preflight');
         setStatus(
-          hasProgress()
+          mode === 'timed'
+            ? attempt.time_taken_s !== null
+              ? 'You have an in-progress exam. Click Resume Exam when ready.'
+              : 'Read the exam details carefully then click Start Exam when ready.'
+            : hasProgress()
             ? 'You have an in-progress attempt. Click Resume Attempt when ready.'
             : 'Review the quiz details then click Start Quiz when ready.',
         );
@@ -191,14 +202,40 @@ export function QuizRunner({
     return Object.keys(answers).length > 0 || Object.keys(flags).length > 0 || Object.keys(sataChecked).length > 0;
   }
 
-  function startQuiz(skipped = false) {
-    if (booted) return;
+  async function startQuiz(skipped = false) {
+    if (booted || startingRef.current) return;
+    startingRef.current = true;
+    if (mode === 'timed') {
+      setSaving('Starting your exam…');
+      try {
+        // Admin preview runs only in memory and never stamps an attempt.
+        const result = previewMode
+          ? { ok: true as const, startedIso: attempt.time_taken_s !== null && attempt.ts_iso ? attempt.ts_iso : new Date().toISOString() }
+          : await markTimedAttemptStarted(attempt.attempt_id);
+        if (!result.ok) {
+          setStartError(result.error);
+          return;
+        }
+        startedAtRef.current = new Date(result.startedIso).getTime();
+        setSecondsLeft(Math.max(0, totalSeconds - Math.max(0, Math.floor((Date.now() - startedAtRef.current) / 1000))));
+      } catch {
+        setStartError('We could not start your exam properly. Please try again.');
+        return;
+      } finally {
+        setSaving('');
+        startingRef.current = false;
+      }
+    }
     setBooted(true);
     setPhase('quiz');
     if (!startedAtRef.current) startedAtRef.current = Date.now();
     setPage(0);
     setViewMode('ALL');
-    if (skipped && hasProgress()) setStatus('Resuming your in-progress attempt. Your saved answers have been restored.');
+    if (mode === 'timed') {
+      setStatus(attempt.time_taken_s !== null
+        ? 'Resuming your in-progress exam. Your saved answers have been restored.'
+        : '');
+    } else if (skipped && hasProgress()) setStatus('Resuming your in-progress attempt. Your saved answers have been restored.');
   }
 
   function onPreflightStart() {
@@ -231,12 +268,39 @@ export function QuizRunner({
     async (showMsg: boolean) => {
       if (previewMode) return true;
       const records = buildAnswersJson(items, answers, flags, mode === 'instant' ? sataChecked : undefined);
-      const result = await saveAttemptProgress(attempt.attempt_id, records);
+      const result = mode === 'timed'
+        ? await saveTimedAttemptProgress(attempt.attempt_id, records)
+        : await saveAttemptProgress(attempt.attempt_id, records);
       if (showMsg) setStatus(result.ok ? W.savedLog : 'Save failed: ' + result.error);
       return result.ok;
     },
     [previewMode, items, answers, flags, sataChecked, mode, attempt.attempt_id, W.savedLog],
   );
+
+  // Read the latest answers on expiry without restarting the interval
+  // on every answer. Recalculate from the saved start, never tick down
+  // a counter: a sleeping/background tab must not gain time.
+  const onTimerTick = useEffectEvent(() => {
+    if (finishingRef.current || startedAtRef.current === null) return;
+    const left = Math.max(0, totalSeconds - Math.max(0, Math.floor((Date.now() - startedAtRef.current) / 1000)));
+    setSecondsLeft(left);
+    if (left <= 0) void submitQuiz(true);
+  });
+
+  useEffect(() => {
+    if (mode !== 'timed' || !booted || locked || reviewMode) return;
+    const first = window.setTimeout(() => onTimerTick(), 0);
+    const id = window.setInterval(() => onTimerTick(), 1000);
+    const wake = () => onTimerTick();
+    window.addEventListener('focus', wake);
+    document.addEventListener('visibilitychange', wake);
+    return () => {
+      window.clearTimeout(first);
+      window.clearInterval(id);
+      window.removeEventListener('focus', wake);
+      document.removeEventListener('visibilitychange', wake);
+    };
+  }, [mode, booted, locked, reviewMode]);
 
   // legacy startAutosave / autosaveTick: every AUTOSAVE_MS while running.
   useEffect(() => {
@@ -316,7 +380,8 @@ export function QuizRunner({
     setFlags(next);
     if (!previewMode) {
       const records = buildAnswersJson(items, answers, next, mode === 'instant' ? sataChecked : undefined);
-      void saveAttemptProgress(attempt.attempt_id, records);
+      if (mode === 'timed') void saveTimedAttemptProgress(attempt.attempt_id, records);
+      else void saveAttemptProgress(attempt.attempt_id, records);
     }
   }
 
@@ -335,8 +400,12 @@ export function QuizRunner({
     void submitQuiz();
   }
 
-  async function submitQuiz() {
-    if (finishSent || locked) return;
+  async function submitQuiz(autoSubmit = false) {
+    if (finishSent || locked || finishingRef.current) return;
+    finishingRef.current = true;
+    if (autoSubmit) setTimeUp(true);
+    setExitOpen(false);
+    setGridOverlayOpen(false);
     setFinishSent(true);
     setLocked(true);
     setSaving('submitting');
@@ -351,7 +420,7 @@ export function QuizRunner({
     }
     setSaving('');
     setScoreCardOpen(true);
-    setStatus(W.submittedLog);
+    setStatus(autoSubmit ? 'Time is up. Your exam has been submitted automatically.' : W.submittedLog);
   }
 
   function reviewAnswers() {
@@ -564,6 +633,11 @@ export function QuizRunner({
   const pageItems = source.slice(pageStart, pageStart + questionsPerPage);
   const grade = gradeFor(score.pct);
   const showControls = mode === 'instant' || locked || reviewMode;
+  const timerPercent = totalSeconds > 0 ? secondsLeft / totalSeconds * 100 : 0;
+  const timerColor = timerPercent <= 10 ? 'red' : timerPercent <= 20 ? 'amber' : '';
+  const timerText = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
+
+  if (startError) return <RunnerError title="Could Not Start Exam" message={startError} />;
 
   return (
     <div className="runner">
@@ -588,6 +662,16 @@ export function QuizRunner({
           <div className="progress-bar"><div className={barClass} style={{ width: `${locked ? 100 : pct}%` }} /></div>
           <div className="count-pill">{answered} / {items.length} answered • {unanswered} unanswered • {flaggedCount} flagged</div>
         </div>
+        {mode === 'timed' && !locked && !reviewMode ? (
+          <div className="timer-bar">
+            <div className="timer-display" role="timer" aria-label={`${timerText} remaining`}>
+              <span className="timer-icon">⏱</span>
+              <span className={`timer-value ${timerColor}`}>{timerText}</span>
+              <span className="timer-label">remaining</span>
+            </div>
+            <div className="timer-progress-wrap"><div className={`timer-progress-fill ${timerColor}`} style={{ width: `${timerPercent}%` }} /></div>
+          </div>
+        ) : null}
         <div className={`header-controls${showControls ? '' : ' hidden'}`}>
           <div className="control-group">
             <span className="ctrl-label">Feedback:</span>
@@ -612,13 +696,15 @@ export function QuizRunner({
               <div className="preflight-title">{label}</div>
               <div className="preflight-meta">
                 <span className="pre-chip">📝 {items.length} questions</span>
-                <span className="pre-chip">⏱ {attempt.duration_min || Math.ceil(items.length)} min suggested</span>
-                <span className="pre-chip">📖 {feedbackModeLabel(feedbackMode)}</span>
-                <span className="pre-chip">{W.modeWord} Mode</span>
+                <span className={`pre-chip${mode === 'timed' ? ' warning' : ''}`}>⏱ {attempt.duration_min || Math.ceil(items.length)} {mode === 'timed' ? 'minutes' : 'min suggested'}</span>
+                {mode === 'instant' ? <span className="pre-chip">📖 {feedbackModeLabel(feedbackMode)}</span> : null}
+                <span className="pre-chip">{mode === 'timed' ? '🎯 ' : ''}{W.modeWord} Mode</span>
               </div>
-              <p className="preflight-text">{W.preflightText}</p>
+              {mode === 'timed' ? (
+                <div className="preflight-warning">⚠️ <strong>Exam mode:</strong> The timer starts when you click Start. No feedback is shown during the exam — you will see your results and explanations after submission. You cannot pause the timer.</div>
+              ) : <p className="preflight-text">{W.preflightText}</p>}
               <div className="preflight-actions">
-                <button type="button" className="btn btn-primary" onClick={onPreflightStart}>{hasProgress() ? W.resume : W.start}</button>
+                <button type="button" className="btn btn-primary" onClick={onPreflightStart}>{(mode === 'timed' ? attempt.time_taken_s !== null : hasProgress()) ? W.resume : W.start}</button>
                 <button type="button" className="btn btn-ghost" onClick={() => window.history.back()}>Cancel</button>
                 <label className="preflight-skip">
                   <input type="checkbox" checked={skipNextTime} onChange={(e) => setSkipNextTime(e.target.checked)} /> Don&apos;t show this again
@@ -628,6 +714,7 @@ export function QuizRunner({
           ) : null}
 
           {reviewMode ? <div className="review-banner">{W.reviewBanner}</div> : null}
+          {timeUp ? <div className="timeup-banner">⏰ Time is up! Your exam has been automatically submitted.</div> : null}
 
           {phase === 'quiz' && desktopGridHidden ? (
             <button type="button" className="show-grid-btn" onClick={() => setDesktopGridHidden(false)}>📋 Show Grid</button>
