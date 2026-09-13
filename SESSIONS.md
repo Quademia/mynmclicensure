@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-13 — slice 8 built: subscriptions, trial at registration, course access, the real question gate, admin Subscriptions page; Sam's test pending
+  - ↳ 8 before 6 (three stand-ins avoided) · slice 6 read, 6a/6b/5b proposed, two rulings open · student self-insert policy dropped, no column dropped · expiry reminder = Sheets-era scan never rebuilt, parked · doc 02 corrected · gate proven by SQL
+
 - 2026-09-13 — slice 5 split; 5a built: quiz tables with content copy, the availability function, admin Fixed Quizzes and Mock Exams pages; Sam's test pending
   - ↳ 5a/5b split, 5b after 6 · quizzes join §6.6 copy · FK to courses · mock visibility carried uncontrolled · dates saved as UTC · edit-loses-fields defect fixed and flagged · Preview + stats wait for 6 · form_input misses React checkboxes
 
