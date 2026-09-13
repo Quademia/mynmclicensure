@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-13 — slice 4 built and closed: question bank (4a) and CSV importer (4b); dev bank loaded from Sam's prod CSV exports
+  - ↳ 4a/4b split · user_has_course() signed-in until slice 8 · CSV reader fixed, rules kept · TF shuffle left as legacy · dev items from CSVs not public copy · 5,361 rows, no images · Table Editor exports one page · slice 5 next
+
 - 2026-09-12 — slice 3 tested by Sam and passed; dev catalogue cleaned; prod parent-site address set; "After the rebuild" list started
   - ↳ PARENT_SITE_ORIGIN prod = quademia.com · NEWPROGRAM + two test products deleted on dev · 32 products active · Premium Prep never linked in legacy · sub-slices go in rebuild.md not feature docs · slice 4 next
 
