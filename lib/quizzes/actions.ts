@@ -1,0 +1,132 @@
+// lib/quizzes/actions.ts
+//
+// The Fixed Quizzes and Mock Exams admin pages' reads-on-demand and
+// writes as Server Actions behind the admin gate — legacy
+// admin/fixed-quizzes.html and admin/mock-exams.html did all of this from
+// the browser with direct `db.from(...)` calls. Each write repeats the
+// page's own validation, in its order, with its words, then writes as
+// the signed-in admin (the RLS admin policies are the floor). A Supabase
+// error comes back as its own message, as the legacy pages showed it.
+// The row types and constants live in ./types.
+
+'use server';
+
+import { requireAdmin } from '@/lib/access';
+import { getItemsByFilters } from '@/lib/bank/queries';
+import { itemsTableFor } from '@/lib/bank/tables';
+import type { Item } from '@/lib/bank/types';
+import { getAllQuizzes, getAllQuizzesPaginated, getQuizById } from './queries';
+import { QUIZ_TABLES, type ActionResult, type Quiz, type QuizKind, type QuizPage, type QuizStatus, type SaveQuizInput } from './types';
+
+function fail(error: string): ActionResult {
+  return { ok: false, error };
+}
+
+// The words differ by page; everything else is the same script.
+const NOUN: Record<QuizKind, string> = { fixed: 'quiz', mock: 'mock exam' };
+
+// ── loadQuizList: the fixed-quiz list, one page (legacy loadQuizList) ──
+export async function loadQuizPage(searchTerm: string, page: number): Promise<QuizPage> {
+  const { supabase } = await requireAdmin();
+  return getAllQuizzesPaginated(supabase, searchTerm, page, 50);
+}
+
+// ── openEditQuiz: the full row ──────────────────────────────────────────
+// Legacy's fixed-quiz list selected only the list columns, then opened
+// the row from that list — so the edit form came up with no questions,
+// no time limit, no schedule and no notes until something re-fetched the
+// whole table. The mock page loaded whole rows and had no such gap. The
+// edit step here reads the full row (legacy getQuizById) for both.
+// Logged as a fix in the 2026-09-13 session entry; not in §9.
+export async function loadQuiz(kind: QuizKind, quizId: string): Promise<Quiz | null> {
+  const { supabase } = await requireAdmin();
+  return getQuizById(supabase, kind, quizId);
+}
+
+// ── loadPickerItems: the course's whole bank (legacy getItemsByFilters(courseId, {})) ──
+export async function loadPickerItems(courseId: string): Promise<Item[]> {
+  const { supabase } = await requireAdmin();
+  if (!itemsTableFor(courseId)) return [];
+  return getItemsByFilters(supabase, courseId, {});
+}
+
+// ── togglePublish ───────────────────────────────────────────────────────
+export async function setQuizPublished(kind: QuizKind, quizId: string, published: boolean): Promise<ActionResult> {
+  const { supabase } = await requireAdmin();
+  const { error } = await supabase
+    .from(QUIZ_TABLES[kind])
+    .update({ published, updated_at: new Date().toISOString() })
+    .eq('quiz_id', quizId);
+  if (error) return fail('Failed to update: ' + error.message);
+  return { ok: true };
+}
+
+// ── archiveCurrentQuiz: archived ↔ active ──────────────────────────────
+export async function setQuizStatus(kind: QuizKind, quizId: string, status: QuizStatus): Promise<ActionResult> {
+  const { supabase } = await requireAdmin();
+  const { error } = await supabase
+    .from(QUIZ_TABLES[kind])
+    .update({ status, updated_at: new Date().toISOString() })
+    .eq('quiz_id', quizId);
+  if (error) return fail('Error: ' + error.message);
+  return { ok: true };
+}
+
+// ── saveQuiz ────────────────────────────────────────────────────────────
+// The page's checks, in legacy's order, then the insert or update with
+// legacy's payload. The two datetime strings go in as they are.
+export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
+  const { supabase } = await requireAdmin();
+  const noun = NOUN[input.kind];
+
+  const courseId = input.courseId;
+  const title = input.title.trim();
+  const quizId = input.quizId.trim();
+  if (!courseId) return fail('Please select a course.');
+  if (!title) return fail(`Please enter a ${noun} title.`);
+  if (!quizId) return fail(`${input.kind === 'fixed' ? 'Quiz' : 'Mock Exam'} ID could not be generated. Please re-select the course.`);
+
+  const itemIds = input.itemIds.map((id) => String(id || '').trim()).filter(Boolean);
+  const n = itemIds.length;
+  if (n === 0) return fail(`Cannot save a ${noun} with no questions.`);
+
+  const timeLimitRaw = input.timeLimitSec.trim();
+  const timeLimit = timeLimitRaw ? parseInt(timeLimitRaw, 10) : null;
+
+  const payload: Record<string, unknown> = {
+    course_id: courseId,
+    title,
+    item_ids: itemIds,
+    n,
+    allowed_modes: input.allowedModes,
+    shuffle: input.shuffle,
+    time_limit_sec: Number.isFinite(timeLimit) ? timeLimit : null,
+    published: input.published,
+    publish_at: input.publishAt || null,
+    unpublish_at: input.unpublishAt || null,
+    status: input.status,
+    notes: input.notes.trim() || null,
+    updated_at: new Date().toISOString(),
+  };
+
+  const table = QUIZ_TABLES[input.kind];
+  let error: { message: string } | null;
+  if (input.isEdit) {
+    ({ error } = await supabase.from(table).update(payload).eq('quiz_id', quizId));
+  } else {
+    payload.quiz_id = quizId;
+    payload.created_at = new Date().toISOString();
+    ({ error } = await supabase.from(table).insert(payload));
+  }
+  if (error) return fail(`Error saving ${noun}: ` + error.message);
+
+  return { ok: true };
+}
+
+// ── the whole list (legacy getAllQuizzes / getAllMockQuizzes) ──────────
+// The mock-exam page loads its list whole, and both pages re-read the
+// whole table after a save or an archive.
+export async function loadAllQuizzes(kind: QuizKind): Promise<Quiz[]> {
+  const { supabase } = await requireAdmin();
+  return getAllQuizzes(supabase, kind);
+}
