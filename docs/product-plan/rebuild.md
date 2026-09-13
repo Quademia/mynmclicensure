@@ -734,7 +734,7 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 5b Fixed quizzes and mock exams — student list pages (after 6) | ⬜ |
 | 6 Runner, attempts, builder | ⬜ |
 | 7 Student home | ⬜ |
-| 8 Subscriptions | ⬜ |
+| 8 Subscriptions | ✅ 2026-09-13 |
 | 9 Payments | ⬜ |
 | 10 Email | ⬜ |
 | 11 Announcements | ⬜ |
