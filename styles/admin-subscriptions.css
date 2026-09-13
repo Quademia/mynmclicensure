@@ -1,0 +1,155 @@
+/* styles/admin-subscriptions.css
+ *
+ * The admin Subscriptions page (slice 8). Transcribed from the legacy
+ * page's inline <style> block (admin/subscriptions.html), scoped under
+ * `.subs` for the page and `.subs-overlay` for the portalled side panel
+ * and dialogs (AGENTS.md: every overlay is portalled to <body>). The
+ * .top-nav block every page carried is in shell.css already. The legacy
+ * .alert boxes are toasts now (UI convention #1) and have no rules here.
+ *
+ * Breakpoint 768px (UI convention #3): the filters stack, the table
+ * scrolls inside its wrapper, the side panel and dialogs go full width.
+ */
+
+/* ── Stats row ── */
+.subs .stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.subs .stat-mini { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; }
+.subs .stat-mini .label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+.subs .stat-mini .value { font-size: 24px; font-weight: 700; color: var(--primary); }
+.subs .stat-mini .value.success { color: var(--success); }
+.subs .stat-mini .value.danger { color: var(--danger); }
+.subs .stat-mini .value.accent { color: var(--accent); }
+.subs .stat-mini .value.muted { color: var(--text-muted); }
+.subs .stat-mini .value.warning { color: var(--warning); }
+
+/* ── Filters bar ── */
+.subs .filters-bar { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.subs .filter-group { display: flex; flex-direction: column; gap: 4px; min-width: 140px; }
+.subs .filter-group label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.subs .filter-group select,
+.subs .filter-group input { padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; font-family: inherit; background: var(--bg); color: var(--text); }
+.subs .filter-group select:focus,
+.subs .filter-group input:focus { outline: none; border-color: var(--primary); }
+.subs .filter-toggle { display: flex; align-items: center; gap: 8px; padding: 8px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; cursor: pointer; font-family: inherit; color: var(--text); align-self: flex-end; height: 36px; }
+.subs .filter-toggle.active { background: #fff7ed; border-color: var(--warning); color: var(--warning); font-weight: 600; }
+.subs .filter-actions { display: flex; gap: 8px; align-self: flex-end; margin-left: auto; flex-wrap: wrap; }
+
+/* ── Table ── */
+.subs .table-wrapper { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.subs .table-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); gap: 8px; flex-wrap: wrap; }
+.subs .table-header h3 { font-size: 15px; font-weight: 600; margin: 0; }
+.subs .result-count { font-size: 13px; color: var(--text-muted); }
+.subs .table-scroll { overflow-x: auto; }
+.subs table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.subs th { text-align: left; padding: 10px 16px; background: var(--bg); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+.subs td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.subs tr:last-child td { border-bottom: none; }
+.subs tbody tr:hover td { background: var(--bg); cursor: pointer; }
+.subs .cell-name { font-weight: 600; font-size: 14px; }
+.subs .cell-email { font-size: 12px; color: var(--text-muted); }
+.subs .cell-13 { font-size: 13px; }
+.subs .cell-muted { font-size: 13px; color: var(--text-muted); }
+.subs .cell-product { max-width: 200px; font-size: 13px; }
+.subs .cell-expiring { color: var(--warning); font-weight: 600; }
+.subs .cell-ref { color: var(--text-muted); font-size: 12px; }
+
+/* ── Visual grouping ── */
+.subs tr.group-continuation td { background: #fafafa; border-bottom: 1px solid #f3f4f6; }
+.subs tr.group-continuation td:first-child { padding-left: 36px; }
+.subs tr.group-continuation:hover td { background: var(--bg); }
+.subs tr.group-first td { border-top: 2px solid var(--border); }
+.subs tr.group-first:first-child td { border-top: none; }
+.subs .sub-count-badge { display: inline-block; margin-left: 8px; padding: 1px 7px; border-radius: 20px; font-size: 11px; font-weight: 700; background: var(--primary-light); color: var(--primary); vertical-align: middle; }
+
+/* ── Chips ── */
+.subs .chip, .subs-overlay .chip { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.subs .chip.ACTIVE, .subs-overlay .chip.ACTIVE { background: #f0fdf4; color: var(--success); }
+.subs .chip.EXPIRED, .subs-overlay .chip.EXPIRED { background: #fef2f2; color: var(--danger); }
+.subs .chip.REVOKED, .subs-overlay .chip.REVOKED { background: #f3f4f6; color: var(--text-muted); }
+.subs .chip.TRIAL, .subs-overlay .chip.TRIAL { background: var(--primary-light); color: var(--primary); }
+.subs .chip.expiring, .subs-overlay .chip.expiring { background: #fff7ed; color: var(--warning); }
+.subs .source-chip, .subs-overlay .source-chip { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+.subs .ref-link { font-size: 12px; color: var(--primary); text-decoration: none; font-family: monospace; }
+.subs .ref-link:hover { text-decoration: underline; }
+
+/* ── Side panel (portalled) ── */
+.subs-overlay .overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3); z-index: 100; }
+.subs-overlay .overlay.show { display: block; }
+.subs-overlay .side-panel { position: fixed; top: 0; right: -480px; width: 480px; height: 100vh; background: var(--white); border-left: 1px solid var(--border); box-shadow: -4px 0 24px rgba(0, 0, 0, 0.08); z-index: 101; transition: right 0.3s ease; overflow-y: auto; display: flex; flex-direction: column; }
+.subs-overlay .side-panel.open { right: 0; }
+.subs-overlay .panel-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--white); z-index: 1; }
+.subs-overlay .panel-header h3 { font-size: 16px; font-weight: 700; margin: 0; }
+.subs-overlay .panel-close { background: none; border: none; cursor: pointer; font-size: 22px; color: var(--text-muted); line-height: 1; }
+.subs-overlay .panel-close:hover { color: var(--danger); }
+.subs-overlay .panel-body { padding: 24px; flex: 1; }
+.subs-overlay .detail-section { margin-bottom: 24px; }
+.subs-overlay .detail-section h4 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin: 0 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.subs-overlay .detail-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; gap: 12px; }
+.subs-overlay .detail-row .key { color: var(--text-muted); }
+.subs-overlay .detail-row .val { font-weight: 500; text-align: right; max-width: 60%; word-break: break-word; }
+.subs-overlay .detail-row .val.warning { color: var(--warning); font-weight: 700; }
+.subs-overlay .detail-row .val.small { font-size: 12px; }
+.subs-overlay .panel-actions { padding: 20px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; flex-wrap: wrap; position: sticky; bottom: 0; background: var(--white); }
+
+/* ── Dialogs (portalled) ── */
+.subs-overlay .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 200; align-items: center; justify-content: center; padding: 16px; }
+.subs-overlay .modal-overlay.show { display: flex; }
+.subs-overlay .modal { background: var(--white); border-radius: var(--radius); width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2); }
+.subs-overlay .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.subs-overlay .modal-header h3 { font-size: 16px; font-weight: 700; margin: 0; }
+.subs-overlay .modal-body { padding: 24px; }
+.subs-overlay .modal-body p.msg { font-size: 14px; margin: 0; }
+.subs-overlay .modal-body p.note { font-size: 13px; color: var(--text-muted); margin: 0; }
+.subs-overlay .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+.subs-overlay .student-label { background: var(--bg); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 16px; font-size: 13px; font-weight: 700; }
+.subs-overlay .date-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.subs-overlay .duration-preview { padding: 10px 14px; background: var(--primary-light); border-radius: var(--radius); font-size: 13px; color: var(--primary); margin-bottom: 16px; }
+
+/* ── Buttons ── */
+.subs .btn, .subs-overlay .btn { display: inline-block; padding: 9px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; border: none; transition: 0.2s; }
+.subs .btn:disabled, .subs-overlay .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.subs .btn-primary, .subs-overlay .btn-primary { background: var(--primary); color: white; }
+.subs .btn-primary:hover, .subs-overlay .btn-primary:hover { background: var(--primary-dark); }
+.subs .btn-danger, .subs-overlay .btn-danger { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
+.subs .btn-danger:hover, .subs-overlay .btn-danger:hover { background: #fee2e2; }
+.subs .btn-ghost, .subs-overlay .btn-ghost { background: none; border: 1px solid var(--border); color: var(--text); }
+.subs .btn-ghost:hover, .subs-overlay .btn-ghost:hover { background: var(--bg); }
+.subs .btn-success, .subs-overlay .btn-success { background: #f0fdf4; color: var(--success); border: 1px solid #bbf7d0; }
+.subs .btn-success:hover, .subs-overlay .btn-success:hover { background: #dcfce7; }
+
+/* ── Forms (dialogs) ── */
+.subs-overlay .form-group { margin-bottom: 16px; }
+.subs-overlay .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.subs-overlay .form-group input,
+.subs-overlay .form-group select { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; font-family: inherit; color: var(--text); box-sizing: border-box; background: var(--white); }
+.subs-overlay .form-group input:focus,
+.subs-overlay .form-group select:focus { outline: none; border-color: var(--primary); }
+.subs-overlay .form-hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ── Student search in the Grant dialog ── */
+.subs-overlay .user-search-results { border: 1px solid var(--border); border-radius: var(--radius); max-height: 200px; overflow-y: auto; background: var(--white); display: none; }
+.subs-overlay .user-search-results.show { display: block; }
+.subs-overlay .user-result-item { padding: 10px 14px; cursor: pointer; border-bottom: 1px solid var(--border); font-size: 13px; }
+.subs-overlay .user-result-item:last-child { border-bottom: none; }
+.subs-overlay .user-result-item:hover { background: var(--primary-light); }
+.subs-overlay .user-result-item .name { font-weight: 600; }
+.subs-overlay .user-result-item .meta { color: var(--text-muted); font-size: 12px; }
+.subs-overlay .selected-user-badge { display: none; padding: 8px 12px; background: var(--primary-light); border: 1px solid var(--primary); border-radius: var(--radius); font-size: 13px; font-weight: 600; color: var(--primary); margin-top: 6px; align-items: center; justify-content: space-between; gap: 8px; }
+.subs-overlay .selected-user-badge.show { display: flex; }
+.subs-overlay .selected-user-badge button { background: none; border: none; cursor: pointer; color: var(--primary); font-size: 16px; line-height: 1; }
+
+.subs .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+.subs .empty-state p { font-size: 15px; margin: 0 0 4px; }
+.subs .empty-state small { font-size: 13px; }
+
+/* ── Phone (UI convention #3) ── */
+@media (max-width: 768px) {
+  .subs .filter-group { flex: 1 1 100%; min-width: 0; }
+  .subs .filter-toggle { width: 100%; justify-content: center; }
+  .subs .filter-actions { margin-left: 0; width: 100%; }
+  .subs .filter-actions .btn { flex: 1; }
+  .subs-overlay .side-panel { width: 100%; right: -100%; }
+  .subs-overlay .panel-actions .btn { flex: 1 1 auto; }
+  .subs-overlay .date-grid { grid-template-columns: 1fr; }
+  .subs-overlay .modal-footer .btn { flex: 1; }
+}

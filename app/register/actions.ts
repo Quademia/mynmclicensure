@@ -9,14 +9,16 @@
 // the service role, so no orphan login is left behind (the MyNclex
 // app/register/actions.ts rollback pattern).
 //
-// Not here yet, by slice: the trial subscription (slice 8 — needs
-// `products` and `subscriptions`) and the welcome email (slice 10).
-// Registration succeeds without them.
+// The programme trial (legacy step 3) is granted after the profile row
+// with the service role (lib/subscriptions/trial.ts, slice 8); it never
+// blocks the registration. Not here yet: the welcome email (slice 10).
+// Registration succeeds without it.
 
 'use server';
 
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { makeUserId } from '@/lib/auth/ids';
+import { grantTrialSubscription } from '@/lib/subscriptions/trial';
 
 type RegisterResult = { ok: true; email: string } | { ok: false; error: string };
 
@@ -98,7 +100,10 @@ export async function registerAction(formData: FormData): Promise<RegisterResult
     };
   }
 
-  // Step 3 (trial) and step 5 (welcome email): slices 8 and 10.
+  // Step 3: the programme trial, service role, non-blocking (legacy too).
+  await grantTrialSubscription(userId, programId);
+
+  // Step 5 (welcome email): slice 10.
 
   // Sign out so the student arrives at /login with a clean state, as
   // legacy did.
