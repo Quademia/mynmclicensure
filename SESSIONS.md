@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-14 — 6a passed; 6b built by Codex (timed mode on the shared core), reviewed and tested, ticked and merged; Codex's two helper scripts removed
+  - ↳ Codex left no log or index lines and an unpushed branch · server-stamped start, elapsed on server, capped · concurrent start shares one stamp · scripts/ is baseline + runner only · 5b next
+
 - 2026-09-13 — slice 6 split (6a/6b after 8); 6a built: attempts table, Quiz Builder, the runner core with instant mode and review; Sam's test pending
   - ↳ one core two pages (Sam: proceed as planned) · Preview button dead, not built (§9 #16) · score recomputed on server at finish · Send feedback waits for 12 · exits land on 5b's page · SATA gate not walked in pane
 
