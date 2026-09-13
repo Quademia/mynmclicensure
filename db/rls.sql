@@ -377,3 +377,20 @@ using (auth_user_role() = 'ADMIN');
 -- items_rm_mid, items_rphn_pphn, items_rphn_disease_ctrl,
 -- items_rmhn_psych_nurs, items_rmhn_psych_ppharm, items_nac_basic_clin,
 -- items_nac_basic_prev.
+
+-- ── slice 5a: fixed quizzes and mock exams ─────────────────────────────
+-- Any signed-in user reads (the student pages filter published + active
+-- themselves); ADMIN inserts and updates; no DELETE, as legacy.
+create policy quizzes_select on quizzes for select
+using (auth.uid() is not null);
+create policy quizzes_insert on quizzes for insert
+with check (auth_user_role() = 'ADMIN');
+create policy quizzes_update on quizzes for update
+using (auth_user_role() = 'ADMIN');
+
+create policy mock_quizzes_select on mock_quizzes for select
+using (auth.uid() is not null);
+create policy mock_quizzes_insert on mock_quizzes for insert
+with check (auth_user_role() = 'ADMIN');
+create policy mock_quizzes_update on mock_quizzes for update
+using (auth_user_role() = 'ADMIN');

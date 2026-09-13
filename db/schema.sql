@@ -170,3 +170,45 @@ create table if not exists items_gp (
 
 -- Storage bucket (global namespace, hence the prefix):
 -- licensure-gh-rationale-images — public read, 2 MB limit, server uploads only.
+
+-- ── quizzes and mock_quizzes (slice 5a) ────────────────────────────────
+-- Two tables of one shape, kept as two (D4); mock_quizzes adds
+-- `visibility`. No DELETE policy on either: archive is the way out.
+create table if not exists quizzes (
+  quiz_id        text primary key,
+  course_id      text not null references courses (course_id),  -- S4
+  title          text not null,
+  item_ids       text[] not null default '{}',
+  n              integer not null default 0,
+  allowed_modes  text not null default 'BOTH',    -- BOTH | INSTANT_ONLY | TIMED_ONLY
+  shuffle        boolean not null default false,
+  time_limit_sec integer,                         -- null = 1 min per question
+  published      boolean not null default false,
+  publish_at     timestamptz,
+  unpublish_at   timestamptz,
+  status         text not null default 'draft',   -- draft | active | archived
+  notes          text,                            -- admin only
+  created_at     timestamptz default now(),
+  updated_at     timestamptz default now()
+);
+create index if not exists quizzes_course_id_idx on quizzes (course_id);
+
+create table if not exists mock_quizzes (
+  quiz_id        text primary key,
+  course_id      text not null references courses (course_id),  -- S4
+  title          text not null,
+  n              integer not null,
+  item_ids       text[] not null default '{}',
+  allowed_modes  text not null default 'BOTH',
+  shuffle        boolean not null default false,
+  time_limit_sec integer,
+  status         text not null default 'draft',   -- draft | active | archived
+  published      boolean not null default false,
+  visibility     text not null default 'ALL',     -- ALL | PAID | TRIAL; stored, never set or checked (legacy)
+  publish_at     timestamptz,
+  unpublish_at   timestamptz,
+  notes          text,
+  created_at     timestamptz default now(),
+  updated_at     timestamptz default now()
+);
+create index if not exists mock_quizzes_course_id_idx on mock_quizzes (course_id);
