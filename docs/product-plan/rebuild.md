@@ -423,7 +423,7 @@ feature; a user cannot tell.
 |---|---|---|---|
 | 1 | `EMAIL_SECRET` shipped in browser JS; anyone can send email from the domain | `js/config.js`, email worker | Gone with the worker. Emails are sent server-side (§7.2). Slice 10 |
 | 2 | A student can INSERT their own subscription row for any product (`subscriptions_insert` policy) | `db/rls.sql` | Policy dropped; trial grant happens in the registration Server Action. Slice 2 + 8 |
-| 3 | Every question in every course readable by any logged-in user; entitlement checked only in the browser | `db/rls.sql` `items_*` SELECT | App-layer gate on the course loader AND a subscription-aware SELECT policy (§6.4). Slice 4 |
+| 3 | Every question in every course readable by any logged-in user; entitlement checked only in the browser | `db/rls.sql` `items_*` SELECT | App-layer gate on the course loader AND a subscription-aware SELECT policy (§6.4). Slice 4a creates the function `user_has_course()` and the eleven policies, allowing any signed-in user until then; slice 8 fills in the subscription check and carries the test (Sam, 2026-09-13) |
 | 4 | Registration creates the auth user, then the profile insert can fail, leaving an orphan login | `register.html` | One Server Action; on profile failure the auth user is deleted with the service role (the MyNclex `app/register/actions.ts` rollback pattern). Slice 2 |
 | 5 | Session cap kicks the oldest session **without** the not-expired filter the count uses; can leave three live | `auth.js` `createLoginSession` | The kick query filters `active AND expires_utc > now`, same as the count. Slice 2 |
 | 6 | Two different `buildDeviceLabel()` definitions; last script loaded wins | `auth.js`, `guard.js` | One implementation (`lib/auth/device-label.ts`); the `auth.js` version is the one users actually got, so its labels are kept. Slice 2 |
@@ -560,8 +560,27 @@ key and the public pages read them.
 Bank page with search, filters, edit, and the CSV importer with its nine
 rules (upsert on `item_id`, TF never shuffles, skipped rows reported);
 the subscription-aware item policy (§9 #3); content copy of all eleven.
-*Done when* prod-equal row counts and hashes on dev, and a student with
-no subscription cannot read a course's items by any route.
+Built in two parts (Sam, 2026-09-13): **4a** the eleven tables with the
+legacy columns and indexes, ADMIN writes, one SELECT policy per table
+through a single function `user_has_course(course_id)`, the bucket
+`licensure-gh-rationale-images`, the three reads (by ids in the order
+given, by filters with the keyword search, the distinct filter values),
+the admin Question Bank page — course picker, filters, list, edit / new
+panel, image attach, delete — and the dev content load; **4b** the CSV
+importer — template, upload, row report, import. Content: dev's eleven
+tables are loaded from Sam's CSV exports of prod (2026-09-13), so the 4a
+migration creates tables only and does not copy from `public.*`; prod
+is copied at cutover by the §6.6 SQL. The gate function allows any
+signed-in user until slice 8 fills in the subscription check (the
+`subscriptions` table lands there; without this, slices 5–7 could not
+be tested), so the "no subscription cannot read" test moves to slice 8.
+The CSV reader handles a quoted comma and a line break inside a field,
+which legacy's did not; every row rule is unchanged (Sam, 2026-09-13).
+*Done when* (4a) an admin can pick a course on `localhost:3000`,
+filter and search prod's questions, edit one, add one with an image and
+delete it, and dev's row count per table equals the export's; (4b) a
+file with good and bad rows imports with the skipped rows named in the
+report, and importing it again updates rather than duplicates.
 
 **5 — Fixed quizzes and mock exams.** `quizzes`, `mock_quizzes`; admin
 pages for both; the availability state machine (HIDDEN / UPCOMING /
@@ -589,9 +608,12 @@ no dead link.
 **8 — Subscriptions.** `subscriptions`; the trial grant at registration
 (moved here from the browser); course access (`getStudentCourseAccess`
 summing days across products); admin Subscriptions page with grant,
-update, revoke, the manual sync-expired button; doc 02 corrected.
-*Done when* a fresh registration holds a 7-day trial, an admin can
-extend it and revoke it, and sync-expired flips a back-dated row.
+update, revoke, the manual sync-expired button; doc 02 corrected; the
+body of `user_has_course()` (slice 4a) replaced with the subscription
+check (§9 #3). *Done when* a fresh registration holds a 7-day trial, an
+admin can extend it and revoke it, sync-expired flips a back-dated row,
+and a student with no subscription cannot read a course's items by any
+route (moved here from slice 4, 2026-09-13).
 
 **9 — Payments.** `payments`; the four public actions and the
 confirmation page with its polling; subscribe and premium-prep buttons
@@ -678,7 +700,8 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 2a Auth | ✅ 2026-09-11 |
 | 2b Shell | ✅ 2026-09-11 |
 | 3 Catalogue and config | ✅ 2026-09-11 |
-| 4 Question bank | ⬜ |
+| 4a Question bank — tables, bucket, gate, reads, admin page, dev content | ⬜ |
+| 4b Question bank — CSV importer | ⬜ |
 | 5 Fixed quizzes and mock exams | ⬜ |
 | 6 Runner, attempts, builder | ⬜ |
 | 7 Student home | ⬜ |
