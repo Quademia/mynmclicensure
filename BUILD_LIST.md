@@ -70,7 +70,7 @@ rebuild work; listed so they are not lost.
 - ⬜ Content: set-size targets for RMHN / NACNAP / RPHN
 - ⬜ Remove MANUAL_TEST rows before cutover (moot if cutover deletes old data)
 - ⏸ Email confirmation on signup — a product change; not in the like-for-like rebuild
-- ⏸ Expiry-reminder email — `expiry_reminded` exists unused; a new feature, after the rebuild
+- ⏸ Expiry-reminder scan — a Sheets-era admin tool (git 31ccde3) never rebuilt on Supabase; only `expiry_reminded` survived; after the rebuild, needs 10
 - ⏸ Admin create user; sessions / auth-events / reset-request audits — new features, after
 - ⏸ Student analytics, notifications, search, sequential runner mode — new features, after
 - ⏸ Paystack LIVE key on prod — waits on the company / Paystack-account decision

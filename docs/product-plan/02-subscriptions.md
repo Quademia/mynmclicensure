@@ -14,7 +14,7 @@ Every product has a kind that determines how it works:
 - **TRIAL** — given automatically when a student registers. No payment needed. Gives limited access so the student can explore the platform before deciding to pay.
 - **FREE** — no payment needed, access granted directly. Used for special promotions or courtesy access.
 
-Important: the product kind describes how the product was obtained. The subscription itself is always either ACTIVE, EXPIRED, or CANCELLED — the status column never says "TRIAL."
+Important: the product kind describes how the product was obtained. The subscription itself is always either ACTIVE, EXPIRED, or REVOKED — the status column never says "TRIAL."
 
 ## How Trial Works
 
@@ -27,7 +27,7 @@ When a new student registers on QAcademy, the platform automatically gives them 
 
 Each programme has its own trial product, so an RN student gets RN-specific trial content and an RM student gets RM-specific trial content.
 
-Trial access covers a limited set of courses — enough to try some quizzes and get a feel for the platform, but not the complete course list. This is intentional: the trial is a taste, not the full meal.
+A trial covers the same courses as the programme's paid product — every trial product's course list equals the paid product's. What limits a trial is its length (7 days), not the courses. *(Corrected 2026-09-13 from the code and the product rows; the earlier text said a trial covered a limited course list — rebuild.md §3.2.)*
 
 ## Stacked Subscriptions
 
@@ -43,8 +43,7 @@ This stacking approach is fair to the student. If they pay early (before their c
 
 - **ACTIVE** — the subscription is currently valid. The student has access to the courses it covers.
 - **EXPIRED** — the subscription's time ran out. The student no longer has access through this subscription. (They might still have access through a different active subscription.)
-- **CANCELLED** — the subscription was manually stopped, usually by admin.
-- **REVOKED** — removed by admin, typically for a policy reason such as a refund or a terms violation.
+- **REVOKED** — removed by admin, typically for a policy reason such as a refund or a terms violation. *(A CANCELLED status was listed here until 2026-09-13; no code ever wrote or read it — rebuild.md §9 #13.)*
 
 ## How Access Is Checked
 
