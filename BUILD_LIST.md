@@ -35,7 +35,7 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ✅ 2b Shell — page header, both sidebars, phone drawer, placeholder dashboards; no footer (legacy has none) — 2026-09-11
 - ✅ 3 Catalogue and config — courses, levels, products, config + copy; admin Products / Courses / Config; landing, Premium Prep — 2026-09-11
 - ⬜ (unplanned) Paid-plan pause switch lifted for testing 2026-09-11; decide before cutover whether prod launches paused
-- ⬜ 4a Question bank — eleven tables, bucket, entitlement gate, reads, admin page, dev content from prod CSVs
+- ✅ 4a Question bank — eleven tables, bucket, entitlement gate, reads, admin page, dev content from prod CSVs — 2026-09-13
 - ⬜ 4b Question bank — CSV importer: template, upload, row report, upsert on item_id
 - ⬜ 5 Fixed quizzes and mock exams — admin pages, availability state machine, student lists
 - ⬜ 6 Runner, attempts, builder — shared core, instant + timed, resume, review, retake

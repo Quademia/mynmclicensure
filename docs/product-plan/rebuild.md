@@ -700,7 +700,7 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 2a Auth | ✅ 2026-09-11 |
 | 2b Shell | ✅ 2026-09-11 |
 | 3 Catalogue and config | ✅ 2026-09-11 |
-| 4a Question bank — tables, bucket, gate, reads, admin page, dev content | ⬜ |
+| 4a Question bank — tables, bucket, gate, reads, admin page, dev content | ✅ 2026-09-13 |
 | 4b Question bank — CSV importer | ⬜ |
 | 5 Fixed quizzes and mock exams | ⬜ |
 | 6 Runner, attempts, builder | ⬜ |
