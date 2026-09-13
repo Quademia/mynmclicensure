@@ -412,7 +412,7 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
           </span>
         </div>
         <div className="toolbar-right">
-          <button type="button" className="btn btn-ghost" disabled title="Available in slice 4b">📥 Import CSV</button>
+          <button type="button" className="btn btn-ghost" disabled>📥 Import CSV</button>
           <button type="button" className="btn btn-primary" disabled={!courseId} onClick={openNew}>+ New Question</button>
         </div>
       </div>
