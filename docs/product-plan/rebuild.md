@@ -284,7 +284,9 @@ slice that needs it:
 
 ```sql
 insert into licensure_gh.items_gp select * from public.items_gp;
--- × 11 item tables, then programs, courses, levels, products, config, schools
+-- × 11 item tables, then programs, courses, levels, products, config, schools,
+-- quizzes, mock_quizzes (added 2026-09-13, slice 5a: the live quizzes must
+-- reach the new product; D6 names them now)
 ```
 
 Verify by row count and by `md5(string_agg(item_id || stem, '|' order
@@ -558,7 +560,9 @@ key and the public pages read them.
 
 **4 — Question bank.** Eleven item tables; the bucket; admin Question
 Bank page with search, filters, edit, and the CSV importer with its nine
-rules (upsert on `item_id`, TF never shuffles, skipped rows reported);
+rules (upsert on `item_id`, the shuffle column taken as given — the
+"TF never shuffles" rule is the runner's, not the importer's (Sam,
+2026-09-13), skipped rows reported);
 the subscription-aware item policy (§9 #3); content copy of all eleven.
 Built in two parts (Sam, 2026-09-13): **4a** the eleven tables with the
 legacy columns and indexes, ADMIN writes, one SELECT policy per table
@@ -586,8 +590,32 @@ report, and importing it again updates rather than duplicates.
 pages for both; the availability state machine (HIDDEN / UPCOMING /
 CLOSED / ACTIVE from `published`, `publish_at`, `unpublish_at`,
 `status`); `allowed_modes`; mock `visibility` ALL / PAID / TRIAL;
-student list pages. *Done when* a quiz scheduled for tomorrow shows
-UPCOMING today and ACTIVE tomorrow.
+student list pages. Built in two parts (Sam, 2026-09-13): **5a** the two
+tables with the legacy columns, policies (any signed-in user reads,
+ADMIN inserts and updates, no DELETE — archive is the way out) and the
+§8 S4 foreign key to `courses`; the content copy of both (§6.6); one
+availability function; the reads; the Server Actions for save, the
+Published toggle, archive / restore; the two admin pages — list with
+filters (the fixed list fifty at a time with a database search, the
+mock list whole, as legacy), details, question picker, review and save.
+The admin Preview button and the attempt-stats box on the details step
+read the runner and `attempts`, so slice 6 adds them. **5b** the two
+student list pages — course accordions, the three filters, the cards
+with badge, schedule line and the Practice / Exam sections with their
+stats and Start / Resume / Abandon / Retake / Review — built **after
+slice 6**, because every button and every stat reads `attempts`.
+Enrolled courses come from a course-access helper that returns every
+active course until slice 8 fills in the subscription check (the same
+stand-in as `user_has_course()`). Mock `visibility` is a column with a
+default and no control: the legacy admin form never sets it and the
+student page never checks it (`mock-exams-reference.md` says so); it is
+carried as is. Scheduling times are saved as legacy saved them, with no
+timezone — Ghana time, which is UTC; the server does not convert them.
+*Done when* (5a) an admin can create a fixed quiz and a mock exam by
+picking questions, edit each, toggle Published from the list, archive
+and restore, and the mock list shows its schedule; (5b) a quiz
+scheduled for tomorrow shows UPCOMING today and ACTIVE tomorrow, and
+Start opens the runner.
 
 **6 — Runner, attempts, builder.** `attempts`; spawn for fixed, builder,
 mock; the shared runner core with instant and timed wrappers;
@@ -702,7 +730,8 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 3 Catalogue and config | ✅ 2026-09-11 |
 | 4a Question bank — tables, bucket, gate, reads, admin page, dev content | ✅ 2026-09-13 |
 | 4b Question bank — CSV importer | ✅ 2026-09-13 |
-| 5 Fixed quizzes and mock exams | ⬜ |
+| 5a Fixed quizzes and mock exams — tables, copy, availability, admin pages | ⬜ |
+| 5b Fixed quizzes and mock exams — student list pages (after 6) | ⬜ |
 | 6 Runner, attempts, builder | ⬜ |
 | 7 Student home | ⬜ |
 | 8 Subscriptions | ⬜ |
