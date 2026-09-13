@@ -46,7 +46,7 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ⬜ 9 Payments — init-public, init-upgrade, verify, setup-complete, admin rescue, rate limit
 - ⬜ 10 Email — four templates, Quademia sender, `appOrigin()`
 - ⬜ 11 Announcements — eight scope dimensions, notice state, dashboard strip
-- ⬜ 12 Messaging — three contexts, admin inbox, bulk send, badges
+- ⬜ 12 Messaging — three contexts, admin inbox, bulk send, badges, the runner's Send feedback button (left out of 6)
 - ⬜ 13 Offline packs — builder, allowance, non-repeat picker, watermark, renderer
 - ⬜ 14 Admin home — dashboard counts, users drawer, attempts analytics
 - ⬜ 15 Phone pass — student at 375px, admin navigable at 768px

@@ -693,9 +693,14 @@ student with that product and not an RM one.
 with the three contexts, the question context capturing stem + options +
 current answer and **never** the correct answer; admin inbox with
 filters, search, close / reopen; bulk send with recipient preview and
-resolution by scope; unread badges in both sidebars. *Done when* a
-bulk send to a scope creates one thread per recipient and the badge
-counts match.
+resolution by scope; unread badges in both sidebars. **Also here: the
+"Send feedback" button under every question in both runners** (left
+out of slice 6, 2026-09-13) — it saves progress, then opens the
+messages page with the course, attempt, quiz and item ids and the
+quoted question, options as shown and the student's current answer,
+never the correct one. *Done when* a bulk send to a scope creates one
+thread per recipient and the badge counts match, and a student can
+send feedback on a question from inside a running quiz.
 
 **13 — Offline packs.** `offline_packs`; the builder with filters,
 `offline_max_questions` (100) and `offline_packs_per_course` (5) from
