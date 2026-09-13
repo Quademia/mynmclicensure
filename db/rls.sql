@@ -350,9 +350,10 @@ create policy config_delete on config for delete
 using (auth_user_role() = 'ADMIN');
 
 -- ── slice 4a: the question bank ────────────────────────────────────────
--- The entitlement gate (rebuild.md §9 defect 3). Any signed-in user until
--- slice 8 replaces the body with the subscription check; the signature
--- stays.
+-- The entitlement gate (rebuild.md §9 defect 3), filled in by slice 8:
+-- an ADMIN, or a student with an ACTIVE, unexpired subscription whose
+-- product includes the course. Slice 4a created it allowing any
+-- signed-in user; the signature has not changed.
 create or replace function user_has_course(p_course_id text)
 returns boolean
 language sql
@@ -360,7 +361,18 @@ security definer
 stable
 set search_path = licensure_gh
 as $$
-  select auth.uid() is not null
+  select auth.uid() is not null and (
+    auth_user_role() = 'ADMIN'
+    or exists (
+      select 1
+      from subscriptions s
+      join products p on p.product_id = s.product_id
+      where s.user_id = auth_user_id()
+        and s.status = 'ACTIVE'
+        and s.expires_utc > now()
+        and p_course_id = any (p.courses_included)
+    )
+  )
 $$;
 
 -- items_* (all eleven; the migration loops). Read through the gate with
@@ -393,4 +405,16 @@ using (auth.uid() is not null);
 create policy mock_quizzes_insert on mock_quizzes for insert
 with check (auth_user_role() = 'ADMIN');
 create policy mock_quizzes_update on mock_quizzes for update
+using (auth_user_role() = 'ADMIN');
+
+
+-- ── slice 8: subscriptions ─────────────────────────────────────────────
+-- Own rows or ADMIN read; ADMIN inserts and updates; no DELETE. The
+-- legacy student self-insert policy is not carried (§9 defect 2): the
+-- trial grant is a Server Action with the service role.
+create policy subscriptions_select on subscriptions for select
+using (subscriptions.user_id = auth_user_id() or auth_user_role() = 'ADMIN');
+create policy subscriptions_insert on subscriptions for insert
+with check (auth_user_role() = 'ADMIN');
+create policy subscriptions_update on subscriptions for update
 using (auth_user_role() = 'ADMIN');

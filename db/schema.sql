@@ -212,3 +212,21 @@ create table if not exists mock_quizzes (
   updated_at     timestamptz default now()
 );
 create index if not exists mock_quizzes_course_id_idx on mock_quizzes (course_id);
+
+-- ── subscriptions (slice 8) ────────────────────────────────────────────
+-- No content copy (D5). expiry_reminded is carried unused: the
+-- Sheets-era reminder scan that read it was never rebuilt (BUILD_LIST).
+create table if not exists subscriptions (
+  subscription_id text primary key,                                    -- 'SUB_' + hex
+  user_id         text not null references users (user_id),           -- S4
+  product_id      text not null references products (product_id),     -- S4
+  start_utc       timestamptz not null default now(),
+  expires_utc     timestamptz not null,
+  status          text not null default 'ACTIVE',    -- ACTIVE | EXPIRED | REVOKED
+  expiry_reminded boolean not null default false,
+  source          text not null default 'PAYMENT',   -- PAYMENT | PAYSTACK | ADMIN | SELF_TRIAL_SIGNUP
+  source_ref      text
+);
+create index if not exists subscriptions_user_id_idx on subscriptions (user_id);
+create index if not exists subscriptions_user_product_status_idx on subscriptions (user_id, product_id, status);
+create index if not exists subscriptions_status_expires_idx on subscriptions (status, expires_utc);
