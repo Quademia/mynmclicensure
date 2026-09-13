@@ -84,6 +84,12 @@ export const CSV_COLUMNS = [
 // What the bank Server Actions return.
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
+// What importItems() returns (slice 4b): legacy's two counts, plus the
+// batch errors legacy sent to the browser console.
+export type ImportResult =
+  | { ok: true; successCount: number; failCount: number; errors: string[] }
+  | { ok: false; error: string };
+
 // What loadCourseItems() returns: the whole course, as legacy loaded it
 // (the page filters in the browser), plus the two dropdowns it fills.
 export type CourseItemsResult =

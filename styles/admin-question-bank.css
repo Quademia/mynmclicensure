@@ -158,3 +158,15 @@
   .qb .panel-actions .btn { flex: 1 1 auto; }
   .qb .panel-actions .btn-delete { margin-left: 0; }
 }
+
+/* ── CSV modal, the pieces legacy styled inline ── */
+.qb-modal .modal-template { margin-bottom: 14px; }
+.qb-modal .form-group { margin-bottom: 14px; }
+.qb-modal .csv-label { font-size: 13px; font-weight: 600; color: var(--primary); display: block; margin-bottom: 6px; }
+.qb-modal .csv-file { font-size: 13px; border: 1px solid var(--border); padding: 8px; border-radius: 6px; width: 100%; box-sizing: border-box; font-family: inherit; }
+.qb-modal .csv-summary { font-weight: 600; margin-bottom: 8px; font-size: 13px; }
+.qb-modal .btn { padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: opacity 0.15s; }
+.qb-modal .btn:hover { opacity: 0.85; }
+.qb-modal .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.qb-modal .btn-primary { background: var(--accent); color: white; }
+.qb-modal .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--primary); }

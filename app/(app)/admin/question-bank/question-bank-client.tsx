@@ -9,8 +9,7 @@
 // the inline .alert boxes; Delete keeps the browser's own confirm box
 // with legacy's words (Sam, 2026-09-11: dialogs stay as legacy has them).
 //
-// The CSV import button is here as legacy placed it, disabled until
-// slice 4b wires the modal.
+// The CSV importer is the modal beside this file (slice 4b).
 //
 // Two legacy quirks carried as they are (logged, not in §9): opening a
 // question runs onTypeChange() after the fields are filled, so the
@@ -22,6 +21,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Toast } from '@/lib/toast/toast';
+import { CsvImportModal } from './csv-import-modal';
 import { deleteQuestion, loadCourseItems, saveQuestion } from '@/lib/bank/actions';
 import {
   DIFFICULTIES,
@@ -123,6 +123,13 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
   const [imgUrl, setImgUrl] = useState('');
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // ── the CSV modal (slice 4b) ──
+  const [csvOpen, setCsvOpen] = useState(false);
+  function openCsvModal() {
+    if (!courseId) return setMsg({ text: 'Please select a course first.', tone: 'error' });
+    setCsvOpen(true);
+  }
 
   async function fetchCourse(id: string): Promise<Item[]> {
     setLoading(true);
@@ -353,6 +360,13 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
   return (
     <div className="qb">
       <Toast message={msg?.text ?? null} tone={msg?.tone} onDismiss={dismiss} />
+      {csvOpen ? (
+        <CsvImportModal
+          courseId={courseId}
+          onClose={() => setCsvOpen(false)}
+          onImported={async () => { await fetchCourse(courseId); }}
+        />
+      ) : null}
 
       {/* Filter bar */}
       <div className="filter-bar">
@@ -412,7 +426,7 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
           </span>
         </div>
         <div className="toolbar-right">
-          <button type="button" className="btn btn-ghost" disabled>📥 Import CSV</button>
+          <button type="button" className="btn btn-ghost" disabled={!courseId} onClick={openCsvModal}>📥 Import CSV</button>
           <button type="button" className="btn btn-primary" disabled={!courseId} onClick={openNew}>+ New Question</button>
         </div>
       </div>

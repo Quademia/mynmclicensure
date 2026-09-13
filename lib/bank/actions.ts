@@ -11,6 +11,7 @@
 'use server';
 
 import { requireAdmin } from '@/lib/access';
+import { rowToPayload, type CsvRow } from './csv';
 import { uploadRationaleImage } from './images';
 import { getItemFilterOptions, getItemsByFilters } from './queries';
 import { itemsTableFor } from './tables';
@@ -19,6 +20,7 @@ import {
   RATIONALE_IMAGE_MAX_BYTES,
   type ActionResult,
   type CourseItemsResult,
+  type ImportResult,
   type QuestionType,
 } from './types';
 
@@ -117,6 +119,41 @@ export async function saveQuestion(input: SaveQuestionInput, image: FormData | n
   if (error) return fail('Save failed: ' + error.message);
 
   return { ok: true };
+}
+
+// ── runCsvImport (slice 4b) ────────────────────────────────────────────
+// The rows arrive already read and checked in the browser (lib/bank/csv,
+// the report the admin saw); the same rules run again here on what was
+// sent, then legacy's upsert on item_id in batches of 50. A batch that
+// fails counts its rows as failed and carries the message back — legacy
+// wrote it to the browser console, which a Server Action cannot reach.
+const IMPORT_BATCH = 50;
+
+export async function importItems(courseId: string, rows: CsvRow[]): Promise<ImportResult> {
+  const { supabase } = await requireAdmin();
+  const table = itemsTableFor(courseId);
+  if (!table) return { ok: false, error: 'Unknown course.' };
+
+  const payloads = rows
+    .filter((r) => r.stem && r.correct && (r.option_a || r.option_b))
+    .map((r) => rowToPayload({ ...r, item_id: r.item_id || `${courseId.replace(/_/g, '')}_${Date.now()}` }));
+  if (!payloads.length) return { ok: true, successCount: 0, failCount: 0, errors: [] };
+
+  let successCount = 0;
+  let failCount = 0;
+  const errors: string[] = [];
+  for (let i = 0; i < payloads.length; i += IMPORT_BATCH) {
+    const batch = payloads.slice(i, i + IMPORT_BATCH);
+    const { error } = await supabase.from(table).upsert(batch, { onConflict: 'item_id' });
+    if (error) {
+      failCount += batch.length;
+      errors.push(error.message);
+      console.error('CSV import batch error:', error);
+    } else {
+      successCount += batch.length;
+    }
+  }
+  return { ok: true, successCount, failCount, errors: [...new Set(errors)] };
 }
 
 // ── confirmDelete ──────────────────────────────────────────────────────
