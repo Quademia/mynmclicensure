@@ -230,3 +230,34 @@ create table if not exists subscriptions (
 create index if not exists subscriptions_user_id_idx on subscriptions (user_id);
 create index if not exists subscriptions_user_product_status_idx on subscriptions (user_id, product_id, status);
 create index if not exists subscriptions_status_expires_idx on subscriptions (status, expires_utc);
+
+-- ── attempts (slice 6a) ────────────────────────────────────────────────
+-- One row per run. item_ids and answers_json stay TEXT (§8 S3 unticked).
+-- No content copy (D5). quiz_id names a row in quizzes OR mock_quizzes
+-- and is null for the builder, so it carries no key.
+create table if not exists attempts (
+  attempt_id        text primary key,                                  -- 'ATT_' + ms + '_' + 7 hex
+  user_id           text not null references users (user_id),         -- S4
+  quiz_id           text,
+  course_id         text not null references courses (course_id),     -- S4
+  mode              text not null,                                     -- instant | timed
+  source            text not null,                                     -- fixed | builder | retake | mock
+  item_ids          text not null,                                     -- comma-joined, in the attempt's order
+  n                 integer not null,
+  seed              text,
+  duration_min      integer,
+  status            text not null default 'in_progress',               -- in_progress | completed | abandoned
+  score_raw         numeric,
+  score_total       numeric,
+  score_pct         numeric,
+  time_taken_s      integer,
+  origin_attempt_id text references attempts (attempt_id),             -- S4; the retake chain
+  display_label     text,
+  answers_json      text not null default '[]',
+  ts_iso            timestamptz default now()
+);
+create index if not exists attempts_user_id_idx   on attempts (user_id);
+create index if not exists attempts_quiz_id_idx   on attempts (quiz_id);
+create index if not exists attempts_course_id_idx on attempts (course_id);
+create index if not exists attempts_status_idx    on attempts (status);
+create index if not exists attempts_user_quiz_mode_status_idx on attempts (user_id, quiz_id, mode, status);

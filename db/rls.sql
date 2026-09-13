@@ -418,3 +418,13 @@ create policy subscriptions_insert on subscriptions for insert
 with check (auth_user_role() = 'ADMIN');
 create policy subscriptions_update on subscriptions for update
 using (auth_user_role() = 'ADMIN');
+
+-- ── slice 6a: attempts ─────────────────────────────────────────────────
+-- Own rows or ADMIN read; own-row insert and update; no DELETE, as
+-- legacy. The runner's Server Actions write as the signed-in student.
+create policy attempts_select on attempts for select
+using (attempts.user_id = auth_user_id() or auth_user_role() = 'ADMIN');
+create policy attempts_insert on attempts for insert
+with check (attempts.user_id = auth_user_id());
+create policy attempts_update on attempts for update
+using (attempts.user_id = auth_user_id());
