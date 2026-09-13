@@ -1,7 +1,7 @@
 -- db/rls.sql — the readable statement of the current policies and the
 -- SECURITY DEFINER functions in `licensure_gh`. Regenerated from
 -- db/migrations/ whenever a migration changes one. NEVER applied directly.
--- Last regenerated: 2026-09-11, after 20260911150000_catalogue_tables.sql.
+-- Last regenerated: 2026-09-13, after 20260913120000_question_bank_tables.sql.
 
 -- ── helper functions for the policies ──────────────────────────────────
 -- SECURITY DEFINER so a policy on users can ask about users without
@@ -348,3 +348,32 @@ create policy config_update on config for update
 using (auth_user_role() = 'ADMIN');
 create policy config_delete on config for delete
 using (auth_user_role() = 'ADMIN');
+
+-- ── slice 4a: the question bank ────────────────────────────────────────
+-- The entitlement gate (rebuild.md §9 defect 3). Any signed-in user until
+-- slice 8 replaces the body with the subscription check; the signature
+-- stays.
+create or replace function user_has_course(p_course_id text)
+returns boolean
+language sql
+security definer
+stable
+set search_path = licensure_gh
+as $$
+  select auth.uid() is not null
+$$;
+
+-- items_* (all eleven; the migration loops). Read through the gate with
+-- the table's own course id; ADMIN insert, update and delete, as legacy.
+create policy items_gp_select on items_gp for select
+using (user_has_course('GP'));
+create policy items_gp_insert on items_gp for insert
+with check (auth_user_role() = 'ADMIN');
+create policy items_gp_update on items_gp for update
+using (auth_user_role() = 'ADMIN');
+create policy items_gp_delete on items_gp for delete
+using (auth_user_role() = 'ADMIN');
+-- … × 11: items_rn_med ('RN_MED'), items_rn_surg, items_rm_ped_obs_hrn,
+-- items_rm_mid, items_rphn_pphn, items_rphn_disease_ctrl,
+-- items_rmhn_psych_nurs, items_rmhn_psych_ppharm, items_nac_basic_clin,
+-- items_nac_basic_prev.

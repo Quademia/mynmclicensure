@@ -58,6 +58,15 @@ in a chat.
   creates the table, as a guarded `insert … select from public.<table>`
   (see `20260911010000_auth_tables.sql` for programs and schools), so
   each environment is filled by its own run.
+  **Exception, the question bank (slice 4a):** the eleven `items_*`
+  tables are created with no copy. Dev was loaded from Sam's CSV exports
+  of prod (2026-09-13, a one-off loader outside the repo, verified by
+  row count per table); prod is copied at cutover by the §6.6 SQL.
+- Storage buckets are global to the project, so they carry the
+  `licensure-gh-` prefix and are created by the migration that needs
+  them (`insert into storage.buckets`). One so far:
+  `licensure-gh-rationale-images`, public read, 2 MB limit, written
+  only from the server.
 - Everything in `licensure_gh`. A migration that names `public.*` or
   `teacher_*` is a plan violation (AGENTS.md rule #7), except the read-only
   content copy and the cutover scripts, which say so in their header.

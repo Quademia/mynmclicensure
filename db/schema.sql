@@ -1,7 +1,7 @@
 -- db/schema.sql — the readable statement of the current tables in `licensure_gh`.
 -- Regenerated from db/migrations/ whenever a migration changes a table.
 -- NEVER applied directly; the migrations are what run (db/README.md).
--- Last regenerated: 2026-09-11, after 20260911150000_catalogue_tables.sql.
+-- Last regenerated: 2026-09-13, after 20260913120000_question_bank_tables.sql.
 
 -- ── programs (moved up from slice 3: the register page's dropdown) ─────
 create table if not exists programs (
@@ -135,3 +135,38 @@ create table if not exists config (
   description text,
   updated_at  timestamptz default now()
 );
+
+-- ── the question bank (slice 4a) ───────────────────────────────────────
+-- Eleven tables of one shape, one per course (rebuild.md §8 S2, kept):
+--   items_gp, items_rn_med, items_rn_surg,
+--   items_rm_ped_obs_hrn, items_rm_mid,
+--   items_rphn_pphn, items_rphn_disease_ctrl,
+--   items_rmhn_psych_nurs, items_rmhn_psych_ppharm,
+--   items_nac_basic_clin, items_nac_basic_prev
+-- The migration creates them in a loop; the shape, written once:
+create table if not exists items_gp (
+  item_id         text primary key,
+  question_type   text not null default 'MCQ',   -- MCQ | TF | SATA
+  stem            text not null,
+  option_a        text, fb_a text,
+  option_b        text, fb_b text,
+  option_c        text, fb_c text,
+  option_d        text, fb_d text,
+  option_e        text, fb_e text,
+  option_f        text, fb_f text,
+  correct         text not null,   -- "b" for MCQ / TF; "a,c,e" for SATA
+  rationale       text,
+  rationale_img   text,            -- public URL in licensure-gh-rationale-images
+  subject         text,
+  maintopic       text,
+  subtopic        text,
+  difficulty      text,
+  marks           numeric not null default 1,
+  batch_id        text,
+  shuffle_options boolean not null default true   -- false for TF
+);
+-- Six indexes per table: maintopic, subtopic, subject, difficulty,
+-- question_type, batch_id (items_<t>_<column>_idx).
+
+-- Storage bucket (global namespace, hence the prefix):
+-- licensure-gh-rationale-images — public read, 2 MB limit, server uploads only.
