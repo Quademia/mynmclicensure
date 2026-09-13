@@ -443,6 +443,7 @@ feature; a user cannot tell.
 | 12 | `guard.js` TEACHER branch and `router.html`'s "everything else goes to student" | The TEACHER role is MyTeacher's and left with the April split. Roles here are STUDENT and ADMIN; any other value is refused at login, not routed |
 | 13 | `docs/product-plan/02` `CANCELLED` status | Doc corrected when slice 8 lands |
 | 14 | `legacy/archive/` (diverged old copies of the JS) and the empty `workers/`, `payments-worker/` at root | Deleted in slice 0 |
+| 16 | The admin Preview button on Fixed Quizzes and Mock Exams — opens the runner with a `quiz_id`; the runner demands an `attempt_id` and shows "Missing Quiz"; nothing turns a quiz into a preview attempt | **Not built** (Sam, 2026-09-13). The runner's own admin preview path (`?preview=1` on an attempt) is transcribed as it is |
 
 ## 10. Authentication and access, as rebuilt
 
@@ -598,8 +599,9 @@ availability function; the reads; the Server Actions for save, the
 Published toggle, archive / restore; the two admin pages — list with
 filters (the fixed list fifty at a time with a database search, the
 mock list whole, as legacy), details, question picker, review and save.
-The admin Preview button and the attempt-stats box on the details step
-read the runner and `attempts`, so slice 6 adds them. **5b** the two
+The attempt-stats box on the details step reads `attempts`, so slice 6
+adds it (the admin Preview button never worked and is not built — §9
+#16). **5b** the two
 student list pages — course accordions, the three filters, the cards
 with badge, schedule line and the Practice / Exam sections with their
 stats and Start / Resume / Abandon / Retake / Review — built **after
@@ -624,9 +626,34 @@ config; flagging, the question grid, the pre-submit summary, resume of
 an in-progress attempt, auto-submit on time-out, SATA exact-set scoring
 and the instant-mode "Check answer" gate, TF never shuffled; review;
 retake with `origin_attempt_id`; the Quiz Builder with
-`builder_max_questions` and `builder_minutes_per_question`. *Done when*
-Sam can run one quiz in each mode end to end, close the tab mid-way,
-resume, finish, review, retake.
+`builder_max_questions` and `builder_minutes_per_question`. Built in
+two parts after slice 8 (Sam, 2026-09-13): **6a** the `attempts` table
+with the legacy columns (`item_ids` and `answers_json` stay TEXT — §8
+S3 unticked), the §8 S4 foreign key to `users`, own-row policies (no
+DELETE); the Quiz Builder — five steps, topics or concept search, the
+pool counted live from the course, the config caps, the random pick,
+the recent setups in the browser; the runner core at
+`/runner/instant` — the ten preflight checks, the per-attempt seeded
+option order, pages from config, flags, the question grid (a desktop
+column, a phone overlay), the feedback switch, autosave, the exit
+dialog, the SATA "Check Answer" gate, submit, the score card, review
+mode, and the admin `?preview=1` path; the spawn / save / finish
+Server Actions. **6b** the timed mode at `/runner/timed` on the same
+core: the server-stamped start, the countdown, auto-submit at zero,
+resume with the clock still running, feedback only after submit.
+**5b** follows (its own paragraph). Two things run on the server that
+legacy ran in the browser (Sam, 2026-09-13): **the score and each
+answer's correctness are recomputed from the items when an attempt is
+finished**, not taken from the browser (invisible to a student; a
+tampered score cannot be saved), and the course-access check reads
+slice 8's subscriptions. Not in 6: the "Send feedback" button on each
+question (it opens the messages page — slice 12 adds it); the admin
+Preview button (§9 #16). The runner has no sidebar, as legacy: its
+own header, under the `(app)` auth boundary. *Done when* (6a) Sam
+builds a custom quiz in instant mode, answers some, closes the tab,
+resumes, finishes, and reviews it; (6b) a timed quiz counts down,
+survives a closed tab with the clock still running, and submits itself
+at zero with the feedback then shown.
 
 **7 — Student home.** Dashboard, course page, learning history with its
 stats bar and pagination, profile, procedures, portal guide, upgrade
@@ -732,7 +759,8 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 4b Question bank — CSV importer | ✅ 2026-09-13 |
 | 5a Fixed quizzes and mock exams — tables, copy, availability, admin pages | ✅ 2026-09-13 |
 | 5b Fixed quizzes and mock exams — student list pages (after 6) | ⬜ |
-| 6 Runner, attempts, builder | ⬜ |
+| 6a Runner — attempts table, Quiz Builder, the core with the instant mode and review | ⬜ |
+| 6b Runner — the timed mode | ⬜ |
 | 7 Student home | ⬜ |
 | 8 Subscriptions | ✅ 2026-09-13 |
 | 9 Payments | ⬜ |
