@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-13 — slice 6 split (6a/6b after 8); 6a built: attempts table, Quiz Builder, the runner core with instant mode and review; Sam's test pending
+  - ↳ one core two pages (Sam: proceed as planned) · Preview button dead, not built (§9 #16) · score recomputed on server at finish · Send feedback waits for 12 · exits land on 5b's page · SATA gate not walked in pane
+
 - 2026-09-13 — slice 8 built: subscriptions, trial at registration, course access, the real question gate, admin Subscriptions page; Sam's test pending
   - ↳ 8 before 6 (three stand-ins avoided) · slice 6 read, 6a/6b/5b proposed, two rulings open · student self-insert policy dropped, no column dropped · expiry reminder = Sheets-era scan never rebuilt, parked · doc 02 corrected · gate proven by SQL
 
