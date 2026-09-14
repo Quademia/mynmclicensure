@@ -130,13 +130,23 @@ export async function spawnBuilderAttempt(
 }
 
 // ── saveAttemptProgress (the instant runner's autosave and exits) ──────
+// The student's own row, and only while it is in progress (rebuild.md §9
+// #17, fixed 2026-09-14): legacy wrote status = in_progress on every save,
+// so an autosave landing a moment after Submit flipped a completed
+// attempt back. A late save is refused; the runner is locked by then and
+// ignores it.
 export async function saveAttemptProgress(attemptId: string, answers: AnswerRecord[]): Promise<ActionResult> {
-  const { supabase } = await requireStudent();
-  const { error } = await supabase
+  const { supabase, profile } = await requireStudent();
+  const { data, error } = await supabase
     .from('attempts')
     .update({ answers_json: JSON.stringify(answers), status: 'in_progress' })
-    .eq('attempt_id', attemptId);
+    .eq('attempt_id', attemptId)
+    .eq('user_id', profile.user_id)
+    .eq('status', 'in_progress')
+    .select('attempt_id')
+    .maybeSingle();
   if (error) return fail(error.message);
+  if (!data) return fail('This attempt is no longer in progress.');
   return { ok: true };
 }
 

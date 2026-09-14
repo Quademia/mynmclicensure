@@ -42,6 +42,7 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ✅ 6a Runner — attempts table, Quiz Builder, instant mode, resume, review — 2026-09-14
 - ✅ 6b Runner — the timed mode: server-stamped start, countdown, auto-submit — 2026-09-14
 - ✅ 7a Student home — learning history: stats bar, filters, Load more, Resume / Review / Retake — 2026-09-14
+- ✅ (unplanned) §9 #17 — the instant save no longer flips a completed attempt back to in progress — 2026-09-14
 - ⬜ 7b Student home — dashboard, course, profile, procedures, guide, upgrade; after 8, 11, 12 fold in
 - ✅ 8 Subscriptions — trial at registration, course access, admin grant/update/revoke/sync, the real question gate — 2026-09-13
 - ⬜ 9 Payments — init-public, init-upgrade, verify, setup-complete, admin rescue, rate limit
