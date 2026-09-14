@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-14 — 7b built: the portal guide (static help page, side list, FAQ accordion, footer); walked in the pane; 7 split again (7b guide, 7c rest)
+  - ↳ QAcademy → Quademia in two strings · footer links wait for 7c and 12 · legacy had no .btn-secondary rule, carried · side-list highlight is legacy’s lagging algorithm · no data read · next is Sam’s call
+
 - 2026-09-14 — 7a built: learning history (stats bar, six filters, cards twenty at a time, Resume / Review / Retake); walked in the pane; ticked
   - ↳ three legacy quirks carried (stats and Source / Sort over loaded pages only, no Mock source) → after the rebuild · late autosave flips completed back to in_progress (6a, as legacy) · next is Sam’s call
 

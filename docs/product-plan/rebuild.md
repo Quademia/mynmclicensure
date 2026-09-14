@@ -789,7 +789,7 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 6a Runner — attempts table, Quiz Builder, the core with the instant mode and review | ✅ 2026-09-14 |
 | 6b Runner — the timed mode | ✅ 2026-09-14 |
 | 7a Student home — learning history | ✅ 2026-09-14 |
-| 7b Student home — portal guide | ⬜ |
+| 7b Student home — portal guide | ✅ 2026-09-14 |
 | 7c Student home — dashboard, course, profile, procedures, upgrade | ⬜ |
 | 8 Subscriptions | ✅ 2026-09-13 |
 | 9 Payments | ⬜ |
