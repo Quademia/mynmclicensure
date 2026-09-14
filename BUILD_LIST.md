@@ -38,7 +38,7 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ✅ 4a Question bank — eleven tables, bucket, entitlement gate, reads, admin page, dev content from prod CSVs — 2026-09-13
 - ✅ 4b Question bank — CSV importer: template, upload, row report, upsert on item_id — 2026-09-13
 - ✅ 5a Fixed quizzes and mock exams — tables, content copy, availability function, admin pages — 2026-09-13
-- ⬜ 5b Fixed quizzes and mock exams — student list pages; after slice 6
+- ✅ 5b Fixed quizzes and mock exams — student list pages, start / retake / abandon, admin attempt stats — 2026-09-14
 - ✅ 6a Runner — attempts table, Quiz Builder, instant mode, resume, review — 2026-09-14
 - ✅ 6b Runner — the timed mode: server-stamped start, countdown, auto-submit — 2026-09-14
 - ⬜ 7 Student home — dashboard, course, history, profile, procedures, guide, upgrade

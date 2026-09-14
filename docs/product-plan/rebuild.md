@@ -763,7 +763,7 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 4a Question bank — tables, bucket, gate, reads, admin page, dev content | ✅ 2026-09-13 |
 | 4b Question bank — CSV importer | ✅ 2026-09-13 |
 | 5a Fixed quizzes and mock exams — tables, copy, availability, admin pages | ✅ 2026-09-13 |
-| 5b Fixed quizzes and mock exams — student list pages (after 6) | ⬜ |
+| 5b Fixed quizzes and mock exams — student list pages (after 6) | ✅ 2026-09-14 |
 | 6a Runner — attempts table, Quiz Builder, the core with the instant mode and review | ✅ 2026-09-14 |
 | 6b Runner — the timed mode | ✅ 2026-09-14 |
 | 7 Student home | ⬜ |

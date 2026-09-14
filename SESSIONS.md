@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-14 — 5b built: student Fixed Quizzes and Mock Exams pages, start / retake / abandon, admin attempt stats; Sam’s test passed; 5 and 6 closed
+  - ↳ start refuses closed / wrong-mode / no-access on the server · Abandon keeps browser confirm · runner exits land on Fixed Quizzes as legacy · dev quizzes carried legacy item ids, re-pointed by hand · 7 next
+
 - 2026-09-14 — 6a passed; 6b built by Codex (timed mode on the shared core), reviewed and tested, ticked and merged; Codex's two helper scripts removed
   - ↳ Codex left no log or index lines and an unpushed branch · server-stamped start, elapsed on server, capped · concurrent start shares one stamp · scripts/ is baseline + runner only · 5b next
 
