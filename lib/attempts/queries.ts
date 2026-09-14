@@ -11,7 +11,23 @@
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import { itemsTableFor } from '@/lib/bank/tables';
-import type { Attempt, BuilderItem } from './types';
+import type { Attempt, BuilderItem, QuizAttemptStats } from './types';
+
+// The admin details step's attempt-stats box (legacy openEditQuiz's
+// inline read on both admin quiz pages): every attempt on the quiz, the
+// completed count and the mean completed score, rounded.
+export async function getQuizAttemptStats(db: ServerSupabaseClient, quizId: string): Promise<QuizAttemptStats> {
+  const { data, error } = await db.from('attempts').select('attempt_id, status, score_pct').eq('quiz_id', quizId);
+  if (error) {
+    console.error('getQuizAttemptStats:', error);
+    return { total: 0, completed: 0, avgScore: 0 };
+  }
+  const rows = (data ?? []) as { status: string; score_pct: number | null }[];
+  const completedRows = rows.filter((a) => a.status === 'completed');
+  const completed = completedRows.length;
+  const avgScore = completed > 0 ? Math.round(completedRows.reduce((s, a) => s + (a.score_pct || 0), 0) / completed) : 0;
+  return { total: rows.length, completed, avgScore };
+}
 
 export async function getAttemptById(db: ServerSupabaseClient, attemptId: string): Promise<Attempt | null> {
   const { data, error } = await db.from('attempts').select('*').eq('attempt_id', attemptId).maybeSingle();

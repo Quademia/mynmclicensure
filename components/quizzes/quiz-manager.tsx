@@ -14,9 +14,10 @@
 // .alert boxes; Archive / Restore keeps the browser's own confirm box
 // with legacy's words (Sam, 2026-09-11: dialogs stay as legacy has them).
 //
-// Not here, by rebuild.md §12 (slice 5): the Preview button (opens the
-// runner) and the attempt-stats box on the details step — both read
-// slice 6's tables and are added there.
+// Not here, by rebuild.md §12 (slice 5): the Preview button — it never
+// worked (§9 #16). The attempt-stats box on the details step (edit mode
+// only: Total Attempts, Completed, Avg Score) arrived with slice 5b,
+// once `attempts` existed; it loads after the row, as legacy's did.
 //
 // One legacy defect not carried (logged, not in §9): the fixed-quiz list
 // held only the list columns, so opening a quiz from it lost its
@@ -31,11 +32,13 @@ import {
   loadAllQuizzes,
   loadPickerItems,
   loadQuiz,
+  loadQuizAttemptStats,
   loadQuizPage,
   saveQuiz,
   setQuizPublished,
   setQuizStatus,
 } from '@/lib/quizzes/actions';
+import type { QuizAttemptStats } from '@/lib/attempts/types';
 import {
   MODE_LABELS,
   MODE_OPTIONS,
@@ -268,6 +271,7 @@ export function QuizManager({
   const [currentStatus, setCurrentStatus] = useState<QuizStatus>('draft');
   const [form, setForm] = useState<Form>(EMPTY_FORM);
   const [opening, setOpening] = useState<string | null>(null);
+  const [stats, setStats] = useState<QuizAttemptStats | null>(null);
 
   function setField<K extends keyof Form>(key: K, value: Form[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -328,6 +332,7 @@ export function QuizManager({
     setPickerAll([]);
     setPickerCourse('');
     setForm(EMPTY_FORM);
+    setStats(null);
     goToPane(2);
   }
 
@@ -359,7 +364,10 @@ export function QuizManager({
       unpublishAt: quiz.unpublish_at ? quiz.unpublish_at.slice(0, 16) : '',
     });
 
-    const items = await fetchPicker(quiz.course_id);
+    // legacy: the attempt stats, then the picker pre-loaded
+    setStats(null);
+    const [quizStats, items] = await Promise.all([loadQuizAttemptStats(quizId), fetchPicker(quiz.course_id)]);
+    setStats(quizStats);
     const byId = new Map(items.map((i) => [i.item_id, i]));
     setSelected((quiz.item_ids || []).map((id) => byId.get(id)).filter((i): i is Item => Boolean(i)));
     setOpening(null);
@@ -707,6 +715,18 @@ export function QuizManager({
                 Published — visible to students
               </label>
             </div>
+
+            {/* Attempt stats (edit mode only) */}
+            {isEdit && stats ? (
+              <div>
+                <div className="form-section-title">Attempt Stats</div>
+                <div className="stats-row">
+                  <div className="stat-box"><div className="stat-val">{stats.total}</div><div className="stat-lbl">Total Attempts</div></div>
+                  <div className="stat-box"><div className="stat-val">{stats.completed}</div><div className="stat-lbl">Completed</div></div>
+                  <div className="stat-box"><div className="stat-val">{stats.completed > 0 ? `${stats.avgScore}%` : '—'}</div><div className="stat-lbl">Avg Score</div></div>
+                </div>
+              </div>
+            ) : null}
           </div>
 
           <div className="pane-actions">

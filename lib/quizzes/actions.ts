@@ -12,6 +12,8 @@
 'use server';
 
 import { requireAdmin } from '@/lib/access';
+import { getQuizAttemptStats } from '@/lib/attempts/queries';
+import type { QuizAttemptStats } from '@/lib/attempts/types';
 import { getItemsByFilters } from '@/lib/bank/queries';
 import { itemsTableFor } from '@/lib/bank/tables';
 import type { Item } from '@/lib/bank/types';
@@ -129,4 +131,11 @@ export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
 export async function loadAllQuizzes(kind: QuizKind): Promise<Quiz[]> {
   const { supabase } = await requireAdmin();
   return getAllQuizzes(supabase, kind);
+}
+
+// ── the attempt-stats box on the details step (legacy openEditQuiz) ───
+// Added with slice 5b, once `attempts` existed.
+export async function loadQuizAttemptStats(quizId: string): Promise<QuizAttemptStats> {
+  const { supabase } = await requireAdmin();
+  return getQuizAttemptStats(supabase, quizId);
 }

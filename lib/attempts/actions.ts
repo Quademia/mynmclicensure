@@ -11,8 +11,13 @@
 // from the items on the server before saving (rebuild.md §12 slice 6,
 // Sam 2026-09-13); the browser's numbers are not written.
 //
-// Not here yet, by slice: spawnFixedAttempt / spawnMockAttempt,
-// retakeAttempt and abandon (5b).
+// The two student list pages' writes (slice 5b) — legacy
+// spawnFixedAttempt / spawnMockAttempt (one function here, the kind
+// naming the table and the source), retakeAttempt, and the pages' inline
+// abandon update — run here too. Start re-reads the quiz and refuses one
+// that is not ACTIVE, not in an accessible course or not offering the
+// mode; legacy only greyed the button out (invisible to a student, the
+// same principle as the server-side score).
 
 'use server';
 
@@ -22,6 +27,9 @@ import { itemsTableFor } from '@/lib/bank/tables';
 import type { ItemFilterOptions } from '@/lib/bank/types';
 import { getConfig } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
+import { getQuizAvailability } from '@/lib/quizzes/availability';
+import { getQuizById } from '@/lib/quizzes/queries';
+import type { QuizKind } from '@/lib/quizzes/types';
 import { makeAttemptId } from './ids';
 import { getAttemptById, getBuilderCourseItems } from './queries';
 import { computeScore, recomputeAnswers } from './scoring';
@@ -217,4 +225,131 @@ export async function finishAttempt(attemptId: string, answers: AnswerRecord[], 
     .eq('status', 'in_progress');
   if (error) return fail(error.message);
   return { ok: true, score };
+}
+
+// ── the list pages (5b) ────────────────────────────────────────────────
+
+// legacy secureShuffle: Fisher–Yates driven by crypto.getRandomValues —
+// the question order of a shuffled quiz, fixed at spawn.
+function secureShuffle<T>(array: T[]): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const bytes = crypto.getRandomValues(new Uint8Array(4));
+    const rand = (bytes[0] * 16777216 + bytes[1] * 65536 + bytes[2] * 256 + bytes[3]) / 4294967296;
+    const j = Math.floor(rand * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// spawnFixedAttempt / spawnMockAttempt: Start and Resume on a quiz card.
+// One in-progress slot per quiz per mode per student — an existing one
+// is returned (the runner resumes it); otherwise a fresh row, the item
+// order shuffled when the quiz says so, the time limit one minute per
+// question when the quiz sets none.
+export async function spawnQuizAttempt(kind: QuizKind, quizId: string, mode: AttemptMode): Promise<SpawnResult> {
+  const { supabase, profile } = await requireStudent();
+  if (kind !== 'fixed' && kind !== 'mock') return fail('Unknown quiz kind.');
+  if (mode !== 'instant' && mode !== 'timed') return fail('Unknown mode.');
+
+  const quiz = await getQuizById(supabase, kind, quizId);
+  if (!quiz) return fail('Could not start quiz. Please try again.');
+  if (getQuizAvailability(quiz) !== 'ACTIVE') return fail('This quiz is not open right now.');
+  const modeAllowed = mode === 'instant' ? quiz.allowed_modes !== 'TIMED_ONLY' : quiz.allowed_modes !== 'INSTANT_ONLY';
+  if (!modeAllowed) return fail('This mode is not available for this quiz.');
+
+  const access = await getStudentCourseAccess(supabase, profile.user_id);
+  if (!access[quiz.course_id]) return fail('You do not have an active subscription for this course.');
+
+  // Step 1 — an existing in-progress attempt resumes.
+  const { data: existing, error: existingError } = await supabase
+    .from('attempts')
+    .select('attempt_id')
+    .eq('user_id', profile.user_id)
+    .eq('quiz_id', quiz.quiz_id)
+    .eq('mode', mode)
+    .eq('status', 'in_progress')
+    .order('ts_iso', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (existingError) return fail(existingError.message);
+  if (existing?.attempt_id) return { ok: true, attemptId: String(existing.attempt_id) };
+
+  // Steps 2–5 — the order, the id, the time limit, the row.
+  let orderedIds = [...(quiz.item_ids || [])];
+  if (quiz.shuffle) orderedIds = secureShuffle(orderedIds);
+  if (!orderedIds.length) return fail('This quiz has no questions yet.');
+
+  const attemptId = makeAttemptId();
+  const timeLimitSec = quiz.time_limit_sec || quiz.n * 60;
+
+  const { error } = await supabase.from('attempts').insert({
+    attempt_id: attemptId,
+    user_id: profile.user_id,
+    quiz_id: quiz.quiz_id,
+    course_id: quiz.course_id,
+    mode,
+    source: kind,
+    item_ids: orderedIds.join(','),
+    n: orderedIds.length,
+    status: 'in_progress',
+    ts_iso: new Date().toISOString(),
+    duration_min: Math.ceil(timeLimitSec / 60),
+    answers_json: JSON.stringify([]),
+    display_label: quiz.title,
+  });
+  if (error) return fail(error.message);
+  return { ok: true, attemptId };
+}
+
+// retakeAttempt: a fresh attempt on the same questions in the same order,
+// linked back through origin_attempt_id. The origin must be the
+// student's own and completed.
+export async function retakeAttempt(originAttemptId: string): Promise<SpawnResult> {
+  const { supabase, profile } = await requireStudent();
+
+  const origin = await getAttemptById(supabase, originAttemptId);
+  if (!origin) return fail('Could not create retake. Please try again.');
+  if (origin.user_id !== profile.user_id) return fail('This quiz attempt does not belong to your account.');
+  if (origin.status !== 'completed') return fail('Only a completed attempt can be retaken.');
+
+  const access = await getStudentCourseAccess(supabase, profile.user_id);
+  if (!access[origin.course_id]) return fail('You do not have an active subscription for this course.');
+
+  const attemptId = makeAttemptId();
+  const { error } = await supabase.from('attempts').insert({
+    attempt_id: attemptId,
+    user_id: profile.user_id,
+    quiz_id: origin.quiz_id,
+    course_id: origin.course_id,
+    mode: origin.mode,
+    source: 'retake',
+    item_ids: origin.item_ids,
+    n: origin.n,
+    status: 'in_progress',
+    ts_iso: new Date().toISOString(),
+    duration_min: origin.duration_min,
+    answers_json: JSON.stringify([]),
+    display_label: origin.display_label,
+    origin_attempt_id: origin.attempt_id,
+  });
+  if (error) return fail(error.message);
+  return { ok: true, attemptId };
+}
+
+// abandonAttempt: the list pages' inline update — status to abandoned on
+// the student's own in-progress attempt. The confirm box is the page's.
+export async function abandonAttempt(attemptId: string): Promise<ActionResult> {
+  const { supabase, profile } = await requireStudent();
+  const { data, error } = await supabase
+    .from('attempts')
+    .update({ status: 'abandoned' })
+    .eq('attempt_id', attemptId)
+    .eq('user_id', profile.user_id)
+    .eq('status', 'in_progress')
+    .select('attempt_id')
+    .maybeSingle();
+  if (error) return fail(error.message);
+  if (!data) return fail('This attempt is no longer in progress.');
+  return { ok: true };
 }

@@ -89,6 +89,12 @@
 .qm .quiz-id-display { font-family: monospace; font-size: 14px; font-weight: 600; color: var(--accent); background: var(--primary-light); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); display: inline-block; word-break: break-all; }
 .qm .schedule-helper { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; border-radius: 6px; padding: 10px 14px; font-size: 12px; margin-bottom: 14px; }
 
+/* ── Stats row (the details step's attempt-stats box, slice 5b) ── */
+.qm .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
+.qm .stat-box { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; text-align: center; }
+.qm .stat-box .stat-val { font-size: 24px; font-weight: 700; color: var(--primary); }
+.qm .stat-box .stat-lbl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
 /* ── Pane 3: question picker ── */
 .qm .picker-layout { display: grid; grid-template-columns: 1fr 320px; gap: 20px; align-items: start; }
 .qm .picker-left { min-width: 0; }

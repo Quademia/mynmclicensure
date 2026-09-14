@@ -94,3 +94,7 @@ export type SpawnResult = { ok: true; attemptId: string } | { ok: false; error: 
 export type FinishResult = { ok: true; score: Score } | { ok: false; error: string };
 
 export type TimedStartResult = { ok: true; startedIso: string } | { ok: false; error: string };
+
+// The admin details step's attempt-stats box (legacy: Total Attempts,
+// Completed, Avg Score) — read by lib/attempts/queries getQuizAttemptStats.
+export type QuizAttemptStats = { total: number; completed: number; avgScore: number };
