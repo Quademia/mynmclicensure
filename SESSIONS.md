@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-14 — 7d built: the course page (header, days left, quiz previews, builder shortcut; announcements wait for 11); walked; 7 split (7d, 7e)
+  - ↳ announcements section waits for 11 (Sam: build now) · Message button → 12’s page · expired days state unreachable (legacy) · unknown id shows No Access as legacy · merge ≠ wrap-up (Sam’s correction) · next is Sam’s call
+
 - 2026-09-14 — 13b built: My Packs (list, filters, summary counts, Open / Download, Build Similar); walked in the pane; slice 13 closed
   - ↳ same branch as 13a, not merged between · filters and counts over the loaded rows as legacy · Archived / Deleted options set by nothing · Load More and an inactive pack not walked · renderer 11 s on dev · next is Sam’s call
 

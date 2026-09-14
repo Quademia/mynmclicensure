@@ -45,7 +45,7 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ✅ (unplanned) §9 #17 — the instant save no longer flips a completed attempt back to in progress — 2026-09-14
 - ✅ 7b Student home — portal guide: the static help page, side list, FAQ accordion — 2026-09-14
 - ✅ 7c Student home — NMC Procedures: programme card, viewer, the manual list — 2026-09-14
-- ⬜ 7d Student home — course page: header, days left, quiz previews, builder shortcut, announcements after 11
+- ✅ 7d Student home — course page: header, days left, quiz previews, builder shortcut, announcements after 11 — 2026-09-14
 - ⬜ 7e Student home — dashboard, profile, upgrade; after 11, 12 fold in
 - ✅ 8 Subscriptions — trial at registration, course access, admin grant/update/revoke/sync, the real question gate — 2026-09-13
 - ⬜ 9 Payments — init-public, init-upgrade, verify, setup-complete, admin rescue, rate limit

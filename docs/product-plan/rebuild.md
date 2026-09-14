@@ -862,7 +862,7 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 7a Student home — learning history | ✅ 2026-09-14 |
 | 7b Student home — portal guide | ✅ 2026-09-14 |
 | 7c Student home — NMC Procedures | ✅ 2026-09-14 |
-| 7d Student home — course page | ⬜ |
+| 7d Student home — course page | ✅ 2026-09-14 |
 | 7e Student home — dashboard, profile, upgrade | ⬜ |
 | 8 Subscriptions | ✅ 2026-09-13 |
 | 9 Payments | ⬜ |
