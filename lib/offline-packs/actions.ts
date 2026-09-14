@@ -18,8 +18,15 @@ import { getItemsByIds } from '@/lib/bank/queries';
 import { itemsTableFor } from '@/lib/bank/tables';
 import { getConfig } from '@/lib/catalogue/queries';
 import { buildOfflineOwnerLabel, buildOfflinePackDefaultName, buildOfflinePackDisplayLabel, maskEmailForOffline, ownerNameOf, safeArray } from './labels';
-import { getOfflinePackAllowance, pickOfflinePackItemIds } from './queries';
-import { OFFLINE_MAX_QUESTIONS_DEFAULT, type CreatePackInput, type CreatePackResult, type PrepareResult } from './types';
+import { getOfflinePackAllowance, listOfflinePacks, pickOfflinePackItemIds } from './queries';
+import {
+  MY_PACKS_PAGE_SIZE,
+  OFFLINE_MAX_QUESTIONS_DEFAULT,
+  type CreatePackInput,
+  type CreatePackResult,
+  type OfflinePackPage,
+  type PrepareResult,
+} from './types';
 
 // legacy makeOfflinePackId: 'PACK_' + Date.now() + '_' + makeSecureId('').slice(0, 8)
 function makeOfflinePackId(): string {
@@ -141,4 +148,10 @@ export async function createOfflinePack(input: CreatePackInput): Promise<CreateP
   }
 
   return { ok: true, pack_id: packId, remaining: Math.max(0, (allowance.remaining || 0) - 1) };
+}
+
+// ── My Packs' Load More and Refresh (legacy loadNextPage, 13b) ─────────
+export async function loadOfflinePacksPage(offset: number): Promise<OfflinePackPage> {
+  const { supabase, profile } = await requireStudent();
+  return listOfflinePacks(supabase, profile.user_id, MY_PACKS_PAGE_SIZE, Math.max(0, Math.floor(Number(offset) || 0)));
 }

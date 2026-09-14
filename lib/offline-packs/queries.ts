@@ -14,7 +14,7 @@ import type { ServerSupabaseClient } from '@/lib/access';
 import { getItemsByIds } from '@/lib/bank/queries';
 import type { Item } from '@/lib/bank/types';
 import { getConfig } from '@/lib/catalogue/queries';
-import type { Allowance, OfflinePack, PickResult } from './types';
+import type { Allowance, OfflinePack, OfflinePackListRow, OfflinePackPage, PickResult } from './types';
 import { OFFLINE_PACKS_PER_COURSE_DEFAULT } from './types';
 
 // ── the item ids of the student's earlier active packs for the course ──
@@ -228,4 +228,44 @@ export async function getOfflinePackForRender(db: ServerSupabaseClient, userId: 
   const missing = savedIds.filter((id) => !found.has(String(id || '').trim()));
 
   return { ok: true, pack, items, missing_item_ids: missing };
+}
+
+// ── My Packs' read (legacy listOfflinePacks) ───────────────────────────
+// The student's packs, every status, newest first, one page of `limit`
+// from `offset`, with the exact total; the course titles joined by a
+// second read, the id standing in when a course is gone. The card's
+// columns only (7a's precedent) — legacy selected `*`.
+export async function listOfflinePacks(db: ServerSupabaseClient, userId: string, limit: number, offset: number): Promise<OfflinePackPage> {
+  const safeLimit = Math.max(1, Math.min(Number(limit || 100), 200));
+  const safeOffset = Math.max(0, Number(offset || 0));
+
+  const { data, error, count } = await db
+    .from('offline_packs')
+    .select('pack_id, course_id, pack_name, display_label, question_count, status, created_utc', { count: 'exact' })
+    .eq('user_id', userId)
+    .order('created_utc', { ascending: false })
+    .range(safeOffset, safeOffset + safeLimit - 1);
+  if (error) {
+    console.error('listOfflinePacks:', error);
+    return { ok: false, message: error.message };
+  }
+
+  type Row = Omit<OfflinePackListRow, 'course_title'>;
+  const rows = (data ?? []) as Row[];
+  const courseIds = [...new Set(rows.map((r) => String(r.course_id || '').trim()).filter(Boolean))];
+
+  const titles: Record<string, string> = {};
+  if (courseIds.length) {
+    const { data: courses } = await db.from('courses').select('course_id, title').in('course_id', courseIds);
+    for (const c of (courses ?? []) as { course_id: string; title: string }[]) {
+      titles[String(c.course_id || '').trim().toUpperCase()] = String(c.title || '').trim();
+    }
+  }
+
+  const items: OfflinePackListRow[] = rows.map((row) => {
+    const cid = String(row.course_id || '').trim().toUpperCase();
+    return { ...row, course_title: titles[cid] || cid };
+  });
+
+  return { ok: true, total: Number(count ?? items.length), items };
 }

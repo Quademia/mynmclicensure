@@ -119,3 +119,16 @@ export type CreatePackInput = {
 export type CreatePackResult =
   | { ok: true; pack_id: string; remaining: number }
   | { ok: false; reason: BlockedReason; message: string; allowance: Allowance | null };
+
+// ── My Packs (13b) ─────────────────────────────────────────────────────
+// legacy listOfflinePacks' rows: the card's columns plus the course
+// title joined from `courses` (the id when the course is gone).
+export type OfflinePackListRow = Pick<
+  OfflinePack,
+  'pack_id' | 'course_id' | 'pack_name' | 'display_label' | 'question_count' | 'status' | 'created_utc'
+> & { course_title: string };
+
+export type OfflinePackPage = { ok: true; total: number; items: OfflinePackListRow[] } | { ok: false; message: string };
+
+// legacy PAGE_SIZE on my-offline-packs.html
+export const MY_PACKS_PAGE_SIZE = 24;
