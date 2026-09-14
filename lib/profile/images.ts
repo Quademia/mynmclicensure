@@ -30,5 +30,12 @@ export async function uploadProfileImage(userId: string, file: File): Promise<st
   }
 
   const { data } = storage.getPublicUrl(fileName);
-  return data?.publicUrl || null;
+  if (!data?.publicUrl) return null;
+
+  // A version stamp on the saved address (Sam, 2026-09-14): the file is
+  // still one per student, overwritten in place, but the storage
+  // delivery network and the browser cache the address for an hour, so
+  // legacy's plain address kept showing the previous photo. A new stamp
+  // per upload is a new address; the old one simply goes unused.
+  return `${data.publicUrl}?v=${Date.now()}`;
 }
