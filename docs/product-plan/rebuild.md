@@ -738,9 +738,50 @@ send feedback on a question from inside a running quiz.
 `offline_max_questions` (100) and `offline_packs_per_course` (5) from
 config, the trial block, the non-repeat picker that recycles only when
 the pool is exhausted, the watermark (masked email + owner label); My
-Packs; the renderer / print view. *Done when* two packs on the same
-course share no item until the pool runs out, and a trial student is
-refused with the legacy reason.
+Packs; the renderer / print view. Built in two parts (Sam,
+2026-09-14): **13a** the `offline_packs` table with the legacy
+columns, the own-row policies (no DELETE — a pack is deactivated, never
+deleted), the `updated_utc` trigger and the §8 S4 foreign keys to
+`users` and `courses`; the shared logic in `lib/offline-packs/` —
+the allowance (an active, non-trial subscription covering the course;
+packs counted since the earliest such subscription started; legacy's
+four refusals: not subscribed, renew required, trial not allowed,
+limit reached), the non-repeat picker (unused items first, reused only
+when the filtered pool is exhausted), the masked email and the
+"Prepared for" owner label, the display label and the default pack
+name; the Build New Pack page at `/student/offline-packs/build` — the
+Quiz Builder's five-step wizard with Step 4 asking a count and a pack
+name (the suggested name, "Next" held until one is set) and Step 5's
+"Create pack" opening the confirmation box (the rules, the course /
+questions / allowance pills, "Fresh: N • Reused: N", the editable name,
+Cancel, Create & Download), the last three setups remembered in the
+browser under legacy's own key; and the renderer at
+`/offline-pack?pack_id=…`, outside the student chrome because
+legacy's page had no sidebar and prints the pack alone — the cover
+(owner name, masked email, owner label), the overview, the questions
+with their options and topic line and the watermark strip after every
+tenth, the answer key, Back / Print / "Download / Save PDF" / Reload;
+both print buttons open the browser's print dialog as legacy's did —
+no PDF is generated (a real file would be an "After the rebuild"
+item). Three things run on the server that legacy ran in the browser
+(the same principle as slice 6's score, invisible to a student): the
+allowance check, the pick against the student's earlier packs, and
+the check that every id is one of the course's items. Config
+fallbacks equal the seed (§9 #11): 100 and 5, not legacy's 50 and 3.
+"QA", "QAcademy Nurses Hub" and "QAcademy Student" render as "Q",
+"Quademia" and "Quademia Student" (UI convention #5); the stored
+`watermark.owner_label` uses the new fallback. **13b** My Packs at
+`/student/offline-packs` — the list twenty-four at a time with Load
+More, the search / course / status / sort filters over the loaded rows
+(as legacy), the four summary counts, Open / Download and Build
+Similar (into 13a's builder with `?course=`), the empty card; the
+Archived / Deleted status options are kept though no legacy code ever
+sets a pack to either. *Done when* (13a) Sam builds a pack on dev, the
+renderer opens on it with the cover, the questions, the watermark
+strip and the answer key, a second pack on the same course shares no
+item until the pool runs out, and a trial student is refused with the
+legacy reason; (13b) the packs from 13a appear with the right counts,
+a filter narrows them, and Open lands on the renderer.
 
 **14 — Admin home.** Dashboard with its four counts; Users page with
 the detail drawer and the profile fields; Attempts analytics page as
@@ -807,7 +848,8 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 10 Email | ⬜ |
 | 11 Announcements | ⬜ |
 | 12 Messaging | ⬜ |
-| 13 Offline packs | ⬜ |
+| 13a Offline packs — table, allowance, picker, watermark, the builder, the renderer | ⬜ |
+| 13b Offline packs — My Packs | ⬜ |
 | 14 Admin home | ⬜ |
 | 15 Phone pass | ⬜ |
 | 16 Cutover | ⬜ |
