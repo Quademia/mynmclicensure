@@ -1,0 +1,190 @@
+/* styles/student-offline-builder.css
+ *
+ * The student Offline Pack Builder (slice 13a). Transcribed from the
+ * legacy page's inline <style> block (student/offline-pack-builder.html),
+ * scoped under `.opb` for the page and `.opb-overlay` for the two
+ * portalled dialogs (the access dialog and the offline confirmation
+ * box). The wizard rules match the Quiz Builder's (the legacy pages
+ * shared them); Step 4's pack-name section and the confirmation box's
+ * rule box and pills are this page's own. The .top-nav block every page
+ * carried is in shell.css already. Legacy's own breakpoints (760px,
+ * 480px) are kept; they sit inside the repo's 768px rule.
+ */
+
+/* ── Progress block ── */
+.opb .prog-block { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 20px; }
+.opb .prog-bar { display: flex; align-items: center; margin-bottom: 14px; }
+.opb .prog-step { display: flex; align-items: center; flex: 1; }
+.opb .prog-step:last-child { flex: 0; }
+.opb .prog-circle { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; cursor: pointer; flex-shrink: 0; transition: all 0.18s; border: 1.5px solid var(--border); background: var(--bg); color: var(--text-muted); }
+.opb .prog-circle.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+.opb .prog-circle.done { background: var(--accent); border-color: var(--accent); color: #fff; font-size: 12px; }
+.opb .prog-line { flex: 1; height: 1.5px; background: var(--border); margin: 0 6px; transition: background 0.18s; }
+.opb .prog-line.done { background: var(--accent); }
+.opb .prog-labels { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin-bottom: 14px; }
+.opb .prog-lbl { font-size: 11px; color: var(--text-muted); text-align: center; cursor: pointer; padding-top: 6px; line-height: 1.3; }
+.opb .prog-lbl.active { color: var(--primary); font-weight: 600; }
+.opb .prog-lbl.done { color: var(--accent); }
+.opb .prog-step-label { font-size: 13px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 12px; margin-top: 0; }
+.opb .prog-step-label strong { color: var(--text); font-weight: 600; }
+
+/* ── Wizard panes ── */
+.opb .pane-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; }
+.opb .pane-title { font-size: 20px; font-weight: 700; color: var(--primary); margin: 0 0 4px; }
+.opb .pane-sub { font-size: 13px; color: var(--text-muted); margin: 0 0 20px; line-height: 1.5; }
+
+/* ── Nav bar (Back / Next / Create) ── */
+.opb .nav-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); gap: 10px; }
+.opb .btn-back { font-size: 14px; padding: 9px 20px; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--text); cursor: pointer; font-family: inherit; }
+.opb .btn-back:hover { background: var(--bg); }
+.opb .btn-next { font-size: 14px; font-weight: 600; padding: 9px 24px; border: 1.5px solid var(--primary); border-radius: 8px; background: var(--primary); color: #fff; cursor: pointer; font-family: inherit; }
+.opb .btn-next:hover { background: var(--primary-dark); }
+.opb .btn-next:disabled { opacity: 0.45; cursor: default; }
+.opb .btn-create, .opb-overlay .btn-create { font-size: 14px; font-weight: 600; padding: 9px 24px; border: 1.5px solid var(--accent); border-radius: 8px; background: var(--accent); color: #fff; cursor: pointer; font-family: inherit; }
+.opb .btn-create:hover, .opb-overlay .btn-create:hover { background: #235f56; }
+.opb .btn-create:disabled, .opb-overlay .btn-create:disabled { opacity: 0.45; cursor: default; }
+
+/* ── Recent setups ── */
+.opb .recent-collapse { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; }
+.opb .recent-toggle { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+.opb .recent-toggle-lbl { font-size: 13px; font-weight: 600; color: var(--text); }
+.opb .recent-count { font-size: 12px; font-weight: 400; color: var(--text-muted); }
+.opb .recent-toggle-caret { font-size: 12px; color: var(--text-muted); transition: transform 0.18s; display: inline-block; }
+.opb .recent-toggle-caret.open { transform: rotate(180deg); }
+.opb .recent-body { display: none; flex-direction: column; gap: 8px; margin-top: 12px; }
+.opb .recent-body.open { display: flex; }
+.opb .recent-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; gap: 12px; }
+.opb .recent-main { min-width: 0; }
+.opb .recent-title { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.opb .recent-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.opb .btn-lite { font-size: 12px; font-weight: 500; padding: 6px 14px; border: 1px solid var(--border); border-radius: 6px; background: var(--white); color: var(--text); cursor: pointer; white-space: nowrap; flex-shrink: 0; font-family: inherit; }
+.opb .btn-lite:hover { background: var(--bg); }
+
+/* ── Form fields ── */
+.opb .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.opb .field, .opb-overlay .field { display: flex; flex-direction: column; gap: 6px; }
+.opb .field label, .opb-overlay .field label { font-size: 13px; font-weight: 600; color: var(--text); }
+.opb .field select { width: 100%; }
+.opb .field .hint, .opb .hint, .opb-overlay .hint { font-size: 12px; color: var(--text-muted); }
+.opb .hint.block { display: block; margin-bottom: 8px; }
+.opb select, .opb input[type='text'], .opb input[type='number'], .opb-overlay input[type='text'] { padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit; color: var(--text); background: var(--white); box-sizing: border-box; }
+.opb select:focus, .opb input:focus, .opb-overlay input:focus { outline: none; border-color: var(--primary); }
+.opb .error-text { font-size: 12px; color: var(--danger); margin-top: 12px; }
+
+/* ── Segmented control ── */
+.opb .segmented { display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.opb .segmented label { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 12px; font-size: 13px; cursor: pointer; color: var(--text-muted); border-right: 1px solid var(--border); transition: all 0.15s; }
+.opb .segmented label:last-child { border-right: none; }
+.opb .segmented label.picked { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+.opb .segmented input { display: none; }
+
+/* ── Topics ── */
+.opb .topics-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.opb .topics-toolbar input[type='text'] { flex: 1; min-width: 140px; }
+.opb .topics-box { border: 1px solid var(--border); border-radius: 10px; background: var(--white); padding: 12px; max-height: 280px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+.opb .topics-empty { font-size: 13px; color: var(--text-muted); grid-column: 1 / -1; padding: 8px; }
+.opb .topic-chip { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; cursor: pointer; background: var(--bg); color: var(--text-muted); display: flex; align-items: center; gap: 8px; transition: all 0.13s; }
+.opb .topic-chip:hover { border-color: var(--accent); color: var(--text); }
+.opb .topic-chip.picked { border-color: var(--accent); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+.opb .topic-chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); flex-shrink: 0; transition: background 0.13s; }
+.opb .topic-chip.picked .dot { background: var(--accent); }
+.opb .topic-chip-count { font-size: 11px; font-weight: 600; color: var(--text-muted); background: var(--bg); border: 1px solid var(--border); padding: 1px 6px; border-radius: 999px; margin-left: auto; flex-shrink: 0; }
+.opb .topic-chip.picked .topic-chip-count { color: var(--accent); border-color: rgba(11, 122, 117, 0.2); background: rgba(11, 122, 117, 0.08); }
+.opb .use-all-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.opb .use-all-row label { font-size: 13px; color: var(--text); cursor: pointer; }
+.opb .chips-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; min-height: 0; }
+.opb .chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--primary-light); color: var(--primary); border: 1px solid rgba(30, 58, 95, 0.18); }
+.opb .chip-remove { cursor: pointer; font-size: 14px; line-height: 1; color: var(--primary); opacity: 0.7; background: none; border: none; padding: 0; }
+.opb .chip-remove:hover { opacity: 1; }
+
+/* ── Concept mode ── */
+.opb .concept-search-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-bottom: 10px; }
+.opb .concepts-box { border: 1px solid var(--border); border-radius: 10px; background: var(--white); padding: 8px; max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+.opb .concepts-empty { font-size: 13px; color: var(--text-muted); padding: 8px; }
+.opb .concept-item { padding: 8px 12px; border-radius: 7px; font-size: 13px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.opb .concept-item:hover { background: var(--bg); color: var(--text); }
+.opb .concept-item.picked { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+.opb .concept-item-count { font-size: 11px; font-weight: 600; color: var(--text-muted); background: var(--bg); border: 1px solid var(--border); padding: 1px 6px; border-radius: 999px; flex-shrink: 0; }
+.opb .concept-item.picked .concept-item-count { color: var(--accent); border-color: rgba(11, 122, 117, 0.2); background: rgba(11, 122, 117, 0.08); }
+
+/* ── Difficulty & Type ── */
+.opb .checks-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.opb .check-item { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; background: var(--bg); transition: all 0.13s; }
+.opb .check-item:hover { border-color: var(--accent); }
+.opb .check-item.picked { border-color: var(--accent); background: var(--primary-light); }
+.opb .check-item label { font-size: 13px; color: var(--text); cursor: pointer; margin: 0; }
+.opb .check-item input { accent-color: var(--accent); }
+.opb .check-item-count { font-size: 11px; font-weight: 600; color: var(--text-muted); background: var(--white); border: 1px solid var(--border); padding: 1px 6px; border-radius: 999px; margin-left: auto; flex-shrink: 0; }
+.opb .check-item.picked .check-item-count { color: var(--accent); border-color: rgba(11, 122, 117, 0.2); background: rgba(11, 122, 117, 0.08); }
+
+/* ── Pool bar ── */
+.opb .pool-bar { display: flex; align-items: center; justify-content: space-between; background: var(--primary-light); border: 1px solid rgba(45, 125, 114, 0.2); border-radius: 8px; padding: 10px 16px; margin-top: 20px; }
+.opb .pool-bar-lbl { font-size: 13px; color: var(--text-muted); }
+.opb .pool-bar-count { font-size: 15px; font-weight: 700; color: var(--primary); }
+
+/* ── Count & pack name (Step 4) ── */
+.opb .count-display-row { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+.opb .count-big { font-size: 36px; font-weight: 700; color: var(--primary); min-width: 56px; line-height: 1; }
+.opb .count-sub { font-size: 13px; color: var(--text-muted); }
+.opb .count-controls { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.opb .count-input-row { display: flex; align-items: center; gap: 8px; }
+.opb .count-input-row input[type='number'] { width: 120px; padding: 8px 10px; }
+.opb .count-input-row .hint { margin: 0; }
+.opb .count-hint { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; }
+.opb .pack-name-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+.opb .pack-name-section label { font-size: 13px; font-weight: 600; color: var(--text); display: block; margin-bottom: 6px; }
+.opb .pack-name-section input[type='text'] { width: 100%; }
+.opb .pack-name-suggestion { margin-top: 8px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.opb .pack-name-suggestion .btn-lite { font-size: 12px; white-space: normal; text-align: left; }
+.opb .pack-name-status { font-size: 12px; margin-top: 8px; }
+.opb .pack-name-status.ok { color: var(--accent); }
+.opb .pack-name-status.missing { color: var(--danger); }
+
+/* ── Review & Create (Step 5) ── */
+.opb .stats-row { display: flex; gap: 12px; margin-bottom: 20px; }
+.opb .stat-card { flex: 1; background: var(--bg); border-radius: 8px; padding: 14px; text-align: center; border: 1px solid var(--border); }
+.opb .stat-num { font-size: 24px; font-weight: 700; color: var(--primary); }
+.opb .stat-lbl { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.opb .summary-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.opb .summary-item { background: var(--bg); border-radius: 8px; padding: 12px 14px; border: 1px solid var(--border); }
+.opb .summary-head { display: flex; justify-content: space-between; align-items: center; }
+.opb .summary-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+.opb .summary-value { font-size: 13px; font-weight: 600; color: var(--text); word-break: break-word; }
+.opb .review-edit { border: none; background: transparent; color: var(--accent); font-size: 11px; font-weight: 600; cursor: pointer; padding: 0; font-family: inherit; }
+.opb .review-edit:hover { text-decoration: underline; }
+.opb .status-box { font-size: 13px; color: var(--text-muted); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; }
+
+/* ── Empty card ── */
+.opb .empty-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 40px; text-align: center; }
+.opb .empty-card h2 { margin-top: 0; color: var(--primary); }
+.opb .empty-card p { color: var(--text-muted); font-size: 14px; line-height: 1.6; }
+.opb .btn-primary { display: inline-block; padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; background: var(--primary); color: #fff; text-decoration: none; border: none; cursor: pointer; font-family: inherit; }
+
+/* ── The two dialogs (portalled) ── */
+.opb-overlay .modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 16px; }
+.opb-overlay .modal-backdrop.show { display: flex; }
+.opb-overlay .modal-card { background: #fff; border-radius: 18px; max-width: 520px; width: 100%; padding: 24px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22); max-height: calc(100vh - 32px); overflow-y: auto; }
+.opb-overlay .modal-card h3 { margin: 0 0 8px; font-size: 20px; color: var(--primary); }
+.opb-overlay .modal-card p { margin: 0 0 18px; color: var(--text-muted); font-size: 14px; line-height: 1.6; }
+.opb-overlay .modal-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.opb-overlay .rule-box { border: 1px solid rgba(11, 122, 117, 0.14); background: var(--primary-light); border-radius: 14px; padding: 14px; margin-bottom: 14px; font-size: 13px; line-height: 1.65; color: var(--text); }
+.opb-overlay .kv-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.opb-overlay .pill { display: inline-flex; align-items: center; gap: 8px; background: #f3f4f6; color: var(--text); border-radius: 999px; padding: 8px 12px; font-size: 12px; font-weight: 700; }
+.opb-overlay .field { margin-bottom: 8px; }
+.opb-overlay .inline-error { font-size: 12px; color: var(--danger); min-height: 18px; margin-bottom: 12px; }
+.opb-overlay .btn-ghost { font-size: 14px; padding: 9px 18px; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--text); cursor: pointer; font-family: inherit; }
+.opb-overlay .btn-ghost:hover { background: var(--bg); }
+.opb-overlay .btn-primary { display: inline-block; padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; background: var(--primary); color: #fff; text-decoration: none; border: none; cursor: pointer; font-family: inherit; }
+
+@media (max-width: 760px) {
+  .opb .field-grid, .opb .summary-grid, .opb .stats-row { grid-template-columns: 1fr; }
+  .opb .stats-row { flex-direction: column; }
+  .opb .checks-grid { grid-template-columns: 1fr 1fr; }
+  .opb .prog-lbl { font-size: 10px; }
+  .opb .count-big { font-size: 28px; }
+  .opb .count-display-row { flex-direction: column; align-items: stretch; }
+}
+@media (max-width: 480px) {
+  .opb .prog-circle { width: 28px; height: 28px; font-size: 12px; }
+  .opb .checks-grid { grid-template-columns: 1fr; }
+}
