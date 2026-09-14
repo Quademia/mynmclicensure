@@ -665,13 +665,22 @@ the six filters (course, mode, status, source, sort, search), the
 attempt cards twenty at a time with Load more, Review and Retake on
 each card (the retake through 5b's action); the paginated read with
 its filters runs on the server. It reads `attempts` only, so it needs
-nothing further. **7b** the rest — dashboard, course page, profile,
-procedures, portal guide, upgrade — later, because the dashboard's
-course cards, announcements strip and messages badge fold in slices 8,
-11 and 12. *Done when* (7a) Sam's attempts from slices 6 and 5b appear
-with the right stats, a filter narrows them, Load more pages, and
-Review and Retake open the runner; (7b) the student sidebar has no
-dead link.
+nothing further. **7b** the portal guide alone (Sam, 2026-09-14): the
+static help page — hero, the eleven sections, the "On this page" list
+that follows the scroll (a "Tap to open" panel on a phone), the FAQ
+accordion, the footer with Upgrade Access and Message Support — no
+data; "QAcademy" in its copy becomes Quademia (UI convention #5); its
+two footer links land on 7c's upgrade page and slice 12's messages
+page and 404 until those exist, as the sidebar's own links do. **7c**
+the rest — dashboard, course page, profile, procedures, upgrade —
+later, because the dashboard's course cards, announcements strip and
+messages badge fold in slices 8, 11 and 12. *Done when* (7a) Sam's
+attempts from slices 6 and 5b appear with the right stats, a filter
+narrows them, Load more pages, and Review and Retake open the runner;
+(7b) the guide reads as legacy's did, the side list follows the
+scroll and jumps on click, a FAQ opens and closes, and the phone
+layout stacks with the "On this page" panel; (7c) the student sidebar
+has no dead link.
 
 **8 — Subscriptions.** `subscriptions`; the trial grant at registration
 (moved here from the browser); course access (`getStudentCourseAccess`
@@ -780,7 +789,8 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 6a Runner — attempts table, Quiz Builder, the core with the instant mode and review | ✅ 2026-09-14 |
 | 6b Runner — the timed mode | ✅ 2026-09-14 |
 | 7a Student home — learning history | ✅ 2026-09-14 |
-| 7b Student home — dashboard, course, profile, procedures, guide, upgrade | ⬜ |
+| 7b Student home — portal guide | ⬜ |
+| 7c Student home — dashboard, course, profile, procedures, upgrade | ⬜ |
 | 8 Subscriptions | ✅ 2026-09-13 |
 | 9 Payments | ⬜ |
 | 10 Email | ⬜ |
