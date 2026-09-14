@@ -1,0 +1,44 @@
+/* styles/student-procedures.css
+ *
+ * The student NMC Procedures page (slice 7c). Transcribed from the
+ * legacy page's inline <style> block (student/procedures.html), scoped
+ * under `.spr`. The .top-nav block every page carried is in shell.css
+ * already. Legacy's global .btn / .btn-primary (css/style.css) are
+ * scoped in — the shell loads no global .btn — and legacy had no
+ * .btn-secondary rule, so the "Open" buttons render with the .btn base
+ * only, as they did. The card headers and manual rows already wrap;
+ * nothing more is needed at 768px.
+ */
+
+.spr .proc-intro { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
+.spr .proc-intro h2 { font-size: 20px; font-weight: 700; color: var(--primary); margin: 0 0 8px; }
+.spr .proc-intro p { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin: 0 0 6px; }
+.spr .proc-intro .programme-label { font-size: 14px; font-weight: 600; color: var(--text); }
+
+.spr .proc-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
+.spr .proc-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; }
+.spr .proc-card-title { font-size: 16px; font-weight: 700; color: var(--primary); }
+.spr .proc-text { font-size: 14px; color: var(--text-muted); margin: 0 0 14px; }
+.spr .proc-text.tight { line-height: 1.6; margin: 0 0 8px; }
+.spr .proc-text.last { line-height: 1.6; margin: 0; }
+.spr .proc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.spr .proc-viewer { width: 100%; height: 80vh; border: 1px solid var(--border); border-radius: var(--radius); background: #fff; }
+.spr .viewer-label { font-size: 14px; color: var(--text-muted); margin: 0 0 10px; }
+.spr .proc-fallback { margin-top: 10px; font-size: 13px; color: var(--text-muted); }
+.spr .proc-fallback a { color: var(--accent); text-decoration: underline; }
+
+.spr .list-desc { font-size: 13px; color: var(--text-muted); margin: 0 0 14px; }
+.spr .manual-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; flex-wrap: wrap; }
+.spr .manual-row-name { font-size: 14px; font-weight: 500; color: var(--text); }
+.spr .manual-row-actions { display: flex; gap: 6px; }
+.spr .manual-row-actions .btn { padding: 6px 12px; font-size: 12px; }
+
+.spr .btn-toggle { padding: 5px 12px; font-size: 12px; border-radius: 999px; background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); cursor: pointer; font-weight: 500; font-family: inherit; }
+.spr .btn-toggle:hover { background: var(--border); }
+
+/* legacy css/style.css .btn / .btn-primary, scoped */
+.spr .btn { display: inline-block; padding: 10px 20px; border-radius: var(--radius); font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; border: none; transition: background-color 0.2s; text-align: center; }
+.spr .btn-primary { background-color: var(--primary); color: var(--white); width: 100%; padding: 12px; }
+.spr .btn-primary:hover { background-color: var(--primary-dark); }
+.spr .proc-actions a, .spr .manual-row-actions a { text-decoration: none; }
