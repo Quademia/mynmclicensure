@@ -698,7 +698,27 @@ d Mon" / "Closes d Mon"), the Quiz Builder shortcut with `?course=`,
 the Course Announcements section showing legacy's empty state ("No
 announcements for this course yet.") until slice 11 lands and fills
 it — the same folding-in as the dashboard strip — and the Practical
-Skills block into 7c's page. **7e** the rest — dashboard, profile,
+Skills block into 7c's page. **7e** the profile page alone (Sam, 2026-09-14):
+`/student/profile` — the Personal Details panel (the photo or the
+initials, the name and "Student", First Name, Last Name, Email,
+Phone; the pencil opens edit mode with "Change photo"; Save requires a
+first name, uploads the photo if one was picked, writes the names, the
+joined `name`, the phone and `avatar_url`, "Personal details
+updated."; Cancel restores), the Academic Details panel (Programme
+read-only; School as the region-grouped picker from 2a's register
+page with "My school isn't listed" and its text box; Level L100–L400;
+Cohort; Save requires the typed name when "not listed" is chosen,
+"Academic details updated."), the Subscription panel (the active
+subscription's status badge, plan and expiry, or "None"), and the
+`?complete=1` arrival from the dashboard nudge (the panel with the
+missing phone or school opens in edit mode, the field highlighted,
+scrolled to). The photo goes to a bucket of this product's own,
+`licensure-gh-profile-images` (2 MB, public; legacy's was the shared
+`profile-images`), uploaded on the server as the question bank's
+images are, stored as one file per student and overwritten in place
+as legacy did. The two writes are Server Actions on the student's own
+row (2a's `users_update` policy is the floor). The page's own toast
+is the shared one (UI convention #1). **7f** the rest — dashboard,
 upgrade — later, because the dashboard's course cards, announcements
 strip and messages badge fold in slices 8, 11 and 12. *Done when* (7a)
 Sam's attempts from slices 6 and 5b appear with the right stats, a
@@ -711,8 +731,10 @@ manual from the list opens there too, the list hides and shows, and a
 NACNAP student sees the NAC/NAP card; (7d) a My Courses row opens its
 course with the right days left, the quiz previews match 5b's lists,
 "View all" and the builder shortcut land filtered to the course, and
-a course the student does not hold shows the No Access card; (7e) the
-student sidebar has no dead link.
+a course the student does not hold shows the No Access card; (7e) Sam edits and saves both panels, uploads a photo and sees it on
+the page and in the sidebar, "not listed" saves a typed school, and
+`?complete=1` opens the right panel; (7f) the student sidebar has no
+dead link.
 
 **8 — Subscriptions.** `subscriptions`; the trial grant at registration
 (moved here from the browser); course access (`getStudentCourseAccess`
@@ -892,7 +914,8 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 7b Student home — portal guide | ✅ 2026-09-14 |
 | 7c Student home — NMC Procedures | ✅ 2026-09-14 |
 | 7d Student home — course page | ✅ 2026-09-14 |
-| 7e Student home — dashboard, profile, upgrade | ⬜ |
+| 7e Student home — profile | ⬜ |
+| 7f Student home — dashboard, upgrade | ⬜ |
 | 8 Subscriptions | ✅ 2026-09-13 |
 | 9 Payments | ⬜ |
 | 10 Email | ⬜ |
