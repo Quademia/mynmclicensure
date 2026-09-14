@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-14 — 7e built: the profile page (two editable panels, photo upload to a product bucket, subscription panel, ?complete=1); walked; 7 split (7e, 7f)
+  - ↳ two quirks listed for after the rebuild first (Sam) · bucket licensure-gh-profile-images, upload on the server · toast title folded in · empty first name refused on the server · student1 dev row holds test data · next is Sam’s call
+
 - 2026-09-14 — 11 built: announcements (tables, server-side scoping, admin page, student page, dashboard block, course section); walked on both sign-ins
   - ↳ §9 #18 Scheduled status dropped, #19 course scope applied (Sam: §9 and fix) · RM half proven by script · edit adds a <br> per save (legacy) → after the rebuild · one save hung on dev · next is Sam’s call
 
