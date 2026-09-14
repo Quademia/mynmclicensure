@@ -680,17 +680,37 @@ Programme Procedures list with View / Open per manual and the list
 toggle; the thirteen manuals and their addresses stay in the page, as
 legacy held them (a table with an admin page is an "After the
 rebuild" item); "Inside QAcademy" becomes "Inside Quademia". **7d**
-the rest — dashboard, course page, profile, upgrade — later, because
-the dashboard's course cards, announcements strip and messages badge
-fold in slices 8, 11 and 12. *Done when* (7a) Sam's attempts from
-slices 6 and 5b appear with the right stats, a filter narrows them,
-Load more pages, and Review and Retake open the runner; (7b) the guide
-reads as legacy's did, the side list follows the scroll and jumps on
-click, a FAQ opens and closes, and the phone layout stacks with the
-"On this page" panel; (7c) the page names the student's programme and
-its manual, View opens the viewer on it, a manual from the list opens
-there too, the list hides and shows, and a NACNAP student sees the
-NAC/NAP card; (7d) the student sidebar has no dead link.
+the course page alone (Sam, 2026-09-14): `/student/course/[id]` — the
+gate (no access → the locked "No Access" card; an unknown course →
+"Course Not Found"), the header with the title, one badge per
+programme in `program_scope` and the "days left" box (amber at seven
+or fewer; legacy's red "expired" state can never show because the
+access map skips a subscription with no days left — carried), the
+"Message us about this course" button into slice 12's messages page
+with the course pre-filled (404 until 12, as the sidebar's own link),
+the Fixed Quizzes preview (the course's published active rows that
+are ACTIVE or UPCOMING, the first three, question count and time
+limit, the badge, "View all fixed quizzes →" into 5b's page with
+`?course=`), the Mock Exams preview (the same, every row, with "Opens
+d Mon" / "Closes d Mon"), the Quiz Builder shortcut with `?course=`,
+the Course Announcements section showing legacy's empty state ("No
+announcements for this course yet.") until slice 11 lands and fills
+it — the same folding-in as the dashboard strip — and the Practical
+Skills block into 7c's page. **7e** the rest — dashboard, profile,
+upgrade — later, because the dashboard's course cards, announcements
+strip and messages badge fold in slices 8, 11 and 12. *Done when* (7a)
+Sam's attempts from slices 6 and 5b appear with the right stats, a
+filter narrows them, Load more pages, and Review and Retake open the
+runner; (7b) the guide reads as legacy's did, the side list follows
+the scroll and jumps on click, a FAQ opens and closes, and the phone
+layout stacks with the "On this page" panel; (7c) the page names the
+student's programme and its manual, View opens the viewer on it, a
+manual from the list opens there too, the list hides and shows, and a
+NACNAP student sees the NAC/NAP card; (7d) a My Courses row opens its
+course with the right days left, the quiz previews match 5b's lists,
+"View all" and the builder shortcut land filtered to the course, and
+a course the student does not hold shows the No Access card; (7e) the
+student sidebar has no dead link.
 
 **8 — Subscriptions.** `subscriptions`; the trial grant at registration
 (moved here from the browser); course access (`getStudentCourseAccess`
@@ -842,7 +862,8 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 7a Student home — learning history | ✅ 2026-09-14 |
 | 7b Student home — portal guide | ✅ 2026-09-14 |
 | 7c Student home — NMC Procedures | ✅ 2026-09-14 |
-| 7d Student home — dashboard, course, profile, upgrade | ⬜ |
+| 7d Student home — course page | ⬜ |
+| 7e Student home — dashboard, profile, upgrade | ⬜ |
 | 8 Subscriptions | ✅ 2026-09-13 |
 | 9 Payments | ⬜ |
 | 10 Email | ⬜ |
