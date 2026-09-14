@@ -47,6 +47,7 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ✅ 7c Student home — NMC Procedures: programme card, viewer, the manual list — 2026-09-14
 - ✅ 7d Student home — course page: header, days left, quiz previews, builder shortcut, announcements after 11 — 2026-09-14
 - ✅ 7e Student home — profile: two editable panels, photo upload to a product bucket, subscription panel, ?complete=1 — 2026-09-14
+- ✅ (unplanned) Server Action body cap raised to 3 MB — a 2 MB photo or rationale image no longer refused; rule in AGENTS.md — 2026-09-14
 - ⬜ 7f Student home — dashboard, upgrade; after 12 folds in
 - ✅ 8 Subscriptions — trial at registration, course access, admin grant/update/revoke/sync, the real question gate — 2026-09-13
 - ⬜ 9 Payments — init-public, init-upgrade, verify, setup-complete, admin rescue, rate limit

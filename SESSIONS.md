@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-14 — fix: profile photo over 1 MB refused by Next’s Server Action body cap; raised to 3 MB, refusal caught into a toast, rule in AGENTS.md
+  - ↳ Sam’s own upload failed after the 7e merge · same cap covered the question bank image upload · proven with a 1.61 MB PNG · cached photo after a change seen (after the rebuild) · dev server restarted
+
 - 2026-09-14 — 7e built: the profile page (two editable panels, photo upload to a product bucket, subscription panel, ?complete=1); walked; 7 split (7e, 7f)
   - ↳ two quirks listed for after the rebuild first (Sam) · bucket licensure-gh-profile-images, upload on the server · toast title folded in · empty first name refused on the server · student1 dev row holds test data · next is Sam’s call
 
