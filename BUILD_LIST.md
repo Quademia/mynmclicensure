@@ -51,7 +51,7 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ⬜ 10 Email — four templates, Quademia sender, `appOrigin()`
 - ⬜ 11 Announcements — eight scope dimensions, notice state, dashboard strip
 - ⬜ 12 Messaging — three contexts, admin inbox, bulk send, badges, the runner's Send feedback button (left out of 6)
-- ⬜ 13a Offline packs — table, allowance, non-repeat picker, watermark, the builder, the renderer
+- ✅ 13a Offline packs — table, allowance, non-repeat picker, watermark, the builder, the renderer — 2026-09-14
 - ⬜ 13b Offline packs — My Packs: list, filters, summary counts, Open / Build Similar
 - ⬜ 14 Admin home — dashboard counts, users drawer, attempts analytics
 - ⬜ 15 Phone pass — student at 375px, admin navigable at 768px
@@ -93,3 +93,4 @@ cutover is done.
 - ⬜ Learning history: Source and Sort work over the loaded pages only; Course / Mode / Status / Search are database-side (slice 7a, 2026-09-14)
 - ⬜ Learning history: no Mock option in the Source filter; a mock attempt’s chip shows the raw word "mock" (slice 7a, 2026-09-14)
 - ⬜ Procedures: the thirteen NMC manual links are fixed in the page; move them to a table with an admin management page (slice 7c, 2026-09-14)
+- ⬜ Offline packs: the renderer’s cover prints "Prepared for: …" twice, the owner line and the stored label beneath it — legacy did (slice 13a, 2026-09-14)

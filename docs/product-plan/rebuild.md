@@ -848,7 +848,7 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 10 Email | ⬜ |
 | 11 Announcements | ⬜ |
 | 12 Messaging | ⬜ |
-| 13a Offline packs — table, allowance, picker, watermark, the builder, the renderer | ⬜ |
+| 13a Offline packs — table, allowance, picker, watermark, the builder, the renderer | ✅ 2026-09-14 |
 | 13b Offline packs — My Packs | ⬜ |
 | 14 Admin home | ⬜ |
 | 15 Phone pass | ⬜ |

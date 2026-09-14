@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-14 — 13a built: offline packs (table, allowance, non-repeat picker, builder wizard, renderer); walked in the pane; 13 split (13a, 13b My Packs)
+  - ↳ "PDF" = the browser print dialog, no file · allowance / pick / id check on the server · two packs shared 0 items · trial refusal not walked · QA strings → Quademia · cover repeats Prepared for (legacy) · next is Sam’s call
+
 - 2026-09-14 — 7c built: NMC Procedures (programme card, the NMC site in a viewer, the manual list); walked in the pane; 7 split again (7c, 7d rest)
   - ↳ manuals hard-coded as legacy → table + admin page after the rebuild (Sam) · NMC site does load in the iframe · Inside QAcademy → Quademia · no src until a manual is chosen · NACNAP card not walked · next is Sam’s call
 
