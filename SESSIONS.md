@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-14 — 7a built: learning history (stats bar, six filters, cards twenty at a time, Resume / Review / Retake); walked in the pane; ticked
+  - ↳ three legacy quirks carried (stats and Source / Sort over loaded pages only, no Mock source) → after the rebuild · late autosave flips completed back to in_progress (6a, as legacy) · next is Sam’s call
+
 - 2026-09-14 — 5b built: student Fixed Quizzes and Mock Exams pages, start / retake / abandon, admin attempt stats; Sam’s test passed; 5 and 6 closed
   - ↳ start refuses closed / wrong-mode / no-access on the server · Abandon keeps browser confirm · runner exits land on Fixed Quizzes as legacy · dev quizzes carried legacy item ids, re-pointed by hand · 7 next
 

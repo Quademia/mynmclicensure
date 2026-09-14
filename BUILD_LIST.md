@@ -41,7 +41,7 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ✅ 5b Fixed quizzes and mock exams — student list pages, start / retake / abandon, admin attempt stats — 2026-09-14
 - ✅ 6a Runner — attempts table, Quiz Builder, instant mode, resume, review — 2026-09-14
 - ✅ 6b Runner — the timed mode: server-stamped start, countdown, auto-submit — 2026-09-14
-- ⬜ 7a Student home — learning history: stats bar, filters, Load more, Review / Retake
+- ✅ 7a Student home — learning history: stats bar, filters, Load more, Resume / Review / Retake — 2026-09-14
 - ⬜ 7b Student home — dashboard, course, profile, procedures, guide, upgrade; after 8, 11, 12 fold in
 - ✅ 8 Subscriptions — trial at registration, course access, admin grant/update/revoke/sync, the real question gate — 2026-09-13
 - ⬜ 9 Payments — init-public, init-upgrade, verify, setup-complete, admin rescue, rate limit
@@ -85,3 +85,6 @@ line each, with the slice that surfaced it; Sam orders them once
 cutover is done.
 
 - ⬜ A link to Premium Prep from the landing page — legacy never linked it; the page was shared by address only (slice 3, 2026-09-12)
+- ⬜ Learning history: the stats bar counts the loaded pages, not the whole history — legacy called true totals deferred (slice 7a, 2026-09-14)
+- ⬜ Learning history: Source and Sort work over the loaded pages only; Course / Mode / Status / Search are database-side (slice 7a, 2026-09-14)
+- ⬜ Learning history: no Mock option in the Source filter; a mock attempt’s chip shows the raw word "mock" (slice 7a, 2026-09-14)
