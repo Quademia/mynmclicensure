@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-09-12. Rules for **any** assistant working in this
+Last updated: 2026-09-14. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What is built and
@@ -187,6 +187,11 @@ above sit at the repo root; the audience grouping inside them is kept.
 - **Deep-clone any rich-text doc before a Server Action boundary**
   (`JSON.parse(JSON.stringify(doc))`) — attrs with a null prototype are
   dropped by the serialiser.
+- **A file sent through a Server Action is capped at 1 MB by Next** unless
+  `experimental.serverActions.bodySizeLimit` in `next.config.ts` says
+  otherwise; the refusal is a thrown 413, not a reply, so the page must
+  catch it. Set to 3 MB (the product's 2 MB uploads plus the other
+  fields); raise it if a bigger upload ever arrives.
 - **`npm install` can drop `lightningcss`'s native binary** on Windows;
   `next dev` then 500s every page. Copy
   `node_modules/lightningcss-win32-x64-msvc/*.node` into

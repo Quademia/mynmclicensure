@@ -32,6 +32,17 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: findProjectRoot(__dirname),
   },
+  // A file uploaded through a Server Action travels in its body, which
+  // Next caps at 1 MB by default. The product's uploads (a profile photo,
+  // a rationale image) allow 2 MB, as legacy did when the browser sent
+  // them straight to storage; the cap sits above that to leave room for
+  // the other fields and the multipart framing (AGENTS.md, Known
+  // Workarounds).
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "3mb",
+    },
+  },
 };
 
 export default nextConfig;

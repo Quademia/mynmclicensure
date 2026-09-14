@@ -160,7 +160,17 @@ export function ProfileClient({
         photo = new FormData();
         photo.append('photo', pendingPhoto);
       }
-      const result = await savePersonalDetails({ forename, surname, phone_number: phone }, photo);
+      // A refusal below the action (the body cap, a dropped connection)
+      // arrives as a thrown error, not a reply; legacy's "Upload failed"
+      // covers it.
+      let result: Awaited<ReturnType<typeof savePersonalDetails>>;
+      try {
+        result = await savePersonalDetails({ forename, surname, phone_number: phone }, photo);
+      } catch (e) {
+        console.error('savePersonalDetails:', e);
+        setMsg({ text: 'Upload failed: Image must be JPG, PNG, or WebP under 2 MB.', tone: 'error' });
+        return;
+      }
       if (!result.ok) {
         setMsg({ text: result.error, tone: 'error' });
         return;
