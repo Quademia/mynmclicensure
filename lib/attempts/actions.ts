@@ -31,7 +31,7 @@ import { getQuizAvailability } from '@/lib/quizzes/availability';
 import { getQuizById } from '@/lib/quizzes/queries';
 import type { QuizKind } from '@/lib/quizzes/types';
 import { makeAttemptId } from './ids';
-import { getAttemptById, getBuilderCourseItems } from './queries';
+import { getAttemptById, getBuilderCourseItems, getStudentAttemptsPaginated } from './queries';
 import { computeScore, recomputeAnswers } from './scoring';
 import {
   BUILDER_MAX_QUESTIONS_DEFAULT,
@@ -42,6 +42,8 @@ import {
   type BuilderItem,
   type BuilderMeta,
   type FinishResult,
+  type HistoryFilters,
+  type HistoryPage,
   type SpawnResult,
   type TimedStartResult,
   type Attempt,
@@ -352,4 +354,18 @@ export async function abandonAttempt(attemptId: string): Promise<ActionResult> {
   if (error) return fail(error.message);
   if (!data) return fail('This attempt is no longer in progress.');
   return { ok: true };
+}
+
+// ── the learning history page (7a) ─────────────────────────────────────
+// Every filter change and every Load more is one page from here; the
+// first page is read by the page itself.
+export async function loadHistoryPage(filters: HistoryFilters, page: number): Promise<HistoryPage> {
+  const { supabase, profile } = await requireStudent();
+  const safe: HistoryFilters = {
+    courseId: String(filters?.courseId || ''),
+    status: String(filters?.status || ''),
+    mode: String(filters?.mode || ''),
+    search: String(filters?.search || '').trim(),
+  };
+  return getStudentAttemptsPaginated(supabase, profile.user_id, safe, Math.max(0, Math.floor(Number(page) || 0)));
 }

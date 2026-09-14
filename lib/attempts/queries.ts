@@ -11,7 +11,7 @@
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import { itemsTableFor } from '@/lib/bank/tables';
-import type { Attempt, BuilderItem, QuizAttemptStats } from './types';
+import { HISTORY_PAGE_SIZE, type Attempt, type AttemptListRow, type BuilderItem, type HistoryFilters, type HistoryPage, type QuizAttemptStats } from './types';
 
 // The admin details step's attempt-stats box (legacy openEditQuiz's
 // inline read on both admin quiz pages): every attempt on the quiz, the
@@ -69,4 +69,40 @@ export async function getBuilderCourseItems(db: ServerSupabaseClient, courseId: 
     return [];
   }
   return (data ?? []) as BuilderItem[];
+}
+
+// getStudentAttemptsPaginated: the learning history page's read (7a) —
+// the card columns only, newest first, one page of `pageSize`, with the
+// exact total for the "Showing N of M" line and the Load more button.
+// Course, status, mode and the label search are the database's; the
+// source filter and the sort order stay in the browser, as legacy.
+export async function getStudentAttemptsPaginated(
+  db: ServerSupabaseClient,
+  userId: string,
+  filters: HistoryFilters,
+  page = 0,
+  pageSize = HISTORY_PAGE_SIZE,
+): Promise<HistoryPage> {
+  let query = db
+    .from('attempts')
+    .select(
+      'attempt_id, user_id, quiz_id, course_id, mode, source, status, n, score_raw, score_total, score_pct, time_taken_s, display_label, ts_iso',
+      { count: 'exact' },
+    )
+    .eq('user_id', userId)
+    .order('ts_iso', { ascending: false });
+
+  if (filters.courseId) query = query.eq('course_id', filters.courseId);
+  if (filters.status) query = query.eq('status', filters.status);
+  if (filters.mode) query = query.eq('mode', filters.mode);
+  if (filters.search) query = query.ilike('display_label', `%${filters.search}%`);
+
+  query = query.range(page * pageSize, (page + 1) * pageSize - 1);
+
+  const { data, count, error } = await query;
+  if (error) {
+    console.error('getStudentAttemptsPaginated:', error);
+    return { attempts: [], total: 0 };
+  }
+  return { attempts: (data ?? []) as AttemptListRow[], total: count ?? 0 };
 }

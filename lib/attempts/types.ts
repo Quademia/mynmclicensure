@@ -98,3 +98,31 @@ export type TimedStartResult = { ok: true; startedIso: string } | { ok: false; e
 // The admin details step's attempt-stats box (legacy: Total Attempts,
 // Completed, Avg Score) — read by lib/attempts/queries getQuizAttemptStats.
 export type QuizAttemptStats = { total: number; completed: number; avgScore: number };
+
+// ── the learning history page (7a) ─────────────────────────────────────
+// legacy getStudentAttemptsPaginated selected the card-visible columns
+// only — no item_ids, no answers_json.
+export type AttemptListRow = Pick<
+  Attempt,
+  | 'attempt_id'
+  | 'user_id'
+  | 'quiz_id'
+  | 'course_id'
+  | 'mode'
+  | 'source'
+  | 'status'
+  | 'n'
+  | 'score_raw'
+  | 'score_total'
+  | 'score_pct'
+  | 'time_taken_s'
+  | 'display_label'
+  | 'ts_iso'
+>;
+
+/** The four database-side filters (course, status, mode, a label search). */
+export type HistoryFilters = { courseId: string; status: string; mode: string; search: string };
+
+export type HistoryPage = { attempts: AttemptListRow[]; total: number };
+
+export const HISTORY_PAGE_SIZE = 20;
