@@ -896,8 +896,8 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 8 Subscriptions | ✅ 2026-09-13 |
 | 9 Payments | ⬜ |
 | 10 Email | ⬜ |
-| 11a Announcements — tables, scoping, admin page | ⬜ |
-| 11b Announcements — student page, dashboard strip, course section | ⬜ |
+| 11a Announcements — tables, scoping, admin page | ✅ 2026-09-14 |
+| 11b Announcements — student page, dashboard strip, course section | ✅ 2026-09-14 |
 | 12 Messaging | ⬜ |
 | 13a Offline packs — table, allowance, picker, watermark, the builder, the renderer | ✅ 2026-09-14 |
 | 13b Offline packs — My Packs | ✅ 2026-09-14 |
