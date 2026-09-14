@@ -445,6 +445,8 @@ feature; a user cannot tell.
 | 13 | `docs/product-plan/02` `CANCELLED` status | Doc corrected when slice 8 lands |
 | 14 | `legacy/archive/` (diverged old copies of the JS) and the empty `workers/`, `payments-worker/` at root | Deleted in slice 0 |
 | 16 | The admin Preview button on Fixed Quizzes and Mock Exams — opens the runner with a `quiz_id`; the runner demands an `attempt_id` and shows "Missing Quiz"; nothing turns a quiz into a preview attempt | **Not built** (Sam, 2026-09-13). The runner's own admin preview path (`?preview=1` on an attempt) is transcribed as it is |
+| 18 | The admin announcement form offers a status **Scheduled** and saves `status = 'scheduled'`; the student read (`getAnnouncements`) fetches `status = 'active'` only, so anything saved as Scheduled never reaches a student, even after its start date. The table's own "scheduled" pill is computed from Active + a future start | **Fixed in slice 11** (Sam, 2026-09-14): the option leaves the dropdown; scheduling is Active plus a start date, as the table already labels it. No prod row carries the status |
+| 19 | Course targeting does nothing: the admin form saves `scope_courses`, but `filterAnnouncementsForStudent` never reads it (a course-scoped announcement reaches everyone) and the course page filters on `a.course_id`, a column that does not exist (its section is always empty). Doc 05 says a course-scoped announcement reaches students holding that course | **Fixed in slice 11** (Sam, 2026-09-14): a course scope matches a student whose course access covers any listed course; the course page shows the ones whose scope lists it. No prod row carries a course scope |
 
 ## 10. Authentication and access, as rebuilt
 
@@ -738,8 +740,35 @@ a real inbox from dev with working links.
 page with the eight scope dimensions; student page; the dashboard strip
 (up to 2 unread, pinned first, "view all" count); read / clicked /
 dismissed. AND-logic scoping moves from the browser to the server query.
-*Done when* an announcement scoped to RN + a product reaches an RN
-student with that product and not an RM one.
+Built in two parts (Sam, 2026-09-14): **11a** the two tables with the
+legacy columns (`user_notice_state.user_id` gets the §8 S4 key to
+`users`; the legacy policies, including the admin DELETE no page
+uses), the scoping in `lib/announcements/` (legacy's seven checks plus
+the course scope — §9 #19 — with the student's subscription kind and
+product from the most recently expiring active subscription, as
+legacy read them), and the admin page — the five counts, the search /
+status / audience filters, the table (title with programme chips,
+the computed status pill, audience, schedule, the read / clicked /
+dismissed counts, flags, Edit), the side panel (title, the body box
+with its Bold / Italic / Link / Button helpers and the dead Quiz Link
+one, the live preview, status without Scheduled — §9 #18 — priority,
+start and end, the pin and dismissible switches, the eight targeting
+controls with the cohort list from `users` and the student search,
+the live audience sentence), the duplicate-title check, the
+newline-to-paragraph and allow-list sanitising at save, Archive with
+its confirm dialog. **11b** the student page (the four tabs, the
+cards with the pinned and read badges, Mark as Read, Dismiss, the
+clicked state on a body button, the subtitle count), the dashboard
+strip mounted on the placeholder dashboard until 7e (two unread,
+pinned expanded, dismiss, "View all announcements →" with the count,
+the two empty states), and the course page's section (7d) filled
+with the course-scoped ones. Announcements are not copied at cutover
+(D5); dev starts empty. *Done when* (11a) an admin creates an
+announcement scoped to RN plus a product, edits it, sees its counts
+and archives it; (11b) that announcement reaches an RN student with
+the product on the page, the strip and the course page when
+course-scoped, and not an RM one, Mark as Read and Dismiss move it
+between the tabs, and the counts on the admin table follow.
 
 **12 — Messaging.** `messages_threads`, `messages`; student threads
 with the three contexts, the question context capturing stem + options +
@@ -867,7 +896,8 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 8 Subscriptions | ✅ 2026-09-13 |
 | 9 Payments | ⬜ |
 | 10 Email | ⬜ |
-| 11 Announcements | ⬜ |
+| 11a Announcements — tables, scoping, admin page | ⬜ |
+| 11b Announcements — student page, dashboard strip, course section | ⬜ |
 | 12 Messaging | ⬜ |
 | 13a Offline packs — table, allowance, picker, watermark, the builder, the renderer | ✅ 2026-09-14 |
 | 13b Offline packs — My Packs | ✅ 2026-09-14 |

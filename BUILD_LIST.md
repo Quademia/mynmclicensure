@@ -50,7 +50,8 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ✅ 8 Subscriptions — trial at registration, course access, admin grant/update/revoke/sync, the real question gate — 2026-09-13
 - ⬜ 9 Payments — init-public, init-upgrade, verify, setup-complete, admin rescue, rate limit
 - ⬜ 10 Email — four templates, Quademia sender, `appOrigin()`
-- ⬜ 11 Announcements — eight scope dimensions, notice state, dashboard strip
+- ⬜ 11a Announcements — two tables, server-side scoping (course scope fixed, §9 #19), admin page (no Scheduled status, §9 #18)
+- ⬜ 11b Announcements — student page, dashboard strip on the placeholder, the course page section
 - ⬜ 12 Messaging — three contexts, admin inbox, bulk send, badges, the runner's Send feedback button (left out of 6)
 - ✅ 13a Offline packs — table, allowance, non-repeat picker, watermark, the builder, the renderer — 2026-09-14
 - ✅ 13b Offline packs — My Packs: list, filters, summary counts, Open / Build Similar — 2026-09-14
