@@ -1,0 +1,88 @@
+/* styles/student-course.css
+ *
+ * The student course page (slice 7d). Transcribed from the legacy
+ * page's inline <style> block (student/course.html), scoped under
+ * `.scp`. The .top-nav block every page carried is in shell.css
+ * already. Legacy's global .btn / .btn-primary (css/style.css) are
+ * scoped in — the shell loads no global .btn — with the inline
+ * overrides legacy put on the procedures link (.skills-btn). The
+ * .shell-placeholder rules legacy kept were used by nothing and are
+ * not carried. Legacy had no breakpoint on this page; the header and
+ * the skills row wrap at the repo's 768px (UI convention #3).
+ */
+
+/* ── Course header ── */
+.scp .course-header { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.scp .course-header-left h1 { font-size: 22px; font-weight: 700; color: var(--primary); margin: 0 0 8px; }
+.scp .course-programme-badge { display: inline-block; background: var(--primary-light); color: var(--accent); font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 6px; }
+.scp .course-access-badge { background: var(--primary-light); border: 1px solid var(--accent); border-radius: var(--radius); padding: 12px 16px; text-align: center; min-width: 110px; flex-shrink: 0; }
+.scp .course-access-badge .days { font-size: 28px; font-weight: 700; color: var(--primary); line-height: 1; }
+.scp .course-access-badge .days-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.scp .course-access-badge.warning .days { color: var(--warning); }
+.scp .course-access-badge.expired .days { color: var(--danger); }
+
+/* ── Section cards ── */
+.scp .section-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
+.scp .section-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.scp .section-card-title { font-size: 16px; font-weight: 700; color: var(--primary); }
+.scp .section-card-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #f3f4f6; color: var(--text-muted); }
+.scp .section-card-badge:empty { display: none; }
+
+/* ── Quiz builder shortcut (legacy's inline style lifted the disabled look) ── */
+.scp .builder-shortcut { display: flex; align-items: center; gap: 16px; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius); opacity: 1; cursor: pointer; text-decoration: none; color: inherit; }
+.scp .builder-shortcut-icon { font-size: 28px; }
+.scp .builder-shortcut-text .title { font-weight: 600; font-size: 14px; color: var(--primary); }
+.scp .builder-shortcut-text .sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+/* ── Announcements (slice 11 fills these) ── */
+.scp .announcement-item { border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+.scp .announcement-item:last-child { margin-bottom: 0; }
+.scp .announcement-title { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+.scp .announcement-body { font-size: 13px; color: var(--text); line-height: 1.6; }
+.scp .announcement-body a[data-qa='btn'] { display: inline-block; background: var(--accent); color: #fff; padding: 8px 16px; border-radius: 999px; text-decoration: none; font-size: 13px; font-weight: 600; margin-top: 8px; }
+.scp .empty-state { text-align: center; padding: 32px; color: var(--text-muted); font-size: 14px; }
+
+/* ── Message button ── */
+.scp .message-row { margin-bottom: 20px; }
+.scp .btn-message-course { display: inline-block; padding: 8px 18px; border-radius: 8px; background: var(--primary-light, #edf6f5); color: var(--primary); border: 1px solid var(--border); cursor: pointer; font-size: 13px; font-weight: 600; font-family: inherit; text-decoration: none; transition: background 0.15s; }
+.scp .btn-message-course:hover { background: #daf0ed; }
+
+/* ── Preview quiz cards ── */
+.scp .preview-card { display: flex; align-items: center; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; gap: 10px; text-decoration: none; color: inherit; cursor: pointer; transition: border-color 0.12s, background 0.12s, transform 0.12s; }
+.scp .preview-card:hover { border-color: var(--accent); background: rgba(30, 58, 95, 0.03); transform: translateX(2px); }
+.scp .preview-card > div:first-child { flex: 1 1 auto; min-width: 0; }
+.scp .preview-card::after { content: '\203A'; flex-shrink: 0; font-size: 20px; line-height: 1; color: var(--text-muted); }
+.scp .preview-card:last-child { margin-bottom: 0; }
+.scp .preview-card-title { font-size: 14px; font-weight: 600; color: var(--primary); }
+.scp .preview-card-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.scp .preview-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; flex-shrink: 0; white-space: nowrap; }
+.scp .preview-badge.ACTIVE { background: #dcfce7; color: #15803d; }
+.scp .preview-badge.UPCOMING { background: #fef9c3; color: #854d0e; }
+.scp .preview-badge.CLOSED { background: #f1f5f9; color: #64748b; }
+.scp .preview-empty { text-align: center; padding: 20px; color: var(--text-muted); font-size: 13px; }
+.scp .view-all-link { display: inline-block; margin-top: 10px; font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; }
+.scp .view-all-link:hover { text-decoration: underline; }
+
+/* ── Practical Skills block (legacy's inline styles) ── */
+.scp .skills-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.scp .skills-text { max-width: 70%; }
+.scp .skills-title { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 2px; }
+.scp .skills-sub { font-size: 13px; color: var(--text-muted); line-height: 1.4; }
+
+/* ── No access state ── */
+.scp .no-access-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 48px 32px; text-align: center; margin-top: 40px; }
+.scp .no-access-card .icon { font-size: 40px; margin-bottom: 16px; }
+.scp .no-access-card h2 { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+.scp .no-access-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
+
+/* ── legacy global .btn / .btn-primary, scoped ── */
+.scp .btn { display: inline-block; padding: 10px 20px; border-radius: var(--radius); font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; border: none; transition: background-color 0.2s; text-align: center; text-decoration: none; }
+.scp .btn-primary { background-color: var(--primary); color: var(--white); width: 100%; padding: 12px; }
+.scp .btn-primary:hover { background-color: var(--primary-dark); }
+.scp .skills-btn { display: inline-block; width: auto; padding: 8px 14px; font-size: 13px; white-space: nowrap; }
+
+@media (max-width: 768px) {
+  .scp .course-header { flex-direction: column; }
+  .scp .course-access-badge { align-self: flex-start; }
+  .scp .skills-text { max-width: 100%; }
+}

@@ -57,6 +57,16 @@ export async function getCourses(db: Db): Promise<Course[]> {
   return (data ?? []) as Course[];
 }
 
+/** One course by id, any status — legacy getCourseById (the course page, 7d). */
+export async function getCourseById(db: Db, courseId: string): Promise<Course | null> {
+  const { data, error } = await db.from('courses').select('*').eq('course_id', courseId).maybeSingle();
+  if (error) {
+    console.error('getCourseById:', error);
+    return null;
+  }
+  return (data as Course | null) ?? null;
+}
+
 /** Every course, every status — the admin Courses page. */
 export async function getAllCourses(db: Db): Promise<Course[]> {
   const { data, error } = await db.from('courses').select('*').order('title');
