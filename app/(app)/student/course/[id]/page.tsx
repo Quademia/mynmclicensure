@@ -12,10 +12,10 @@
 // shared availability), the Quiz Builder shortcut, the Course
 // Announcements section and the Practical Skills block.
 //
-// Course Announcements: legacy filtered getAnnouncements() by audience,
-// programme, product and course; the `announcements` table is slice
-// 11's, so until it lands this section shows legacy's empty state and
-// slice 11 fills it (rebuild.md §12 slice 7, Sam 2026-09-14).
+// Course Announcements (slice 11b): the announcements this student
+// qualifies for whose course scope lists this course. Legacy filtered
+// on `a.course_id`, a column that never existed, so its section was
+// always empty (rebuild.md §9 #19, fixed in slice 11).
 //
 // Legacy's "expired" (red) state on the days box can never show: the
 // access map skips a subscription with no days left, so a course with
@@ -30,6 +30,8 @@ import { getQuizzesForCourse } from '@/lib/quizzes/queries';
 import { getQuizAvailability } from '@/lib/quizzes/availability';
 import type { Quiz } from '@/lib/quizzes/types';
 import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { getAnnouncementsForStudent } from '@/lib/announcements/queries';
+import { AnnouncementBody } from '@/components/announcements/announcement-body';
 import '@/styles/student-course.css';
 
 export const dynamic = 'force-dynamic';
@@ -113,12 +115,14 @@ export default async function CoursePage({ params }: { params: Params }) {
     );
   }
 
-  const [fixedRows, mockRows] = await Promise.all([
+  const [fixedRows, mockRows, myAnnouncements] = await Promise.all([
     getQuizzesForCourse(supabase, 'fixed', courseId),
     getQuizzesForCourse(supabase, 'mock', courseId),
+    getAnnouncementsForStudent(supabase, profile),
   ]);
   const fixed = visibleOf(fixedRows);
   const mocks = visibleOf(mockRows);
+  const courseAnnouncements = myAnnouncements.filter((a) => (a.scope_courses || []).includes(courseId));
 
   const fixedHref = `/student/fixed-quizzes?course=${encodeURIComponent(courseId)}`;
   const mockHref = `/student/mock-exams?course=${encodeURIComponent(courseId)}`;
@@ -211,13 +215,24 @@ export default async function CoursePage({ params }: { params: Params }) {
         </a>
       </div>
 
-      {/* 4. Course Announcements — slice 11 fills this */}
+      {/* 4. Course Announcements */}
       <div className="section-card">
         <div className="section-card-header">
           <span className="section-card-title">📢 Course Announcements</span>
-          <span className="section-card-badge"></span>
+          <span className="section-card-badge">
+            {courseAnnouncements.length ? `${courseAnnouncements.length} announcement${courseAnnouncements.length !== 1 ? 's' : ''}` : ''}
+          </span>
         </div>
-        <div className="empty-state">No announcements for this course yet.</div>
+        {!courseAnnouncements.length ? (
+          <div className="empty-state">No announcements for this course yet.</div>
+        ) : (
+          courseAnnouncements.map((a) => (
+            <div key={a.announcement_id} className="announcement-item">
+              <div className="announcement-title">{a.title}</div>
+              <AnnouncementBody html={a.body_html || a.body_text || ''} className="announcement-body" />
+            </div>
+          ))
+        )}
       </div>
 
       {/* 5. NMC Procedures block */}
