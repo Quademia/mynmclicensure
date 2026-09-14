@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-14 — 13b built: My Packs (list, filters, summary counts, Open / Download, Build Similar); walked in the pane; slice 13 closed
+  - ↳ same branch as 13a, not merged between · filters and counts over the loaded rows as legacy · Archived / Deleted options set by nothing · Load More and an inactive pack not walked · renderer 11 s on dev · next is Sam’s call
+
 - 2026-09-14 — 13a built: offline packs (table, allowance, non-repeat picker, builder wizard, renderer); walked in the pane; 13 split (13a, 13b My Packs)
   - ↳ "PDF" = the browser print dialog, no file · allowance / pick / id check on the server · two packs shared 0 items · trial refusal not walked · QA strings → Quademia · cover repeats Prepared for (legacy) · next is Sam’s call
 
