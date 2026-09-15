@@ -1,0 +1,139 @@
+/* styles/admin-attempts.css
+ *
+ * The admin Attempts analytics page (slice 14b). Transcribed from the
+ * legacy page's inline <style> block (admin/attempts.html, as built
+ * 2026-06-04 with its per-day fix), scoped under `.att` for the page and
+ * `.att-overlay` for the portalled detail modal (AGENTS.md: every
+ * overlay is portalled to <body>). The .top-nav block every page
+ * carried is in shell.css already.
+ *
+ * Breakpoint 768px (UI convention #3): the KPI rows go two across, the
+ * breakdown and top cards stack, the filters stack, the table scrolls
+ * inside its wrapper.
+ */
+
+.att .btn { padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: opacity 0.15s; }
+.att .btn:hover { opacity: 0.88; }
+.att .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
+.att .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+.att .section-title { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 28px 0 12px; }
+
+/* ── KPI cards ── */
+.att .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.att .kpi { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+.att .kpi .kpi-val { font-size: 26px; font-weight: 700; color: var(--primary); line-height: 1; }
+.att .kpi .kpi-lbl { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+.att .kpi.accent .kpi-val { color: var(--accent); }
+
+/* ── Period bar ── */
+.att .period-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; padding: 14px 16px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 18px; }
+.att .preset-group { display: inline-flex; gap: 3px; background: #f1f5f9; border-radius: 6px; padding: 3px; }
+.att .preset-group button { border: none; background: transparent; font-family: inherit; font-size: 12.5px; font-weight: 600; color: var(--text-muted); padding: 6px 12px; border-radius: 5px; cursor: pointer; }
+.att .preset-group button:hover { color: var(--primary); }
+.att .preset-group button.active { background: var(--white); color: var(--accent); box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
+.att .period-field { display: flex; flex-direction: column; gap: 4px; }
+.att .period-field label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+.att .period-field input { padding: 6px 9px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-family: inherit; color: var(--primary); }
+.att .period-note { margin-left: auto; font-size: 12px; color: var(--text-muted); align-self: center; }
+.att .period-note strong { color: var(--primary); }
+
+/* ── Breakdown cards ── */
+.att .break-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.att .break-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+.att .break-card h4 { font-size: 13px; font-weight: 700; color: var(--primary); margin: 0 0 12px; }
+.att .break-line { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; font-size: 13px; }
+.att .break-line:last-child { margin-bottom: 0; }
+.att .break-line .bl-label { min-width: 110px; color: var(--text-muted); }
+.att .break-line .bl-bar { flex: 1; height: 8px; background: #f1f5f9; border-radius: 999px; overflow: hidden; }
+.att .break-line .bl-fill { display: block; height: 100%; border-radius: 999px; background: var(--accent); }
+.att .break-line .bl-fill.mock { background: #6366f1; }
+.att .break-line .bl-fill.fixed { background: #0ea5e9; }
+.att .break-line .bl-fill.builder { background: #10b981; }
+.att .break-line .bl-fill.retake { background: #f59e0b; }
+.att .break-line .bl-fill.completed { background: #15803d; }
+.att .break-line .bl-fill.in_progress { background: #f59e0b; }
+.att .break-line .bl-fill.abandoned { background: #94a3b8; }
+.att .break-line .bl-num { min-width: 44px; text-align: right; font-weight: 700; color: var(--primary); }
+
+/* ── Per-day trend ── */
+.att .trend-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+.att .trend-bars { display: flex; align-items: flex-end; gap: 4px; height: 150px; margin-top: 8px; }
+.att .trend-day { flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; min-width: 0; }
+.att .trend-day .td-bar { width: 100%; max-width: 26px; background: var(--accent); border-radius: 4px 4px 0 0; min-height: 3px; transition: height .2s; }
+.att .trend-day .td-bar:hover { opacity: 0.8; }
+.att .trend-day .td-lbl { font-size: 9px; color: var(--text-muted); white-space: nowrap; transform: rotate(-45deg); transform-origin: center; height: 26px; }
+.att .trend-empty { color: var(--text-muted); font-size: 13px; padding: 24px 0; text-align: center; width: 100%; align-self: center; }
+
+/* ── Top lists ── */
+.att .top-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.att .top-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+.att .top-card h4 { font-size: 13px; font-weight: 700; color: var(--primary); margin: 0 0 10px; }
+.att .top-item { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.att .top-item:last-child { border-bottom: none; }
+.att .top-item .ti-rank { color: var(--text-muted); min-width: 18px; font-size: 12px; }
+.att .top-item .ti-name { flex: 1; color: var(--primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.att .top-item .ti-sub { font-size: 11px; color: var(--text-muted); }
+.att .top-item .ti-count { font-weight: 700; color: var(--accent); }
+
+/* ── Filters bar ── */
+.att .filters-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-bottom: 16px; padding: 16px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); }
+.att .filter-group { display: flex; flex-direction: column; gap: 4px; }
+.att .filter-group label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.att .filter-group input, .att .filter-group select { padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; font-family: inherit; color: var(--primary); min-width: 140px; }
+.att .filter-actions { display: flex; gap: 8px; align-items: flex-end; margin-left: auto; }
+
+/* ── Table ── */
+.att .table-wrapper { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.att .table-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); }
+.att .table-header h3 { font-size: 15px; font-weight: 700; color: var(--primary); margin: 0; }
+.att .result-count { font-size: 13px; color: var(--text-muted); }
+.att .table-scroll { overflow-x: auto; }
+.att table { width: 100%; border-collapse: collapse; }
+.att thead th { text-align: left; padding: 10px 16px; font-size: 12px; font-weight: 600; color: var(--text-muted); background: #f8fafc; border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+.att tbody td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+.att tbody tr:last-child td { border-bottom: none; }
+.att tbody tr:hover { background: #f8fafc; cursor: pointer; }
+.att .st-name { font-weight: 600; }
+.att .st-email { font-size: 11px; color: var(--text-muted); }
+.att .cell-muted { font-size: 12px; color: var(--text-muted); }
+.att .cell-12 { font-size: 12px; }
+.att .cell-bold { font-weight: 600; }
+
+/* ── Chips ── */
+.att .chip { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.att .chip.mock { background: #eef2ff; color: #4f46e5; }
+.att .chip.fixed { background: #e0f2fe; color: #0369a1; }
+.att .chip.builder { background: #dcfce7; color: #15803d; }
+.att .chip.retake { background: #fef3c7; color: #92400e; }
+.att .chip.completed { background: #dcfce7; color: #15803d; }
+.att .chip.in_progress { background: #fef9c3; color: #854d0e; }
+.att .chip.abandoned { background: #f1f5f9; color: #64748b; }
+
+/* ── Pagination, empty, cap ── */
+.att .pager { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 14px; font-size: 13px; color: var(--text-muted); }
+.att .pager button:disabled { opacity: 0.4; cursor: not-allowed; }
+.att .empty-state, .att-overlay .empty-state { padding: 48px 24px; text-align: center; color: var(--text-muted); font-size: 14px; }
+.att .empty-state.small { padding: 16px; }
+.att .cap-note { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; border-radius: 6px; padding: 8px 12px; font-size: 12px; margin-bottom: 14px; }
+
+/* ── Detail modal (portalled) ── */
+.att-overlay .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, .5); display: none; align-items: center; justify-content: center; z-index: 100; padding: 24px; }
+.att-overlay .modal-overlay.show { display: flex; }
+.att-overlay .modal { background: var(--white); border-radius: 12px; width: 100%; max-width: 560px; max-height: 88vh; display: flex; flex-direction: column; overflow: hidden; }
+.att-overlay .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+.att-overlay .modal-head h3 { font-size: 15px; font-weight: 700; color: var(--primary); margin: 0; }
+.att-overlay .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); line-height: 1; }
+.att-overlay .modal-body { padding: 20px; overflow-y: auto; }
+.att-overlay .detail-row { display: flex; gap: 10px; margin-bottom: 11px; font-size: 13px; }
+.att-overlay .detail-label { font-weight: 600; color: var(--text-muted); min-width: 130px; flex-shrink: 0; }
+.att-overlay .detail-value { color: var(--primary); word-break: break-word; }
+
+@media (max-width: 768px) {
+  .att .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .att .break-row, .att .top-row { grid-template-columns: 1fr; }
+  .att .period-note { margin-left: 0; }
+  .att .filters-bar { flex-direction: column; align-items: stretch; }
+  .att .filter-group input, .att .filter-group select { min-width: 0; }
+  .att .filter-actions { margin-left: 0; }
+}
