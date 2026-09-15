@@ -435,6 +435,8 @@ feature; a user cannot tell.
 | 20 | The setup link the admin Payments page copies carries `&setup_token=…`, but the confirmation page never reads the token from the address — only from the verify reply or the browser's storage. The link still works because verify re-mints a token on every call | `admin/payments.html` `copySetupLink`, `payment-confirmation.html` `getReference` | Found in the slice 9 reading (2026-09-15). Reaches nobody: the page verifies on arrival and gets a fresh token. **Carried** (Sam, 2026-09-15); listed under "After the rebuild" to decide whether the link should carry the token at all |
 | 21 | `verify` is unauthenticated by design (the payer has no session yet) and hands a setup token to anyone who presents a reference; the reference (`QAC_` + 12 upper hex) is the only secret, and it also appears in Paystack's return address and the payer's receipt | `payment-worker` `handleVerify` | Found in the slice 9 reading (2026-09-15). Reaches a real payer only if a reference leaks before setup is completed, and only lets the holder create the account for the paid email. **Carried** (Sam, 2026-09-15) — the same model on the new stack; listed under "After the rebuild" for a rethink (a signed link, or the token read from the address and required) |
 | 22 | The confirmation page verifies every 3 seconds, up to 20 times, while Paystack has not said success — and the Worker's rate limit allows 5 calls per 60 seconds per address on the same route. So a payer whose mobile-money payment is still pending after about twelve seconds sees "Too many requests" and must tap Retry Verification, instead of the "still verifying" screen the poll was written for | `payment-confirmation.html` POLL_MS / MAX_POLLS, `payment-worker` wrangler ratelimits | Seen in the slice 9a walk (2026-09-15) on an unpaid reference: four polls, then the sixth call refused. Both numbers transcribed as they were. **Carried** (Sam, 2026-09-15); listed under "After the rebuild" — the fix is either a slower poll or a limit that excludes verify |
+| 23 | The admin dashboard's "View" links and the Payments page's "View Student" put the user's id in the address (`users.html?id=` and `?user_id=`), but the Users page never reads the address, so the drawer did not open — the admin landed on the plain list | `admin/dashboard.html`, `admin/payments.html`, `admin/users.html` | Found in the slice 14 reading (2026-09-15). Reaches an admin. **Fixed in 14a** (Sam, 2026-09-15): the Users page opens the drawer for a `?user_id=` in the address; the dashboard's View link uses the same name |
+| 24 | Two ways to assign a subscription: the Users page's drawer inserted a new row straight from the browser every time (`assignSubscription`), with no check for an existing one, so a second assign made a duplicate ACTIVE row; the Subscriptions page used the Worker's grant, which extends an existing one instead | `js/mynmclicensure-api.js` `assignSubscription`, `admin/users.html` | Found in the slice 14 reading (2026-09-15). Reaches an admin (and the student's course-access sum, which adds the duplicate's days). **Fixed in 14a** (Sam, 2026-09-15): the drawer's Assign calls slice 8's `grantSubscription` — one mechanism; the extend case is the only behaviour that changes |
 
 **Dead things — remove or decide**
 
@@ -880,7 +882,23 @@ a filter narrows them, and Open lands on the renderer.
 **14 — Admin home.** Dashboard with its four counts; Users page with
 the detail drawer and the profile fields; Attempts analytics page as
 built 2026-06-04 (windows, breakdowns, per-day strip, top-10s, table,
-drawer). *Done when* the admin sidebar has no dead link.
+drawer). Built in two sessions (Sam, 2026-09-15): **14a** the Users
+page (the search debounced 300 ms, the role and programme filters —
+the Teacher option dropped, §9 #12 — the table of 50 with Load More
+and "Showing X of Y", the drawer with the profile fields, the active
+subscription with its expiry state, the subscription history, Assign
+Subscription through slice 8's grant action — one mechanism, §9 #24 —
+Send Password Reset Email as a server call with the link on
+`appOrigin()` and no rate limit as legacy's admin path had none,
+Deactivate / Reactivate; a `?user_id=` in the address opens the
+drawer, §9 #23) and the dashboard (the four counts, the eight quick
+links, Recent Registrations with View into the Users page); **14b**
+the Attempts analytics page. *Done when* (14a) an admin finds a
+student by name, opens the drawer from the table and from a Payments
+"View Student" link, assigns a subscription that extends rather than
+duplicates, sends a reset, deactivates and reactivates, and the
+dashboard's counts match the tables; (14b) the admin sidebar has no
+dead link.
 
 **15 — Phone pass.** Every student surface at 375px, every admin
 surface navigable at 768px, using the shared drawer. Not a redesign:
@@ -948,7 +966,8 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 12 Messaging | ⬜ |
 | 13a Offline packs — table, allowance, picker, watermark, the builder, the renderer | ✅ 2026-09-14 |
 | 13b Offline packs — My Packs | ✅ 2026-09-14 |
-| 14 Admin home | ⬜ |
+| 14a Admin home — the Users page and the dashboard | ⬜ |
+| 14b Admin home — the Attempts analytics page | ⬜ |
 | 15 Phone pass | ⬜ |
 | 16 Cutover | ⬜ |
 | 17 Telegram gate | ⬜ |
