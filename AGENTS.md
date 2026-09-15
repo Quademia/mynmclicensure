@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-09-14. Rules for **any** assistant working in this
+Last updated: 2026-09-15. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What is built and
@@ -231,8 +231,14 @@ Two long-lived branches on the remote:
 
 Each session works on a short-lived branch named for the assistant and
 the session (`codex/<slug>` or `claude/<slug>`), committing freely
-there. Nobody pushes directly to `main`; nobody merges to `main` or
-`production` without Sam's yes in the session.
+there. **The session branch stays local and is never pushed**: work
+reaches the remote by merging into `main` and pushing `main`, so the
+remote carries `main` and `production` only. A branch pushed by
+mistake is deleted from the remote after its merge (twelve had piled
+up by 2026-09-15). Nobody merges to `main` or `production` without
+Sam's yes in the session; a session may merge to `main` more than
+once, from the same branch, and the branch lives until the session
+ends.
 
 **Per-session loop:**
 
@@ -266,7 +272,16 @@ Sam says we are stopping. Do this, in this order.
 4. **This file, only if a rule changed** or a workaround was learned.
 5. **`npm run lint:check`** once; the log says what was checked.
 6. **One docs commit** on the session branch.
-7. **Ask Sam for the merge to `main`.** Merge only on an explicit yes.
+7. **Ask Sam for the merge to `main`.** Merge only on an explicit yes:
+
+   ```
+   git checkout main
+   git merge <session-branch> --ff-only
+   git push origin main
+   git checkout <session-branch>
+   ```
+
+   Never `git push origin <session-branch>`.
 8. **Report:** what is committed, what is on `main`, what is open. Stop.
 
 A session ends merged to `main`, or the log entry's first line says
@@ -297,7 +312,9 @@ gives one hard rule and two habits:
   the same working tree at once sweep up each other's half-written
   changes. A session ends merged to `main`, or its log entry says why
   not; the next session, whichever agent runs it, starts from there.
-- Start of session: `git fetch --prune`, read `SESSIONS.md` and the head
+- Start of session: `git fetch --prune` and `git branch -r` (a stray
+  remote branch is a fact to report, never assumed away — a cloud or
+  web session can push one), read `SESSIONS.md` and the head
   of the latest period file, `BUILD_LIST.md`, `git log --oneline -10`,
   and `git branch --no-merged main` — the other agent may have left a
   branch unmerged. Pick it up from its log entry, continue it or leave
