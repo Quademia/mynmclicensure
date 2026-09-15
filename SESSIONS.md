@@ -22,8 +22,8 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
-- 2026-09-15 — 9a, 9b, 14a built: payments end to end, subscribe / confirmation / upgrade pages, admin Payments, admin Users, dashboard; first prod release
-  - ↳ 9 and 14 split on one branch · 7f narrowed · §9 #20–#24 (two fixed in 14a) · password in the dev log → FormData · one Quademia account → after · prod: 11 migrations, licensure-prod up, paid products archived · branch rule the MyNclex way
+- 2026-09-15 — 9a, 9b, 14a, 14b built: payments end to end, subscribe / confirmation / upgrade, admin Payments, Users, dashboard, Attempts; first prod release
+  - ↳ 9 and 14 split on one branch, 14 closed · 7f narrowed · §9 #20–#24 (two fixed) · password in the dev log → FormData · one Quademia account → after · prod: 11 migrations, licensure-prod up, paid products archived · branch rule the MyNclex way
 
 - 2026-09-14 — fix: profile photo over 1 MB refused by Next’s Server Action body cap; raised to 3 MB, refusal caught into a toast, rule in AGENTS.md
   - ↳ Sam’s own upload failed after the 7e merge · same cap covered the question bank image upload · proven with a 1.61 MB PNG · then the cached old photo fixed with a version stamp on the address (Sam) · dev server restarted

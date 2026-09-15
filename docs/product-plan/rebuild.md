@@ -967,7 +967,7 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 13a Offline packs — table, allowance, picker, watermark, the builder, the renderer | ✅ 2026-09-14 |
 | 13b Offline packs — My Packs | ✅ 2026-09-14 |
 | 14a Admin home — the Users page and the dashboard | ✅ 2026-09-15 |
-| 14b Admin home — the Attempts analytics page | ⬜ |
+| 14b Admin home — the Attempts analytics page | ✅ 2026-09-15 |
 | 15 Phone pass | ⬜ |
 | 16 Cutover | ⬜ |
 | 17 Telegram gate | ⬜ |
