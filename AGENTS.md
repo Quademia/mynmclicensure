@@ -196,6 +196,14 @@ above sit at the repo root; the audience grouping inside them is kept.
   `next dev` then 500s every page. Copy
   `node_modules/lightningcss-win32-x64-msvc/*.node` into
   `node_modules/lightningcss/`, delete `.next`, restart.
+- **The React compiler's lint refuses a clock read or a ref write during
+  render** (`react-hooks/purity`, `react-hooks/refs`): stamp `Date.now()`
+  into state from a handler or an effect and compute from it; write a
+  ref only in a handler.
+- **A realtime subscription needs the table in the `supabase_realtime`
+  publication** and the client's `schema: 'licensure_gh'` on the
+  subscription — a table outside the publication fires nothing, with
+  no error. Add it in the migration that creates the table (guarded).
 - **A `<form action={fn}>` resets its fields after the action returns**
   (React 19). When the fields must survive — a submit that only opens a
   confirm step — use a plain `onSubmit` + `new FormData(form)`.
