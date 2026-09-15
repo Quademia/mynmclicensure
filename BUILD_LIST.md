@@ -50,7 +50,7 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ✅ (unplanned) Server Action body cap raised to 3 MB — a 2 MB photo or rationale image no longer refused; rule in AGENTS.md — 2026-09-14
 - ⬜ 7f Student home — dashboard; after 12 folds in (upgrade moved to 9b, 2026-09-15)
 - ✅ 8 Subscriptions — trial at registration, course access, admin grant/update/revoke/sync, the real question gate — 2026-09-13
-- ⬜ 9a Payments — table, rate limit, the four actions, subscribe, Premium Prep live, confirmation page
+- ✅ 9a Payments — table, rate limit, the four actions, subscribe, Premium Prep live, confirmation page — 2026-09-15
 - ⬜ 9b Payments — the upgrade page live, the admin Payments page (rescue buttons, revenue summary)
 - ⬜ 10 Email — four templates, Quademia sender, `appOrigin()`
 - ✅ 11a Announcements — two tables, server-side scoping (course scope fixed, §9 #19), admin page (no Scheduled status, §9 #18) — 2026-09-14
@@ -104,3 +104,5 @@ cutover is done.
 - ✅ Profile: the photo is one file per student overwritten in place and the cached old one kept showing — a version stamp on the saved address (Sam, 2026-09-14)
 - ⬜ Payments: the copied setup link carries a token the confirmation page never reads; verify re-mints one on every call (§9 #20; slice 9, 2026-09-15)
 - ⬜ Payments: verify hands a setup token to anyone holding a reference; the reference is the only secret (§9 #21; slice 9, 2026-09-15)
+- ⬜ Payments: the confirmation page's 3-second poll trips the 5-per-minute limit on a pending payment — "Too many requests" after four polls, as legacy (§9 #22; slice 9a, 2026-09-15)
+- ⬜ Payments: the setup step deletes the new login again when the profile row fails (the §9 #4 rollback, not in legacy) — Sam to confirm or drop (slice 9a, 2026-09-15)
