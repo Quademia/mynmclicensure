@@ -108,3 +108,4 @@ cutover is done.
 - ⬜ Payments: the confirmation page's 3-second poll trips the 5-per-minute limit on a pending payment — "Too many requests" after four polls, as legacy (§9 #22; slice 9a, 2026-09-15)
 - ⬜ Payments: the setup step deletes the new login again when the profile row fails (the §9 #4 rollback, not in legacy) — Sam to confirm or drop (slice 9a, 2026-09-15)
 - ⬜ Subscribe: a signed-in student only sees a note pointing to the upgrade page and can still pay here as a new buyer — consider redirecting them to /student/upgrade instead (Sam, slice 9a, 2026-09-15)
+- ⬜ One Quademia account across the products: the project has one login table, so an email registered in one app cannot register in another — register should offer "sign in to add this product", and a sign-in with no profile here should offer a "complete your profile" step; a cross-product rule, before MyTeacher's rebuild copies this register page (Sam, 2026-09-15)
