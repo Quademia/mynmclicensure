@@ -1,0 +1,53 @@
+name: Deploy dev Worker (workspace CF)
+
+on:
+  push:
+    branches:
+      - main
+
+# One deploy at a time. If a second push lands while one is in flight,
+# the new one waits rather than racing.
+concurrency:
+  group: dev-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy licensure-dev to workspace CF
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm clean-install
+
+      # ⚠ THESE MUST BE HERE, NOT ONLY IN wrangler.jsonc.
+      #
+      # wrangler.jsonc's `vars` are RUNTIME bindings. `NEXT_PUBLIC_*` is a
+      # BUILD-time substitution: webpack replaces each reference with a
+      # string literal while `next build` runs, and anything absent then is
+      # `undefined` in the browser bundle forever. Found in MyNclex on
+      # 2026-08-08 after three months of deploys that could not have worked
+      # in the browser — localhost has .env.local at build time, CI did not.
+      #
+      # Duplicated with wrangler.jsonc on purpose (JSONC cannot be read by
+      # a workflow step). Change a public value in one, change it in both.
+      - name: Build OpenNext bundle
+        run: npm run cf:build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://zrakjibtxyzoqcdtvpmq.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpyYWtqaWJ0eHl6b3FjZHR2cG1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MDcyODAsImV4cCI6MjA4ODk4MzI4MH0.saSEaK1IkbP03rfVvuwFpXQlLtAdKLIg9V7UwO7a2po
+
+      - name: Deploy to workspace CF
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN_DEV }}
+          command: deploy

@@ -1,11 +1,51 @@
-.claude/
-.wrangler/
-node_modules/
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# mynclex — Next.js app inside the monorepo
-mynclex/node_modules/
-mynclex/.next/
-mynclex/.open-next/
-mynclex/.wrangler/
-mynclex/.env.local
-mynclex/.dev.vars
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# cloudflare wrangler runtime state
+.wrangler/
+.open-next/
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# design scratch — disposable mocks not meant for the repo
+/docs/scratch/
+
+# Claude Code session-local state
+.claude/scheduled_tasks.lock

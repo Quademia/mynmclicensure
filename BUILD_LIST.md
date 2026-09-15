@@ -1,192 +1,109 @@
-# Build List
+# MyNMCLicensure Build List
 
-**Status: MVP complete — preparing for free trial launch (May 2026)**
+The inventory of slices: everything built, everything queued, everything
+parked, one line each, grouped by the plan doc that defines it. Rebuilt
+to this shape on 2026-09-10 when the rebuild was planned; the gamma-era
+list it replaces is in git history and in `qacademy-gamma`.
 
-Last updated: April 2026
+## Rules for this file
 
----
-
-## Launch Blockers
-
-These must be done before real users touch the platform.
-
-### Infrastructure
-- [x] Set up dev/prod split — separate Supabase project, GitHub repo, Cloudflare Pages, payments + email workers. Mirror pipeline from production branch. Hostname detection in config.js.
-- [ ] Set up custom domain on Cloudflare
-- [ ] Remove test accounts (MANUAL_TEST rows)
-- [ ] Review and clean up question bank content
-- [ ] **`items_rphn_disease_ctrl` empty but course `status='active'`** — RPHN cohort would see a broken course at launch. Holding fix: flip status to `'inactive'`. Proper fix: seed questions (blocked on source material).
-- [ ] **RM_MID question-bank gap** — 540 questions, 3 sets of 180. Target is 5 sets per course → needs +360 questions. Blocked on acquiring NMC Ghana midwifery syllabus + WHO/GHS reference PDFs before authoring can start.
-- [ ] **Set-size targets for RMHN / NACNAP / RPHN courses** — decide whether to hold to "5 sets of 180" for these too (currently 1–2 sets each) or launch with current volume.
-- [ ] **Swap Paystack secret on prod payment worker from TEST → LIVE key.** Currently prod uses Paystack test keys, so no real customer can complete a payment. Live key must be set via Cloudflare dashboard on `qacademy-licensure-payment-worker` before real users arrive.
-
-### Email Confirmation (on hold — required before real users)
-- [ ] Turn on email confirmation in Supabase Auth
-- [ ] "Check your inbox" screen after registration
-- [ ] Unconfirmed email error state on login.html
-- [ ] Resend confirmation button
-- [ ] Password reset confirmation email (custom branded via email worker)
+- **One line per slice:** `- <mark> <id> <name> — <date if built>`.
+  Under 120 characters. No explanation, no commit hashes, no merge or
+  release status (git holds that).
+- **Marks:** ✅ built (with the date) · ⬜ queued · ⏸ parked, with a
+  one-line reason · ✖ cancelled.
+- **A section per plan doc.** Slice ids are the doc's own ids.
+- **Built means ticked in two places in one commit:** here and in the
+  plan doc's ladder.
+- **There is no "next" marker.** Sam decides each session.
+- **Unplanned work still gets a line** when done, marked `(unplanned)`.
+- **Found mid-build and out of scope:** a ⬜ line in the right section,
+  or a ⏸ line with its reason. Never a paragraph.
 
 ---
 
-## Post-Launch Polish
+## The rebuild
 
-Important but won't block the free trial. Real user feedback will help prioritise.
+### [rebuild.md](docs/product-plan/rebuild.md)
 
-### Empty States & UI Polish
-- [ ] Empty state guidance on every page ("No quizzes yet — create your first one")
-- [ ] Skeleton loaders replacing "Loading..." text
-- [ ] Stats bar on learning-history reflects loaded page only — needs separate count query for true totals
+- ✅ 0 Repo reshape — old tree to `legacy/`, MyTeacher and residue deleted — 2026-09-10
+- ✅ 1 Scaffold — Next app, Workers, deploy + migrate workflows, schema `licensure_gh`, runner — 2026-09-10
+- ✅ 1b First dev deploy — deploy-dev + migrate-dev green, licensure-dev live — 2026-09-11
+- ✅ 1c One Cloudflare account — both Workers on the workspace account, one plan fee — 2026-09-10
+- ✅ (unplanned) Release branch named `production` — two prod workflows and the docs retargeted — 2026-09-10
+- ✅ 2a Auth — tables incl. `programs`, login (three doors), register, forgot, reset, router, logout, gates — 2026-09-11
+- ✅ 2b Shell — page header, both sidebars, phone drawer, placeholder dashboards; no footer (legacy has none) — 2026-09-11
+- ✅ 3 Catalogue and config — courses, levels, products, config + copy; admin Products / Courses / Config; landing, Premium Prep — 2026-09-11
+- ⬜ (unplanned) Paid-plan pause switch lifted for testing 2026-09-11; decide before cutover whether prod launches paused
+- ✅ 4a Question bank — eleven tables, bucket, entitlement gate, reads, admin page, dev content from prod CSVs — 2026-09-13
+- ✅ 4b Question bank — CSV importer: template, upload, row report, upsert on item_id — 2026-09-13
+- ✅ 5a Fixed quizzes and mock exams — tables, content copy, availability function, admin pages — 2026-09-13
+- ✅ 5b Fixed quizzes and mock exams — student list pages, start / retake / abandon, admin attempt stats — 2026-09-14
+- ✅ 6a Runner — attempts table, Quiz Builder, instant mode, resume, review — 2026-09-14
+- ✅ 6b Runner — the timed mode: server-stamped start, countdown, auto-submit — 2026-09-14
+- ✅ 7a Student home — learning history: stats bar, filters, Load more, Resume / Review / Retake — 2026-09-14
+- ✅ (unplanned) §9 #17 — the instant save no longer flips a completed attempt back to in progress — 2026-09-14
+- ✅ 7b Student home — portal guide: the static help page, side list, FAQ accordion — 2026-09-14
+- ✅ 7c Student home — NMC Procedures: programme card, viewer, the manual list — 2026-09-14
+- ✅ 7d Student home — course page: header, days left, quiz previews, builder shortcut, announcements after 11 — 2026-09-14
+- ✅ 7e Student home — profile: two editable panels, photo upload to a product bucket, subscription panel, ?complete=1 — 2026-09-14
+- ✅ (unplanned) Server Action body cap raised to 3 MB — a 2 MB photo or rationale image no longer refused; rule in AGENTS.md — 2026-09-14
+- ⬜ 7f Student home — dashboard; after 12 folds in (upgrade moved to 9b, 2026-09-15)
+- ✅ 8 Subscriptions — trial at registration, course access, admin grant/update/revoke/sync, the real question gate — 2026-09-13
+- ✅ 9a Payments — table, rate limit, the four actions, subscribe, Premium Prep live, confirmation page — 2026-09-15
+- ✅ 9b Payments — the upgrade page live, the admin Payments page (rescue buttons, revenue summary) — 2026-09-15
+- ⬜ 10 Email — four templates, Quademia sender, `appOrigin()`
+- ✅ 11a Announcements — two tables, server-side scoping (course scope fixed, §9 #19), admin page (no Scheduled status, §9 #18) — 2026-09-14
+- ✅ 11b Announcements — student page, dashboard strip on the placeholder, the course page section — 2026-09-14
+- ⬜ 12 Messaging — three contexts, admin inbox, bulk send, badges, the runner's Send feedback button (left out of 6)
+- ✅ 13a Offline packs — table, allowance, non-repeat picker, watermark, the builder, the renderer — 2026-09-14
+- ✅ 13b Offline packs — My Packs: list, filters, summary counts, Open / Build Similar — 2026-09-14
+- ⬜ 14 Admin home — dashboard counts, users drawer, attempts analytics
+- ⬜ 15 Phone pass — student at 375px, admin navigable at 768px
+- ⬜ 16 Cutover — DNS, live keys, content re-copy, old logins deleted, `legacy/` removed
+- ⬜ 17 Telegram gate — Connect page, link codes, bot Worker on the DB, allowlist from subscriptions; after 8
 
-### Code Cleanup
-- [ ] Harden `teacher_classes_select` — currently allows any logged-in user to read active class rows so students can look up classes by join_code. Move `getClassByJoinCode()` to a SECURITY DEFINER RPC and tighten the policy to teacher-or-admin-or-member only.
-- [ ] Consolidate escapeHtml() and safeText() in utils.js
-- [ ] Revisit session expiry length (currently 7 days)
-- [ ] users.last_login_utc — wire up or drop
-- [ ] users.username — wire up or drop
-- [ ] README and CLONING files need updating to reflect current folder structure and My Teacher naming
-- [ ] **Tighten library item table SELECT policy** — the 10 `teacher_library_X` tables allow unauthenticated SELECT (role `public`, qual `true`). `teacher_library_courses` requires `auth.uid() IS NOT NULL`. Align for consistency. Library content isn't secret so low priority, but cheap: 10 policy drops + recreates.
+### Decisions still open in rebuild.md
 
-### Product Separation
-- [x] Auth split complete — each product has own user table, session table, guard/auth JS, and auth pages (see docs/sprints/myteacher-clean-split.md)
-- [x] MyTeacher JS files moved into myteacher/js/ — myteacher-api.js, myteacher-teacher-nav.js, myteacher-student-nav.js, myteacher-admin-nav.js
-- [x] Create MyTeacher auth RPCs: log_mt_auth_event, check_mt_login_rate_limit, log_mt_reset_request, check_mt_reset_rate_limit, mark_mt_reset_used
-- [x] Copy utils.js into myteacher/js/utils.js and update all MyTeacher pages to use it
-- [x] Copy css/style.css into myteacher/css/style.css and update all MyTeacher pages to use it
-- [x] Split paths.js — create myteacher/js/paths.js with MYTEACHER constant only, update MyTeacher pages to load it instead of root paths.js
-- [x] Copy all Licensure JS files into mynmclicensure/js/ (api, sidebars, guard, auth, paths, utils)
-- [x] Copy style.css into mynmclicensure/css/ and redirect all Licensure pages
-- [x] Make product-select.html self-contained with inline styles
-- [x] Archive root css/ folder — no active references remain
-- [x] Switch link in MyTeacher topbar updated to point to product-select.html
-- [x] Fixed duplicate guard.js and api.js loads in quiz-builder.html
-- [x] Split config.js into product-local copies (mynmclicensure/js/ and myteacher/js/)
-- [x] Archive root js/ folder — js/ no longer exists at root
-- [x] Archive root css/ folder — css/ no longer exists at root
-- [x] Move Licensure landing page into mynmclicensure/index.html
-- [x] Create clean company root index.html — no product dependency
-- [x] Create MyTeacher landing page — myteacher/index.html
-- [x] All three landing pages link back to root consistently
-- [x] Move email worker references into product-local scope (split into mynmclicensure/workers/email-worker/ and myteacher/workers/email-worker/, archived old shared workers/)
-- [x] Move payments worker into mynmclicensure scope (mynmclicensure/workers/payment-worker/, archived old payments-worker/)
-- [x] Rename payments worker to qacademy-licensure-payment-worker (dev: qacademy-dev-licensure-payment-worker)
+- ✅ §8 S1 user primary key — keep `U_` ids, add the FK — 2026-09-11
+- ⬜ §8 S3 attempts blobs → JSONB / arrays
+- ✅ §8 S4 foreign keys on licensure tables — 2026-09-11, as each table lands
+- ✅ §8 S6 populate `sessions.ip_hash` — 2026-09-11
+- ✅ §9 #8 `must_change_password` — left as it is, no gate, column carried — 2026-09-11
 
-**Code-level product separation is complete.** All remaining "separation" work is database hygiene — see "Licensure Table Renaming" below.
+## Carried from gamma
 
-### Licensure Table Renaming (own initiative — sprint-sized)
+Items from the gamma-era list that still apply after the rebuild. Not
+rebuild work; listed so they are not lost.
 
-When MyTeacher was carved out, every new MyTeacher table got a `teacher_` prefix (`teacher_users`, `teacher_classes`, `teacher_quizzes`, etc.). Licensure tables kept their original generic names from the pre-split era (`users`, `sessions`, `subscriptions`, `payments`, `quizzes`, `attempts`, etc.), so the schema is asymmetric — Licensure looks like "the default" and MyTeacher looks like "the addon." This initiative renames every Licensure table to a `licensure_` prefix so both products read symmetrically in the schema.
+- ⬜ Content: `items_rphn_disease_ctrl` is empty while its course is active
+- ⬜ Content: `items_rm_mid` short of its target set count (540 of 900)
+- ⬜ Content: set-size targets for RMHN / NACNAP / RPHN
+- ⬜ Remove MANUAL_TEST rows before cutover (moot if cutover deletes old data)
+- ⏸ Email confirmation on signup — a product change; not in the like-for-like rebuild
+- ⏸ Expiry-reminder scan — a Sheets-era admin tool (git 31ccde3) never rebuilt on Supabase; only `expiry_reminded` survived; after the rebuild, needs 10
+- ⏸ Admin create user; sessions / auth-events / reset-request audits — new features, after
+- ⏸ Student analytics, notifications, search, sequential runner mode — new features, after
+- ⏸ Paystack LIVE key on prod — waits on the company / Paystack-account decision
 
-**Why it's a sprint, not an afternoon:**
-- Foreign keys across dozens of tables need updating
-- All RLS policies in `db/rls.sql` reference table names in subqueries and need rewriting
-- All RPCs (`log_auth_event`, `check_login_rate_limit`, `auth_user_role`, `auth_user_id`, etc.) embed table names in SQL bodies — drop and recreate
-- ~80–100 `db.from('users')`-style call sites in `mynmclicensure-api.js`, `guard.js`, `auth.js`, sidebars, and pages — every one must change
-- `db/schema.sql`, `db/rls.sql`, and `db/seed_data.sql` all get rewritten
-- Migration runs twice: dev Supabase first, smoke-test, then prod
-- Any missed call site silently breaks at runtime ("table does not exist") only when a real user hits it
+## After the rebuild
 
-**Decisions to make before starting:**
-- [ ] Naming convention — `licensure_users` (matches `teacher_users`) or `lic_users` (shorter)?
-- [ ] Scope — every Licensure table, or only the core identity tables (`users`, `sessions`, `auth_events`, `reset_requests`)?
-- [ ] Compatibility window — use a transitional `CREATE VIEW users AS SELECT * FROM licensure_users` so old code keeps working during the sweep, or big-bang cutover?
-- [ ] Cutover style — single migration on a quiet day, or rolling table-by-table
+Product changes spotted while transcribing `legacy/`. None is built
+during the rebuild (AGENTS.md ⭐: no new user-visible feature). One
+line each, with the slice that surfaced it; Sam orders them once
+cutover is done.
 
-**Tables in scope (full list, for sizing):**
-`users`, `sessions`, `auth_events`, `reset_requests`, `subscriptions`, `payments`, `programs`, `courses`, `products`, `quizzes`, `attempts`, `items_*` (11 tables), `announcements`, `messages_threads`, `messages`, `config`, `offline_packs`, `user_notice_state`
-
-**Pick this up only when:**
-- No active feature work is mid-flight on Licensure
-- Dev Supabase is in a known-good state for testing
-- You have a clear window to deploy and smoke-test before real users hit prod
-
-### Move Business Logic Server-Side
-- [x] Look into new stack that offers proper backend — **decided April 2026**: Next.js 16 + OpenNext + Cloudflare Workers + Supabase (shared Postgres + Auth) + `@supabase/ssr`. First product on the new stack is MyNclex (`mynclex/` folder). MyNMCLicensure and MyTeacher migrate one at a time later.
-- [ ] Migrate MyNMCLicensure to the new stack (one product at a time, no data migration — tables already isolated)
-- [ ] Migrate MyTeacher to the new stack
-- [ ] DB transactions for multi-step ops (quiz publish, subscription assign) — still relevant for the legacy products until they migrate
-- [ ] Create Supabase RPCs or worker endpoints for admin bulk ops, subscription assignment, quiz publish, result release — bridge solutions on the legacy stack; new stack handles these server-side natively
-- [ ] Correlation IDs on key flows (payment, join, publish, submission)
-- [ ] Explore moving config from the front end
-
-### Admin Tools
-- [ ] Admin create user
-- [ ] Admin token audit / sessions audit / auth events audit
-- [ ] Admin reset request audit (data already in reset_requests table)
-- [ ] Admin expiry reminder / auto expiry reminder
-- [ ] Admin diagnostics — failed payments view, failed ops log
-- [ ] Admin Users page Stage 2 — Quiz History and Payment History panels in user side panel
-
-### Features & Enhancements
-- [ ] Telegram for premium members
-- [ ] Export/print — CSV for teachers, PDF results for students
-- [ ] Search — courses, questions, messages
-- [ ] Notifications — quiz published, results released, join approved
-- [ ] Student analytics — strength/weakness, progress trends
-- [ ] Teacher guidance / how-to pages
-- [ ] Accessibility basics — semantic HTML, aria labels, keyboard nav on key flows
-- [ ] teacher_ref column on teacher_bank_items
-- [ ] Sequential runner mode
-- [ ] My Teacher payment model — define tiers when platform has real users
-- [ ] Introduce a teacher public question bank for sharing of resources
-- [ ] Introduce tagging system into question bank
-- [ ] Introduce MyTeacher exams listing timeline
-
-### Testing
-- [ ] Playwright smoke tests for 8 critical paths
-- [ ] Audit/event logging for important actions (payment, publish, archive, grant subscription)
-- [ ] Retry mechanisms on failed data loads
-
-### Future
-- [ ] Beta v2 rebuild in React + Next.js — planned, not started
-- [ ] Rotate Supabase anon key if ever committed publicly
-- [ ] BIMI record — shows QAcademy logo next to sender name in Gmail inbox. Requires DMARC setup + Verified Mark Certificate (~$1,000/year). Revisit post-revenue.
-
----
-
-## Completed Work
-
-### Sprint 1: Security Hardening (April 2026)
-RLS on all 36 tables, XSS fixes (4 locations + safeText/escapeHtml helpers), CORS fix on payments worker, payment timestamp validation, crypto.getRandomValues() for IDs, rate limiting on payment endpoints, sensitive writes moved behind trusted boundaries.
-
-### Sprint 2: Service Boundaries (April 2026)
-Pagination on all admin and student list pages (users, payments, fixed-quizzes, bank, learning-history). DB-side search replacing client-side filtering (users, bank, messages, recipient resolution). Narrow select replacing select('*') on all list queries (users, payments, subscriptions, quizzes, bank, attempts, classes, messages). Fixed payments.created_at schema mismatch.
-
-### Sprint 3: Auth Hardening (April 2026)
-- Auth events table for login attempt tracking
-- Rate limit on login (5 fails / 10 min → lockout, 10 fails / 24 hr → long lockout)
-- Rate limit on password reset (3 per email per 60 min) — dedicated reset_requests table with full audit trail (user_exists, status, device info, used tracking). Admin UI deferred.
-- Login methods: username + password, Google OAuth, magic link (passwordless email)
-- Reset password error handling for invalid/expired/replaced links
-
-### Slices 12–14: Academic Structure (April 2026)
-- 3 new tables: teacher_programmes, teacher_cohorts, teacher_courses (all with RLS)
-- CRUD APIs for all three + self-contained panel components (programmes-panel.js, cohorts-panel.js, courses-panel.js)
-- Academic Structure page (academic-structure.html) with all three panels, added to teacher nav as "Academics"
-- Classes wired to cohorts: cohort dropdown replaces programme/course text fields, class list grouped by cohort, auto-suggested titles
-- Quizzes wired to courses: course dropdown replaces subject free-text, backward compat for old quizzes with subject hint
-- Key decision: courses link through quizzes only (not classes). A class = cohort + semester (student group). A quiz = course (subject identity)
-- Schema: cohort_id on teacher_classes, course_id on teacher_quizzes. Both nullable for backward compat. 39 tables total
-
-### Sprint 4: Emails & Error Hardening (April 2026)
-- Email worker via Cloudflare Worker + Resend API (welcome student, welcome teacher, class join approved, subscription assigned/revoked, payment setup required)
-- Shared injectable email footer across all templates
-- Fixed 14 silent catch blocks in myteacher-api.js
-- Standardised error response shapes in mynmclicensure-api.js (ok→success, error→code, added missing messages)
-- User-facing error states verified on all 4 critical flows (login, quiz submission, join class, payment)
-- Moved 4 mynmclicensure-only pages (register, subscribe, payment-confirmation, premium-prep) from root into /mynmclicensure/
-
-### MyTeacher Clean Split (April 2026)
-Full auth separation between MyTeacher and MyNMCLicensure. New tables: teacher_users (originally myteacher_users — renamed post-sprint), teacher_sessions, teacher_auth_events, teacher_reset_requests. New JS: myteacher-guard.js, myteacher-auth.js. New pages: myteacher/login, forgot-password, reset-password, router, access-request + mynmclicensure equivalents. Root login.html converted to product-select.html (product selector entry point). All 18 MyTeacher pages swapped to myteacher-guard.js. myteacher-api.js, nav files, and register pages updated. Root forgot-password, reset-password, router deleted. Post-sprint: teacher_profiles FK/RLS bug fixed, all 5 MyTeacher RPCs created and confirmed, router pending-teacher intercept and OAuth session creation added, access-request.html moved to myteacher/ and boot() rebuilt with full status states.
-
-### Question Schema Phase 3: CSV Import Update (April 2026)
-- CSV import now supports question_ref, tags, batch_id, year_level, bloom_level columns
-- Reordered columns: question_ref first, new metadata at end
-- Updated template download, AI prompt, and instructions modal with new columns
-- Fixed shuffle_options case-sensitivity bug (TRUE/True/true all work now)
-- TF questions always force shuffle_options to false
-- Added bloom_level validation (rejects invalid values)
-- Full preview table showing all 27 columns with horizontal scroll
-- Cancel button on validation step returns to upload screen
-- Loading overlay with spinner and progress during import
-- Added teacher nav bar to import page
+- ⬜ A link to Premium Prep from the landing page — legacy never linked it; the page was shared by address only (slice 3, 2026-09-12)
+- ⬜ Learning history: the stats bar counts the loaded pages, not the whole history — legacy called true totals deferred (slice 7a, 2026-09-14)
+- ⬜ Learning history: Source and Sort work over the loaded pages only; Course / Mode / Status / Search are database-side (slice 7a, 2026-09-14)
+- ⬜ Learning history: no Mock option in the Source filter; a mock attempt’s chip shows the raw word "mock" (slice 7a, 2026-09-14)
+- ⬜ Procedures: the thirteen NMC manual links are fixed in the page; move them to a table with an admin management page (slice 7c, 2026-09-14)
+- ⬜ Offline packs: the renderer’s cover prints "Prepared for: …" twice, the owner line and the stored label beneath it — legacy did (slice 13a, 2026-09-14)
+- ⬜ Announcements: each edit re-saves the body through the paragraph converter and adds a line break between paragraphs — legacy did (slice 11a, 2026-09-14)
+- ⬜ Profile: the Subscription panel shows one active subscription, the first returned, even when the student holds two — legacy did (slice 7e, 2026-09-14)
+- ✅ Profile: the photo is one file per student overwritten in place and the cached old one kept showing — a version stamp on the saved address (Sam, 2026-09-14)
+- ⬜ Payments: the copied setup link carries a token the confirmation page never reads; verify re-mints one on every call (§9 #20; slice 9, 2026-09-15)
+- ⬜ Payments: verify hands a setup token to anyone holding a reference; the reference is the only secret (§9 #21; slice 9, 2026-09-15)
+- ⬜ Payments: the confirmation page's 3-second poll trips the 5-per-minute limit on a pending payment — "Too many requests" after four polls, as legacy (§9 #22; slice 9a, 2026-09-15)
+- ⬜ Payments: the setup step deletes the new login again when the profile row fails (the §9 #4 rollback, not in legacy) — Sam to confirm or drop (slice 9a, 2026-09-15)
+- ⬜ Subscribe: a signed-in student only sees a note pointing to the upgrade page and can still pay here as a new buyer — consider redirecting them to /student/upgrade instead (Sam, slice 9a, 2026-09-15)

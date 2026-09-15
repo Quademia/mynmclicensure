@@ -1,0 +1,76 @@
+/* styles/student-offline-packs.css
+ *
+ * The student My Offline Packs page (slice 13b). Transcribed from the
+ * legacy page's inline <style> block (student/my-offline-packs.html),
+ * scoped under `.opk`. The .top-nav block every page carried is in
+ * shell.css already. Legacy's own breakpoints (980px, 700px) are kept;
+ * they sit inside the repo's 768px rule.
+ */
+
+.opk .hero-card, .opk .filters-card, .opk .stats-card, .opk .grid-card, .opk .empty-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
+
+.opk .hero-card { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.opk .hero-card h1 { font-size: 24px; margin: 0 0 8px; color: var(--primary); }
+.opk .hero-card p { margin: 0; color: var(--text-muted); font-size: 14px; line-height: 1.6; max-width: 760px; }
+.opk .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.opk .btn-primary, .opk .btn-ghost, .opk .btn-lite { border: none; border-radius: 999px; padding: 10px 16px; font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; font-family: inherit; }
+.opk .btn-primary { background: var(--accent); color: #fff; }
+.opk .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+.opk .btn-ghost { background: #f3f4f6; color: var(--text); }
+.opk .btn-lite { background: var(--primary-light); color: var(--accent); border: 1px solid rgba(11, 122, 117, 0.16); }
+.opk .btn-lite:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.opk .filters-head, .opk .stats-head, .opk .grid-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.opk .section-title { font-size: 18px; font-weight: 700; color: var(--primary); margin: 0; }
+.opk .section-sub { font-size: 13px; color: var(--text-muted); margin: 6px 0 0 0; }
+.opk .step-pill { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: #f3f4f6; color: var(--text-muted); }
+
+.opk .filters-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr auto; gap: 12px; align-items: end; }
+.opk .field label { display: block; font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.opk .field input[type='text'], .opk .field select { width: 100%; border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; font-size: 14px; outline: none; background: #fff; font-family: inherit; color: var(--text); box-sizing: border-box; }
+
+.opk .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.opk .stat-box { border: 1px solid var(--border); border-radius: 14px; background: #fff; padding: 14px; }
+.opk .stat-label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+.opk .stat-value { font-size: 22px; font-weight: 700; color: var(--primary); }
+
+.opk .packs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.opk .pack-card { position: relative; border: 1px solid var(--border); border-radius: 16px; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-height: 220px; }
+.opk .pack-card.inactive { background: #fafafa; opacity: 0.82; }
+.opk .pack-status { position: absolute; top: 14px; right: 14px; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; text-transform: capitalize; }
+.opk .pack-status.active { background: #e7f6f4; color: #0b7a75; }
+.opk .pack-status.archived { background: #f3f4f6; color: #6b7280; }
+.opk .pack-status.deleted { background: #fef2f2; color: #b91c1c; }
+.opk .pack-course { font-size: 12px; color: var(--text-muted); margin-right: 74px; }
+.opk .pack-title { font-size: 16px; font-weight: 700; color: var(--text); line-height: 1.4; margin-top: 2px; }
+.opk .pack-meta { display: grid; gap: 8px; }
+.opk .meta-row { font-size: 13px; color: var(--text); line-height: 1.5; }
+.opk .meta-row strong { color: var(--primary); margin-right: 6px; }
+.opk .tag-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.opk .tag { display: inline-flex; align-items: center; gap: 8px; background: #f3f4f6; color: var(--text); border-radius: 999px; padding: 7px 11px; font-size: 11px; font-weight: 700; }
+.opk .pack-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: auto; }
+.opk .pack-actions .btn-primary, .opk .pack-actions .btn-ghost, .opk .pack-actions .btn-lite { flex: 1; min-width: 120px; }
+
+.opk .muted-box { border: 1px dashed var(--border); border-radius: 14px; padding: 16px; background: #fafbfc; color: var(--text-muted); font-size: 13px; line-height: 1.6; margin-bottom: 14px; }
+
+.opk .empty-card { text-align: center; }
+.opk .empty-card h2 { margin: 0 0 8px; color: var(--primary); font-size: 22px; }
+.opk .empty-card p { margin: 0 0 18px; color: var(--text-muted); font-size: 14px; line-height: 1.6; }
+
+.opk .footer-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+.opk .footer-actions.start { justify-content: flex-start; margin-top: 16px; }
+.opk .load-more-wrap { display: flex; justify-content: center; margin-top: 18px; }
+
+.opk .error-box { margin-bottom: 18px; border: 1px solid rgba(185, 28, 28, 0.16); background: #fef2f2; color: #991b1b; border-radius: 14px; padding: 14px 16px; font-size: 13px; line-height: 1.6; }
+
+@media (max-width: 980px) {
+  .opk .filters-grid { grid-template-columns: 1fr 1fr; }
+  .opk .stats-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 700px) {
+  .opk .filters-grid { grid-template-columns: 1fr; }
+  .opk .stats-grid { grid-template-columns: 1fr; }
+  .opk .pack-actions { flex-direction: column; }
+  .opk .pack-actions .btn-primary, .opk .pack-actions .btn-ghost, .opk .pack-actions .btn-lite { width: 100%; }
+}

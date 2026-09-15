@@ -1,0 +1,41 @@
+/* styles/student-dashboard.css
+ *
+ * The student dashboard (legacy student/dashboard.html). Started in
+ * slice 11b with the announcements block only, transcribed from the
+ * legacy page's inline <style> block and scoped under `.sdash`; 7e
+ * brings the rest of the page's rules here.
+ */
+
+.sdash .announcements-block { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 24px; overflow: hidden; }
+.sdash .announcements-block-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--bg); }
+.sdash .announcements-block-title { font-size: 13px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.04em; }
+.sdash .announcements-block-count { font-size: 12px; color: var(--text-muted); }
+.sdash .announcements-empty { padding: 20px 16px; text-align: center; font-size: 13px; color: var(--text-muted); }
+
+.sdash .announcement-item { border-bottom: 1px solid var(--border); transition: opacity 0.25s; }
+.sdash .announcement-item:last-of-type { border-bottom: none; }
+.sdash .announcement-item.fading { opacity: 0; }
+.sdash .announcement-item.pinned .announcement-item-header { background: var(--primary-light); border-left: 4px solid var(--accent); }
+.sdash .announcement-item-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; cursor: pointer; gap: 12px; transition: background 0.15s; }
+.sdash .announcement-item-header:hover { background: var(--bg); }
+.sdash .announcement-title { font-weight: 600; font-size: 14px; color: var(--text); flex: 1; }
+.sdash .announcement-item-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.sdash .announcement-expand-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 16px; line-height: 1; padding: 0 2px; transition: transform 0.2s; font-family: inherit; }
+.sdash .announcement-expand-btn.open { transform: rotate(180deg); }
+.sdash .announcement-dismiss { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 18px; line-height: 1; padding: 0; font-family: inherit; }
+.sdash .announcement-dismiss:hover { color: var(--danger); }
+
+.sdash .announcement-item-body { display: none; padding: 0 16px 14px; font-size: 13px; color: var(--text); line-height: 1.65; max-height: 300px; overflow-y: auto; }
+.sdash .announcement-item-body.open { display: block; }
+.sdash .announcement-item-body p { margin: 0 0 8px; }
+.sdash .announcement-item-body p:last-child { margin-bottom: 0; }
+.sdash .announcement-item-body .no-content { color: var(--text-muted); }
+.sdash .announcement-item-body strong { font-weight: 700; }
+.sdash .announcement-item-body em { font-style: italic; }
+.sdash .announcement-item-body a { color: var(--accent); text-decoration: underline; }
+.sdash .announcement-item-body a[data-qa='btn'] { display: inline-block; padding: 8px 18px; background: var(--accent); color: #fff !important; border-radius: var(--radius); text-decoration: none; font-size: 13px; font-weight: 600; margin-top: 8px; transition: background 0.15s; }
+.sdash .announcement-item-body a[data-qa='btn']:hover { background: var(--primary); }
+.sdash .announcement-read-more { font-size: 12px; color: var(--accent); font-weight: 500; margin-top: 8px; display: inline-block; text-decoration: none; }
+.sdash .announcement-read-more:hover { text-decoration: underline; }
+.sdash .announcements-footer { display: block; padding: 10px 16px; font-size: 13px; color: var(--accent); font-weight: 500; text-decoration: none; border-top: 1px solid var(--border); text-align: center; }
+.sdash .announcements-footer:hover { background: var(--bg); text-decoration: none; }

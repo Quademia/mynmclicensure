@@ -1,0 +1,255 @@
+/* styles/shell.css
+ *
+ * The authenticated chrome — transcribed from legacy
+ * mynmclicensure/css/style.css ("Dashboard Layout", "Cards",
+ * "Responsive", hamburger, overlay), the dropdown and badge CSS the two
+ * sidebar scripts injected at runtime, and the .top-nav / .user-menu /
+ * .logout-btn block every page carried inline. Same values, same names.
+ *
+ * Loaded once from app/(app)/layout.tsx.
+ */
+
+/* --- Dashboard Layout --- */
+.dashboard-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 240px;
+  background: var(--primary-dark);
+  border-right: 1px solid var(--primary);
+  padding: 24px 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  padding: 0 24px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-logo h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.sidebar-logo p {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.sidebar-nav {
+  padding: 16px 0;
+}
+
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  transition: background 0.15s;
+}
+
+.sidebar-nav a:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--white);
+  text-decoration: none;
+}
+
+.sidebar-nav a.active {
+  background: var(--accent);
+  color: var(--white);
+}
+
+/* --- Sidebar dropdowns (injected by the legacy student sidebar) --- */
+.sidebar-dropdown { position: relative; }
+.sidebar-dropdown-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: background 0.15s;
+  user-select: none;
+}
+.sidebar-dropdown-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sidebar-account-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 10px 16px;
+}
+.sidebar-dropdown-toggle:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.sidebar-dropdown-toggle.active { background: var(--accent); color: #fff; }
+.sidebar-dropdown-arrow { font-size: 11px; transition: transform 0.2s; }
+.sidebar-dropdown.open .sidebar-dropdown-arrow { transform: rotate(180deg); }
+.sidebar-dropdown-menu {
+  display: none;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.15);
+}
+.sidebar-dropdown.open .sidebar-dropdown-menu { display: flex; }
+.sidebar-dropdown-menu a {
+  padding: 8px 24px 8px 40px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: background 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+.sidebar-dropdown-menu a:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.sidebar-dropdown-menu a.active { color: #fff; font-weight: 600; background: transparent; }
+.sidebar-dropdown-loading { padding: 8px 24px 8px 40px; font-size: 12px; color: rgba(255, 255, 255, 0.4); }
+.sidebar-account-avatar-wrap { display: inline-flex; align-items: center; flex-shrink: 0; }
+.sidebar-account-avatar {
+  width: 24px; height: 24px; border-radius: 50%; object-fit: cover;
+}
+.sidebar-account-initials {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700;
+}
+
+/* --- Messages badge (student .sidebar-msg-badge = admin .admin-msg-badge) --- */
+.sidebar-msg-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 18px; padding: 0 5px;
+  border-radius: 9px; background: #e74c3c; color: #fff;
+  font-size: 10px; font-weight: 700; margin-left: 4px;
+}
+
+/* --- Main content --- */
+.main-content {
+  margin-left: 240px;
+  flex: 1;
+  padding: 32px;
+  min-width: 0;
+}
+
+.page-header {
+  margin-bottom: 28px;
+}
+.page-header-inline { margin-bottom: 0; }
+
+.page-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.page-header p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+/* --- Top nav (every legacy page's inline block) --- */
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+.user-menu { display: flex; align-items: center; gap: 12px; }
+.user-name { font-size: 14px; font-weight: 500; }
+.logout-btn {
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+  padding: 0;
+}
+.logout-btn:hover { color: var(--danger); }
+
+/* --- Cards --- */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  border: 1px solid var(--border);
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+/* --- Hamburger button — phone only --- */
+.hamburger-btn {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 1100;
+  background: var(--primary-dark);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* --- Overlay — phone only --- */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+.sidebar-overlay.open {
+  display: block;
+}
+
+/* --- Responsive (UI convention #3, 768px) --- */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 1000;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .main-content {
+    margin-left: 0;
+    padding: 16px;
+    padding-top: 64px;
+  }
+  .hamburger-btn {
+    display: flex;
+  }
+  .top-nav {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}

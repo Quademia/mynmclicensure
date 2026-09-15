@@ -1,1040 +1,302 @@
--- ============================================================
--- QAcademy Nurses Hub — Full Database Schema
--- Supabase (PostgreSQL)
--- Last updated: April 2026
---
--- HOW TO USE THIS FILE:
---   - This is the single source of truth for all tables.
---   - When adding a new table, add it here first.
---   - Run the relevant CREATE/ALTER in Supabase SQL editor.
---   - All tables use dev_allow_all RLS during build.
---   - 49 tables total (11 core + 3 quiz engine + 11 items
---     + 1 offline packs + 2 messaging + 12 teacher assess
---     + 10 library items (teacher_library_anatomy, etc) — see section 5.9b)
--- ============================================================
+-- db/schema.sql — the readable statement of the current tables in `licensure_gh`.
+-- Regenerated from db/migrations/ whenever a migration changes a table.
+-- NEVER applied directly; the migrations are what run (db/README.md).
+-- Last regenerated: 2026-09-15, after 20260915120000_payments.sql.
 
-
--- ────────────────────────────────────────────────────────────
--- 1. CORE TABLES (MyNMCLicensure)
--- ────────────────────────────────────────────────────────────
-
--- 1.1 programs
-CREATE TABLE programs (
-  program_id       TEXT PRIMARY KEY,
-  program_name     TEXT NOT NULL,
-  trial_product_id TEXT
+-- ── programs (moved up from slice 3: the register page's dropdown) ─────
+create table if not exists programs (
+  program_id       text primary key,
+  program_name     text not null,
+  trial_product_id text references products (product_id)  -- S4 (slice 3; products is created below)
 );
 
--- 1.2 courses
-CREATE TABLE courses (
-  course_id     TEXT PRIMARY KEY,
-  title         TEXT NOT NULL,
-  program_scope TEXT[] NOT NULL,
-  status        TEXT NOT NULL DEFAULT 'active',
-  page_slug     TEXT
-);
--- status: active | draft | archived
-
--- 1.3 levels
-CREATE TABLE levels (
-  level_id   TEXT PRIMARY KEY,
-  label      TEXT NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+-- ── schools (legacy migration add_schools_and_signup_capture.sql) ──────
+create table if not exists schools (
+  id          bigint generated always as identity primary key,
+  name        text not null,
+  region      text not null,
+  ownership   text,                 -- 'State' | 'Private'
+  programmes  text[] default '{}',  -- NMC programme codes (RGN, RM, ...)
+  active      boolean not null default true,
+  created_at  timestamptz not null default now()
 );
 
--- 1.4 products
-CREATE TABLE products (
-  product_id          TEXT PRIMARY KEY,
-  name                TEXT NOT NULL,
-  kind                TEXT NOT NULL DEFAULT 'PAID',
-  status              TEXT NOT NULL DEFAULT 'active',
-  courses_included    TEXT[] NOT NULL,
-  price_minor         INTEGER NOT NULL,
-  currency            TEXT NOT NULL DEFAULT 'GHS',
-  duration_days       INTEGER NOT NULL,
-  telegram_group_keys TEXT[]
-);
--- kind: PAID | TRIAL | FREE
-
--- 1.5 users
--- MyNMC Licensure users only. MyTeacher users are in teacher_users.
-CREATE TABLE users (
-  user_id              TEXT PRIMARY KEY,
-  auth_id              UUID,
-  username             TEXT,
-  email                TEXT NOT NULL,
-  phone_number         TEXT,
-  name                 TEXT,
-  forename             TEXT,
-  surname              TEXT,
-  program_id           TEXT,
-  cohort               TEXT,
-  level                TEXT,
-  role                 TEXT NOT NULL DEFAULT 'STUDENT',
-  active               BOOLEAN NOT NULL DEFAULT true,
-  avatar_url           TEXT,
-  must_change_password BOOLEAN NOT NULL DEFAULT false,
-  signup_source        TEXT DEFAULT 'SUPABASE_AUTH',
-  created_utc          TIMESTAMPTZ DEFAULT NOW(),
-  last_login_utc       TIMESTAMPTZ
-);
--- user_id: 'U_' + random string (TEXT, not UUID)
--- role: STUDENT | ADMIN | TEACHER
--- signup_source: SUPABASE_AUTH | PAYSTACK_SETUP
-
--- 1.6 subscriptions
-CREATE TABLE subscriptions (
-  subscription_id TEXT PRIMARY KEY,
-  user_id         TEXT NOT NULL,
-  product_id      TEXT NOT NULL,
-  start_utc       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  expires_utc     TIMESTAMPTZ NOT NULL,
-  status          TEXT NOT NULL DEFAULT 'ACTIVE',
-  expiry_reminded BOOLEAN NOT NULL DEFAULT false,
-  source          TEXT NOT NULL DEFAULT 'PAYMENT',
-  source_ref      TEXT
-);
--- status: ACTIVE | EXPIRED | REVOKED
--- source: PAYMENT | PAYSTACK | ADMIN | SELF_TRIAL_SIGNUP
-
--- 1.7 payments
-CREATE TABLE payments (
-  reference             TEXT PRIMARY KEY,
-  status                TEXT NOT NULL,
-  email                 TEXT NOT NULL,
-  user_id               TEXT,
-  product_id            TEXT NOT NULL,
-  product_name          TEXT,
-  amount_minor_expected INTEGER NOT NULL,
-  currency              TEXT NOT NULL,
-  amount_minor_paid     INTEGER,
-  paid_utc              TIMESTAMPTZ,
-  activated_utc         TIMESTAMPTZ,
-  subscription_id       TEXT,
-  failure_note          TEXT,
-  raw                   JSONB,
-  setup_token           TEXT,
-  setup_created_utc     TIMESTAMPTZ,
-  setup_completed_utc   TIMESTAMPTZ,
-  program_id            TEXT,
-  phone_number          TEXT
-);
--- status: INIT | PAID | ACTIVATED | SETUP_REQUIRED | FAILED
-
--- 1.8 announcements
-CREATE TABLE announcements (
-  announcement_id         TEXT PRIMARY KEY,
-  title                   TEXT NOT NULL,
-  body_html               TEXT,
-  body_text               TEXT,
-  status                  TEXT NOT NULL DEFAULT 'draft',
-  created_at              TIMESTAMPTZ DEFAULT NOW(),
-  start_at                TIMESTAMPTZ,
-  end_at                  TIMESTAMPTZ,
-  pinned                  BOOLEAN NOT NULL DEFAULT false,
-  priority                INTEGER NOT NULL DEFAULT 0,
-  dismissible             BOOLEAN NOT NULL DEFAULT true,
-  scope_programs          TEXT[],
-  scope_courses           TEXT[],
-  scope_level             TEXT,
-  scope_subscription_kind TEXT,
-  scope_product_ids       TEXT[],
-  scope_audience          TEXT DEFAULT 'ALL',
-  scope_cohort            TEXT,
-  scope_user_ids          TEXT[]
-);
--- announcement_id: 'ANN_' + Date.now()
--- status: draft | active | archived
--- scope_level and scope_cohort are single TEXT values, not arrays
--- scope_subscription_kind: PAID | TRIAL | FREE (single value)
-
--- 1.9 user_notice_state
-CREATE TABLE user_notice_state (
-  id         BIGSERIAL PRIMARY KEY,
-  user_id    TEXT NOT NULL,
-  item_type  TEXT NOT NULL DEFAULT 'ANNOUNCEMENT',
-  item_id    TEXT NOT NULL,
-  state      TEXT NOT NULL,
-  seen_at    TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  CONSTRAINT unique_user_notice UNIQUE (user_id, item_type, item_id)
-);
--- state: read | clicked | dismissed
-
--- 1.10 config
-CREATE TABLE config (
-  key         TEXT PRIMARY KEY,
-  value       TEXT NOT NULL,
-  description TEXT,
-  updated_at  TIMESTAMPTZ DEFAULT NOW()
+-- ── users ──────────────────────────────────────────────────────────────
+create table if not exists users (
+  user_id              text primary key,                 -- 'U_' + 16 hex
+  auth_id              uuid not null unique references auth.users (id) on delete cascade,  -- S1
+  username             text,
+  email                text not null,
+  phone_number         text,
+  name                 text,
+  forename             text,
+  surname              text,
+  program_id           text references programs (program_id),  -- S4
+  cohort               text,
+  level                text,
+  role                 text not null default 'STUDENT',  -- STUDENT | ADMIN
+  active               boolean not null default true,
+  avatar_url           text,
+  must_change_password boolean not null default false,   -- carried, unused (§9 #8)
+  signup_source        text default 'SUPABASE_AUTH',     -- SUPABASE_AUTH | PAYSTACK_SETUP
+  created_utc          timestamptz default now(),
+  last_login_utc       timestamptz,
+  school_id            bigint references schools (id),
+  school_other         text,
+  referral_source      text
 );
 
-INSERT INTO config (key, value, description) VALUES
-  ('runner_questions_per_page',   '2',  'Questions per page in both runners'),
-  ('runner_autosave_interval_sec','60', 'Autosave frequency in runners (seconds)'),
-  ('builder_max_questions',       '50', 'Max questions student can request in builder'),
-  ('builder_default_questions',   '20', 'Default question count in builder'),
-  ('builder_minutes_per_question','1',  'Time estimate per question in builder');
-
-
--- ────────────────────────────────────────────────────────────
--- 2. QUIZ ENGINE TABLES (MyNMCLicensure)
--- ────────────────────────────────────────────────────────────
-
--- 2.1 quizzes (fixed quizzes)
-CREATE TABLE quizzes (
-  quiz_id        TEXT PRIMARY KEY,
-  course_id      TEXT NOT NULL,
-  title          TEXT NOT NULL,
-  item_ids       TEXT[] NOT NULL DEFAULT '{}',
-  n              INTEGER NOT NULL DEFAULT 0,
-  allowed_modes  TEXT NOT NULL DEFAULT 'BOTH',
-  shuffle        BOOLEAN NOT NULL DEFAULT false,
-  time_limit_sec INTEGER,
-  published      BOOLEAN NOT NULL DEFAULT false,
-  publish_at     TIMESTAMPTZ,
-  unpublish_at   TIMESTAMPTZ,
-  status         TEXT NOT NULL DEFAULT 'draft',
-  notes          TEXT,
-  created_at     TIMESTAMPTZ DEFAULT NOW(),
-  updated_at     TIMESTAMPTZ DEFAULT NOW()
+-- ── sessions ───────────────────────────────────────────────────────────
+-- Device sessions for the concurrent-login cap (2). Never deleted:
+-- active = false on logout or kick.
+create table if not exists sessions (
+  session_id    text primary key,                        -- 'SESS_' + 32 hex
+  user_id       text not null references users (user_id) on delete cascade,  -- S4
+  kind          text not null default 'LOGIN',
+  issued_utc    timestamptz not null default now(),
+  expires_utc   timestamptz not null,
+  last_seen_utc timestamptz not null default now(),
+  device_label  text,
+  ua_hash       text,
+  ip_hash       text,                                    -- S6: written now
+  login_via     text not null default 'EMAIL',           -- EMAIL | GOOGLE | MAGIC_LINK
+  active        boolean not null default true
 );
--- allowed_modes: BOTH | INSTANT_ONLY | TIMED_ONLY
--- status: draft | active | archived
+create index if not exists sessions_user_id            on sessions (user_id);
+create index if not exists sessions_user_active_expiry on sessions (user_id, active, expires_utc);
 
--- 2.2 mock_quizzes
-CREATE TABLE mock_quizzes (
-  quiz_id        TEXT PRIMARY KEY,
-  course_id      TEXT NOT NULL,
-  title          TEXT NOT NULL,
-  n              INTEGER NOT NULL,
-  item_ids       TEXT[] NOT NULL DEFAULT '{}',
-  allowed_modes  TEXT NOT NULL DEFAULT 'BOTH',
-  shuffle        BOOLEAN NOT NULL DEFAULT false,
-  time_limit_sec INTEGER,
-  status         TEXT NOT NULL DEFAULT 'draft',
-  published      BOOLEAN NOT NULL DEFAULT false,
-  visibility     TEXT NOT NULL DEFAULT 'ALL',
-  publish_at     TIMESTAMPTZ,
-  unpublish_at   TIMESTAMPTZ,
-  notes          TEXT,
-  created_at     TIMESTAMPTZ DEFAULT NOW(),
-  updated_at     TIMESTAMPTZ DEFAULT NOW()
+-- ── auth_events ────────────────────────────────────────────────────────
+-- Every login attempt, success and failure. Never deleted. Written only
+-- by log_auth_event().
+create table if not exists auth_events (
+  event_id      text primary key,                        -- 'EVT_' + 16 hex
+  event_type    text not null,                           -- LOGIN_SUCCESS | LOGIN_FAIL
+  identifier    text not null,                           -- email, lowercased
+  user_id       text,                                    -- null when unknown
+  fp_hash       text,
+  ua_hash       text,
+  device_label  text,
+  fail_reason   text,                                    -- INVALID_CREDENTIALS | RATE_LIMITED | NO_ACCOUNT
+  created_utc   timestamptz not null default now()
 );
--- allowed_modes: BOTH | INSTANT_ONLY | TIMED_ONLY
--- status: draft | active | archived
--- visibility: ALL | PAID | TRIAL
+create index if not exists auth_events_identifier_created on auth_events (identifier, created_utc);
+create index if not exists auth_events_fp_hash_created    on auth_events (fp_hash, created_utc) where fp_hash is not null;
+create index if not exists auth_events_user_id_created    on auth_events (user_id, created_utc) where user_id is not null;
+create index if not exists auth_events_created            on auth_events (created_utc);
 
--- 2.3 attempts
-CREATE TABLE attempts (
-  attempt_id        TEXT PRIMARY KEY,
-  user_id           TEXT NOT NULL,
-  quiz_id           TEXT,
-  course_id         TEXT NOT NULL,
-  mode              TEXT NOT NULL,
-  source            TEXT NOT NULL,
-  item_ids          TEXT NOT NULL,
-  n                 INTEGER NOT NULL,
-  seed              TEXT,
-  duration_min      INTEGER,
-  status            TEXT NOT NULL DEFAULT 'in_progress',
-  score_raw         NUMERIC,
-  score_total       NUMERIC,
-  score_pct         NUMERIC,
-  time_taken_s      INTEGER,
-  origin_attempt_id TEXT,
-  display_label     TEXT,
-  answers_json      TEXT NOT NULL DEFAULT '[]',
-  ts_iso            TIMESTAMPTZ DEFAULT NOW()
+-- ── reset_requests ─────────────────────────────────────────────────────
+create table if not exists reset_requests (
+  request_id    text primary key,                        -- 'RR_' + 16 hex
+  email         text not null,                           -- lowercased
+  user_exists   boolean not null default false,          -- resolved server-side
+  status        text not null,                           -- EMAIL_SENT | RATE_LIMITED | EMAIL_FAILED
+  fp_hash       text,
+  device_label  text,
+  used          boolean not null default false,
+  used_utc      timestamptz,
+  created_utc   timestamptz not null default now()
 );
--- mode: instant | timed
--- source: fixed | builder | retake | mock
--- status: in_progress | completed | abandoned
+create index if not exists reset_requests_email_created on reset_requests (email, created_utc);
+create index if not exists reset_requests_created       on reset_requests (created_utc);
 
-CREATE INDEX ON attempts (user_id);
-CREATE INDEX ON attempts (quiz_id);
-CREATE INDEX ON attempts (course_id);
-CREATE INDEX ON attempts (status);
-CREATE INDEX ON attempts (user_id, quiz_id, mode, status);
+-- ── courses (slice 3) ──────────────────────────────────────────────────
+create table if not exists courses (
+  course_id     text primary key,
+  title         text not null,
+  program_scope text[] not null,
+  status        text not null default 'active',   -- active | draft | archived
+  page_slug     text
+);
 
+-- ── levels (slice 3; unused, kept as legacy) ───────────────────────────
+create table if not exists levels (
+  level_id   text primary key,
+  label      text not null,
+  created_at timestamptz default now()
+);
 
--- ────────────────────────────────────────────────────────────
--- 3. ITEMS TABLES (one per course — MyNMCLicensure)
--- ────────────────────────────────────────────────────────────
--- All 11 tables follow this schema. Replace items_gp with:
+-- ── products (slice 3) ─────────────────────────────────────────────────
+create table if not exists products (
+  product_id          text primary key,
+  name                text not null,
+  kind                text not null default 'PAID',     -- PAID | TRIAL | FREE
+  status              text not null default 'active',   -- active | archived
+  courses_included    text[] not null,
+  price_minor         integer not null,
+  currency            text not null default 'GHS',
+  duration_days       integer not null,
+  telegram_group_keys text[]
+);
+
+-- ── config (slice 3) ───────────────────────────────────────────────────
+create table if not exists config (
+  key         text primary key,
+  value       text not null,
+  description text,
+  updated_at  timestamptz default now()
+);
+
+-- ── the question bank (slice 4a) ───────────────────────────────────────
+-- Eleven tables of one shape, one per course (rebuild.md §8 S2, kept):
 --   items_gp, items_rn_med, items_rn_surg,
 --   items_rm_ped_obs_hrn, items_rm_mid,
 --   items_rphn_pphn, items_rphn_disease_ctrl,
 --   items_rmhn_psych_nurs, items_rmhn_psych_ppharm,
 --   items_nac_basic_clin, items_nac_basic_prev
-
-CREATE TABLE items_gp (
-  item_id         TEXT PRIMARY KEY,
-  question_type   TEXT NOT NULL DEFAULT 'MCQ',
-  stem            TEXT NOT NULL,
-  option_a        TEXT, fb_a TEXT,
-  option_b        TEXT, fb_b TEXT,
-  option_c        TEXT, fb_c TEXT,
-  option_d        TEXT, fb_d TEXT,
-  option_e        TEXT, fb_e TEXT,
-  option_f        TEXT, fb_f TEXT,
-  correct         TEXT NOT NULL,
-  rationale       TEXT,
-  rationale_img   TEXT,
-  subject         TEXT,
-  maintopic       TEXT,
-  subtopic        TEXT,
-  difficulty      TEXT,
-  marks           NUMERIC NOT NULL DEFAULT 1,
-  batch_id        TEXT,
-  shuffle_options BOOLEAN NOT NULL DEFAULT true
+-- The migration creates them in a loop; the shape, written once:
+create table if not exists items_gp (
+  item_id         text primary key,
+  question_type   text not null default 'MCQ',   -- MCQ | TF | SATA
+  stem            text not null,
+  option_a        text, fb_a text,
+  option_b        text, fb_b text,
+  option_c        text, fb_c text,
+  option_d        text, fb_d text,
+  option_e        text, fb_e text,
+  option_f        text, fb_f text,
+  correct         text not null,   -- "b" for MCQ / TF; "a,c,e" for SATA
+  rationale       text,
+  rationale_img   text,            -- public URL in licensure-gh-rationale-images
+  subject         text,
+  maintopic       text,
+  subtopic        text,
+  difficulty      text,
+  marks           numeric not null default 1,
+  batch_id        text,
+  shuffle_options boolean not null default true   -- false for TF
 );
--- question_type: MCQ | TF | SATA
--- correct: single letter for MCQ/TF e.g. "b", comma-separated for SATA e.g. "a,c,e"
--- rationale_img: public URL from Supabase Storage rationale-images bucket
--- shuffle_options: false for TF questions
+-- Six indexes per table: maintopic, subtopic, subject, difficulty,
+-- question_type, batch_id (items_<t>_<column>_idx).
 
-CREATE INDEX ON items_gp (maintopic);
-CREATE INDEX ON items_gp (subtopic);
-CREATE INDEX ON items_gp (subject);
-CREATE INDEX ON items_gp (difficulty);
-CREATE INDEX ON items_gp (question_type);
-CREATE INDEX ON items_gp (batch_id);
+-- Storage bucket (global namespace, hence the prefix):
+-- licensure-gh-rationale-images — public read, 2 MB limit, server uploads only.
 
-
--- ────────────────────────────────────────────────────────────
--- 3b. OFFLINE PACKS
--- ────────────────────────────────────────────────────────────
-
--- 3b.1 offline_packs
-CREATE TABLE offline_packs (
-  pack_id        TEXT NOT NULL PRIMARY KEY,
-  user_id        TEXT NOT NULL,
-  course_id      TEXT NOT NULL,
-  pack_name      TEXT NOT NULL,
-  selection_mode TEXT NOT NULL DEFAULT 'topics',
-  maintopics     TEXT[] NOT NULL DEFAULT '{}',
-  subtopics      TEXT[] NOT NULL DEFAULT '{}',
-  difficulties   TEXT[] NOT NULL DEFAULT '{}',
-  question_types TEXT[] NOT NULL DEFAULT '{}',
-  concept_query  TEXT,
-  display_label  TEXT,
-  item_ids       TEXT[] NOT NULL,
-  question_count INTEGER NOT NULL,
-  watermark      JSONB NOT NULL DEFAULT '{}',
-  status         TEXT NOT NULL DEFAULT 'active',
-  created_utc    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_utc    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+-- ── quizzes and mock_quizzes (slice 5a) ────────────────────────────────
+-- Two tables of one shape, kept as two (D4); mock_quizzes adds
+-- `visibility`. No DELETE policy on either: archive is the way out.
+create table if not exists quizzes (
+  quiz_id        text primary key,
+  course_id      text not null references courses (course_id),  -- S4
+  title          text not null,
+  item_ids       text[] not null default '{}',
+  n              integer not null default 0,
+  allowed_modes  text not null default 'BOTH',    -- BOTH | INSTANT_ONLY | TIMED_ONLY
+  shuffle        boolean not null default false,
+  time_limit_sec integer,                         -- null = 1 min per question
+  published      boolean not null default false,
+  publish_at     timestamptz,
+  unpublish_at   timestamptz,
+  status         text not null default 'draft',   -- draft | active | archived
+  notes          text,                            -- admin only
+  created_at     timestamptz default now(),
+  updated_at     timestamptz default now()
 );
--- selection_mode: topics | concepts
+create index if not exists quizzes_course_id_idx on quizzes (course_id);
 
-
--- ────────────────────────────────────────────────────────────
--- 4. MESSAGING TABLES
--- ────────────────────────────────────────────────────────────
-
--- 4.1 messages_threads
-CREATE TABLE messages_threads (
-  thread_id        TEXT PRIMARY KEY,
-  user_id          TEXT NOT NULL,
-  admin_id         TEXT NOT NULL DEFAULT 'admin1',
-  status           TEXT NOT NULL DEFAULT 'open',
-  context_type     TEXT NOT NULL DEFAULT 'general',
-  subject          TEXT,
-  course_id        TEXT,
-  quiz_id          TEXT,
-  question_id      TEXT,
-  attempt_id       TEXT,
-  bulk_batch_id    TEXT,
-  ref_text         TEXT,
-  created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  last_message_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  last_sender_role TEXT NOT NULL DEFAULT 'student'
+create table if not exists mock_quizzes (
+  quiz_id        text primary key,
+  course_id      text not null references courses (course_id),  -- S4
+  title          text not null,
+  n              integer not null,
+  item_ids       text[] not null default '{}',
+  allowed_modes  text not null default 'BOTH',
+  shuffle        boolean not null default false,
+  time_limit_sec integer,
+  status         text not null default 'draft',   -- draft | active | archived
+  published      boolean not null default false,
+  visibility     text not null default 'ALL',     -- ALL | PAID | TRIAL; stored, never set or checked (legacy)
+  publish_at     timestamptz,
+  unpublish_at   timestamptz,
+  notes          text,
+  created_at     timestamptz default now(),
+  updated_at     timestamptz default now()
 );
--- thread_id: 'THR_' + Date.now() + random
--- context_type: general | course | question
--- status: open | closed
--- ref_text: human-readable question reference for question context threads
+create index if not exists mock_quizzes_course_id_idx on mock_quizzes (course_id);
 
--- 4.2 messages
-CREATE TABLE messages (
-  message_id    TEXT PRIMARY KEY,
-  thread_id     TEXT NOT NULL,
-  sender_id     TEXT NOT NULL,
-  sender_role   TEXT NOT NULL,
-  body_text     TEXT NOT NULL,
-  read_by_user  BOOLEAN NOT NULL DEFAULT false,
-  read_by_admin BOOLEAN NOT NULL DEFAULT false,
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+-- ── subscriptions (slice 8) ────────────────────────────────────────────
+-- No content copy (D5). expiry_reminded is carried unused: the
+-- Sheets-era reminder scan that read it was never rebuilt (BUILD_LIST).
+create table if not exists subscriptions (
+  subscription_id text primary key,                                    -- 'SUB_' + hex
+  user_id         text not null references users (user_id),           -- S4
+  product_id      text not null references products (product_id),     -- S4
+  start_utc       timestamptz not null default now(),
+  expires_utc     timestamptz not null,
+  status          text not null default 'ACTIVE',    -- ACTIVE | EXPIRED | REVOKED
+  expiry_reminded boolean not null default false,
+  source          text not null default 'PAYMENT',   -- PAYMENT | PAYSTACK | ADMIN | SELF_TRIAL_SIGNUP
+  source_ref      text
 );
--- message_id: 'MSG_' + Date.now() + random
--- sender_role: student | admin
+create index if not exists subscriptions_user_id_idx on subscriptions (user_id);
+create index if not exists subscriptions_user_product_status_idx on subscriptions (user_id, product_id, status);
+create index if not exists subscriptions_status_expires_idx on subscriptions (status, expires_utc);
 
-
--- ────────────────────────────────────────────────────────────
--- 5. TEACHER ASSESS TABLES (MyTeacher)
--- ────────────────────────────────────────────────────────────
-
--- 5.1 teacher_profiles
-CREATE TABLE teacher_profiles (
-  teacher_id      TEXT NOT NULL PRIMARY KEY,
-  display_name    TEXT,
-  email           TEXT,
-  phone_number    TEXT,
-  organisation    TEXT,
-  role_requested  TEXT DEFAULT 'TEACHER',
-  plan_type       TEXT NOT NULL DEFAULT 'FREE',
-  active          BOOLEAN NOT NULL DEFAULT false,
-  request_status  TEXT NOT NULL DEFAULT 'PENDING',
-  request_note    TEXT,
-  request_count   INTEGER NOT NULL DEFAULT 0,
-  requested_at    TIMESTAMPTZ,
-  last_request_at TIMESTAMPTZ,
-  created_at      TIMESTAMPTZ DEFAULT NOW(),
-  updated_at      TIMESTAMPTZ DEFAULT NOW(),
-  avatar_url      TEXT,
-  org_tagline     TEXT,
-  org_region      TEXT,
-  org_logo_url    TEXT
+-- ── attempts (slice 6a) ────────────────────────────────────────────────
+-- One row per run. item_ids and answers_json stay TEXT (§8 S3 unticked).
+-- No content copy (D5). quiz_id names a row in quizzes OR mock_quizzes
+-- and is null for the builder, so it carries no key.
+create table if not exists attempts (
+  attempt_id        text primary key,                                  -- 'ATT_' + ms + '_' + 7 hex
+  user_id           text not null references users (user_id),         -- S4
+  quiz_id           text,
+  course_id         text not null references courses (course_id),     -- S4
+  mode              text not null,                                     -- instant | timed
+  source            text not null,                                     -- fixed | builder | retake | mock
+  item_ids          text not null,                                     -- comma-joined, in the attempt's order
+  n                 integer not null,
+  seed              text,
+  duration_min      integer,
+  status            text not null default 'in_progress',               -- in_progress | completed | abandoned
+  score_raw         numeric,
+  score_total       numeric,
+  score_pct         numeric,
+  time_taken_s      integer,
+  origin_attempt_id text references attempts (attempt_id),             -- S4; the retake chain
+  display_label     text,
+  answers_json      text not null default '[]',
+  ts_iso            timestamptz default now()
 );
--- request_status: PENDING | APPROVED | REJECTED
--- plan_type: FREE | PRO
+create index if not exists attempts_user_id_idx   on attempts (user_id);
+create index if not exists attempts_quiz_id_idx   on attempts (quiz_id);
+create index if not exists attempts_course_id_idx on attempts (course_id);
+create index if not exists attempts_status_idx    on attempts (status);
+create index if not exists attempts_user_quiz_mode_status_idx on attempts (user_id, quiz_id, mode, status);
 
--- 5.2 teacher_classes
-CREATE TABLE teacher_classes (
-  class_id           TEXT NOT NULL PRIMARY KEY,
-  teacher_id         TEXT NOT NULL,
-  title              TEXT NOT NULL,
-  join_code          TEXT NOT NULL UNIQUE,
-  custom_fields_json JSONB NOT NULL DEFAULT '{"fields": []}',
-  status             TEXT NOT NULL DEFAULT 'ACTIVE',
-  created_at         TIMESTAMPTZ DEFAULT NOW(),
-  updated_at         TIMESTAMPTZ DEFAULT NOW(),
-  require_approval   BOOLEAN DEFAULT false,
-  description        TEXT,
-  programme          TEXT,
-  course             TEXT,
-  academic_year      TEXT,
-  semester           TEXT,
-  max_capacity       INTEGER,
-  start_date         DATE,
-  end_date           DATE,
-  colour             TEXT,
-  cohort_id          TEXT
+-- ── payments (slice 9a) ────────────────────────────────────────────────
+-- No content copy (D5). Every write is the server's (service role); an
+-- ADMIN reads. setup_token is re-minted on every verify; its 48-hour
+-- clock is setup_created_utc.
+create table if not exists payments (
+  reference             text primary key,                                   -- 'QAC_' + 12 upper hex
+  status                text not null,                                      -- INIT | PAID | SETUP_REQUIRED | ACTIVATED | FAILED
+  email                 text not null,
+  user_id               text references users (user_id),                    -- S4; null until setup on a pay-first row
+  product_id            text not null references products (product_id),    -- S4
+  product_name          text,
+  amount_minor_expected integer not null,
+  currency              text not null,
+  amount_minor_paid     integer,
+  paid_utc              timestamptz,
+  activated_utc         timestamptz,
+  subscription_id       text references subscriptions (subscription_id),   -- S4; null until activation
+  failure_note          text,
+  raw                   jsonb,                                              -- { init, verify, setup_complete, flow, … }
+  setup_token           text,
+  setup_created_utc     timestamptz,
+  setup_completed_utc   timestamptz,
+  program_id            text,
+  phone_number          text
 );
--- status: ACTIVE | ARCHIVED
+create index if not exists payments_status_idx   on payments (status);
+create index if not exists payments_email_idx    on payments (email);
+create index if not exists payments_user_id_idx  on payments (user_id);
+create index if not exists payments_paid_utc_idx on payments (paid_utc desc nulls last);
 
-CREATE INDEX ON teacher_classes (teacher_id);
-CREATE INDEX ON teacher_classes (join_code);
-CREATE INDEX ON teacher_classes (cohort_id);
-
--- 5.3 teacher_class_members
-CREATE TABLE teacher_class_members (
-  member_id          TEXT NOT NULL PRIMARY KEY,
-  class_id           TEXT NOT NULL,
-  user_id            TEXT NOT NULL,
-  teacher_id         TEXT NOT NULL,
-  display_name       TEXT,
-  email              TEXT,
-  member_fields_json JSONB NOT NULL DEFAULT '{"fields": {}}',
-  status             TEXT NOT NULL DEFAULT 'ACTIVE',
-  joined_at          TIMESTAMPTZ DEFAULT NOW(),
-  updated_at         TIMESTAMPTZ DEFAULT NOW(),
-  CONSTRAINT unique_class_member UNIQUE (class_id, user_id)
+-- ── rate_limits (slice 9a) ─────────────────────────────────────────────
+-- The payment actions' 5-per-60-s counter, one row per caller address;
+-- read and written only by check_payment_rate_limit() (db/rls.sql).
+create table if not exists rate_limits (
+  key          text primary key,                       -- 'payments:' + the caller's address
+  window_start timestamptz not null default now(),
+  count        integer not null default 0
 );
--- status: ACTIVE | PENDING | REJECTED
-
-CREATE INDEX ON teacher_class_members (class_id);
-CREATE INDEX ON teacher_class_members (user_id);
-CREATE INDEX ON teacher_class_members (teacher_id);
-
--- 5.4 teacher_bank_items
-CREATE TABLE teacher_bank_items (
-  bank_item_id     TEXT NOT NULL PRIMARY KEY,
-  teacher_id       TEXT NOT NULL,
-  status           TEXT NOT NULL DEFAULT 'ACTIVE',
-  question_type    TEXT NOT NULL DEFAULT 'MCQ',
-  stem             TEXT NOT NULL,
-  option_a         TEXT, fb_a TEXT,
-  option_b         TEXT, fb_b TEXT,
-  option_c         TEXT, fb_c TEXT,
-  option_d         TEXT, fb_d TEXT,
-  option_e         TEXT, fb_e TEXT,
-  option_f         TEXT, fb_f TEXT,
-  correct          TEXT NOT NULL,
-  rationale        TEXT,
-  rationale_img    TEXT,
-  subject          TEXT,
-  maintopic        TEXT,
-  subtopic         TEXT,
-  difficulty       TEXT,
-  marks            INTEGER NOT NULL DEFAULT 1,
-  shuffle_options  BOOLEAN NOT NULL DEFAULT true,
-  source_type      TEXT NOT NULL DEFAULT 'TEACHER',
-  source_course_id TEXT,
-  source_item_id   TEXT,
-  imported_at      TIMESTAMPTZ,
-  created_at       TIMESTAMPTZ DEFAULT NOW(),
-  updated_at       TIMESTAMPTZ DEFAULT NOW(),
-  question_ref     TEXT,
-  tags             TEXT[] NOT NULL DEFAULT '{}',
-  batch_id         TEXT,
-  year_level       TEXT,
-  bloom_level      TEXT
-);
--- question_type: MCQ | TF | SATA
--- source_type: TEACHER | IMPORT | QUIZ_INLINE | LIBRARY
--- question_ref: teacher's own reference code for numbering questions (unique per teacher)
--- bloom_level: Remember | Understand | Apply | Analyse | Evaluate | Create
--- year_level: e.g. 'Year 1', 'Year 2', 'Level 100', 'Level 200'
-
-CREATE INDEX ON teacher_bank_items (teacher_id);
-CREATE INDEX ON teacher_bank_items (teacher_id, status);
-CREATE INDEX ON teacher_bank_items (maintopic);
-CREATE INDEX ON teacher_bank_items (source_type);
-CREATE UNIQUE INDEX idx_bank_question_ref ON teacher_bank_items (teacher_id, question_ref) WHERE question_ref IS NOT NULL;
-CREATE INDEX idx_bank_tags ON teacher_bank_items USING GIN (tags);
-CREATE INDEX idx_bank_batch ON teacher_bank_items (batch_id);
-CREATE INDEX idx_bank_year ON teacher_bank_items (year_level);
-CREATE INDEX idx_bank_bloom ON teacher_bank_items (bloom_level);
-
--- 5.5 teacher_quizzes
-CREATE TABLE teacher_quizzes (
-  teacher_quiz_id        TEXT NOT NULL PRIMARY KEY,
-  teacher_id             TEXT NOT NULL,
-  title                  TEXT NOT NULL,
-  subject                TEXT,
-  course_id              TEXT,
-  preset                 TEXT NOT NULL DEFAULT 'EXAM',
-  duration_minutes       INTEGER NOT NULL DEFAULT 0,
-  shuffle_questions      BOOLEAN NOT NULL DEFAULT false,
-  shuffle_options        BOOLEAN NOT NULL DEFAULT true,
-  max_attempts           INTEGER NOT NULL DEFAULT 1,
-  show_review            BOOLEAN NOT NULL DEFAULT false,
-  show_results           BOOLEAN NOT NULL DEFAULT true,
-  results_release_policy TEXT NOT NULL DEFAULT 'MANUAL',
-  -- NOTE: results_released / results_released_at at quiz level are no longer
-  -- used for gating. Release state lives on teacher_quiz_classes (per-class).
-  -- Kept here for backward compat; remove in a follow-up.
-  results_released       BOOLEAN NOT NULL DEFAULT false,
-  results_released_at    TIMESTAMPTZ,
-  -- open_at / close_at serve as the default template window. Per-class
-  -- overrides live on teacher_quiz_classes (link.* ?? quiz.*).
-  open_at                TIMESTAMPTZ,
-  close_at               TIMESTAMPTZ,
-  status                 TEXT NOT NULL DEFAULT 'DRAFT',
-  access_code            TEXT,
-  custom_fields_json     JSONB NOT NULL DEFAULT '{"fields": []}',
-  draft_items_json       JSONB NOT NULL DEFAULT '{"items": []}',
-  grading_policy         TEXT NOT NULL DEFAULT 'BANDS_PCT',
-  grade_bands_json       JSONB NOT NULL DEFAULT '{"bands": []}',
-  pass_threshold_pct     NUMERIC NOT NULL DEFAULT 50,
-  score_display_policy   TEXT NOT NULL DEFAULT 'RAW_AND_PCT',
-  created_at             TIMESTAMPTZ DEFAULT NOW(),
-  updated_at             TIMESTAMPTZ DEFAULT NOW(),
-  sata_scoring_policy    TEXT NOT NULL DEFAULT 'ALL_OR_NOTHING'
-);
--- status: DRAFT | PUBLISHED | ARCHIVED
--- preset: EXAM | PRACTICE | HOMEWORK
--- results_release_policy: IMMEDIATE | AFTER_CLOSE | MANUAL
--- sata_scoring_policy: ALL_OR_NOTHING | PARTIAL_CREDIT | PER_OPTION
--- grading_policy: BANDS_PCT | PASS_FAIL | NONE
--- score_display_policy: RAW_AND_PCT | PCT_ONLY | RAW_ONLY | HIDDEN
-
-CREATE INDEX ON teacher_quizzes (teacher_id);
-CREATE INDEX ON teacher_quizzes (teacher_id, status);
-
--- 5.6 teacher_quiz_items (snapshot at publish time)
-CREATE TABLE teacher_quiz_items (
-  quiz_item_id         TEXT NOT NULL PRIMARY KEY,
-  teacher_quiz_id      TEXT NOT NULL,
-  position             INTEGER NOT NULL,
-  bank_item_id         TEXT,
-  snap_stem            TEXT NOT NULL,
-  snap_option_a        TEXT, snap_fb_a TEXT,
-  snap_option_b        TEXT, snap_fb_b TEXT,
-  snap_option_c        TEXT, snap_fb_c TEXT,
-  snap_option_d        TEXT, snap_fb_d TEXT,
-  snap_option_e        TEXT, snap_fb_e TEXT,
-  snap_option_f        TEXT, snap_fb_f TEXT,
-  snap_correct         TEXT NOT NULL,
-  snap_rationale       TEXT,
-  snap_rationale_img   TEXT,
-  snap_subject         TEXT,
-  snap_maintopic       TEXT,
-  snap_subtopic        TEXT,
-  snap_difficulty      TEXT,
-  snap_marks           INTEGER NOT NULL DEFAULT 1,
-  snap_question_type   TEXT NOT NULL DEFAULT 'MCQ',
-  snap_shuffle_options BOOLEAN NOT NULL DEFAULT true,
-  snapped_at           TIMESTAMPTZ DEFAULT NOW(),
-  snap_question_ref    TEXT,
-  snap_tags            TEXT[] NOT NULL DEFAULT '{}',
-  snap_year_level      TEXT,
-  snap_bloom_level     TEXT
-);
-
-CREATE INDEX ON teacher_quiz_items (teacher_quiz_id);
-CREATE INDEX ON teacher_quiz_items (teacher_quiz_id, position);
-
--- 5.7 teacher_quiz_classes
--- Assignment row: links a quiz (template) to a class with its own schedule
--- and release state. open_at/close_at override the quiz-level template
--- (null = inherit). results_released/_at is link-only (no inheritance).
-CREATE TABLE teacher_quiz_classes (
-  tqc_id              TEXT NOT NULL PRIMARY KEY,
-  teacher_quiz_id     TEXT NOT NULL,
-  class_id            TEXT NOT NULL,
-  teacher_id          TEXT NOT NULL,
-  status              TEXT NOT NULL DEFAULT 'ACTIVE',
-  open_at             TIMESTAMPTZ,
-  close_at            TIMESTAMPTZ,
-  results_released    BOOLEAN NOT NULL DEFAULT false,
-  results_released_at TIMESTAMPTZ,
-  created_at          TIMESTAMPTZ DEFAULT NOW(),
-  updated_at          TIMESTAMPTZ DEFAULT NOW(),
-  CONSTRAINT unique_quiz_class UNIQUE (teacher_quiz_id, class_id)
-);
-
-CREATE INDEX ON teacher_quiz_classes (teacher_quiz_id);
-CREATE INDEX ON teacher_quiz_classes (class_id);
-CREATE INDEX ON teacher_quiz_classes (teacher_id);
-
--- 5.8 teacher_quiz_attempts
-CREATE TABLE teacher_quiz_attempts (
-  attempt_id            TEXT NOT NULL PRIMARY KEY,
-  user_id               TEXT NOT NULL,
-  teacher_quiz_id       TEXT NOT NULL,
-  teacher_id            TEXT NOT NULL,
-  class_id              TEXT NOT NULL,
-  attempt_no            INTEGER NOT NULL DEFAULT 1,
-  mode                  TEXT NOT NULL,
-  duration_minutes      INTEGER NOT NULL DEFAULT 0,
-  status                TEXT NOT NULL DEFAULT 'IN_PROGRESS',
-  started_at            TIMESTAMPTZ DEFAULT NOW(),
-  due_at                TIMESTAMPTZ,
-  submitted_at          TIMESTAMPTZ,
-  updated_at            TIMESTAMPTZ DEFAULT NOW(),
-  items_json            JSONB NOT NULL DEFAULT '[]',
-  answers_json          JSONB NOT NULL DEFAULT '{}',
-  flags_json            JSONB NOT NULL DEFAULT '{}',
-  candidate_fields_json JSONB NOT NULL DEFAULT '{"fields": {}}',
-  score_raw             NUMERIC,
-  score_total           NUMERIC,
-  score_pct             NUMERIC,
-  time_taken_s          INTEGER,
-  score_json            JSONB,
-  grading_policy        TEXT,
-  grade_bands_json      JSONB,
-  score_display_policy  TEXT
-);
--- status: IN_PROGRESS | SUBMITTED
-
-CREATE INDEX ON teacher_quiz_attempts (user_id);
-CREATE INDEX ON teacher_quiz_attempts (teacher_quiz_id);
-CREATE INDEX ON teacher_quiz_attempts (teacher_id);
-CREATE INDEX ON teacher_quiz_attempts (class_id);
-CREATE INDEX ON teacher_quiz_attempts (user_id, teacher_quiz_id);
-CREATE INDEX ON teacher_quiz_attempts (status);
-
--- 5.9 teacher_library_courses
-CREATE TABLE teacher_library_courses (
-  course_id    TEXT NOT NULL PRIMARY KEY,
-  title        TEXT NOT NULL,
-  description  TEXT,
-  programme    TEXT,
-  faculty      TEXT,
-  category     TEXT,
-  year_group   TEXT,
-  tags         TEXT[] NOT NULL DEFAULT '{}',
-  status       TEXT NOT NULL DEFAULT 'active',
-  created_at   TIMESTAMPTZ DEFAULT NOW(),
-  updated_at   TIMESTAMPTZ DEFAULT NOW(),
-  items_table  TEXT
-);
--- items_table: points to the library items table (e.g. teacher_library_anatomy, teacher_library_english)
--- programme: e.g. 'Nursing', 'Business', 'General'
--- faculty: e.g. 'Health Sciences', 'Arts', 'Social Sciences'
--- category: e.g. 'Sciences', 'Languages', 'Commerce'
--- year_group: e.g. 'Year 1', 'Year 2', 'Postgraduate'
-
-CREATE INDEX ON teacher_library_courses (status);
-CREATE INDEX idx_lib_courses_programme ON teacher_library_courses (programme);
-CREATE INDEX idx_lib_courses_faculty ON teacher_library_courses (faculty);
-CREATE INDEX idx_lib_courses_category ON teacher_library_courses (category);
-CREATE INDEX idx_lib_courses_year ON teacher_library_courses (year_group);
-CREATE INDEX idx_lib_courses_tags ON teacher_library_courses USING GIN (tags);
-
--- 5.9b Library item tables (one per course)
--- All follow the same schema. Replace teacher_library_anatomy with:
---   teacher_library_anatomy, teacher_library_physiology, teacher_library_english,
---   teacher_library_accounting, teacher_library_government, teacher_library_microbiology,
---   teacher_library_pharmacology, teacher_library_sociology, teacher_library_surveying,
---   teacher_library_management (add more as needed)
--- 10 tables total
-
-CREATE TABLE teacher_library_anatomy (
-  item_id         TEXT PRIMARY KEY,
-  question_type   TEXT NOT NULL DEFAULT 'MCQ',
-  stem            TEXT NOT NULL,
-  option_a        TEXT, fb_a TEXT,
-  option_b        TEXT, fb_b TEXT,
-  option_c        TEXT, fb_c TEXT,
-  option_d        TEXT, fb_d TEXT,
-  option_e        TEXT, fb_e TEXT,
-  option_f        TEXT, fb_f TEXT,
-  correct         TEXT NOT NULL,
-  rationale       TEXT,
-  rationale_img   TEXT,
-  subject         TEXT,
-  maintopic       TEXT,
-  subtopic        TEXT,
-  difficulty      TEXT,
-  marks           INTEGER NOT NULL DEFAULT 1,
-  shuffle_options BOOLEAN NOT NULL DEFAULT true,
-  question_ref    TEXT,
-  tags            TEXT[] NOT NULL DEFAULT '{}',
-  batch_id        TEXT,
-  year_level      TEXT,
-  bloom_level     TEXT
-);
--- question_type: MCQ | TF | SATA
--- bloom_level: Remember | Understand | Apply | Analyse | Evaluate | Create
--- year_level: e.g. 'Year 1', 'Year 2', 'Level 100', 'Level 200'
-
-CREATE INDEX ON teacher_library_anatomy (maintopic);
-CREATE INDEX ON teacher_library_anatomy (subtopic);
-CREATE INDEX ON teacher_library_anatomy (difficulty);
-CREATE INDEX ON teacher_library_anatomy USING GIN (tags);
-CREATE INDEX ON teacher_library_anatomy (batch_id);
-CREATE INDEX ON teacher_library_anatomy (year_level);
-CREATE INDEX ON teacher_library_anatomy (bloom_level);
-
--- 5.10 teacher_courses
--- A Course is what a teacher teaches (Pharmacology 1, Anatomy, etc).
--- Created once, reused across years. Quizzes link to a Course.
-CREATE TABLE teacher_courses (
-  course_id    TEXT PRIMARY KEY,
-  teacher_id   TEXT NOT NULL,
-  title        TEXT NOT NULL,
-  description  TEXT,
-  status       TEXT NOT NULL DEFAULT 'ACTIVE',
-  created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
-);
--- status: ACTIVE | ARCHIVED
-
-CREATE INDEX ON teacher_courses (teacher_id);
-
--- 5.11 teacher_programmes
--- A Programme is the academic programme (BSc Nursing, BSc Midwifery).
--- Lightweight label — just a title. Cohorts belong to a Programme.
-CREATE TABLE teacher_programmes (
-  programme_id  TEXT PRIMARY KEY,
-  teacher_id    TEXT NOT NULL,
-  title         TEXT NOT NULL,
-  status        TEXT NOT NULL DEFAULT 'ACTIVE',
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
-);
--- status: ACTIVE | ARCHIVED
-
-CREATE INDEX ON teacher_programmes (teacher_id);
-
--- 5.12 teacher_cohorts
--- A Cohort is the permanent identity of a student group.
--- e.g. "BSc Nursing 2024 Intake". Created once per intake year.
--- No uniqueness constraint — multiple cohorts per programme/year allowed.
-CREATE TABLE teacher_cohorts (
-  cohort_id     TEXT PRIMARY KEY,
-  teacher_id    TEXT NOT NULL,
-  programme_id  TEXT NOT NULL REFERENCES teacher_programmes(programme_id),
-  title         TEXT NOT NULL,
-  intake_year   INT NOT NULL,
-  status        TEXT NOT NULL DEFAULT 'ACTIVE',
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
-);
--- status: ACTIVE | ARCHIVED
-
-CREATE INDEX ON teacher_cohorts (teacher_id);
-CREATE INDEX ON teacher_cohorts (programme_id);
-
-
--- 1.11 sessions
--- Tracks active device sessions for concurrent login control.
--- Max 2 active sessions per user at any time.
--- Never delete rows — set active=FALSE on logout.
--- TODO: add pg_cron cleanup job when user base grows.
-CREATE TABLE sessions (
-  session_id    TEXT PRIMARY KEY,
-  user_id       TEXT NOT NULL,
-  kind          TEXT NOT NULL DEFAULT 'LOGIN',
-  issued_utc    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  expires_utc   TIMESTAMPTZ NOT NULL,
-  last_seen_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  device_label  TEXT,
-  ua_hash       TEXT,
-  ip_hash       TEXT,
-  login_via     TEXT NOT NULL DEFAULT 'EMAIL',  -- EMAIL | GOOGLE | MAGIC_LINK
-  active        BOOLEAN NOT NULL DEFAULT TRUE
-);
-
-CREATE INDEX ON sessions (user_id);
-CREATE INDEX ON sessions (user_id, active, expires_utc);
-
-
--- 1.12 auth_events
--- Logs every login attempt (success + failure) for audit trail
--- and rate limiting. Never delete rows — use pg_cron cleanup
--- when table grows large. All writes go through RPC
--- (log_auth_event) — no direct browser INSERT.
-CREATE TABLE auth_events (
-  event_id      TEXT PRIMARY KEY,
-  event_type    TEXT NOT NULL,          -- LOGIN_SUCCESS | LOGIN_FAIL
-  identifier    TEXT NOT NULL,          -- email used (lowercased)
-  user_id       TEXT,                   -- NULL if unknown email
-  fp_hash       TEXT,                   -- device fingerprint hash
-  ua_hash       TEXT,                   -- user-agent hash
-  device_label  TEXT,                   -- 'Windows · Chrome' etc.
-  fail_reason   TEXT,                   -- NULL on success; INVALID_CREDENTIALS, RATE_LIMITED
-  created_utc   TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX auth_events_identifier_created
-  ON auth_events (identifier, created_utc);
-
-CREATE INDEX auth_events_fp_hash_created
-  ON auth_events (fp_hash, created_utc)
-  WHERE fp_hash IS NOT NULL;
-
-CREATE INDEX auth_events_user_id_created
-  ON auth_events (user_id, created_utc)
-  WHERE user_id IS NOT NULL;
-
-CREATE INDEX auth_events_created
-  ON auth_events (created_utc);
-
-
--- 1.13 reset_requests
--- Tracks every forgot-password submission for rate limiting
--- and audit. Logs whether the email belonged to a real user,
--- whether the request was rate-limited, and whether the reset
--- link was actually used. All writes go through RPCs.
-CREATE TABLE reset_requests (
-  request_id    TEXT PRIMARY KEY,
-  email         TEXT NOT NULL,            -- what the user typed (lowercased)
-  user_exists   BOOLEAN NOT NULL DEFAULT FALSE,  -- was this a registered email
-  status        TEXT NOT NULL,            -- EMAIL_SENT | RATE_LIMITED | EMAIL_FAILED
-  fp_hash       TEXT,                     -- device fingerprint hash
-  device_label  TEXT,                     -- 'Windows · Chrome' etc.
-  used          BOOLEAN NOT NULL DEFAULT FALSE,  -- did they complete the reset
-  used_utc      TIMESTAMPTZ,             -- when they completed it
-  created_utc   TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX reset_requests_email_created
-  ON reset_requests (email, created_utc);
-
-CREATE INDEX reset_requests_created
-  ON reset_requests (created_utc);
-
-
--- ────────────────────────────────────────────────────────────
--- 7. MYTEACHER AUTH TABLES
--- Mirror of the Licensure auth tables (users, sessions,
--- auth_events, reset_requests) — fully separate infrastructure.
--- auth.users (Supabase Auth) stays shared across both products.
--- ────────────────────────────────────────────────────────────
-
--- 7.1 teacher_users
--- Core identity for all MyTeacher users (teachers + students).
--- role field differentiates: TEACHER | STUDENT | ADMIN
--- Teachers also have a row in teacher_profiles (org detail, plan, approval).
--- signup_source default is 'MYTEACHER' instead of 'SUPABASE_AUTH'.
-CREATE TABLE teacher_users (
-  user_id              TEXT PRIMARY KEY,
-  auth_id              UUID,
-  username             TEXT,
-  email                TEXT NOT NULL,
-  phone_number         TEXT,
-  name                 TEXT,
-  forename             TEXT,
-  surname              TEXT,
-  program_id           TEXT,
-  cohort               TEXT,
-  level                TEXT,
-  role                 TEXT NOT NULL DEFAULT 'STUDENT',
-  active               BOOLEAN NOT NULL DEFAULT true,
-  avatar_url           TEXT,
-  must_change_password BOOLEAN NOT NULL DEFAULT false,
-  signup_source        TEXT DEFAULT 'MYTEACHER',
-  created_utc          TIMESTAMPTZ DEFAULT NOW(),
-  last_login_utc       TIMESTAMPTZ
-);
-
-CREATE INDEX idx_teacher_users_auth_id ON teacher_users(auth_id);
-CREATE INDEX idx_teacher_users_email   ON teacher_users(email);
-CREATE INDEX idx_teacher_users_role    ON teacher_users(role);
-
-
--- 7.2 teacher_sessions
--- Tracks active device sessions for MyTeacher users.
--- Mirror of sessions. Max 2 active sessions per user.
--- Never DELETE rows — set active=FALSE on logout.
-CREATE TABLE teacher_sessions (
-  session_id    TEXT PRIMARY KEY,
-  user_id       TEXT NOT NULL,
-  kind          TEXT NOT NULL DEFAULT 'LOGIN',
-  issued_utc    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  expires_utc   TIMESTAMPTZ NOT NULL,
-  last_seen_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  device_label  TEXT,
-  ua_hash       TEXT,
-  ip_hash       TEXT,
-  login_via     TEXT NOT NULL DEFAULT 'EMAIL',
-  active        BOOLEAN NOT NULL DEFAULT true
-);
-
-CREATE INDEX idx_teacher_sessions_user_id ON teacher_sessions(user_id);
-CREATE INDEX idx_teacher_sessions_active  ON teacher_sessions(active);
-
-
--- 7.3 teacher_auth_events
--- Logs every login attempt (success + failure) for MyTeacher users.
--- Mirror of auth_events. Never DELETE rows.
--- All writes go through RPC (log_myteacher_auth_event) — no direct browser INSERT.
-CREATE TABLE teacher_auth_events (
-  event_id     TEXT PRIMARY KEY,
-  event_type   TEXT NOT NULL,
-  identifier   TEXT NOT NULL,
-  user_id      TEXT,
-  fp_hash      TEXT,
-  ua_hash      TEXT,
-  device_label TEXT,
-  fail_reason  TEXT,
-  created_utc  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX idx_teacher_auth_events_user_id    ON teacher_auth_events(user_id);
-CREATE INDEX idx_teacher_auth_events_identifier ON teacher_auth_events(identifier);
-CREATE INDEX idx_teacher_auth_events_created    ON teacher_auth_events(created_utc);
-
-
--- 7.4 teacher_reset_requests
--- Tracks every forgot-password submission for MyTeacher users.
--- Mirror of reset_requests. All writes go through RPCs — no direct browser INSERT.
-CREATE TABLE teacher_reset_requests (
-  request_id   TEXT PRIMARY KEY,
-  email        TEXT NOT NULL,
-  user_exists  BOOLEAN NOT NULL DEFAULT false,
-  status       TEXT NOT NULL,
-  fp_hash      TEXT,
-  device_label TEXT,
-  used         BOOLEAN NOT NULL DEFAULT false,
-  used_utc     TIMESTAMPTZ,
-  created_utc  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX idx_teacher_reset_requests_email   ON teacher_reset_requests(email);
-CREATE INDEX idx_teacher_reset_requests_created ON teacher_reset_requests(created_utc);
-
-
--- 5.11a teacher_config
--- MyTeacher runtime-tunable UX settings (future use — builder
--- bounds, runner behaviour, import caps, etc). Mirror of the
--- Licensure `config` table. Do NOT put worker URLs here —
--- those live in myteacher/js/config.js with hostname detection.
-CREATE TABLE teacher_config (
-  key         TEXT PRIMARY KEY,
-  value       TEXT NOT NULL,
-  description TEXT
-);
-
-
--- ────────────────────────────────────────────────────────────
--- 5.12 MyTeacher FK constraints
--- ────────────────────────────────────────────────────────────
--- Declared here (after teacher_users exists) rather than inline
--- on each table definition. Both teacher_id and user_id columns
--- on MyTeacher content tables reference teacher_users, NOT the
--- Licensure users table — MyTeacher has its own identity table
--- since the auth split.
-
-ALTER TABLE teacher_bank_items
-  ADD CONSTRAINT teacher_bank_items_teacher_id_fkey
-  FOREIGN KEY (teacher_id) REFERENCES teacher_users(user_id);
-
-ALTER TABLE teacher_classes
-  ADD CONSTRAINT teacher_classes_teacher_id_fkey
-  FOREIGN KEY (teacher_id) REFERENCES teacher_users(user_id);
-
-ALTER TABLE teacher_class_members
-  ADD CONSTRAINT teacher_class_members_teacher_id_fkey
-  FOREIGN KEY (teacher_id) REFERENCES teacher_users(user_id);
-ALTER TABLE teacher_class_members
-  ADD CONSTRAINT teacher_class_members_user_id_fkey
-  FOREIGN KEY (user_id) REFERENCES teacher_users(user_id);
-
-ALTER TABLE teacher_quizzes
-  ADD CONSTRAINT teacher_quizzes_teacher_id_fkey
-  FOREIGN KEY (teacher_id) REFERENCES teacher_users(user_id);
-
-ALTER TABLE teacher_quiz_classes
-  ADD CONSTRAINT teacher_quiz_classes_teacher_id_fkey
-  FOREIGN KEY (teacher_id) REFERENCES teacher_users(user_id);
-
-ALTER TABLE teacher_quiz_attempts
-  ADD CONSTRAINT teacher_quiz_attempts_teacher_id_fkey
-  FOREIGN KEY (teacher_id) REFERENCES teacher_users(user_id);
-ALTER TABLE teacher_quiz_attempts
-  ADD CONSTRAINT teacher_quiz_attempts_user_id_fkey
-  FOREIGN KEY (user_id) REFERENCES teacher_users(user_id);
-
--- Parent-child links (required for referential integrity AND
--- for PostgREST nested select embeds across these tables)
-ALTER TABLE teacher_profiles
-  ADD CONSTRAINT teacher_profiles_teacher_id_fkey
-  FOREIGN KEY (teacher_id) REFERENCES teacher_users(user_id) ON DELETE CASCADE;
-
-ALTER TABLE teacher_class_members
-  ADD CONSTRAINT teacher_class_members_class_id_fkey
-  FOREIGN KEY (class_id) REFERENCES teacher_classes(class_id);
-
-ALTER TABLE teacher_quiz_attempts
-  ADD CONSTRAINT teacher_quiz_attempts_class_id_fkey
-  FOREIGN KEY (class_id) REFERENCES teacher_classes(class_id);
-ALTER TABLE teacher_quiz_attempts
-  ADD CONSTRAINT teacher_quiz_attempts_teacher_quiz_id_fkey
-  FOREIGN KEY (teacher_quiz_id) REFERENCES teacher_quizzes(teacher_quiz_id);
-
-ALTER TABLE teacher_quiz_classes
-  ADD CONSTRAINT teacher_quiz_classes_class_id_fkey
-  FOREIGN KEY (class_id) REFERENCES teacher_classes(class_id);
-ALTER TABLE teacher_quiz_classes
-  ADD CONSTRAINT teacher_quiz_classes_teacher_quiz_id_fkey
-  FOREIGN KEY (teacher_quiz_id) REFERENCES teacher_quizzes(teacher_quiz_id);
-
-ALTER TABLE teacher_quiz_items
-  ADD CONSTRAINT teacher_quiz_items_teacher_quiz_id_fkey
-  FOREIGN KEY (teacher_quiz_id) REFERENCES teacher_quizzes(teacher_quiz_id);
-
--- Forward-ref FKs deferred here because teacher_cohorts and
--- teacher_courses are defined later in the file (5.11 / 5.10)
--- than teacher_classes and teacher_quizzes (5.2 / 5.5).
-ALTER TABLE teacher_classes
-  ADD CONSTRAINT teacher_classes_cohort_id_fkey
-  FOREIGN KEY (cohort_id) REFERENCES teacher_cohorts(cohort_id);
-
-ALTER TABLE teacher_quizzes
-  ADD CONSTRAINT teacher_quizzes_course_id_fkey
-  FOREIGN KEY (course_id) REFERENCES teacher_courses(course_id);
-
-
--- ────────────────────────────────────────────────────────────
--- 6. RLS (dev mode — replace before go-live)
--- ────────────────────────────────────────────────────────────
--- Apply to every table above:
---
--- ALTER TABLE <table_name> ENABLE ROW LEVEL SECURITY;
--- CREATE POLICY "dev_allow_all" ON <table_name> FOR ALL USING (true) WITH CHECK (true);
