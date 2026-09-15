@@ -109,16 +109,8 @@ export type VerifyResult =
     };
 
 // ── setup-complete ─────────────────────────────────────────────────────
-export type SetupCompleteInput = {
-  reference: string;
-  setup_token: string;
-  forename: string;
-  surname: string;
-  password: string;
-  phone_number: string;
-  program_id: string;
-};
-
+// The input is a FormData (reference, setup_token, forename, surname,
+// password, phone_number, program_id) — see setup-complete.ts.
 export type SetupCompleteResult =
   | {
       ok: true;

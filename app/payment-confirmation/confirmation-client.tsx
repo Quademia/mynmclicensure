@@ -282,15 +282,17 @@ export function ConfirmationClient() {
     setLoading(true);
     setSetupBusy(true);
     try {
-      const out = await completePaymentSetup({
-        reference: referenceRef.current,
-        setup_token: setupTokenRef.current,
-        forename: fn,
-        surname: sn,
-        password,
-        phone_number: ph,
-        program_id: programId,
-      });
+      // A FormData, not an object: Next's dev log prints an action's
+      // arguments, and the password must not appear there.
+      const fd = new FormData();
+      fd.set('reference', referenceRef.current);
+      fd.set('setup_token', setupTokenRef.current);
+      fd.set('forename', fn);
+      fd.set('surname', sn);
+      fd.set('password', password);
+      fd.set('phone_number', ph);
+      fd.set('program_id', programId);
+      const out = await completePaymentSetup(fd);
       if (!out.ok) throw new Error(out.message || out.error || 'Could not complete setup');
 
       const store = ls();

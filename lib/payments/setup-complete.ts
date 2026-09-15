@@ -27,6 +27,12 @@
 // after the login was created, the login is deleted again (rebuild.md
 // §9 #4, the registration rollback), because an orphan login would
 // make every retry fail with "already registered" — noted in the log.
+//
+// The input is a FormData, as the register and login actions take,
+// and not a plain object: Next's dev server prints a Server Action's
+// first arguments to the terminal, and a plain object would put the
+// payer's password there (seen in Sam's walk, 2026-09-15). A FormData
+// prints as {}.
 
 'use server';
 
@@ -36,23 +42,28 @@ import { activatePaymentForUser } from './activate';
 import { makePaymentUserId } from './ids';
 import { findPaymentUser, getPaymentByReference, patchPayment, type ServiceDb } from './queries';
 import { checkPaymentRateLimit } from './rate-limit';
-import { RATE_LIMITED_MESSAGE, SETUP_TOKEN_LIFETIME_MS, type PaymentUser, type SetupCompleteInput, type SetupCompleteResult } from './types';
+import { RATE_LIMITED_MESSAGE, SETUP_TOKEN_LIFETIME_MS, type PaymentUser, type SetupCompleteResult } from './types';
 
 function fail(error: string, message?: string): SetupCompleteResult {
   return { ok: false, error, message: message || error };
 }
 
-export async function completePaymentSetup(input: SetupCompleteInput): Promise<SetupCompleteResult> {
+function field(formData: FormData, name: string): string {
+  const v = formData.get(name);
+  return typeof v === 'string' ? v.trim() : '';
+}
+
+export async function completePaymentSetup(formData: FormData): Promise<SetupCompleteResult> {
   const rl = await checkPaymentRateLimit();
   if (!rl.ok) return fail('rate_limited', RATE_LIMITED_MESSAGE);
 
-  const reference = String(input?.reference || '').trim();
-  const setupToken = String(input?.setup_token || '').trim();
-  const forename = String(input?.forename || '').trim();
-  const surname = String(input?.surname || '').trim();
-  const password = String(input?.password || '');
-  const phoneNumberInput = String(input?.phone_number || '').trim();
-  const programIdInput = String(input?.program_id || '').trim();
+  const reference = field(formData, 'reference');
+  const setupToken = field(formData, 'setup_token');
+  const forename = field(formData, 'forename');
+  const surname = field(formData, 'surname');
+  const password = String(formData.get('password') ?? '');
+  const phoneNumberInput = field(formData, 'phone_number');
+  const programIdInput = field(formData, 'program_id');
 
   if (!reference) return fail('missing_reference');
   if (!setupToken) return fail('missing_setup_token');
