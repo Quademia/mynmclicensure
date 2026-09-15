@@ -59,7 +59,7 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ⬜ 12 Messaging — three contexts, admin inbox, bulk send, badges, the runner's Send feedback button (left out of 6)
 - ✅ 13a Offline packs — table, allowance, non-repeat picker, watermark, the builder, the renderer — 2026-09-14
 - ✅ 13b Offline packs — My Packs: list, filters, summary counts, Open / Build Similar — 2026-09-14
-- ⬜ 14a Admin home — the Users page (drawer, assign, reset, deactivate; ?user_id= opens it) and the dashboard counts
+- ✅ 14a Admin home — the Users page (drawer, assign, reset, deactivate; ?user_id= opens it) and the dashboard counts — 2026-09-15
 - ⬜ 14b Admin home — the Attempts analytics page
 - ⬜ 15 Phone pass — student at 375px, admin navigable at 768px
 - ⬜ 16 Cutover — DNS, live keys, content re-copy, old logins deleted, `legacy/` removed
