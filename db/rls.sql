@@ -1,7 +1,7 @@
 -- db/rls.sql — the readable statement of the current policies and the
 -- SECURITY DEFINER functions in `licensure_gh`. Regenerated from
 -- db/migrations/ whenever a migration changes one. NEVER applied directly.
--- Last regenerated: 2026-09-15, after 20260915120000_payments.sql.
+-- Last regenerated: 2026-09-15, after 20260915150000_messaging.sql.
 
 -- ── helper functions for the policies ──────────────────────────────────
 -- SECURITY DEFINER so a policy on users can ask about users without
@@ -471,3 +471,25 @@ end;
 $$;
 
 revoke execute on function check_payment_rate_limit(text, integer, integer) from public, anon, authenticated;
+
+-- ── slice 12a: messaging ───────────────────────────────────────────────
+-- A student reads, inserts and updates their own threads and the
+-- messages on them; an ADMIN all — the thread INSERT bypass included
+-- (legacy's June 2026 fix). No DELETE, as legacy.
+create policy messages_threads_select on messages_threads for select
+using (auth_user_role() = 'ADMIN' or messages_threads.user_id = auth_user_id());
+create policy messages_threads_insert on messages_threads for insert
+with check (auth_user_role() = 'ADMIN' or messages_threads.user_id = auth_user_id());
+create policy messages_threads_update on messages_threads for update
+using (auth_user_role() = 'ADMIN' or messages_threads.user_id = auth_user_id());
+
+create policy messages_select on messages for select
+using (auth_user_role() = 'ADMIN' or exists (select 1 from messages_threads t where t.thread_id = messages.thread_id and t.user_id = auth_user_id()));
+create policy messages_insert on messages for insert
+with check (auth_user_role() = 'ADMIN' or exists (select 1 from messages_threads t where t.thread_id = messages.thread_id and t.user_id = auth_user_id()));
+create policy messages_update on messages for update
+using (auth_user_role() = 'ADMIN' or exists (select 1 from messages_threads t where t.thread_id = messages.thread_id and t.user_id = auth_user_id()));
+
+-- The realtime feed: messages is in the supabase_realtime publication
+-- (the migration adds it when absent); the browser subscribes under
+-- messages_select.

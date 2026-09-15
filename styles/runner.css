@@ -238,3 +238,6 @@
   .runner .header-title { display: none; }
   .runner .ctrl-label { display: none; }
 }
+
+/* Send feedback (slice 12a) — legacy .btn-sm-link */
+.runner .btn-sm-link { background: none; border: none; font-size: 12px; font-weight: 600; color: var(--accent); cursor: pointer; font-family: inherit; text-decoration: underline; padding: 0; }

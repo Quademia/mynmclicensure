@@ -7,7 +7,8 @@
 //
 // The My Courses rows are the active courses the student's subscriptions
 // cover (legacy populateCourseDropdown(courseAccessMap, allCourses) —
-// slice 8). The Messages badge is slice 12 and reads nothing yet.
+// slice 8). The Messages badge is legacy getUnreadCountForUser — the
+// student's open threads holding a message not yet read (slice 12a).
 
 import { requireStudent } from '@/lib/access';
 import { AppShell } from '@/components/shell/app-shell';
@@ -15,14 +16,16 @@ import { StudentSidebar } from '@/components/nav/student/student-sidebar';
 import { displayNameOf } from '@/components/shell/page-header';
 import { getCourses } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
+import { getUnreadCountForUser } from '@/lib/messaging/queries';
 
 export const dynamic = 'force-dynamic';
 
 export default async function StudentLayout({ children }: { children: React.ReactNode }) {
   const { supabase, profile } = await requireStudent();
-  const [access, allCourses] = await Promise.all([
+  const [access, allCourses, unread] = await Promise.all([
     getStudentCourseAccess(supabase, profile.user_id),
     getCourses(supabase),
+    getUnreadCountForUser(supabase, profile.user_id),
   ]);
   const courses = allCourses
     .filter((c) => Boolean(access[c.course_id]))
@@ -34,7 +37,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
         <StudentSidebar
           user={{ label: displayNameOf(profile) || 'My Account', avatarUrl: profile.avatar_url }}
           courses={courses}
-          badges={{}}
+          badges={{ messages: unread }}
         />
       }
     >

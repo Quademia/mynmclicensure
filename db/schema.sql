@@ -1,7 +1,7 @@
 -- db/schema.sql — the readable statement of the current tables in `licensure_gh`.
 -- Regenerated from db/migrations/ whenever a migration changes a table.
 -- NEVER applied directly; the migrations are what run (db/README.md).
--- Last regenerated: 2026-09-15, after 20260915120000_payments.sql.
+-- Last regenerated: 2026-09-15, after 20260915150000_messaging.sql.
 
 -- ── programs (moved up from slice 3: the register page's dropdown) ─────
 create table if not exists programs (
@@ -300,3 +300,42 @@ create table if not exists rate_limits (
   window_start timestamptz not null default now(),
   count        integer not null default 0
 );
+
+-- ── messages_threads and messages (slice 12a) ──────────────────────────
+-- No content copy (D5). admin_id keeps legacy's bare default 'admin1';
+-- quiz_id, question_id and attempt_id carry no key (two quiz tables,
+-- eleven item tables). messages is in the supabase_realtime publication.
+create table if not exists messages_threads (
+  thread_id        text primary key,                                   -- 'THR_' + 16 upper hex
+  user_id          text not null references users (user_id),           -- S4
+  admin_id         text not null default 'admin1',
+  status           text not null default 'open',                       -- open | closed
+  context_type     text not null default 'general',                    -- general | course | question
+  subject          text,
+  course_id        text references courses (course_id),                -- S4; nullable
+  quiz_id          text,
+  question_id      text,
+  attempt_id       text,
+  bulk_batch_id    text,
+  ref_text         text,
+  created_at       timestamptz not null default now(),
+  last_message_at  timestamptz not null default now(),
+  last_sender_role text not null default 'student'                     -- student | admin
+);
+create index if not exists messages_threads_user_id_idx on messages_threads (user_id);
+create index if not exists messages_threads_last_message_idx on messages_threads (last_message_at desc);
+create index if not exists messages_threads_status_idx on messages_threads (status);
+
+create table if not exists messages (
+  message_id    text primary key,                                       -- 'MSG_' + 16 upper hex
+  thread_id     text not null references messages_threads (thread_id),  -- S4
+  sender_id     text not null,
+  sender_role   text not null,                                          -- student | admin
+  body_text     text not null,
+  read_by_user  boolean not null default false,
+  read_by_admin boolean not null default false,
+  created_at    timestamptz not null default now()
+);
+create index if not exists messages_thread_id_idx on messages (thread_id);
+create index if not exists messages_thread_created_idx on messages (thread_id, created_at);
+create index if not exists messages_unread_admin_idx on messages (read_by_admin) where read_by_admin = false;
