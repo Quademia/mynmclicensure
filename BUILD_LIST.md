@@ -48,9 +48,10 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ✅ 7d Student home — course page: header, days left, quiz previews, builder shortcut, announcements after 11 — 2026-09-14
 - ✅ 7e Student home — profile: two editable panels, photo upload to a product bucket, subscription panel, ?complete=1 — 2026-09-14
 - ✅ (unplanned) Server Action body cap raised to 3 MB — a 2 MB photo or rationale image no longer refused; rule in AGENTS.md — 2026-09-14
-- ⬜ 7f Student home — dashboard, upgrade; after 12 folds in
+- ⬜ 7f Student home — dashboard; after 12 folds in (upgrade moved to 9b, 2026-09-15)
 - ✅ 8 Subscriptions — trial at registration, course access, admin grant/update/revoke/sync, the real question gate — 2026-09-13
-- ⬜ 9 Payments — init-public, init-upgrade, verify, setup-complete, admin rescue, rate limit
+- ⬜ 9a Payments — table, rate limit, the four actions, subscribe, Premium Prep live, confirmation page
+- ⬜ 9b Payments — the upgrade page live, the admin Payments page (rescue buttons, revenue summary)
 - ⬜ 10 Email — four templates, Quademia sender, `appOrigin()`
 - ✅ 11a Announcements — two tables, server-side scoping (course scope fixed, §9 #19), admin page (no Scheduled status, §9 #18) — 2026-09-14
 - ✅ 11b Announcements — student page, dashboard strip on the placeholder, the course page section — 2026-09-14
@@ -101,3 +102,5 @@ cutover is done.
 - ⬜ Announcements: each edit re-saves the body through the paragraph converter and adds a line break between paragraphs — legacy did (slice 11a, 2026-09-14)
 - ⬜ Profile: the Subscription panel shows one active subscription, the first returned, even when the student holds two — legacy did (slice 7e, 2026-09-14)
 - ✅ Profile: the photo is one file per student overwritten in place and the cached old one kept showing — a version stamp on the saved address (Sam, 2026-09-14)
+- ⬜ Payments: the copied setup link carries a token the confirmation page never reads; verify re-mints one on every call (§9 #20; slice 9, 2026-09-15)
+- ⬜ Payments: verify hands a setup token to anyone holding a reference; the reference is the only secret (§9 #21; slice 9, 2026-09-15)

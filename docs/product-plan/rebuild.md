@@ -432,6 +432,8 @@ feature; a user cannot tell.
 | 7 | Login rate-limit and reset rate-limit checks fail **open** on error | `login.html`, `forgot-password.html` | **Kept.** Legacy chose availability over lockout; changing it is a policy change, not a defect fix. Noted for Sam |
 | 15 | `users_update` policy has no `WITH CHECK`; a signed-in user can set their own row to `role = 'ADMIN'` | `db/rls.sql` | Found in the slice 2 inventory (2026-09-11). Reaches no user on the new stack (the browser never writes tables), but the floor is the floor. Sam: close it. The new policy's `WITH CHECK` refuses a change of `role`, `active`, `user_id`, `auth_id` by a non-admin. Slice 2 |
 | 17 | The instant runner’s progress save writes `status = in_progress` on every save and never checks the row, so an autosave landing a moment after Submit flips a completed attempt back to in progress (the score stays); the lists then show Resume and no Review | `runner/instant.html` `saveAttemptProgress`, `js/mynmclicensure-api.js` | Found in the 7a session (2026-09-14): one of Sam’s builder attempts sat at `in_progress` with `score_pct 80`. Reaches a real student, rarely; confusion, not loss (a resubmit recomputes the score). **Fixed 2026-09-14** (Sam): the save is the student’s own row and `status = in_progress` only, as the timed save already was (6b); a late save after a finish is refused and the runner ignores it, as it is locked |
+| 20 | The setup link the admin Payments page copies carries `&setup_token=…`, but the confirmation page never reads the token from the address — only from the verify reply or the browser's storage. The link still works because verify re-mints a token on every call | `admin/payments.html` `copySetupLink`, `payment-confirmation.html` `getReference` | Found in the slice 9 reading (2026-09-15). Reaches nobody: the page verifies on arrival and gets a fresh token. **Carried** (Sam, 2026-09-15); listed under "After the rebuild" to decide whether the link should carry the token at all |
+| 21 | `verify` is unauthenticated by design (the payer has no session yet) and hands a setup token to anyone who presents a reference; the reference (`QAC_` + 12 upper hex) is the only secret, and it also appears in Paystack's return address and the payer's receipt | `payment-worker` `handleVerify` | Found in the slice 9 reading (2026-09-15). Reaches a real payer only if a reference leaks before setup is completed, and only lets the holder create the account for the paid email. **Carried** (Sam, 2026-09-15) — the same model on the new stack; listed under "After the rebuild" for a rethink (a signed link, or the token read from the address and required) |
 
 **Dead things — remove or decide**
 
@@ -718,9 +720,10 @@ scrolled to). The photo goes to a bucket of this product's own,
 images are, stored as one file per student and overwritten in place
 as legacy did. The two writes are Server Actions on the student's own
 row (2a's `users_update` policy is the floor). The page's own toast
-is the shared one (UI convention #1). **7f** the rest — dashboard,
-upgrade — later, because the dashboard's course cards, announcements
-strip and messages badge fold in slices 8, 11 and 12. *Done when* (7a)
+is the shared one (UI convention #1). **7f** the dashboard alone —
+later, because its course cards, announcements strip and messages badge
+fold in slices 8, 11 and 12; the upgrade page moved to **9b** (Sam,
+2026-09-15), where it goes live with its payment button. *Done when* (7a)
 Sam's attempts from slices 6 and 5b appear with the right stats, a
 filter narrows them, Load more pages, and Review and Retake open the
 runner; (7b) the guide reads as legacy's did, the side list follows
@@ -749,10 +752,29 @@ route (moved here from slice 4, 2026-09-13).
 **9 — Payments.** `payments`; the four public actions and the
 confirmation page with its polling; subscribe and premium-prep buttons
 live; upgrade live; admin Payments page with Retry Activation and Copy
-Setup Link; the rate-limit RPC. Paystack test keys throughout. *Done
-when* a pay-first purchase creates an account through the setup link,
-a second verify replays safely, an upgrade extends an existing
-subscription, and an amount mismatch lands as FAILED.
+Setup Link; the rate-limit RPC. Paystack test keys throughout. Built in
+two sessions (Sam, 2026-09-15): **9a** the money path — the `payments`
+table (admin-only read; every write is server-side), the
+`rate_limits` counter and its SECURITY DEFINER function (5 per 60 s
+per address on the four public actions, failing open as legacy), the
+four Server Actions in `lib/payments/` (§7.1), the public
+`/subscribe` page, the Premium Prep button made live, and the public
+`/payment-confirmation` page (the reference from Paystack's return
+address, verify every 3 s up to 20 times, Retry Verification, the
+setup form — first name, surname, password twice, phone, programme —
+Hide Setup Form, the support box with the Quademia address, the three
+activation messages); **9b** the two management surfaces — the student
+`/student/upgrade` page (the active subscriptions panel, the paid
+product picker with the trial ids hidden, Proceed to Payment through
+init-upgrade, inside the student chrome) and the admin
+`/admin/payments` page (the seven counters, the six filters, the
+paginated table of 50 with Load More, the side panel with the raw
+payload, Retry Activation, Copy Setup Link, View Student, the revenue
+summary); the PAYMENT_SETUP_REQUIRED email from Retry Activation waits
+for slice 10. *Done when* (9a) a pay-first purchase creates an account
+through the setup form, a second verify replays safely, and an amount
+mismatch lands as FAILED; (9b) an upgrade extends an existing
+subscription, and an admin can rescue a stuck row from the Payments page.
 
 **10 — Email.** The four templates and their four call sites; the
 Quademia sender; `appOrigin()`. *Done when* each of the four arrives in
@@ -915,9 +937,10 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 7c Student home — NMC Procedures | ✅ 2026-09-14 |
 | 7d Student home — course page | ✅ 2026-09-14 |
 | 7e Student home — profile | ✅ 2026-09-14 |
-| 7f Student home — dashboard, upgrade | ⬜ |
+| 7f Student home — dashboard | ⬜ |
 | 8 Subscriptions | ✅ 2026-09-13 |
-| 9 Payments | ⬜ |
+| 9a Payments — table, rate limit, the four actions, subscribe, Premium Prep live, confirmation page | ⬜ |
+| 9b Payments — the upgrade page live, the admin Payments page | ⬜ |
 | 10 Email | ⬜ |
 | 11a Announcements — tables, scoping, admin page | ✅ 2026-09-14 |
 | 11b Announcements — student page, dashboard strip, course section | ✅ 2026-09-14 |
