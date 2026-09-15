@@ -13,7 +13,7 @@
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import { nowIso } from './dates';
-import type { CourseAccessMap, StudentHit, Subscription, SubscriptionListRow } from './types';
+import type { ActiveSubscriptionWithProduct, CourseAccessMap, StudentHit, Subscription, SubscriptionListRow } from './types';
 
 // ── getStudentCourseAccess ──────────────────────────────────────────────
 // Every ACTIVE subscription with its product; for each course the product
@@ -132,4 +132,22 @@ export async function getActiveSubscriptionForUserProduct(
     return null;
   }
   return (data as Subscription | null) ?? null;
+}
+
+// ── the upgrade page's list (legacy loadActiveSubscriptions, slice 9b) ─
+// The student's ACTIVE, unexpired subscriptions with their product
+// name, latest expiry first.
+export async function getActiveSubscriptionsWithProduct(db: ServerSupabaseClient, userId: string): Promise<ActiveSubscriptionWithProduct[]> {
+  const { data, error } = await db
+    .from('subscriptions')
+    .select('subscription_id, user_id, product_id, start_utc, expires_utc, status, products ( name )')
+    .eq('user_id', userId)
+    .eq('status', 'ACTIVE')
+    .gt('expires_utc', nowIso())
+    .order('expires_utc', { ascending: false });
+  if (error) {
+    console.error('getActiveSubscriptionsWithProduct:', error);
+    return [];
+  }
+  return (data ?? []) as unknown as ActiveSubscriptionWithProduct[];
 }

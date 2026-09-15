@@ -80,3 +80,10 @@ export type UpdateSubscriptionInput = {
   source: string;
   sourceRef: string;
 };
+
+// The student upgrade page's list (slice 9b): legacy
+// student/upgrade.html's loadActiveSubscriptions select.
+export type ActiveSubscriptionWithProduct = Pick<
+  Subscription,
+  'subscription_id' | 'user_id' | 'product_id' | 'start_utc' | 'expires_utc' | 'status'
+> & { products: { name: string } | null };
