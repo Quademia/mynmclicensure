@@ -1,0 +1,165 @@
+/* styles/admin-messages.css
+ *
+ * The admin Messages page (slice 12b). Transcribed from the legacy
+ * page's inline <style> block (admin/messages.html), scoped under
+ * `.amsg` for the page and `.amsg-overlay` for the two portalled
+ * dialogs (AGENTS.md: every overlay is portalled to <body>). The
+ * legacy .toast is the shared one (UI convention #1). The reference
+ * card's inline styles are classes here. Legacy's own 768px
+ * breakpoint: the split stacks, the open thread hides the list and
+ * shows the back arrow, the dialogs' rows stack, the filters stack.
+ */
+
+.amsg .msg-container { max-width: 1100px; margin: 0 auto; }
+.amsg .page-header { margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.amsg .page-header h1 { font-size: 22px; font-weight: 800; color: var(--primary); margin: 0; }
+.amsg .header-actions { display: flex; gap: 8px; }
+.amsg .btn-action, .amsg-overlay .btn-action { padding: 7px 16px; border-radius: 8px; background: var(--primary); color: #fff; border: none; cursor: pointer; font-size: 13px; font-weight: 600; font-family: inherit; }
+.amsg .btn-action:hover, .amsg-overlay .btn-action:hover { opacity: 0.9; }
+.amsg .btn-action.accent, .amsg-overlay .btn-action.accent { background: var(--accent); }
+.amsg-overlay .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Filters bar ── */
+.amsg .filters-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+.amsg .filters-bar input, .amsg .filters-bar select { padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: inherit; color: var(--text); background: var(--white); }
+.amsg .filters-bar input { min-width: 200px; }
+.amsg .filters-bar input:focus, .amsg .filters-bar select:focus { outline: none; border-color: var(--primary); }
+.amsg .result-count { font-size: 13px; color: var(--text-muted); margin-left: auto; }
+
+/* ── Split pane ── */
+.amsg .msg-split { display: flex; gap: 0; border: 1px solid var(--border, #e2e8f0); border-radius: 14px; overflow: hidden; background: var(--white, #fff); height: calc(100vh - 200px); min-height: 480px; box-shadow: 0 2px 12px rgba(30, 58, 95, 0.06); }
+
+/* ── Thread list ── */
+.amsg .thread-list { width: 360px; min-width: 300px; border-right: 1px solid var(--border, #e2e8f0); display: flex; flex-direction: column; }
+.amsg .thread-list-header { padding: 14px 16px; border-bottom: 1px solid var(--border, #e2e8f0); display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-shrink: 0; }
+.amsg .thread-list-header h2 { font-size: 14px; font-weight: 700; color: var(--primary); margin: 0; }
+.amsg .thread-items { flex: 1; overflow-y: auto; }
+.amsg .thread-item { padding: 12px 16px; border-bottom: 1px solid var(--border, #e2e8f0); cursor: pointer; transition: background 0.12s; }
+.amsg .thread-item:hover { background: rgba(30, 58, 95, 0.03); }
+.amsg .thread-item.active { background: rgba(30, 58, 95, 0.06); border-left: 3px solid var(--primary); }
+.amsg .thread-item.unread .t-name { font-weight: 700; }
+.amsg .thread-item .t-name { font-size: 13px; font-weight: 600; color: var(--primary); margin-bottom: 1px; display: flex; align-items: center; gap: 6px; }
+.amsg .thread-item .t-programme { font-weight: 400; font-size: 11px; color: var(--text-muted); }
+.amsg .thread-item .t-label { font-size: 12px; color: var(--text-muted); margin-bottom: 2px; }
+.amsg .thread-item .t-preview { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.amsg .thread-item .t-preview.t-ref { font-style: italic; color: var(--primary); }
+.amsg .thread-item .t-meta { font-size: 11px; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 6px; }
+.amsg .unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); display: inline-block; flex-shrink: 0; }
+.amsg .context-chip { font-size: 10px; padding: 1px 6px; border-radius: 4px; background: var(--primary-light, #edf6f5); color: var(--primary); font-weight: 600; text-transform: uppercase; }
+.amsg .status-chip { font-size: 10px; padding: 1px 6px; border-radius: 4px; font-weight: 600; }
+.amsg .status-chip.closed { background: #ffeaea; color: #c0392b; }
+.amsg .thread-empty { padding: 40px 16px; text-align: center; color: var(--text-muted); font-size: 13px; }
+
+/* ── Conversation pane ── */
+.amsg .convo-pane { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.amsg .convo-active { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.amsg .convo-header { padding: 14px 16px; border-bottom: 1px solid var(--border, #e2e8f0); display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-shrink: 0; }
+.amsg .convo-header-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.amsg .convo-header h3 { font-size: 14px; font-weight: 700; color: var(--primary); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.amsg .convo-header .back-btn { display: none; background: none; border: none; font-size: 18px; cursor: pointer; color: var(--primary); padding: 0; flex-shrink: 0; }
+.amsg .convo-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.amsg .btn-sm, .amsg-overlay .btn-sm { font-size: 11px; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--white); cursor: pointer; font-weight: 600; color: var(--text-muted); font-family: inherit; }
+.amsg .btn-sm:hover, .amsg-overlay .btn-sm:hover { background: var(--bg); }
+.amsg .btn-sm.danger { border-color: #fecaca; color: #c0392b; }
+.amsg .btn-sm.danger:hover { background: #fef2f2; }
+.amsg .convo-empty { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 14px; text-align: center; padding: 40px; flex-direction: column; gap: 12px; }
+.amsg .convo-empty .empty-icon { font-size: 36px; opacity: 0.3; }
+
+/* ── Feed ── */
+.amsg .convo-messages { flex: 1; overflow-y: auto; padding: 16px 16px 8px; display: flex; flex-direction: column; gap: 0; }
+.amsg .no-messages { text-align: center; color: var(--text-muted); font-size: 13px; padding: 30px; }
+.amsg .date-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0 12px; }
+.amsg .date-divider::before, .amsg .date-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.amsg .date-divider span { font-size: 11px; color: var(--text-muted); font-weight: 600; white-space: nowrap; }
+.amsg .feed-msg { padding: 10px 0; }
+.amsg .feed-msg + .feed-msg { border-top: 1px solid rgba(0, 0, 0, 0.04); }
+.amsg .feed-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.amsg .feed-avatar { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; color: #fff; }
+.amsg .feed-avatar.student-av { background: var(--accent); }
+.amsg .feed-avatar.admin-av { background: var(--primary); }
+.amsg .feed-name { font-size: 12px; font-weight: 700; color: var(--primary); }
+.amsg .feed-name.admin-name { color: var(--accent); }
+.amsg .feed-time { font-size: 10px; color: var(--text-muted); }
+.amsg .feed-body { font-size: 13px; line-height: 1.5; color: var(--text); padding-left: 34px; white-space: pre-wrap; word-wrap: break-word; }
+.amsg .feed-body a { color: var(--primary); text-decoration: underline; font-weight: 600; word-break: break-all; }
+.amsg .feed-msg.is-admin { border-left: 3px solid var(--accent); padding-left: 12px; margin-left: 0; }
+
+/* ── Reference card ── */
+.amsg .ref-wrap { margin: 12px 16px 0; flex-shrink: 0; }
+.amsg .ref-card { font-size: 12px; color: var(--text-muted); background: var(--primary-light, #edf6f5); padding: 10px 14px; border-radius: 10px; margin: 0 0 8px 0; line-height: 1.5; }
+.amsg .ref-card strong { color: var(--primary); }
+.amsg .ref-id { margin-bottom: 4px; }
+.amsg .ref-id code { font-size: 11px; background: rgba(0, 0, 0, 0.05); padding: 1px 4px; border-radius: 3px; }
+.amsg .ref-head { font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+.amsg .ref-section { margin-top: 8px; font-weight: 600; color: var(--primary); }
+.amsg .ref-option { padding-left: 12px; font-size: 11.5px; }
+.amsg .ref-answer { margin-top: 8px; font-weight: 600; }
+.amsg .ref-line { padding-left: 4px; }
+.amsg .ref-hint { margin-top: 8px; font-size: 11px; color: var(--text-muted); font-style: italic; }
+
+/* ── Closed, compose ── */
+.amsg .closed-banner { padding: 10px 16px; background: #fef2f2; border-top: 1px solid #fecaca; color: #c0392b; font-size: 12px; font-weight: 600; text-align: center; flex-shrink: 0; }
+.amsg .compose-bar { padding: 12px 16px; border-top: 1px solid var(--border, #e2e8f0); display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0; background: var(--white); }
+.amsg .compose-bar textarea { flex: 1; resize: none; border: 1px solid var(--border, #e2e8f0); border-radius: 10px; padding: 10px 14px; font-size: 13px; font-family: inherit; min-height: 40px; max-height: 120px; line-height: 1.4; }
+.amsg .compose-bar textarea:focus { outline: none; border-color: var(--primary); }
+.amsg .btn-send { padding: 8px 18px; border-radius: 8px; background: var(--primary); color: #fff; border: none; cursor: pointer; font-size: 13px; font-weight: 600; white-space: nowrap; font-family: inherit; }
+.amsg .btn-send:hover { opacity: 0.9; }
+.amsg .btn-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Dialogs (portalled) ── */
+.amsg-overlay .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.45); z-index: 1000; align-items: flex-start; justify-content: center; padding: 40px 12px; overflow-y: auto; }
+.amsg-overlay .modal-overlay.open { display: flex; }
+.amsg-overlay .modal { background: var(--white); border-radius: 14px; width: 580px; max-width: 95vw; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18); }
+.amsg-overlay .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--white); z-index: 1; }
+.amsg-overlay .modal-header h2 { font-size: 16px; font-weight: 700; color: var(--primary); margin: 0; }
+.amsg-overlay .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); }
+.amsg-overlay .modal-body { padding: 20px; }
+.amsg-overlay .modal-footer { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; position: sticky; bottom: 0; background: var(--white); }
+.amsg-overlay .form-group { margin-bottom: 14px; }
+.amsg-overlay .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
+.amsg-overlay .form-group input, .amsg-overlay .form-group select, .amsg-overlay .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: inherit; color: var(--text); background: var(--white); box-sizing: border-box; }
+.amsg-overlay .form-group textarea { min-height: 100px; resize: vertical; }
+.amsg-overlay .form-group input:focus, .amsg-overlay .form-group select:focus, .amsg-overlay .form-group textarea:focus { outline: none; border-color: var(--primary); }
+.amsg-overlay .form-group-end { display: flex; align-items: flex-end; }
+.amsg-overlay .form-hint { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+.amsg-overlay .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.amsg-overlay .preview-count { font-size: 13px; color: var(--primary); font-weight: 600; padding: 8px 12px; background: var(--primary-light); border-radius: 8px; text-align: center; margin-bottom: 12px; }
+.amsg-overlay .student-search-results { max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; margin-top: 6px; }
+.amsg-overlay .student-result { padding: 8px 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid var(--border); transition: background 0.12s; }
+.amsg-overlay .student-result.muted { cursor: default; color: var(--text-muted); }
+.amsg-overlay .student-result:hover { background: var(--primary-light); }
+.amsg-overlay .student-result:last-child { border-bottom: none; }
+.amsg-overlay .student-result .sr-name { font-weight: 600; color: var(--primary); }
+.amsg-overlay .student-result .sr-meta { font-size: 11px; color: var(--text-muted); }
+.amsg-overlay .selected-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--primary-light); border-radius: 6px; font-size: 13px; font-weight: 600; color: var(--primary); }
+.amsg-overlay .selected-pill .pill-clear { cursor: pointer; opacity: 0.6; font-size: 16px; }
+.amsg-overlay .selected-pill .pill-clear:hover { opacity: 1; }
+.amsg-overlay .confirm-box { padding: 14px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; margin-bottom: 14px; text-align: center; }
+.amsg-overlay .confirm-box strong { color: var(--warning); }
+
+/* ── Multi-select pill picker ── */
+.amsg-overlay .ms-picker { position: relative; }
+.amsg-overlay .ms-picker .ms-selected { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 4px; }
+.amsg-overlay .ms-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; background: var(--primary-light); border-radius: 4px; font-size: 11px; font-weight: 600; color: var(--primary); }
+.amsg-overlay .ms-pill .ms-x { cursor: pointer; opacity: 0.5; font-size: 13px; line-height: 1; }
+.amsg-overlay .ms-pill .ms-x:hover { opacity: 1; }
+.amsg-overlay .ms-picker .ms-dropdown { width: 100%; padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: inherit; color: var(--text); background: var(--white); cursor: pointer; box-sizing: border-box; }
+.amsg-overlay .ms-picker .ms-options { display: none; position: absolute; left: 0; right: 0; top: 100%; z-index: 10; background: var(--white); border: 1px solid var(--border); border-radius: 8px; max-height: 180px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); margin-top: 2px; }
+.amsg-overlay .ms-picker.open .ms-options { display: block; }
+.amsg-overlay .ms-option { padding: 6px 12px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.amsg-overlay .ms-option:hover { background: var(--primary-light); }
+.amsg-overlay .ms-option .ms-check { width: 14px; height: 14px; border: 1.5px solid var(--border); border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; }
+.amsg-overlay .ms-option.selected .ms-check { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+/* ── Phone ── */
+@media (max-width: 768px) {
+  .amsg .msg-split { flex-direction: column; height: auto; min-height: auto; border-radius: 10px; }
+  .amsg .thread-list { width: 100%; min-width: 0; border-right: none; border-bottom: 1px solid var(--border, #e2e8f0); max-height: 40vh; }
+  .amsg .convo-pane { min-height: 55vh; }
+  .amsg .msg-split.convo-open .thread-list { display: none; }
+  .amsg .msg-split.convo-open .convo-pane { min-height: 75vh; }
+  .amsg .msg-split.convo-open .convo-pane .back-btn { display: inline-block; }
+  .amsg .filters-bar { flex-direction: column; align-items: stretch; }
+  .amsg .result-count { margin-left: 0; }
+  .amsg-overlay .form-row { grid-template-columns: 1fr; }
+}
