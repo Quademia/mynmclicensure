@@ -51,7 +51,7 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ⬜ 7f Student home — dashboard; after 12 folds in (upgrade moved to 9b, 2026-09-15)
 - ✅ 8 Subscriptions — trial at registration, course access, admin grant/update/revoke/sync, the real question gate — 2026-09-13
 - ✅ 9a Payments — table, rate limit, the four actions, subscribe, Premium Prep live, confirmation page — 2026-09-15
-- ⬜ 9b Payments — the upgrade page live, the admin Payments page (rescue buttons, revenue summary)
+- ✅ 9b Payments — the upgrade page live, the admin Payments page (rescue buttons, revenue summary) — 2026-09-15
 - ⬜ 10 Email — four templates, Quademia sender, `appOrigin()`
 - ✅ 11a Announcements — two tables, server-side scoping (course scope fixed, §9 #19), admin page (no Scheduled status, §9 #18) — 2026-09-14
 - ✅ 11b Announcements — student page, dashboard strip on the placeholder, the course page section — 2026-09-14
