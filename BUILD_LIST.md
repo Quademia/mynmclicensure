@@ -56,7 +56,8 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ⬜ 10 Email — four templates, Quademia sender, `appOrigin()`
 - ✅ 11a Announcements — two tables, server-side scoping (course scope fixed, §9 #19), admin page (no Scheduled status, §9 #18) — 2026-09-14
 - ✅ 11b Announcements — student page, dashboard strip on the placeholder, the course page section — 2026-09-14
-- ⬜ 12 Messaging — three contexts, admin inbox, bulk send, badges, the runner's Send feedback button (left out of 6)
+- ⬜ 12a Messaging — tables, the student page, the three contexts, both runners' Send feedback, live replies, the student badge
+- ⬜ 12b Messaging — the admin inbox, New Thread, Bulk Send (batched writes), the admin badge
 - ✅ 13a Offline packs — table, allowance, non-repeat picker, watermark, the builder, the renderer — 2026-09-14
 - ✅ 13b Offline packs — My Packs: list, filters, summary counts, Open / Build Similar — 2026-09-14
 - ✅ 14a Admin home — the Users page (drawer, assign, reset, deactivate; ?user_id= opens it) and the dashboard counts — 2026-09-15

@@ -826,9 +826,34 @@ resolution by scope; unread badges in both sidebars. **Also here: the
 out of slice 6, 2026-09-13) — it saves progress, then opens the
 messages page with the course, attempt, quiz and item ids and the
 quoted question, options as shown and the student's current answer,
-never the correct one. *Done when* a bulk send to a scope creates one
-thread per recipient and the badge counts match, and a student can
-send feedback on a question from inside a running quiz.
+never the correct one. Built in two sessions (Sam, 2026-09-15): **12a**
+the student side — the migration with both tables and legacy's
+policies (the June 2026 admin bypass on the thread insert included)
+and the `messages` table added to the realtime publication; the
+student page (the inbox and the conversation pane, "+ New" with its
+subject prompt and the reuse banner, the 800-character compose with
+Enter to send, date dividers, links made clickable, the closed banner
+with "Start a new conversation", the pinned reference card for a
+course or question thread); the three contexts — general from the
+page, course from the course page's "Message us", question from the
+runners' "Send feedback" (both runners: the reference text with the
+stem, the options as shown and the current answer, never the correct
+one; progress saved first; the page opened in a new tab); live admin
+replies through the realtime feed as legacy had them; the student
+sidebar's badge. **12b** the admin side — the inbox with its filters
+(student search, type and status on the server; "unread only" in the
+browser), the conversation pane with reply, Close and Reopen, the
+New Thread dialog (student search or a pasted id, one thread per
+chosen course), Bulk Send (the five scope pickers, "Preview count"
+required first, the confirmation line, the subject in brackets) —
+the recipients resolved as legacy resolved them, then the threads
+written in one insert and the messages in another, not one student
+at a time (a Worker's time limit; same rows, same result); the admin
+sidebar's badge. *Done when* (12a) a student sends feedback on a
+question from inside a running quiz and it lands as a question thread
+with the reference text, and a course page's "Message us" opens or
+reuses that course's thread; (12b) a bulk send to a scope creates one
+thread per recipient and the badge counts match.
 
 **13 — Offline packs.** `offline_packs`; the builder with filters,
 `offline_max_questions` (100) and `offline_packs_per_course` (5) from
@@ -963,7 +988,8 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 10 Email | ⬜ |
 | 11a Announcements — tables, scoping, admin page | ✅ 2026-09-14 |
 | 11b Announcements — student page, dashboard strip, course section | ✅ 2026-09-14 |
-| 12 Messaging | ⬜ |
+| 12a Messaging — tables, the student page, the three contexts, the runners' Send feedback, the student badge | ⬜ |
+| 12b Messaging — the admin inbox, New Thread, Bulk Send, the admin badge | ⬜ |
 | 13a Offline packs — table, allowance, picker, watermark, the builder, the renderer | ✅ 2026-09-14 |
 | 13b Offline packs — My Packs | ✅ 2026-09-14 |
 | 14a Admin home — the Users page and the dashboard | ✅ 2026-09-15 |
