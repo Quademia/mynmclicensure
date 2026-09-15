@@ -988,7 +988,7 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 10 Email | ⬜ |
 | 11a Announcements — tables, scoping, admin page | ✅ 2026-09-14 |
 | 11b Announcements — student page, dashboard strip, course section | ✅ 2026-09-14 |
-| 12a Messaging — tables, the student page, the three contexts, the runners' Send feedback, the student badge | ⬜ |
+| 12a Messaging — tables, the student page, the three contexts, the runners' Send feedback, the student badge | ✅ 2026-09-15 |
 | 12b Messaging — the admin inbox, New Thread, Bulk Send, the admin badge | ⬜ |
 | 13a Offline packs — table, allowance, picker, watermark, the builder, the renderer | ✅ 2026-09-14 |
 | 13b Offline packs — My Packs | ✅ 2026-09-14 |
