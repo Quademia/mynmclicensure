@@ -1,7 +1,7 @@
 -- db/schema.sql — the readable statement of the current tables in `licensure_gh`.
 -- Regenerated from db/migrations/ whenever a migration changes a table.
 -- NEVER applied directly; the migrations are what run (db/README.md).
--- Last regenerated: 2026-09-13, after 20260913120000_question_bank_tables.sql.
+-- Last regenerated: 2026-09-15, after 20260915120000_payments.sql.
 
 -- ── programs (moved up from slice 3: the register page's dropdown) ─────
 create table if not exists programs (
@@ -261,3 +261,42 @@ create index if not exists attempts_quiz_id_idx   on attempts (quiz_id);
 create index if not exists attempts_course_id_idx on attempts (course_id);
 create index if not exists attempts_status_idx    on attempts (status);
 create index if not exists attempts_user_quiz_mode_status_idx on attempts (user_id, quiz_id, mode, status);
+
+-- ── payments (slice 9a) ────────────────────────────────────────────────
+-- No content copy (D5). Every write is the server's (service role); an
+-- ADMIN reads. setup_token is re-minted on every verify; its 48-hour
+-- clock is setup_created_utc.
+create table if not exists payments (
+  reference             text primary key,                                   -- 'QAC_' + 12 upper hex
+  status                text not null,                                      -- INIT | PAID | SETUP_REQUIRED | ACTIVATED | FAILED
+  email                 text not null,
+  user_id               text references users (user_id),                    -- S4; null until setup on a pay-first row
+  product_id            text not null references products (product_id),    -- S4
+  product_name          text,
+  amount_minor_expected integer not null,
+  currency              text not null,
+  amount_minor_paid     integer,
+  paid_utc              timestamptz,
+  activated_utc         timestamptz,
+  subscription_id       text references subscriptions (subscription_id),   -- S4; null until activation
+  failure_note          text,
+  raw                   jsonb,                                              -- { init, verify, setup_complete, flow, … }
+  setup_token           text,
+  setup_created_utc     timestamptz,
+  setup_completed_utc   timestamptz,
+  program_id            text,
+  phone_number          text
+);
+create index if not exists payments_status_idx   on payments (status);
+create index if not exists payments_email_idx    on payments (email);
+create index if not exists payments_user_id_idx  on payments (user_id);
+create index if not exists payments_paid_utc_idx on payments (paid_utc desc nulls last);
+
+-- ── rate_limits (slice 9a) ─────────────────────────────────────────────
+-- The payment actions' 5-per-60-s counter, one row per caller address;
+-- read and written only by check_payment_rate_limit() (db/rls.sql).
+create table if not exists rate_limits (
+  key          text primary key,                       -- 'payments:' + the caller's address
+  window_start timestamptz not null default now(),
+  count        integer not null default 0
+);

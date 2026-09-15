@@ -1,7 +1,7 @@
 -- db/rls.sql — the readable statement of the current policies and the
 -- SECURITY DEFINER functions in `licensure_gh`. Regenerated from
 -- db/migrations/ whenever a migration changes one. NEVER applied directly.
--- Last regenerated: 2026-09-13, after 20260913120000_question_bank_tables.sql.
+-- Last regenerated: 2026-09-15, after 20260915120000_payments.sql.
 
 -- ── helper functions for the policies ──────────────────────────────────
 -- SECURITY DEFINER so a policy on users can ask about users without
@@ -428,3 +428,46 @@ create policy attempts_insert on attempts for insert
 with check (attempts.user_id = auth_user_id());
 create policy attempts_update on attempts for update
 using (attempts.user_id = auth_user_id());
+
+-- ── slice 9a: payments and the rate limit ──────────────────────────────
+-- payments: ADMIN reads; no INSERT or UPDATE policy on purpose — every
+-- write comes from the Server Actions in lib/payments/ with the service
+-- role (the payer has no session yet). Students cannot read a payment
+-- row at all, as legacy.
+create policy payments_select on payments for select
+using (auth_user_role() = 'ADMIN');
+
+-- rate_limits: RLS on, no policies. The function below is the only
+-- reader and writer; the browser cannot call it (EXECUTE revoked).
+-- 5 per 60 s per key, a fixed window; the caller fails OPEN on error.
+create or replace function check_payment_rate_limit(
+  p_key            text,
+  p_limit          integer default 5,
+  p_window_seconds integer default 60
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = licensure_gh
+as $$
+declare
+  v_count integer;
+begin
+  insert into rate_limits (key, window_start, count)
+  values (p_key, now(), 1)
+  on conflict (key) do update
+    set count = case
+                  when rate_limits.window_start < now() - make_interval(secs => p_window_seconds) then 1
+                  else rate_limits.count + 1
+                end,
+        window_start = case
+                  when rate_limits.window_start < now() - make_interval(secs => p_window_seconds) then now()
+                  else rate_limits.window_start
+                end
+  returning count into v_count;
+
+  return v_count <= p_limit;
+end;
+$$;
+
+revoke execute on function check_payment_rate_limit(text, integer, integer) from public, anon, authenticated;

@@ -7,9 +7,9 @@
 // phone are remembered in localStorage under the legacy keys, and a
 // `?program_id=` in the address pre-selects, as legacy.
 //
-// Not here yet: the payment itself. Legacy posted to the payment Worker's
-// /payments/init-public; that becomes a Server Action in slice 9. Until
-// then the button validates as legacy and then says so in a toast.
+// The payment: legacy posted to the payment Worker's /payments/init-public;
+// that is the init-public Server Action (slice 9a), which hands back the
+// Paystack checkout address the browser is sent to.
 //
 // Changed on the way: the "paid plans are paused" switch is lifted (Sam,
 // 2026-09-11); "QAcademy Nurses Hub" → "Quademia"; the alerts are toasts
@@ -20,6 +20,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Toast } from '@/lib/toast/toast';
 import { formatMinor } from '@/lib/money/format-minor';
+import { initPublicPayment } from '@/lib/payments/init-public';
 import type { Product, Program } from '@/lib/catalogue/types';
 
 const PREP_SUFFIX = '_2026_PREP';
@@ -186,9 +187,17 @@ export function PremiumPrepClient({ programs, products }: { programs: Program[];
     ls()?.setItem('qa_last_program_id', v.program_id);
     ls()?.setItem('qa_join_program', v.program_id);
     ls()?.setItem('qa_join_product', v.product_id);
-    // Slice 9 replaces this line with the payment Server Action.
-    setMsg({ text: 'Payments are not connected yet — this button goes live with slice 9.', tone: 'info' });
-    setPaying(false);
+    try {
+      const res = await initPublicPayment({ email: v.email, phone_number: v.phone || '', program_id: v.program_id, product_id: v.product_id });
+      if (!res.ok) throw new Error(res.message || res.error || 'Could not start payment');
+      if (!res.authorization_url) throw new Error('Payment session was created without an authorization URL.');
+      ls()?.setItem('qa_last_reference', res.reference || '');
+      setMsg({ text: 'Redirecting to Paystack…', tone: 'success' });
+      window.location.href = res.authorization_url;
+    } catch (err) {
+      setMsg({ text: (err instanceof Error && err.message) || 'Network error. Please try again.', tone: 'error' });
+      setPaying(false);
+    }
   }
 
   // Enter on the details step starts the payment, as legacy.
