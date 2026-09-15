@@ -1,0 +1,100 @@
+/* styles/admin-users.css
+ *
+ * The admin Users page (slice 14a). Transcribed from the legacy page's
+ * inline <style> block (admin/users.html), scoped under `.usr` for the
+ * page and `.usr-overlay` for the portalled side drawer (AGENTS.md:
+ * every overlay is portalled to <body>). The .top-nav block every page
+ * carried is in shell.css already; the .card wrapper is shell.css's.
+ * The legacy .panel-alert box is a toast now (UI convention #1). The
+ * TEACHER chip colour is dropped with the role (§9 #12).
+ *
+ * Breakpoint 768px (UI convention #3): the toolbar stacks, the table
+ * scrolls inside its card, the drawer goes full width.
+ */
+
+/* ── Toolbar ── */
+.usr .page-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+.usr .search-input { flex: 1; min-width: 200px; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; font-family: inherit; }
+.usr .search-input:focus { outline: none; border-color: var(--primary); }
+.usr .filter-select { padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; font-family: inherit; background: var(--white); cursor: pointer; }
+.usr .filter-select:focus { outline: none; border-color: var(--primary); }
+.usr .results-count { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; min-height: 16px; }
+
+/* ── Table ── */
+.usr .table-card { padding: 0; overflow: hidden; }
+.usr .table-scroll { overflow-x: auto; }
+.usr .table-note { padding: 24px; color: var(--text-muted); font-size: 14px; margin: 0; }
+.usr .users-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.usr .users-table th { text-align: left; padding: 10px 14px; border-bottom: 2px solid var(--border); font-size: 13px; color: var(--text-muted); font-weight: 600; white-space: nowrap; }
+.usr .users-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.usr .users-table tr:last-child td { border-bottom: none; }
+.usr .users-table tr:hover td { background: var(--primary-light); cursor: pointer; }
+.usr .u-name { font-weight: 500; }
+.usr .u-email { font-size: 12px; color: var(--text-muted); }
+.usr .cell-13 { font-size: 13px; }
+.usr .muted { color: var(--text-muted); }
+
+.usr .role-chip, .usr-overlay .role-chip { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.usr .role-chip.STUDENT, .usr-overlay .role-chip.STUDENT { background: var(--primary-light); color: var(--primary); }
+.usr .role-chip.ADMIN, .usr-overlay .role-chip.ADMIN { background: #fef2f2; color: var(--danger); }
+.usr .status-dot, .usr-overlay .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.usr .status-dot.active, .usr-overlay .status-dot.active { background: var(--success); }
+.usr .status-dot.inactive, .usr-overlay .status-dot.inactive { background: var(--danger); }
+
+/* ── Buttons (page and drawer) ── */
+.usr .btn-action, .usr-overlay .btn-action { width: 100%; padding: 10px 16px; border-radius: var(--radius); font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; border: 1px solid var(--border); background: var(--white); color: var(--text); text-align: left; transition: background 0.15s; }
+.usr .btn-action:hover, .usr-overlay .btn-action:hover { background: var(--bg); }
+.usr .btn-action:disabled, .usr-overlay .btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
+.usr .btn-action.load-more { margin-top: 16px; text-align: center; }
+.usr-overlay .btn-action.danger { color: var(--danger); border-color: #fecaca; }
+.usr-overlay .btn-action.danger:hover { background: #fef2f2; }
+.usr-overlay .btn-action.success { color: var(--success); border-color: #bbf7d0; }
+.usr-overlay .btn-action.success:hover { background: #f0fdf4; }
+
+/* ── Side drawer (portalled) ── */
+.usr-overlay .panel-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.3); z-index: 100; }
+.usr-overlay .panel-overlay.open { display: block; }
+.usr-overlay .side-panel { position: fixed; top: 0; right: -480px; width: 480px; max-width: 95vw; height: 100vh; background: var(--white); border-left: 1px solid var(--border); z-index: 101; overflow-y: auto; transition: right 0.25s ease; padding: 0; }
+.usr-overlay .side-panel.open { right: 0; }
+.usr-overlay .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--white); z-index: 1; }
+.usr-overlay .panel-header h2 { font-size: 17px; font-weight: 700; margin: 0; }
+.usr-overlay .panel-close { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-muted); line-height: 1; padding: 0; }
+.usr-overlay .panel-close:hover { color: var(--danger); }
+.usr-overlay .panel-body { padding: 24px; }
+.usr-overlay .panel-section { margin-bottom: 28px; }
+.usr-overlay .panel-section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.usr-overlay .detail-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; font-size: 14px; }
+.usr-overlay .detail-label { color: var(--text-muted); flex-shrink: 0; margin-right: 12px; }
+.usr-overlay .detail-value { font-weight: 500; text-align: right; }
+.usr-overlay .detail-note { color: var(--text-muted); font-weight: 400; }
+.usr-overlay .muted-14 { color: var(--text-muted); font-size: 14px; margin: 0; }
+.usr-overlay .muted-13 { color: var(--text-muted); font-size: 13px; margin: 0; }
+
+.usr-overlay .sub-card { background: var(--primary-light); border: 1px solid var(--primary); border-radius: var(--radius); padding: 14px 16px; font-size: 14px; }
+.usr-overlay .sub-card-name { font-weight: 600; margin-bottom: 4px; }
+.usr-overlay .sub-card-expiry { font-size: 13px; color: var(--text-muted); }
+.usr-overlay .sub-card-expiry.warning { color: var(--warning); font-weight: 600; }
+.usr-overlay .sub-card-expiry.expired { color: var(--danger); font-weight: 600; }
+.usr-overlay .no-sub-badge { background: #f3f4f6; border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; font-size: 14px; color: var(--text-muted); }
+
+.usr-overlay .history-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.usr-overlay .history-table th { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); color: var(--text-muted); font-weight: 600; }
+.usr-overlay .history-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
+.usr-overlay .history-table tr:last-child td { border-bottom: none; }
+
+.usr-overlay .panel-actions { display: flex; flex-direction: column; gap: 10px; }
+.usr-overlay .assign-form { display: none; padding: 14px; background: var(--bg); border-radius: var(--radius); border: 1px solid var(--border); }
+.usr-overlay .assign-form.open { display: block; }
+.usr-overlay .assign-form select, .usr-overlay .assign-form input { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; font-family: inherit; margin-bottom: 10px; background: var(--white); }
+.usr-overlay .assign-form-actions { display: flex; gap: 8px; }
+.usr-overlay .btn-sm { padding: 8px 16px; border-radius: var(--radius); font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; border: none; }
+.usr-overlay .btn-sm:disabled { opacity: 0.6; cursor: not-allowed; }
+.usr-overlay .btn-sm-primary { background: var(--primary); color: var(--white); }
+.usr-overlay .btn-sm-primary:hover { background: var(--primary-dark); }
+.usr-overlay .btn-sm-cancel { background: var(--white); color: var(--text-muted); border: 1px solid var(--border); }
+
+@media (max-width: 768px) {
+  .usr .page-toolbar { flex-direction: column; align-items: stretch; }
+  .usr .search-input { min-width: 0; }
+  .usr-overlay .side-panel { width: 100%; max-width: 100%; right: -100%; }
+}
