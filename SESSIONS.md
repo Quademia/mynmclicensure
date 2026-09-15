@@ -22,8 +22,8 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
-- 2026-09-15 — 9a and 9b built: payments table, the four actions, subscribe, Premium Prep live, confirmation page, upgrade page, admin Payments; paid by Sam
-  - ↳ 9 split (9a, 9b) on one branch · 7f narrowed to the dashboard · §9 #20 #21 #22 → after the rebuild · pane cannot finish a Paystack checkout · a password in the dev log → FormData · setup rollback kept, Sam to confirm · support@quademia.com
+- 2026-09-15 — 9a and 9b built: payments table, the four actions, subscribe, Premium Prep, confirmation page, upgrade page, admin Payments; first prod release
+  - ↳ 9 split on one branch · 7f narrowed to the dashboard · §9 #20 #21 #22 → after the rebuild · a password in the dev log → FormData · setup rollback kept, Sam to confirm · prod: 11 migrations, licensure-prod up, paid products archived
 
 - 2026-09-14 — fix: profile photo over 1 MB refused by Next’s Server Action body cap; raised to 3 MB, refusal caught into a toast, rule in AGENTS.md
   - ↳ Sam’s own upload failed after the 7e merge · same cap covered the question bank image upload · proven with a 1.61 MB PNG · then the cached old photo fixed with a version stamp on the address (Sam) · dev server restarted
