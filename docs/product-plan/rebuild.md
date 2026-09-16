@@ -437,6 +437,7 @@ feature; a user cannot tell.
 | 22 | The confirmation page verifies every 3 seconds, up to 20 times, while Paystack has not said success — and the Worker's rate limit allows 5 calls per 60 seconds per address on the same route. So a payer whose mobile-money payment is still pending after about twelve seconds sees "Too many requests" and must tap Retry Verification, instead of the "still verifying" screen the poll was written for | `payment-confirmation.html` POLL_MS / MAX_POLLS, `payment-worker` wrangler ratelimits | Seen in the slice 9a walk (2026-09-15) on an unpaid reference: four polls, then the sixth call refused. Both numbers transcribed as they were. **Carried** (Sam, 2026-09-15); listed under "After the rebuild" — the fix is either a slower poll or a limit that excludes verify |
 | 23 | The admin dashboard's "View" links and the Payments page's "View Student" put the user's id in the address (`users.html?id=` and `?user_id=`), but the Users page never reads the address, so the drawer did not open — the admin landed on the plain list | `admin/dashboard.html`, `admin/payments.html`, `admin/users.html` | Found in the slice 14 reading (2026-09-15). Reaches an admin. **Fixed in 14a** (Sam, 2026-09-15): the Users page opens the drawer for a `?user_id=` in the address; the dashboard's View link uses the same name |
 | 24 | Two ways to assign a subscription: the Users page's drawer inserted a new row straight from the browser every time (`assignSubscription`), with no check for an existing one, so a second assign made a duplicate ACTIVE row; the Subscriptions page used the Worker's grant, which extends an existing one instead | `js/mynmclicensure-api.js` `assignSubscription`, `admin/users.html` | Found in the slice 14 reading (2026-09-15). Reaches an admin (and the student's course-access sum, which adds the duplicate's days). **Fixed in 14a** (Sam, 2026-09-15): the drawer's Assign calls slice 8's `grantSubscription` — one mechanism; the extend case is the only behaviour that changes |
+| 25 | Every value is pasted into the email's HTML as it is (`fillTemplate`'s plain replace), so a name typed at registration is rendered as markup: anyone can register a stranger's address with a link or a fake notice in the First name box, and the stranger receives a genuine welcome email carrying it | `email-worker/index.js` `fillTemplate`, `register.html` | Found in the slice 10 reading (2026-09-16); MyNclex's review of gamma's templates noted it too. Reaches a real person after launch — anyone whose address a stranger types into the register form. **Fixed in slice 10** (Sam, 2026-09-16): every value is HTML-escaped as it is filled in; a name with no markup in it reads exactly as before |
 
 **Dead things — remove or decide**
 
@@ -785,8 +786,36 @@ mismatch lands as FAILED; (9b) an upgrade extends an existing
 subscription, and an admin can rescue a stuck row from the Payments page.
 
 **10 — Email.** The four templates and their four call sites; the
-Quademia sender; `appOrigin()`. *Done when* each of the four arrives in
-a real inbox from dev with working links.
+Quademia sender; `appOrigin()`. Scoped with Sam (2026-09-16), one
+session, no split: `lib/email/send.ts` hands each email to Resend with a
+plain fetch (no SDK, MyNclex's reason), awaited inside a try that logs
+and never blocks the action (§7.2); `lib/email/templates/` holds the
+four templates and the shared footer, transcribed from legacy's HTML.
+**The sender is MyNclex's as it is today**: `MyNMCLicensure
+<noreply@quademia.com>`, replies to `support@quademia.com` through a
+Reply-To header (legacy set none), on the Resend account MyNclex uses
+but with this product's own keys, `licensure-dev-app` and
+`licensure-prod-app` (a MyNclex key replaced would otherwise stop these
+emails with no page to show it); every Quademia product moves to the
+agreed `hello@mail.quademia.com` together. **The grant sends
+SUBSCRIPTION_ASSIGNED wherever it is called**, so the Users page's
+Assign — silent in legacy — sends it too (§9 #24's one mechanism); the
+expiry is read back from the row, and the product is named as legacy's
+Grant dropdown named it, `name (KIND)`. **Every value filled into a
+template is escaped** (§9 #25). "QAcademy" becomes "Quademia" in the
+subjects, the headers and the copy (UI convention #5; "QAcademy Nurses
+Hub" → "Quademia" as in 13a), and `support@qacademynurses.com` becomes
+`support@quademia.com` (the 9a address). The footer names **Quademia
+with no company name** (Quademia Ltd is not registered — MyNclex's
+rule) and links quademia.com through `parentSiteOrigin()`; its Telegram
+button goes to the live `t.me/QAcademynurseshub` channel the landing
+page and the sidebar use (legacy's `t.me/qacademynurses` is a blank
+contact page); TikTok and WhatsApp are legacy's. PAYMENT_SETUP_REQUIRED
+is sent from an admin-only Retry Activation action that wraps verify —
+never from verify itself, which the confirmation page polls every 3 s.
+Not built, as legacy had none: an outbox, retries, an admin email page
+(MyNclex's are a mechanism, not stack). *Done when* each of the four
+arrives in a real inbox from dev with working links.
 
 **11 — Announcements.** `announcements`, `user_notice_state`; admin
 page with the eight scope dimensions; student page; the dashboard strip
