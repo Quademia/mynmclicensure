@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-16 — 10 built: the four legacy emails sent from the server through Resend; walked, all six arrived; the rebuild's slices declared complete
+  - ↳ sender as MyNclex, own Resend keys · Users page Assign emails too · §9 #25 values escaped · footer Quademia, live Telegram · expiry read from row · 15 dropped · 16, 17 to After · like for like until cutover · legacy check next
+
 - 2026-09-16 — 7f built: the student dashboard; slice 7 closed; then a measured investigation into why the app is slow, and into the schema
   - ↳ Sam: keep 15, it is a sweep · ruling: runner link follows attempt mode · ~13 round trips a page, gate waits 3x, Postgres only 13ms · MyNclex: gate waits 2x, next/link 48 files vs 3 · item-bank policy per row · 2 scale cliffs · nothing changed
 
