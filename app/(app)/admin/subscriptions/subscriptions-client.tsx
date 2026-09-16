@@ -10,8 +10,9 @@
 // and "done" messages are toasts (UI convention #1) where legacy used
 // the dialogs' inline alert boxes or a browser alert().
 //
-// The two emails legacy fired after a grant and a revoke are slice 10;
-// the Grant dialog's line promising one is legacy copy and stays.
+// The two emails legacy's page fired after a grant and a revoke are sent
+// by the grant and revoke actions on the server (slice 10); the Grant
+// dialog's line promising one is legacy copy, and now true.
 //
 // One legacy quirk changed: the student search ran a query on every
 // keystroke; here it waits 250 ms after typing stops. Same results.

@@ -10,13 +10,20 @@
 // Plus the Grant dialog's student search, which legacy ran from the
 // browser against `users`.
 //
-// Not here yet, by slice: the two emails (SUBSCRIPTION_ASSIGNED after a
-// grant, SUBSCRIPTION_REVOKED after a revoke) are slice 10 and are sent
-// from these two actions when it lands (§7.2).
+// The two emails legacy's page fired after a grant and a revoke
+// (SUBSCRIPTION_ASSIGNED, SUBSCRIPTION_REVOKED) are sent from these two
+// actions once the write has succeeded (slice 10, §7.2). The grant's goes
+// out wherever the grant is called, so the Users page's Assign — silent
+// in legacy — sends it too (Sam, 2026-09-16). Neither email can fail the
+// action: a failure is logged.
 
 'use server';
 
-import { requireAdmin } from '@/lib/access';
+import { requireAdmin, type ServerSupabaseClient } from '@/lib/access';
+import { sendEmail } from '@/lib/email/send';
+import { subscriptionAssignedEmail } from '@/lib/email/templates/subscription-assigned';
+import { subscriptionRevokedEmail } from '@/lib/email/templates/subscription-revoked';
+import { appOrigin } from '@/lib/site/app-origin';
 import { addDaysIso, dateOnlyToEndIso, dateOnlyToStartIso, isDateOnlyString, nowIso } from './dates';
 import { makeSubscriptionId } from './ids';
 import { getActiveSubscriptionForUserProduct, getSubscriptionById, searchStudents } from './queries';
@@ -26,6 +33,7 @@ import {
   type ActionResult,
   type GrantResult,
   type StudentHit,
+  type Subscription,
   type SyncResult,
   type UpdateSubscriptionInput,
 } from './types';
@@ -57,7 +65,7 @@ export async function grantSubscription(userIdIn: string, productIdIn: string, s
 
   const { data: targetUser } = await supabase
     .from('users')
-    .select('user_id, active')
+    .select('user_id, active, email, name, forename, surname')
     .eq('user_id', userId)
     .maybeSingle();
   if (!targetUser) return fail('Target user was not found');
@@ -66,7 +74,7 @@ export async function grantSubscription(userIdIn: string, productIdIn: string, s
   // The Worker's getProductById(…, requireActive = true).
   const { data: product } = await supabase
     .from('products')
-    .select('product_id, name, duration_days, status')
+    .select('product_id, name, kind, duration_days, status')
     .eq('product_id', productId)
     .eq('status', 'active')
     .maybeSingle();
@@ -86,6 +94,7 @@ export async function grantSubscription(userIdIn: string, productIdIn: string, s
       .update({ expires_utc: addDaysIso(baseIso, durationDays), status: 'ACTIVE', source: 'ADMIN', source_ref: 'admin_grant' })
       .eq('subscription_id', existing.subscription_id);
     if (error) return fail(error.message);
+    await sendAssignedEmail(supabase, targetUser, product, existing.subscription_id);
     return { ok: true, mode: 'extended_existing' };
   }
 
@@ -96,8 +105,9 @@ export async function grantSubscription(userIdIn: string, productIdIn: string, s
     if (!startIso) return fail('Start date must be YYYY-MM-DD');
   }
 
+  const subscriptionId = makeSubscriptionId();
   const { error } = await supabase.from('subscriptions').insert({
-    subscription_id: makeSubscriptionId(),
+    subscription_id: subscriptionId,
     user_id: userId,
     product_id: productId,
     start_utc: startIso,
@@ -108,7 +118,35 @@ export async function grantSubscription(userIdIn: string, productIdIn: string, s
     expiry_reminded: false,
   });
   if (error) return fail(error.message);
+  await sendAssignedEmail(supabase, targetUser, product, subscriptionId);
   return { ok: true, mode: 'created_new' };
+}
+
+// SUBSCRIPTION_ASSIGNED — legacy submitGrant's email: the student's name
+// and email from the chosen student, the product as the Grant dropdown
+// labelled it (`name (KIND)`), the login page, and the expiry — read back
+// from the saved row, where legacy's page recomputed it from the start
+// date and was wrong whenever the grant extended (§7.2).
+async function sendAssignedEmail(
+  db: ServerSupabaseClient,
+  student: { email: string | null; name: string | null; forename: string | null; surname: string | null },
+  product: { name: string | null; kind: string | null },
+  subscriptionId: string,
+): Promise<void> {
+  try {
+    const row = await getSubscriptionById(db, subscriptionId);
+    await sendEmail(
+      student.email ?? '',
+      subscriptionAssignedEmail({
+        name: student.name || `${student.forename || ''} ${student.surname || ''}`.trim(),
+        loginUrl: `${appOrigin()}/login`,
+        productName: `${product.name ?? ''} (${product.kind ?? ''})`,
+        expiresUtc: row?.expires_utc ?? '',
+      }),
+    );
+  } catch (err) {
+    console.error('[subscriptions] grant email failed for', subscriptionId, err);
+  }
 }
 
 // ── POST /admin/subscriptions/update ───────────────────────────────────
@@ -169,7 +207,30 @@ export async function revokeSubscription(subscriptionIdIn: string): Promise<Acti
 
   const { error } = await supabase.from('subscriptions').update({ status: 'REVOKED' }).eq('subscription_id', subscriptionId);
   if (error) return fail(error.message);
+  await sendRevokedEmail(supabase, existing);
   return { ok: true };
+}
+
+// SUBSCRIPTION_REVOKED — legacy confirmCancel's email: the student's name
+// (else the forename) and email, the product's name, and the site's own
+// address as the Renew link (legacy's window.location.origin).
+async function sendRevokedEmail(db: ServerSupabaseClient, sub: Subscription): Promise<void> {
+  try {
+    const [{ data: student }, { data: product }] = await Promise.all([
+      db.from('users').select('email, name, forename').eq('user_id', sub.user_id).maybeSingle(),
+      db.from('products').select('name').eq('product_id', sub.product_id).maybeSingle(),
+    ]);
+    await sendEmail(
+      student?.email ?? '',
+      subscriptionRevokedEmail({
+        name: student?.name || student?.forename || '',
+        productName: product?.name || '',
+        renewUrl: appOrigin(),
+      }),
+    );
+  } catch (err) {
+    console.error('[subscriptions] revoke email failed for', sub.subscription_id, err);
+  }
 }
 
 // ── POST /admin/subscriptions/sync-expired ─────────────────────────────

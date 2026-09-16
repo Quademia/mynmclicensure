@@ -45,9 +45,12 @@
     // APP_ORIGIN: dev points at the dev parent site. Unset falls back to
     // the prod address in the code.
     "PARENT_SITE_ORIGIN": "https://quademia-parent-site-dev.mybackpacc.workers.dev",
-    // The From line on every email. Printed on each message, so not a
-    // secret. Same value in both environments; RESEND_API_KEY separates
-    // dev from prod. The sender domain is decided with the DNS slice.
+    // The From line on every email (lib/email/send.ts). Printed on each
+    // message, so not a secret. Same value in both environments;
+    // RESEND_API_KEY separates dev from prod — this product's own keys,
+    // licensure-dev-app and licensure-prod-app. As MyNclex sends today
+    // (Sam, 2026-09-16); every Quademia product moves to the agreed
+    // hello@mail.quademia.com together.
     "EMAIL_FROM": "MyNMCLicensure <noreply@quademia.com>"
   },
   "env": {

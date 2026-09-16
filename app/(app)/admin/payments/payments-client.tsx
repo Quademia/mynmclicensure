@@ -6,8 +6,9 @@
 // debounced 300 ms, status, product, programme, from, to) and Clear,
 // the table of 50 with Load More and the "Showing X of Y" count, the
 // side panel (payment, student, timeline, subscription, failure reason,
-// the raw payload toggle), Retry Activation → the verify action, Copy
-// Setup Link, View Student, and the revenue summary by product.
+// the raw payload toggle), Retry Activation → the admin retry action
+// (verify, then the setup email), Copy Setup Link, View Student, and the
+// revenue summary by product.
 //
 // Legacy quirks carried: the programme filter runs in the browser over
 // the page already fetched (the programme lives on the joined student),
@@ -19,9 +20,9 @@
 // Changed on the way: the panel's inline alert boxes are the shared
 // toast (UI convention #1); money through formatMinor() (#4); the
 // setup link is built on the site's own address handed in by the page
-// (never the browser's origin); the PAYMENT_SETUP_REQUIRED email legacy
-// fired after a retry that landed on SETUP_REQUIRED is slice 10 and is
-// not sent yet (rebuild.md §7.2).
+// (never the browser's origin); the PAYMENT_SETUP_REQUIRED email legacy's
+// page fired after a retry that landed on SETUP_REQUIRED is sent by the
+// retry action on the server (slice 10, rebuild.md §7.2).
 
 'use client';
 
@@ -30,8 +31,7 @@ import { useRouter } from 'next/navigation';
 import { Toast } from '@/lib/toast/toast';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { formatMinor } from '@/lib/money/format-minor';
-import { verifyPayment } from '@/lib/payments/verify';
-import { listPaymentsAction } from '@/lib/payments/admin-actions';
+import { listPaymentsAction, retryActivationAction } from '@/lib/payments/admin-actions';
 import {
   EMPTY_PAYMENT_FILTERS,
   type PaymentFilters,
@@ -180,11 +180,12 @@ export function PaymentsClient({
     setSelectedRef(null);
   }
 
-  // legacy retryActivation: the verify route again.
+  // legacy retryActivation: the verify route again, and on SETUP_REQUIRED
+  // the setup email — both inside the action (slice 10).
   async function retryActivation(reference: string) {
     setRetryState('busy');
     try {
-      const data = await verifyPayment(reference);
+      const data = await retryActivationAction(reference);
 
       if (!data.ok) {
         setMsg({ text: `Retry failed: ${data.error === 'payment_failed' ? data.failure_note : data.message || data.error || 'Activation failed.'}`, tone: 'error' });
@@ -198,7 +199,6 @@ export function PaymentsClient({
       } else if (data.status === 'SETUP_REQUIRED') {
         setMsg({ text: 'Payment verified but no account found yet. Student needs to complete setup.', tone: 'info' });
         setRetryState('idle');
-        // The PAYMENT_SETUP_REQUIRED email legacy sent here is slice 10.
       } else {
         setMsg({ text: `Status returned: ${(data as { status?: string }).status || 'unknown'}. Check Paystack dashboard.`, tone: 'info' });
         setRetryState('idle');

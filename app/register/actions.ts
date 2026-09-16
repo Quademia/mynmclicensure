@@ -11,14 +11,19 @@
 //
 // The programme trial (legacy step 3) is granted after the profile row
 // with the service role (lib/subscriptions/trial.ts, slice 8); it never
-// blocks the registration. Not here yet: the welcome email (slice 10).
-// Registration succeeds without it.
+// blocks the registration. The welcome email (legacy step 5, slice 10)
+// follows it, sent from here where legacy's browser posted to the email
+// Worker; a failure is logged and the registration succeeds without it.
 
 'use server';
 
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { makeUserId } from '@/lib/auth/ids';
 import { grantTrialSubscription } from '@/lib/subscriptions/trial';
+import { sendEmail } from '@/lib/email/send';
+import { welcomeStudentEmail } from '@/lib/email/templates/welcome-student';
+import { appOrigin } from '@/lib/site/app-origin';
+import type { ServerSupabaseClient } from '@/lib/access';
 
 type RegisterResult = { ok: true; email: string } | { ok: false; error: string };
 
@@ -103,13 +108,34 @@ export async function registerAction(formData: FormData): Promise<RegisterResult
   // Step 3: the programme trial, service role, non-blocking (legacy too).
   await grantTrialSubscription(userId, programId);
 
-  // Step 5 (welcome email): slice 10.
+  // Step 5: the welcome email, before the sign-out as legacy sent it.
+  await sendWelcomeEmail(supabase, email, forename, programId);
 
   // Sign out so the student arrives at /login with a clean state, as
   // legacy did.
   await supabase.auth.signOut();
 
   return { ok: true, email };
+}
+
+// legacy step 5: the forename, the email, the login page, and the
+// programme as the dropdown showed it (its program_name; '' if the read
+// fails, as legacy's `|| ''`). Awaited, and never blocks: sendEmail does
+// not throw, and the read is caught here.
+async function sendWelcomeEmail(
+  supabase: ServerSupabaseClient,
+  email: string,
+  forename: string,
+  programId: string,
+): Promise<void> {
+  let programName = '';
+  try {
+    const { data } = await supabase.from('programs').select('program_name').eq('program_id', programId).maybeSingle();
+    programName = String(data?.program_name ?? '').trim();
+  } catch (err) {
+    console.error('[register] programme name read failed for the welcome email:', err);
+  }
+  await sendEmail(email, welcomeStudentEmail({ name: forename, email, loginUrl: `${appOrigin()}/login`, programName }));
 }
 
 async function rollbackAuthUser(authUserId: string): Promise<void> {
