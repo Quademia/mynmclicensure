@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-09-15. Rules for **any** assistant working in this
+Last updated: 2026-09-16. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What is built and
@@ -197,9 +197,18 @@ above sit at the repo root; the audience grouping inside them is kept.
   `node_modules/lightningcss-win32-x64-msvc/*.node` into
   `node_modules/lightningcss/`, delete `.next`, restart.
 - **The React compiler's lint refuses a clock read or a ref write during
-  render** (`react-hooks/purity`, `react-hooks/refs`): stamp `Date.now()`
-  into state from a handler or an effect and compute from it; write a
-  ref only in a handler.
+  render, and a synchronous `setState` inside an effect**
+  (`react-hooks/purity`, `react-hooks/refs`,
+  `react-hooks/set-state-in-effect`): read the clock through a
+  module-level helper, never in render; write a ref only in a handler;
+  stamp `Date.now()` into state from a **handler**, not an effect body.
+- **Browser storage is read through `useSyncExternalStore`**, never in
+  render and never through an effect that calls `setState`. Reading
+  `sessionStorage` / `localStorage` during render splits the server's
+  paint from the browser's (a hydration mismatch), and the effect that
+  would fix it trips the lint above. Give the hook a module-level
+  subscribe, a getSnapshot that reads storage in a try/catch, and a
+  server snapshot of whatever the first paint should show.
 - **A realtime subscription needs the table in the `supabase_realtime`
   publication** and the client's `schema: 'licensure_gh'` on the
   subscription — a table outside the publication fires nothing, with

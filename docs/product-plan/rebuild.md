@@ -726,7 +726,12 @@ row (2a's `users_update` policy is the floor). The page's own toast
 is the shared one (UI convention #1). **7f** the dashboard alone —
 later, because its course cards, announcements strip and messages badge
 fold in slices 8, 11 and 12; the upgrade page moved to **9b** (Sam,
-2026-09-15), where it goes live with its payment button. *Done when* (7a)
+2026-09-15), where it goes live with its payment button. Built
+2026-09-16 with one ruling: the Recent Quiz Attempts table's Review and
+Resume open the runner for the attempt's own **mode**, where legacy sent
+every attempt to `instant.html` — 7a's learning history already routes
+that way and the two now agree (Sam, 2026-09-16; not a §9 entry, ruled
+on in session). *Done when* (7a)
 Sam's attempts from slices 6 and 5b appear with the right stats, a
 filter narrows them, Load more pages, and Review and Retake open the
 runner; (7b) the guide reads as legacy's did, the side list follows
@@ -981,7 +986,7 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 7c Student home — NMC Procedures | ✅ 2026-09-14 |
 | 7d Student home — course page | ✅ 2026-09-14 |
 | 7e Student home — profile | ✅ 2026-09-14 |
-| 7f Student home — dashboard | ⬜ |
+| 7f Student home — dashboard | ✅ 2026-09-16 |
 | 8 Subscriptions | ✅ 2026-09-13 |
 | 9a Payments — table, rate limit, the four actions, subscribe, Premium Prep live, confirmation page | ✅ 2026-09-15 |
 | 9b Payments — the upgrade page live, the admin Payments page | ✅ 2026-09-15 |

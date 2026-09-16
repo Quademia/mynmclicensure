@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-16 — 7f built: the student dashboard (nudge, subscription bar, channels, course cards, recent attempts); slice 7 closed; phone pass kept
+  - ↳ Sam: keep 15 where it is, it is a sweep not a build · ruling: runner link follows the attempt mode, legacy always sent instant · useSyncExternalStore for storage, AGENTS bullet corrected · inline styles out-rank a scoped rule · 10 next?
+
 - 2026-09-15 — 9, 14 and 12 built: payments, admin Payments / Users / dashboard / Attempts, messaging both sides with live replies; first prod release
   - ↳ three slices split on one branch, all closed · 7f narrowed · §9 #20–#24 (two fixed) · password in the dev log → FormData · one Quademia account → after · prod: 11 migrations, licensure-prod up, paid products archived · branch rule per MyNclex
 
