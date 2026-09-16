@@ -65,6 +65,28 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ✖ 15 Phone pass — not a session of its own: phones kept working with every change (Sam, 2026-09-16)
 - ✅ (unplanned) The rebuild's slices declared complete — 16 and 17 moved to *After the rebuild* (Sam) — 2026-09-16
 
+### The legacy check — gaps found 2026-09-16 (fix before new features)
+
+Every legacy page compared with its rebuilt route; nothing missing outright. Detail and the minor list: `sessions/2026-09.md`, the legacy check entry. Numbered as reported to Sam; 1–4 first.
+
+- ⬜ 1 Runner autosave restarts its 60 s timer on every answer or flag — steady answering never autosaves; a timed exam loses answers on a closed tab
+- ⬜ 2 Runner: a dropped connection at Submit, Save & Resume Later or the timed auto-submit leaves the spinner forever — legacy showed the score
+- ⬜ 3 Question Bank: an MCQ with answer C–F switched to TF shows "A (True)" but saves the old letter — every student marked wrong on it
+- ⬜ 4 Register: the "N-day free trial — no card required" hint never shows — `trialDays` still null, waiting on slice 8
+- ⬜ 5 Sidebar badge, My Courses and name / photo load once in the layout — stale across sidebar clicks; dropdown open state carries across pages
+- ⬜ 6 The device check on every save signs a kicked or expired device out mid-quiz, losing unsaved answers — legacy let it finish (§10, unrecorded)
+- ⬜ 7 Quiz Builder and Offline Pack builder: the status line sticks after a failure; "Select a course…" leaves the previous course's topics and counts
+- ⬜ 8 Password reset: legacy signed the student straight in, the rebuild asks for a new sign-in — Sam to decide
+- ⬜ 9 Admin Messages: the open conversation vanishes when a filter hides its thread, realtime still marks new messages read, no way back on a phone
+- ⬜ 10 Admin Payments: after Retry Activation the panel redraws — "Activated ✓" gone, and the panel can close itself
+- ⬜ 11 Admin Products: a draft or archived course inside a product is kept on save, where legacy dropped it — Sam to rule
+- ⬜ 12 Admin Users: Assign refuses a deactivated account; legacy's Users page allowed it (a second change beyond §9 #24)
+- ⬜ 13 A failed database read shows "No config keys found." (Config) and "No active subscriptions found yet." (Upgrade) instead of an error
+- ⬜ 14 Offline pack renderer: the course code instead of its title once the course is not active
+- ⬜ About 40 minor or cosmetic differences (titles, wording, focus, scroll, spinners) — listed in the session entry; Sam's call whether to tidy
+- ⬜ Five legacy bugs the rebuild fixed without a record (history Retake, "%" in Send feedback, inbox unread, picker Subtopic filter, timed pre-Start save) — keep, Sam to confirm
+- ⬜ `db/schema.sql` and `db/rls.sql` snapshots omit offline_packs, announcements and user_notice_state — the migrations are complete
+
 ### Decisions still open in rebuild.md
 
 - ✅ §8 S1 user primary key — keep `U_` ids, add the FK — 2026-09-11
@@ -101,6 +123,7 @@ built as legacy had it, not listed here as new.
 
 - ⬜ 16 Cutover — DNS, live keys, content re-copy, old logins deleted, `legacy/` removed (moved from the rebuild, Sam, 2026-09-16)
 - ⬜ Before cutover: Resend's free plan caps the account shared with MyNclex at 100 emails a day (MyNclex's notes); re-registration day would pass it and lose the rest — the Pro upgrade first (slice 10, 2026-09-16)
+- ⬜ Before cutover: the Supabase Auth dashboard settings (redirect allow-list, sender, QAcademy-branded reset and magic-link templates) are recorded nowhere here — check them and add the live address (legacy check, 2026-09-16)
 - ⬜ 17 Telegram gate — Connect page, link codes, bot Worker on the DB, allowlist from subscriptions (moved from the rebuild, Sam, 2026-09-16)
 - ⬜ A link to Premium Prep from the landing page — legacy never linked it; the page was shared by address only (slice 3, 2026-09-12)
 - ⬜ Learning history: the stats bar counts the loaded pages, not the whole history — legacy called true totals deferred (slice 7a, 2026-09-14)

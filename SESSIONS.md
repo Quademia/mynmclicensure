@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-16 — the legacy check: every legacy page compared with the rebuild; nothing missing outright; 14 gaps queued, 4 to fix first
+  - ↳ nine parallel readers · autosave restarts on every answer · dropped connection freezes the runner · MCQ→TF saves the old letter · trial hint off · stale sidebar · 5 legacy bugs fixed silently · ~40 minor · nothing changed
+
 - 2026-09-16 — 10 built: the four legacy emails sent from the server through Resend; walked, all six arrived; the rebuild's slices declared complete
   - ↳ sender as MyNclex, own Resend keys · Users page Assign emails too · §9 #25 values escaped · footer Quademia, live Telegram · expiry read from row · 15 dropped · 16, 17 to After · like for like until cutover · legacy check next
 
