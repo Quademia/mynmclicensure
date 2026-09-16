@@ -126,3 +126,6 @@ export type HistoryFilters = { courseId: string; status: string; mode: string; s
 export type HistoryPage = { attempts: AttemptListRow[]; total: number };
 
 export const HISTORY_PAGE_SIZE = 20;
+
+/** The dashboard's Recent Quiz Attempts table (legacy's `.limit(5)`). */
+export const RECENT_ATTEMPTS_LIMIT = 5;

@@ -11,7 +11,7 @@
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import { itemsTableFor } from '@/lib/bank/tables';
-import { HISTORY_PAGE_SIZE, type Attempt, type AttemptListRow, type BuilderItem, type HistoryFilters, type HistoryPage, type QuizAttemptStats } from './types';
+import { HISTORY_PAGE_SIZE, RECENT_ATTEMPTS_LIMIT, type Attempt, type AttemptListRow, type BuilderItem, type HistoryFilters, type HistoryPage, type QuizAttemptStats } from './types';
 
 // The admin details step's attempt-stats box (legacy openEditQuiz's
 // inline read on both admin quiz pages): every attempt on the quiz, the
@@ -105,4 +105,27 @@ export async function getStudentAttemptsPaginated(
     return { attempts: [], total: 0 };
   }
   return { attempts: (data ?? []) as AttemptListRow[], total: count ?? 0 };
+}
+
+// ── the dashboard's Recent Quiz Attempts (legacy loadRecentAttempts) ────
+// The five newest attempts, whatever their status. Legacy read `*` with
+// `.limit(5)`; the columns are narrowed to the list row's, which is every
+// column the table renders.
+export async function getRecentAttempts(
+  db: ServerSupabaseClient,
+  userId: string,
+  limit = RECENT_ATTEMPTS_LIMIT,
+): Promise<AttemptListRow[]> {
+  const { data, error } = await db
+    .from('attempts')
+    .select('attempt_id, user_id, quiz_id, course_id, mode, source, status, n, score_raw, score_total, score_pct, time_taken_s, display_label, ts_iso')
+    .eq('user_id', userId)
+    .order('ts_iso', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('getRecentAttempts:', error);
+    return [];
+  }
+  return (data ?? []) as AttemptListRow[];
 }
