@@ -22,8 +22,8 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
-- 2026-09-16 — 7f built: the student dashboard (nudge, subscription bar, channels, course cards, recent attempts); slice 7 closed; phone pass kept
-  - ↳ Sam: keep 15 where it is, it is a sweep not a build · ruling: runner link follows the attempt mode, legacy always sent instant · useSyncExternalStore for storage, AGENTS bullet corrected · inline styles out-rank a scoped rule · 10 next?
+- 2026-09-16 — 7f built: the student dashboard; slice 7 closed; then a measured investigation into why the app is slow, and into the schema
+  - ↳ Sam: keep 15, it is a sweep · ruling: runner link follows attempt mode · ~13 round trips a page, gate waits 3x, Postgres only 13ms · MyNclex: gate waits 2x, next/link 48 files vs 3 · item-bank policy per row · 2 scale cliffs · nothing changed
 
 - 2026-09-15 — 9, 14 and 12 built: payments, admin Payments / Users / dashboard / Attempts, messaging both sides with live replies; first prod release
   - ↳ three slices split on one branch, all closed · 7f narrowed · §9 #20–#24 (two fixed) · password in the dev log → FormData · one Quademia account → after · prod: 11 migrations, licensure-prod up, paid products archived · branch rule per MyNclex
