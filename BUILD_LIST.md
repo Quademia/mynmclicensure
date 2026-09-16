@@ -53,7 +53,7 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ✅ 9a Payments — table, rate limit, the four actions, subscribe, Premium Prep live, confirmation page — 2026-09-15
 - ✅ 9b Payments — the upgrade page live, the admin Payments page (rescue buttons, revenue summary) — 2026-09-15
 - ✅ (unplanned) First production release — main → production (slices 0–9), the eleven migrations on the prod project, licensure-prod created; no DNS — 2026-09-15
-- ⬜ 10 Email — four templates, Quademia sender, `appOrigin()`
+- ✅ 10 Email — four templates, Quademia sender, `appOrigin()` — 2026-09-16
 - ✅ 11a Announcements — two tables, server-side scoping (course scope fixed, §9 #19), admin page (no Scheduled status, §9 #18) — 2026-09-14
 - ✅ 11b Announcements — student page, dashboard strip on the placeholder, the course page section — 2026-09-14
 - ✅ 12a Messaging — tables, the student page, the three contexts, both runners' Send feedback, live replies, the student badge — 2026-09-15
@@ -64,6 +64,7 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ✅ 14b Admin home — the Attempts analytics page — 2026-09-15
 - ⬜ 15 Phone pass — student at 375px, admin navigable at 768px
 - ⬜ 16 Cutover — DNS, live keys, content re-copy, old logins deleted, `legacy/` removed
+- ⬜ Before cutover: Resend's free plan caps the account shared with MyNclex at 100 emails a day (MyNclex's notes); re-registration day would pass it and lose the rest — the Pro upgrade first (slice 10, 2026-09-16)
 - ⬜ 17 Telegram gate — Connect page, link codes, bot Worker on the DB, allowlist from subscriptions; after 8
 
 ### Decisions still open in rebuild.md

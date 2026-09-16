@@ -1019,7 +1019,7 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 8 Subscriptions | ✅ 2026-09-13 |
 | 9a Payments — table, rate limit, the four actions, subscribe, Premium Prep live, confirmation page | ✅ 2026-09-15 |
 | 9b Payments — the upgrade page live, the admin Payments page | ✅ 2026-09-15 |
-| 10 Email | ⬜ |
+| 10 Email | ✅ 2026-09-16 |
 | 11a Announcements — tables, scoping, admin page | ✅ 2026-09-14 |
 | 11b Announcements — student page, dashboard strip, course section | ✅ 2026-09-14 |
 | 12a Messaging — tables, the student page, the three contexts, the runners' Send feedback, the student badge | ✅ 2026-09-15 |
