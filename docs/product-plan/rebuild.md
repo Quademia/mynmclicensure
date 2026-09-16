@@ -1,7 +1,11 @@
 # MyNMCLicensure — the rebuild plan
 
 Written 2026-09-10 by Claude, from a planning session with Sam. Status:
-**in build — slices 0 and 1 done 2026-09-10; slice 2 (2a + 2b) done 2026-09-11.** This is the one document that says what the
+**the slices complete — declared by Sam on 2026-09-16** (0–14 built;
+15 dropped as a slice; 16 Cutover and 17 Telegram gate moved to *After
+the rebuild* in `BUILD_LIST.md` — §12's closing paragraph). Next: Sam's
+surface-by-surface check of `legacy/` for anything missed; like for
+like holds until cutover. This is the one document that says what the
 rebuild is, what it is not, and in what order it is built. The slice
 ladder at the end is mirrored line-for-line in `BUILD_LIST.md`; a slice
 is ticked in both places in the same commit.
@@ -972,6 +976,18 @@ Slices 3–7 need nothing from 8–14 and can run in any order after 2.
 Slices 8 → 9 → 10 are a chain. 11, 12, 13 are independent of each
 other and of 8–10. 14 needs 6 and 8. 15 last but one.
 
+**The slices declared complete (Sam, 2026-09-16)**, with 10 closed the
+same day. **15 is dropped as a slice**: the phone layout is kept
+working with every change, during the rebuild and after it (UI
+convention #3), so it is not a session of its own. **16 Cutover and 17
+Telegram gate move to *After the rebuild*** in `BUILD_LIST.md`; §11
+still describes the day, and 17's paragraph above still describes the
+feature (the live legacy site lacks it, so launching before it loses
+nothing). **What comes next is Sam's check of `legacy/`, surface by
+surface, for anything the slices missed**; what it finds is built as
+legacy had it, under the same rules. **Like for like holds until
+cutover** — new features come after it (AGENTS.md ⭐).
+
 ## 13. What this plan does not do
 
 - It does not change the product's design, copy, or feature set (D4).
@@ -1028,6 +1044,6 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 13b Offline packs — My Packs | ✅ 2026-09-14 |
 | 14a Admin home — the Users page and the dashboard | ✅ 2026-09-15 |
 | 14b Admin home — the Attempts analytics page | ✅ 2026-09-15 |
-| 15 Phone pass | ⬜ |
-| 16 Cutover | ⬜ |
-| 17 Telegram gate | ⬜ |
+| 15 Phone pass | ✖ not a session of its own — phones kept working with every change (Sam, 2026-09-16) |
+| 16 Cutover | → *After the rebuild* in `BUILD_LIST.md` (Sam, 2026-09-16) |
+| 17 Telegram gate | → *After the rebuild* in `BUILD_LIST.md` (Sam, 2026-09-16) |

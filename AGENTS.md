@@ -23,7 +23,11 @@ Ghana.
 
 ## Current Status
 
-**Being rebuilt, like for like, onto the MyNclex stack.** The live
+**Rebuilt, like for like, onto the MyNclex stack — not yet live.** The
+rebuild's slices are complete (Sam, 2026-09-16). What remains is Sam's
+check of `legacy/`, surface by surface, for anything they missed; what
+it finds is built as legacy had it. Cutover and the Telegram gate sit
+on the *After the rebuild* list in `BUILD_LIST.md`. The live
 product is still the vanilla-JS site served from the `qacademy-gamma`
 repo; its code sits here under `legacy/` as the reference. The plan,
 the decisions and the slice ladder are `docs/product-plan/rebuild.md`.
@@ -33,7 +37,9 @@ the session; nothing more. A slice that needs splitting is split in
 in one commit — never in the feature docs `00–07`, which describe the
 legacy product and are not build plans (Sam, 2026-09-12).
 
-⭐ **The rebuild adds no user-visible feature and no new mechanism.**
+⭐ **The rebuild adds no user-visible feature and no new mechanism, and
+the rule holds until cutover** — through the legacy check; new features
+come after cutover (Sam, 2026-09-16).
 Behaviour is transcribed from `legacy/` and the feature specs
 `docs/product-plan/00–07`. Where
 the two disagree, the code wins. An internal shape may change only where

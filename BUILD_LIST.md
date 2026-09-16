@@ -62,10 +62,8 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ✅ 13b Offline packs — My Packs: list, filters, summary counts, Open / Build Similar — 2026-09-14
 - ✅ 14a Admin home — the Users page (drawer, assign, reset, deactivate; ?user_id= opens it) and the dashboard counts — 2026-09-15
 - ✅ 14b Admin home — the Attempts analytics page — 2026-09-15
-- ⬜ 15 Phone pass — student at 375px, admin navigable at 768px
-- ⬜ 16 Cutover — DNS, live keys, content re-copy, old logins deleted, `legacy/` removed
-- ⬜ Before cutover: Resend's free plan caps the account shared with MyNclex at 100 emails a day (MyNclex's notes); re-registration day would pass it and lose the rest — the Pro upgrade first (slice 10, 2026-09-16)
-- ⬜ 17 Telegram gate — Connect page, link codes, bot Worker on the DB, allowlist from subscriptions; after 8
+- ✖ 15 Phone pass — not a session of its own: phones kept working with every change (Sam, 2026-09-16)
+- ✅ (unplanned) The rebuild's slices declared complete — 16 and 17 moved to *After the rebuild* (Sam) — 2026-09-16
 
 ### Decisions still open in rebuild.md
 
@@ -93,12 +91,17 @@ rebuild work; listed so they are not lost.
 
 ## After the rebuild
 
-Product changes spotted while transcribing `legacy/`, and internal
-findings that are nobody's slice. None is built during the rebuild
-(AGENTS.md ⭐: no new user-visible feature). One line each, with the
-slice or the work that surfaced it; Sam orders them once cutover is
-done — except where a line says otherwise, as the Speed ones do.
+Product changes spotted while transcribing `legacy/`, internal findings
+that are nobody's slice, and — since Sam declared the rebuild's slices
+complete (2026-09-16) — the two slices moved out of it, Cutover and the
+Telegram gate. One line each, with the slice or the work that surfaced
+it; Sam orders them. No new user-visible feature is built before
+cutover (AGENTS.md ⭐); what Sam's check of `legacy/` finds missing is
+built as legacy had it, not listed here as new.
 
+- ⬜ 16 Cutover — DNS, live keys, content re-copy, old logins deleted, `legacy/` removed (moved from the rebuild, Sam, 2026-09-16)
+- ⬜ Before cutover: Resend's free plan caps the account shared with MyNclex at 100 emails a day (MyNclex's notes); re-registration day would pass it and lose the rest — the Pro upgrade first (slice 10, 2026-09-16)
+- ⬜ 17 Telegram gate — Connect page, link codes, bot Worker on the DB, allowlist from subscriptions (moved from the rebuild, Sam, 2026-09-16)
 - ⬜ A link to Premium Prep from the landing page — legacy never linked it; the page was shared by address only (slice 3, 2026-09-12)
 - ⬜ Learning history: the stats bar counts the loaded pages, not the whole history — legacy called true totals deferred (slice 7a, 2026-09-14)
 - ⬜ Learning history: Source and Sort work over the loaded pages only; Course / Mode / Status / Search are database-side (slice 7a, 2026-09-14)
