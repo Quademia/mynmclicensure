@@ -36,6 +36,10 @@ convention in a string did the work a column should do.
   marked `→ queued <date>` below. When it is rejected, it is marked
   `✖ <reason> (Sam, <date>)` and kept, so it is not re-found.
 - No session history. That belongs in `sessions/`.
+- **A *Proposed direction* section** may follow the findings where
+  several point at one shape. It carries the comparison, the staging
+  and a draft row for `rebuild.md` §8 — as text to be judged, never
+  as an edit to that file. The row moves to §8 only when Sam ticks it.
 
 ---
 
@@ -184,3 +188,248 @@ completed payment activates whether or not the browser ever comes back.
 
 **Status.** Open. Not approved, not queued. The only finding here that
 costs money rather than tidiness.
+
+---
+
+## D5 — The runner hands every answer to the browser
+
+**What.** The runner loads its questions with `select('*')`, so every
+column comes back — `correct`, `rationale`, `rationale_img` and the
+per-option feedback `fb_a`–`fb_f`. The page then passes those rows to
+`<QuizRunner>`, which is a `'use client'` component. Next.js serialises
+a client component's props into the HTML so the browser can rebuild it,
+so the answer key for every question in the attempt is in the page
+source before the student answers anything.
+
+In timed mode the answer is withheld from the *screen*, not from the
+browser: `canReveal` is `locked || reviewMode` — a render rule over data
+that is fully present.
+
+**Where.** `lib/bank/queries.ts:36` (`select('*')`),
+`lib/attempts/runner-load.ts` (returns `items: Item[]`),
+`app/(app)/runner/timed/page.tsx` and `.../instant/page.tsx`
+(`items={load.items}`), `components/runner/quiz-runner.tsx:30`
+(`'use client'`), `:532-535` (the reveal rule). The type:
+`lib/bank/types.ts:30-50`.
+
+**Who it reaches.** A paying student — who already holds these questions
+legitimately in practice mode, so this is not a privacy breach and no
+personal data is exposed. What it costs is **exam integrity**: a timed
+mock exam, the product's central claim, can be read off the page source.
+Not confirmed by running the app (no keys in that session); confirm in
+half a minute by opening a timed attempt and searching the page source
+for a rationale sentence.
+
+**Proposed fix.** Send the runner display columns only, and return the
+answer for one question at a time as it is answered (instant) or at
+submit (timed) — MyNclex's sealed/unsealed split, see *Proposed
+direction* below.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D6 — `answers_json` stores the correct answer a second time
+
+**What.** `buildAnswersJson` writes `correct` into every record it saves
+to `attempts.answers_json`. The whole attempt row, that blob included,
+is handed to the browser runner — so a half-finished timed attempt leaks
+the answers to everything already answered, independently of D5.
+
+The stored copy is never trusted: the server recomputes `correct` and
+`is_correct` from the live questions at submit (`recomputeAnswers`). So
+it is a duplicate of the truth whose only effects are the leak and a
+second, drifting version of the answer if the question is ever edited.
+
+**Where.** `lib/attempts/scoring.ts:108-131` (`buildAnswersJson`),
+`lib/attempts/types.ts` (`AnswerRecord.correct`), the column at
+`db/migrations/20260913230000_attempts.sql`.
+
+**Who it reaches.** The same paying student as D5, on a resumed attempt.
+
+**Proposed fix.** Stop writing `correct` into the record — the server
+recomputes it anyway. Old rows keep their copy harmlessly.
+
+**Status.** Open. Not approved, not queued. The cheapest item in this
+file; one function.
+
+---
+
+## D7 — A student can write their own attempt row, including the score
+
+**What.** The attempts policies are row-scoped but not column-scoped:
+
+```
+create policy attempts_update on attempts for update
+using (attempts.user_id = auth_user_id());
+```
+
+That restricts *which rows* a student may change, not *which columns*.
+The browser holds a live authenticated database client
+(`lib/supabase/client.ts`, used by the messages pages for live replies),
+so the database's own rules are the only control on a direct write. A
+student can edit their own attempt row and set `score_pct` to 100. The
+insert policy is the same shape.
+
+The server-side recompute at submit is a good guard on the path that
+goes *through* the Server Action. The direct path has no guard.
+
+**Where.** `db/migrations/20260913230000_attempts.sql` (the three
+policies), `lib/supabase/client.ts`.
+
+**Who it reaches.** A paying student, on their own rows only. Nothing
+rides on the score — no certificate, no leaderboard — but it silently
+corrupts the admin Attempts analytics, which is the number that decides
+which topics need more content. Same shape as §9 #15 (`users_update`),
+closed for this reason.
+
+**Proposed fix.** Drop the student insert/update policies; the runner's
+writes go through `SECURITY DEFINER` functions or service-role Server
+Actions, as MyNclex does (`nclex_attempts` grants students SELECT only).
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D8 — The question bank is readable directly from the browser
+
+**What.** The root of D5, and the one that survives fixing it. The item
+policies read:
+
+```
+create policy items_gp_select on items_gp for select
+using (user_has_course('GP'));
+```
+
+Every row and every column, `correct` and `rationale` included, to any
+student holding that course. With the browser's authenticated client
+(D7), one console request pulls a whole course. The Quiz Builder already
+does a mild version of this legitimately: picking a course ships every
+stem and rationale in it to the browser, because the concept search
+filters client-side.
+
+**Where.** `db/rls.sql:378-391` (the eleven policies),
+`lib/attempts/queries.ts:60-71` (`getBuilderCourseItems` selects
+`stem, rationale` for the whole course),
+`app/(app)/student/quiz-builder/quiz-builder-client.tsx:193-199`
+(the client-side concept search that is the reason).
+
+**Who it reaches.** A paying student, and it is the paid content itself
+— the bank, with answers and rationales, as a single request. Carried,
+not introduced: legacy queried Supabase from the browser too, and §9 #3
+already tightened this from *any signed-in user* to *a subscriber*.
+
+⚠ **Do not copy MyNclex here.** Its equivalent policy
+(`nclex_bank_items_read_published`) grants every **signed-in** user the
+whole published bank and defers entitlement to the app layer; a
+migration of 2026-09-03 restates that as a live constraint. MyNMCLicensure's
+`user_has_course()` gate is the stricter of the two and stays.
+
+**Proposed fix.** Move the builder's search server-side, then revoke the
+answer columns from `authenticated` and have the server read the bank
+with the service role after its existing access check. Only possible
+once the runner no longer reads the live bank — see *Proposed direction*.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+# Proposed direction — the attempts restructure
+
+Not a finding and not a decision: the shape D5–D8 point at, written out
+so it can be judged. Read with `rebuild.md` §8 — a draft row for that
+table sits at the end, to be moved there only if Sam ticks it.
+
+## What MyNclex does, and how it compares
+
+Read from `Quademia/mynclex` on 2026-09-17 (reference only; AGENTS.md
+rule #2 forbids importing from a sibling, copy-paste is allowed).
+
+MyNclex hit this problem and named the answer **Pillar 2 — no answer-key
+leakage**, enforced at the one place data crosses to the browser
+(`app/(app)/(focused)/session/[attempt_id]/page.tsx:40-66`): a
+`SEALED_ITEM_COLUMNS` list while a sitting is live, `UNSEALED_ITEM_COLUMNS`
+(the same plus `correct_answer_snapshot_json`, `rationale_snapshot`,
+`rationale_img_snapshot`) in review. A type split makes it a compile
+error to get wrong (`lib/practice/runner/types.ts:7-12`): live mode
+accepts `SealedItem` only. Instant feedback is a **per-item unseal
+envelope** returned by the submit action for the one question just
+answered, never a wholesale unseal.
+
+| | MyNMCLicensure | MyNclex |
+|---|---|---|
+| What the runner receives | every column of every question | sealed while live, unsealed in review |
+| Answer key in the browser | always, from page load | never while live; one item at a time |
+| Enforced by | nothing | a type split — wrong code will not compile |
+| Attempt storage | one row, two TEXT blobs | a header row + one row per question |
+| A question edited later | the past attempt changes | snapshots — the attempt keeps what was shown |
+| Student writing their attempt | INSERT + UPDATE, any column | SELECT only; writes via SECURITY DEFINER RPCs |
+| Scoring | browser computes live, server recomputes | server reads the key, scores in tested TS, RPC persists |
+| **Direct read of the bank** | **subscriber only (`user_has_course`)** | any signed-in user (deferred, see D8) |
+
+Six rows to MyNclex, one to here — and the one is the access gate, which
+is why this is a transplant, not a merger: **adopt MyNclex's attempt
+architecture; keep MyNMCLicensure's access gate and its smaller scope.**
+
+MyNclex's own decision record (`sessions/2026-05.md`, slice 2.3) chose
+server-side projection over column-level RLS deliberately: review
+legitimately needs the keys, so tightening the database would have meant
+column policies plus a permissive view — "more moving parts".
+
+## What is adopted, and what is kept
+
+**Adopted from MyNclex:** one row per question instead of a text blob;
+each row snapshotting the question as served; the sealed/unsealed
+projection; the type split; the per-item unseal for instant feedback;
+writes through locked server functions.
+
+**Kept from MyNMCLicensure:** `user_has_course()` (stricter than
+MyNclex's — D8); the server-side recompute at finish, which already
+refuses to trust the browser's score; three question types (MCQ / TF /
+SATA) — MyNclex's nine types, NGN case studies, CAT, trends and
+clinical-judgement steps are machinery this product does not have; the
+eleven per-course item tables (§8 S2); the `U_` / `ATT_` id conventions
+that support conversations depend on; the ten preflight checks, already
+server-side.
+
+## Staged, so it can stop between stages
+
+- **A — seal the runner.** The type split and the per-item unseal.
+  Attempts table untouched. Closes D5. Moderate: the runner is 885 lines
+  and computes feedback in the browser today, so that path moves. Alone,
+  this is what makes a timed mock exam an exam.
+- **B — A, plus close the write door.** Closes D7. A plus rewiring four
+  or five save paths.
+- **C — A + B, plus the snapshot structure.** Header row + one row per
+  question, each carrying its own copy of the question. Closes D6, ends
+  §8 S3's blobs, makes "which questions does everyone fail" a SQL
+  question instead of parsing every row in app code (today the admin
+  Attempts page gives up at 5,000 rows and reports from an arbitrary
+  slice), and makes a finished attempt immune to later question edits.
+  Large: new tables, migration, and the runner's save/load, the review
+  page and the admin analytics rewritten. Weeks.
+
+⚠ **C does not close D8 by itself** — it is what makes closing it
+possible. Once a sitting carries its own questions, the runner stops
+reading the live bank, and the browser's access to it can be revoked.
+That still needs the builder's search moved server-side. **C + the
+builder move → then D8 can be closed.** Anyone reading C as full
+protection is reading it wrong.
+
+## The timing argument
+
+`rebuild.md` D5 says attempts do not move at cutover: **the table is
+empty on launch day.** Today C costs code and nothing else. After
+cutover the same change also means migrating real students' history
+without losing or corrupting it — slower, riskier, and not fully
+reversible. That window is open once.
+
+Against it: C is weeks on a product that is not yet earning, and stage A
+alone already fixes the thing that actually hurts.
+
+## Draft row for `rebuild.md` §8 — not yet added there
+
+> | S7 | Attempts shape | one row; `item_ids` comma-joined TEXT, `answers_json` a JSON string; the runner reads the live bank and receives every column | Split into a header row plus one row per question, each snapshotting the question as served; the runner's projection sealed while live, unsealed in review, with a per-item unseal for instant feedback; student INSERT/UPDATE on attempts dropped in favour of server-side writes. Supersedes S3. Adopted from MyNclex (Pillar 2 + snapshot tables), keeping `user_has_course()` and this product's three question types. Cheapest before cutover, while the table is empty | ☐ |
+
+**Status.** Draft. Not in `rebuild.md`, not approved, not queued. Nothing
+is built from this until Sam ticks it there with a date.
