@@ -334,111 +334,6 @@ once the runner no longer reads the live bank — see *Proposed direction*.
 
 ---
 
-# Proposed direction — the attempts restructure
-
-Not a finding and not a decision: the shape D5–D8 point at, written out
-so it can be judged. Read with `rebuild.md` §8 — a draft row for that
-table sits at the end, to be moved there only if Sam ticks it.
-
-## What MyNclex does, and how it compares
-
-Read from `Quademia/mynclex` on 2026-09-17 (reference only; AGENTS.md
-rule #2 forbids importing from a sibling, copy-paste is allowed).
-
-MyNclex hit this problem and named the answer **Pillar 2 — no answer-key
-leakage**, enforced at the one place data crosses to the browser
-(`app/(app)/(focused)/session/[attempt_id]/page.tsx:40-66`): a
-`SEALED_ITEM_COLUMNS` list while a sitting is live, `UNSEALED_ITEM_COLUMNS`
-(the same plus `correct_answer_snapshot_json`, `rationale_snapshot`,
-`rationale_img_snapshot`) in review. A type split makes it a compile
-error to get wrong (`lib/practice/runner/types.ts:7-12`): live mode
-accepts `SealedItem` only. Instant feedback is a **per-item unseal
-envelope** returned by the submit action for the one question just
-answered, never a wholesale unseal.
-
-| | MyNMCLicensure | MyNclex |
-|---|---|---|
-| What the runner receives | every column of every question | sealed while live, unsealed in review |
-| Answer key in the browser | always, from page load | never while live; one item at a time |
-| Enforced by | nothing | a type split — wrong code will not compile |
-| Attempt storage | one row, two TEXT blobs | a header row + one row per question |
-| A question edited later | the past attempt changes | snapshots — the attempt keeps what was shown |
-| Student writing their attempt | INSERT + UPDATE, any column | SELECT only; writes via SECURITY DEFINER RPCs |
-| Scoring | browser computes live, server recomputes | server reads the key, scores in tested TS, RPC persists |
-| **Direct read of the bank** | **subscriber only (`user_has_course`)** | any signed-in user (deferred, see D8) |
-
-Six rows to MyNclex, one to here — and the one is the access gate, which
-is why this is a transplant, not a merger: **adopt MyNclex's attempt
-architecture; keep MyNMCLicensure's access gate and its smaller scope.**
-
-MyNclex's own decision record (`sessions/2026-05.md`, slice 2.3) chose
-server-side projection over column-level RLS deliberately: review
-legitimately needs the keys, so tightening the database would have meant
-column policies plus a permissive view — "more moving parts".
-
-## What is adopted, and what is kept
-
-**Adopted from MyNclex:** one row per question instead of a text blob;
-each row snapshotting the question as served; the sealed/unsealed
-projection; the type split; the per-item unseal for instant feedback;
-writes through locked server functions.
-
-**Kept from MyNMCLicensure:** `user_has_course()` (stricter than
-MyNclex's — D8); the server-side recompute at finish, which already
-refuses to trust the browser's score; three question types (MCQ / TF /
-SATA) — MyNclex's nine types, NGN case studies, CAT, trends and
-clinical-judgement steps are machinery this product does not have; the
-eleven per-course item tables (§8 S2); the `U_` / `ATT_` id conventions
-that support conversations depend on; the ten preflight checks, already
-server-side.
-
-## Staged, so it can stop between stages
-
-- **A — seal the runner.** The type split and the per-item unseal.
-  Attempts table untouched. Closes D5. Moderate: the runner is 885 lines
-  and computes feedback in the browser today, so that path moves. Alone,
-  this is what makes a timed mock exam an exam.
-- **B — A, plus close the write door.** Closes D7. A plus rewiring four
-  or five save paths.
-- **C — A + B, plus the snapshot structure.** Header row + one row per
-  question, each carrying its own copy of the question. Closes D6, ends
-  §8 S3's blobs, makes "which questions does everyone fail" a SQL
-  question instead of parsing every row in app code (today the admin
-  Attempts page gives up at 5,000 rows and reports from an arbitrary
-  slice), and makes a finished attempt immune to later question edits.
-  Large: new tables, migration, and the runner's save/load, the review
-  page and the admin analytics rewritten. Weeks.
-  ℹ️ In MyNclex the copy is an `INSERT … SELECT … FROM nclex_bank_items`
-  inside the create-attempt function, so the question rows never leave
-  the database at creation either — table to table, not via a server.
-
-⚠ **C does not close D8 by itself** — it is what makes closing it
-possible. Once a sitting carries its own questions, the runner stops
-reading the live bank, and the browser's access to it can be revoked.
-That still needs the builder's search moved server-side. **C + the
-builder move → then D8 can be closed.** Anyone reading C as full
-protection is reading it wrong.
-
-## The timing argument
-
-`rebuild.md` D5 says attempts do not move at cutover: **the table is
-empty on launch day.** Today C costs code and nothing else. After
-cutover the same change also means migrating real students' history
-without losing or corrupting it — slower, riskier, and not fully
-reversible. That window is open once.
-
-Against it: C is weeks on a product that is not yet earning, and stage A
-alone already fixes the thing that actually hurts.
-
-## Draft row for `rebuild.md` §8 — not yet added there
-
-> | S7 | Attempts shape | one row; `item_ids` comma-joined TEXT, `answers_json` a JSON string; the runner reads the live bank and receives every column | Split into a header row plus one row per question, each snapshotting the question as served; the runner's projection sealed while live, unsealed in review, with a per-item unseal for instant feedback; student INSERT/UPDATE on attempts dropped in favour of server-side writes. Supersedes S3. Adopted from MyNclex (Pillar 2 + snapshot tables), keeping `user_has_course()` and this product's three question types. Cheapest before cutover, while the table is empty | ☐ |
-
-**Status.** Draft. Not in `rebuild.md`, not approved, not queued. Nothing
-is built from this until Sam ticks it there with a date.
-
----
-
 ## D9 — Both builders ship a whole course's stems and rationales
 
 **What.** Picking a course in the Quiz Builder sends every question stem
@@ -565,6 +460,54 @@ known — server-side ORDER BY from the start, rather than load-all-to-sort.
 
 ---
 
+## D12 — A saved offline pack is a pointer list, not a snapshot
+
+**What.** The table's own header calls a pack *"an immutable snapshot of
+the chosen item ids"* — and that sentence is the defect. It stores
+**which** questions, not the questions. `offline_packs.item_ids` is an
+array of ids and the renderer follows them back to the live bank every
+time the pack is opened
+(`lib/offline-packs/queries.ts:226` → `getItemsByIds`).
+
+So a saved pack is not immutable:
+
+- a question edited → the pack quietly shows the new wording;
+- a question deleted → it disappears from the pack. The renderer already
+  apologises for this: *"Some saved questions could not be loaded from
+  the source items table. Missing count: N."*
+  (`app/(app)/offline-pack/page.tsx:109-110`);
+- the pack then disagrees with itself — stored `question_count` says 50,
+  `items.length` is 47, and the header prefers the smaller number
+  (`:120`).
+
+That warning is the tell: legacy knew a saved pack could lose questions
+and chose to apologise rather than prevent it.
+
+**Where.** `db/migrations/20260914200000_offline_packs.sql` (the
+`item_ids text[]` / `question_count` columns and the header's wording),
+`lib/offline-packs/queries.ts:208-231`,
+`app/(app)/offline-pack/page.tsx:109-120`.
+
+**Who it reaches.** A student who re-opens a pack weeks after saving it.
+Lower stakes than D6: a pack is *printed*, so the paper copy is frozen
+whatever the database does, and there is **no leak** — the renderer is a
+Server Component and a pack carries its answer key by design.
+
+**Proposed fix.** The same fix as S7, pointed at a second table:
+`offline_pack_items`, one row per question, the question copied in at
+build time. Structurally identical to `attempts` → `attempt_items`, so
+the machinery is written once and reused. Folded into S7's draft row
+below rather than listed as work of its own.
+
+ℹ️ Storage is not a concern: fifty questions of full text is ~100 KB per
+pack, and `offline_packs_per_course` caps how many a student may hold.
+The same holds for attempts.
+
+**Status.** Open. Not approved, not queued. Lower urgency than D6 — it
+should not be the reason S7 grows and slips.
+
+---
+
 ## The inventory — everything that reads the bank
 
 Traced 2026-09-17. Every caller of `lib/bank/queries.ts` and every use of
@@ -602,3 +545,139 @@ smaller consequence. Noted, not queued.
 Steps 1 and 2 are not protection on their own; they are what make step 3
 possible. Step 3 is the one that protects the content. Doing 3 before 1
 and 2 breaks the app.
+
+---
+
+## The line: records, not definitions
+
+Three tables hold an `item_ids` list. Only two of them should be
+snapshotted, and the rule that separates them is:
+
+> **Snapshot the records of what happened. Never snapshot the
+> definitions of what is on offer.**
+
+| Table | What it is | Snapshot? |
+|---|---|---|
+| `attempts` | a record of a sitting that happened | **yes** — D6 |
+| `offline_packs` | a record of something a student saved | **yes** — D12 |
+| `quizzes`, `mock_quizzes` | a product being offered, edited by an admin | **no — deliberately** |
+
+A fixed quiz or mock exam *should* follow the live bank: correcting a
+typo must correct it everywhere the quiz is served
+(`db/migrations/20260913180000_quiz_tables.sql:33` — `item_ids text[]`,
+and the same on `mock_quizzes`). Snapshotting those would mean every
+content fix required rebuilding the quizzes that use it.
+
+⚠ Written down because the opposite is the obvious mistake: anyone
+reading S7, then grepping for `item_ids`, finds three tables and
+"finishes the job". Two of them, and stop.
+
+# Proposed direction — the attempts restructure
+
+Not a finding and not a decision: the shape D5–D8 point at, written out
+so it can be judged. Read with `rebuild.md` §8 — a draft row for that
+table sits at the end, to be moved there only if Sam ticks it.
+
+## What MyNclex does, and how it compares
+
+Read from `Quademia/mynclex` on 2026-09-17 (reference only; AGENTS.md
+rule #2 forbids importing from a sibling, copy-paste is allowed).
+
+MyNclex hit this problem and named the answer **Pillar 2 — no answer-key
+leakage**, enforced at the one place data crosses to the browser
+(`app/(app)/(focused)/session/[attempt_id]/page.tsx:40-66`): a
+`SEALED_ITEM_COLUMNS` list while a sitting is live, `UNSEALED_ITEM_COLUMNS`
+(the same plus `correct_answer_snapshot_json`, `rationale_snapshot`,
+`rationale_img_snapshot`) in review. A type split makes it a compile
+error to get wrong (`lib/practice/runner/types.ts:7-12`): live mode
+accepts `SealedItem` only. Instant feedback is a **per-item unseal
+envelope** returned by the submit action for the one question just
+answered, never a wholesale unseal.
+
+| | MyNMCLicensure | MyNclex |
+|---|---|---|
+| What the runner receives | every column of every question | sealed while live, unsealed in review |
+| Answer key in the browser | always, from page load | never while live; one item at a time |
+| Enforced by | nothing | a type split — wrong code will not compile |
+| Attempt storage | one row, two TEXT blobs | a header row + one row per question |
+| A question edited later | the past attempt changes | snapshots — the attempt keeps what was shown |
+| Student writing their attempt | INSERT + UPDATE, any column | SELECT only; writes via SECURITY DEFINER RPCs |
+| Scoring | browser computes live, server recomputes | server reads the key, scores in tested TS, RPC persists |
+| **Direct read of the bank** | **subscriber only (`user_has_course`)** | any signed-in user (deferred, see D8) |
+
+Six rows to MyNclex, one to here — and the one is the access gate, which
+is why this is a transplant, not a merger: **adopt MyNclex's attempt
+architecture; keep MyNMCLicensure's access gate and its smaller scope.**
+
+MyNclex's own decision record (`sessions/2026-05.md`, slice 2.3) chose
+server-side projection over column-level RLS deliberately: review
+legitimately needs the keys, so tightening the database would have meant
+column policies plus a permissive view — "more moving parts".
+
+## What is adopted, and what is kept
+
+**Adopted from MyNclex:** one row per question instead of a text blob;
+each row snapshotting the question as served; the sealed/unsealed
+projection; the type split; the per-item unseal for instant feedback;
+writes through locked server functions.
+
+**Kept from MyNMCLicensure:** `user_has_course()` (stricter than
+MyNclex's — D8); the server-side recompute at finish, which already
+refuses to trust the browser's score; three question types (MCQ / TF /
+SATA) — MyNclex's nine types, NGN case studies, CAT, trends and
+clinical-judgement steps are machinery this product does not have; the
+eleven per-course item tables (§8 S2); the `U_` / `ATT_` id conventions
+that support conversations depend on; the ten preflight checks, already
+server-side.
+
+## Staged, so it can stop between stages
+
+- **A — seal the runner.** The type split and the per-item unseal.
+  Attempts table untouched. Closes D5. Moderate: the runner is 885 lines
+  and computes feedback in the browser today, so that path moves. Alone,
+  this is what makes a timed mock exam an exam.
+- **B — A, plus close the write door.** Closes D7. A plus rewiring four
+  or five save paths.
+- **C — A + B, plus the snapshot structure.** Header row + one row per
+  question, each carrying its own copy of the question. Closes D6, ends
+  §8 S3's blobs, makes "which questions does everyone fail" a SQL
+  question instead of parsing every row in app code (today the admin
+  Attempts page gives up at 5,000 rows and reports from an arbitrary
+  slice), and makes a finished attempt immune to later question edits.
+  Large: new tables, migration, and the runner's save/load, the review
+  page and the admin analytics rewritten. Weeks.
+  ℹ️ In MyNclex the copy is an `INSERT … SELECT … FROM nclex_bank_items`
+  inside the create-attempt function, so the question rows never leave
+  the database at creation either — table to table, not via a server.
+
+⚠ **C does not close D8 by itself** — it is what makes closing it
+possible. Once a sitting carries its own questions, the runner stops
+reading the live bank, and the browser's access to it can be revoked.
+That still needs the builder's search moved server-side. **C + the
+builder move → then D8 can be closed.** Anyone reading C as full
+protection is reading it wrong.
+
+## The timing argument
+
+`rebuild.md` D5 says attempts do not move at cutover: **the table is
+empty on launch day.** Today C costs code and nothing else. After
+cutover the same change also means migrating real students' history
+without losing or corrupting it — slower, riskier, and not fully
+reversible. That window is open once.
+
+Against it: C is weeks on a product that is not yet earning, and stage A
+alone already fixes the thing that actually hurts.
+
+## Draft row for `rebuild.md` §8 — not yet added there
+
+Widened to both snapshot tables on 2026-09-17 (Sam) — see *The line:
+records, not definitions*. `quizzes` / `mock_quizzes` stay pointer lists.
+
+> | S7 | Attempt and offline-pack shape | Both keep an id list and re-read the live bank: `attempts.item_ids` comma-joined TEXT + `answers_json` a JSON string carrying a second copy of `correct`; `offline_packs.item_ids` a TEXT[] the renderer follows back on every open. The runner receives every column of every question | Split each into a header row plus one row per question, the question snapshotted as served (`attempt_items`, `offline_pack_items` — one set of snapshot machinery, two tables). The runner's projection sealed while live, unsealed in review, with a per-item unseal for instant feedback; student INSERT/UPDATE on attempts dropped for server-side writes. Supersedes S3. `quizzes` / `mock_quizzes` deliberately unchanged — a product on offer must follow the live bank. Adopted from MyNclex (Pillar 2 + snapshot tables), keeping `user_has_course()` and this product's three question types. Cheapest before cutover: rebuild.md D5 leaves **both** tables empty on launch day, so both windows close on the same date | ☐ |
+
+Covers D5, D6, D7 and D12. Does **not** cover D9 (the builders) or D8
+(the permission) — those are the second and third steps of the order
+above, and D8 cannot run until both are done.
+
+**Status.** Draft. Not in `rebuild.md`, not approved, not queued. Nothing
+is built from this until Sam ticks it there with a date.
