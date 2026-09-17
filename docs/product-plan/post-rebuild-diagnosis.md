@@ -508,6 +508,215 @@ should not be the reason S7 grows and slips.
 
 ---
 
+## D13 — Course access has two definitions that agree by coincidence
+
+**What.** "Which courses does this student hold" is answered twice, in
+two languages, from the same text list. TypeScript
+(`getStudentCourseAccess`) loads every ACTIVE subscription with its
+product and, for each course in `products.courses_included`, adds up the
+remaining days. SQL (`user_has_course()`) checks for one ACTIVE,
+unexpired row whose product's list contains the course. Both unpack the
+same array by hand; nothing ties them together. Two more readers do the
+same unpacking their own way (D17). They agree today. Editing any one of
+them, or the meaning of `courses_included`, breaks the agreement with no
+error anywhere.
+
+**Where.** `lib/subscriptions/queries.ts:24-66`;
+`db/migrations/20260913220000_subscriptions.sql:66-84` (the function,
+`p_course_id = any (p.courses_included)` at :82; `db/rls.sql:373`).
+
+**Who it reaches.** Everyone, silently — the pages (TypeScript) and the
+bank policies (SQL) can disagree about the same student.
+
+**Proposed fix.** One definition in the database, read by both: the
+course-level access table in *Proposed direction — course-level access*
+below. Until then, at minimum both readers call one SQL function.
+
+---
+
+## D14 — The days-left number is wrong whenever two products overlap
+
+**What.** The TypeScript reader **adds** the remaining days of every
+subscription that covers a course. Two *different* products covering the
+same course (the trial and the paid product always do; RN Full and RM
+Full share GP) are summed on screen, but nothing grants the sum: the SQL
+gate checks each row's own expiry, and the TypeScript yes/no also ends
+when the last row ends. Sam's example: RN Full on day 0, RM Full on day
+65 → GP shows 300 + 365 = **665** days; access actually ends on day 430,
+**365** days away. Worse, the sum is recomputed from *remaining* days on
+every read, so the shown end date moves **earlier every day** until the
+shorter row dies (10 + 20 shows 30 today and 28 tomorrow, not 29).
+
+Doc 02's stacking example is the *same* product, where the grant and
+Paystack activation extend the existing row — that stacking is real and
+written into the row. The cross-product sum is a legacy arithmetic error
+carried over. Same-product stacking cannot be generalised to different
+products under this shape: rows carry dates per product, and two
+products overlapping on one course out of three have nothing to extend.
+
+**Where.** `lib/subscriptions/queries.ts:44-57` (the sum at :55); shown
+by the course page's days box and the dashboard's subscription bar.
+
+**Who it reaches.** Every student who buys during their trial — the
+common buying path — and anyone holding two products.
+
+**Proposed fix.** Course-level access rows (below): the number becomes a
+stored date. Interim, code only: latest expiry per course, not a sum.
+
+---
+
+## D15 — The access read runs four or five times per request
+
+**What.** `getStudentCourseAccess` is not wrapped in React's `cache()`
+(the gate is). The course page reads subscriptions in the layout, in the
+tab-title function, in the page, and twice more inside the announcements
+scope (its own "active subscription" read plus the access map). The
+dashboard: four times.
+
+**Where.** `app/(app)/student/layout.tsx:26`,
+`app/(app)/student/course/[id]/page.tsx:51` and `:92`,
+`lib/announcements/queries.ts:89-113` (`:99`),
+`app/(app)/student/dashboard/page.tsx:115`.
+
+**Who it reaches.** Everyone, as slowness — part of the ~13 round trips
+per page measured on 2026-09-16.
+
+**Proposed fix.** Wrap the read in `cache()` so one request reads once.
+Code only, no shape change.
+
+---
+
+## D16 — Product-to-course is text, not a relationship
+
+**What.** `products.courses_included` is a `text[]`. No foreign key, so a
+product can name a course that does not exist, is misspelt, or is
+archived; the database cannot check it and cannot join on it, so every
+reader unpacks it in code (D13, D17), and the bank policy scans product
+rows per question row (the "per row" cost in the perf notes). The legacy
+check's gap 11 (a draft or archived course kept inside a product on save)
+is a symptom.
+
+**Where.** `db/migrations/20260911150000_catalogue_tables.sql:45` (the
+header at :14 says why: "cannot carry a foreign key").
+
+**Who it reaches.** An admin editing products; students only when a
+typo lands.
+
+**Proposed fix.** A `product_courses` link table (below). The least
+important change in this group on its own; it is what makes the access
+rows writable from a checked list.
+
+---
+
+## D17 — Announcements and offline packs each pick "the" subscription by their own rule
+
+**What.** The announcement scope takes the most recently expiring ACTIVE
+subscription as *the* student's product and kind; with a trial and a paid
+product it picks whichever expires later, which is arbitrary. The offline
+allowance re-reads every subscription and re-filters by `courses_included`
+in code, then applies its own TRIAL rule. Third and fourth readers of the
+same list.
+
+**Where.** `lib/announcements/queries.ts:89-113` (`:111-112`),
+`lib/announcements/scoping.ts:37-44`;
+`lib/offline-packs/queries.ts:115-140`.
+
+**Who it reaches.** A student holding two products — an announcement
+scoped to a product may miss them, or reach them, by expiry order.
+
+**Proposed fix.** Read the course-level rows; scope announcements by
+course (already possible, §9 #19) rather than by "the" product.
+
+---
+
+## D18 — Quizzes and mock exams are not course-gated in SQL
+
+**What.** The `quizzes` and `mock_quizzes` SELECT policies are
+`auth.uid() is not null`: any signed-in student reads every quiz of every
+course, `item_ids` included, from the browser. The course gate on quizzes
+is TypeScript only. Proven on dev with a student's own credential: 5 of 5
+quizzes and 2 of 2 mocks visible to a student holding one course.
+
+**Where.** `db/rls.sql:396-407`.
+
+**Who it reaches.** Low harm — ids and titles, no content — but it is the
+same pattern as D8: the floor does not know about courses.
+
+**Proposed fix.** The same access function the bank uses, on both quiz
+tables. A policy change, no data change.
+
+---
+
+## D19 — Telegram group keys are on public pages
+
+**What.** `getProducts()` selects `*`, and Premium Prep and Subscribe
+hand every active product row — `telegram_group_keys` included — to
+signed-out visitors; the Upgrade page hands the same to every student.
+Harmless today (nothing reads the keys — D3). The Telegram gate (slice 17)
+would make those keys the thing the gate protects, sitting on a public
+page.
+
+**Where.** `lib/catalogue/queries.ts:32`, `app/premium-prep/page.tsx:25`,
+`app/subscribe/page.tsx:32`, `app/(app)/student/upgrade/page.tsx:46`.
+
+**Who it reaches.** Nobody until slice 17.
+
+**Proposed fix.** The sales pages select the columns they show. Code only.
+Settle before slice 17, with D3.
+
+---
+
+## D20 — EXPIRED is a manual button
+
+**What.** A subscription becomes EXPIRED only when an admin presses Sync
+Status. Access does not depend on it (both readers check the date), but
+the admin list and the profile's Subscription panel filter on
+`status = 'ACTIVE'` with no date check, so an expired row shows as
+active until the button is pressed. A no-scheduler-era workaround (doc
+02: "the platform does not have automatic background jobs on the free
+tier"); Supabase has `pg_cron`, and a date needs no status at all.
+
+**Where.** `lib/subscriptions/actions.ts:238-249`,
+`lib/profile/queries.ts:26-34` (`:31`), `lib/subscriptions/queries.ts:69-83`.
+
+**Who it reaches.** An admin reading the list; a student reading the
+profile panel after expiry and before a sync.
+
+**Proposed fix.** Derive "expired" from the date wherever it is shown, and
+retire the button; or a scheduled job. The course-level rows carry a
+`revoked_utc` date instead of a status for the same reason.
+
+---
+
+## D21 — What a student's own credential can read (dev, 2026-09-17)
+
+Recorded so the subscription gate's real floor is on file. Run on the
+dev project as the two dev students' own JWTs (`set local role
+authenticated` + `request.jwt.claims`), the way their browser would:
+
+| read | result |
+|---|---|
+| own `subscriptions` | own rows only |
+| `products`, every column | all 32 (D19) |
+| `quizzes` / `mock_quizzes` of every course | all (D18) |
+| `items_rn_med` for a student holding RN_MED, `correct` and `rationale` included | 900 of 900 (D8) |
+| `items_rn_med` for a student holding GP only | 0 |
+| other students' `users`, `sessions`, `attempts`, `offline_packs` | none |
+
+**The gate on the bank holds**; what leaks is the paid content to the
+student who paid for it (D8), plus D18 and D19. `information_schema`
+shows the browser roles (`anon`, `authenticated`) hold **table-wide**
+privileges on every table — RLS is the only barrier — so the
+column-level REVOKE D8 proposes is available and has not been used.
+
+**Where.** `db/rls.sql` throughout; the grants are Supabase's defaults.
+
+**Who it reaches.** Nobody by itself. A baseline for D8, D18, D19.
+
+**Proposed fix.** None of its own.
+
+---
+
 ## The inventory — everything that reads the bank
 
 Traced 2026-09-17. Every caller of `lib/bank/queries.ts` and every use of
@@ -587,7 +796,11 @@ finished. Sam's method for continuing, his words, 2026-09-17:
    bank only. Run over every page it would also cover users, payments,
    subscriptions, messages and announcements, which nobody has checked.
 
-Either sweep appends findings as `D<n>`. Neither has been run.
+Either sweep appends findings as `D<n>`. The table-by-table sweep was
+run over **subscriptions** (with `products`, `programs`, `courses` as
+its neighbours) on 2026-09-17 → D13–D21 and *Proposed direction —
+course-level access*. Every other table, and the page-by-page sweep,
+remain unrun.
 
 
 # Proposed direction — the attempts restructure
@@ -699,3 +912,147 @@ above, and D8 cannot run until both are done.
 
 **Status.** Draft. Not in `rebuild.md`, not approved, not queued. Nothing
 is built from this until Sam ticks it there with a date.
+
+
+# Proposed direction — course-level access
+
+The shape D13–D17 and D20 point at, worked through with Sam on
+2026-09-17. Not a decision until it has its §8 row and tick; the rulings
+below are how Sam wants it shaped *when* it is built.
+
+## The idea, in one line
+
+The expiry moves from the product to the course. A purchase writes one
+access row per course it unlocks; the subscription row stays as the
+receipt. The gate becomes one lookup; the days-left number becomes a
+stored date; both readers (D13), the sum (D14) and the extra readers
+(D17) go away together. Sam's framing: *"we should not say they have
+access to RN_FULL for 365 days; we should say they have access to GP for
+365 days, RN_MED 365 days…"*
+
+## Two new tables
+
+**`product_courses` — the definition side.** What a product unlocks,
+one row per course, replacing `products.courses_included` (D16).
+
+| column | type | why |
+|---|---|---|
+| product_id | text → products | the product |
+| course_id | text → courses | the course it unlocks |
+
+Primary key on both: no duplicates. Foreign keys on both: no unknown or
+deleted course. No dates, no status — a definition carries no time.
+`courses_included` is dropped once the admin Products page writes here.
+
+**`course_access` — the entitlement side.** One row per course per
+purchase. What the gate reads.
+
+| column | type | why |
+|---|---|---|
+| access_id | bigint identity | never quoted in support, so no text-id convention |
+| user_id | text → users | who holds it |
+| course_id | text → courses | what they hold |
+| subscription_id | text → subscriptions | the receipt that granted it; Revoke follows this link |
+| start_utc | timestamptz | when access begins — today, or queued behind the course's current end (below) |
+| expires_utc | timestamptz | when it ends; the days-left number is this date |
+| revoked_utc | timestamptz null | empty = live. A date, not a status: a date is a fact, a status goes stale (D20) |
+| created_utc | timestamptz | when written |
+
+Check: expiry after start. Index on (user_id, course_id) over live rows.
+Several rows per course per student are intended (trial, paid, queued
+renewal), so no uniqueness. Students SELECT their own rows; no browser
+write path — every write is a Server Action with the service role, as
+the trial grant already is.
+
+**`subscriptions` stays as the receipt**, unchanged in shape; it stops
+being what the gate reads. `product_id` becomes nullable for a hand-
+picked grant (below). `status` then serves only the admin list and
+Revoke — where D20 lands.
+
+**Functions.** `user_has_course(course)` keeps its name and its eleven
+callers; its body becomes one lookup in `course_access`. A second
+function returns the student's courses with their latest expiry, for the
+pages. One definition. D18 puts the same function on the quiz tables.
+
+## The write rule
+
+Five paths write access today, all already on the server. Each gains one
+step: after the receipt, write its course rows from `product_courses`.
+
+| path | rows written |
+|---|---|
+| registration trial | the trial product's courses |
+| Paystack activation | the paid product's courses |
+| admin Grant | the product's courses (later: as ticked in the form) |
+| admin Update | the receipt's rows rewritten to its edited dates / product |
+| admin Revoke | `revoked_utc` stamped on the receipt's rows |
+
+**Start date, two settings.** *Off* (before cutover): every row starts
+today. *On* (after cutover, a product change): for each course, if the
+student already holds it, the new row **queues** — starts at the
+course's current latest end. Same-product renewal, cross-product overlap
+and a new course are then one rule; the "extend the existing row"
+branch in grant and activation goes.
+
+## Worked example (stacking on)
+
+Ama, RN. 1 Sep 2026 registers → SUB_1 (RN_TRIAL): GP, RN_MED, RN_SURG,
+1 Sep–31 Oct 2026. 17 Sep buys RN Full → SUB_2: the same three courses,
+17 Sep 2026–17 Sep 2027 (a trial never extends anything — ruling 2; the
+trial rows run out on their own date). 21 Nov buys RM Full → SUB_3:
+
+| course | receipt | starts | ends |
+|---|---|---|---|
+| GP | SUB_3 | 17 Sep 2027 | 17 Sep 2028 |
+| RM_MID | SUB_3 | 21 Nov 2026 | 21 Nov 2027 |
+| RM_PED_OBS_HRN | SUB_3 | 21 Nov 2026 | 21 Nov 2027 |
+
+GP queued behind its current end; the two new courses start today. On
+21 Nov the page shows GP 665 (a stored date — D14's number, true this
+time), RN_MED 300, RM_MID 365; tomorrow 664, not 663. Revoke SUB_3 on
+1 Mar 2027: its three rows get `revoked_utc`, GP falls back to 17 Sep
+2027 by itself. Renew RN Full early on 1 Sep 2027: three rows queued
+from 17 Sep 2027 — the remaining two weeks are not lost, with no
+special case. Admin extends SUB_2 to 1 Oct 2027: SUB_2's three rows take
+the new end; SUB_5's queued rows keep 17 Sep 2027 and overlap for two
+weeks, which the gate does not mind (ruling 4).
+
+The two questions the gate asks, both on this table: *can Ama open
+RN_MED now* — a live row whose window contains now; *how many days on
+GP* — the latest end among her live GP rows.
+
+## Sam's rulings (2026-09-17)
+
+1. **Bought means kept.** Rows are written at purchase; a later edit to
+   a product's course list affects new buyers only. A product is a
+   definition, a subscription is a record pointing at it — the same
+   line as *records, not definitions* above.
+2. **A trial does not stack.** A paid purchase starts today; the trial's
+   rows run out on their own date. Carrying a trial remainder into a paid
+   plan is a promise to make deliberately after cutover, if ever.
+3. **Timing.** The tables and the four automatic paths before cutover
+   with stacking *off* (`subscriptions` is empty on launch day —
+   rebuild.md D5 — so the window is open once). Queued-row stacking on
+   after cutover, as a product change under the ⭐ rule.
+4. **Revoke and edits do not ripple.** Revoking a receipt switches off
+   its rows; rows queued behind keep their dates. An admin extension
+   overlaps rather than shifts the queue. Every row's dates are written
+   once and read as facts.
+5. **Every row traces to a receipt.** A hand-picked grant (courses and
+   days chosen without a product) writes a receipt with no product,
+   source ADMIN and the admin's note, so "why does Ama have this" is
+   always answerable.
+6. **The admin forms follow the rows.** Grant lists the product's courses
+   ticked (untick one); Update lists the receipt's course rows, each
+   editable; Revoke takes a receipt or one row. This closes "give Ama 14
+   more days on GP", which no tool does today. It is admin capability
+   beyond like-for-like: read-only rows in the dialogs before cutover,
+   editing after — unless Sam exempts the admin surface.
+
+## Draft row for `rebuild.md` §8 — not yet added there
+
+> | S8 | Course-level access | Access is derived from `products.courses_included` (a `text[]`, no FK) by two readers that agree by coincidence — TypeScript sums remaining days per course, SQL checks each row's own expiry — plus two more in announcements and offline packs; the days shown are a sum nothing grants and drift earlier daily; EXPIRED is a manual button | `product_courses` (product_id, course_id; FKs) replaces the array; `course_access` (user, course, subscription, start, expires, revoked_utc) written by the five server-side paths from `product_courses`, one row per course per receipt; `user_has_course()` becomes one lookup in it, a second function returns courses with latest expiry for the pages; `subscriptions` stays as the receipt (`product_id` nullable for a hand-picked grant). Start rule: "today" before cutover; queued behind the course's current end after (product change). Covers D13, D14, D16, D17, D20; enables D18. Cheapest before cutover: `subscriptions` is empty on launch day | ☐ |
+
+**Status.** Draft. Not in `rebuild.md`, not approved, not queued. D15
+(the per-request cache) and D19 (column selection on the sales pages) are
+code-only and independent of this row.
