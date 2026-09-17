@@ -408,6 +408,9 @@ server-side.
   slice), and makes a finished attempt immune to later question edits.
   Large: new tables, migration, and the runner's save/load, the review
   page and the admin analytics rewritten. Weeks.
+  ℹ️ In MyNclex the copy is an `INSERT … SELECT … FROM nclex_bank_items`
+  inside the create-attempt function, so the question rows never leave
+  the database at creation either — table to table, not via a server.
 
 ⚠ **C does not close D8 by itself** — it is what makes closing it
 possible. Once a sitting carries its own questions, the runner stops
@@ -433,3 +436,169 @@ alone already fixes the thing that actually hurts.
 
 **Status.** Draft. Not in `rebuild.md`, not approved, not queued. Nothing
 is built from this until Sam ticks it there with a date.
+
+---
+
+## D9 — Both builders ship a whole course's stems and rationales
+
+**What.** Picking a course in the Quiz Builder sends every question stem
+and every rationale in that course to the browser, so the "search by
+concept" box can filter as the student types. The Offline Pack Builder
+calls the same function and does the same thing.
+
+The filters are all criteria — main topic, subtopic, difficulty,
+question type, a search word. None of them needs the question text in
+the browser to be answered. The payload is the whole leak: the criteria
+are not.
+
+Scale: `items_rm_mid` holds 540 questions against a 900 target, so
+picking midwifery ships 540 stems and rationales in one response —
+more than the runner (D5) ever leaked, before the student has built
+anything. It carries stem and rationale but **not** the options and
+**not** `correct`, so it is not the complete question; a rationale
+usually names the answer in prose, so treat it as leaked.
+
+Inherited, like the rest: the legacy site had no server, so the browser
+needed the rows in order to filter them. The rebuild moved the rendering
+to the server and kept the data shape.
+
+**Where.** `lib/attempts/actions.ts:60-72` (`loadBuilderCourse`),
+`lib/attempts/queries.ts:60-71` (`getBuilderCourseItems` — selects
+`stem, rationale` for the whole course),
+`app/(app)/student/quiz-builder/quiz-builder-client.tsx:159, 193-199`,
+`app/(app)/student/offline-packs/build/offline-builder-client.tsx:112`.
+
+**Who it reaches.** A paying student, one click after opening the
+builder. Both builders share the call, so one fix covers both.
+
+**Proposed fix — counts only.** MyNclex's shape, and it is already
+running: `nclex_count_eligible_items(p_filters JSONB) RETURNS JSONB`
+takes the filters and returns
+`{ "total": 47, "by_question_type": { "MCQ": 31, "SATA": 16 } }` — a
+number and a breakdown, no stems, no rationales, not even ids
+(`db/migrations/20260506150000_slice_2_2a_count_and_create_attempt.sql:257-295`
+in `Quademia/mynclex`). Called on every filter change, debounced ~150 ms
+(`lib/practice/builder/actions.ts`). Start then calls a separate
+function that picks and snapshots inside the database.
+
+⚠ The concept search matches against `rationale`. Server-side it still
+works — the database searches the text and returns a count, faster than
+the browser can — but the count lands a moment after typing stops rather
+than on every keystroke. That is what the debounce is for.
+
+**Status.** Open. Not approved, not queued. Much smaller than S7, and
+required before D8 can be closed.
+
+---
+
+## D10 — The browser's database credential is the stack, not the messaging feature
+
+**What.** Recorded because the opposite is the natural assumption, and
+acting on it would cost a feature and fix nothing.
+
+Audited every use of the browser Supabase client. It appears in four
+files and does exactly two things: realtime channels for live message
+replies (`app/(app)/student/messages/messages-client.tsx:184-202`,
+`app/(app)/admin/messages/messages-client.tsx:277-279`) and auth
+(`app/login/login-card.tsx`, `app/reset-password/page.tsx`).
+**No browser code queries a table** — not one `.from()` or `.rpc()`.
+
+The credential is there regardless:
+
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` is compiled into the JavaScript bundle
+  at build time and is public by design.
+- The access token sits in a cookie the browser can read — it must, or
+  `createBrowserClient` could not hold a session, and realtime could not
+  authenticate. Nothing in `lib/supabase/server.ts` or `middleware.ts`
+  sets `httpOnly`, and setting it would break the browser client.
+
+So a student needs none of this product's code to query the database
+directly. Removing realtime messaging would remove a feature students
+use and close nothing.
+
+**Who it reaches.** Nobody by itself — it is a property of cookie-based
+Supabase auth, shared with MyNclex and with every app on this stack.
+It is what makes D8 exploitable, and the reason D8's fix has to be the
+permission rather than a code path.
+
+**Proposed fix.** None here. Keep live messaging. Fix D8 in the database
+(D8's own entry), which is the only thing that constrains a credential
+already in the browser.
+
+**Status.** Open as a recorded fact, not as work. ⚠ Do not "close the
+messaging connection" — it is not the door.
+
+---
+
+## D11 — The admin bank reads are a speed problem, not a leak
+
+**What.** The admin Question Bank page and the admin quiz picker each
+load an entire course, every column, into the admin's browser. Both are
+properly gated: `loadCourseItems` and `loadPickerItems` call
+`requireAdmin()` before reading anything.
+
+An admin authoring or picking questions needs to see the answers, so
+this is not a leak — MyNclex sends full rows with answers to its
+curator's browser too. The difference is only how much at once: MyNclex
+pages at 50 with Load more, capped at 500, filters applied server-side
+(`lib/bank/bank-list-query.ts:175-176` in `Quademia/mynclex`); this
+product loads the whole course.
+
+⚠ The pattern is only half-built over there. Their own note:
+*"the bank WILL grow past 500, so this is a real to-do, not
+hypothetical"* — past the cap, a sort silently shows the first 500 only,
+the same class of bug as this product's admin Attempts page.
+
+**Where.** `lib/bank/actions.ts:32-42` (`loadCourseItems`),
+`lib/quizzes/actions.ts:49-53` (`loadPickerItems`),
+`app/(app)/admin/question-bank/question-bank-client.tsx:136`,
+`components/quizzes/quiz-manager.tsx:296`.
+
+**Who it reaches.** An admin, who is entitled to the content. The cost
+is load time on a growing bank, on a phone especially.
+
+**Proposed fix.** Page the two admin reads server-side when the bank
+gets big enough to hurt. Borrow MyNclex's shape with its limitation
+known — server-side ORDER BY from the start, rather than load-all-to-sort.
+
+**Status.** Open, low priority. Not a leak; do not bundle it with D5–D10.
+
+---
+
+## The inventory — everything that reads the bank
+
+Traced 2026-09-17. Every caller of `lib/bank/queries.ts` and every use of
+`itemsTableFor`, checked for whether the result crosses into a browser.
+
+| Surface | Reaches a browser | After S7 (C) |
+|---|---|---|
+| The runner | yes — whole quiz, every column | **closed** |
+| Quiz Builder | yes — whole course's stems + rationales | open → D9 |
+| Offline Pack Builder | yes — same call, same payload | open → D9 |
+| Admin Question Bank | yes — whole course, admin-gated | fine → D11 |
+| Admin quiz picker | yes — whole course, admin-gated | fine → D11 |
+| Offline Pack renderer | no — Server Component, HTML only | fine |
+| `spawnBuilderAttempt` validation | no — server only | fine |
+| `finishAttempt` recompute | no — server only | fine |
+| **The database permission** | **the door behind all of them** | open → D8 |
+
+Nothing else reads the bank. The only student-facing readers are the
+runner and the two builders.
+
+ℹ️ A saved offline pack stores `item_ids` only and the renderer re-reads
+the live bank (`lib/offline-packs/queries.ts:226`), so editing a
+question changes an old pack. Same no-snapshot shape as attempts, far
+smaller consequence. Noted, not queued.
+
+## The order the three steps have to run in
+
+1. **S7 (C)** — the runner stops reading the live bank; each sitting
+   carries its own questions.
+2. **D9** — the builders stop reading it; counts and a breakdown replace
+   the payload.
+3. **D8** — only now can the answer columns be revoked from
+   `authenticated`, because nothing in a browser needs them any more.
+
+Steps 1 and 2 are not protection on their own; they are what make step 3
+possible. Step 3 is the one that protects the content. Doing 3 before 1
+and 2 breaks the app.
