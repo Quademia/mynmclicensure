@@ -910,8 +910,9 @@ Covers D5, D6, D7 and D12. Does **not** cover D9 (the builders) or D8
 (the permission) — those are the second and third steps of the order
 above, and D8 cannot run until both are done.
 
-**Status.** Draft. Not in `rebuild.md`, not approved, not queued. Nothing
-is built from this until Sam ticks it there with a date.
+**Status.** ✅ Ticked into `rebuild.md` §8 as S7 (Sam, 2026-09-18). The
+row above is the copy; §8 is the truth. Not yet in `BUILD_LIST.md`; the
+stage (A, B or C) and its place in the order are not yet set.
 
 
 # Proposed direction — course-level access
@@ -1053,6 +1054,7 @@ GP* — the latest end among her live GP rows.
 
 > | S8 | Course-level access | Access is derived from `products.courses_included` (a `text[]`, no FK) by two readers that agree by coincidence — TypeScript sums remaining days per course, SQL checks each row's own expiry — plus two more in announcements and offline packs; the days shown are a sum nothing grants and drift earlier daily; EXPIRED is a manual button | `product_courses` (product_id, course_id; FKs) replaces the array; `course_access` (user, course, subscription, start, expires, revoked_utc) written by the five server-side paths from `product_courses`, one row per course per receipt; `user_has_course()` becomes one lookup in it, a second function returns courses with latest expiry for the pages; `subscriptions` stays as the receipt (`product_id` nullable for a hand-picked grant). Start rule: "today" before cutover; queued behind the course's current end after (product change). Covers D13, D14, D16, D17, D20; enables D18. Cheapest before cutover: `subscriptions` is empty on launch day | ☐ |
 
-**Status.** Draft. Not in `rebuild.md`, not approved, not queued. D15
+**Status.** ✅ Ticked into `rebuild.md` §8 as S8 (Sam, 2026-09-18). The
+row above is the copy; §8 is the truth. Not yet in `BUILD_LIST.md`. D15
 (the per-request cache) and D19 (column selection on the sales pages) are
 code-only and independent of this row.
