@@ -572,6 +572,24 @@ content fix required rebuilding the quizzes that use it.
 reading S7, then grepping for `item_ids`, finds three tables and
 "finishes the job". Two of them, and stop.
 
+## How this file gets extended — the two sweeps
+
+D1–D12 came from following one thread (the payment ids, then the
+attempts table, then everything that reads the bank). That thread is
+finished. Sam's method for continuing, his words, 2026-09-17:
+
+1. **Table by table** — take each table, then what code uses it, then
+   whether the table is good. D1–D3 and D6–D8, D12 were found this way
+   by accident; done deliberately it would cover the tables nothing has
+   looked at yet.
+2. **Page by page** — take each page and see what it leaks into the
+   browser. *The inventory* above is this sweep run over the question
+   bank only. Run over every page it would also cover users, payments,
+   subscriptions, messages and announcements, which nobody has checked.
+
+Either sweep appends findings as `D<n>`. Neither has been run.
+
+
 # Proposed direction — the attempts restructure
 
 Not a finding and not a decision: the shape D5–D8 point at, written out

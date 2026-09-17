@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-17 — post-rebuild diagnosis: a findings register opened, twelve structural findings, the attempts restructure drafted as §8 S7; no code changed
+  - ↳ new doc not BUILD_LIST · rebuild.md untouched · prep-suffix ids → option C · runner leaks answers · score writable · bank readable · builders ship courses · keep live messaging · offline packs · MyNclex Pillar 2 · order S7→D9→D8 · unmerged
+
 - 2026-09-16 — the legacy check: every legacy page compared with the rebuild; nothing missing outright; 14 gaps queued, 4 to fix first
   - ↳ nine parallel readers · autosave restarts on every answer · dropped connection freezes the runner · MCQ→TF saves the old letter · trial hint off · stale sidebar · 5 legacy bugs fixed silently · ~40 minor · nothing changed
 
