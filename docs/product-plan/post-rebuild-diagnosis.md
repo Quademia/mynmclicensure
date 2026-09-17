@@ -899,6 +899,93 @@ reversible. That window is open once.
 Against it: C is weeks on a product that is not yet earning, and stage A
 alone already fixes the thing that actually hurts.
 
+## The tables (agreed with Sam, 2026-09-18)
+
+MyNclex's three attempt tables read from GitHub on 2026-09-18
+(`db/migrations/20260505120000_slice_2_1_attempt_tables.sql`; the sealed
+list in `app/(app)/(focused)/session/[attempt_id]/page.tsx:40-66`). Its
+structure is taken — a header, one snapshot row per question, one
+answer row per question, a fixed column list at the boundary, reads only
+for students — and its machinery for cases, trends, tutor items, nine
+question types, CAT and study/exam intent is not.
+
+**`attempts` — the header.** Today's row minus the two blobs. Keeps
+`attempt_id`, `user_id`, `quiz_id`, `course_id`, `mode`, `source`, `n`,
+`seed`, `duration_min`, `status`, `score_raw`, `score_total`, `score_pct`,
+`time_taken_s`, `origin_attempt_id`, `display_label`, `ts_iso`. Drops
+`item_ids` (the questions are rows now) and `answers_json` (the answers
+are rows now). Every page that lists attempts keeps working.
+
+**`attempt_items` — the snapshot.** One row per question, written once
+at creation, never updated.
+
+| column | why |
+|---|---|
+| attempt_item_id | bigint identity |
+| attempt_id | → attempts, cascade |
+| position | 1, 2, 3… the order served; unique per attempt |
+| item_id | the bank question it came from. **No FK, on purpose** — the snapshot is the truth; editing or deleting the bank row must never touch history (MyNclex does the same) |
+| question_type, stem, option_a…option_f, marks, shuffle_options | the public half — the **sealed** list |
+| correct, rationale, rationale_img, fb_a…fb_f | the secret half — added to make the **unsealed** list |
+| maintopic, subtopic, difficulty | copied so the admin analytics group by topic without re-reading the bank |
+
+The copy is one statement inside a SECURITY DEFINER function: insert
+into `attempt_items` select from the course's item table where the id is
+in the picked list — the questions never leave the database on the way
+in. Eleven course tables, so the function picks the table by course id
+as `itemsTableFor` does in code. A type split makes handing the unsealed
+list to a live runner a compile error (D5).
+
+**`attempt_answers` — what the student wrote.** One row per question,
+created empty with the attempt, updated as the student works.
+
+| column | why |
+|---|---|
+| answer_id, attempt_item_id (unique), attempt_id, user_id | the links |
+| chosen | a letter, a list of letters (SATA), or null — today's `chosen` |
+| is_correct, score_awarded | set by the server at submit, or per item in instant mode; never by the browser |
+| flagged, sata_checked | today's per-question state |
+| time_spent_s, submitted_at, updated_at | today's timing, plus when |
+
+Separate from the snapshot because a snapshot is written once and an
+answer changes on every click; the sealing rule then lives on one table,
+and autosave writes small rows instead of re-serialising the whole
+attempt. D6's second copy of `correct` has nowhere to live.
+
+**`offline_packs` and `offline_pack_items`.** The pack header keeps every
+column but `item_ids`. `offline_pack_items` is `attempt_items` again:
+`pack_id`, `position`, `item_id`, the same snapshot columns. No answers
+table and no sealing — a pack carries its key by design and the renderer
+is a Server Component. Build Similar reads the pack's ids from these rows
+(D12).
+
+**Who may do what.**
+
+| table | student | writes |
+|---|---|---|
+| attempts | SELECT own (ADMIN all) | none from the browser role; create / save / submit / finish / abandon are SECURITY DEFINER functions that check ownership and `user_has_course()` then write (D7) |
+| attempt_items | SELECT own attempt's rows, **sealed columns only** | the create function, once |
+| attempt_answers | SELECT own | the save and submit functions |
+| offline_packs, offline_pack_items | SELECT own | the create function |
+
+**Stricter than MyNclex in one place.** Its students can SELECT the whole
+`attempt_items` row, secret half included; the sealing is the page's
+column list only, so a student with the console open during a timed
+sitting can still read the key. Here the secret-half columns are
+**revoked from the browser role** on `attempt_items` (the grants are
+table-wide today — D21), and the review page reads them with the service
+role after its ownership check. The same move D8 makes on the bank, made
+here first: a timed mock exam is an exam even against the console.
+
+**The four creators** — builder, fixed quiz, mock exam, retake — call one
+create function with an ordered id list, the course and the mode. Retake
+takes the order from the original attempt's rows and copies fresh from
+the live bank (a new sitting records what it was shown today; the old
+one keeps what it saw). Instant mode's Check Answer calls the submit
+function for one item, which grades it and returns that item's secret
+half — the per-item unseal. Timed mode's submit grades every row and
+unseals the attempt for review.
+
 ## Draft row for `rebuild.md` §8 — not yet added there
 
 Widened to both snapshot tables on 2026-09-17 (Sam) — see *The line:
