@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-18 — subscriptions diagnosed (D13–D21); course-level access and the attempt snapshot tables designed; S7 and S8 ticked into §8; no code changed
+  - ↳ cloud branch merged · access has two readers · days summed, never granted · course_access + product_courses · six rulings · attempt_items sealed / unsealed · stricter than MyNclex on the console · S3 superseded · remote delete refused
+
 - 2026-09-17 — post-rebuild diagnosis: a findings register opened, twelve structural findings, the attempts restructure drafted as §8 S7; no code changed
   - ↳ new doc not BUILD_LIST · rebuild.md untouched · prep-suffix ids → option C · runner leaks answers · score writable · bank readable · builders ship courses · keep live messaging · offline packs · MyNclex Pillar 2 · order S7→D9→D8 · unmerged
 
