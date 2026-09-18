@@ -75,7 +75,7 @@ the gamma-era list it replaces is in git history and in `qacademy-gamma`.
 - ✅ §9 #8 `must_change_password` — left as it is, no gate, column carried — 2026-09-11
 - ⬜ §8 has no auth-path entry — the gate's three sequential round trips and the middleware's per-request auth call cannot change until Sam adds one and ticks it (2026-09-16); counted as six trips in D28 (2026-09-18)
 - ✅ §8 S9 auth functions and the two alpha columns — the five functions revoked from the browser roles, IP in the limiter, `username` and `must_change_password` dropped — 2026-09-18
-- ⬜ §8 S10 the users row's browser writes — column-level revoke, server-side profile insert, the email rule (D25–D27); Sam to tick and to choose the email rule
+- ✅ §8 S10 the users row's browser writes — column-level revoke, server-side profile insert, email lowercased with a unique index (D25–D27) — 2026-09-18
 
 ## Improvements
 
@@ -137,7 +137,7 @@ what the diagnosis and the perf investigation surfaced.
 - ⬜ 16 Cutover — DNS, live keys, content re-copy, old logins deleted, `legacy/` removed (moved from the rebuild, Sam, 2026-09-16)
 - ⬜ Storage hygiene: ~14 columns, the `levels` table and one config row with no reader or writer (list in the 2026-09-18 session entry) — Sam: some have an unbuilt purpose; review one at a time (2026-09-18); the auth group's five settled by the trace and the read-back (S9, items 7 and 8)
 - ⬜ Auth holes, queued: revoke EXECUTE on the five auth functions and count by IP (D24, S9); fail closed on the limit check (D30) (Sam, 2026-09-18; auth items 2, 3)
-- ⬜ Auth holes awaiting §8 S10: the owner-writable users row and its pay-first capture chain (D25), the email copy (D26), the server-side profile insert (D27) — recommended first
+- ⬜ Auth holes, queued under S10: the owner-writable users row and its pay-first capture chain (D25), the email copy lowercased and unique (D26), the server-side profile insert (D27) (Sam, 2026-09-18)
 - ⬜ Retention: a nightly pg_cron purge of inactive `sessions` and old `auth_events` rows, window from a config value, as MyNclex does (D29; on auth item 9's clock)
 - ⏸ Course-level pricing (a standalone price per course, products as bundles, a basket later) — the product stays the single unit of sale; revisit when the course count makes a product per course a chore (Sam, 2026-09-18)
 - ⬜ Before cutover: Resend's free plan caps the account shared with MyNclex at 100 emails a day (MyNclex's notes); re-registration day would pass it and lose the rest — the Pro upgrade first (slice 10, 2026-09-16)

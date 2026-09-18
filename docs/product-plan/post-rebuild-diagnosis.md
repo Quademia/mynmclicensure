@@ -934,7 +934,7 @@ options:**
 
 D25, D26 and D27 were not among the nine (holes, not intentions);
 items 2, 3 and 7 lean on them and they are recommended first → §8 S10,
-unticked.
+**ticked by Sam the same day** with the lowercased unique email copy.
 
 ---
 
@@ -1023,9 +1023,8 @@ database-as-gate direction of D10. Check before building: no other
 admin path updates a frozen column as the user client (grep
 `from('users').update`).
 
-**Status.** Open — recommended first, awaiting the §8 S10 tick. Sam
-ruled on the nine intentions (2026-09-18), not yet on this hole; items
-2, 3 and 7 lean on it.
+**Status.** → queued 2026-09-18 (Sam): §8 S10 ticked — the column-level
+revoke and the service-role paths as proposed.
 
 ---
 
@@ -1054,8 +1053,9 @@ and read the email from Auth (`auth.users` via `auth_id`) — one source.
 Either way the lookup in payments stops depending on how a student
 typed their address months earlier.
 
-**Status.** Open — awaiting the §8 S10 tick; the choice between a
-lowercased unique copy and reading the email from Auth is Sam's.
+**Status.** → queued 2026-09-18 (Sam): the lowercased unique copy.
+Reading from Auth rejected — about fifteen readers would each gain a
+join for no gain once the copy is trustworthy. §8 S10.
 
 ---
 
@@ -1083,7 +1083,7 @@ and record the setting with the other Auth dashboard values already
 queued. Pairs with D25's insert revoke: once the browser role cannot
 insert a profile, the server has to.
 
-**Status.** Open — awaiting the §8 S10 tick, with D25.
+**Status.** → queued 2026-09-18 (Sam): §8 S10 ticked, with D25.
 
 ---
 
