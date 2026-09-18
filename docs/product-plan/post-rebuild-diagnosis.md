@@ -1670,13 +1670,18 @@ Effect on the findings: D37, D39, D41, D42, D43 stand for the support
 desk; D38 loses its recipient cap (Bulk Send parked) and keeps the
 length cap and the send limit; D40's question context moves to the
 reports feature, and what remains of it is the course check and the
-link-opens-a-draft question. The decisions still open for the support
-desk rebuild: server writes only with messages fixed once sent; one
-length cap (2000 or 800); a reply to a closed thread reopening it
-visibly or being refused; read timestamps on the thread replacing the
-per-message flags (a §8 row, S11, if yes); the course link opening a
-draft rather than a thread; the assigned-admin column dropped or made
-the admin who first replied.
+link-opens-a-draft question. **The six decisions for the support desk
+rebuild, ruled together (Sam, 2026-09-18, the recommendations as
+given):** the server alone writes and a message is fixed once sent;
+one length cap of **2000** characters on both sides, server and
+database; a reply to a closed thread **reopens it with a visible line**
+in the conversation; **two read timestamps on the thread** replace the
+per-message flags, one rule for badge and dot, one query — the storage
+change drafted as `rebuild.md` §8 **S11**; the course page link opens
+a **New Thread draft** the student sends with a click; the
+assigned-admin column is **dropped**. Question context columns leave
+the thread with the reports feature; a `report_id` link is added when
+that feature lands.
 
 ---
 
