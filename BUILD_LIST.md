@@ -78,7 +78,7 @@ the gamma-era list it replaces is in git history and in `qacademy-gamma`.
 - ✅ §8 S10 the users row's browser writes — column-level revoke, server-side profile insert, email lowercased with a unique index (D25–D27) — 2026-09-18
 - ✅ §8 S11 messaging storage — browser writes revoked, service-role writes, read stamps on the thread, CHECKs, six columns dropped (D37–D42) — 2026-09-18
 - ✅ §8 S12 quiz, mock and announcement storage — course-scoped quiz reads without item_ids, announcements_for_me(), three notice timestamps (D44, D46–D48) — 2026-09-18
-- ⬜ §8 S13 config, levels and cohort — config admin-only with a registry read by the service role, users.level keyed to levels, cohort a year (D49, D51) — drafted 2026-09-18, awaits the tick
+- ✅ §8 S13 config, levels and cohort — config admin-only with a registry read by the service role, users.level keyed to levels, cohort a year (D49, D51) — 2026-09-18
 
 ## Improvements
 
