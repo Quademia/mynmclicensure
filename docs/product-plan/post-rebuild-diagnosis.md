@@ -79,19 +79,28 @@ on prod behind the launch pause. It springs later, in three ways:
    product silently becomes the one the RN button sells. Nothing marks
    which product is the one being sold.
 
-**Proposed fix (option C of three discussed, 2026-09-17).** Add
-`programs.prep_product_id`, mirroring the existing `programs.trial_product_id`
-— the premium product declared by a column and a foreign key, as the
-trial product already is; product IDs unchanged, nothing a student sees
-changes.
+**Proposed fix (option D, Sam, 2026-09-18 — replaces C).** A flag on the
+product, `products.is_premium`; the year leaves the id, so a premium
+product stays premium in 2027 with a price edit and no deploy. The
+Premium Prep page lists every active, paid, premium product and groups
+them by programme using the **derived match** of D23 (a product matches
+the programmes that sit its courses, GP not counting) — no programme
+column on the product, no `prep_product_id` on the programme. Two
+premium RN products show as two cards under RN instead of "cheapest
+wins". `programs.trial_product_id` **stays** as it is: registration must
+pick exactly one product automatically, and "exactly one" is a pointer,
+not a flag or a match.
 
-*Rejected alternatives: (A) move the `_2026_PREP` string from code into
-a `config` row — stops the yearly deploy, but still string-matching, so
-a mistyped ID is still silently invisible. (B) add `products.program_id`
-+ `products.tier` — fixes all three and generalises to several tiers or
-campaign years at once, at the cost of an extra column and more admin
-UI; the better choice only if more than one premium product per
-programme is ever expected.*
+*Replaced: (C) `programs.prep_product_id`, mirroring `trial_product_id`
+— chosen 2026-09-17, replaced 2026-09-18 because premium is a fact about
+the product while the trial is a decision about the programme, and
+because the programme a product is for is derivable from its courses
+(D23). Rejected earlier: (A) move the `_2026_PREP` string from code into
+a `config` row — still string-matching, a mistyped ID still silently
+invisible. (B) `products.program_id` + `products.tier` — `program_id`
+rejected on 2026-09-18 by Sam: a product is a bag of courses and a bag
+can cross programmes (an RM + RN product has no single programme);
+`tier` survives as the boolean above.*
 
 **Status.** Open. Not approved, not queued. Worth settling before D3's
 slice (the Telegram gate) is built on the same pattern.
@@ -759,6 +768,61 @@ part of the copy, not a migration of live data.
 
 **Status.** Open. Re-opens S2 with the opposite recommendation; S2's
 decision cell in §8 is unchanged (☐) until Sam ticks it.
+
+---
+
+## D23 — The sales pages offer everything and adapt to nothing
+
+**What.** Three doors sell products, each deciding for itself what is
+for sale (D2): Premium Prep by the id ending (D1); Subscribe and Upgrade
+by "not a trial id and price > 0", as one flat alphabetical list of all
+21 paid products. Choosing a programme on Subscribe changes nothing on
+the list — the choice is only written onto the payment record. The
+Upgrade page ignores the student's own programme. No sales row says
+which courses a product unlocks. What holds up: the browser never sends
+a price; both payment-start actions look the product up on the server,
+require it active, take the price from the row, and verify refuses a
+Paystack amount that differs (`lib/payments/init-public.ts`,
+`init-upgrade.ts`, `verify.ts:100`).
+
+**Where.** `app/premium-prep/premium-prep-client.tsx:26-64`,
+`app/subscribe/subscribe-client.tsx:30-40` (`programId` unused for the
+list), `app/(app)/student/upgrade/upgrade-client.tsx:50-60`,
+`app/page.tsx` (four links to Subscribe, none to Premium Prep).
+
+**Who it reaches.** Every buyer — a midwife scrolls past the RN and
+mental-health products to find hers; nobody is shown what a product
+unlocks.
+
+**Proposed fix, with Sam's rulings (2026-09-18).**
+
+1. **Anyone may buy any product** — the page adapts, it does not filter
+   (Sam). The list is ordered: the buyer's programme's products first,
+   then "Other programmes", nothing hidden.
+2. **Which programmes a product is for is derived, not stored:** a
+   product matches a programme when any of its courses is sat by that
+   programme (`courses.program_scope`), **ignoring courses every
+   programme sits** (General Paper); a product made only of such courses
+   matches everyone. Checked against the live rows: RN Full → RN; RM
+   Full → RM; GP Only → all; an RM_MID + RN_MED product → RM and RN (Sam:
+   both should see it). A programme column on products was rejected — a
+   product is a bag of courses and a bag can cross programmes.
+3. **One helper for "for sale"** — `kind = PAID`, `status = active`,
+   `price_minor > 0` — called by all three doors (D2's fix).
+4. **`products.is_premium`** for the Premium Prep page (D1 option D).
+5. **Select the columns the page shows** (D19). Once `product_courses`
+   exists (S8), a sales row lists the courses it unlocks.
+6. **`courses.program_scope` becomes a link table (`course_programs`,
+   FKs) when this is built** — it goes from admin grouping to the thing
+   that orders the shop; a typo then moves a product down the list
+   rather than hiding it, so it is worth doing when convenient, not
+   urgent.
+
+Items 1, 2 and 5's course list change what a buyer sees, so they sit
+after cutover under the ⭐ rule; 3, 4 and the column selection are
+shape and code with no visible change.
+
+**Status.** Open. Not approved, not queued.
 
 ---
 
