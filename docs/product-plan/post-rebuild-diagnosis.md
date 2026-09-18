@@ -717,6 +717,51 @@ column-level REVOKE D8 proposes is available and has not been used.
 
 ---
 
+## D22 — Eleven item tables make every bank change eleven changes, and every new course a deploy
+
+**What.** The bank is one table per course (`items_gp`, `items_rn_med`,
+…), a Sheets-era shape where a course was a tab. `rebuild.md` §8 S2
+recommended keeping it (2026-09-10) because the importer, the admin bank
+page and the offline picker were written per table. S7 and S8 change the
+arithmetic: with eleven tables the bank policies are eleven (D8's column
+revoke would be eleven revokes), the S7 snapshot copy must pick a table
+by course id (eleven branches or dynamic SQL, for attempts and for
+packs), D9's counts-only search cannot run across a course set, and
+every column change is eleven ALTERs. Growth costs the same per course:
+a new table, four policies, entries in `itemsTableFor`, the CSV importer
+and the admin bank page, and a deploy — so adding a programme is a code
+change. Sam (2026-09-18): the five programmes are a start; the NMC has
+many more.
+
+**Where.** `db/migrations/20260913120000_question_bank_tables.sql` (the
+eleven tables and their policies, generated in a loop at `:94`),
+`lib/bank/queries.ts` (`itemsTableFor`), `lib/bank/csv.ts`,
+`app/(app)/admin/question-bank/`.
+
+**Who it reaches.** Nobody today. It reaches Sam on the day a twelfth
+course is added, and it multiplies the S7, D8 and D9 work by eleven.
+
+**Proposed fix.** One `items` table with a `course_id` column and a
+foreign key to `courses`; the eleven tables' rows moved in with their
+course id. Then: one SELECT policy `user_has_course(course_id)`, one
+column revoke (D8), one plain insert-select in the S7 copy function, one
+importer path, a course *filter* on the admin page instead of a table
+switch; a new course is a row in `courses` and an import, no code. Size
+is not a concern: ~6,000 questions today, fifty courses at a thousand
+each would be 50,000 rows, small for Postgres with an index on
+`course_id`; MyNclex runs its whole bank as one table; partitioning by
+course exists underneath if a bank ever reached millions. **One
+constraint to check on the live data before deciding:** item ids must be
+unique across the whole bank (the live ids are course-prefixed, `GP_001`
+style, so they should be — verify). Same window as S7 and S8: cutover
+re-copies the whole bank from `public.*`, so done before cutover it is
+part of the copy, not a migration of live data.
+
+**Status.** Open. Re-opens S2 with the opposite recommendation; S2's
+decision cell in §8 is unchanged (☐) until Sam ticks it.
+
+---
+
 ## The inventory — everything that reads the bank
 
 Traced 2026-09-17. Every caller of `lib/bank/queries.ts` and every use of
