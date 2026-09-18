@@ -1,14 +1,18 @@
 # MyNMCLicensure — the rebuild plan
 
 Written 2026-09-10 by Claude, from a planning session with Sam. Status:
-**the slices complete — declared by Sam on 2026-09-16** (0–14 built;
-15 dropped as a slice; 16 Cutover and 17 Telegram gate moved to *After
-the rebuild* in `BUILD_LIST.md` — §12's closing paragraph). Next: Sam's
-surface-by-surface check of `legacy/` for anything missed; like for
-like holds until cutover. This is the one document that says what the
-rebuild is, what it is not, and in what order it is built. The slice
-ladder at the end is mirrored line-for-line in `BUILD_LIST.md`; a slice
-is ticked in both places in the same commit.
+**finished — a completed piece of work, kept as history (Sam,
+2026-09-18).** This document describes the port of MyNMCLicensure from
+the vanilla-JS site onto the MyNclex stack, like for like; it was
+called "the rebuild" throughout, and the name stays in the slice ids
+and the record. The slices were declared complete by Sam on 2026-09-16
+(0–14 built; 15 dropped as a slice; 16 Cutover and 17 Telegram gate
+moved to `BUILD_LIST.md` — §12's closing paragraph), and the legacy
+check that followed found nothing missing. Current work — improving the
+app — is listed in `BUILD_LIST.md` under *Improvements*, with findings
+in `post-rebuild-diagnosis.md`. §8 stays live: a storage change is
+still ticked there before it is built. The slice ladder at the end is
+mirrored line-for-line in `BUILD_LIST.md`.
 
 Claude and Codex both build from this plan, one agent per session.
 Anything this document does not say, the agent in session asks Sam

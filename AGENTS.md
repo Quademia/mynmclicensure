@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-09-16. Rules for **any** assistant working in this
+Last updated: 2026-09-18. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What is built and
@@ -23,30 +23,31 @@ Ghana.
 
 ## Current Status
 
-**Rebuilt, like for like, onto the MyNclex stack — not yet live.** The
-rebuild's slices are complete (Sam, 2026-09-16). What remains is Sam's
-check of `legacy/`, surface by surface, for anything they missed; what
-it finds is built as legacy had it. Cutover and the Telegram gate sit
-on the *After the rebuild* list in `BUILD_LIST.md`. The live
-product is still the vanilla-JS site served from the `qacademy-gamma`
-repo; its code sits here under `legacy/` as the reference. The plan,
-the decisions and the slice ladder are `docs/product-plan/rebuild.md`.
-The inventory with dates is `BUILD_LIST.md`. Build what Sam asks for in
-the session; nothing more. A slice that needs splitting is split in
-`rebuild.md` §12 (a "done when" per part) and §14, then `BUILD_LIST.md`,
-in one commit — never in the feature docs `00–07`, which describe the
-legacy product and are not build plans (Sam, 2026-09-12).
+**The port is finished (Sam, 2026-09-16); the work now is improving
+the app.** The product was moved, like for like, from the vanilla-JS
+site onto the MyNclex stack — slices 0–14 of
+`docs/product-plan/rebuild.md`, then a page-by-page check against
+`legacy/` that found nothing missing. That was a port, not a redesign
+(the plan called it "the rebuild"; the name stays in the slice ids and
+the record): the behaviour and the data shapes came across as they
+were. What follows is one stream of improvement — security and storage
+shape first, so the database is the gate, then everything else — with
+cutover to the live domain as one item in it, not a wall the list is
+sorted around (Sam, 2026-09-18). The findings are
+`docs/product-plan/post-rebuild-diagnosis.md`; the one list is
+`BUILD_LIST.md` under *Improvements*; Sam orders it. The live product is
+still the vanilla-JS site served from the `qacademy-gamma` repo; its
+code stays here under `legacy/` as a reference — it says what the old
+app did, and Sam decides whether the new app should do the same. The
+feature docs `00–07` describe the legacy product and are not build
+plans (Sam, 2026-09-12).
 
-⭐ **The rebuild adds no user-visible feature and no new mechanism, and
-the rule holds until cutover** — through the legacy check; new features
-come after cutover (Sam, 2026-09-16).
-Behaviour is transcribed from `legacy/` and the feature specs
-`docs/product-plan/00–07`. Where
-the two disagree, the code wins. An internal shape may change only where
-`rebuild.md` §8 lists it *and* Sam has ticked it with a date. A defect
-listed in `rebuild.md` §9 is fixed inside the slice that rebuilds its
-surface, never as work of its own. If something looks wrong and is not
-in §9, log it and ask; do not fix it silently.
+⭐ **Nothing is built without Sam's go-ahead in the session.** A change
+to storage still needs its row in `rebuild.md` §8, ticked by Sam with a
+date, before it is built. A finding in the diagnosis is not a decision;
+a decision is a §8 tick or a `BUILD_LIST.md` line. New features are
+allowed now that the port is done; each is still Sam's call, one at a
+time. If something looks wrong, log it and ask; do not fix it silently.
 
 ## Stack
 

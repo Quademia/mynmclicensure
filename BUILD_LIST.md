@@ -1,9 +1,10 @@
 # MyNMCLicensure Build List
 
 The inventory of slices: everything built, everything queued, everything
-parked, one line each, grouped by the plan doc that defines it. Rebuilt
-to this shape on 2026-09-10 when the rebuild was planned; the gamma-era
-list it replaces is in git history and in `qacademy-gamma`.
+parked, one line each. The first section is the port (`rebuild.md`),
+finished 2026-09-16 and kept as history; *Improvements* is the live
+list. Rebuilt to this shape on 2026-09-10 when the port was planned;
+the gamma-era list it replaces is in git history and in `qacademy-gamma`.
 
 ## Rules for this file
 
@@ -22,9 +23,9 @@ list it replaces is in git history and in `qacademy-gamma`.
 
 ---
 
-## The rebuild
+## The port — finished 2026-09-16
 
-### [rebuild.md](docs/product-plan/rebuild.md)
+### [rebuild.md](docs/product-plan/rebuild.md) (the plan called it "the rebuild")
 
 - ✅ 0 Repo reshape — old tree to `legacy/`, MyTeacher and residue deleted — 2026-09-10
 - ✅ 1 Scaffold — Next app, Workers, deploy + migrate workflows, schema `licensure_gh`, runner — 2026-09-10
@@ -65,9 +66,27 @@ list it replaces is in git history and in `qacademy-gamma`.
 - ✖ 15 Phone pass — not a session of its own: phones kept working with every change (Sam, 2026-09-16)
 - ✅ (unplanned) The rebuild's slices declared complete — 16 and 17 moved to *After the rebuild* (Sam) — 2026-09-16
 
-### The legacy check — gaps found 2026-09-16 (fix before new features)
+### Decisions still open in rebuild.md
 
-Every legacy page compared with its rebuilt route; nothing missing outright. Detail and the minor list: `sessions/2026-09.md`, the legacy check entry. Numbered as reported to Sam; 1–4 first.
+- ✅ §8 S1 user primary key — keep `U_` ids, add the FK — 2026-09-11
+- ⬜ §8 S3 attempts blobs → JSONB / arrays
+- ✅ §8 S4 foreign keys on licensure tables — 2026-09-11, as each table lands
+- ✅ §8 S6 populate `sessions.ip_hash` — 2026-09-11
+- ✅ §9 #8 `must_change_password` — left as it is, no gate, column carried — 2026-09-11
+- ⬜ §8 has no auth-path entry — the gate's three sequential round trips and the middleware's per-request auth call cannot change until Sam adds one and ticks it (2026-09-16)
+
+## Improvements
+
+The one list, now that the port is finished (2026-09-16): the gaps the
+legacy check found, items carried from the gamma era, product changes
+and internal findings spotted during the port, the diagnosis findings
+Sam has queued, and cutover and the Telegram gate. One line each, with
+the work that surfaced it; Sam orders them. A finding in
+`post-rebuild-diagnosis.md` gets a line here only when Sam queues it.
+
+### The legacy check — gaps found 2026-09-16
+
+Every legacy page compared with its ported route; nothing missing outright. Detail and the minor list: `sessions/2026-09.md`, the legacy check entry. Numbered as reported to Sam; 1–4 first.
 
 - ⬜ 1 Runner autosave restarts its 60 s timer on every answer or flag — steady answering never autosaves; a timed exam loses answers on a closed tab
 - ⬜ 2 Runner: a dropped connection at Submit, Save & Resume Later or the timed auto-submit leaves the spinner forever — legacy showed the score
@@ -87,19 +106,10 @@ Every legacy page compared with its rebuilt route; nothing missing outright. Det
 - ⬜ Five legacy bugs the rebuild fixed without a record (history Retake, "%" in Send feedback, inbox unread, picker Subtopic filter, timed pre-Start save) — keep, Sam to confirm
 - ⬜ `db/schema.sql` and `db/rls.sql` snapshots omit offline_packs, announcements and user_notice_state — the migrations are complete
 
-### Decisions still open in rebuild.md
+### Carried from gamma
 
-- ✅ §8 S1 user primary key — keep `U_` ids, add the FK — 2026-09-11
-- ⬜ §8 S3 attempts blobs → JSONB / arrays
-- ✅ §8 S4 foreign keys on licensure tables — 2026-09-11, as each table lands
-- ✅ §8 S6 populate `sessions.ip_hash` — 2026-09-11
-- ✅ §9 #8 `must_change_password` — left as it is, no gate, column carried — 2026-09-11
-- ⬜ §8 has no auth-path entry — the gate's three sequential round trips and the middleware's per-request auth call cannot change until Sam adds one and ticks it (2026-09-16)
-
-## Carried from gamma
-
-Items from the gamma-era list that still apply after the rebuild. Not
-rebuild work; listed so they are not lost.
+Items from the gamma-era list that still apply. Listed so they are not
+lost; the ⏸ reasons were written under the port's like-for-like rule.
 
 - ⬜ Content: `items_rphn_disease_ctrl` is empty while its course is active
 - ⬜ Content: `items_rm_mid` short of its target set count (540 of 900)
@@ -111,15 +121,12 @@ rebuild work; listed so they are not lost.
 - ⏸ Student analytics, notifications, search, sequential runner mode — new features, after
 - ⏸ Paystack LIVE key on prod — waits on the company / Paystack-account decision
 
-## After the rebuild
+### Found during the port and since
 
 Product changes spotted while transcribing `legacy/`, internal findings
-that are nobody's slice, and — since Sam declared the rebuild's slices
-complete (2026-09-16) — the two slices moved out of it, Cutover and the
-Telegram gate. One line each, with the slice or the work that surfaced
-it; Sam orders them. No new user-visible feature is built before
-cutover (AGENTS.md ⭐); what Sam's check of `legacy/` finds missing is
-built as legacy had it, not listed here as new.
+that were nobody's slice, the two slices moved out of the port when
+its slices were declared complete (Cutover, the Telegram gate), and
+what the diagnosis and the perf investigation surfaced.
 
 - ⬜ 16 Cutover — DNS, live keys, content re-copy, old logins deleted, `legacy/` removed (moved from the rebuild, Sam, 2026-09-16)
 - ⬜ Storage hygiene: ~14 columns, the `levels` table and one config row with no reader or writer (list in the 2026-09-18 session entry) — Sam: some have an unbuilt purpose; review one at a time (2026-09-18)

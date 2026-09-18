@@ -1,9 +1,10 @@
 # Post-Rebuild Diagnosis & Proposed Fixes
 
 Opened 2026-09-17 by Claude, in session with Sam. Status: **a findings
-register — nothing here is approved, queued, or being built.**
+register — a finding here is seen and written down, not decided; a
+decision is a `rebuild.md` §8 tick or a `BUILD_LIST.md` line.**
 
-Structural problems found by reading the rebuilt app, with a proposed
+Structural problems found by reading the ported app, with a proposed
 fix for each. Most are inherited from the stack the product was first
 built on (a vanilla-JS site over Google Sheets, then Supabase), where a
 convention in a string did the work a column should do.
@@ -14,15 +15,16 @@ convention in a string did the work a column should do.
   queued, parked. A line there means the work is real and ordered. A
   finding here is a *diagnosis*: it has been seen and written down, and
   Sam has decided nothing about it.
-- **Not `rebuild.md` §9.** §9 is carried legacy defects, each fixed
-  inside the slice that rebuilds its surface. The rebuild's slices are
-  complete, so nothing here has a slice to sit in.
+- **Not `rebuild.md` §9.** §9 is the port's carried legacy defects,
+  each fixed inside the slice that rebuilt its surface. The port is
+  finished, so nothing here has a slice to sit in.
 - **A shape change still needs its §8 tick.** Anything below that
   changes storage is a §8 candidate and is not built until it has a row
   in `rebuild.md` §8 with Sam's tick and a date.
-- **The ⭐ rule still holds.** Nothing here is a user-visible feature;
-  none of it changes what a student sees. That does not make any of it
-  authorised.
+- **Not authorised by being here.** The port's like-for-like rule ended
+  with the port (Sam, 2026-09-18), so a finding may propose a new
+  feature as well as an internal fix. Either is built only on Sam's
+  go-ahead in the session.
 
 ## Rules for this file
 
