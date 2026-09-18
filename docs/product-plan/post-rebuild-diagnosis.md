@@ -1531,6 +1531,356 @@ BUILD_LIST.
 
 ---
 
+## The messaging group — where the two tables came from (traced 2026-09-18)
+
+The table-by-table sweep run over `messages_threads` and `messages`
+with every caller read (`lib/messaging/*`, both messages pages, both
+layouts' badges, the runner's Send feedback), the live shape and
+policies read off dev, three policy tests run as a dev student with
+their own credential (all rolled back), and the page-by-page cut of
+what the two pages hand the browser. Sam's rulings are pending;
+nothing here is decided.
+
+**Three eras.**
+
+- **Alpha.** Messaging is alpha-native. The two tables are the two
+  sheet tabs `threads` and `messages` of the portal workbook (git
+  `40f2930^`, `old stack references for claude/licensure/messages/`),
+  column for column: `thread_id, user_id, status, context_type,
+  bulk_batch_id, course_id, quiz_id, attempt_id, question_id, ref_text,
+  created_at, last_message_at, last_sender` and `message_id, thread_id,
+  sender_type, sender_id, body_text, created_at, read_by_user,
+  read_by_admin`. The `THR_` / `MSG_` / `BULK_` text ids, the two read
+  booleans and `ref_text` as a pre-rendered blob are a spreadsheet's
+  shape. The service was a token-verified Apps Script API
+  (`PortalMessaging`, build `msg-v1-2025-12-18`): every student call
+  re-verified the token and the account's `active` flag; admin calls
+  checked `is_admin`. It carried **five protections**: a 2000-character
+  message cap, a send limit of 20 a minute per student and 60 per admin,
+  a bulk-send limit of 5 per ten minutes, a **200-recipient cap** on a
+  bulk send, and paged lists (50 threads, 300 messages per open). The
+  entry points were the same three as today — the Messages page, the
+  course page, both runners' Send feedback — and `admin1` appears as a
+  literal on alpha's thread rows, which is where the column default
+  comes from. A fourth context, `admin_bulk`, was removed before gamma.
+- **Gamma, 2026-03-20.** Built in one day (`b346237`, "feat: add
+  MyLicensure messaging system"; the README had it as "Telegram
+  (planned)" until then). Two renames (`sender_type` → `sender_role`,
+  `last_sender` → `last_sender_role`), two additions (`admin_id`
+  defaulting to `'admin1'`, `subject`), no indexes, no foreign keys —
+  `legacy/db/schema.sql` was reverse-engineered from the live database
+  on 2026-04-01 (`522b974`), so it records what the sheet-shaped tables
+  had. **The trust boundary moved to the browser:** every read and
+  write became the anon key against Postgres under RLS, and every one
+  of alpha's five protections was dropped; the only cap left was an
+  800-character constant in the student page's script. The tables ran
+  **twelve days with `dev_allow_all`** before RLS landed (`d0e30b2`,
+  2026-04-01), and the thread INSERT policy then lacked the admin
+  bypass, so admin-started threads and Bulk Send **never once
+  succeeded on the live site** until the June 2026 migration
+  (`legacy/db/migrations/fix_messages_threads_insert_admin_bypass.sql`).
+  Sprint 2 (April) moved the inbox filters and recipient resolution to
+  the database but missed the student search, which still fetched
+  every active user. Messaging never had a line in the gamma
+  BUILD_LIST except "Search — courses, questions, messages" under
+  ideas; doc 07 claims search by question text, which no era built.
+- **The port (slice 12, 2026-09-15).** Legacy's columns and six
+  policies transcribed; S4 keys added to `users`, `courses` and
+  threads (`quiz_id`, `question_id`, `attempt_id` left bare — two quiz
+  tables, eleven item tables); six indexes added; `messages` put in the
+  realtime publication (Claude's recommendation, accepted); Bulk Send
+  rewritten to write in 500-row batches instead of one student at a
+  time (accepted); the student search paged to twenty on the server.
+  Writes moved behind `requireStudent()` / `requireAdmin()` — but
+  **every messaging statement still runs as the user's own client
+  under RLS**; no messaging code uses the service role. Alpha's caps
+  were not reinstated: the 800-character check exists on the student
+  action only, the admin reply is unbounded, nothing limits sends or
+  recipients. Three legacy behaviours were carried knowingly and are
+  recorded in the 12a/12b entry: the two disagreeing unread rules, a
+  reply reopening a closed thread, and `bulk_batch_id` missing from a
+  reused thread. Dev holds 8 threads and 12 messages from the walks.
+
+**Proven on dev, 2026-09-18** (SQL as a dev student's own claims, each
+in a transaction rolled back): a student can **insert a message into
+their own thread with `sender_role = 'admin'`, any `sender_id`, and
+`read_by_admin = true`** — a forged support reply; can **edit the
+admin's replies** (`body_text`) and flip `read_by_admin`; can
+**rewrite their own thread's `status`, `admin_id`, `context_type`,
+`bulk_batch_id`, `last_sender_role`**. They **cannot** hand the thread
+to another student (`user_id` rewrite refused — with no WITH CHECK,
+Postgres applies USING to the new row too, so the code inventory's
+claim that a thread can be re-owned is **false**), cannot open a
+thread for another student (refused), cannot see any other student's
+thread or message (0 rows), and the public key sees nothing (0 rows).
+DELETE has no policy and is refused (read from the policies; the
+delete test itself was blocked by the tooling).
+
+**What is sound.** Isolation between students holds at the floor.
+Every admin read and write sits behind `requireAdmin()`; every student
+action re-reads the thread's ownership before writing
+(`lib/messaging/actions.ts:111,146,166`). The admin's own inserts and
+the student's own inserts hardcode the right `sender_role`, `sender_id`
+and read flags. The ref text the runner builds carries the stem, the
+options as shown and the student's answer, **never the correct
+answer** (`components/runner/quiz-runner.tsx:640-674`). Bulk Send
+writes in batches of 500 with the existing open threads read first.
+Realtime subscribes under the SELECT policy, one channel per open
+thread, and an admin reply reached an open student pane in ~6 s (12a
+walk). The two pages pass the browser only the signed-in student's
+own threads (student side) or, on the admin side, data an admin may
+see. The schema and policy snapshots match the migration.
+
+---
+
+## D37 — The messaging policies say who may touch a row, not what they may write
+
+**What.** All six policies test one thing: is the caller an ADMIN, or
+does the thread belong to them. `messages_insert` never checks that
+`sender_role` is `'student'` or that `sender_id` is the caller;
+`messages_update` and `messages_threads_update` carry no WITH CHECK, so
+any column of a row the student may see is theirs to set. Proven above:
+a forged admin reply with a link in it, sitting in the student's own
+thread marked read-by-admin (so it never lights the admin badge); the
+admin's real replies rewritten; the thread's status flipped, its admin
+reassigned, a `bulk_batch_id` invented. The app's own code never does
+any of this — `actions.ts` writes the right values — but the app is
+not the only caller of a table the browser roles hold `grant all` on.
+Legacy had the same six policies (`legacy/db/rls.sql:430-507`); alpha
+had none of this exposure because the browser never touched the sheet.
+
+**Where.** `db/migrations/20260915150000_messaging.sql:73-105`;
+`lib/messaging/actions.ts:116-135`.
+
+**Who it reaches.** A student who wants a "support said so" screenshot
+(a forged renewal notice, a forged answer confirmation); an admin
+reading a thread whose replies were edited after the fact; the audit
+value of the table, which is nil while any participant can rewrite it.
+Nobody else's data is at risk — isolation holds.
+
+**Proposed fix.** The S7 / S10 pattern: the Server Actions behind
+`requireStudent()` and `requireAdmin()` write with the service role,
+and INSERT and UPDATE on both tables are **revoked from `anon` and
+`authenticated`**. Reads stay under the SELECT policies (realtime
+needs them). The alternative — WITH CHECK clauses pinning
+`sender_role`, `sender_id`, the read flags and the thread's frozen
+columns — keeps browser writes and is a policy per column; the revoke
+is one line per table and matches where the users row (S10) and the
+attempts (S7) are going.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D38 — Alpha's five protections were dropped by gamma and not restored by the port
+
+**What.** Alpha capped a message at 2000 characters on the server,
+limited sends to 20 a minute per student and 60 per admin, limited
+bulk sends to 5 per ten minutes, refused a bulk send over **200
+recipients**, and paged every list. Today: the student action refuses
+over 800 characters (`MESSAGE_MAX_LEN`, `types.ts:18`); the admin
+reply has **no cap at all** (`admin-actions.ts:119-126`); `body_text`
+has no database constraint; nothing limits how many messages a student
+sends or how many recipients a bulk send reaches — an empty scope is
+every active student, and the only brake is the preview count the
+admin must click through (`messages-client.tsx:509-516`).
+
+**Where.** `lib/messaging/actions.ts:107`, `admin-actions.ts:119-126,
+263-266, 280-380`; alpha `messaging script:27-35, 936, 976`.
+
+**Who it reaches.** The admin inbox (a student can flood it at the
+speed of the network); every student (a mistaken no-scope bulk send
+reaches the whole roster, and a second click sends it again); the
+table's size.
+
+**Proposed fix.** The general limiter Sam queued on 2026-09-18 takes
+the student send and the admin bulk send as two of its first doors,
+numbers in `config`; one length check shared by both send actions
+(alpha's 2000 or legacy's 800 — Sam's call), mirrored by a CHECK
+constraint on `body_text`; a recipient cap on bulk send with the
+number in `config`, refusing above it rather than warning.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D39 — The admin inbox reads the whole table, and the failures are silent
+
+**What.** `getAdminThreads` reads **every thread** with no limit, then
+fetches the latest message for all of them in one `.in()` list
+(`admin-queries.ts:63-84`); the unread badge reads every
+`read_by_admin = false` row in the system on **every admin page**
+(`:98`, `admin/layout.tsx:16`, and again on every `router.refresh()`
+the messages client fires); the search pre-pass matches the whole
+`users` table with no limit and no role filter (`:51-54`); the bulk
+pickers read `level, cohort` off every active user (`:137-147`);
+`resolveRecipients` passes the full recipient list to `.in()`
+unchunked (`:167,178`) — where `bulkSendAction` itself chunks at 500 —
+and **does not check the error** on either query, so a failed query
+filters everyone out and the preview says 0. PostgREST's row cap and
+the URL length turn each of these into a wrong number or an empty
+list, never an error. Legacy's `getUnreadCountForAdmin` was the same
+full scan on every admin page (`api.js:2575-2583`); alpha paged.
+
+**Where.** `lib/messaging/admin-queries.ts`; `app/(app)/admin/layout.tsx`.
+Overlaps the two Scale lines already in BUILD_LIST (Bulk Send / inbox
+`.in()` lists; the Attempts page's 5,000-row slice).
+
+**Who it reaches.** The admin, at a few thousand threads: a badge that
+is too low, an inbox that comes back empty, a preview count of 0 for a
+real population. Nobody today (8 threads on dev).
+
+**Proposed fix.** Page the inbox on the server (a `range` with the
+filters database-side, "Unread only" included); one count query for
+the admin badge scoped to open threads; the search pre-pass limited
+and role-filtered; recipient resolution chunked like the send and its
+errors surfaced; the pickers from a distinct query, not every row.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D40 — A student's thread is built from whatever the browser says, and a link builds one on arrival
+
+**What.** `ensureThreadAction` takes `context_type`, `course_id`,
+`quiz_id`, `question_id`, `attempt_id`, `subject` and up to **6000
+characters** of `ref_text` from the client and checks only lengths
+(`actions.ts:44-47, 52-53, 76-92`). A student can open a course
+thread for a course they hold no access to (the key proves the course
+exists, not the entitlement), attach **another student's**
+`attempt_id` (no key, no check), and store any text as the "quoted
+question". The Messages page's deep-link effect calls the action
+**from the address bar with no click** (`messages-client.tsx:243-268`),
+so any link of the form `/student/messages?item_id=…&ref=…` creates a
+thread in the visiting student's account on page load. The runner
+puts the whole ref text — the stem and every option — into that
+address (`quiz-runner.tsx:676-687`), so the question text sits in
+browser history and travels as a referrer. Legacy did all of this
+(`api.js:2408-2450`; `student/messages.html:263-292`).
+
+**Where.** `lib/messaging/actions.ts:49-98`;
+`app/(app)/student/messages/messages-client.tsx:243-268`;
+`components/runner/quiz-runner.tsx:676-687`.
+
+**Who it reaches.** The admin, reading a thread whose context is
+invented; the question bank, whose stems leave the app by address;
+a student sent a crafted link, who finds a thread they never opened.
+
+**Proposed fix.** The server builds the context: given an `item_id`
+and `attempt_id`, it checks the attempt is the caller's, reads the
+question and the student's answer itself and writes `ref_text` from
+the same builder the runner uses; `course_id` checked against
+`user_has_course()`. The runner passes ids only, never the text. The
+deep link pre-fills a New Thread that the student sends with a click,
+instead of creating on arrival — one change to the reuse rule's UX,
+Sam's call.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D41 — Two unread rules on the student side, and the admin badge counts closed threads
+
+**What.** The sidebar badge counts distinct **open** threads holding
+any message with `read_by_user = false`, sender not checked
+(`queries.ts:62-77`); the dot on the thread list checks that the
+**latest** message is an unread **admin** reply
+(`messages-client.tsx:433`). So an admin reply on a closed thread
+shows a dot but no badge; an older unread reply under a newer read
+one counts in the badge with no dot. The admin badge counts every
+`read_by_admin = false` message including closed threads (`:98`),
+while the inbox's unread flag is computed over the filtered list only
+(`:91`). Both carried from legacy on purpose (12a entry); alpha had
+one rule — `message.unread.count` over open threads. The student badge
+is also the slowest query on every student page (perf investigation,
+35–200 ms, two serial reads).
+
+**Where.** `lib/messaging/queries.ts:58-77`; `admin-queries.ts:91,98`;
+`messages-client.tsx:433`.
+
+**Who it reaches.** Every student and every admin, as a badge that
+does not match the list under it.
+
+**Proposed fix.** One rule, stated once: a thread is unread for a
+party when it holds a message from the other party that party has not
+read; open threads only for the badge, the same test for the dot. One
+query for each badge (already a Speed line in BUILD_LIST).
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D42 — Residue and drift in the two tables
+
+**What.** In one place, the small things the trace explains:
+`admin_id` is the literal `'admin1'` on every student-opened thread
+(`actions.ts:79`) — an alpha sheet value, now a column nothing reads;
+`quiz_id` and `attempt_id` are write-only; the New Thread dialog's
+"Ref text" field is collected and never sent
+(`messages-client.tsx:371,769`; `admin-actions.ts:200`); no CHECK
+constraint pins `status`, `context_type`, `sender_role` or
+`last_sender_role` to their three-or-two values; a reply — student or
+admin — sets `status = 'open'` and so **reopens a closed thread**
+(`actions.ts:133`, `admin-actions.ts:113`; legacy `api.js:2477`);
+`newThreadAction` reports "N threads created" when it reused N
+(`admin-actions.ts:247`); a reused thread never records the
+`bulk_batch_id`, so a batch cannot be reconstructed (12b walk);
+`messages_threads` is not in the realtime publication, so a close or
+reopen never reaches an open student page (`migration:109-118`); the
+student search and New Thread accept an admin as the recipient (no
+role filter, `admin-queries.ts:109`; `admin-actions.ts:232`); the
+student page receives `admin_id`, `bulk_batch_id` and `read_by_admin`
+in its props (`select('*')`), harmless but unread by the UI;
+`db/rls.sql` carries no `enable row level security` line for any
+table after the catalogue slice, so the snapshot understates what the
+migrations did.
+
+**Who it reaches.** Mostly nobody today; the reopen-on-reply and the
+wrong "created" count reach the admin.
+
+**Proposed fix.** Sam's storage-hygiene rule — one at a time: drop or
+write `admin_id`; CHECK constraints in the D37 migration; a reply to a
+closed thread refused or reopened explicitly (product call); the
+threads table into the publication; role filter on the recipient
+search; a narrower select for the student page; the snapshot fixed.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D43 — Every table in the schema grants the browser roles everything; RLS is the only gate (schema-wide)
+
+**What.** Found here, true everywhere: the schema migration grants
+`all on all tables` to `anon` and `authenticated` and sets the same
+as the default privilege for tables created later
+(`db/migrations/20260910120000_licensure_gh_schema.sql:29-39`).
+Checked on dev: all 32 tables carry INSERT, UPDATE, DELETE,
+TRUNCATE, REFERENCES and TRIGGER for both roles. A table with no
+DELETE policy refuses deletes only because RLS defaults to deny;
+TRUNCATE is not row-level and is not policed by RLS at all (not
+reachable through PostgREST today, which exposes no TRUNCATE, but
+reachable from any function or any future surface). Every finding of
+the form "the policy lets a student write X" (D7, D25, D37) exists
+because the grant is wide and the policy is the only narrowing. This
+is Supabase's `public`-schema default copied into our schema.
+
+**Where.** `db/migrations/20260910120000_licensure_gh_schema.sql:29-39`;
+all later migrations rely on it.
+
+**Who it reaches.** Nobody by itself; it is the floor under D7, D25
+and D37 and every table the sweeps have not reached.
+
+**Proposed fix.** Grant by need, not by default: SELECT to
+`authenticated` where a policy exists; INSERT / UPDATE only on the
+tables the browser must write (shrinking as S7, S10 and D37 land);
+nothing to `anon` beyond the public catalogue reads; never DELETE,
+TRUNCATE, REFERENCES or TRIGGER to either. One migration, table by
+table, after the storage sweep finishes so the list is known once.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
 ## The inventory — everything that reads the bank
 
 Traced 2026-09-17. Every caller of `lib/bank/queries.ts` and every use of
@@ -1623,8 +1973,12 @@ judging it** — several "dead" columns were the residue of admin pages
 gamma deferred. Then over **payments** (with `rate_limits` and the
 subscriptions policies) the same day → *The payments group* and
 D31–D36, with the page-by-page cut of the five payment pages folded
-into *What is sound*; Sam's rulings on those wait for the next session.
-Remaining, table by table: messaging; quizzes / mock_quizzes /
+into *What is sound*; Sam ruled on those on 2026-09-18. Then over
+**messaging** (`messages_threads`, `messages`) the same day → *The
+messaging group* and D37–D43, D43 being the schema-wide grant found
+along the way; the sweep proved on dev that the code inventory's
+"a thread can be re-owned" was false — **test a policy claim before
+recording it**. Remaining, table by table: quizzes / mock_quizzes /
 announcements / user_notice_state; config / schools / levels. The
 page-by-page sweep over every other page remains unrun.
 
