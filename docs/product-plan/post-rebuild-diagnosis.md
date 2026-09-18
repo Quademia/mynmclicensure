@@ -1631,6 +1631,53 @@ walk). The two pages pass the browser only the signed-in student's
 own threads (student side) or, on the admin side, data an admin may
 see. The schema and policy snapshots match the migration.
 
+**Sam's rulings (2026-09-18), taken on the feature rather than finding
+by finding.** Messaging is three jobs in one table, and only one fits:
+
+1. **Keep the support desk.** Student-started threads in the general
+   and course contexts, the admin replies and closes. Its value over
+   the WhatsApp and Telegram links on the dashboard: the app knows who
+   is writing, the conversation is on the record against the account,
+   and the admin sees the student's courses and subscription beside
+   the message. Rebuilt the server-writes way (D37's fix), small.
+2. **Park Bulk Send.** Announcements already broadcast with the same
+   targeting and more (`scope_programs, scope_courses, scope_level,
+   scope_subscription_kind, scope_product_ids, scope_audience,
+   scope_cohort, scope_user_ids`); New Thread covers the individual
+   case; the group-with-private-replies case has no named example.
+   A rarely used door is the one nobody watches — Bulk Send did nothing
+   on the live site for three months and nobody noticed. "Keep it but
+   rarely use it" was weighed and rejected: keeping it means paying
+   for its cap, limiter door, chunking and batch id through the
+   rebuild for a door expected to stay shut. The button and its code
+   come out; both tables are empty on launch day; a ⏸ line in
+   BUILD_LIST. If a reply-able broadcast is ever wanted, "allow
+   replies" on an announcement is the smaller change.
+3. **Split question feedback into its own feature.** A report about
+   a question is not a conversation: it wants the question, the
+   attempt, a reason from a short list (wrong answer, unclear wording,
+   rationale wrong, typo), an optional note, the student's answer as
+   the server saw it, and a status (new, reviewed, fixed, dismissed).
+   In a thread it is a blob the admin cannot list by question, count,
+   or mark fixed. The runner's Send feedback opens a small form; an
+   admin Reports page groups by question with counts and a Mark fixed
+   that reaches the bank page; the student sees the outcome in their
+   history; an admin may open a support thread from a report if a
+   conversation is needed. A new feature, Sam's go-ahead given for the
+   queue; its design is written when it is picked.
+
+Effect on the findings: D37, D39, D41, D42, D43 stand for the support
+desk; D38 loses its recipient cap (Bulk Send parked) and keeps the
+length cap and the send limit; D40's question context moves to the
+reports feature, and what remains of it is the course check and the
+link-opens-a-draft question. The decisions still open for the support
+desk rebuild: server writes only with messages fixed once sent; one
+length cap (2000 or 800); a reply to a closed thread reopening it
+visibly or being refused; read timestamps on the thread replacing the
+per-message flags (a §8 row, S11, if yes); the course link opening a
+draft rather than a thread; the assigned-admin column dropped or made
+the admin who first replied.
+
 ---
 
 ## D37 — The messaging policies say who may touch a row, not what they may write
