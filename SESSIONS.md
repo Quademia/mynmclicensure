@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-18 — the port declared finished; auth traced alpha→gamma→port, D24–D30, ten rulings, S9/S10 ticked; payments traced, D31–D36; no code
+  - ↳ rebuild = a port · one Improvements list · auth fns public · users row owner-writable · alpha admin audit pages · Invite not Create User · pg_cron doorbell · email outbox · pay-first the root · raw keeps card data
+
 - 2026-09-18 — subscriptions diagnosed (D13–D21); course-level access and the attempt snapshot tables designed; S7 and S8 ticked into §8; no code changed
   - ↳ cloud branch merged · access has two readers · days summed, never granted · course_access + product_courses · six rulings · attempt_items sealed / unsealed · stricter than MyNclex on the console · S3 superseded · remote delete refused
 
