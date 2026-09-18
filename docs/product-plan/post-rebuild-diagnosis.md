@@ -2269,6 +2269,178 @@ the two snapshots regenerated.
 
 ---
 
+## The config group — where `config`, `schools` and `levels` came from (traced 2026-09-18)
+
+The last table-by-table sweep: the three reference tables, every
+reader of every config key, the admin Config page, the register and
+profile readers of `schools`, the live rows on dev, and three tests as
+a dev student and as the public key (rolled back). Sam's rulings are
+pending; nothing here is decided.
+
+**Three eras.**
+
+- **Alpha.** None of the three existed. Settings were constants in the
+  Apps Script (`auth_config.gs`: "No logic — constants only"), changed
+  by redeploy. School was free text or absent. `cohort` was a
+  registration field from the start; `level` came later as a free-text
+  user column ("✅ NEW"). Bulk messaging already scoped by `cohort_ids`
+  and `level_ids` as raw strings.
+- **Gamma.** `config` was born on 2026-03-16 with three keys, all read
+  (`81695a6` README, `e4a4d2e` api.js); four more keys followed, one of
+  them (`builder_default_questions`) never read by anyone. `levels` was
+  born on 2026-03-13 as CLONING.md boilerplate (`b0f7b22`) with four
+  rows; **no commit in the repository's history ever wrote a query
+  against it** — its own policy comment says "unused but keep open for
+  future". `schools` arrived last, on 2026-06-01, in one signup-capture
+  commit (`df925c0`): 141 NMC-accredited schools from the regulator's
+  list, `users.school_id` keyed to it with a free-text `school_other`
+  escape, readable by the public key because the register page is
+  pre-auth. **Gamma inverted alpha's registration:** school (an id) at
+  register, cohort and level moved to the profile page as free text.
+  Two seed files disagreed on two values (§9 #11). The admin Config
+  page accepted any string for any key and offered "Add Key" for
+  "settings for code you are about to write".
+- **The port (slices 2a, 3, 7e).** All three carried with their rows
+  (141 schools with ids preserved, 4 levels, 7 config keys) and their
+  policies; `users → schools` made an explicit key (S4); the code
+  fallbacks set equal to the seed (§9 #11, fixed). §8 S5 said "read
+  through one `lib/config/` accessor with the legacy fallbacks" — the
+  accessor was not built: config is read through `lib/catalogue/` and
+  the fallback is written inline at **six call sites in two idioms**.
+  `levels` carried, still unread; the four levels are a TypeScript
+  constant in two files. §9 had no row for `levels` or `schools`; the
+  2026-09-17 dead-column sweep caught the table, two `schools` columns
+  and the one config row.
+
+**Proven on dev, 2026-09-18** (rolled back): a student reads all seven
+config rows and the four levels and **cannot** change a config value
+(0 rows updated); the public key reads the 141 schools and nothing
+else (0 config, 0 levels). No writes to `schools` are possible for any
+browser role (a single SELECT policy). Every `users.level` value in use
+exists in `levels`; every `users.school_id` in use exists in `schools`.
+
+**What is sound.** The floor for these three is right for what they
+hold today: reference data readable by those who need it, writable by
+the admin alone or by nobody. The keys are numbers used as numbers and
+never rendered into a page. The server-side caps (offline pack size
+and allowance, builder size) read the table, so an admin's change
+takes effect without a deploy, which is S5's point. The register
+page's school picker is strict with an honest escape hatch.
+
+---
+
+## D49 — The config table accepts anything, and the readers trust it in two different ways
+
+**What.** The admin page and its actions check one thing on a save:
+the value is not empty (`lib/catalogue/actions.ts:179`). No type, no
+range, no list of known keys; Delete is unconditional and unaudited
+(`:191-197`); "Add Key" accepts any lowercase name. The reader then
+coerces: `Number(value)` turns `''` into `0`, `'1e9'` into a billion,
+`'Infinity'` into `Infinity` (`lib/catalogue/queries.ts:101-104`). The
+six read sites guard differently — the builders and offline packs use
+`> 0 ? … : default`, the two runner keys use `|| default`, so
+`runner_questions_per_page = -5` and a negative autosave interval reach
+the runner as props (`lib/attempts/runner-load.ts:116-117`). `getConfig`
+fails open: a database error hands back `{}` and every tunable silently
+reverts to its default with no signal to anyone. The table is read on
+every runner load, every builder load, every spawn and every allowance
+check, uncached. Every signed-in student reads every key and
+description (`config_select: auth.uid() is not null`) — harmless for
+today's seven numbers, but the queued limiter rules (D35, the general
+limiter), the retention window (D29) and the INIT staleness age (D34)
+are all planned to live here, and the page's own copy invites
+"settings for code you are about to write". The card's "⚠️ Key is
+read-only — referenced by platform code" prints on every row,
+including the one nothing reads. Legacy identical throughout; alpha had
+constants and a redeploy.
+
+**Where.** `lib/catalogue/queries.ts:80-110`, `actions.ts:140-197`;
+`app/(app)/admin/config/config-client.tsx`; the six read sites listed
+in the 2026-09-18 entry.
+
+**Who it reaches.** The admin, who can break every runner with one
+typo and learn of it from a student; every student, on the day a
+server-only setting is added to a table they can read.
+
+**Proposed fix.** The accessor S5 asked for, as a **registry**: one
+module listing every known key with its type, bounds, default and
+whether the browser roles may read it. The admin page edits known keys
+with that validation (a number field for a number, refusing out of
+range) and shows unknown keys as such; Delete refuses a known key. One
+read per request (cached). Server-only keys either in a second table
+with an admin-only SELECT, or a `scope` column with the SELECT policy
+honouring it — the second is one column. Drop `builder_default_questions`
+(§9 #9, still not done).
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D50 — `schools` is a regulator's list with no way to change it, in a vocabulary the product does not speak
+
+**What.** 141 rows from the NMC accreditation list, seeded once in
+June 2026. No admin page and no write policy: a school that opens,
+closes or is misspelt cannot be changed except by SQL, and the students
+who chose "My school isn't listed" and typed a name have no path back
+into the list (`users.school_other` is never reviewed anywhere). Two
+columns, `ownership` and `programmes`, are never read; `programmes`
+holds the regulator's codes (`RGN, RCN, RMN, RM, PN`) which are **not
+the product's programme ids** (`RN, RM, RPHN, RMHN, NACNAP`), so
+"schools offering this programme" cannot be asked without a mapping.
+The full active list is re-read on every hit to the public `/register`
+route and every profile render, uncached. Announcements and messaging
+do not scope by school.
+
+**Where.** `db/migrations/20260911010000_auth_tables.sql:36-44, 391-392,
+434-444`; `app/register/page.tsx:25-31`; `lib/profile/queries.ts:13-24`;
+`lib/users/queries.ts:45-50`.
+
+**Who it reaches.** The admin, the day a school must be added or
+renamed; the analytics nobody has yet, when "which schools do our
+students come from" meets 40 free-text spellings.
+
+**Proposed fix.** A small admin Schools page (list, add, rename,
+deactivate, and a view of the free-text "other" names with a "promote
+to the list" action); `programmes` either dropped or mapped to
+`programs` through a join table when a use appears; the list cached
+for the register page. None of it urgent.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D51 — `levels` has never been read, and level and cohort are free text in three places
+
+**What.** The `levels` table (four rows) has had no reader in any
+commit of any era. The four level names are typed constants in
+`lib/profile/types.ts:14` and `lib/announcements/types.ts:25`;
+`users.level` is free text validated against the constant on the
+profile page only; `users.cohort` is free text validated by nothing
+(`lib/profile/actions.ts:62-64`); announcements store `scope_level` as
+a comma-joined string; the admin pickers for bulk messaging and the
+announcement scope are built by `select distinct` over whatever
+students typed (`lib/messaging/admin-queries.ts:137-146`;
+`lib/announcements/queries.ts:50-55`), so one student typing `2024 `
+with a space makes a second cohort. Alpha had both as free text;
+gamma made a table for one of them and never wired it.
+
+**Where.** `db/migrations/20260911150000_catalogue_tables.sql:32-37,
+89-99`; the two constants; `lib/profile/actions.ts:62-64`.
+
+**Who it reaches.** The admin, as a cohort picker that fills with
+typos; nobody else.
+
+**Proposed fix.** Sam's call between two honest shapes. **Drop** the
+table and keep the constant, since four fixed levels have not changed
+in three eras. Or **make it real**: `users.level` keyed to `levels`,
+the pickers reading the table, and `cohort` as a year (`integer`) or
+its own small table so that the announcement and messaging scopes
+match exact values. Either way `scope_level` becomes `text[]` (D48).
+
+**Status.** Open. Not approved, not queued.
+
+---
+
 ## The inventory — everything that reads the bank
 
 Traced 2026-09-17. Every caller of `lib/bank/queries.ts` and every use of
@@ -2370,9 +2542,14 @@ recording it**. Then over **quizzes / mock_quizzes / announcements /
 user_notice_state** the same day → *The quiz and announcement group*
 and D44–D48 (mock exams are gamma-born; the course scope was alpha's
 and regressed in gamma; the two quiz SELECT policies and the
-announcements one admit every signed-in user to every row). Remaining,
-table by table: config / schools / levels. The page-by-page sweep over
-every other page remains unrun.
+announcements one admit every signed-in user to every row). Then over
+**config / schools / levels** the same day → *The config group* and
+D49–D51 (none of the three existed in alpha; `levels` never read in
+any era; the config accessor S5 asked for was not built). **The
+table-by-table sweep is complete: every table in `licensure_gh` has
+been traced once**, which is what D43's one grant migration was
+waiting for. The page-by-page sweep over every other page remains
+unrun.
 
 
 # Proposed direction — the attempts restructure
