@@ -124,6 +124,9 @@ lost; the ⏸ reasons were written under the port's like-for-like rule.
 - ⬜ Admin security page: Reset requests tab — Send reset link, Lift the block, the admin's own sends logged (Sam, 2026-09-18; auth item 6)
 - ⬜ Invite by email — student or admin, optional product, a set-password link, the profile finished on arrival; replaces Create User; drops `username` + `must_change_password` (Sam, 2026-09-18; auth item 7)
 - ⬜ Last login — written on every successful login, shown in the drawer, a dormant filter on the Users list (Sam, 2026-09-18; auth item 8)
+- ⬜ Email outbox + drain — a queue table with a fingerprint, send on the request's tail, pg_cron doorbell retries, an admin emails page with Retry; MyNclex's shape; before item 9 (Sam, 2026-09-18; auth item 10)
+- ⬜ Take over the Supabase-sent emails — magic link, reset, confirm (once on), invite minted with generateLink, our templates, through the outbox; the project's templates are shared with MyTeacher (Sam, 2026-09-18; auth item 10)
+- ⬜ Supabase dashboard: Auth SMTP set to Resend as the fallback sender, neutral Quademia wording on the project's templates (auth item 10)
 - ⏸ Student analytics, notifications, search, sequential runner mode — new features, after
 - ⏸ Paystack LIVE key on prod — waits on the company / Paystack-account decision
 

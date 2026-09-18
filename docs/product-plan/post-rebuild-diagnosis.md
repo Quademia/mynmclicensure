@@ -931,6 +931,29 @@ options:**
    alpha's existed because a Sheets trigger gave no other proof it had
    run. Written against S8's course-level expiry, or adjusted when S8
    lands. The same clock carries D29's retention job later.
+10. **Take over the Supabase-sent emails** (added by Sam after the
+    email review, 2026-09-18). The gamma project is shared with MyTeacher
+    and the legacy site, and Supabase's templates and sender are per
+    *project*, so no app on it can brand them and every app shares the
+    built-in sender's hourly limit. Each app therefore mints its own
+    links through the service role (`auth.admin.generateLink`: magic
+    link, recovery, signup confirmation once D27 turns it on, and item
+    7's invite), wraps them in its own template, and sends through its
+    own Resend key. **Through an outbox, not directly**, copied from
+    MyNclex (`lib/email/outbox.ts`, `drain.ts`, `nclex_email_outbox`,
+    `docs/product-plan/transactional-email.md`): one row per email with
+    a fingerprint the database refuses to duplicate, the send attempted
+    on the request's tail, a failure marked with a next-try time, a
+    pg_cron doorbell retrying due rows in bounded batches, an admin
+    emails page showing what is stuck with Retry. At Resend's cap the
+    rows wait rather than vanish; paying for Resend at the peaks becomes
+    a choice. The outbox and the doorbell are a shared mechanism built
+    **before item 9** (the reminders need them) and before the link
+    takeover. The dashboard still gets one visit: SMTP set to Resend as
+    the fallback for anything Supabase still sends, neutral Quademia
+    wording on its templates. Resend's cap is per account, shared with
+    MyNclex — its notes already argue for one sending subdomain for
+    every product, split by risk.
 
 D25, D26 and D27 were not among the nine (holes, not intentions);
 items 2, 3 and 7 lean on them and they are recommended first → §8 S10,
