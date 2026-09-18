@@ -198,7 +198,11 @@ and runs the same activation path the confirmation page runs, so a
 completed payment activates whether or not the browser ever comes back.
 
 **Status.** Open. Not approved, not queued. The only finding here that
-costs money rather than tidiness.
+costs money rather than tidiness. Two facts added 2026-09-18: alpha's
+Payments web app *was* webhook-driven (Sam); and D34's ruling — a
+nightly sweep that verifies every stale INIT row with Paystack — covers
+most of this finding within a day, leaving the webhook as the
+seconds-not-hours version of the same catch.
 
 ---
 
@@ -1219,7 +1223,8 @@ The table-by-table sweep run over `payments` and `rate_limits` with
 every caller read (`lib/payments/*`, the five payment pages, the
 subscriptions policies), plus the page-by-page cut of what the
 checkout, confirmation, upgrade and admin pages hand the browser. Sam's
-rulings on D31–D36 are for the next session; nothing here is decided.
+rulings on D31–D36 were taken one at a time on 2026-09-18 and sit in
+each finding's Status line; the BUILD_LIST lines followed the same day.
 
 **Three eras.**
 
@@ -1305,7 +1310,26 @@ becomes the same flow with a product attached. Question for Sam first:
 was pay-first a deliberate product choice in gamma (less friction
 before the money), or a side effect of the Worker design?
 
-**Status.** Open. Not approved, not queued. Decides D4's shape too.
+**Status.** Ruled (Sam, 2026-09-18). **Pay-first stays; it was a
+product decision, not a Worker side effect.** Sam's reason: a buyer
+loses interest in the first minutes, so an account form before the
+money loses customers, while a buyer who has paid finishes whatever
+comes after because the money is already committed. Account-first
+(the proposed fix above) is rejected. What changes under pay-first:
+the moment verify sees PAID, the **server creates the account** from
+the email, phone and programme already on the row (the D27
+service-role insert), activates the subscription on that user id, and
+queues a set-password email through the outbox (the same one-time
+link as *Invite by email*). The confirmation page keeps its shape; its
+form shrinks from the whole profile to a password; name and surname
+move to the profile page, which already asks for them. The setup
+token, `setup_created_utc`, `setup_completed_utc` and the admin rescue
+sequence go; the rescue becomes "resend the link". An email that
+already has a login gets the subscription added to it, as today, made
+safe by S10. Money never sits at PAID with no account. Alpha's
+Payments web app **was webhook-driven** (Sam) — recorded for D4, which
+now matters more: without a webhook the server learns of a payment
+only when a browser or an admin asks. Queued in BUILD_LIST.
 
 ---
 
@@ -1341,7 +1365,18 @@ customer email. Strip `authorization` (or keep only `channel`,
 writing. Drop the raw toggle or point it at the stripped copy. A
 one-time scrub of existing rows on both projects at build time.
 
-**Status.** Open. Not approved, not queued.
+**Status.** Ruled (Sam, 2026-09-18): **strip before saving, keeping
+three card fields.** Kept: the gateway transaction id and the
+reference, status, amount, currency, channel, paid time, the
+customer's email, and for an admin to recognise a payment in a
+support conversation `channel`, `card_type` and `last4` only. Dropped
+before the write: the rest of `authorization` (`authorization_code`,
+`bin`, `exp_month`, `exp_year`, `bank`, `brand`, `signature`,
+`reusable`), `ip_address`, and the same trim on the init reply. The
+raw toggle stays and shows the stripped copy (legacy had the toggle).
+A one-time scrub of the rows already on dev and prod when it is
+built. Early in the build order — it reaches every payer from day one
+and is one trim function plus the scrub. Queued in BUILD_LIST.
 
 ---
 
@@ -1372,7 +1407,22 @@ unless the caller proves the token (or is signed in as the row's
 user), and the setup form is pre-filled from the browser's own storage
 rather than the reply.
 
-**Status.** Open. Not approved, not queued.
+**Status.** Ruled (Sam, 2026-09-18): **same browser, with the emailed
+link as the fallback.** Under D31 there is no setup token; the account
+exists at PAID and only the password is missing. Init sets a private
+HttpOnly cookie in the buyer's browser, a random secret tied to the
+reference, that never appears in an address, a receipt or a link.
+When Paystack returns the browser to the confirmation page the cookie
+comes with it; verify matching it to the row shows the password form
+and sets the password on the just-created account. A browser without
+the cookie (a leaked reference, a second device) gets the status and
+"we have emailed you a link to set your password" — the outbox link
+from D31 covers the phone-to-laptop case. Verify returns status and
+the product name to any caller and nothing personal to anyone; the
+page still accepts the reference from the address and its stored copy,
+because the reference alone now yields status only. Emailed-link-only
+rejected: it sends every buyer to their inbox at the moment they are
+readiest to finish. Queued with D31 in BUILD_LIST.
 
 ---
 
@@ -1398,7 +1448,26 @@ counters exclude) — never deletes, so a late Paystack success can still
 be matched by reference. With D31, init happens only for a known user,
 which removes the anonymous-probe half.
 
-**Status.** Open. Not approved, not queued.
+**Status.** Ruled (Sam, 2026-09-18): **a nightly sweep that asks
+Paystack, never guesses by age, never deletes.** Sam's question first:
+the statuses were meant as a checklist of how far a payment got so an
+admin can rescue a stuck one (doc 01); as a "started but did not
+finish" signal the INIT counter is not done right — it sums a buyer on
+the Paystack screen now, a tab closed in March and a script's two
+hundred clicks, and it hides the one row that matters, a payment whose
+browser never returned. The ruling: a job on the pg_cron clock (auth
+item 9's, D29's) takes every INIT row older than a staleness age read
+from `config` (about an hour) and verifies it with Paystack. Paid →
+the normal activation path (account created, link queued, as D31);
+abandoned or failed → **ABANDONED**, a new terminal status the
+counters and the default list leave out; still pending → left alone.
+What remains at INIT is genuinely in progress, so the admin gets three
+honest numbers: in progress, abandoned, paid. The sweep also covers
+most of D4 — a payment the browser never reported is caught within a
+day. Under D31 `SETUP_REQUIRED` goes, so the statuses become INIT,
+PAID, ACTIVATED, FAILED, ABANDONED. Pay-first keeps init sessionless
+(D31), so the anonymous half stays and is answered by the sweep, not
+by a gate. Queued in BUILD_LIST.
 
 ---
 
@@ -1423,7 +1492,20 @@ twelve seconds; any shared address.
 one reference), init and setup per route per address, and let the
 confirmation page poll without counting. Fail closed on error as D30.
 
-**Status.** Open. Not approved, not queued.
+**Status.** Ruled (Sam, 2026-09-18): **as proposed.** One tally per
+action — init and the password step each per address on their own
+key; verify counted per reference, not per address, so one buyer's
+watching never locks out another on the same connection, and the
+confirmation page's own poll is not counted (a poll is one payer
+watching one payment); the check fails closed with a clear message
+when the counter cannot be read, as D30. Removes §9 #22 outright.
+Sam's follow-up question on the same day — when the `rate_limits`
+table was introduced and whether he was asked: built in slice 9a
+(2026-09-15) from rebuild.md §7.1, written in the 2026-09-10 planning
+session, as the plain replacement for gamma's Cloudflare rate-limit
+binding, which does not exist under OpenNext; not a §8 row because it
+changed no legacy data shape; not asked again at build. Queued in
+BUILD_LIST.
 
 ---
 
@@ -1442,7 +1524,10 @@ an equal minor amount in the wrong currency passes.
 **Proposed fix.** One comparison beside the amount check, FAILED with
 a note on mismatch, when the row is next touched (D32 or D31).
 
-**Status.** Open. Not approved, not queued.
+**Status.** Ruled (Sam, 2026-09-18): **add the check now, as a rider
+on D32.** One comparison beside the amount check; a mismatch is
+FAILED with a note, as an amount mismatch is. Queued with D32 in
+BUILD_LIST.
 
 ---
 
