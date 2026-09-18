@@ -1213,6 +1213,239 @@ gap 6 and is not repeated here.
 
 ---
 
+## The payments group — where the table and the flow came from (traced 2026-09-18)
+
+The table-by-table sweep run over `payments` and `rate_limits` with
+every caller read (`lib/payments/*`, the five payment pages, the
+subscriptions policies), plus the page-by-page cut of what the
+checkout, confirmation, upgrade and admin pages hand the browser. Sam's
+rulings on D31–D36 are for the next session; nothing here is decided.
+
+**Three eras.**
+
+- **Alpha.** No payments sheet is in this repo's history, but the
+  activation route is (`auth_actions_admin.gs` `apiPaymentsActivate`,
+  git `40f2930^`). The order was **account first, then pay**:
+  `apiSelfRegisterPaid` created the student with their chosen password
+  and no trial and handed the ids to a separate Payments web app; after
+  Paystack, that app called `payments_activate` server-to-server with a
+  shared secret (`PORTAL_PAYMENTS_SECRET`). The route was idempotent on
+  the Paystack reference (a pipe-delimited list of references on the
+  subscription row so a retry could never double-grant), took a
+  `LockService` lock against two calls landing together, and extended
+  or created the subscription with the "Access active" / "Access
+  updated" email. **Open question for Sam:** whether the Payments web
+  app was driven by Paystack's webhook or by the payer's browser
+  returning — the app itself is not in this repo.
+- **Gamma, from 2026-03-17.** The payment Worker (`payments-worker/`,
+  later `mynmclicensure/workers/payment-worker/`), with `init-public`
+  and `verify` from the first commit (`2963741`), then `init-upgrade`,
+  `setup-complete` and the four admin subscription routes. The order
+  was **inverted: pay first, then set up the account.** That inversion
+  created the nineteen-column `payments` table, the setup token and its
+  48-hour clock, "Retry Activation then Copy Setup Link" (doc 01), the
+  token re-minted on every verify, the confirmation page polling
+  verify, and the lookup of the payer by email. **No Worker version
+  ever had a webhook** (`git log -S'webhook'` over every Worker path is
+  empty); the "webhook" in the 2026-04-17 smoke-test log was the
+  browser return. Doc 01's security section lists CORS and the
+  Cloudflare rate-limit binding, both Worker artefacts.
+- **The port (slice 9, 2026-09-15).** Transcribed exactly (rebuild.md
+  §7.1): the routes became four Server Actions, the binding became the
+  `rate_limits` counter behind a revoked function, the columns gained
+  the S4 keys. Every write is the service role's; only an ADMIN reads
+  rows; no INSERT or UPDATE policy exists on purpose. Dev holds no
+  payment rows today (cleared 2026-09-15); prod holds the September
+  test rows and its 21 paid products archived.
+
+**What is sound.** The Paystack key never leaves the server
+(`lib/payments/paystack.ts:29-33`). The price comes from the product
+row (`init-public.ts:45,65`), never the browser. Verify compares the
+paid amount to the expected one and marks a mismatch FAILED for good
+(`verify.ts:100-108`). A reference can only ever produce one
+subscription (`activate.ts:29-39`). Students cannot read or write
+payment rows (`payments_select` ADMIN only, no write policy). The setup
+form posts as FormData so the payer's password never reaches the dev
+log (`setup-complete.ts:31-35`). A half-made login is rolled back
+(`:187-194`). `check_payment_rate_limit` is the one function correctly
+revoked from the browser roles. The sales pages receive only the
+products list and the programmes; the upgrade page only the student's
+own subscriptions; the admin page is gated and paginated.
+
+---
+
+## D31 — Pay-first is the root of every carried payments question, and alpha had it the other way
+
+**What.** The account is created *after* the money
+(`lib/payments/setup-complete.ts`). Everything awkward on this table
+follows from that one order: the setup token and its 48-hour clock;
+the token re-minted on every verify (§9 #20); a reference that must
+serve as the only secret (§9 #21); the confirmation page polling verify
+against the limiter (§9 #22); the payer found by email, which is D25's
+capture chain (`queries.ts:57-64`, `verify.ts:126`); no school,
+referral or trial captured on a paid account; the admin rescue
+sequence; and the payer who pays and never returns, whose money sits at
+PAID with no account until someone acts. The alpha created the account
+first and activated server-to-server against a known user id.
+
+**Where.** `lib/payments/verify.ts:124-160`, `setup-complete.ts`,
+`app/payment-confirmation/confirmation-client.tsx`; doc 01 "Flow A".
+
+**Who it reaches.** Every new payer: a second form after paying, a
+link that can expire, a support conversation when it does.
+
+**Proposed fix.** Account first — or at least email and password
+before the redirect to Paystack. The subscribe and Premium Prep pages
+create the login and the profile (the server-side insert of D27), then
+start the payment with `user_id` set, exactly as the upgrade page does
+today. The setup token, `setup_created_utc`, `setup_completed_utc` and
+the rescue sequence disappear; the confirmation page only shows status;
+activation lands on a known user id; the auth work's *Invite by email*
+becomes the same flow with a product attached. Question for Sam first:
+was pay-first a deliberate product choice in gamma (less friction
+before the money), or a side effect of the Worker design?
+
+**Status.** Open. Not approved, not queued. Decides D4's shape too.
+
+---
+
+## D32 — The payment row stores Paystack's whole reply, forever, and shows it to admins
+
+**What.** `verify` writes the entire verify reply into `payments.raw`
+(`lib/payments/verify.ts:105,115`), and `init` the entire initialize
+reply (`init-public.ts:99`). Checked against Paystack's published
+OpenAPI spec (`PaystackHQ/openapi`, `dist/paystack.yaml`) and the
+transaction docs on 2026-09-18: the verify reply's `authorization`
+object carries `last4`, `bin`, `card_type`, `bank`, `brand`,
+`exp_month` / `exp_year`, `channel`, `reusable` and
+`authorization_code`; `customer` carries `customer_code`, `email`,
+`phone`; the transaction carries `ip_address`. **A reusable
+authorization code plus the secret key can charge that card again**
+(Paystack's charge-authorization endpoint). Nothing in the app reads
+any of these fields. The admin Payments panel has a "Show raw payload"
+toggle that prints the lot (`payments-client.tsx:435-441`). Rows are
+never deleted.
+
+**Where.** `lib/payments/verify.ts`, `init-public.ts`,
+`init-upgrade.ts:98`, `app/(app)/admin/payments/payments-client.tsx`.
+
+**Who it reaches.** Every payer after launch — card details and a
+re-charge token retained indefinitely, readable by any admin, and part
+of whatever a database leak would carry.
+
+**Proposed fix.** Keep what the app reads: the gateway's transaction
+id and reference, status, amount, currency, channel, paid time,
+customer email. Strip `authorization` (or keep only `channel`,
+`card_type`, `last4` if the admin needs to recognise a card — never
+`authorization_code`, `bin`, `signature`) and `ip_address` before
+writing. Drop the raw toggle or point it at the stripped copy. A
+one-time scrub of existing rows on both projects at build time.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D33 — The reference alone unlocks the payer's personal data and the setup token
+
+**What.** `verify` has no session by design (§9 #21). To any caller
+holding a reference it answers, with no other check: the payer's
+email, phone and programme and the current setup token on a
+SETUP_REQUIRED row (`verify.ts:146-159`), or the subscription id on an
+ACTIVATED one. The reference is `QAC_` + 12 hex, and it travels in
+Paystack's return address, the payer's Paystack receipt, the admin's
+copied link, and the browser's localStorage
+(`confirmation-client.tsx:106-125`). The page also accepts `trxref`,
+`ref` and a remembered reference.
+
+**Where.** `lib/payments/verify.ts:124-160`;
+`app/payment-confirmation/confirmation-client.tsx:105-125`.
+
+**Who it reaches.** A payer whose reference leaks before setup — the
+holder can read their details and create the account on their paid
+email (§9 #21's case), and can read email and phone off any reference
+at any time.
+
+**Proposed fix.** Folds into D31: with account-first there is no token
+to hand out, and verify to an unauthenticated caller returns status
+only. If pay-first stays: verify returns status and nothing else
+unless the caller proves the token (or is signed in as the row's
+user), and the setup form is pre-filled from the browser's own storage
+rather than the reply.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D34 — Abandoned INIT rows pile up forever, and anyone can make them
+
+**What.** `init-public` inserts a payments row and creates a Paystack
+transaction on every call (`init-public.ts:58-97`), five a minute per
+address, for any email, with no session. Nothing expires or clears an
+INIT row: an abandoned checkout, a probe, or a bot each leave one, and
+the admin page's INIT counter and the Load More list grow with them
+(`admin-queries.ts:79-96`). Legacy behaved the same; the gamma prod
+rows show it.
+
+**Where.** `lib/payments/init-public.ts`; no cleanup anywhere;
+`admin-queries.ts`.
+
+**Who it reaches.** The admin, as noise that hides real stuck rows;
+Paystack's transaction count.
+
+**Proposed fix.** A nightly job on the pg_cron clock (auth item 9's)
+marks INIT rows older than N days ABANDONED (a new terminal status the
+counters exclude) — never deletes, so a late Paystack success can still
+be matched by reference. With D31, init happens only for a known user,
+which removes the anonymous-probe half.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D35 — One rate-limit bucket per address for all four payment routes
+
+**What.** `checkPaymentRateLimit` keys on `payments:<ip>` for init,
+upgrade, verify and setup alike (`lib/payments/rate-limit.ts:28`), five
+per sixty seconds. The confirmation page's own poll spends it: four
+verify calls, then "Too many requests" on a pending mobile-money
+payment (§9 #22, seen in the 9a walk). A school computer lab or a
+campus behind one address gets five payment actions a minute for the
+whole room. The check also fails open (D30's twin).
+
+**Where.** `lib/payments/rate-limit.ts`; `verify.ts:39`;
+`init-public.ts:29`; `setup-complete.ts:57`; `VERIFY_POLL_MS` /
+`VERIFY_MAX_POLLS` in `types.ts:20-21`.
+
+**Who it reaches.** Any payer whose mobile-money prompt takes more than
+twelve seconds; any shared address.
+
+**Proposed fix.** Key verify on the reference (a poll is one payer,
+one reference), init and setup per route per address, and let the
+confirmation page poll without counting. Fail closed on error as D30.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D36 — Currency is never checked at verify
+
+**What.** Verify compares `amount` to `amount_minor_expected` and
+nothing else (`lib/payments/verify.ts:100`). The reply's `currency` is
+not compared to the row's. Every product is GHS today (checked on dev:
+one currency), so it cannot bite yet; the day a second currency exists,
+an equal minor amount in the wrong currency passes.
+
+**Where.** `lib/payments/verify.ts:83-108`.
+
+**Who it reaches.** Nobody today.
+
+**Proposed fix.** One comparison beside the amount check, FAILED with
+a note on mismatch, when the row is next touched (D32 or D31).
+
+**Status.** Open. Not approved, not queued.
+
+---
+
 ## The inventory — everything that reads the bank
 
 Traced 2026-09-17. Every caller of `lib/bank/queries.ts` and every use of
@@ -1302,10 +1535,13 @@ from* and D24–D30, with the page-by-page cut for that group in *What
 came out clean*. Sam's addition for the auth sweep, worth repeating for
 the rest: **trace the table's origin (alpha → gamma → port) before
 judging it** — several "dead" columns were the residue of admin pages
-gamma deferred. Remaining, table by table: payments; messaging;
-quizzes / mock_quizzes / announcements / user_notice_state; config /
-schools / levels. The page-by-page sweep over every other page remains
-unrun.
+gamma deferred. Then over **payments** (with `rate_limits` and the
+subscriptions policies) the same day → *The payments group* and
+D31–D36, with the page-by-page cut of the five payment pages folded
+into *What is sound*; Sam's rulings on those wait for the next session.
+Remaining, table by table: messaging; quizzes / mock_quizzes /
+announcements / user_notice_state; config / schools / levels. The
+page-by-page sweep over every other page remains unrun.
 
 
 # Proposed direction — the attempts restructure
