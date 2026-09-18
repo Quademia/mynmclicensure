@@ -828,6 +828,314 @@ shape and code with no visible change.
 
 ---
 
+## The auth group — where the five tables came from (traced 2026-09-18)
+
+The table-by-table sweep run over `users`, `sessions`, `auth_events`,
+`reset_requests` and `rate_limits`, with every caller read
+(`middleware.ts`, `lib/access`, `lib/auth`, the four auth Server
+Actions, `/logout`, `/router`, and every `from('users')` in `lib/`).
+Sam's brief: find what each table was *for* before deciding how to make
+it work better — "this is how hackers could get into the app". The
+origin is recorded here so it never has to be dug out of git again.
+
+**Three eras.**
+
+- **Alpha, Nov 2025 – Mar 2026.** Google Sheets as the database,
+  Blogger pages as the site, Apps Script as the server (the `auth_*.gs`
+  files and the sheet CSVs are in git history under
+  `old stack references for claude/`, added 2026-04-02, deleted
+  2026-04-12 in `40f2930`). The portal owned everything: salted
+  password hashes, its own login tokens (12 h), its own reset tokens,
+  three roles (STUDENT, MODERATOR, ADMIN). **Four admin pages existed:**
+  *Admin-Create User*, *Admin Token Audit*, *Admin Auth & Reset Audit
+  UI*, *Admin Expiry Reminders* — Blogger pages calling
+  `auth_actions_admin.gs` (`create_user`, `list_tokens`,
+  `admin_revoke_token`, `admin_list_auth_events`,
+  `admin_list_reset_requests`, `send_expiry_reminders`).
+- **Gamma, from 2026-03-13.** Supabase Auth took over passwords, login
+  tokens and reset links. The three tables were recreated in Postgres
+  "for audit trail and rate limiting" (`legacy/db/schema.sql` §1.11–1.12,
+  the two migrations `auth_events_and_rate_limit.sql` and
+  `reset_rate_limit.sql`). The admin pages were **not** recreated: the
+  gamma build list (git `70f686e`) says "Admin UI deferred" under Sprint
+  3, and under Admin Tools lists "Admin create user", "Admin token audit
+  / sessions audit / auth events audit" and "Admin reset request audit
+  (data already in reset_requests table)", all unticked. Two lines under
+  Code Cleanup: "users.last_login_utc — wire up or drop",
+  "users.username — wire up or drop".
+- **The port, Sept 2026.** Transcribed gamma exactly (rebuild.md §10);
+  wrote `ip_hash` for the first time (§8 S6); nothing else changed.
+
+So the columns that look dead are the residue of four admin surfaces
+that gamma deferred and the port carried without them.
+
+**Table by table.**
+
+| Table | Alpha intention | What gamma kept | What the port has today |
+|---|---|---|---|
+| `users.username` | The login name, auto-made from the forename, editable on Create User; `login` by username was the first door | Column only; login moved to email under Supabase Auth | Column, never written (0 of 4 dev rows), never read |
+| `users.must_change_password` | An admin-created account got a temporary password shown once and had to change it at first login; alpha's Dashboard read the flag into its page object | Gamma's first `login.html` (git `fe15939`) redirected a flagged user to `/change-password.html` — a page never written; the 2026-04-07 fix `0c6acc4` removed the redirect instead of building the page | Column; the reset action clears it (§9 #8); no gate |
+| `users.last_login_utc` | Written on every alpha login (three call sites in `auth_actions_auth.gs`) | Never written | Never written; `createLoginSession` is the one place it belongs |
+| `users.signup_source` | ADMIN / MODERATOR / SELF / PAID — how an account came to exist, shown to the admin | SUPABASE_AUTH / PAYSTACK_SETUP, written by both registration paths | Written, read by nobody (the admin drawer shows `created_utc` only) |
+| MODERATOR role | A class rep or teacher who could create students but not admins | Dropped; TEACHER became MyTeacher's | STUDENT and ADMIN only (§9 #12) |
+| `sessions` (alpha `tokens`) | The token *was* the login (12 h), and reset tokens shared the sheet — hence `kind` LOGIN / RESET. **Token Audit page:** every session per student with device, login via, issued, last seen, expires, status, and a **Revoke** button per row (the support action for "someone is using my account") | Supabase owns the login token; the table became the device record for the 2-device cap, 7 days, `kind` always LOGIN; no page | Same; the gate reads the current row, `last_seen_utc` is touched; nothing lists or revokes |
+| `auth_events` | Five kinds (LOGIN_EMAIL / USERNAME / GOOGLE, VERIFY_TOKEN, RESET_FLOW) with `ok`, `error_code`, `note`; the limiter keyed on user + identifier + **IP**. **Auth Audit page:** filters by email, user, kind, since / until, "only failed", 24h / 7d / 30d presets | Two types with `fail_reason`; keyed on email + browser fingerprint (a browser cannot see its own IP); no page | Same; the server now knows the IP (`sessions.ip_hash`) but the limiter still ignores it |
+| `reset_requests` | The portal owned the reset token and its life: REQUESTED → TOKEN_CREATED → EMAIL_SENT → USED / EXPIRED / FAILED, "Has token?", "Last check". **Reset Requests tab** on the audit page | Supabase owns the token; a log with `user_exists`, `status`, `used`; no page | Same |
+| `rate_limits` | — (no alpha history) | The payments counter from Sprint 1, April 2026 | Same; EXECUTE revoked from the browser roles — the one auth function that is |
+| Create User | The alpha page: name, email, phone, username, programme, cohort, role, must-change flag; temp password shown once; welcome email | "Admin create user", deferred | Not built (BUILD_LIST ⏸ under Carried from gamma) |
+
+**What this changes.** The question for the dead columns is not "drop
+or keep". It is whether the four alpha admin surfaces come back on the
+new stack — a sessions view with Revoke, a login-events view, a
+reset-requests view, Create User — as admin-only server-rendered pages.
+If they do, the columns have their jobs back and `last_login_utc` gets
+its one missing write. If they do not, the columns go. Sam's call,
+alongside D24–D30 below.
+
+---
+
+## D24 — The login and reset functions answer to anyone holding the public key
+
+**What.** `log_auth_event`, `check_login_rate_limit`,
+`log_reset_request`, `check_reset_rate_limit` and `mark_reset_used` are
+SECURITY DEFINER functions with the default `EXECUTE` grant to
+`public`, so `anon` and `authenticated` can call them through PostgREST
+(`POST /rest/v1/rpc/<name>`). Legacy needed that — the browser was the
+caller (`legacy/mynmclicensure/login.html:283-436`,
+`forgot-password.html:82-136`). The port moved every caller to the
+server (`lib/auth/events.ts`) and left the grant. Proven on dev
+2026-09-18: a plain HTTP call with only the anon key to
+`check_login_rate_limit` and `check_reset_rate_limit` returned
+`{"allowed": true}` (HTTP 200); the same call to
+`check_payment_rate_limit`, which slice 9 revoked, returned 401.
+`has_function_privilege('anon', …, 'execute')` is true for all five and
+false for the payments one.
+
+**Where.** `db/migrations/20260911010000_auth_tables.sql` (no
+`revoke execute` line; contrast `20260915120000_payments.sql:107`).
+
+**Who it reaches.** Every student, after launch. Ten fake `LOGIN_FAIL`
+rows for any email through `log_auth_event` lock that student out of
+password login for 24 hours (the limiter's own rule); three fake
+`EMAIL_SENT` rows through `log_reset_request` block their password
+reset for an hour; `mark_reset_used` marks any email's reset used; the
+two `check_*` calls tell a caller whether an email is currently locked.
+Legacy had the same hole and could not close it (the browser had to
+call them); the new stack has no browser caller, so closing it is free.
+
+**Proposed fix.** One migration: `revoke execute on function <each of
+the five> from public, anon, authenticated;` — the payments migration's
+line, five times. `auth_user_role()`, `auth_user_id()` and
+`user_has_course()` stay executable: the policies call them as the
+querying role. No code change.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D25 — A student can rewrite their own email, programme and setup columns from the browser
+
+**What.** The `users_update` policy's `WITH CHECK` locks `role`,
+`active`, `user_id` and `auth_id` (§9 #15 closed the role hole and
+stopped there). Every other column is writable by the row's owner with
+their own JWT and the anon key, bypassing every Server Action. Proven
+on dev 2026-09-18 as a student's own claims (rolled back): one
+`UPDATE` set `email`, `program_id`, `signup_source`,
+`must_change_password`, `last_login_utc` and `cohort` and succeeded;
+`role = 'ADMIN'` was refused. The `users_insert` policy has the same
+shape (`auth.uid() = auth_id and role = 'STUDENT'`, any other value),
+so a Google sign-in with no profile can insert a row with any values,
+skipping registration's validation.
+
+**The chain that matters.** The pay-first checkout finds the payer by
+email when nobody is signed in: `payments.user_id` is null
+(`lib/payments/init-public.ts:62`) and `findPaymentUser` falls through
+to `getUserByEmail` (`lib/payments/queries.ts:57-64`), then
+`activateOrRequireSetup` activates the paid subscription on the row it
+finds (`lib/payments/verify.ts:125-137`). A student who sets their
+`users.email` to a victim's address receives the victim's paid
+subscription the moment the victim pays.
+
+**Where.** `db/migrations/20260911010000_auth_tables.sql` (the
+`users_update` / `users_insert` policies); the table-wide `UPDATE` and
+`INSERT` grants to `anon` and `authenticated` on `users` (D21's
+observation, now with a consequence).
+
+**Who it reaches.** A real payer, after launch; and any student's own
+record (the email their receipts go to, the programme that orders their
+shop under D23).
+
+**Proposed fix.** Column-level: `revoke update (email, program_id,
+signup_source, must_change_password, created_utc, last_login_utc,
+username, role, active, user_id, auth_id) on users from authenticated;`
+and the same on insert for the columns registration sets on the
+server. The profile page's fields (`forename`, `surname`, `name`,
+`phone_number`, `avatar_url`, `level`, `cohort`, `school_id`,
+`school_other`) stay writable by the owner. The admin's Deactivate
+(`lib/users/actions.ts:42`, which updates `active` as the signed-in
+admin) moves to the service role behind `requireAdmin()` — the
+database-as-gate direction of D10. Check before building: no other
+admin path updates a frozen column as the user client (grep
+`from('users').update`).
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D26 — `users.email` is a loose copy of the login email, with a case problem
+
+**What.** `users.email` is stored as typed at registration
+(`app/register/actions.ts:33` trims, does not lowercase); Supabase Auth
+lowercases its own copy. Nothing ties the two (no unique index, no
+lowercase rule, no FK-like check — only `auth_id` is constrained), and
+D25 lets the owner change it. The payment lookup lowercases the paid
+email and matches exactly (`lib/payments/queries.ts:45,62`).
+
+**Where.** `db/migrations/20260911010000_auth_tables.sql` (`users`:
+`email text not null`, no index); `app/register/actions.ts:33,84`;
+`lib/payments/queries.ts:44-47`.
+
+**Who it reaches.** A real payer whose address has capitals: registered
+as `Ama@Gmail.com`, paying later with the same address, is not found,
+is sent to create a second account, and that fails on Supabase's
+"already registered". Dev's four rows happen to match (0 mismatches,
+checked case-sensitively and not).
+
+**Proposed fix.** Lowercase on every write (registration, the payment
+setup) and a unique index on `lower(email)`; or stop keeping the copy
+and read the email from Auth (`auth.users` via `auth_id`) — one source.
+Either way the lookup in payments stops depending on how a student
+typed their address months earlier.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D27 — Registration depends on a Supabase dashboard setting nobody has recorded
+
+**What.** Registration inserts the profile row *as the new user* under
+the `users_insert` policy (`app/register/actions.ts:79-96`). That needs
+`signUp` to hand back a session, which happens only when the project's
+"Confirm email" setting is off. Dev has it off (0 of 4 auth users
+unconfirmed; every registration in the walks worked). If prod's setting
+differs, every registration fails at step 2 and rolls back with
+"Account created but profile setup failed. Please contact support."
+
+**Where.** `app/register/actions.ts:70-106`; the Supabase Auth
+settings, which the legacy-check BUILD_LIST line already says are
+recorded nowhere.
+
+**Who it reaches.** Every new student, if the setting is wrong on the
+day; nobody while it is right.
+
+**Proposed fix.** Insert the profile with the service role after the
+validated sign-up (the action has already checked every field; the
+policy adds nothing here), so the setting cannot break registration;
+and record the setting with the other Auth dashboard values already
+queued. Pairs with D25's insert revoke: once the browser role cannot
+insert a profile, the server has to.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D28 — Six trips before a protected page renders
+
+**What.** For one request to `/student/...`: the middleware calls
+`getUser()` (a round trip to the auth server, `middleware.ts:58`); the
+`(app)` layout calls it again (`app/(app)/layout.tsx:19`); the gate
+calls it a third time (`lib/access/internal.ts:36`); then the profile
+read (`:39`), then the session read (`:43`), then the fire-and-forget
+`last_seen_utc` touch. Three of the six are the same question. The
+middleware also asks the auth server for every anonymous visit to the
+landing page and the sales pages (the matcher excludes only static
+files). `loadGate` is cached per request, so the count does not grow
+with callers — but it starts at six. This is the BUILD_LIST line "§8
+has no auth-path entry", now counted.
+
+**Where.** `middleware.ts:26-84`, `app/(app)/layout.tsx:15-21`,
+`lib/access/internal.ts:31-47`.
+
+**Who it reaches.** Every user, as latency on every page (the perf
+investigation measured the gate at 3× the page's own queries).
+
+**Proposed fix.** `getClaims()` (a local JWT check, no network) in the
+middleware and the layout — or drop the layout's own check, since every
+page under it calls a gate — and one `getUser()` in the gate. Code
+only; no shape change. A §8 row if Sam wants the auth path treated as a
+shape.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D29 — The audit tables are write-only, and the one column that should be written is not
+
+**What.** Nothing reads `sessions`, `auth_events` or `reset_requests`
+except the limiter (the last 24 h of `auth_events`) and the gate (the
+current `sessions` row). No admin page, no retention rule; the legacy
+schema's own comment says "TODO: add pg_cron cleanup job when user base
+grows". Dev after one week: 44 session rows for 4 users (4 live), 52
+auth events, 3 reset requests. `users.last_login_utc` — the column
+alpha wrote on every login — is written by nothing; `createLoginSession`
+(`lib/auth/sessions.ts:33`) is the one place it belongs. The full
+column list is in the trace above.
+
+**Where.** `lib/auth/sessions.ts`, `lib/auth/events.ts`; the trace.
+
+**Who it reaches.** Nobody as a defect; every support conversation as
+an absence — "someone is using my account" has no page to look at and
+no Revoke.
+
+**Proposed fix.** Two decisions, both Sam's: (1) whether the four alpha
+admin surfaces come back (the trace's closing paragraph); (2) a
+retention rule for `sessions` and `auth_events` (a scheduled delete of
+inactive rows older than N days) once the tables have a reader. Either
+way, one line writes `last_login_utc` at login.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D30 — The rate limits fail open
+
+**What.** `checkLoginRateLimit` and `checkResetRateLimit` return
+"allowed" on any error (`lib/auth/events.ts:83-85,100-102`), so a
+database hiccup during login switches the limiter off. Carried
+deliberately in the port as legacy's policy (§9 #7: "availability over
+lockout"); the port's like-for-like rule is over, so it is a finding
+now.
+
+**Where.** `lib/auth/events.ts:68-103`; `app/login/actions.ts:48`;
+`app/forgot-password/actions.ts:33`.
+
+**Who it reaches.** Nobody while the database answers; during an
+outage, the login form is briefly unlimited.
+
+**Proposed fix.** Fail closed on the *check* (refuse the login with the
+generic "try again" message when the check itself errors), keep the
+*logging* fail-open so a logging failure never blocks a login. Two
+`catch` blocks.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## What came out clean in the auth sweep
+
+Recorded so the next reader does not re-check it. The student pages
+pass a picked list of profile columns to the browser, never the row
+(`app/(app)/student/profile/page.tsx:42-54`, `upgrade/page.tsx:37-43`).
+`auth_events`, `reset_requests` and `rate_limits` have RLS on and zero
+policies: the browser roles see zero rows despite the table-wide
+grants. `sessions_select` is own-rows-or-admin. The admin Users drawer
+sends the whole row including `auth_id` (`lib/users/queries.ts:44-48`),
+which is admin-only and fine. `sessions` has the indexes the gate and
+the cap need. The kicked-device sign-out mid-quiz is the legacy check's
+gap 6 and is not repeated here.
+
+---
+
 ## The inventory — everything that reads the bank
 
 Traced 2026-09-17. Every caller of `lib/bank/queries.ts` and every use of
@@ -910,8 +1218,17 @@ finished. Sam's method for continuing, his words, 2026-09-17:
 Either sweep appends findings as `D<n>`. The table-by-table sweep was
 run over **subscriptions** (with `products`, `programs`, `courses` as
 its neighbours) on 2026-09-17 → D13–D21 and *Proposed direction —
-course-level access*. Every other table, and the page-by-page sweep,
-remain unrun.
+course-level access*; and over **the auth group** (`users`,
+`sessions`, `auth_events`, `reset_requests`, `rate_limits`) on
+2026-09-18 → the trace *The auth group — where the five tables came
+from* and D24–D30, with the page-by-page cut for that group in *What
+came out clean*. Sam's addition for the auth sweep, worth repeating for
+the rest: **trace the table's origin (alpha → gamma → port) before
+judging it** — several "dead" columns were the residue of admin pages
+gamma deferred. Remaining, table by table: payments; messaging;
+quizzes / mock_quizzes / announcements / user_notice_state; config /
+schools / levels. The page-by-page sweep over every other page remains
+unrun.
 
 
 # Proposed direction — the attempts restructure
