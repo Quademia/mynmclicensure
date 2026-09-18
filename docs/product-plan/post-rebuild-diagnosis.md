@@ -892,6 +892,50 @@ If they do, the columns have their jobs back and `last_login_utc` gets
 its one missing write. If they do not, the columns go. Sam's call,
 alongside D24–D30 below.
 
+**Sam's rulings (2026-09-18) — the nine intentions read back one at a
+time, each with what it is, where it came from, done or not, and the
+options:**
+
+1. **Two devices, oldest kicked** — working; keep. The legacy check's
+   gap 6 (a kicked device signed out mid-quiz) is fixed with it: a
+   running attempt finishes, the next page refuses.
+2. **Login lockout** — revoke the public grant on the five functions
+   (D24) **and** count by IP again, alongside email and fingerprint,
+   now the server knows it. → §8 S9.
+3. **Password reset** — the same revoke; fail closed on the *check*,
+   logging stays fail-open (D30). Gap 8 goes legacy's way: signed in
+   straight after the reset.
+4. **Admin sessions view** — build fully: a panel in the Users drawer
+   *and* a platform-wide Sessions page with the alpha's filters, Revoke
+   on every live row. Sam: "we do it fully if we are doing it".
+5. **Admin login-events view** — build, a tab of the same page.
+6. **Admin reset-requests view** — build **with actions**: "Send reset
+   link" on every row, "Lift the block" on a limited one (on the login
+   tab too), the admin's own sends logged so the tab is complete. The
+   alpha page was read-only and the fix lived elsewhere; joined here.
+7. **Create User** — **not rebuilt.** Replaced by *Invite by email*:
+   role student or admin, optional product, a set-password link, the
+   profile finished by the invitee (the `?complete=1` path); admin
+   invites type-to-confirm. `must_change_password` and `username` are
+   dropped. Sam's reasoning: a user created without a subscription is
+   just a trial student, which registration already makes; the real gap
+   is acting on someone who has no account, and the pay-first setup
+   flow already solves that shape. → §8 S9.
+8. **Last login** — written on every successful login, shown in the
+   drawer, a dormant filter on the Users list as the first use; Sam:
+   "there are many ways we can use it".
+9. **Expiry reminders** — a daily pg_cron job knocking on an app route
+   (MyNclex's doorbell pattern: `db/migrations/20260909120000_email_drain_cron.sql`,
+   `app/cron/email-drain/route.ts`, a `CRON_SECRET`), the email through
+   Resend, a status line on the admin dashboard. **No run-now button** —
+   alpha's existed because a Sheets trigger gave no other proof it had
+   run. Written against S8's course-level expiry, or adjusted when S8
+   lands. The same clock carries D29's retention job later.
+
+D25, D26 and D27 were not among the nine (holes, not intentions);
+items 2, 3 and 7 lean on them and they are recommended first → §8 S10,
+unticked.
+
 ---
 
 ## D24 — The login and reset functions answer to anyone holding the public key
@@ -929,7 +973,8 @@ line, five times. `auth_user_role()`, `auth_user_id()` and
 `user_has_course()` stay executable: the policies call them as the
 querying role. No code change.
 
-**Status.** Open. Not approved, not queued.
+**Status.** → queued 2026-09-18 (Sam, auth read-back item 2): the
+revoke, plus the limiter counting by IP again. `rebuild.md` §8 S9.
 
 ---
 
@@ -978,7 +1023,9 @@ database-as-gate direction of D10. Check before building: no other
 admin path updates a frozen column as the user client (grep
 `from('users').update`).
 
-**Status.** Open. Not approved, not queued.
+**Status.** Open — recommended first, awaiting the §8 S10 tick. Sam
+ruled on the nine intentions (2026-09-18), not yet on this hole; items
+2, 3 and 7 lean on it.
 
 ---
 
@@ -1007,7 +1054,8 @@ and read the email from Auth (`auth.users` via `auth_id`) — one source.
 Either way the lookup in payments stops depending on how a student
 typed their address months earlier.
 
-**Status.** Open. Not approved, not queued.
+**Status.** Open — awaiting the §8 S10 tick; the choice between a
+lowercased unique copy and reading the email from Auth is Sam's.
 
 ---
 
@@ -1035,7 +1083,7 @@ and record the setting with the other Auth dashboard values already
 queued. Pairs with D25's insert revoke: once the browser role cannot
 insert a profile, the server has to.
 
-**Status.** Open. Not approved, not queued.
+**Status.** Open — awaiting the §8 S10 tick, with D25.
 
 ---
 
@@ -1065,7 +1113,8 @@ page under it calls a gate — and one `getUser()` in the gate. Code
 only; no shape change. A §8 row if Sam wants the auth path treated as a
 shape.
 
-**Status.** Open. Not approved, not queued.
+**Status.** Open. Not approved, not queued. Code only; not among the
+nine intentions — Sam's call when the auth path is next touched.
 
 ---
 
@@ -1093,7 +1142,11 @@ retention rule for `sessions` and `auth_events` (a scheduled delete of
 inactive rows older than N days) once the tables have a reader. Either
 way, one line writes `last_login_utc` at login.
 
-**Status.** Open. Not approved, not queued.
+**Status.** → queued 2026-09-18 (Sam, items 4, 5, 6 and 8): the admin
+security page — sessions with Revoke, login events, reset requests with
+actions — and `last_login_utc` written and shown. Retention still open;
+MyNclex's nightly pg_cron purge (`nclex_purge_auth_events`, window
+from a config value) is the shape, on item 9's clock.
 
 ---
 
@@ -1117,7 +1170,8 @@ generic "try again" message when the check itself errors), keep the
 *logging* fail-open so a logging failure never blocks a login. Two
 `catch` blocks.
 
-**Status.** Open. Not approved, not queued.
+**Status.** → queued 2026-09-18 (Sam, item 3): fail closed on the
+check, logging stays fail-open.
 
 ---
 

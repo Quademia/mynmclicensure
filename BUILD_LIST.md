@@ -73,7 +73,9 @@ the gamma-era list it replaces is in git history and in `qacademy-gamma`.
 - ✅ §8 S4 foreign keys on licensure tables — 2026-09-11, as each table lands
 - ✅ §8 S6 populate `sessions.ip_hash` — 2026-09-11
 - ✅ §9 #8 `must_change_password` — left as it is, no gate, column carried — 2026-09-11
-- ⬜ §8 has no auth-path entry — the gate's three sequential round trips and the middleware's per-request auth call cannot change until Sam adds one and ticks it (2026-09-16)
+- ⬜ §8 has no auth-path entry — the gate's three sequential round trips and the middleware's per-request auth call cannot change until Sam adds one and ticks it (2026-09-16); counted as six trips in D28 (2026-09-18)
+- ✅ §8 S9 auth functions and the two alpha columns — the five functions revoked from the browser roles, IP in the limiter, `username` and `must_change_password` dropped — 2026-09-18
+- ⬜ §8 S10 the users row's browser writes — column-level revoke, server-side profile insert, the email rule (D25–D27); Sam to tick and to choose the email rule
 
 ## Improvements
 
@@ -93,9 +95,9 @@ Every legacy page compared with its ported route; nothing missing outright. Deta
 - ⬜ 3 Question Bank: an MCQ with answer C–F switched to TF shows "A (True)" but saves the old letter — every student marked wrong on it
 - ⬜ 4 Register: the "N-day free trial — no card required" hint never shows — `trialDays` still null, waiting on slice 8
 - ⬜ 5 Sidebar badge, My Courses and name / photo load once in the layout — stale across sidebar clicks; dropdown open state carries across pages
-- ⬜ 6 The device check on every save signs a kicked or expired device out mid-quiz, losing unsaved answers — legacy let it finish (§10, unrecorded)
+- ⬜ 6 The device check on every save signs a kicked or expired device out mid-quiz, losing unsaved answers — legacy let it finish (§10, unrecorded); fixed with auth item 1: the attempt finishes, the next page refuses (Sam, 2026-09-18)
 - ⬜ 7 Quiz Builder and Offline Pack builder: the status line sticks after a failure; "Select a course…" leaves the previous course's topics and counts
-- ⬜ 8 Password reset: legacy signed the student straight in, the rebuild asks for a new sign-in — Sam to decide
+- ⬜ 8 Password reset: legacy signed the student straight in, the rebuild asks for a new sign-in — Sam: legacy's way, signed in straight after (2026-09-18)
 - ⬜ 9 Admin Messages: the open conversation vanishes when a filter hides its thread, realtime still marks new messages read, no way back on a phone
 - ⬜ 10 Admin Payments: after Retry Activation the panel redraws — "Activated ✓" gone, and the panel can close itself
 - ⬜ 11 Admin Products: a draft or archived course inside a product is kept on save, where legacy dropped it — Sam to rule
@@ -116,8 +118,12 @@ lost; the ⏸ reasons were written under the port's like-for-like rule.
 - ⬜ Content: set-size targets for RMHN / NACNAP / RPHN
 - ⬜ Remove MANUAL_TEST rows before cutover (moot if cutover deletes old data)
 - ⏸ Email confirmation on signup — a product change; not in the like-for-like rebuild
-- ⏸ Expiry-reminder scan — a Sheets-era admin tool (git 31ccde3) never rebuilt on Supabase; only `expiry_reminded` survived; after the rebuild, needs 10
-- ⏸ Admin create user; sessions / auth-events / reset-request audits — new features, after
+- ⬜ Expiry reminders — a daily pg_cron doorbell to an app route, the email through Resend, a dashboard status line; no run-now button; written against S8's course expiry (Sam, 2026-09-18; auth item 9)
+- ⬜ Admin security page: Sessions — a panel in the Users drawer and a platform-wide list with the alpha filters, Revoke on every live row (Sam, 2026-09-18; auth item 4)
+- ⬜ Admin security page: Login events tab — filters by email, user, outcome and date, Lift the block (Sam, 2026-09-18; auth item 5)
+- ⬜ Admin security page: Reset requests tab — Send reset link, Lift the block, the admin's own sends logged (Sam, 2026-09-18; auth item 6)
+- ⬜ Invite by email — student or admin, optional product, a set-password link, the profile finished on arrival; replaces Create User; drops `username` + `must_change_password` (Sam, 2026-09-18; auth item 7)
+- ⬜ Last login — written on every successful login, shown in the drawer, a dormant filter on the Users list (Sam, 2026-09-18; auth item 8)
 - ⏸ Student analytics, notifications, search, sequential runner mode — new features, after
 - ⏸ Paystack LIVE key on prod — waits on the company / Paystack-account decision
 
@@ -129,7 +135,10 @@ its slices were declared complete (Cutover, the Telegram gate), and
 what the diagnosis and the perf investigation surfaced.
 
 - ⬜ 16 Cutover — DNS, live keys, content re-copy, old logins deleted, `legacy/` removed (moved from the rebuild, Sam, 2026-09-16)
-- ⬜ Storage hygiene: ~14 columns, the `levels` table and one config row with no reader or writer (list in the 2026-09-18 session entry) — Sam: some have an unbuilt purpose; review one at a time (2026-09-18)
+- ⬜ Storage hygiene: ~14 columns, the `levels` table and one config row with no reader or writer (list in the 2026-09-18 session entry) — Sam: some have an unbuilt purpose; review one at a time (2026-09-18); the auth group's five settled by the trace and the read-back (S9, items 7 and 8)
+- ⬜ Auth holes, queued: revoke EXECUTE on the five auth functions and count by IP (D24, S9); fail closed on the limit check (D30) (Sam, 2026-09-18; auth items 2, 3)
+- ⬜ Auth holes awaiting §8 S10: the owner-writable users row and its pay-first capture chain (D25), the email copy (D26), the server-side profile insert (D27) — recommended first
+- ⬜ Retention: a nightly pg_cron purge of inactive `sessions` and old `auth_events` rows, window from a config value, as MyNclex does (D29; on auth item 9's clock)
 - ⏸ Course-level pricing (a standalone price per course, products as bundles, a basket later) — the product stays the single unit of sale; revisit when the course count makes a product per course a chore (Sam, 2026-09-18)
 - ⬜ Before cutover: Resend's free plan caps the account shared with MyNclex at 100 emails a day (MyNclex's notes); re-registration day would pass it and lose the rest — the Pro upgrade first (slice 10, 2026-09-16)
 - ⬜ Before cutover: the Supabase Auth dashboard settings (redirect allow-list, sender, QAcademy-branded reset and magic-link templates) are recorded nowhere here — check them and add the live address (legacy check, 2026-09-16)
