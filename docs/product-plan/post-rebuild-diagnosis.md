@@ -2019,6 +2019,30 @@ restored and the `scheduled` trap removed. Retake copies the attempt's
 own item order, so a mock cannot be re-rolled for a better set. The
 `(user, type, item)` unique row makes the notice upsert idempotent.
 
+**Sam's ruling on the mock exams (2026-09-18) — intention first.**
+Fixed quizzes and mock exams look the same because the mock's
+intended experience was never built. Sam: mock exams were an idea
+**specifically for premium members** — every year people sit the
+licensure, and the mock was a way to engage and give more to the
+premium group, ideally as a different experience. The gamma record
+agrees three times: the reference doc ("time-limited quiz sets
+published during exam periods", "a separate table with a separate
+lifecycle"), `visibility = PAID` documented as "only paid subscribers
+can see it — a future enhancement", and the gamma BUILD_LIST's
+deferred "result release" and "notifications — results released".
+So: **the two tables are not merged** (the merge into one table with a
+`kind` was proposed and withdrawn — it would bake the accident in);
+**`visibility` is kept, no longer as residue but as the flag for the
+premium gate** (D48 amended); and **"Mock exams as a premium exam
+experience" is a design item on BUILD_LIST**, to be designed when Sam
+picks it — ingredients noted, none decided: premium-only through S8's
+subscription kind; an exam window with one timed sitting, no retake,
+no instant mode; results and review released together on a date
+(S7's sealed attempt fits); standing against the cohort; notices
+when it opens and when results land (outbox, announcements); a closed
+window submits whatever is in progress (answers D45 (g) by design).
+Until then both tables get the same floor fixes as they stand.
+
 ---
 
 ## D44 — Every signed-in user can read every quiz and mock exam, question ids included
@@ -2198,7 +2222,8 @@ D43 shape). A §8 row if Sam agrees, since the columns change.
 
 **What.** `mock_quizzes.visibility` is alpha residue (`student`)
 redefined by gamma (`ALL | PAID | TRIAL`) and never set or read in
-three eras — drop it (storage hygiene). `n` on `mock_quizzes` has no
+three eras — ~~drop it~~ **kept as the flag for the premium gate the
+mock exam was meant to have (Sam, 2026-09-18; the ruling above)**. `n` on `mock_quizzes` has no
 default where `quizzes` has `0`. No CHECK constraint on any status
 word across the four tables. `announcements` has no key to anything:
 `scope_programs`, `scope_courses`, `scope_product_ids`, `scope_user_ids`
