@@ -2043,6 +2043,17 @@ when it opens and when results land (outbox, announcements); a closed
 window submits whatever is in progress (answers D45 (g) by design).
 Until then both tables get the same floor fixes as they stand.
 
+**Sam's four rulings on the rest of the group (2026-09-18), as
+recommended:** the quiz floor (course-scoped reads of active, published
+rows; `item_ids` and `notes` server-only) — D44; the lifecycle rules
+(one availability check on the server's clock, archive one-way with
+restore to draft, status words pinned, stats keyed by table, the mock
+list paged) — D45, code beside the migration; the announcements
+function `announcements_for_me()` with the table admin-only to read —
+D46; three notice timestamps replacing the state word, with a key to
+the announcement — D47. Drafted as `rebuild.md` §8 **S12**; one
+BUILD_LIST line.
+
 ---
 
 ## D44 — Every signed-in user can read every quiz and mock exam, question ids included
