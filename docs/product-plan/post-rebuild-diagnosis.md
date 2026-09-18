@@ -2437,7 +2437,13 @@ the pickers reading the table, and `cohort` as a year (`integer`) or
 its own small table so that the announcement and messaging scopes
 match exact values. Either way `scope_level` becomes `text[]` (D48).
 
-**Status.** Open. Not approved, not queued.
+**Status.** Ruled in part (Sam, 2026-09-18): **`levels` is kept — "it
+will be needed in the future."** Dropping it is off the table; the
+shape that follows is the real one: `users.level` keyed to
+`levels(level_id)` (every value in use already matches), the profile
+picker and the two admin pickers reading the table instead of the two
+typed constants, and an admin edit path when a fifth level appears.
+Cohort's shape and the S13 row await the rest of the group's rulings.
 
 ---
 
