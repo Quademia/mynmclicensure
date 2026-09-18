@@ -78,6 +78,7 @@ the gamma-era list it replaces is in git history and in `qacademy-gamma`.
 - ✅ §8 S10 the users row's browser writes — column-level revoke, server-side profile insert, email lowercased with a unique index (D25–D27) — 2026-09-18
 - ✅ §8 S11 messaging storage — browser writes revoked, service-role writes, read stamps on the thread, CHECKs, six columns dropped (D37–D42) — 2026-09-18
 - ✅ §8 S12 quiz, mock and announcement storage — course-scoped quiz reads without item_ids, announcements_for_me(), three notice timestamps (D44, D46–D48) — 2026-09-18
+- ⬜ §8 S13 config, levels and cohort — config admin-only with a registry read by the service role, users.level keyed to levels, cohort a year (D49, D51) — drafted 2026-09-18, awaits the tick
 
 ## Improvements
 
@@ -168,6 +169,7 @@ what the diagnosis and the perf investigation surfaced.
 - ⬜ Question reports — a new feature replacing "Send feedback" threads: reason list, the student's answer, status new/reviewed/fixed/dismissed, admin page grouped by question with Mark fixed (Sam, 2026-09-18)
 - ⬜ Mock exams as a premium exam experience — a design item: premium-only, an exam window, one timed sitting, results released together, cohort standing; `visibility` kept as the gate's flag; not merged with quizzes (Sam, 2026-09-18)
 - ⬜ Quizzes and announcements floor: course-scoped quiz reads, item_ids and notes server-only, announcements_for_me(), three notice timestamps, one availability check, restore to draft, paged mock list (S12; D44–D48; Sam, 2026-09-18)
+- ⬜ Config registry: admin-only reads through a service-role accessor, typed and bounded keys, a stricter Config page, the dead row dropped; levels wired to the pickers; cohort a year (S13; D49, D51; Sam, 2026-09-18)
 - ✖ Payments: §9 #20 (token re-minted on verify) and §9 #21 (the reference as the only secret) — no token exists under D31 + D33 (Sam, 2026-09-18)
 - ✖ Payments: the setup step's login rollback (§9 #4) — the login is created by the server at PAID under D31, so the step and its rollback go (Sam, 2026-09-18)
 - ⬜ Subscribe: a signed-in student only sees a note pointing to the upgrade page and can still pay here as a new buyer — consider redirecting them to /student/upgrade instead (Sam, slice 9a, 2026-09-15)

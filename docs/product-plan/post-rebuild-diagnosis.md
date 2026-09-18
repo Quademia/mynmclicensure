@@ -2372,7 +2372,19 @@ with an admin-only SELECT, or a `scope` column with the SELECT policy
 honouring it — the second is one column. Drop `builder_default_questions`
 (§9 #9, still not done).
 
-**Status.** Open. Not approved, not queued.
+**Status.** Ruled (Sam, 2026-09-18): **config is admin-only to read,
+with the registry.** Sam's question — "why were students reading
+config; I thought it is an internal thing" — answered by the trace:
+legacy's runner and builders ran in the browser and read the table
+themselves, so the policy had to admit every signed-in student; the
+port moved the readers to the server but kept reading as the student,
+so the policy stayed as the door the server walked through. The
+ruling: the accessor reads with the service role, `config_select`
+becomes ADMIN-only, no scope column needed; the registry as proposed
+(every known key with type, bounds, default; the admin page validating
+against it, unknown keys shown as such, Delete refusing a known key);
+one read per request; `builder_default_questions` dropped. Drafted
+as `rebuild.md` §8 **S13** with D51's shape.
 
 ---
 
@@ -2443,7 +2455,10 @@ shape that follows is the real one: `users.level` keyed to
 `levels(level_id)` (every value in use already matches), the profile
 picker and the two admin pickers reading the table instead of the two
 typed constants, and an admin edit path when a fifth level appears.
-Cohort's shape and the S13 row await the rest of the group's rulings.
+**Cohort becomes a year** — `users.cohort integer` (Sam, 2026-09-18),
+so the announcement and messaging scopes match exact values; the
+profile field a year input. Drafted with D49 as §8 **S13**. D50
+(schools) stays open — no ruling asked for yet on the admin page.
 
 ---
 
