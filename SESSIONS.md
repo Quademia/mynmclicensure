@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-18 — D31–D36 ruled; messaging, quiz/announcement and config groups traced (D37–D51); S11, S12, S13 ticked; table sweep complete; no code
+  - ↳ pay-first kept, account at PAID · raw stripped · Paystack sweep of INIT · one limiter · Bulk Send parked · question reports · mock = premium design item · levels kept · config admin-only · grant all schema-wide · design system opened
+
 - 2026-09-18 — the port declared finished; auth traced alpha→gamma→port, D24–D30, ten rulings, S9/S10 ticked; payments traced, D31–D36; no code
   - ↳ rebuild = a port · one Improvements list · auth fns public · users row owner-writable · alpha admin audit pages · Invite not Create User · pg_cron doorbell · email outbox · pay-first the root · raw keeps card data
 
