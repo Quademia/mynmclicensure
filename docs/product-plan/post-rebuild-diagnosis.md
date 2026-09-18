@@ -1933,6 +1933,306 @@ table, after the storage sweep finishes so the list is known once.
 
 ---
 
+## The quiz and announcement group — where the four tables came from (traced 2026-09-18)
+
+The table-by-table sweep run over `quizzes`, `mock_quizzes`,
+`announcements` and `user_notice_state`, with every caller read
+(`lib/quizzes/*`, `lib/announcements/*`, the attempt spawn path, both
+student list pages, both admin pages, the announcements page, the
+dashboard strip, the course page), the live shape and policies read
+off dev, four policy tests run as a dev student with their own
+credential (rolled back), and the page-by-page cut of what each page
+hands the browser. Sam's rulings are pending; nothing here is decided.
+
+**Three eras.**
+
+- **Alpha.** *Fixed quizzes* are alpha's: the sheet tab `quizzes`
+  (299 rows at `40f2930^`) carried `quiz_id, course_id, type, title,
+  n, time_limit_sec, version, published, visibility, publish_at,
+  unpublish_at, notes` — one row per mode (`GP-F-T0` timed, `GP-F-I0`
+  instant), no item list (a quiz was "the first n of the course
+  sheet"), `visibility` holding the literal `student`. *Mock exams did
+  not exist.* *Announcements* existed as a separate Apps Script app:
+  `announcements.list` returned the items **and the caller's states in
+  one call**, `announcements.markseen` wrote `seen`; states were
+  `seen` / `dismissed`; `priority >= 3` showed an Urgent pill; and the
+  **course page asked the server for that course's announcements**
+  (`sample course page:1696-1700`). No alpha admin page for any of
+  this — the sheet was edited by hand.
+- **Gamma.** Announcements and `user_notice_state` were born on the
+  student dashboard on 2026-03-13 (`6eda562`, "Create dashboard.html")
+  before any table or admin page; the table was written down in
+  CLONING.md after the code that used it. Fixed quizzes reached
+  `api.js` on 2026-03-16 (`e4a4d2e`); the item picker and `item_ids`
+  are gamma's, `type` became `allowed_modes`, `version` went,
+  `status`, `shuffle`, `created_at`, `updated_at` came. **Mock exams
+  arrived whole on 2026-03-21** (`4e76ec5`) as a second table with the
+  same shape plus `visibility` redefined to `ALL | PAID | TRIAL` — and
+  never once set or read; `mock-exams-reference.md` (same day) says so
+  twice. `seen` became `read`, `clicked` was added for the body
+  button. **The course scope regressed:** gamma's browser filter
+  never read `scope_courses`, and the course page filtered on a column
+  that does not exist — doc 05 describes alpha. The admin form offered
+  a `scheduled` status that never reached a student. No indexes, no
+  keys on any of the four; every read and write was the browser's
+  anon key under RLS; Sprint 2 narrowed the admin fixed-quiz list to
+  eight columns, which is why Edit from that list came up empty. In
+  the gamma BUILD_LIST: "DB transactions for quiz publish" and
+  "Notifications — quiz published" deferred; the rename list omits
+  `mock_quizzes`.
+- **The port (5a/5b 2026-09-13/14, 11a/11b 2026-09-14).** Legacy's
+  columns and policies transcribed; S4 keys to `courses` (both quiz
+  tables) and `users` (notice state); indexes on `course_id`, `status`
+  and the notice `(item_type, item_id)`; `quizzes` and `mock_quizzes`
+  added to the §6.6 content copy, announcements not copied (D5). Four
+  deliberate changes: §9 #18 (Scheduled leaves the dropdown), §9 #19
+  (the course scope honoured — alpha's behaviour restored), scoping
+  moved to the server, and **Start runs on the server and refuses** a
+  non-ACTIVE quiz, an unoffered mode or a course without access where
+  legacy greyed a button. The admin fixed-quiz Edit was made to load
+  the whole row (a fix outside §9, **Sam's word still open**, 5a entry).
+  Carried knowingly: `visibility`; archive ↔ active toggling a draft to
+  active; the unenforced `min=60`; five announcement quirks (the strip's
+  count not falling, the `<br>` per edit, …). Every statement still
+  runs as the user's own client under RLS. Dev holds 5 quizzes, 2 mock
+  exams, 3 announcements, 2 notice rows.
+
+**Proven on dev, 2026-09-18** (SQL as an RN dev student holding GP,
+RN_MED and RN_SURG, rolled back): the student **reads every quiz row of
+every course** — GP, RN_MED, RN_SURG, RM_MID and RM_PED_OBS_HRN — and
+**all 45 question ids of both mock exams**; reads the archived
+announcement and the one scoped to programme RN whatever their scope;
+can write **any words** into their own notice rows' `state` and
+`item_type` and any `item_id`; **cannot** write a notice row for
+another student (refused) or read another's (0 rows). Drafts are
+admitted by the policies by construction; dev holds none to prove it
+on.
+
+**What is sound.** Start is the server's and refuses what the UI only
+hid (5b's change). The question bodies are not in any of these
+payloads — the runner fetches them at attempt time under
+`user_has_course()`. Every admin write is gated and the two admin
+pages validate course, title and question count. The course page's
+announcements section renders on the server and hands the browser only
+a sanitised body. Scoping runs on the server with the course scope
+restored and the `scheduled` trap removed. Retake copies the attempt's
+own item order, so a mock cannot be re-rolled for a better set. The
+`(user, type, item)` unique row makes the notice upsert idempotent.
+
+---
+
+## D44 — Every signed-in user can read every quiz and mock exam, question ids included
+
+**What.** `quizzes_select` and `mock_quizzes_select` are
+`using (auth.uid() is not null)` (`20260913180000_quiz_tables.sql:76,
+88`): any signed-in account reads every row of both tables — every
+course, held or not, every status including draft and archived — with
+`item_ids` (the exact question set) and `notes` ("Internal notes.
+Students never see this."). The TypeScript layer filters by course
+access, `published` and `status` (`lib/quizzes/queries.ts:26`;
+`fixed-quizzes/page.tsx:32-43`), then hands the surviving rows whole
+(`select('*')`) to a client component that renders neither `item_ids`
+nor `notes` (`components/quizzes/student-quiz-list.tsx:39`). So a
+student's own page also ships them every mock exam's question list
+before the exam. Legacy was the same policy and the same `'*'`
+(`legacy/db/rls.sql:801-840`; `api.js:815-829`); alpha's sheet had no
+item list to leak. Contrast the eleven `items_*` tables, which **are**
+gated per course by `user_has_course()`.
+
+**Where.** `db/migrations/20260913180000_quiz_tables.sql:76-98`;
+`lib/quizzes/queries.ts:19-34`; `app/(app)/student/fixed-quizzes/page.tsx:57`,
+`mock-exams/page.tsx:57`.
+
+**Who it reaches.** Every student, as the mock exam's question set
+known in advance for any course they hold (the bodies then readable
+through D8 until S7 lands, and through the runner regardless); a trial
+student, as the full catalogue of every course's quiz definitions; the
+admin, as notes meant for them alone.
+
+**Proposed fix.** Two layers, like the bank. The floor: the SELECT
+policies become `admin or (status = 'active' and published and
+user_has_course(course_id))`; `item_ids` and `notes` leave the browser
+roles' reach (a column-level revoke, or the student read through a
+view that omits them — the D43 shape). The page: the student list
+selects the columns it renders; the attempt spawn, already a Server
+Action, reads `item_ids` with the service role. Drafts and archived
+rows stop being readable by anyone but an admin.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D45 — The quiz lifecycle has rules that disagree with each other
+
+**What.** Small rules, each carried from legacy, that contradict one
+another or the intent. (a) **Retake skips availability**:
+`retakeAttempt` re-checks course access but not
+`getQuizAvailability`, so a closed, archived or draft quiz can be
+retaken by calling the action (`lib/attempts/actions.ts:320-350`
+against `:269`). (b) **Two clocks**: the list pages compute
+UPCOMING / CLOSED against the browser's clock
+(`student-quiz-list.tsx:347,356`), the spawn against the server's;
+a skewed phone shows a card Start refuses. (c) **Restore promotes a
+draft**: archive ↔ active is a two-way toggle, so a draft that is
+archived and restored becomes active without ever being published
+by intent (`lib/quizzes/actions.ts:67-75`; legacy
+`admin/fixed-quizzes.html:1050-1058`). (d) **`saveQuiz` never checks
+`status` or `allowed_modes`** against their lists before writing, and
+no CHECK constraint pins them (`actions.ts:80-126`), where
+`saveAnnouncement` does check. (e) **The attempt stats box merges
+tables**: `getQuizAttemptStats` filters `quiz_id` only, and a fixed
+quiz and a mock exam are separate tables with independent text keys;
+it also counts retake and abandoned rows in the total
+(`lib/attempts/queries.ts:19-30`). (f) **The mock admin page loads the
+whole table with `'*'`** and reports `mocks.length` as the total, so
+past the API row cap the count silently caps (`admin/mock-exams/page.tsx:35`);
+the fixed page pages fifty with an exact count. (g) An in-progress
+attempt on a mock that closes is **orphaned**: Resume is disabled and
+nothing finishes or abandons it (`mock-exams-reference.md:186-196`).
+(h) The 5a fix that made admin Edit load the whole row is built and
+**unruled** (5a entry).
+
+**Where.** `lib/attempts/actions.ts`, `lib/attempts/queries.ts`,
+`lib/quizzes/actions.ts`, `components/quizzes/student-quiz-list.tsx`,
+`app/(app)/admin/mock-exams/page.tsx`.
+
+**Who it reaches.** Students on a mock that closes mid-attempt (g),
+students with a wrong phone clock (b); the admin, as stats that mix
+two tables (e) and a total that caps (f); the rest reaches nobody
+until someone calls an action by hand.
+
+**Proposed fix.** One availability check shared by Start and Retake,
+on the server's clock, with the list page taking `now` from the
+server render; archive as one-way from any status, restore to
+`draft`; CHECK constraints and the same validation in `saveQuiz` that
+`saveAnnouncement` has; stats keyed by `(source, quiz_id)` with
+retakes and abandons shown apart; the mock admin list paged like the
+fixed one; a closed mock finishes its in-progress attempts by the
+D34 clock (auto-submit as the timed runner does) or lets Resume
+through for the attempt already begun — Sam's call; Sam's word on (h).
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D46 — Every signed-in user can read every announcement, scope fields included
+
+**What.** `announcements_select` is `using (auth.uid() is not null)`
+(`20260914220000_announcements.sql:67`): every signed-in account reads
+every announcement — drafts, archived, and ones scoped to other
+programmes, cohorts or **named students**. The scoping that decides
+what a student should see is entirely TypeScript
+(`lib/announcements/scoping.ts:18-55`); the query only narrows to
+`status = 'active'` and the date window (`queries.ts:69-84`). The
+rows that pass are handed to two client components whole, all eight
+scope fields included — `scope_user_ids` carries other students'
+user ids into every browser that qualifies for that announcement
+(`student/announcements/page.tsx:33`; `dashboard/page.tsx:207`;
+`components/announcements/announcements-strip.tsx:21`). The course
+page is the exception: it renders on the server and hands the browser
+only the sanitised body. Legacy's policy and `'*'` were the same;
+alpha's server answered per course.
+
+**Where.** `db/migrations/20260914220000_announcements.sql:67-81`;
+`lib/announcements/queries.ts:69-84`; `scoping.ts`; the two client
+components.
+
+**Who it reaches.** Students, as other students' ids and the targeting
+of every notice they see; the admin, whose drafts are readable before
+they are published.
+
+**Proposed fix.** Move the scoping to where the floor is: one
+SECURITY DEFINER function, `announcements_for_me()`, that applies the
+eight checks in SQL from the caller's profile and access and returns
+only the columns the pages render (id, title, bodies, pinned,
+dismissible, created_at, start/end). The three student pages call it
+— one query instead of three reads plus a filter — and the SELECT
+policy on the table itself becomes admin-only. `scope_user_ids` never
+leaves the server. Alternative, smaller: keep the TS scoping and
+project the columns at the boundary; the drafts stay readable at the
+floor.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D47 — The notice state is one overwritten row, so the counts it feeds are wrong
+
+**What.** `user_notice_state` holds one row per `(user, type, item)`
+whose `state` is overwritten on every write (`recordNoticeState`,
+`lib/announcements/actions.ts:109-132`). A student who marks read and
+then dismisses leaves one `dismissed` row, so the admin's engagement
+counts report read 0 / dismissed 1 — the read is erased
+(`getEngagementCounts`, `queries.ts:34-46`). `seen_at` is overwritten
+too, so it records the last touch, not the first sighting, against its
+name and its `default now()`; nothing reads it or `updated_at`. The
+dashboard strip's ✕ writes `read`, not `dismissed`, while gated on
+`dismissible` and titled Dismiss (`announcements-strip.tsx:34,62`), so
+dismissals from the strip count as reads. `item_id` is checked only
+for non-emptiness and has no key to `announcements`; `state` has no
+CHECK — proven: any words into `state` and `item_type`, any `item_id`.
+The strip's "N unread" does not fall when ✕ is pressed (legacy set it
+once). All of it legacy's (`student/announcements.html:470-490`;
+`dashboard.html:731-745`); alpha's `markseen` set `seen` once.
+
+**Where.** `lib/announcements/actions.ts:109-132`, `queries.ts:34-46`;
+`components/announcements/announcements-strip.tsx`;
+`db/migrations/20260914220000_announcements.sql:51-62, 85-95`.
+
+**Who it reaches.** The admin, as read / clicked / dismissed counts
+that cannot be trusted; students, only as a strip count that lags.
+
+**Proposed fix.** Columns, not a single state word: `read_at`,
+`clicked_at`, `dismissed_at` on the row, each set once and never
+cleared, so every count is a count of non-nulls and "dismissed after
+reading" is both; a key from `item_id` to `announcements`; the strip's
+✕ writes `dismissed_at`; the write through the server as it already
+is, with `item_type` and the row's identity the server's alone (the
+D43 shape). A §8 row if Sam agrees, since the columns change.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
+## D48 — Residue and drift across the four tables
+
+**What.** `mock_quizzes.visibility` is alpha residue (`student`)
+redefined by gamma (`ALL | PAID | TRIAL`) and never set or read in
+three eras — drop it (storage hygiene). `n` on `mock_quizzes` has no
+default where `quizzes` has `0`. No CHECK constraint on any status
+word across the four tables. `announcements` has no key to anything:
+`scope_programs`, `scope_courses`, `scope_product_ids`, `scope_user_ids`
+are loose arrays and `scope_level` is a comma-joined string
+(`'L100,L300'`); `scope_audience` is nullable with a default; its
+hottest read (active + window, ordered pinned, priority) has only a
+`status` index. `body_html` and `body_text` are two copies of one
+body; each edit reloads the stored HTML into the textarea and re-runs
+the paragraph converter, adding a `<br>` per save
+(`sanitise.ts:15-26`; `announcements-client.tsx:154`). The sanitiser
+runs only in the browser (`document`-dependent), so the server never
+validates a body. `getAnnouncementById` has no caller. Both admin
+DELETE policies exist for a Delete no page offers. Doc 03 has no mock
+exams; doc 05 describes alpha's course scope; `mock-exams-reference.md`
+names files renamed in `57eeadc`. `db/schema.sql` and `db/rls.sql`
+omit `announcements` and `user_notice_state` (BUILD_LIST already has
+the line).
+
+**Who it reaches.** The admin editing an announcement twice (the
+`<br>`); otherwise nobody today.
+
+**Proposed fix.** Sam's storage-hygiene rule, one at a time, in the
+migration that D44 / D46 / D47 need anyway: drop `visibility`; CHECKs;
+`scope_level` as `text[]` like its siblings; keys where the target is
+one table (`scope_programs` → `programs`, `scope_courses` → `courses`,
+`scope_product_ids` → `products`, `scope_user_ids` → `users`) or a
+scope table instead of arrays; the body stored once as text and
+rendered on the server; the editor reloading the text, not the HTML;
+the two snapshots regenerated.
+
+**Status.** Open. Not approved, not queued.
+
+---
+
 ## The inventory — everything that reads the bank
 
 Traced 2026-09-17. Every caller of `lib/bank/queries.ts` and every use of
@@ -2030,9 +2330,13 @@ into *What is sound*; Sam ruled on those on 2026-09-18. Then over
 messaging group* and D37–D43, D43 being the schema-wide grant found
 along the way; the sweep proved on dev that the code inventory's
 "a thread can be re-owned" was false — **test a policy claim before
-recording it**. Remaining, table by table: quizzes / mock_quizzes /
-announcements / user_notice_state; config / schools / levels. The
-page-by-page sweep over every other page remains unrun.
+recording it**. Then over **quizzes / mock_quizzes / announcements /
+user_notice_state** the same day → *The quiz and announcement group*
+and D44–D48 (mock exams are gamma-born; the course scope was alpha's
+and regressed in gamma; the two quiz SELECT policies and the
+announcements one admit every signed-in user to every row). Remaining,
+table by table: config / schools / levels. The page-by-page sweep over
+every other page remains unrun.
 
 
 # Proposed direction — the attempts restructure
