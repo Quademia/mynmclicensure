@@ -380,5 +380,5 @@ shows each course's latest end.
 |---|---|
 | C1 The link table | ✅ 2026-09-19 (`20260919200000_product_courses.sql`; proven on dev by SQL — 32 of 32 products with rows, a bad course id refused, the gate unchanged for both dev students; Sam moved on without a defect) |
 | C2 The access rows | ✅ 2026-09-19 (`20260919230000_course_access.sql` + `…233000_course_access_grants.sql`; before S2 — Sam; proven on dev by SQL, walked by Sam on an RM Trial grant: the rows and the per-course ends, GP the later end not the sum) |
-| C3a The queued start | ⬜ |
+| C3a The queued start | ✅ 2026-09-19 (code only; proven on dev by running the writer — RN_FULL queued behind the FREE receipt, RM_FULL's GP behind that, the RM courses starting today past the trial; walked by Sam: an RN_FULL grant, the dashboard's ends) |
 | C3b The admin dialogs follow the rows | ⬜ when Sam picks it (2026-09-19) |
