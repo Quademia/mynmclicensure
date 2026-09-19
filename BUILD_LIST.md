@@ -89,6 +89,25 @@ Sam has queued, and cutover and the Telegram gate. One line each, with
 the work that surfaced it; Sam orders them. A finding in
 `post-rebuild-diagnosis.md` gets a line here only when Sam queues it.
 
+### Plans by feature doc
+
+The feature docs `00–07` are the living plan per feature (Sam,
+2026-09-19); a doc rewritten into that shape gets a section here with
+its own slice ids. The flat lists below keep the items no doc has
+taken yet.
+
+#### [03-quiz-system.md](docs/product-plan/03-quiz-system.md)
+
+- ⬜ Q1 The floor — course-scoped reads of active published rows, item_ids and notes server-only, CHECKs (S12; D44, D48)
+- ⬜ Q2 The lifecycle rules — one availability check on the server clock, archive one-way, saveQuiz validation, stats by table, the mock list paged (D45)
+- ⏸ Q3 Mock exams as a premium exam experience — a design item, ingredients noted, none decided (Sam, 2026-09-18)
+
+#### [05-announcements.md](docs/product-plan/05-announcements.md)
+
+- ⬜ A1 The floor — announcements_for_me(), the table admin-only to read, scope_level text[], CHECKs, the hot-read index (S12, S13; D46, D48)
+- ⬜ A2 The notice state — read_at / clicked_at / dismissed_at, a key to the announcement, server-side writes, the strip's ✕ dismisses (S12; D47)
+- ⬜ A3 Residue — the body stored once and the <br> per edit ended, keys for the scope arrays, the unused read removed (D48) — later
+
 ### The legacy check — gaps found 2026-09-16
 
 Every legacy page compared with its ported route; nothing missing outright. Detail and the minor list: `sessions/2026-09.md`, the legacy check entry. Numbered as reported to Sam; 1–4 first.
@@ -168,8 +187,8 @@ what the diagnosis and the perf investigation surfaced.
 - ⬜ Messaging as a support desk: general + course threads, server writes only, messages fixed once sent, 2000-char cap, read stamps on the thread (§8 S11), visible reopen, draft from the course link, paged admin inbox (D37–D42; Sam, 2026-09-18)
 - ⏸ Bulk Send parked — announcements broadcast with the same targeting; New Thread covers one student; a rarely used door is the one nobody watches; button and code out at the rebuild (Sam, 2026-09-18)
 - ⬜ Question reports — a new feature replacing "Send feedback" threads: reason list, the student's answer, status new/reviewed/fixed/dismissed, admin page grouped by question with Mark fixed (Sam, 2026-09-18)
-- ⬜ Mock exams as a premium exam experience — a design item: premium-only, an exam window, one timed sitting, results released together, cohort standing; `visibility` kept as the gate's flag; not merged with quizzes (Sam, 2026-09-18)
-- ⬜ Quizzes and announcements floor: course-scoped quiz reads, item_ids and notes server-only, announcements_for_me(), three notice timestamps, one availability check, restore to draft, paged mock list (S12; D44–D48; Sam, 2026-09-18)
+- → Mock exams as a premium exam experience — moved to the 03-quiz-system.md section above as Q3 (2026-09-19)
+- → Quizzes and announcements floor (S12; D44–D48) — sliced into 03-quiz-system.md Q1–Q2 and 05-announcements.md A1–A2 above (2026-09-19)
 - ⬜ Config registry: admin-only reads through a service-role accessor, typed and bounded keys, a stricter Config page, the dead row dropped; levels wired to the pickers; cohort a year (S13; D49, D51; Sam, 2026-09-18)
 - ✖ Payments: §9 #20 (token re-minted on verify) and §9 #21 (the reference as the only secret) — no token exists under D31 + D33 (Sam, 2026-09-18)
 - ✖ Payments: the setup step's login rollback (§9 #4) — the login is created by the server at PAID under D31, so the step and its rollback go (Sam, 2026-09-18)

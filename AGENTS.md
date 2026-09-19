@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-09-18. Rules for **any** assistant working in this
+Last updated: 2026-09-19. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What is built and
@@ -39,8 +39,15 @@ sorted around (Sam, 2026-09-18). The findings are
 still the vanilla-JS site served from the `qacademy-gamma` repo; its
 code stays here under `legacy/` as a reference — it says what the old
 app did, and Sam decides whether the new app should do the same. The
-feature docs `00–07` describe the legacy product and are not build
-plans (Sam, 2026-09-12).
+feature docs `00–07` are the **living plan per feature** (Sam,
+2026-09-19, replacing the 2026-09-12 ruling that they were not build
+plans): each holds what the feature does today, what the diagnosis
+found, Sam's rulings, and the sliced plan with the doc's own slice
+ids; `BUILD_LIST.md` carries a section per doc. A doc is rewritten
+into that shape when its feature comes up, not before; until then it
+still describes the legacy product (rewritten so far: 03, 05). The
+diagnosis stays the register of findings; the feature doc is where a
+finding becomes a slice.
 
 ⭐ **Nothing is built without Sam's go-ahead in the session.** A change
 to storage still needs its row in `rebuild.md` §8, ticked by Sam with a

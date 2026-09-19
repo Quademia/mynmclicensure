@@ -1727,7 +1727,7 @@ columns — keeps browser writes and is a policy per column; the revoke
 is one line per table and matches where the users row (S10) and the
 attempts (S7) are going.
 
-**Status.** Open. Not approved, not queued.
+**Status.** → ruled and ticked as §8 S11 (Sam, 2026-09-18): browser writes revoked, the writes the service role's behind the gates, messages fixed once sent.
 
 ---
 
@@ -1759,7 +1759,7 @@ numbers in `config`; one length check shared by both send actions
 constraint on `body_text`; a recipient cap on bulk send with the
 number in `config`, refusing above it rather than warning.
 
-**Status.** Open. Not approved, not queued.
+**Status.** → ruled 2026-09-18 (Sam): the 2000-char cap and the paged inbox in S11; the send limits through the one general limiter (queued); Bulk Send parked.
 
 ---
 
@@ -1795,7 +1795,7 @@ the admin badge scoped to open threads; the search pre-pass limited
 and role-filtered; recipient resolution chunked like the send and its
 errors surfaced; the pickers from a distinct query, not every row.
 
-**Status.** Open. Not approved, not queued.
+**Status.** → ruled and ticked as §8 S11 (Sam, 2026-09-18): the admin inbox paged, the failures surfaced.
 
 ---
 
@@ -1834,7 +1834,7 @@ deep link pre-fills a New Thread that the student sends with a click,
 instead of creating on arrival — one change to the reuse rule's UX,
 Sam's call.
 
-**Status.** Open. Not approved, not queued.
+**Status.** → ruled and ticked as §8 S11 (Sam, 2026-09-18): the thread built by the server, the course link opening a draft.
 
 ---
 
@@ -1865,7 +1865,7 @@ party when it holds a message from the other party that party has not
 read; open threads only for the badge, the same test for the dot. One
 query for each badge (already a Speed line in BUILD_LIST).
 
-**Status.** Open. Not approved, not queued.
+**Status.** → ruled and ticked as §8 S11 (Sam, 2026-09-18): student_read_at / admin_read_at replacing the flags, one unread rule each side.
 
 ---
 
@@ -1903,7 +1903,7 @@ closed thread refused or reopened explicitly (product call); the
 threads table into the publication; role filter on the recipient
 search; a narrower select for the student page; the snapshot fixed.
 
-**Status.** Open. Not approved, not queued.
+**Status.** → ruled and ticked as §8 S11 (Sam, 2026-09-18): admin_id and the five bulk / question columns dropped, CHECKs; question feedback split into a reports feature (queued).
 
 ---
 
@@ -1936,7 +1936,7 @@ nothing to `anon` beyond the public catalogue reads; never DELETE,
 TRUNCATE, REFERENCES or TRIGGER to either. One migration, table by
 table, after the storage sweep finishes so the list is known once.
 
-**Status.** Open. Not approved, not queued.
+**Status.** → queued last of the floor migrations (Sam, 2026-09-18): the schema-wide grant scoped in its own migration once the table sweeps are built.
 
 ---
 
@@ -2100,7 +2100,7 @@ selects the columns it renders; the attempt spawn, already a Server
 Action, reads `item_ids` with the service role. Drafts and archived
 rows stop being readable by anyone but an admin.
 
-**Status.** Open. Not approved, not queued.
+**Status.** → ruled and ticked as §8 S12 (Sam, 2026-09-18); sliced as 03-quiz-system.md Q1 (2026-09-19).
 
 ---
 
@@ -2153,7 +2153,7 @@ fixed one; a closed mock finishes its in-progress attempts by the
 D34 clock (auto-submit as the timed runner does) or lets Resume
 through for the attempt already begun — Sam's call; Sam's word on (h).
 
-**Status.** Open. Not approved, not queued.
+**Status.** → ruled 2026-09-18 (Sam), code beside S12; sliced as 03-quiz-system.md Q2 (2026-09-19); (g) answered by the mock premium design, (h) awaits Sam's word.
 
 ---
 
@@ -2194,7 +2194,7 @@ leaves the server. Alternative, smaller: keep the TS scoping and
 project the columns at the boundary; the drafts stay readable at the
 floor.
 
-**Status.** Open. Not approved, not queued.
+**Status.** → ruled and ticked as §8 S12 (Sam, 2026-09-18); sliced as 05-announcements.md A1 (2026-09-19).
 
 ---
 
@@ -2232,7 +2232,7 @@ reading" is both; a key from `item_id` to `announcements`; the strip's
 is, with `item_type` and the row's identity the server's alone (the
 D43 shape). A §8 row if Sam agrees, since the columns change.
 
-**Status.** Open. Not approved, not queued.
+**Status.** → ruled and ticked as §8 S12 (Sam, 2026-09-18); sliced as 05-announcements.md A2 (2026-09-19).
 
 ---
 
@@ -2272,7 +2272,7 @@ scope table instead of arrays; the body stored once as text and
 rendered on the server; the editor reloading the text, not the HTML;
 the two snapshots regenerated.
 
-**Status.** Open. Not approved, not queued.
+**Status.** → ruled in part 2026-09-18 (Sam): visibility kept, CHECKs and scope_level text[] in S12 / S13; the rest sliced as 03 Q1 and 05 A1 / A3 (2026-09-19).
 
 ---
 
