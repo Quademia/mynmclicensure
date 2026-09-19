@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-19 — 02 rewritten as the living plan; S8 built as C1 the link table and C2 the access rows, walked on an RM grant; C3 ruled buildable any time
+  - ↳ product_courses 72 pairs · course_access no browser write · one live definition · days a stored date · C2 before S2 (reversed) · TRUNCATE left by default grants · migrate before readers reload · six on prod
+
 - 2026-09-19 — S9+S10 auth floor, D32+D36 Paystack trim, 03 Q1+Q2 quiz floor and lifecycle built, walked, merged; docs 00–07 become the living plans
   - ↳ five functions revoked · IP in the limiter · fail closed · users row frozen · email unique · card data trimmed · quiz reads course-scoped · restore→draft · mock list paged · one palette already · course codes stay · S2 before S8
 

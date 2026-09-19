@@ -308,9 +308,13 @@ reach the receipt's rows; a student's direct insert into
 `course_access` is refused; an expired receipt shows Expired on the
 admin list without the button.
 
-### C3 — After cutover: stacking on, the admin forms follow the rows (rulings 3, 5, 6)
+### C3 — Stacking on, the admin forms follow the rows (rulings 3, 5, 6)
 
-A product change under the ⭐ rule, sliced when Sam picks it.
+Ruling 3 put this after cutover under the like-for-like rule; with the
+port finished that rule no longer holds, and C3 is code on C1 and C2's
+tables. **Buildable whenever Sam picks it (Sam, 2026-09-19)** — one
+rule from day one is simpler to explain than a change after launch.
+Sliced then into two: the queued start, then the admin dialogs.
 
 - **Queued start.** For each course the student already holds, the new
   row starts at the course's current latest live end; a new course
@@ -350,5 +354,5 @@ A product change under the ⭐ rule, sliced when Sam picks it.
 | Slice | Date |
 |---|---|
 | C1 The link table | ✅ 2026-09-19 (`20260919200000_product_courses.sql`; proven on dev by SQL — 32 of 32 products with rows, a bad course id refused, the gate unchanged for both dev students; Sam moved on without a defect) |
-| C2 The access rows | ⬜ (before S2 — Sam, 2026-09-19) |
-| C3 Stacking on, the admin forms follow the rows | ⬜ after cutover |
+| C2 The access rows | ✅ 2026-09-19 (`20260919230000_course_access.sql` + `…233000_course_access_grants.sql`; before S2 — Sam; proven on dev by SQL, walked by Sam on an RM Trial grant: the rows and the per-course ends, GP the later end not the sum) |
+| C3 Stacking on, the admin forms follow the rows | ⬜ when Sam picks it (2026-09-19) |
