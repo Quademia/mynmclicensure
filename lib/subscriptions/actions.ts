@@ -24,6 +24,8 @@ import { sendEmail } from '@/lib/email/send';
 import { subscriptionAssignedEmail } from '@/lib/email/templates/subscription-assigned';
 import { subscriptionRevokedEmail } from '@/lib/email/templates/subscription-revoked';
 import { appOrigin } from '@/lib/site/app-origin';
+import { createServiceRoleClient } from '@/lib/supabase/server';
+import { revokeAccessRows, syncAccessRows, writeAccessRows } from './access-rows';
 import { addDaysIso, dateOnlyToEndIso, dateOnlyToStartIso, isDateOnlyString, nowIso } from './dates';
 import { makeSubscriptionId } from './ids';
 import { getActiveSubscriptionForUserProduct, getSubscriptionById, searchStudents } from './queries';
@@ -89,11 +91,18 @@ export async function grantSubscription(userIdIn: string, productIdIn: string, s
   if (existing) {
     const currentExpiryMs = new Date(existing.expires_utc).getTime();
     const baseIso = currentExpiryMs > Date.now() ? existing.expires_utc : nowIso();
+    const newExpiry = addDaysIso(baseIso, durationDays);
     const { error } = await supabase
       .from('subscriptions')
-      .update({ expires_utc: addDaysIso(baseIso, durationDays), status: 'ACTIVE', source: 'ADMIN', source_ref: 'admin_grant' })
+      .update({ expires_utc: newExpiry, status: 'ACTIVE', source: 'ADMIN', source_ref: 'admin_grant' })
       .eq('subscription_id', existing.subscription_id);
     if (error) return fail(error.message);
+    // The receipt's course rows take the new end (02 C2).
+    try {
+      await syncAccessRows(createServiceRoleClient(), { ...existing, expires_utc: newExpiry, status: 'ACTIVE' }, false);
+    } catch (err) {
+      return fail(`Subscription extended, but its course access rows failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
     await sendAssignedEmail(supabase, targetUser, product, existing.subscription_id);
     return { ok: true, mode: 'extended_existing' };
   }
@@ -106,18 +115,27 @@ export async function grantSubscription(userIdIn: string, productIdIn: string, s
   }
 
   const subscriptionId = makeSubscriptionId();
-  const { error } = await supabase.from('subscriptions').insert({
+  const receipt = {
     subscription_id: subscriptionId,
     user_id: userId,
     product_id: productId,
     start_utc: startIso,
     expires_utc: addDaysIso(startIso, durationDays),
     status: 'ACTIVE',
+  };
+  const { error } = await supabase.from('subscriptions').insert({
+    ...receipt,
     source: 'ADMIN',
     source_ref: 'admin_grant',
     expiry_reminded: false,
   });
   if (error) return fail(error.message);
+  // One course row per course of the product, the receipt's dates (02 C2).
+  try {
+    await writeAccessRows(createServiceRoleClient(), receipt);
+  } catch (err) {
+    return fail(`Subscription saved, but its course access rows failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
   await sendAssignedEmail(supabase, targetUser, product, subscriptionId);
   return { ok: true, mode: 'created_new' };
 }
@@ -192,6 +210,17 @@ export async function updateSubscription(input: UpdateSubscriptionInput): Promis
     .update({ product_id: productId, start_utc: startIso, expires_utc: expiresIso, status, source, source_ref: finalSourceRef })
     .eq('subscription_id', subscriptionId);
   if (error) return fail(error.message);
+  // The receipt's course rows follow the edit: its dates and status; a
+  // changed product replaces the course set (02 C2).
+  try {
+    await syncAccessRows(
+      createServiceRoleClient(),
+      { subscription_id: subscriptionId, user_id: existing.user_id, product_id: productId, start_utc: startIso, expires_utc: expiresIso, status },
+      productId !== existing.product_id,
+    );
+  } catch (err) {
+    return fail(`Subscription updated, but its course access rows failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
   return { ok: true };
 }
 
@@ -207,6 +236,12 @@ export async function revokeSubscription(subscriptionIdIn: string): Promise<Acti
 
   const { error } = await supabase.from('subscriptions').update({ status: 'REVOKED' }).eq('subscription_id', subscriptionId);
   if (error) return fail(error.message);
+  // The receipt's live course rows are stamped; the course closes at once (02 C2).
+  try {
+    await revokeAccessRows(createServiceRoleClient(), subscriptionId);
+  } catch (err) {
+    return fail(`Subscription revoked, but its course access rows failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
   await sendRevokedEmail(supabase, existing);
   return { ok: true };
 }

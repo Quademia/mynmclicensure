@@ -77,12 +77,15 @@ export function SubscriptionsClient({
     const exp = new Date(s.expires_utc);
     return s.status === 'ACTIVE' && exp <= in7 && exp >= now;
   };
+  // Expired is the date's word, not the Sync button's (D20, 02 C2): an
+  // ACTIVE row past its expiry shows and counts as EXPIRED.
+  const shownStatus = (s: SubscriptionListRow) => (s.status === 'ACTIVE' && new Date(s.expires_utc) < now ? 'EXPIRED' : s.status);
 
   // ── stats (legacy updateStats) ──
   const stats = {
     total: subscriptions.length,
-    active: subscriptions.filter((s) => s.status === 'ACTIVE').length,
-    expired: subscriptions.filter((s) => s.status === 'EXPIRED').length,
+    active: subscriptions.filter((s) => shownStatus(s) === 'ACTIVE').length,
+    expired: subscriptions.filter((s) => shownStatus(s) === 'EXPIRED').length,
     paid: subscriptions.filter((s) => s.products?.kind === 'PAID').length,
     trial: subscriptions.filter((s) => s.products?.kind === 'TRIAL').length,
     free: subscriptions.filter((s) => s.products?.kind === 'FREE').length,
@@ -104,7 +107,7 @@ export function SubscriptionsClient({
     const fullName = studentName(u).toLowerCase();
     const email = (u?.email || '').toLowerCase();
     if (q && !fullName.includes(q) && !email.includes(q)) return false;
-    if (fStatus && s.status !== fStatus) return false;
+    if (fStatus && shownStatus(s) !== fStatus) return false;
     if (fKind && s.products?.kind !== fKind) return false;
     if (fProduct && s.product_id !== fProduct) return false;
     if (fProgramme && u?.program_id !== fProgramme) return false;
@@ -469,7 +472,7 @@ export function SubscriptionsClient({
                       )}
                       <td className={first ? 'cell-13' : 'cell-muted'}>{u?.program_id || '—'}</td>
                       <td className="cell-product">{s.products?.name || s.product_id || '—'}</td>
-                      <td>{expiring ? <span className="chip expiring">⚠️ Expiring</span> : <span className={`chip ${s.status}`}>{s.status}</span>}</td>
+                      <td>{expiring ? <span className="chip expiring">⚠️ Expiring</span> : <span className={`chip ${shownStatus(s)}`}>{shownStatus(s)}</span>}</td>
                       <td className="cell-13">{fmtDate(s.start_utc)}</td>
                       <td className={`cell-13${expiring ? ' cell-expiring' : ''}`}>{fmtDate(s.expires_utc)}</td>
                       <td><span className="source-chip">{s.source || '—'}</span></td>
@@ -504,7 +507,7 @@ export function SubscriptionsClient({
                   <div className="detail-section">
                     <h4>Subscription</h4>
                     <div className="detail-row"><span className="key">Product</span><span className="val">{panelSub.products?.name || panelSub.product_id}</span></div>
-                    <div className="detail-row"><span className="key">Status</span><span className="val"><span className={`chip ${panelSub.status}`}>{panelSub.status}</span></span></div>
+                    <div className="detail-row"><span className="key">Status</span><span className="val"><span className={`chip ${shownStatus(panelSub)}`}>{shownStatus(panelSub)}</span></span></div>
                     <div className="detail-row"><span className="key">Start</span><span className="val">{fmtDate(panelSub.start_utc)}</span></div>
                     <div className="detail-row"><span className="key">Expires</span><span className="val">{fmtDate(panelSub.expires_utc)}</span></div>
                     <div className="detail-row">

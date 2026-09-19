@@ -258,6 +258,26 @@ create index if not exists subscriptions_user_id_idx on subscriptions (user_id);
 create index if not exists subscriptions_user_product_status_idx on subscriptions (user_id, product_id, status);
 create index if not exists subscriptions_status_expires_idx on subscriptions (status, expires_utc);
 
+-- ── course_access (02 C2, §8 S8 the entitlement side) ──────────────────
+-- One row per course per receipt: what the gate reads. revoked_utc empty
+-- means live — a date, not a status (D20). Several rows per course per
+-- student are intended (trial, paid, a queued renewal), so no uniqueness.
+-- No browser write path: insert / update / delete revoked from anon and
+-- authenticated; every write is a Server Action with the service role.
+create table if not exists course_access (
+  access_id       bigint generated always as identity primary key,
+  user_id         text not null references users (user_id),
+  course_id       text not null references courses (course_id),
+  subscription_id text not null references subscriptions (subscription_id),
+  start_utc       timestamptz not null,
+  expires_utc     timestamptz not null,
+  revoked_utc     timestamptz,
+  created_utc     timestamptz not null default now(),
+  constraint course_access_window_check check (expires_utc > start_utc)
+);
+create index if not exists course_access_user_course_live_idx on course_access (user_id, course_id) where revoked_utc is null;
+create index if not exists course_access_subscription_idx on course_access (subscription_id);
+
 -- ── attempts (slice 6a) ────────────────────────────────────────────────
 -- One row per run. item_ids and answers_json stay TEXT (§8 S3 unticked).
 -- No content copy (D5). quiz_id names a row in quizzes OR mock_quizzes

@@ -193,7 +193,11 @@ One line each; the full text with proof is in
 - **S2 before S8** (2026-09-19): the eleven per-course item tables
   become one before the access rows land, so the new gate is written
   onto one bank policy, not eleven. The link table (C1) touches no item
-  table and is not held by this.
+  table and is not held by this. **Reversed later the same day for C2
+  (Sam, 2026-09-19):** the gate is one function the eleven policies
+  call by name, so its body changes once whether the tables are eleven
+  or one; C2 touches no item table and was built before S2. S2 stays
+  its own decision.
 
 ---
 
@@ -242,7 +246,7 @@ unchanged; New Thread's course list unchanged.
 
 ### C2 — The access rows (S8's entitlement side; D13, D14, D15, D17, D20)
 
-After S2 (Sam, 2026-09-19).
+Built before S2 (Sam, 2026-09-19; the order reversed — §3).
 
 **Storage, one migration.**
 
@@ -257,7 +261,8 @@ After S2 (Sam, 2026-09-19).
   is a Server Action with the service role. (`subscriptions` keeps its
   ADMIN policies for the admin actions, as today.)
 - `subscriptions.product_id` nullable, for the hand-picked grant
-  (ruling 5; the form arrives in C3).
+  (ruling 5) — **moved to C3** with the form that writes it, so the
+  type change lands beside its writer (Claude, at build, 2026-09-19).
 - `user_has_course(course_id)` keeps its name and every caller; its
   body becomes one lookup: an ADMIN, or a live row for the caller and
   course whose window contains now. A second function,
@@ -283,9 +288,13 @@ distance, so tomorrow shows one less. The announcement scope takes its
 course list from the same read; the offline-pack allowance and the
 messaging admin's two readers read `course_access` (the allowance's
 TRIAL rule reads the receipt's product kind through the link). The
-admin list and the profile panel derive "expired" from the date; the
-Sync Status button retires, its rule now the display's (D20) — Sam's
-call whether the button stays as a no-op comfort until cutover.
+admin list and the profile panel derive "expired" from the date (D20);
+the Sync Status button **stays** for now — it only tidies the status
+column, which nothing reads for access any more (no ruling asked for
+its removal, 2026-09-19). One parity note: today's gate ignored a
+receipt's start date, so a future-dated admin grant gave access at
+once; a row is live only inside its window, so such a grant now waits
+for its day.
 
 **Done when** (SQL as the dev students, rolled back, then the
 browser): `user_has_course` answers as before for both dev students
@@ -341,5 +350,5 @@ A product change under the ⭐ rule, sliced when Sam picks it.
 | Slice | Date |
 |---|---|
 | C1 The link table | ✅ 2026-09-19 (`20260919200000_product_courses.sql`; proven on dev by SQL — 32 of 32 products with rows, a bad course id refused, the gate unchanged for both dev students; Sam moved on without a defect) |
-| C2 The access rows | ⬜ after S2 (Sam, 2026-09-19) |
+| C2 The access rows | ⬜ (before S2 — Sam, 2026-09-19) |
 | C3 Stacking on, the admin forms follow the rows | ⬜ after cutover |

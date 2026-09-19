@@ -373,9 +373,30 @@ using (auth_user_role() = 'ADMIN');
 -- The entitlement gate (rebuild.md §9 defect 3), filled in by slice 8:
 -- an ADMIN, or a student with an ACTIVE, unexpired subscription whose
 -- product includes the course. Slice 4a created it allowing any
--- signed-in user; the signature has not changed. Since 02 C1
--- (2026-09-19) the product's courses come from product_courses, not
--- the dropped courses_included array.
+-- signed-in user; the signature has not changed. Since 02 C2
+-- (2026-09-19) it is one lookup in my_course_access() — the one
+-- definition of "live" the pages read too (§8 S8, D13).
+--
+-- my_course_access(): the caller's courses with the latest end among
+-- their live course_access rows — unrevoked, not yet ended, and at
+-- least one row already started. EXECUTE revoked from public and anon;
+-- authenticated keeps it (the student calls it as themselves).
+create or replace function my_course_access()
+returns table (course_id text, expires_utc timestamptz)
+language sql
+security definer
+stable
+set search_path = licensure_gh
+as $$
+  select a.course_id, max(a.expires_utc)
+  from course_access a
+  where a.user_id = auth_user_id()
+    and a.revoked_utc is null
+    and a.expires_utc > now()
+  group by a.course_id
+  having bool_or(a.start_utc <= now())
+$$;
+
 create or replace function user_has_course(p_course_id text)
 returns boolean
 language sql
@@ -385,15 +406,7 @@ set search_path = licensure_gh
 as $$
   select auth.uid() is not null and (
     auth_user_role() = 'ADMIN'
-    or exists (
-      select 1
-      from subscriptions s
-      join product_courses pc on pc.product_id = s.product_id
-      where s.user_id = auth_user_id()
-        and s.status = 'ACTIVE'
-        and s.expires_utc > now()
-        and pc.course_id = p_course_id
-    )
+    or exists (select 1 from my_course_access() m where m.course_id = p_course_id)
   )
 $$;
 
@@ -452,6 +465,12 @@ create policy subscriptions_insert on subscriptions for insert
 with check (auth_user_role() = 'ADMIN');
 create policy subscriptions_update on subscriptions for update
 using (auth_user_role() = 'ADMIN');
+
+-- course_access (02 C2): a student reads their own rows, an admin every
+-- row; no browser write path (the grants, not a policy — the migration
+-- revoked insert / update / delete from anon and authenticated).
+create policy course_access_select on course_access for select
+using (user_id = auth_user_id() or auth_user_role() = 'ADMIN');
 
 -- ── slice 6a: attempts ─────────────────────────────────────────────────
 -- Own rows or ADMIN read; own-row insert and update; no DELETE, as

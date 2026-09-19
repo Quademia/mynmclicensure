@@ -23,6 +23,7 @@
 // threads' users in a second call by id.
 
 import type { ServerSupabaseClient } from '@/lib/access';
+import { nowIso } from '@/lib/subscriptions/dates';
 import type { LatestMessage, Thread } from './types';
 
 export type AdminThreadFilters = { search: string; contextType: string; status: string };
@@ -120,18 +121,22 @@ export async function searchStudentsForMessaging(db: ServerSupabaseClient, q: st
 }
 
 // ── a student's entitled courses (legacy ntLoadUserCourses) ────────────
-// The product's courses are its product_courses rows (02 C1).
+// The student's live course_access rows (02 C2): unrevoked, inside their
+// window. The admin reads them through the table's ADMIN policy.
 export async function getStudentCourseIds(db: ServerSupabaseClient, userId: string): Promise<string[]> {
-  const { data, error } = await db.from('subscriptions').select('product_id, products ( product_courses ( course_id ) )').eq('user_id', userId).eq('status', 'ACTIVE');
+  const now = nowIso();
+  const { data, error } = await db
+    .from('course_access')
+    .select('course_id')
+    .eq('user_id', userId)
+    .is('revoked_utc', null)
+    .lte('start_utc', now)
+    .gt('expires_utc', now);
   if (error) {
     console.error('getStudentCourseIds:', error);
     return [];
   }
-  const ids = new Set<string>();
-  for (const s of (data ?? []) as unknown as { products: { product_courses: { course_id: string }[] | null } | null }[]) {
-    for (const r of s.products?.product_courses ?? []) ids.add(r.course_id);
-  }
-  return Array.from(ids);
+  return Array.from(new Set((data ?? []).map((r) => r.course_id as string)));
 }
 
 // ── the distinct levels and cohorts (legacy fetchDistinctFilters) ──────
@@ -162,7 +167,7 @@ export async function resolveRecipients(db: ServerSupabaseClient, scope: Recipie
   let userIds = (data ?? []).map((u) => u.user_id as string);
   if (!userIds.length) return [];
 
-  type SubRow = { user_id: string; products: { kind: string | null; product_courses: { course_id: string }[] | null } | null };
+  type SubRow = { user_id: string; products: { kind: string | null } | null };
 
   if (scope.subscription_kinds?.length) {
     const { data: subs } = await db.from('subscriptions').select('user_id, products ( kind )').eq('status', 'ACTIVE').in('user_id', userIds);
@@ -176,12 +181,17 @@ export async function resolveRecipients(db: ServerSupabaseClient, scope: Recipie
   }
 
   if (scope.course_ids?.length) {
-    const { data: subs } = await db.from('subscriptions').select('user_id, products ( product_courses ( course_id ) )').eq('status', 'ACTIVE').in('user_id', userIds);
-    const want = new Set(scope.course_ids);
-    const matched = new Set<string>();
-    for (const s of (subs ?? []) as unknown as SubRow[]) {
-      if ((s.products?.product_courses ?? []).some((r) => want.has(r.course_id))) matched.add(s.user_id);
-    }
+    // Live course_access rows on any of the wanted courses (02 C2).
+    const now = nowIso();
+    const { data: rows } = await db
+      .from('course_access')
+      .select('user_id')
+      .in('user_id', userIds)
+      .in('course_id', scope.course_ids)
+      .is('revoked_utc', null)
+      .lte('start_utc', now)
+      .gt('expires_utc', now);
+    const matched = new Set((rows ?? []).map((r) => r.user_id as string));
     userIds = userIds.filter((id) => matched.has(id));
   }
 

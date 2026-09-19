@@ -7,6 +7,7 @@
 // the caller's per-request client and fails open as legacy did.
 
 import type { ServerSupabaseClient } from '@/lib/access';
+import { nowIso } from '@/lib/subscriptions/dates';
 import type { ProfileSubscription, SchoolOption } from './types';
 
 export async function getActiveSchools(db: ServerSupabaseClient): Promise<SchoolOption[]> {
@@ -29,6 +30,7 @@ export async function getProfileSubscription(db: ServerSupabaseClient, userId: s
     .select('subscription_id, product_id, status, expires_utc, products ( name )')
     .eq('user_id', userId)
     .eq('status', 'ACTIVE')
+    .gt('expires_utc', nowIso()) // expired is the date's word, not the button's (D20, 02 C2)
     .order('expires_utc', { ascending: false })
     .limit(1)
     .maybeSingle();

@@ -14,6 +14,7 @@
 //
 // Server only.
 
+import { syncAccessRows, writeAccessRows } from '@/lib/subscriptions/access-rows';
 import { addDaysIso, nowIso } from '@/lib/subscriptions/dates';
 import { makeSubscriptionId } from '@/lib/subscriptions/ids';
 import type { Subscription } from '@/lib/subscriptions/types';
@@ -29,6 +30,9 @@ export async function activatePaymentForUser(db: ServiceDb, payment: Payment, us
   // Idempotency 1: this reference already produced a subscription.
   const existingByRef = await getSubscriptionByPaymentRef(db, payment.reference);
   if (existingByRef) {
+    // The course rows (02 C2) — written here too, so a retry after a
+    // failure between the receipt and its rows heals itself.
+    await syncAccessRows(db, existingByRef, false);
     await patchPayment(db, payment.reference, {
       user_id: user.user_id,
       subscription_id: existingByRef.subscription_id,
@@ -73,6 +77,9 @@ export async function activatePaymentForUser(db: ServiceDb, payment: Payment, us
     if (error) throw new Error(`Supabase patch failed on subscriptions: ${error.message}`);
 
     const sub = updatedSub as Subscription;
+    // The receipt's course rows take the new end with it (02 C2; the
+    // extend branch itself goes when stacking turns on, C3).
+    await syncAccessRows(db, sub, false);
     await patchPayment(db, payment.reference, {
       user_id: user.user_id,
       subscription_id: sub.subscription_id,
@@ -101,6 +108,8 @@ export async function activatePaymentForUser(db: ServiceDb, payment: Payment, us
   if (insertError) throw new Error(`Supabase insert failed on subscriptions: ${insertError.message}`);
 
   const sub = newSub as Subscription;
+  // One course row per course of the product, the receipt's dates (02 C2).
+  await writeAccessRows(db, sub);
   await patchPayment(db, payment.reference, {
     user_id: user.user_id,
     subscription_id: sub.subscription_id,

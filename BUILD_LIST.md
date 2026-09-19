@@ -99,7 +99,7 @@ taken yet.
 #### [02-subscriptions.md](docs/product-plan/02-subscriptions.md)
 
 - ✅ C1 The link table — product_courses with keys, the Products page and five readers on it, the list dropped (S8; D16) — 2026-09-19
-- ⬜ C2 The access rows — course_access from five writers, one-lookup gate, stored dates (S8; D13–D17, D20); after S2
+- ⬜ C2 The access rows — course_access from five writers, one-lookup gate, stored dates (S8; D13–D17, D20); before S2
 - ⬜ C3 Stacking on, admin forms per row — queued start, hand-picked grant, row edits (rulings 3, 5, 6); after cutover
 
 #### [03-quiz-system.md](docs/product-plan/03-quiz-system.md)
