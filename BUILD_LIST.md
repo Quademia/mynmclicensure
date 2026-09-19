@@ -96,6 +96,12 @@ The feature docs `00–07` are the living plan per feature (Sam,
 its own slice ids. The flat lists below keep the items no doc has
 taken yet.
 
+#### [02-subscriptions.md](docs/product-plan/02-subscriptions.md)
+
+- ⬜ C1 The link table — product_courses with keys, the Products page and the five readers on it, courses_included dropped (S8; D16)
+- ⬜ C2 The access rows — course_access written by the five paths, user_has_course one lookup, stored dates (S8; D13–D15, D17, D20) — after S2
+- ⬜ C3 Stacking on and the admin forms per course row — queued start, hand-picked grant, Update per row (S8 rulings 3, 5, 6) — after cutover
+
 #### [03-quiz-system.md](docs/product-plan/03-quiz-system.md)
 
 - ✅ Q1 The floor — course-scoped reads of active published rows, item_ids and notes server-only, CHECKs (S12; D44, D48) — 2026-09-19
