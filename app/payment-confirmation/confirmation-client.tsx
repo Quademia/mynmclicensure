@@ -72,7 +72,6 @@ function ls(): Storage | null {
 }
 
 function describeActivationMode(mode: ActivationMode | '' | undefined): string {
-  if (mode === 'extended') return 'Payment confirmed. Your existing subscription has been extended.';
   if (mode === 'created') return 'Payment confirmed. Your access is now active.';
   if (mode === 'existing_by_ref') return 'This payment was already confirmed earlier. Your access is active.';
   return 'Payment confirmed. Your access is now active.';
@@ -231,6 +230,10 @@ export function ConfirmationClient() {
       }
       if (!out.ok && out.error === 'amount_mismatch') {
         renderError('Payment amount mismatch. Please contact support with your reference.', 'AMOUNT_MISMATCH');
+        return;
+      }
+      if (!out.ok && out.error === 'currency_mismatch') {
+        renderError('Payment currency mismatch. Please contact support with your reference.', 'CURRENCY_MISMATCH');
         return;
       }
       if (!out.ok && out.error === 'payment_failed') {

@@ -15,9 +15,11 @@
 //   - FAILED → refuse, terminal.
 //   - INIT → ask Paystack. Not "success" yet → "not ready", the row stays
 //     INIT. An amount mismatch → FAILED with the note "Amount mismatch.
-//     Expected X, got Y", terminal. Success → PAID: adopt the Paystack
+//     Expected X, got Y", terminal; a currency mismatch the same way
+//     (D36, added 2026-09-19). Success → PAID: adopt the Paystack
 //     customer email, set paid_utc only if unset, merge the verify reply
-//     into raw; then the same activate-or-setup step.
+//     into raw — TRIMMED first (D32, lib/payments/trim.ts: the card and
+//     IP fields never reach the row); then the same activate-or-setup step.
 // A thrown error writes failure_note and leaves the status alone
 // (retryable); the browser gets a generic message (§7.1).
 
@@ -30,6 +32,7 @@ import { makeSetupToken } from './ids';
 import { paystackVerify } from './paystack';
 import { findPaymentUser, getPaymentByReference, patchPayment, type ServiceDb } from './queries';
 import { checkPaymentRateLimit } from './rate-limit';
+import { trimVerifyReply } from './trim';
 import { RATE_LIMITED_MESSAGE, type Payment, type VerifyResult } from './types';
 
 export async function verifyPayment(referenceIn: string): Promise<VerifyResult> {
@@ -79,9 +82,13 @@ export async function verifyPayment(referenceIn: string): Promise<VerifyResult> 
   try {
     const verifyResult = await paystackVerify(reference);
     const tx = (verifyResult?.data || {}) as Record<string, unknown>;
+    // The only form of the reply that is ever written to the row.
+    const verifySaved = trimVerifyReply(verifyResult);
 
     const gatewayStatus = String(tx.status || '').toLowerCase();
     const amountPaid = Number(tx.amount || 0);
+    const currencyPaid = String(tx.currency || '').trim().toUpperCase();
+    const currencyExpected = String(payment.currency || '').trim().toUpperCase();
     const customer = (tx.customer || {}) as Record<string, unknown>;
     const paidEmail = String(customer.email || payment.email || '').trim().toLowerCase();
 
@@ -102,9 +109,22 @@ export async function verifyPayment(referenceIn: string): Promise<VerifyResult> 
         status: 'FAILED',
         amount_minor_paid: amountPaid,
         failure_note: `Amount mismatch. Expected ${payment.amount_minor_expected}, got ${amountPaid}`,
-        raw: { ...(payment.raw || {}), verify: verifyResult },
+        raw: { ...(payment.raw || {}), verify: verifySaved },
       });
       return { ok: false, error: 'amount_mismatch', reference, message: 'amount_mismatch' };
+    }
+
+    // Currency mismatch = the same terminal failure (D36). Every product
+    // is GHS today; the day a second currency exists, an equal minor
+    // amount in the wrong one must not pass.
+    if (currencyPaid !== currencyExpected) {
+      await patchPayment(db, reference, {
+        status: 'FAILED',
+        amount_minor_paid: amountPaid,
+        failure_note: `Currency mismatch. Expected ${currencyExpected || 'none'}, got ${currencyPaid || 'none'}`,
+        raw: { ...(payment.raw || {}), verify: verifySaved },
+      });
+      return { ok: false, error: 'currency_mismatch', reference, message: 'currency_mismatch' };
     }
 
     payment = await patchPayment(db, reference, {
@@ -112,7 +132,7 @@ export async function verifyPayment(referenceIn: string): Promise<VerifyResult> 
       email: paidEmail || payment.email,
       amount_minor_paid: amountPaid,
       paid_utc: payment.paid_utc || nowIso(),
-      raw: { ...(payment.raw || {}), verify: verifyResult },
+      raw: { ...(payment.raw || {}), verify: verifySaved },
     });
 
     return await activateOrRequireSetup(db, payment);

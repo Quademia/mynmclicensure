@@ -9,13 +9,16 @@
 //   sendMagicLinkAction         "Email me a magic link"
 //
 // Strings are the legacy page's. Every LOGIN_* row that legacy wrote is
-// written here, with the same fail_reason.
+// written here, with the same fail_reason — through the service role
+// since §8 S9 revoked the auth functions from the browser roles, with
+// the caller's IP hash as the limiter's third key, and the limit check
+// failing closed (D30).
 
 'use server';
 
 import { redirect } from 'next/navigation';
 import { createClient as createPlainClient } from '@supabase/supabase-js';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { findProfileByAuthId } from '@/lib/auth/profile';
 import { createLoginSession, type LoginVia } from '@/lib/auth/sessions';
 import { requestInfo, requestOrigin } from '@/lib/auth/request-info';
@@ -41,22 +44,26 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
 
   const identifier = email.toLowerCase();
   const info = await requestInfo();
-  const base = { identifier, fpHash, uaHash: info.uaHash, deviceLabel: info.deviceLabel };
+  const base = { identifier, fpHash, uaHash: info.uaHash, ipHash: info.ipHash, deviceLabel: info.deviceLabel };
   const supabase = await createClient();
+  const serviceDb = createServiceRoleClient();
 
-  // Rate limit first, fail open (§9 #7 kept).
-  const limited = await checkLoginRateLimit(supabase, identifier, fpHash);
-  if (limited) {
-    await logLoginFail(supabase, base, 'RATE_LIMITED');
+  // Rate limit first, fail closed (D30): a broken check refuses.
+  const check = await checkLoginRateLimit(serviceDb, identifier, fpHash, info.ipHash);
+  if (check.status === 'error') {
+    return { ok: false, error: GENERIC_ERROR };
+  }
+  if (check.status === 'limited') {
+    await logLoginFail(serviceDb, base, 'RATE_LIMITED');
     return {
       ok: false,
-      error: retryMessage('Too many failed login attempts.', limited.retryAfterSeconds),
+      error: retryMessage('Too many failed login attempts.', check.retryAfterSeconds),
     };
   }
 
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error || !data.user) {
-    await logLoginFail(supabase, base, 'INVALID_CREDENTIALS');
+    await logLoginFail(serviceDb, base, 'INVALID_CREDENTIALS');
     return { ok: false, error: 'Invalid email or password. Please try again.' };
   }
 
@@ -64,7 +71,7 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
     // One retry after 500 ms: replication lag right after signup.
     const profile = await findProfileByAuthId(supabase, data.user.id, { retry: true });
 
-    await logLoginSuccess(supabase, { ...base, userId: profile?.user_id ?? null });
+    await logLoginSuccess(serviceDb, { ...base, userId: profile?.user_id ?? null });
 
     if (!profile) {
       await supabase.auth.signOut();
@@ -103,14 +110,16 @@ export async function completeExternalLoginAction(input: {
     identifier,
     fpHash: input.fpHash,
     uaHash: info.uaHash,
+    ipHash: info.ipHash,
     deviceLabel: info.deviceLabel,
   };
+  const serviceDb = createServiceRoleClient();
 
   try {
     const profile = await findProfileByAuthId(supabase, user.id);
 
     if (!profile) {
-      await logLoginFail(supabase, base, 'NO_ACCOUNT');
+      await logLoginFail(serviceDb, base, 'NO_ACCOUNT');
       await supabase.auth.signOut();
       return {
         ok: false,
@@ -119,7 +128,7 @@ export async function completeExternalLoginAction(input: {
       };
     }
 
-    await logLoginSuccess(supabase, { ...base, userId: profile.user_id });
+    await logLoginSuccess(serviceDb, { ...base, userId: profile.user_id });
     await createLoginSession(profile.user_id, input.via, info);
   } catch (err) {
     console.error('[login] external sign-in error:', err);

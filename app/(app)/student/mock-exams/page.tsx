@@ -11,7 +11,7 @@ import { getCourses } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import { getQuizzesForCourse } from '@/lib/quizzes/queries';
 import { getStudentAttempts } from '@/lib/attempts/queries';
-import type { Quiz } from '@/lib/quizzes/types';
+import type { QuizCard } from '@/lib/quizzes/types';
 import type { Attempt } from '@/lib/attempts/types';
 import { PageHeader, displayNameOf } from '@/components/shell/page-header';
 import { StudentQuizList } from '@/components/quizzes/student-quiz-list';
@@ -33,7 +33,7 @@ export default async function StudentMockExamsPage({ searchParams }: { searchPar
   ]);
   const enrolled = allCourses.filter((c) => Boolean(access[c.course_id])).map((c) => ({ course_id: c.course_id, title: c.title }));
 
-  const quizzesByCourse: Record<string, Quiz[]> = {};
+  const quizzesByCourse: Record<string, QuizCard[]> = {};
   const attemptsByCourse: Record<string, Attempt[]> = {};
   await Promise.all(
     enrolled.map(async (c) => {
@@ -56,6 +56,7 @@ export default async function StudentMockExamsPage({ searchParams }: { searchPar
         quizzesByCourse={quizzesByCourse}
         attemptsByCourse={attemptsByCourse}
         activeCourseFilter={String(course || '') || null}
+        serverNow={new Date().toISOString()}
       />
     </>
   );

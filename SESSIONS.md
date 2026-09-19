@@ -22,8 +22,35 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
-- 2026-09-15 — 9a and 9b built: payments table, the four actions, subscribe, Premium Prep live, confirmation page, upgrade page, admin Payments; paid by Sam
-  - ↳ 9 split (9a, 9b) on one branch · 7f narrowed to the dashboard · §9 #20 #21 #22 → after the rebuild · pane cannot finish a Paystack checkout · a password in the dev log → FormData · setup rollback kept, Sam to confirm · support@quademia.com
+- 2026-09-19 — 02 rewritten; S8 built whole (C1 link table, C2 access rows, C3a queued start, C3b the chain); one Grant dialog; S2 ticked, 08 opened, B1 built
+  - ↳ product_courses · course_access · receipt = paper trail, window from rows · created_utc, requested_start_utc · no per-course admin edits · chain re-packed on every write · question_bank one table, gate once per statement · ten on prod
+
+- 2026-09-19 — S9+S10 auth floor, D32+D36 Paystack trim, 03 Q1+Q2 quiz floor and lifecycle built, walked, merged; docs 00–07 become the living plans
+  - ↳ five functions revoked · IP in the limiter · fail closed · users row frozen · email unique · card data trimmed · quiz reads course-scoped · restore→draft · mock list paged · one palette already · course codes stay · S2 before S8
+
+- 2026-09-18 — D31–D36 ruled; messaging, quiz/announcement and config groups traced (D37–D51); S11, S12, S13 ticked; table sweep complete; no code
+  - ↳ pay-first kept, account at PAID · raw stripped · Paystack sweep of INIT · one limiter · Bulk Send parked · question reports · mock = premium design item · levels kept · config admin-only · grant all schema-wide · design system opened
+
+- 2026-09-18 — the port declared finished; auth traced alpha→gamma→port, D24–D30, ten rulings, S9/S10 ticked; payments traced, D31–D36; no code
+  - ↳ rebuild = a port · one Improvements list · auth fns public · users row owner-writable · alpha admin audit pages · Invite not Create User · pg_cron doorbell · email outbox · pay-first the root · raw keeps card data
+
+- 2026-09-18 — subscriptions diagnosed (D13–D21); course-level access and the attempt snapshot tables designed; S7 and S8 ticked into §8; no code changed
+  - ↳ cloud branch merged · access has two readers · days summed, never granted · course_access + product_courses · six rulings · attempt_items sealed / unsealed · stricter than MyNclex on the console · S3 superseded · remote delete refused
+
+- 2026-09-17 — post-rebuild diagnosis: a findings register opened, twelve structural findings, the attempts restructure drafted as §8 S7; no code changed
+  - ↳ new doc not BUILD_LIST · rebuild.md untouched · prep-suffix ids → option C · runner leaks answers · score writable · bank readable · builders ship courses · keep live messaging · offline packs · MyNclex Pillar 2 · order S7→D9→D8 · unmerged
+
+- 2026-09-16 — the legacy check: every legacy page compared with the rebuild; nothing missing outright; 14 gaps queued, 4 to fix first
+  - ↳ nine parallel readers · autosave restarts on every answer · dropped connection freezes the runner · MCQ→TF saves the old letter · trial hint off · stale sidebar · 5 legacy bugs fixed silently · ~40 minor · nothing changed
+
+- 2026-09-16 — 10 built: the four legacy emails sent from the server through Resend; walked, all six arrived; the rebuild's slices declared complete
+  - ↳ sender as MyNclex, own Resend keys · Users page Assign emails too · §9 #25 values escaped · footer Quademia, live Telegram · expiry read from row · 15 dropped · 16, 17 to After · like for like until cutover · legacy check next
+
+- 2026-09-16 — 7f built: the student dashboard; slice 7 closed; then a measured investigation into why the app is slow, and into the schema
+  - ↳ Sam: keep 15, it is a sweep · ruling: runner link follows attempt mode · ~13 round trips a page, gate waits 3x, Postgres only 13ms · MyNclex: gate waits 2x, next/link 48 files vs 3 · item-bank policy per row · 2 scale cliffs · nothing changed
+
+- 2026-09-15 — 9, 14 and 12 built: payments, admin Payments / Users / dashboard / Attempts, messaging both sides with live replies; first prod release
+  - ↳ three slices split on one branch, all closed · 7f narrowed · §9 #20–#24 (two fixed) · password in the dev log → FormData · one Quademia account → after · prod: 11 migrations, licensure-prod up, paid products archived · branch rule per MyNclex
 
 - 2026-09-14 — fix: profile photo over 1 MB refused by Next’s Server Action body cap; raised to 3 MB, refusal caught into a toast, rule in AGENTS.md
   - ↳ Sam’s own upload failed after the 7e merge · same cap covered the question bank image upload · proven with a 1.61 MB PNG · then the cached old photo fixed with a version stamp on the address (Sam) · dev server restarted

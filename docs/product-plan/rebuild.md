@@ -1,10 +1,18 @@
 # MyNMCLicensure — the rebuild plan
 
 Written 2026-09-10 by Claude, from a planning session with Sam. Status:
-**in build — slices 0 and 1 done 2026-09-10; slice 2 (2a + 2b) done 2026-09-11.** This is the one document that says what the
-rebuild is, what it is not, and in what order it is built. The slice
-ladder at the end is mirrored line-for-line in `BUILD_LIST.md`; a slice
-is ticked in both places in the same commit.
+**finished — a completed piece of work, kept as history (Sam,
+2026-09-18).** This document describes the port of MyNMCLicensure from
+the vanilla-JS site onto the MyNclex stack, like for like; it was
+called "the rebuild" throughout, and the name stays in the slice ids
+and the record. The slices were declared complete by Sam on 2026-09-16
+(0–14 built; 15 dropped as a slice; 16 Cutover and 17 Telegram gate
+moved to `BUILD_LIST.md` — §12's closing paragraph), and the legacy
+check that followed found nothing missing. Current work — improving the
+app — is listed in `BUILD_LIST.md` under *Improvements*, with findings
+in `post-rebuild-diagnosis.md`. §8 stays live: a storage change is
+still ticked there before it is built. The slice ladder at the end is
+mirrored line-for-line in `BUILD_LIST.md`.
 
 Claude and Codex both build from this plan, one agent per session.
 Anything this document does not say, the agent in session asks Sam
@@ -407,11 +415,18 @@ not a decision.
 | # | Candidate | Legacy | Recommendation | Decision |
 |---|---|---|---|---|
 | S1 | User primary key | `users.user_id TEXT 'U_…'` + nullable `auth_id UUID`, no FK to `auth.users` | Keep `U_` ids (every table and every id in a support conversation uses them) but add the FK and make `auth_id` NOT NULL UNIQUE. A missing link is a bug, not a state | ✅ Sam, 2026-09-11. Slice 2 |
-| S2 | Eleven item tables | one table per course, identical shape | Keep eleven. The CSV importer, the bank page and the offline-pack picker are all written per table; one table is a bigger transcription for no visible gain | ☐ |
-| S3 | `attempts.answers_json`, `attempts.item_ids` | TEXT blobs | JSONB / TEXT[] — free under Postgres, lets the review page query rather than parse | ☐ |
+| S2 | Eleven item tables | one table per course, identical shape | ~~Keep eleven. The CSV importer, the bank page and the offline-pack picker are all written per table; one table is a bigger transcription for no visible gain~~ **Recommendation reversed 2026-09-18:** one `items` table with `course_id` → `courses`. S7 and S8 multiply every bank change by eleven (policies, D8's revoke, the snapshot copy, D9's counts), and a twelfth course is a deploy under the per-table shape. Detail and the one check (item ids unique bank-wide): `post-rebuild-diagnosis.md` D22 | ✅ Sam, 2026-09-19 (one `items` table; ids unique bank-wide on dev — 5,281 of 5,281 distinct; the plan in `08-question-bank.md`) · built 2026-09-19 as 08 B1 (`20260920010000_question_bank.sql`, named `question_bank`, the drop in the same file) |
+| S3 | `attempts.answers_json`, `attempts.item_ids` | TEXT blobs | JSONB / TEXT[] — free under Postgres, lets the review page query rather than parse | superseded by S7 (Sam, 2026-09-18) |
 | S4 | Foreign keys | none on licensure tables | Add them where the legacy data would satisfy them (subscriptions→users, products; attempts→users; payments→products; messages→threads). Refuse orphans at the floor | ✅ Sam, 2026-09-11, for `sessions → users` (slice 2). The rest as each table lands |
 | S5 | `config` table | live-editable key/value read on every page | Keep, exactly. An admin can change runner and builder tunables without a deploy, and that is a feature they have today. Read through one `lib/config/` accessor with the legacy fallbacks | keep (D4) |
 | S6 | `sessions.ip_hash` | column exists, never written (browser cannot see the IP) | Write it now that the server can. Same column, finally populated | ✅ Sam, 2026-09-11. Slice 2 |
+| S7 | Attempt and offline-pack shape | Both keep an id list and re-read the live bank: `attempts.item_ids` comma-joined TEXT + `answers_json` a JSON string carrying a second copy of `correct`; `offline_packs.item_ids` a TEXT[] the renderer follows back on every open. The runner receives every column of every question | Split each into a header row plus one row per question, the question snapshotted as served (`attempt_items`, `offline_pack_items` — one set of snapshot machinery, two tables). The runner's projection sealed while live, unsealed in review, with a per-item unseal for instant feedback; student INSERT/UPDATE on attempts dropped for server-side writes. Supersedes S3. `quizzes` / `mock_quizzes` deliberately unchanged — a product on offer must follow the live bank. Adopted from MyNclex (Pillar 2 + snapshot tables), keeping `user_has_course()` and this product's three question types. Cheapest before cutover: D5 leaves **both** tables empty on launch day. Detail: `post-rebuild-diagnosis.md`, D5–D7, D12 and *Proposed direction — the attempts restructure* | ✅ Sam, 2026-09-18 |
+| S8 | Course-level access | Access is derived from `products.courses_included` (a `text[]`, no FK) by two readers that agree by coincidence — TypeScript sums remaining days per course, SQL checks each row's own expiry — plus two more in announcements and offline packs; the days shown are a sum nothing grants and drift earlier daily; EXPIRED is a manual button | `product_courses` (product_id, course_id; FKs) replaces the array; `course_access` (user, course, subscription, start, expires, revoked_utc) written by the five server-side paths from `product_courses`, one row per course per receipt; `user_has_course()` becomes one lookup in it, a second function returns courses with latest expiry for the pages; `subscriptions` stays as the receipt (`product_id` nullable for a hand-picked grant). Start rule: "today" before cutover; queued behind the course's current end after (product change). Covers D13, D14, D16, D17, D20; enables D18. Cheapest before cutover: `subscriptions` is empty on launch day. Detail and Sam's six rulings: `post-rebuild-diagnosis.md`, *Proposed direction — course-level access* | ✅ Sam, 2026-09-18 · built 2026-09-19 as `02-subscriptions.md` C1 + C2 (`20260919200000_product_courses.sql`, `20260919230000_course_access.sql`, `…233000_course_access_grants.sql`; before S2 on Sam's reversal); C3a the queued start built 2026-09-19; C3b reshaped the same day — rows written by rule, the admin edits receipts, the panel shows the rows, no hand-picked grant, so `product_id` stays NOT NULL (Sam, 2026-09-19); **`subscriptions.created_utc` ticked (Sam, 2026-09-19)** — the receipt's start / expiry become its access window set from its rows, created_utc keeps when it was made (`20260919235000_subscriptions_created_utc.sql`); **the chain and `subscriptions.requested_start_utc` ticked (Sam, 2026-09-19)** — on each course a student's paid and free rows form a chain in floor order, each link starting at the later of its floor and the previous link's end, re-packed on every write; the floor is the admin's requested start on Grant, else created_utc (`20260920003000_subscriptions_requested_start.sql`); ruling 4 replaced |
+| S9 | Auth functions and the two alpha columns | The five login / reset functions (`log_auth_event`, `check_login_rate_limit`, `log_reset_request`, `check_reset_rate_limit`, `mark_reset_used`) carry the default EXECUTE to `public` — legacy's browser had to call them; the limiter keys on email + browser fingerprint only; `users.username` and `users.must_change_password` are residue of alpha's Create User page, which gamma never rebuilt (diagnosis, *The auth group*) | Revoke EXECUTE from `public`, `anon`, `authenticated` (the payments migration's own line, five times); the limiter takes the server's IP hash as a third key; drop `username` and `must_change_password` — *Invite by email* replaces Create User with a set-password link. Detail: D24, D29, D30 and the trace | ✅ Sam, 2026-09-18 (auth read-back items 2, 3, 7) · built 2026-09-19 (`20260919120000_auth_floor.sql`; IP thresholds 20 / 10 min, 50 / 24 h) |
+| S10 | The users row's browser writes | `users_update` locks role, active, user_id and auth_id only, so the owner can rewrite email, programme and the setup columns with their own JWT (proven on dev); `users_insert` accepts any values; `users.email` is an unconstrained copy stored as typed while Auth lowercases; registration inserts the profile as the new user, which works only while "Confirm email" is off | Column-level REVOKE of the frozen columns from `authenticated`; the profile insert and the admin's Deactivate through the service role behind the gates; `email` kept as a copy, lowercased on every write, with a unique index on `lower(email)` — reading it from Auth was rejected: ~15 readers would each gain a join for no gain once the copy is trustworthy. Closes the pay-first capture chain (D25). Detail: D25–D27 | ✅ Sam, 2026-09-18 (the lowercased unique copy) · built 2026-09-19 (same migration; UPDATE granted on the nine profile-page columns only) |
+| S11 | Messaging storage — the support desk shape | `messages_threads` and `messages` are alpha's two sheet tabs: the browser roles hold `grant all` and six policies that check only whose thread it is, so a student can insert a message as the admin, edit the admin's replies and rewrite the thread's status (proven on dev); `read_by_user` / `read_by_admin` on every message, counted by two rules that disagree; `admin_id` the literal `'admin1'`; `bulk_batch_id`, `quiz_id`, `question_id`, `attempt_id`, `ref_text` carrying the bulk and question jobs; no CHECK on any status word; `body_text` unbounded; the threads table outside the realtime publication (diagnosis, *The messaging group*, D37–D42) | **Writes:** INSERT and UPDATE on both tables revoked from `anon` and `authenticated`; the Server Actions write with the service role behind `requireStudent()` / `requireAdmin()`; the SELECT policies stay for reads and realtime; no UPDATE path on `messages` at all — a message is fixed once sent. **Unread:** `student_read_at` and `admin_read_at` (timestamptz, nullable) on `messages_threads` replace the two flags; a thread is unread for a party when `last_message_at` is later than their stamp and `last_sender_role` is the other party; the badge counts open threads by that test in one query, the dot uses the same test. **Shape:** `context_type` CHECK (`general`, `course`); `status` CHECK (`open`, `closed`); `sender_role` and `last_sender_role` CHECK (`student`, `admin`, `system`) — a `system` row written by the server carries the visible line "reopened by a reply"; `body_text` CHECK ≤ 2000; `admin_id`, `bulk_batch_id`, `quiz_id`, `question_id`, `attempt_id`, `ref_text` dropped (Bulk Send parked; question feedback becomes the reports feature, which adds a nullable `report_id` link when it lands); `messages_threads` added to the publication so a close reaches an open page. **Kept:** the `THR_` / `MSG_` ids, `user_id` → `users`, `course_id` → `courses`, `subject`, the reuse rule (general and course reuse an open thread), the six indexes less the two on the dropped flag. Code beside it, not storage: the 2000 cap in both send actions, the course link opening a draft, a paged admin inbox, the student send as a limiter door. Cheapest before cutover: both tables are empty on launch day; dev's 8 threads and 12 messages go with the migration | ✅ Sam, 2026-09-18 (the six support-desk rulings) |
+| S12 | Quiz, mock exam and announcement storage — the floor and the notice state | `quizzes_select`, `mock_quizzes_select` and `announcements_select` are `auth.uid() is not null`: every signed-in account reads every row of the three tables — every course, draft and archived, `item_ids` and `notes`, every scope field including `scope_user_ids` (proven on dev: an RN student reads the RM quizzes and all 45 mock question ids); the student pages then ship the rows whole to the browser; the scoping is TypeScript over an unscoped read; `user_notice_state.state` is one overwritten word (read then dismissed erases the read), `item_id` has no key, no CHECK on any status word (diagnosis, *The quiz and announcement group*, D44, D46, D47, D48) | **Quizzes and mock exams (kept as two tables — the mock is a different product awaiting its design):** the SELECT policies become `auth_user_role() = 'ADMIN' or (status = 'active' and published and user_has_course(course_id))`; `item_ids` and `notes` leave the browser roles' reach (column-level REVOKE of SELECT on both, the student list selecting the columns it renders; the attempt spawn reads `item_ids` with the service role — the same server-only read S7's start step makes); CHECK constraints on `status`, `allowed_modes`; `mock_quizzes.visibility` kept as the premium gate's flag, a CHECK on its three words. **Announcements:** one SECURITY DEFINER function `announcements_for_me()` applies the eight scope checks in SQL from the caller's profile and access and returns only the rendered columns (id, title, body, pinned, dismissible, created_at, start_at, end_at); the three student pages call it, one query each; `announcements_select` becomes ADMIN-only; `scope_user_ids` never leaves the server; CHECKs on `status`, `scope_audience`, `scope_subscription_kind`. **Notice state:** `read_at`, `clicked_at`, `dismissed_at` (timestamptz, nullable, each set once, never cleared) replace `state`, `seen_at`, `updated_at`; every count is a count of non-nulls; `item_id` → `announcements(announcement_id)`; the strip's ✕ sets `dismissed_at`; the write through the server behind `requireStudent()` with the row's identity the server's. Code beside it, not storage (D45): one availability check shared by Start and Retake on the server's clock, the list page taking `now` from the server render; archive one-way from any status, restore lands on `draft`; `saveQuiz` validating `status` and `allowed_modes`; stats keyed by `(source, quiz_id)` with retakes and abandons apart; the mock admin list paged like the fixed one. Cheapest before cutover: announcements and notice rows are empty on launch day (D5); the quizzes copied at cutover carry no `visibility` change. After S2 (one items table) the `item_ids` array becomes `quiz_items(quiz_id, item_id → items, position)` — noted here, decided with S2's build | ✅ Sam, 2026-09-18 (the four rulings: the floor, the lifecycle rules, the scoping function, the three timestamps) |
+| S13 | Config, levels and cohort — the reference shape | `config_select` is `auth.uid() is not null` because legacy's runner and builders read the table from the browser; the port's readers are server-side but read as the student, six inline fallbacks in two idioms, no accessor (S5 unbuilt), any string accepted for any key, `builder_default_questions` never read; the `levels` table (four rows) never read in any era while the four names live as two typed constants and `users.level` is free text; `users.cohort` free text, the admin pickers built by `distinct` over what students typed; `announcements.scope_level` a comma-joined string (diagnosis, *The config group*, D49, D51; D48) | **Config:** `config_select` becomes `auth_user_role() = 'ADMIN'`; the accessor S5 asked for, built as a **registry** in `lib/config/` — every known key with its type, bounds and default — reading the table **with the service role**, once per request; the admin page edits known keys through fields typed by the registry and refuses a value out of bounds, shows an unknown key as unknown, and refuses to delete a known key; `builder_default_questions` dropped (§9 #9). **Levels:** kept (Sam: needed in the future); `users.level` → `levels(level_id)` (every value in use matches); the profile picker and the two admin pickers read the table; the two typed constants go. **Cohort:** `users.cohort` becomes `integer` (a year), the profile field a year input, the pickers `distinct` over integers; existing text values cast where they parse, null where they do not (dev holds one, `2024`). **Announcements:** `scope_level` becomes `text[]` like its siblings (D48). Nothing user-visible changes except the cohort field's shape and a stricter Config page. Cheapest before cutover: users are not copied at cutover (D5) and config is seven rows | ✅ Sam, 2026-09-18 (config admin-only with the registry; levels kept; cohort a year) |
 
 ## 9. Carried defects and dead code — dispositions
 
@@ -435,6 +450,9 @@ feature; a user cannot tell.
 | 20 | The setup link the admin Payments page copies carries `&setup_token=…`, but the confirmation page never reads the token from the address — only from the verify reply or the browser's storage. The link still works because verify re-mints a token on every call | `admin/payments.html` `copySetupLink`, `payment-confirmation.html` `getReference` | Found in the slice 9 reading (2026-09-15). Reaches nobody: the page verifies on arrival and gets a fresh token. **Carried** (Sam, 2026-09-15); listed under "After the rebuild" to decide whether the link should carry the token at all |
 | 21 | `verify` is unauthenticated by design (the payer has no session yet) and hands a setup token to anyone who presents a reference; the reference (`QAC_` + 12 upper hex) is the only secret, and it also appears in Paystack's return address and the payer's receipt | `payment-worker` `handleVerify` | Found in the slice 9 reading (2026-09-15). Reaches a real payer only if a reference leaks before setup is completed, and only lets the holder create the account for the paid email. **Carried** (Sam, 2026-09-15) — the same model on the new stack; listed under "After the rebuild" for a rethink (a signed link, or the token read from the address and required) |
 | 22 | The confirmation page verifies every 3 seconds, up to 20 times, while Paystack has not said success — and the Worker's rate limit allows 5 calls per 60 seconds per address on the same route. So a payer whose mobile-money payment is still pending after about twelve seconds sees "Too many requests" and must tap Retry Verification, instead of the "still verifying" screen the poll was written for | `payment-confirmation.html` POLL_MS / MAX_POLLS, `payment-worker` wrangler ratelimits | Seen in the slice 9a walk (2026-09-15) on an unpaid reference: four polls, then the sixth call refused. Both numbers transcribed as they were. **Carried** (Sam, 2026-09-15); listed under "After the rebuild" — the fix is either a slower poll or a limit that excludes verify |
+| 23 | The admin dashboard's "View" links and the Payments page's "View Student" put the user's id in the address (`users.html?id=` and `?user_id=`), but the Users page never reads the address, so the drawer did not open — the admin landed on the plain list | `admin/dashboard.html`, `admin/payments.html`, `admin/users.html` | Found in the slice 14 reading (2026-09-15). Reaches an admin. **Fixed in 14a** (Sam, 2026-09-15): the Users page opens the drawer for a `?user_id=` in the address; the dashboard's View link uses the same name |
+| 24 | Two ways to assign a subscription: the Users page's drawer inserted a new row straight from the browser every time (`assignSubscription`), with no check for an existing one, so a second assign made a duplicate ACTIVE row; the Subscriptions page used the Worker's grant, which extends an existing one instead | `js/mynmclicensure-api.js` `assignSubscription`, `admin/users.html` | Found in the slice 14 reading (2026-09-15). Reaches an admin (and the student's course-access sum, which adds the duplicate's days). **Fixed in 14a** (Sam, 2026-09-15): the drawer's Assign calls slice 8's `grantSubscription` — one mechanism; the extend case is the only behaviour that changes |
+| 25 | Every value is pasted into the email's HTML as it is (`fillTemplate`'s plain replace), so a name typed at registration is rendered as markup: anyone can register a stranger's address with a link or a fake notice in the First name box, and the stranger receives a genuine welcome email carrying it | `email-worker/index.js` `fillTemplate`, `register.html` | Found in the slice 10 reading (2026-09-16); MyNclex's review of gamma's templates noted it too. Reaches a real person after launch — anyone whose address a stranger types into the register form. **Fixed in slice 10** (Sam, 2026-09-16): every value is HTML-escaped as it is filled in; a name with no markup in it reads exactly as before |
 
 **Dead things — remove or decide**
 
@@ -724,7 +742,12 @@ row (2a's `users_update` policy is the floor). The page's own toast
 is the shared one (UI convention #1). **7f** the dashboard alone —
 later, because its course cards, announcements strip and messages badge
 fold in slices 8, 11 and 12; the upgrade page moved to **9b** (Sam,
-2026-09-15), where it goes live with its payment button. *Done when* (7a)
+2026-09-15), where it goes live with its payment button. Built
+2026-09-16 with one ruling: the Recent Quiz Attempts table's Review and
+Resume open the runner for the attempt's own **mode**, where legacy sent
+every attempt to `instant.html` — 7a's learning history already routes
+that way and the two now agree (Sam, 2026-09-16; not a §9 entry, ruled
+on in session). *Done when* (7a)
 Sam's attempts from slices 6 and 5b appear with the right stats, a
 filter narrows them, Load more pages, and Review and Retake open the
 runner; (7b) the guide reads as legacy's did, the side list follows
@@ -778,8 +801,36 @@ mismatch lands as FAILED; (9b) an upgrade extends an existing
 subscription, and an admin can rescue a stuck row from the Payments page.
 
 **10 — Email.** The four templates and their four call sites; the
-Quademia sender; `appOrigin()`. *Done when* each of the four arrives in
-a real inbox from dev with working links.
+Quademia sender; `appOrigin()`. Scoped with Sam (2026-09-16), one
+session, no split: `lib/email/send.ts` hands each email to Resend with a
+plain fetch (no SDK, MyNclex's reason), awaited inside a try that logs
+and never blocks the action (§7.2); `lib/email/templates/` holds the
+four templates and the shared footer, transcribed from legacy's HTML.
+**The sender is MyNclex's as it is today**: `MyNMCLicensure
+<noreply@quademia.com>`, replies to `support@quademia.com` through a
+Reply-To header (legacy set none), on the Resend account MyNclex uses
+but with this product's own keys, `licensure-dev-app` and
+`licensure-prod-app` (a MyNclex key replaced would otherwise stop these
+emails with no page to show it); every Quademia product moves to the
+agreed `hello@mail.quademia.com` together. **The grant sends
+SUBSCRIPTION_ASSIGNED wherever it is called**, so the Users page's
+Assign — silent in legacy — sends it too (§9 #24's one mechanism); the
+expiry is read back from the row, and the product is named as legacy's
+Grant dropdown named it, `name (KIND)`. **Every value filled into a
+template is escaped** (§9 #25). "QAcademy" becomes "Quademia" in the
+subjects, the headers and the copy (UI convention #5; "QAcademy Nurses
+Hub" → "Quademia" as in 13a), and `support@qacademynurses.com` becomes
+`support@quademia.com` (the 9a address). The footer names **Quademia
+with no company name** (Quademia Ltd is not registered — MyNclex's
+rule) and links quademia.com through `parentSiteOrigin()`; its Telegram
+button goes to the live `t.me/QAcademynurseshub` channel the landing
+page and the sidebar use (legacy's `t.me/qacademynurses` is a blank
+contact page); TikTok and WhatsApp are legacy's. PAYMENT_SETUP_REQUIRED
+is sent from an admin-only Retry Activation action that wraps verify —
+never from verify itself, which the confirmation page polls every 3 s.
+Not built, as legacy had none: an outbox, retries, an admin email page
+(MyNclex's are a mechanism, not stack). *Done when* each of the four
+arrives in a real inbox from dev with working links.
 
 **11 — Announcements.** `announcements`, `user_notice_state`; admin
 page with the eight scope dimensions; student page; the dashboard strip
@@ -824,9 +875,34 @@ resolution by scope; unread badges in both sidebars. **Also here: the
 out of slice 6, 2026-09-13) — it saves progress, then opens the
 messages page with the course, attempt, quiz and item ids and the
 quoted question, options as shown and the student's current answer,
-never the correct one. *Done when* a bulk send to a scope creates one
-thread per recipient and the badge counts match, and a student can
-send feedback on a question from inside a running quiz.
+never the correct one. Built in two sessions (Sam, 2026-09-15): **12a**
+the student side — the migration with both tables and legacy's
+policies (the June 2026 admin bypass on the thread insert included)
+and the `messages` table added to the realtime publication; the
+student page (the inbox and the conversation pane, "+ New" with its
+subject prompt and the reuse banner, the 800-character compose with
+Enter to send, date dividers, links made clickable, the closed banner
+with "Start a new conversation", the pinned reference card for a
+course or question thread); the three contexts — general from the
+page, course from the course page's "Message us", question from the
+runners' "Send feedback" (both runners: the reference text with the
+stem, the options as shown and the current answer, never the correct
+one; progress saved first; the page opened in a new tab); live admin
+replies through the realtime feed as legacy had them; the student
+sidebar's badge. **12b** the admin side — the inbox with its filters
+(student search, type and status on the server; "unread only" in the
+browser), the conversation pane with reply, Close and Reopen, the
+New Thread dialog (student search or a pasted id, one thread per
+chosen course), Bulk Send (the five scope pickers, "Preview count"
+required first, the confirmation line, the subject in brackets) —
+the recipients resolved as legacy resolved them, then the threads
+written in one insert and the messages in another, not one student
+at a time (a Worker's time limit; same rows, same result); the admin
+sidebar's badge. *Done when* (12a) a student sends feedback on a
+question from inside a running quiz and it lands as a question thread
+with the reference text, and a course page's "Message us" opens or
+reuses that course's thread; (12b) a bulk send to a scope creates one
+thread per recipient and the badge counts match.
 
 **13 — Offline packs.** `offline_packs`; the builder with filters,
 `offline_max_questions` (100) and `offline_packs_per_course` (5) from
@@ -880,7 +956,23 @@ a filter narrows them, and Open lands on the renderer.
 **14 — Admin home.** Dashboard with its four counts; Users page with
 the detail drawer and the profile fields; Attempts analytics page as
 built 2026-06-04 (windows, breakdowns, per-day strip, top-10s, table,
-drawer). *Done when* the admin sidebar has no dead link.
+drawer). Built in two sessions (Sam, 2026-09-15): **14a** the Users
+page (the search debounced 300 ms, the role and programme filters —
+the Teacher option dropped, §9 #12 — the table of 50 with Load More
+and "Showing X of Y", the drawer with the profile fields, the active
+subscription with its expiry state, the subscription history, Assign
+Subscription through slice 8's grant action — one mechanism, §9 #24 —
+Send Password Reset Email as a server call with the link on
+`appOrigin()` and no rate limit as legacy's admin path had none,
+Deactivate / Reactivate; a `?user_id=` in the address opens the
+drawer, §9 #23) and the dashboard (the four counts, the eight quick
+links, Recent Registrations with View into the Users page); **14b**
+the Attempts analytics page. *Done when* (14a) an admin finds a
+student by name, opens the drawer from the table and from a Payments
+"View Student" link, assigns a subscription that extends rather than
+duplicates, sends a reset, deactivates and reactivates, and the
+dashboard's counts match the tables; (14b) the admin sidebar has no
+dead link.
 
 **15 — Phone pass.** Every student surface at 375px, every admin
 surface navigable at 768px, using the shared drawer. Not a redesign:
@@ -894,6 +986,18 @@ phone.
 Slices 3–7 need nothing from 8–14 and can run in any order after 2.
 Slices 8 → 9 → 10 are a chain. 11, 12, 13 are independent of each
 other and of 8–10. 14 needs 6 and 8. 15 last but one.
+
+**The slices declared complete (Sam, 2026-09-16)**, with 10 closed the
+same day. **15 is dropped as a slice**: the phone layout is kept
+working with every change, during the rebuild and after it (UI
+convention #3), so it is not a session of its own. **16 Cutover and 17
+Telegram gate move to *After the rebuild*** in `BUILD_LIST.md`; §11
+still describes the day, and 17's paragraph above still describes the
+feature (the live legacy site lacks it, so launching before it loses
+nothing). **What comes next is Sam's check of `legacy/`, surface by
+surface, for anything the slices missed**; what it finds is built as
+legacy had it, under the same rules. **Like for like holds until
+cutover** — new features come after it (AGENTS.md ⭐).
 
 ## 13. What this plan does not do
 
@@ -938,17 +1042,19 @@ other and of 8–10. 14 needs 6 and 8. 15 last but one.
 | 7c Student home — NMC Procedures | ✅ 2026-09-14 |
 | 7d Student home — course page | ✅ 2026-09-14 |
 | 7e Student home — profile | ✅ 2026-09-14 |
-| 7f Student home — dashboard | ⬜ |
+| 7f Student home — dashboard | ✅ 2026-09-16 |
 | 8 Subscriptions | ✅ 2026-09-13 |
 | 9a Payments — table, rate limit, the four actions, subscribe, Premium Prep live, confirmation page | ✅ 2026-09-15 |
 | 9b Payments — the upgrade page live, the admin Payments page | ✅ 2026-09-15 |
-| 10 Email | ⬜ |
+| 10 Email | ✅ 2026-09-16 |
 | 11a Announcements — tables, scoping, admin page | ✅ 2026-09-14 |
 | 11b Announcements — student page, dashboard strip, course section | ✅ 2026-09-14 |
-| 12 Messaging | ⬜ |
+| 12a Messaging — tables, the student page, the three contexts, the runners' Send feedback, the student badge | ✅ 2026-09-15 |
+| 12b Messaging — the admin inbox, New Thread, Bulk Send, the admin badge | ✅ 2026-09-15 |
 | 13a Offline packs — table, allowance, picker, watermark, the builder, the renderer | ✅ 2026-09-14 |
 | 13b Offline packs — My Packs | ✅ 2026-09-14 |
-| 14 Admin home | ⬜ |
-| 15 Phone pass | ⬜ |
-| 16 Cutover | ⬜ |
-| 17 Telegram gate | ⬜ |
+| 14a Admin home — the Users page and the dashboard | ✅ 2026-09-15 |
+| 14b Admin home — the Attempts analytics page | ✅ 2026-09-15 |
+| 15 Phone pass | ✖ not a session of its own — phones kept working with every change (Sam, 2026-09-16) |
+| 16 Cutover | → *After the rebuild* in `BUILD_LIST.md` (Sam, 2026-09-16) |
+| 17 Telegram gate | → *After the rebuild* in `BUILD_LIST.md` (Sam, 2026-09-16) |

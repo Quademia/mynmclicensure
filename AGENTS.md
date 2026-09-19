@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-09-14. Rules for **any** assistant working in this
+Last updated: 2026-09-19. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What is built and
@@ -23,24 +23,38 @@ Ghana.
 
 ## Current Status
 
-**Being rebuilt, like for like, onto the MyNclex stack.** The live
-product is still the vanilla-JS site served from the `qacademy-gamma`
-repo; its code sits here under `legacy/` as the reference. The plan,
-the decisions and the slice ladder are `docs/product-plan/rebuild.md`.
-The inventory with dates is `BUILD_LIST.md`. Build what Sam asks for in
-the session; nothing more. A slice that needs splitting is split in
-`rebuild.md` §12 (a "done when" per part) and §14, then `BUILD_LIST.md`,
-in one commit — never in the feature docs `00–07`, which describe the
-legacy product and are not build plans (Sam, 2026-09-12).
+**The port is finished (Sam, 2026-09-16); the work now is improving
+the app.** The product was moved, like for like, from the vanilla-JS
+site onto the MyNclex stack — slices 0–14 of
+`docs/product-plan/rebuild.md`, then a page-by-page check against
+`legacy/` that found nothing missing. That was a port, not a redesign
+(the plan called it "the rebuild"; the name stays in the slice ids and
+the record): the behaviour and the data shapes came across as they
+were. What follows is one stream of improvement — security and storage
+shape first, so the database is the gate, then everything else — with
+cutover to the live domain as one item in it, not a wall the list is
+sorted around (Sam, 2026-09-18). The findings are
+`docs/product-plan/post-rebuild-diagnosis.md`; the one list is
+`BUILD_LIST.md` under *Improvements*; Sam orders it. The live product is
+still the vanilla-JS site served from the `qacademy-gamma` repo; its
+code stays here under `legacy/` as a reference — it says what the old
+app did, and Sam decides whether the new app should do the same. The
+feature docs `00–08` are the **living plan per feature** (Sam,
+2026-09-19, replacing the 2026-09-12 ruling that they were not build
+plans): each holds what the feature does today, what the diagnosis
+found, Sam's rulings, and the sliced plan with the doc's own slice
+ids; `BUILD_LIST.md` carries a section per doc. A doc is rewritten
+into that shape when its feature comes up, not before; until then it
+still describes the legacy product (rewritten so far: 03, 05). The
+diagnosis stays the register of findings; the feature doc is where a
+finding becomes a slice.
 
-⭐ **The rebuild adds no user-visible feature and no new mechanism.**
-Behaviour is transcribed from `legacy/` and the feature specs
-`docs/product-plan/00–07`. Where
-the two disagree, the code wins. An internal shape may change only where
-`rebuild.md` §8 lists it *and* Sam has ticked it with a date. A defect
-listed in `rebuild.md` §9 is fixed inside the slice that rebuilds its
-surface, never as work of its own. If something looks wrong and is not
-in §9, log it and ask; do not fix it silently.
+⭐ **Nothing is built without Sam's go-ahead in the session.** A change
+to storage still needs its row in `rebuild.md` §8, ticked by Sam with a
+date, before it is built. A finding in the diagnosis is not a decision;
+a decision is a §8 tick or a `BUILD_LIST.md` line. New features are
+allowed now that the port is done; each is still Sam's call, one at a
+time. If something looks wrong, log it and ask; do not fix it silently.
 
 ## Stack
 
@@ -67,7 +81,7 @@ stack and the source of the plumbing. MyTeacher follows later.
 - `scripts/` — the lint baseline and the migration runner.
 - `public/` — static assets.
 - `docs/product-plan/` — flat: the rebuild plan, the feature specs
-  `00–07`, the mock-exams reference, and the gamma-era plans kept for
+  `00–08`, the mock-exams reference, and the gamma-era plans kept for
   history. One folder until there is a reason to separate.
 - `sessions/` — period logs. `legacy/` — the old product, read-only.
 
@@ -196,6 +210,23 @@ above sit at the repo root; the audience grouping inside them is kept.
   `next dev` then 500s every page. Copy
   `node_modules/lightningcss-win32-x64-msvc/*.node` into
   `node_modules/lightningcss/`, delete `.next`, restart.
+- **The React compiler's lint refuses a clock read or a ref write during
+  render, and a synchronous `setState` inside an effect**
+  (`react-hooks/purity`, `react-hooks/refs`,
+  `react-hooks/set-state-in-effect`): read the clock through a
+  module-level helper, never in render; write a ref only in a handler;
+  stamp `Date.now()` into state from a **handler**, not an effect body.
+- **Browser storage is read through `useSyncExternalStore`**, never in
+  render and never through an effect that calls `setState`. Reading
+  `sessionStorage` / `localStorage` during render splits the server's
+  paint from the browser's (a hydration mismatch), and the effect that
+  would fix it trips the lint above. Give the hook a module-level
+  subscribe, a getSnapshot that reads storage in a try/catch, and a
+  server snapshot of whatever the first paint should show.
+- **A realtime subscription needs the table in the `supabase_realtime`
+  publication** and the client's `schema: 'licensure_gh'` on the
+  subscription — a table outside the publication fires nothing, with
+  no error. Add it in the migration that creates the table (guarded).
 - **A `<form action={fn}>` resets its fields after the action returns**
   (React 19). When the fields must survive — a submit that only opens a
   confirm step — use a plain `onSubmit` + `new FormData(form)`.
@@ -209,6 +240,16 @@ above sit at the repo root; the audience grouping inside them is kept.
 - **A desktop-app worktree has no `node_modules`** — `npm ci` in it —
   and gets a COPY of `.env.local` when created; a key added to the
   main checkout's file later must be copied across by hand.
+- **A new table in `licensure_gh` starts with `grant all` to the browser
+  roles** (the schema's default privileges): `revoke insert, update,
+  delete` still leaves TRUNCATE, REFERENCES and TRIGGER with `anon` and
+  `authenticated`. A table with no browser write path gets `revoke all`
+  then the one grant it needs; check `information_schema.role_table_grants`
+  after the apply.
+- **Migrate before the readers hot-reload.** `next dev` picks up an
+  edited reader within seconds; a migration applied minutes later leaves
+  every open page erroring in between. Run `npm run db:migrate` the
+  moment the readers are written, or migrate first.
 - **Migrations are applied by this repo's own runner**
   (`npm run db:migrate`, `scripts/db-migrate.mjs`), recorded in
   `licensure_gh.migrations`. Never `supabase db push`, never the MCP
@@ -231,8 +272,14 @@ Two long-lived branches on the remote:
 
 Each session works on a short-lived branch named for the assistant and
 the session (`codex/<slug>` or `claude/<slug>`), committing freely
-there. Nobody pushes directly to `main`; nobody merges to `main` or
-`production` without Sam's yes in the session.
+there. **The session branch stays local and is never pushed**: work
+reaches the remote by merging into `main` and pushing `main`, so the
+remote carries `main` and `production` only. A branch pushed by
+mistake is deleted from the remote after its merge (twelve had piled
+up by 2026-09-15). Nobody merges to `main` or `production` without
+Sam's yes in the session; a session may merge to `main` more than
+once, from the same branch, and the branch lives until the session
+ends.
 
 **Per-session loop:**
 
@@ -266,7 +313,16 @@ Sam says we are stopping. Do this, in this order.
 4. **This file, only if a rule changed** or a workaround was learned.
 5. **`npm run lint:check`** once; the log says what was checked.
 6. **One docs commit** on the session branch.
-7. **Ask Sam for the merge to `main`.** Merge only on an explicit yes.
+7. **Ask Sam for the merge to `main`.** Merge only on an explicit yes:
+
+   ```
+   git checkout main
+   git merge <session-branch> --ff-only
+   git push origin main
+   git checkout <session-branch>
+   ```
+
+   Never `git push origin <session-branch>`.
 8. **Report:** what is committed, what is on `main`, what is open. Stop.
 
 A session ends merged to `main`, or the log entry's first line says
@@ -297,7 +353,9 @@ gives one hard rule and two habits:
   the same working tree at once sweep up each other's half-written
   changes. A session ends merged to `main`, or its log entry says why
   not; the next session, whichever agent runs it, starts from there.
-- Start of session: `git fetch --prune`, read `SESSIONS.md` and the head
+- Start of session: `git fetch --prune` and `git branch -r` (a stray
+  remote branch is a fact to report, never assumed away — a cloud or
+  web session can push one), read `SESSIONS.md` and the head
   of the latest period file, `BUILD_LIST.md`, `git log --oneline -10`,
   and `git branch --no-merged main` — the other agent may have left a
   branch unmerged. Pick it up from its log entry, continue it or leave

@@ -3,34 +3,30 @@
 // The script block of legacy admin/subscriptions.html (slice 8): the
 // seven-counter stats row, the six filters and the Expiring Soon toggle,
 // the table grouped by student (first row full, the rest indented), the
-// side panel, the Grant dialog with its live student search and expiry
-// preview, the Edit dialog, the Revoke dialog, and the Sync Status
+// side panel, the shared Grant dialog (components/admin/grant-dialog.tsx,
+// opened here and from the Users drawer), the Edit dialog, the Revoke dialog, and the Sync Status
 // button. The lists arrive as props; after a write the route is
 // refreshed so the props carry the new rows (legacy re-fetched). Errors
 // and "done" messages are toasts (UI convention #1) where legacy used
 // the dialogs' inline alert boxes or a browser alert().
 //
-// The two emails legacy fired after a grant and a revoke are slice 10;
-// the Grant dialog's line promising one is legacy copy and stays.
+// The two emails legacy's page fired after a grant and a revoke are sent
+// by the grant and revoke actions on the server (slice 10); the Grant
+// dialog's line promising one is legacy copy, and now true.
 //
 // One legacy quirk changed: the student search ran a query on every
 // keystroke; here it waits 250 ms after typing stops. Same results.
 
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Toast } from '@/lib/toast/toast';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
-import {
-  grantSubscription,
-  revokeSubscription,
-  searchStudentsAction,
-  syncExpiredSubscriptions,
-  updateSubscription,
-} from '@/lib/subscriptions/actions';
-import { SUB_STATUSES, type StudentHit, type SubscriptionListRow } from '@/lib/subscriptions/types';
+import { loadAccessRows, revokeSubscription, syncExpiredSubscriptions, updateSubscription } from '@/lib/subscriptions/actions';
+import { SUB_STATUSES, type AccessRow, type SubscriptionListRow } from '@/lib/subscriptions/types';
 import type { Product, Program } from '@/lib/catalogue/types';
+import { GrantDialog, type GrantPreset } from '@/components/admin/grant-dialog';
 
 type Msg = { text: string; tone: 'error' | 'success' } | null;
 
@@ -45,8 +41,13 @@ function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-function fmtDateLong(d: Date): string {
-  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+// A course row's state word (02 C3b): a date, not a status — the same
+// test the gate makes.
+function accessRowState(r: AccessRow, now: Date): { word: string; cls: string } {
+  if (r.revoked_utc) return { word: 'Revoked', cls: 'REVOKED' };
+  if (new Date(r.expires_utc) <= now) return { word: 'Ended', cls: 'EXPIRED' };
+  if (new Date(r.start_utc) > now) return { word: 'Queued', cls: 'queued' };
+  return { word: 'Live', cls: 'ACTIVE' };
 }
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -76,12 +77,15 @@ export function SubscriptionsClient({
     const exp = new Date(s.expires_utc);
     return s.status === 'ACTIVE' && exp <= in7 && exp >= now;
   };
+  // Expired is the date's word, not the Sync button's (D20, 02 C2): an
+  // ACTIVE row past its expiry shows and counts as EXPIRED.
+  const shownStatus = (s: SubscriptionListRow) => (s.status === 'ACTIVE' && new Date(s.expires_utc) < now ? 'EXPIRED' : s.status);
 
   // ── stats (legacy updateStats) ──
   const stats = {
     total: subscriptions.length,
-    active: subscriptions.filter((s) => s.status === 'ACTIVE').length,
-    expired: subscriptions.filter((s) => s.status === 'EXPIRED').length,
+    active: subscriptions.filter((s) => shownStatus(s) === 'ACTIVE').length,
+    expired: subscriptions.filter((s) => shownStatus(s) === 'EXPIRED').length,
     paid: subscriptions.filter((s) => s.products?.kind === 'PAID').length,
     trial: subscriptions.filter((s) => s.products?.kind === 'TRIAL').length,
     free: subscriptions.filter((s) => s.products?.kind === 'FREE').length,
@@ -103,7 +107,7 @@ export function SubscriptionsClient({
     const fullName = studentName(u).toLowerCase();
     const email = (u?.email || '').toLowerCase();
     if (q && !fullName.includes(q) && !email.includes(q)) return false;
-    if (fStatus && s.status !== fStatus) return false;
+    if (fStatus && shownStatus(s) !== fStatus) return false;
     if (fKind && s.products?.kind !== fKind) return false;
     if (fProduct && s.product_id !== fProduct) return false;
     if (fProgramme && u?.program_id !== fProgramme) return false;
@@ -138,98 +142,34 @@ export function SubscriptionsClient({
   const [panelId, setPanelId] = useState<string | null>(null);
   const panelSub = panelId ? subscriptions.find((s) => s.subscription_id === panelId) ?? null : null;
   const closePanel = () => setPanelId(null);
-
-  // ── Grant dialog ──
-  const [grantOpen, setGrantOpen] = useState(false);
-  const [grantSearch, setGrantSearch] = useState('');
-  const [grantHits, setGrantHits] = useState<StudentHit[] | null>(null);
-  const [grantUserId, setGrantUserId] = useState('');
-  const [grantUserLabel, setGrantUserLabel] = useState('');
-  const [grantProduct, setGrantProduct] = useState('');
-  const [grantStart, setGrantStart] = useState('');
-  const [grantBusy, setGrantBusy] = useState<'idle' | 'granting' | 'granted'>('idle');
-
-  const activeProducts = products.filter((p) => String(p.status || '').toLowerCase() === 'active');
-
-  function resetGrant() {
-    setGrantSearch('');
-    setGrantHits(null);
-    setGrantUserId('');
-    setGrantUserLabel('');
-    setGrantProduct('');
-    setGrantStart('');
-    setGrantBusy('idle');
+  // The receipt's course rows (02 C3b): loaded when the panel opens and
+  // again after an Edit or a Revoke; null while loading.
+  const [panelRows, setPanelRows] = useState<AccessRow[] | null>(null);
+  function loadPanelRows(subscriptionId: string) {
+    setPanelRows(null);
+    loadAccessRows(subscriptionId).then(setPanelRows);
+  }
+  function openPanel(subscriptionId: string) {
+    setPanelId(subscriptionId);
+    loadPanelRows(subscriptionId);
   }
 
+  // ── Grant dialog — the shared component, remounted by key on each
+  // open so it starts clean (components/admin/grant-dialog.tsx) ──
+  const [grantOpen, setGrantOpen] = useState(false);
+  const [grantPreset, setGrantPreset] = useState<GrantPreset | null>(null);
+  const [grantKey, setGrantKey] = useState(0);
+
   function openGrantModal() {
-    resetGrant();
+    setGrantPreset(null);
+    setGrantKey((k) => k + 1);
     setGrantOpen(true);
   }
 
   function openGrantForUser(userId: string, name: string, email: string) {
-    resetGrant();
-    setGrantSearch(name);
-    setGrantUserId(userId);
-    setGrantUserLabel(`${name} (${email})`);
+    setGrantPreset({ user_id: userId, name, email });
+    setGrantKey((k) => k + 1);
     setGrantOpen(true);
-  }
-
-  // legacy searchGrantUser: typing clears the selection; 2+ chars searches.
-  useEffect(() => {
-    if (!grantOpen) return;
-    const term = grantSearch.trim();
-    if (grantUserId || term.length < 2) return;
-    const id = window.setTimeout(async () => {
-      const hits = await searchStudentsAction(term);
-      setGrantHits(hits);
-    }, 250);
-    return () => window.clearTimeout(id);
-  }, [grantSearch, grantOpen, grantUserId]);
-
-  function onGrantSearchChange(value: string) {
-    setGrantSearch(value);
-    setGrantUserId('');
-    setGrantUserLabel('');
-    if (value.trim().length < 2) setGrantHits(null);
-  }
-
-  function selectGrantUser(u: StudentHit) {
-    const name = studentName(u);
-    setGrantUserId(u.user_id);
-    setGrantSearch(name);
-    setGrantUserLabel(`${name} (${u.email})`);
-    setGrantHits(null);
-  }
-
-  function clearSelectedUser() {
-    setGrantUserId('');
-    setGrantSearch('');
-    setGrantUserLabel('');
-  }
-
-  // legacy updateDurationPreview
-  const grantProductRow = activeProducts.find((p) => p.product_id === grantProduct);
-  let durationPreview = '';
-  if (grantProductRow && grantProductRow.duration_days) {
-    const start = grantStart ? new Date(grantStart) : new Date();
-    const expiry = new Date(start.getTime() + grantProductRow.duration_days * DAY_MS);
-    durationPreview = `✅ Access will be granted for ${grantProductRow.duration_days} days — expires ${fmtDateLong(expiry)}`;
-  }
-
-  async function submitGrant() {
-    if (!grantUserId) return err('Please select a student.');
-    if (!grantProduct) return err('Please select a product.');
-
-    setGrantBusy('granting');
-    const result = await grantSubscription(grantUserId, grantProduct, grantStart || '');
-    if (!result.ok) {
-      setGrantBusy('idle');
-      return err(result.error);
-    }
-    setGrantBusy('granted');
-    ok('✅ Subscription granted successfully.');
-    router.refresh();
-    window.setTimeout(() => setGrantOpen(false), 1800);
   }
 
   // ── Edit dialog ──
@@ -286,6 +226,7 @@ export function SubscriptionsClient({
     }
     setEditBusy('saved');
     ok('✅ Subscription updated successfully.');
+    loadPanelRows(editId);
     router.refresh();
     window.setTimeout(() => {
       setEditId(null);
@@ -439,6 +380,7 @@ export function SubscriptionsClient({
                   <th>Programme</th>
                   <th>Product</th>
                   <th>Status</th>
+                  <th>Granted</th>
                   <th>Start</th>
                   <th>Expires</th>
                   <th>Source</th>
@@ -454,7 +396,7 @@ export function SubscriptionsClient({
                   const count = userSubCount[s.user_id];
                   const expiring = isExpiringSoon(s);
                   return (
-                    <tr key={s.subscription_id} className={first ? 'group-first' : 'group-continuation'} onClick={() => setPanelId(s.subscription_id)}>
+                    <tr key={s.subscription_id} className={first ? 'group-first' : 'group-continuation'} onClick={() => openPanel(s.subscription_id)}>
                       {first ? (
                         <td>
                           <div className="cell-name">
@@ -468,7 +410,8 @@ export function SubscriptionsClient({
                       )}
                       <td className={first ? 'cell-13' : 'cell-muted'}>{u?.program_id || '—'}</td>
                       <td className="cell-product">{s.products?.name || s.product_id || '—'}</td>
-                      <td>{expiring ? <span className="chip expiring">⚠️ Expiring</span> : <span className={`chip ${s.status}`}>{s.status}</span>}</td>
+                      <td>{expiring ? <span className="chip expiring">⚠️ Expiring</span> : <span className={`chip ${shownStatus(s)}`}>{shownStatus(s)}</span>}</td>
+                      <td className="cell-13 cell-muted">{fmtDate(s.created_utc)}</td>
                       <td className="cell-13">{fmtDate(s.start_utc)}</td>
                       <td className={`cell-13${expiring ? ' cell-expiring' : ''}`}>{fmtDate(s.expires_utc)}</td>
                       <td><span className="source-chip">{s.source || '—'}</span></td>
@@ -503,7 +446,8 @@ export function SubscriptionsClient({
                   <div className="detail-section">
                     <h4>Subscription</h4>
                     <div className="detail-row"><span className="key">Product</span><span className="val">{panelSub.products?.name || panelSub.product_id}</span></div>
-                    <div className="detail-row"><span className="key">Status</span><span className="val"><span className={`chip ${panelSub.status}`}>{panelSub.status}</span></span></div>
+                    <div className="detail-row"><span className="key">Status</span><span className="val"><span className={`chip ${shownStatus(panelSub)}`}>{shownStatus(panelSub)}</span></span></div>
+                    <div className="detail-row"><span className="key">Granted on</span><span className="val">{fmtDate(panelSub.created_utc)}</span></div>
                     <div className="detail-row"><span className="key">Start</span><span className="val">{fmtDate(panelSub.start_utc)}</span></div>
                     <div className="detail-row"><span className="key">Expires</span><span className="val">{fmtDate(panelSub.expires_utc)}</span></div>
                     <div className="detail-row">
@@ -516,6 +460,26 @@ export function SubscriptionsClient({
                     {panelSub.source_ref ? (
                       <div className="detail-row"><span className="key">Reference</span><span className="val small">{panelSub.source_ref}</span></div>
                     ) : null}
+                  </div>
+                  <div className="detail-section">
+                    <h4>Course access</h4>
+                    {panelRows === null ? (
+                      <div className="detail-empty">Loading…</div>
+                    ) : panelRows.length === 0 ? (
+                      <div className="detail-empty">No course rows on this subscription.</div>
+                    ) : (
+                      panelRows.map((r) => {
+                        const state = accessRowState(r, now);
+                        return (
+                          <div className="detail-row" key={r.access_id}>
+                            <span className="key" title={r.course_id}>{r.courses?.title || r.course_id}</span>
+                            <span className="val small">
+                              {fmtDate(r.start_utc)} → {fmtDate(r.expires_utc)} <span className={`chip ${state.cls}`}>{state.word}</span>
+                            </span>
+                          </div>
+                        );
+                      })
+                    )}
                   </div>
                 </div>
                 <div className="panel-actions">
@@ -530,57 +494,15 @@ export function SubscriptionsClient({
             ) : null}
           </div>
 
-          {/* Grant dialog */}
-          <div className={`modal-overlay${grantOpen ? ' show' : ''}`}>
-            <div className="modal" role="dialog" aria-modal="true" aria-labelledby="grantTitle">
-              <div className="modal-header">
-                <h3 id="grantTitle">Grant Subscription</h3>
-                <button type="button" className="panel-close" onClick={() => setGrantOpen(false)}>×</button>
-              </div>
-              <div className="modal-body">
-                <div className="form-group">
-                  <label htmlFor="grantUserSearch">Student *</label>
-                  <input id="grantUserSearch" type="text" placeholder="Search by name or email…" autoComplete="off" value={grantSearch} onChange={(e) => onGrantSearchChange(e.target.value)} />
-                  <div className={`user-search-results${grantHits && !grantUserId ? ' show' : ''}`}>
-                    {grantHits && grantHits.length === 0 ? (
-                      <div className="user-result-item"><span className="meta">No students found</span></div>
-                    ) : (
-                      (grantHits || []).map((u) => (
-                        <div key={u.user_id} className="user-result-item" onClick={() => selectGrantUser(u)}>
-                          <div className="name">{studentName(u)}</div>
-                          <div className="meta">{u.email} · {u.program_id || '—'}</div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                  <div className={`selected-user-badge${grantUserId ? ' show' : ''}`}>
-                    <span>{grantUserLabel}</span>
-                    <button type="button" onClick={clearSelectedUser}>×</button>
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="grantProduct">Product *</label>
-                  <select id="grantProduct" value={grantProduct} onChange={(e) => setGrantProduct(e.target.value)}>
-                    <option value="">Select product</option>
-                    {activeProducts.map((p) => <option key={p.product_id} value={p.product_id}>{p.name} ({p.kind})</option>)}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="grantStartDate">Start Date</label>
-                  <input id="grantStartDate" type="date" value={grantStart} onChange={(e) => setGrantStart(e.target.value)} />
-                  <p className="form-hint">Leave blank to start from today.</p>
-                </div>
-                {durationPreview ? <div className="duration-preview">{durationPreview}</div> : null}
-                <p className="note">📧 A confirmation email will be sent to the student automatically.</p>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-ghost" onClick={() => setGrantOpen(false)}>Cancel</button>
-                <button type="button" className="btn btn-primary" disabled={grantBusy !== 'idle'} onClick={submitGrant}>
-                  {grantBusy === 'granting' ? 'Granting…' : grantBusy === 'granted' ? 'Granted ✓' : 'Grant Access'}
-                </button>
-              </div>
-            </div>
-          </div>
+          <GrantDialog
+            key={grantKey}
+            open={grantOpen}
+            preset={grantPreset}
+            products={products}
+            notify={(text, tone) => (tone === 'error' ? err(text) : ok(text))}
+            onClose={() => setGrantOpen(false)}
+            onGranted={() => router.refresh()}
+          />
 
           {/* Revoke dialog */}
           <div className={`modal-overlay${revokeTarget ? ' show' : ''}`}>

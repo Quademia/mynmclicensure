@@ -29,6 +29,8 @@ export const RATIONALE_IMAGE_MAX_BYTES = 2 * 1024 * 1024;
 
 export type Item = {
   item_id: string;
+  /** The course the question belongs to — the one table's key to courses (08 B1). */
+  course_id: string;
   question_type: QuestionType;
   stem: string;
   option_a: string | null; fb_a: string | null;

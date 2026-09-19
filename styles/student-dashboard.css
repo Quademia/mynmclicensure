@@ -2,8 +2,12 @@
  *
  * The student dashboard (legacy student/dashboard.html). Started in
  * slice 11b with the announcements block only, transcribed from the
- * legacy page's inline <style> block and scoped under `.sdash`; 7e
- * brings the rest of the page's rules here.
+ * legacy page's inline <style> block and scoped under `.sdash`; slice
+ * 7f brought the rest of the page's rules here — the nudge, the
+ * subscription bar, the channels card, the course cards, the two promo
+ * blocks, the attempts table and the guide bubble — plus legacy's
+ * global .btn / .btn-primary, scoped in as the other student pages do,
+ * and the 768px pass (UI convention #3).
  */
 
 .sdash .announcements-block { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 24px; overflow: hidden; }
@@ -39,3 +43,105 @@
 .sdash .announcement-read-more:hover { text-decoration: underline; }
 .sdash .announcements-footer { display: block; padding: 10px 16px; font-size: 13px; color: var(--accent); font-weight: 500; text-decoration: none; border-top: 1px solid var(--border); text-align: center; }
 .sdash .announcements-footer:hover { background: var(--bg); text-decoration: none; }
+
+/* ── Profile-completion nudge (slim strip) ── */
+.sdash .profile-nudge { display: flex; align-items: center; gap: 10px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 9px 12px; margin-bottom: 16px; }
+.sdash .profile-nudge .pn-main { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; text-decoration: none; color: #92400e; font-size: 13px; font-weight: 600; }
+.sdash .profile-nudge .pn-text { flex: 1; min-width: 0; }
+.sdash .profile-nudge .pn-cta { color: #b45309; white-space: nowrap; }
+.sdash .profile-nudge .pn-close { background: none; border: none; color: #b45309; font-size: 18px; line-height: 1; cursor: pointer; padding: 0 2px; opacity: 0.7; flex-shrink: 0; font-family: inherit; }
+.sdash .profile-nudge .pn-close:hover { opacity: 1; }
+
+/* ── Subscription status bar ── */
+.sdash .subscription-bar { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 20px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.sdash .subscription-bar.warning { background: #fffbeb; border-color: #fcd34d; }
+.sdash .subscription-bar.expired { background: #fef2f2; border-color: #fecaca; }
+.sdash .sub-label { font-size: 13px; color: var(--text-muted); }
+.sdash .sub-name { font-size: 15px; font-weight: 600; color: var(--text); }
+.sdash .sub-expiry { font-size: 13px; color: var(--text-muted); }
+.sdash .sub-expiry.warning { color: var(--warning); font-weight: 600; }
+.sdash .sub-expiry.expired { color: var(--danger); font-weight: 600; }
+/* legacy put `width:auto; padding:8px 16px` inline on the Subscribe
+   button, so it beat the global .btn-primary's width:100%. Scoped here
+   it must out-rank .sdash .btn-primary, which is declared further down. */
+.sdash .btn.sub-cta { width: auto; padding: 8px 16px; }
+
+/* ── Stay-connected channels card ── */
+.sdash .channels-card { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: var(--white); border: 1px solid var(--border); border-left: 4px solid #25d366; border-radius: var(--radius); padding: 14px 16px; margin-bottom: 24px; }
+.sdash .channels-card-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sdash .channels-card-title { font-size: 14px; font-weight: 700; color: var(--primary); }
+.sdash .channels-card-sub { font-size: 12.5px; color: var(--text-muted); }
+.sdash .channels-card-btns { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+.sdash .channel-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; color: #fff; text-decoration: none; white-space: nowrap; transition: opacity 0.12s; }
+.sdash .channel-btn:hover { opacity: 0.9; }
+.sdash .channel-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+.sdash .channel-btn.wa { background: #25d366; }
+.sdash .channel-btn.tg { background: #229ed9; }
+
+/* ── Section titles and the course cards ── */
+.sdash .section-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--text); }
+.sdash .empty-line { color: var(--text-muted); font-size: 14px; }
+/* legacy's dashboard grid is wider than the shell's shared .card-grid */
+.sdash .courses-area { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); margin-bottom: 32px; }
+.sdash .course-card { display: block; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; cursor: pointer; text-decoration: none; transition: box-shadow 0.2s, border-color 0.2s; }
+.sdash .course-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); border-color: var(--accent); }
+.sdash .course-badge { display: inline-block; background: var(--primary-light); color: var(--accent); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; margin-bottom: 10px; text-transform: uppercase; }
+.sdash .course-card h3 { font-size: 15px; font-weight: 700; margin: 0 0 6px; color: var(--primary); }
+.sdash .course-card p { font-size: 13px; color: var(--text-muted); margin: 0 0 12px; }
+.sdash .course-expiry { font-size: 12px; font-weight: 600; }
+.sdash .course-expiry.warning { color: var(--warning); }
+.sdash .course-expiry.normal { color: var(--accent); }
+
+/* ── The Quiz Builder and NMC Procedures blocks (legacy: inline styles) ── */
+.sdash .promo-block { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 24px; }
+.sdash .promo-block h3 { margin: 0 0 6px; font-size: 16px; font-weight: 700; color: var(--primary); }
+.sdash .promo-block p { margin: 4px 0 14px; color: var(--text-muted); font-size: 13px; line-height: 1.55; }
+/* legacy's inline style on these two set no width, so they keep the
+   global .btn-primary's full width — only the padding and size change */
+.sdash .promo-btn { display: inline-block; padding: 8px 16px; font-size: 13px; text-decoration: none; }
+
+/* ── Recent Quiz Attempts ── */
+.sdash .attempts-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 12px; }
+.sdash .attempts-head .section-title { margin-bottom: 0; }
+.sdash .attempts-head-link { font-size: 13px; color: var(--accent); font-weight: 600; text-decoration: none; white-space: nowrap; }
+.sdash .attempts-empty { margin: 0 0 12px; }
+.sdash .attempts-empty-btns { display: flex; gap: 8px; }
+.sdash .attempts-empty-btns .btn { flex: 1; padding: 8px 14px; font-size: 13px; text-decoration: none; text-align: center; }
+.sdash .attempts-scroll { overflow-x: auto; }
+.sdash .attempts-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.sdash .attempts-table th,
+.sdash .attempts-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; }
+.sdash .attempts-table th { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.sdash .attempt-action { font-size: 13px; color: var(--accent); text-decoration: none; }
+.sdash .attempt-action:hover { text-decoration: underline; }
+.sdash .status-chip { display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: capitalize; }
+.sdash .status-chip.completed { background: #dcfce7; color: #166534; }
+.sdash .status-chip.in_progress { background: #fef9c3; color: #854d0e; }
+.sdash .status-chip.abandoned { background: #f3f4f6; color: #6b7280; }
+
+/* ── Floating Portal Guide bubble (legacy: inline styles) ── */
+.sdash .guide-bubble { position: fixed; bottom: 18px; right: 16px; z-index: 900; display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px; background: var(--primary); color: #fff; font-size: 13px; font-weight: 600; text-decoration: none; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2); transition: transform 0.15s, box-shadow 0.15s; }
+.sdash .guide-bubble:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25); }
+.sdash .guide-bubble-mark { display: inline-flex; width: 20px; height: 20px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); align-items: center; justify-content: center; font-size: 13px; font-weight: 800; }
+
+/* ── legacy global .btn / .btn-primary, scoped (the shell loads none) ── */
+.sdash .btn { display: inline-block; padding: 10px 20px; border-radius: var(--radius); font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; border: none; transition: background-color 0.2s; text-align: center; text-decoration: none; }
+.sdash .btn-primary { background-color: var(--primary); color: var(--white); width: 100%; padding: 12px; }
+.sdash .btn-primary:hover { background-color: var(--primary-dark); }
+
+/* ── Phone (UI convention #3) ── */
+@media (max-width: 560px) {
+  .sdash .channels-card { flex-direction: column; align-items: stretch; }
+  .sdash .channels-card-btns { width: 100%; }
+  .sdash .channel-btn { flex: 1; justify-content: center; }
+}
+
+@media (max-width: 768px) {
+  /* the subscription bar needs nothing: legacy's own flex-wrap drops the
+     Subscribe button onto its own line at its natural width */
+  .sdash .courses-area { grid-template-columns: 1fr; }
+  .sdash .attempts-head { flex-wrap: wrap; }
+  .sdash .attempts-table { min-width: 620px; }
+  .sdash .attempts-empty-btns { flex-direction: column; }
+  .sdash .guide-bubble { bottom: 12px; right: 12px; padding: 8px 14px; }
+}

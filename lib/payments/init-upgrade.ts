@@ -21,6 +21,7 @@ import { makePaymentReference } from './ids';
 import { paystackInitialize } from './paystack';
 import { getProductForPayment } from './queries';
 import { checkPaymentRateLimit } from './rate-limit';
+import { trimInitReply } from './trim';
 import { RATE_LIMITED_MESSAGE, type InitResult } from './types';
 
 export async function initUpgradePayment(productIdIn: string): Promise<InitResult> {
@@ -95,7 +96,8 @@ export async function initUpgradePayment(productIdIn: string): Promise<InitResul
       },
     });
 
-    await db.from('payments').update({ raw: { flow: 'upgrade', init: initResult } }).eq('reference', reference);
+    // Trimmed before the write (D32), as init-public.
+    await db.from('payments').update({ raw: { flow: 'upgrade', init: trimInitReply(initResult) } }).eq('reference', reference);
 
     const authorizationUrl = String(initResult?.data?.authorization_url || '');
     if (!authorizationUrl) {

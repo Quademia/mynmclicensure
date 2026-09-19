@@ -14,6 +14,9 @@ export type SubscriptionStatus = (typeof SUB_STATUSES)[number];
 export const ADMIN_SUB_SOURCES = ['SELF_TRIAL_SIGNUP', 'PAYSTACK', 'ADMIN'] as const;
 export type SubscriptionSource = (typeof ADMIN_SUB_SOURCES)[number] | 'PAYMENT';
 
+// The receipt (02 C3b, Sam 2026-09-19): start_utc / expires_utc are its
+// access window, set from its course rows by the row writer; created_utc
+// is when it was made.
 export type Subscription = {
   subscription_id: string;
   user_id: string;
@@ -24,13 +27,16 @@ export type Subscription = {
   expiry_reminded: boolean;
   source: SubscriptionSource;
   source_ref: string | null;
+  created_utc: string;
+  /** The admin's chosen start on Grant — the receipt's floor in the chain; null = created_utc (C3b). */
+  requested_start_utc: string | null;
 };
 
 // The admin page's list row: the subscription with the student and the
-// product joined, exactly the columns legacy selected.
+// product joined, exactly the columns legacy selected, plus created_utc.
 export type SubscriptionListRow = Pick<
   Subscription,
-  'subscription_id' | 'user_id' | 'product_id' | 'start_utc' | 'expires_utc' | 'status' | 'source' | 'source_ref'
+  'subscription_id' | 'user_id' | 'product_id' | 'start_utc' | 'expires_utc' | 'status' | 'source' | 'source_ref' | 'created_utc'
 > & {
   users: {
     user_id: string;
@@ -57,14 +63,31 @@ export type StudentHit = {
   program_id: string | null;
 };
 
+// A receipt's course rows as the admin panel shows them (02 C3b): the
+// course_access row with the course's title joined.
+export type AccessRow = {
+  access_id: number;
+  course_id: string;
+  start_utc: string;
+  expires_utc: string;
+  revoked_utc: string | null;
+  courses: { title: string } | null;
+};
+
+// The Grant dialog's preview (02 C3b): each course of the product with
+// the start and end the chain would give it.
+export type PreviewRow = { course_id: string; title: string; start_utc: string; expires_utc: string };
+export type PreviewResult = { ok: true; rows: PreviewRow[] } | { ok: false; error: string };
+
 // legacy getStudentCourseAccess(): { course_id: { totalDays, expires } }.
 export type CourseAccess = { totalDays: number; expires: string };
 export type CourseAccessMap = Record<string, CourseAccess>;
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
-// grant: the Worker said which of its two paths ran.
-export type GrantResult = { ok: true; mode: 'extended_existing' | 'created_new' } | { ok: false; error: string };
+// grant: the Worker said which of its two paths ran; since 02 C3a there
+// is one path (a fresh receipt, its rows queued), so the mode went.
+export type GrantResult = ActionResult;
 
 // sync-expired: the Worker returned the count.
 export type SyncResult = { ok: true; updatedCount: number } | { ok: false; error: string };

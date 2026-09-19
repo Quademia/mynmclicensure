@@ -19,7 +19,11 @@
 // are the server's (finishAttempt recomputes); before that the browser's
 // own arithmetic drives the live feedback, from the same functions.
 //
-// Not here, by slice: "Send feedback" on each question (slice 12).
+// "Send feedback" under each question (slice 12a): builds legacy's
+// reference text — the stem, the options as shown and the student's
+// current answer, never the correct one — saves progress, then opens
+// the messages page in a new tab with the course, attempt, quiz and
+// item ids and the quoted question (locked or review: opens at once).
 // Legacy's brand string in the header and the watermark read
 // "QAcademy"; the brand is Quademia (AGENTS.md UI convention #5).
 
@@ -622,11 +626,66 @@ export function QuizRunner({
             <button type="button" className={`btn btn-flag${flags[item.item_id] ? ' flagged' : ''}`} disabled={disabled} onClick={() => toggleFlag(item)}>
               {flags[item.item_id] ? '🚩 Unflag' : '⚑ Flag'}
             </button>
+            <button type="button" className="btn-sm-link" onClick={() => sendFeedback(item, globalIdx, opts, chosenRaw)}>
+              Send feedback
+            </button>
           </div>
           <div className="watermark">Quademia</div>
         </div>
       </div>
     );
+  }
+
+  // ── Send feedback (legacy buildFriendlyRefText + the button) ──
+  function buildFeedbackRef(item: Item, globalIdx: number, opts: OptionView[], chosenRaw: ChosenMap[string] | undefined): string {
+    const lines: string[] = [];
+    lines.push(`Quademia — Question feedback (${mode === 'timed' ? 'Timed' : 'Instant'} quiz)`);
+    lines.push(`Course: ${attempt.display_label || attempt.course_id || ''}`);
+    lines.push(`Question: ${globalIdx + 1} of ${items.length}`);
+    const topic = [item.maintopic, item.subtopic].filter(Boolean).join(' › ');
+    if (topic) lines.push(`Topic: ${topic}`);
+    lines.push('');
+    lines.push('Question:');
+    lines.push((item.stem || '').slice(0, 900));
+    lines.push('');
+    lines.push('Options (as shown):');
+    const labels = 'ABCDEFGH';
+    opts.forEach((opt, i) => {
+      lines.push(`${labels[i]}. ${(opt.text || '').slice(0, 360)}`);
+    });
+    lines.push('');
+    if (chosenRaw) {
+      if (Array.isArray(chosenRaw)) {
+        const picks = chosenRaw.map((letter) => {
+          const match = opts.find((o) => o.letter === letter);
+          return match ? match.text.slice(0, 120) : letter.toUpperCase();
+        });
+        lines.push(`My answer: ${picks.join(', ')}`);
+      } else {
+        const match = opts.find((o) => o.letter === chosenRaw);
+        const idx = match ? opts.indexOf(match) : -1;
+        const label = idx >= 0 ? labels[idx] : chosenRaw.toUpperCase();
+        lines.push(`My answer: ${label} - ${match ? match.text.slice(0, 120) : ''}`);
+      }
+    } else {
+      lines.push('My answer: (not answered yet)');
+    }
+    return lines.join('\n');
+  }
+
+  function sendFeedback(item: Item, globalIdx: number, opts: OptionView[], chosenRaw: ChosenMap[string] | undefined) {
+    const ref = buildFeedbackRef(item, globalIdx, opts, chosenRaw);
+    const url =
+      `/student/messages?course_id=${encodeURIComponent(attempt.course_id)}` +
+      `&attempt_id=${encodeURIComponent(attempt.attempt_id)}` +
+      `&quiz_id=${encodeURIComponent(attempt.quiz_id || '')}` +
+      `&item_id=${encodeURIComponent(item.item_id)}` +
+      `&ref=${encodeURIComponent(ref)}`;
+    if (locked || reviewMode) {
+      window.open(url, '_blank');
+    } else {
+      void saveProgress(false).then(() => window.open(url, '_blank'));
+    }
   }
 
   const pageStart = safePage * questionsPerPage;

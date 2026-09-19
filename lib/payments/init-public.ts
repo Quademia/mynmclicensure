@@ -23,6 +23,7 @@ import { makePaymentReference } from './ids';
 import { paystackInitialize } from './paystack';
 import { getProductForPayment } from './queries';
 import { checkPaymentRateLimit } from './rate-limit';
+import { trimInitReply } from './trim';
 import { RATE_LIMITED_MESSAGE, type InitPublicInput, type InitResult } from './types';
 
 export async function initPublicPayment(input: InitPublicInput): Promise<InitResult> {
@@ -96,7 +97,9 @@ export async function initPublicPayment(input: InitPublicInput): Promise<InitRes
       },
     });
 
-    await db.from('payments').update({ raw: { init: initResult } }).eq('reference', reference);
+    // Trimmed before the write (D32): the checkout address and access
+    // code are handed to the browser once and never stored.
+    await db.from('payments').update({ raw: { init: trimInitReply(initResult) } }).eq('reference', reference);
 
     const authorizationUrl = String(initResult?.data?.authorization_url || '');
     if (!authorizationUrl) {

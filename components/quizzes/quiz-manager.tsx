@@ -29,7 +29,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Toast } from '@/lib/toast/toast';
 import {
-  loadAllQuizzes,
   loadPickerItems,
   loadQuiz,
   loadQuizAttemptStats,
@@ -44,7 +43,6 @@ import {
   MODE_OPTIONS,
   QUIZ_STATUSES,
   type AllowedModes,
-  type Quiz,
   type QuizKind,
   type QuizListRow,
   type QuizStatus,
@@ -55,7 +53,7 @@ import type { Course } from '@/lib/catalogue/types';
 type Msg = { text: string; tone: 'error' | 'success' } | null;
 
 // The fixed list carries the list columns only; the mock list is whole.
-type ListRow = QuizListRow & Partial<Pick<Quiz, 'publish_at' | 'unpublish_at'>>;
+type ListRow = QuizListRow;
 
 type Pane = 1 | 2 | 3 | 4;
 
@@ -187,29 +185,22 @@ export function QuizManager({
   const [fMode, setFMode] = useState('');
   const [fPublished, setFPublished] = useState('');
 
-  // Fixed: one page from the database (legacy loadQuizList). Mock: the
-  // whole table (legacy getAllMockQuizzes).
+  // One page from the database (legacy loadQuizList) for both kinds —
+  // legacy loaded the mock table whole; since Q2 (D45 f) it pages too.
   const reloadList = useCallback(
     async (term: string, pageIndex: number, append: boolean) => {
       setListLoading(true);
-      if (kind === 'fixed') {
-        const result = await loadQuizPage(term, pageIndex);
-        setTotal(result.total);
-        setRows((prev) => (append ? prev.concat(result.quizzes) : result.quizzes));
-      } else {
-        const all = await loadAllQuizzes(kind);
-        setRows(all);
-        setTotal(all.length);
-      }
+      const result = await loadQuizPage(kind, term, pageIndex);
+      setTotal(result.total);
+      setRows((prev) => (append ? prev.concat(result.quizzes) : result.quizzes));
       setListLoading(false);
     },
     [kind],
   );
 
   // legacy applyQuizFilters: the title / id search hits the database after
-  // a 300 ms pause (fixed page only); the other filters run in the browser.
+  // a 300 ms pause; the other filters run in the browser over the loaded page.
   useEffect(() => {
-    if (kind !== 'fixed') return;
     const term = search.trim();
     if (term === currentSearch) return;
     const id = window.setTimeout(() => {
@@ -218,11 +209,9 @@ export function QuizManager({
       void reloadList(term, 0, false);
     }, 300);
     return () => window.clearTimeout(id);
-  }, [search, currentSearch, kind, reloadList]);
+  }, [search, currentSearch, reloadList]);
 
-  const q = search.toLowerCase().trim();
   const displayed = rows.filter((r) => {
-    if (kind === 'mock' && q && !r.title.toLowerCase().includes(q) && !r.quiz_id.toLowerCase().includes(q)) return false;
     if (fCourse && r.course_id !== fCourse) return false;
     if (fStatus && r.status !== fStatus) return false;
     if (fMode && r.allowed_modes !== fMode) return false;
@@ -230,10 +219,7 @@ export function QuizManager({
     return true;
   });
 
-  const resultCount =
-    kind === 'fixed'
-      ? `Showing ${displayed.length} of ${total} ${quizzesWord(total, kind)}`
-      : `${displayed.length} ${quizzesWord(displayed.length, kind)}`;
+  const resultCount = `Showing ${displayed.length} of ${total} ${quizzesWord(total, kind)}`;
 
   function clearListFilters() {
     setSearch('');
@@ -241,11 +227,9 @@ export function QuizManager({
     setFStatus('');
     setFMode('');
     setFPublished('');
-    if (kind === 'fixed') {
-      setCurrentSearch('');
-      setPage(0);
-      void reloadList('', 0, false);
-    }
+    setCurrentSearch('');
+    setPage(0);
+    void reloadList('', 0, false);
   }
 
   function loadMore() {
@@ -366,7 +350,7 @@ export function QuizManager({
 
     // legacy: the attempt stats, then the picker pre-loaded
     setStats(null);
-    const [quizStats, items] = await Promise.all([loadQuizAttemptStats(quizId), fetchPicker(quiz.course_id)]);
+    const [quizStats, items] = await Promise.all([loadQuizAttemptStats(kind, quizId), fetchPicker(quiz.course_id)]);
     setStats(quizStats);
     const byId = new Map(items.map((i) => [i.item_id, i]));
     setSelected((quiz.item_ids || []).map((id) => byId.get(id)).filter((i): i is Item => Boolean(i)));
@@ -402,17 +386,20 @@ export function QuizManager({
     goToPane(3);
   }
 
-  // legacy archiveCurrentQuiz: archived ↔ active, behind the browser's confirm.
+  // legacy archiveCurrentQuiz toggled archived ↔ active, so a restored
+  // draft came back active (D45 c). Since Q2: archive from any status,
+  // restore lands on draft — active is chosen on the form and saved.
+  // Behind the browser's confirm, as legacy.
   async function archiveOrRestore() {
     if (!currentQuizId) return;
-    const newStatus: QuizStatus = currentStatus === 'archived' ? 'active' : 'archived';
+    const newStatus: QuizStatus = currentStatus === 'archived' ? 'draft' : 'archived';
     if (!window.confirm(newStatus === 'archived' ? W.confirmArchive : W.confirmRestore)) return;
     const result = await setQuizStatus(kind, currentQuizId, newStatus);
     if (!result.ok) return err(result.error);
     setCurrentStatus(newStatus);
     setField('status', newStatus);
     setRows((prev) => prev.map((r) => (r.quiz_id === currentQuizId ? { ...r, status: newStatus } : r)));
-    ok(`${W.Noun} ${newStatus === 'archived' ? 'archived' : 'restored'} successfully.`);
+    ok(newStatus === 'archived' ? `${W.Noun} archived successfully.` : `${W.Noun} restored as a draft. Set it Active and save to publish it again.`);
   }
 
   // ── the picker's filters, in the browser (legacy applyPickerFilters) ──
@@ -637,7 +624,7 @@ export function QuizManager({
             )}
           </div>
 
-          {kind === 'fixed' && rows.length < total ? (
+          {rows.length < total ? (
             <div className="load-more-wrap">
               <button type="button" className="btn btn-ghost" disabled={listLoading} onClick={loadMore}>Load More</button>
             </div>
@@ -722,7 +709,10 @@ export function QuizManager({
                 <div className="form-section-title">Attempt Stats</div>
                 <div className="stats-row">
                   <div className="stat-box"><div className="stat-val">{stats.total}</div><div className="stat-lbl">Total Attempts</div></div>
+                  <div className="stat-box"><div className="stat-val">{stats.firstSittings}</div><div className="stat-lbl">First Sittings</div></div>
+                  <div className="stat-box"><div className="stat-val">{stats.retakes}</div><div className="stat-lbl">Retakes</div></div>
                   <div className="stat-box"><div className="stat-val">{stats.completed}</div><div className="stat-lbl">Completed</div></div>
+                  <div className="stat-box"><div className="stat-val">{stats.abandoned}</div><div className="stat-lbl">Abandoned</div></div>
                   <div className="stat-box"><div className="stat-val">{stats.completed > 0 ? `${stats.avgScore}%` : '—'}</div><div className="stat-lbl">Avg Score</div></div>
                 </div>
               </div>

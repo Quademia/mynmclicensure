@@ -12,13 +12,23 @@
 'use server';
 
 import { requireAdmin } from '@/lib/access';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getQuizAttemptStats } from '@/lib/attempts/queries';
 import type { QuizAttemptStats } from '@/lib/attempts/types';
 import { getItemsByFilters } from '@/lib/bank/queries';
-import { itemsTableFor } from '@/lib/bank/tables';
 import type { Item } from '@/lib/bank/types';
-import { getAllQuizzes, getAllQuizzesPaginated, getQuizById } from './queries';
-import { QUIZ_TABLES, type ActionResult, type Quiz, type QuizKind, type QuizPage, type QuizStatus, type SaveQuizInput } from './types';
+import { getAllQuizzesPaginated, getQuizById } from './queries';
+import {
+  ALLOWED_MODES,
+  QUIZ_STATUSES,
+  QUIZ_TABLES,
+  type ActionResult,
+  type Quiz,
+  type QuizKind,
+  type QuizPage,
+  type QuizStatus,
+  type SaveQuizInput,
+} from './types';
 
 function fail(error: string): ActionResult {
   return { ok: false, error };
@@ -27,10 +37,11 @@ function fail(error: string): ActionResult {
 // The words differ by page; everything else is the same script.
 const NOUN: Record<QuizKind, string> = { fixed: 'quiz', mock: 'mock exam' };
 
-// ── loadQuizList: the fixed-quiz list, one page (legacy loadQuizList) ──
-export async function loadQuizPage(searchTerm: string, page: number): Promise<QuizPage> {
+// ── loadQuizList: one page of either list (legacy loadQuizList; the mock
+// list pages too since Q2) ──
+export async function loadQuizPage(kind: QuizKind, searchTerm: string, page: number): Promise<QuizPage> {
   const { supabase } = await requireAdmin();
-  return getAllQuizzesPaginated(supabase, searchTerm, page, 50);
+  return getAllQuizzesPaginated(supabase, kind, searchTerm, page, 50);
 }
 
 // ── openEditQuiz: the full row ──────────────────────────────────────────
@@ -39,16 +50,16 @@ export async function loadQuizPage(searchTerm: string, page: number): Promise<Qu
 // no time limit, no schedule and no notes until something re-fetched the
 // whole table. The mock page loaded whole rows and had no such gap. The
 // edit step here reads the full row (legacy getQuizById) for both.
-// Logged as a fix in the 2026-09-13 session entry; not in §9.
+// Logged as a fix in the 2026-09-13 session entry; not in §9. Service
+// role since Q1: the admin's own client cannot read item_ids or notes.
 export async function loadQuiz(kind: QuizKind, quizId: string): Promise<Quiz | null> {
-  const { supabase } = await requireAdmin();
-  return getQuizById(supabase, kind, quizId);
+  await requireAdmin();
+  return getQuizById(createServiceRoleClient(), kind, quizId);
 }
 
 // ── loadPickerItems: the course's whole bank (legacy getItemsByFilters(courseId, {})) ──
 export async function loadPickerItems(courseId: string): Promise<Item[]> {
   const { supabase } = await requireAdmin();
-  if (!itemsTableFor(courseId)) return [];
   return getItemsByFilters(supabase, courseId, {});
 }
 
@@ -63,9 +74,14 @@ export async function setQuizPublished(kind: QuizKind, quizId: string, published
   return { ok: true };
 }
 
-// ── archiveCurrentQuiz: archived ↔ active ──────────────────────────────
+// ── archiveCurrentQuiz: archive one-way, restore to draft ─────────────
+// Legacy toggled archived ↔ active, so an archived draft came back
+// active without anyone publishing it (D45 c). Since Q2 this action
+// accepts two words only: 'archived' from any status, 'draft' as the
+// only way back; active is a choice made on the details form.
 export async function setQuizStatus(kind: QuizKind, quizId: string, status: QuizStatus): Promise<ActionResult> {
   const { supabase } = await requireAdmin();
+  if (status !== 'archived' && status !== 'draft') return fail('A quiz is archived, or restored as a draft.');
   const { error } = await supabase
     .from(QUIZ_TABLES[kind])
     .update({ status, updated_at: new Date().toISOString() })
@@ -91,6 +107,11 @@ export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
   const itemIds = input.itemIds.map((id) => String(id || '').trim()).filter(Boolean);
   const n = itemIds.length;
   if (n === 0) return fail(`Cannot save a ${noun} with no questions.`);
+
+  // Q2 (D45 d): the two words checked against their lists before the
+  // write, as saveAnnouncement checks its own; Q1's CHECKs are the floor.
+  if (!(QUIZ_STATUSES as readonly string[]).includes(input.status)) return fail('Please choose a valid status.');
+  if (!(ALLOWED_MODES as readonly string[]).includes(input.allowedModes)) return fail('Please choose a valid mode.');
 
   const timeLimitRaw = input.timeLimitSec.trim();
   const timeLimit = timeLimitRaw ? parseInt(timeLimitRaw, 10) : null;
@@ -125,17 +146,9 @@ export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
   return { ok: true };
 }
 
-// ── the whole list (legacy getAllQuizzes / getAllMockQuizzes) ──────────
-// The mock-exam page loads its list whole, and both pages re-read the
-// whole table after a save or an archive.
-export async function loadAllQuizzes(kind: QuizKind): Promise<Quiz[]> {
-  const { supabase } = await requireAdmin();
-  return getAllQuizzes(supabase, kind);
-}
-
 // ── the attempt-stats box on the details step (legacy openEditQuiz) ───
 // Added with slice 5b, once `attempts` existed.
-export async function loadQuizAttemptStats(quizId: string): Promise<QuizAttemptStats> {
+export async function loadQuizAttemptStats(kind: QuizKind, quizId: string): Promise<QuizAttemptStats> {
   const { supabase } = await requireAdmin();
-  return getQuizAttemptStats(supabase, quizId);
+  return getQuizAttemptStats(supabase, kind, quizId);
 }

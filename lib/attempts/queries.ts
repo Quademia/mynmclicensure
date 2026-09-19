@@ -10,23 +10,37 @@
 // their user; the runner's ownership check is in lib/attempts/runner-load.
 
 import type { ServerSupabaseClient } from '@/lib/access';
-import { itemsTableFor } from '@/lib/bank/tables';
-import { HISTORY_PAGE_SIZE, type Attempt, type AttemptListRow, type BuilderItem, type HistoryFilters, type HistoryPage, type QuizAttemptStats } from './types';
+import { HISTORY_PAGE_SIZE, RECENT_ATTEMPTS_LIMIT, type Attempt, type AttemptListRow, type BuilderItem, type HistoryFilters, type HistoryPage, type QuizAttemptStats } from './types';
 
 // The admin details step's attempt-stats box (legacy openEditQuiz's
-// inline read on both admin quiz pages): every attempt on the quiz, the
-// completed count and the mean completed score, rounded.
-export async function getQuizAttemptStats(db: ServerSupabaseClient, quizId: string): Promise<QuizAttemptStats> {
-  const { data, error } = await db.from('attempts').select('attempt_id, status, score_pct').eq('quiz_id', quizId);
+// inline read on both admin quiz pages). Since Q2 (D45 e) the read is
+// keyed by the quiz's table as well as its id — a fixed quiz and a mock
+// exam are separate tables with independent ids — and first sittings
+// (source = the kind), retakes (source = 'retake') and abandons are
+// counted apart. The mean score is over the completed rows, rounded.
+export async function getQuizAttemptStats(db: ServerSupabaseClient, kind: 'fixed' | 'mock', quizId: string): Promise<QuizAttemptStats> {
+  const empty: QuizAttemptStats = { total: 0, firstSittings: 0, retakes: 0, abandoned: 0, completed: 0, avgScore: 0 };
+  const { data, error } = await db
+    .from('attempts')
+    .select('attempt_id, source, status, score_pct')
+    .eq('quiz_id', quizId)
+    .in('source', [kind, 'retake']);
   if (error) {
     console.error('getQuizAttemptStats:', error);
-    return { total: 0, completed: 0, avgScore: 0 };
+    return empty;
   }
-  const rows = (data ?? []) as { status: string; score_pct: number | null }[];
+  const rows = (data ?? []) as { source: string; status: string; score_pct: number | null }[];
   const completedRows = rows.filter((a) => a.status === 'completed');
   const completed = completedRows.length;
   const avgScore = completed > 0 ? Math.round(completedRows.reduce((s, a) => s + (a.score_pct || 0), 0) / completed) : 0;
-  return { total: rows.length, completed, avgScore };
+  return {
+    total: rows.length,
+    firstSittings: rows.filter((a) => a.source === kind).length,
+    retakes: rows.filter((a) => a.source === 'retake').length,
+    abandoned: rows.filter((a) => a.status === 'abandoned').length,
+    completed,
+    avgScore,
+  };
 }
 
 export async function getAttemptById(db: ServerSupabaseClient, attemptId: string): Promise<Attempt | null> {
@@ -58,11 +72,10 @@ export async function getStudentAttempts(
 // and counts on, by item id. (The SELECT policy through user_has_course()
 // returns nothing for a course the student cannot access.)
 export async function getBuilderCourseItems(db: ServerSupabaseClient, courseId: string): Promise<BuilderItem[]> {
-  const table = itemsTableFor(courseId);
-  if (!table) return [];
   const { data, error } = await db
-    .from(table)
+    .from('question_bank')
     .select('item_id, subject, maintopic, subtopic, difficulty, question_type, stem, rationale')
+    .eq('course_id', courseId)
     .order('item_id');
   if (error) {
     console.error('getBuilderCourseItems:', error);
@@ -105,4 +118,27 @@ export async function getStudentAttemptsPaginated(
     return { attempts: [], total: 0 };
   }
   return { attempts: (data ?? []) as AttemptListRow[], total: count ?? 0 };
+}
+
+// ── the dashboard's Recent Quiz Attempts (legacy loadRecentAttempts) ────
+// The five newest attempts, whatever their status. Legacy read `*` with
+// `.limit(5)`; the columns are narrowed to the list row's, which is every
+// column the table renders.
+export async function getRecentAttempts(
+  db: ServerSupabaseClient,
+  userId: string,
+  limit = RECENT_ATTEMPTS_LIMIT,
+): Promise<AttemptListRow[]> {
+  const { data, error } = await db
+    .from('attempts')
+    .select('attempt_id, user_id, quiz_id, course_id, mode, source, status, n, score_raw, score_total, score_pct, time_taken_s, display_label, ts_iso')
+    .eq('user_id', userId)
+    .order('ts_iso', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('getRecentAttempts:', error);
+    return [];
+  }
+  return (data ?? []) as AttemptListRow[];
 }

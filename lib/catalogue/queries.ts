@@ -27,24 +27,37 @@ export async function getPrograms(db: Db): Promise<Program[]> {
   return (data ?? []) as Program[];
 }
 
+// A product's courses are product_courses rows (02 C1); the select embeds
+// them and the row is flattened to `courses`, sorted by id.
+const PRODUCT_SELECT = '*, product_courses ( course_id )';
+
+type ProductRow = Omit<Product, 'courses'> & { product_courses: { course_id: string }[] | null };
+
+function flattenProducts(rows: ProductRow[]): Product[] {
+  return rows.map(({ product_courses, ...rest }) => ({
+    ...rest,
+    courses: (product_courses ?? []).map((r) => r.course_id).sort(),
+  }));
+}
+
 /** Active products only, by name. The public pages and the trial grant. */
 export async function getProducts(db: Db): Promise<Product[]> {
-  const { data, error } = await db.from('products').select('*').eq('status', 'active').order('name');
+  const { data, error } = await db.from('products').select(PRODUCT_SELECT).eq('status', 'active').order('name');
   if (error) {
     console.error('getProducts:', error);
     return [];
   }
-  return (data ?? []) as Product[];
+  return flattenProducts((data ?? []) as unknown as ProductRow[]);
 }
 
 /** Every product, archived included — the admin Products page. */
 export async function getAllProducts(db: Db): Promise<Product[]> {
-  const { data, error } = await db.from('products').select('*').order('name');
+  const { data, error } = await db.from('products').select(PRODUCT_SELECT).order('name');
   if (error) {
     console.error('getAllProducts:', error);
     return [];
   }
-  return (data ?? []) as Product[];
+  return flattenProducts((data ?? []) as unknown as ProductRow[]);
 }
 
 /** Active courses only, by title. */

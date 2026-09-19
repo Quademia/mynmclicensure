@@ -125,7 +125,7 @@ export function ProductsClient({
       price: p.price_minor != null ? (p.price_minor / 100).toFixed(2) : '',
       currency: p.currency || 'GHS',
       duration: p.duration_days ? String(p.duration_days) : '',
-      courses: p.courses_included || [],
+      courses: p.courses,
       tgKeys: [...(p.telegram_group_keys || [])],
     });
     setTgInput('');
@@ -343,8 +343,8 @@ export function ProductsClient({
                     <td className="cell-strong">{priceCell(p)}</td>
                     <td className="cell-13">{p.duration_days ? `${p.duration_days}d` : '—'}</td>
                     <td className="cell-courses">
-                      {(p.courses_included || []).length
-                        ? (p.courses_included || []).map((c) => <span key={c} className="course-tag">{c}</span>)
+                      {p.courses.length
+                        ? p.courses.map((c) => <span key={c} className="course-tag">{c}</span>)
                         : <span className="cell-muted">None</span>}
                     </td>
                     <td>
@@ -387,10 +387,10 @@ export function ProductsClient({
                     <div className="detail-row"><span className="key">Price (minor units)</span><span className="val mono">{panelProduct.price_minor ?? '—'}</span></div>
                   </div>
                   <div className="detail-section">
-                    <h4>Courses Included ({(panelProduct.courses_included || []).length})</h4>
+                    <h4>Courses Included ({panelProduct.courses.length})</h4>
                     <div className="detail-tags">
-                      {(panelProduct.courses_included || []).length
-                        ? (panelProduct.courses_included || []).map((c) => <span key={c} className="course-tag">{courseTitle(c)}</span>)
+                      {panelProduct.courses.length
+                        ? panelProduct.courses.map((c) => <span key={c} className="course-tag">{courseTitle(c)}</span>)
                         : <span className="detail-empty">None assigned</span>}
                     </div>
                   </div>

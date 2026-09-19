@@ -12,6 +12,7 @@
 // logged and never stops the registration.
 
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { writeAccessRows } from './access-rows';
 import { makeTrialSubscriptionId } from './ids';
 
 export async function grantTrialSubscription(userId: string, programId: string): Promise<void> {
@@ -37,18 +38,26 @@ export async function grantTrialSubscription(userId: string, programId: string):
     const expires = new Date(start);
     expires.setDate(expires.getDate() + Number(trialProduct.duration_days || 0));
 
-    const { error } = await db.from('subscriptions').insert({
+    const receipt = {
       subscription_id: makeTrialSubscriptionId(),
       user_id: userId,
       product_id: trialProductId,
       start_utc: start.toISOString(),
       expires_utc: expires.toISOString(),
       status: 'ACTIVE',
+    };
+    const { error } = await db.from('subscriptions').insert({
+      ...receipt,
       source: 'SELF_TRIAL_SIGNUP',
       source_ref: userId,
       expiry_reminded: false,
     });
-    if (error) console.error('[register] trial grant failed for', userId, error.message);
+    if (error) {
+      console.error('[register] trial grant failed for', userId, error.message);
+      return;
+    }
+    // The course rows the gate reads (02 C2).
+    await writeAccessRows(db, receipt);
   } catch (err) {
     console.error('[register] trial grant threw for', userId, err);
   }

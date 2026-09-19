@@ -59,9 +59,12 @@ in a chat.
   (see `20260911010000_auth_tables.sql` for programs and schools), so
   each environment is filled by its own run.
   **Exception, the question bank (slice 4a):** the eleven `items_*`
-  tables are created with no copy. Dev was loaded from Sam's CSV exports
+  tables were created with no copy. Dev was loaded from Sam's CSV exports
   of prod (2026-09-13, a one-off loader outside the repo, verified by
-  row count per table); prod is copied at cutover by the §6.6 SQL.
+  row count per table); prod is copied at cutover by the §6.6 SQL. Since
+  08 B1 (2026-09-19) the bank is one table, `question_bank`, with a
+  `course_id`; the migration copied each project's eleven tables in and
+  dropped them, so the §6.6 cutover copy now targets the one table.
 - Storage buckets are global to the project, so they carry the
   `licensure-gh-` prefix and are created by the migration that needs
   them (`insert into storage.buckets`). One so far:

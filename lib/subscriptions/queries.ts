@@ -3,66 +3,69 @@
 // The subscription reads, transcribed one for one: getStudentCourseAccess
 // from legacy js/mynmclicensure-api.js; the admin list's joined select
 // from admin/subscriptions.html; the Grant dialog's student search from
-// the same page; getSubscriptionById and
-// getActiveSubscriptionForUserProduct from the payments Worker. Each
+// the same page; getSubscriptionById from the payments Worker (its
+// getActiveSubscriptionForUserProduct — the extend / duplicate test —
+// went with 02 C3a). Each
 // takes the caller's per-request client and, as legacy, fails open: an
 // error is logged and an empty result returned.
 //
 // RLS is the floor, not the filter (AGENTS.md): every student read names
 // its user; the admin list is admin by the gate that made the client.
 
+import { cache } from 'react';
 import type { ServerSupabaseClient } from '@/lib/access';
 import { nowIso } from './dates';
 import type { ActiveSubscriptionWithProduct, CourseAccessMap, StudentHit, Subscription, SubscriptionListRow } from './types';
 
 // ── getStudentCourseAccess ──────────────────────────────────────────────
-// Every ACTIVE subscription with its product; for each course the product
-// covers, add the subscription's remaining days (rounded up; a
-// subscription with none left is skipped). The expiry the student sees
-// is today plus the total — doc 02's stacking, the reader's half of the
-// two mechanisms (rebuild.md §7).
-export async function getStudentCourseAccess(db: ServerSupabaseClient, userId: string): Promise<CourseAccessMap> {
-  const now = new Date();
-
-  const { data, error } = await db
-    .from('subscriptions')
-    .select('*, products ( product_id, name, kind, courses_included )')
-    .eq('user_id', userId)
-    .eq('status', 'ACTIVE');
-
+// The caller's courses with the latest end among their live course_access
+// rows — my_course_access(), the one definition the SQL gate
+// (user_has_course) reads too (02 C2, §8 S8). The days shown are that
+// stored date's distance: a number nothing grants can no longer appear
+// (D14), and tomorrow shows one less. Wrapped in cache() so a request
+// reads once however many callers (D15). The row identity is the
+// caller's own (auth.uid()); userId names the scope for the log.
+export const getStudentCourseAccess = cache(async function getStudentCourseAccess(
+  db: ServerSupabaseClient,
+  userId: string,
+): Promise<CourseAccessMap> {
+  const now = Date.now();
+  const { data, error } = await db.rpc('my_course_access');
   if (error) {
-    console.error('getStudentCourseAccess:', error);
+    console.error('getStudentCourseAccess:', userId, error);
     return {};
   }
 
-  type Row = Subscription & { products: { courses_included: string[] | null } | null };
-  const courseMap: Record<string, { totalDays: number; expires: Date }> = {};
-
-  for (const sub of (data ?? []) as Row[]) {
-    if (!sub.products?.courses_included) continue;
-
-    const remainingMs = new Date(sub.expires_utc).getTime() - now.getTime();
-    const remainingDays = Math.max(0, Math.ceil(remainingMs / (1000 * 60 * 60 * 24)));
-    if (remainingDays === 0) continue;
-
-    for (const courseId of sub.products.courses_included) {
-      if (!courseMap[courseId]) {
-        courseMap[courseId] = {
-          totalDays: remainingDays,
-          expires: new Date(now.getTime() + remainingDays * 24 * 60 * 60 * 1000),
-        };
-      } else {
-        courseMap[courseId].totalDays += remainingDays;
-        courseMap[courseId].expires = new Date(now.getTime() + courseMap[courseId].totalDays * 24 * 60 * 60 * 1000);
-      }
-    }
-  }
-
   const result: CourseAccessMap = {};
-  for (const [courseId, v] of Object.entries(courseMap)) {
-    result[courseId] = { totalDays: v.totalDays, expires: v.expires.toISOString() };
+  for (const row of (data ?? []) as { course_id: string; expires_utc: string }[]) {
+    const remainingDays = Math.max(0, Math.ceil((new Date(row.expires_utc).getTime() - now) / (1000 * 60 * 60 * 24)));
+    if (remainingDays === 0) continue;
+    result[row.course_id] = { totalDays: remainingDays, expires: row.expires_utc };
   }
   return result;
+});
+
+// ── the dashboard's "starts later" line (02 C3b) ───────────────────────
+// The student's earliest course row still to start — a receipt queued
+// behind one that has since been revoked or run out, or a future-dated
+// grant. Own rows only; null when nothing is coming.
+export async function getUpcomingAccess(db: ServerSupabaseClient, userId: string): Promise<{ starts: string; productName: string } | null> {
+  const { data, error } = await db
+    .from('course_access')
+    .select('start_utc, subscriptions ( products ( name ) )')
+    .eq('user_id', userId)
+    .is('revoked_utc', null)
+    .gt('start_utc', nowIso())
+    .order('start_utc')
+    .limit(1)
+    .maybeSingle();
+  if (error) {
+    console.error('getUpcomingAccess:', error);
+    return null;
+  }
+  const row = data as unknown as { start_utc: string; subscriptions: { products: { name: string } | null } | null } | null;
+  if (!row) return null;
+  return { starts: row.start_utc, productName: row.subscriptions?.products?.name || 'Your' };
 }
 
 // ── the admin list (legacy loadData) ───────────────────────────────────
@@ -70,7 +73,7 @@ export async function getAllSubscriptions(db: ServerSupabaseClient): Promise<Sub
   const { data, error } = await db
     .from('subscriptions')
     .select(
-      'subscription_id, user_id, product_id, start_utc, expires_utc, status, source, source_ref, ' +
+      'subscription_id, user_id, product_id, start_utc, expires_utc, status, source, source_ref, created_utc, ' +
         'users ( user_id, name, forename, surname, email, program_id ), ' +
         'products ( name, kind, duration_days )',
     )
@@ -105,30 +108,6 @@ export async function getSubscriptionById(db: ServerSupabaseClient, subscription
   const { data, error } = await db.from('subscriptions').select('*').eq('subscription_id', subscriptionId).maybeSingle();
   if (error) {
     console.error('getSubscriptionById:', error);
-    return null;
-  }
-  return (data as Subscription | null) ?? null;
-}
-
-/** An ACTIVE, unexpired row for this user and product — the extend / duplicate test. */
-export async function getActiveSubscriptionForUserProduct(
-  db: ServerSupabaseClient,
-  userId: string,
-  productId: string,
-  excludeSubscriptionId = '',
-): Promise<Subscription | null> {
-  let query = db
-    .from('subscriptions')
-    .select('*')
-    .eq('user_id', userId)
-    .eq('product_id', productId)
-    .eq('status', 'ACTIVE')
-    .gt('expires_utc', nowIso());
-  if (excludeSubscriptionId) query = query.neq('subscription_id', excludeSubscriptionId);
-
-  const { data, error } = await query.limit(1).maybeSingle();
-  if (error) {
-    console.error('getActiveSubscriptionForUserProduct:', error);
     return null;
   }
   return (data as Subscription | null) ?? null;

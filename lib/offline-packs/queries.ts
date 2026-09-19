@@ -98,44 +98,45 @@ function shuffleArray<T>(arr: T[]): T[] {
   return a;
 }
 
-// ── the student's subscriptions that cover the course ─────────────────
-// legacy getSubscriptionsForOfflineCourse — every status, joined to the
-// product; filtered by courses_included in code.
+// ── the student's course_access rows for the course ───────────────────
+// legacy getSubscriptionsForOfflineCourse read every receipt and filtered
+// by the product's course list in code; since 02 C2 the rows are the
+// student's own course_access rows for the course (any state), each
+// carrying its receipt and the receipt's product kind for the TRIAL rule.
 type SubRow = {
+  access_id: number;
   subscription_id: string;
-  user_id: string;
-  product_id: string;
   start_utc: string | null;
   expires_utc: string | null;
-  status: string | null;
-  source: string | null;
-  products: { product_id: string; name: string; kind: string | null; courses_included: string[] | null } | null;
+  revoked_utc: string | null;
+  subscriptions: { product_id: string; products: { kind: string | null } | null } | null;
 };
 
 async function getSubscriptionsForOfflineCourse(db: ServerSupabaseClient, userId: string, courseId: string): Promise<SubRow[]> {
   const { data, error } = await db
-    .from('subscriptions')
-    .select('subscription_id, user_id, product_id, start_utc, expires_utc, status, source, products ( product_id, name, kind, courses_included )')
-    .eq('user_id', userId);
+    .from('course_access')
+    .select('access_id, subscription_id, start_utc, expires_utc, revoked_utc, subscriptions ( product_id, products ( kind ) )')
+    .eq('user_id', userId)
+    .eq('course_id', String(courseId || '').trim().toUpperCase());
   if (error) {
     console.error('getSubscriptionsForOfflineCourse:', error);
     return [];
   }
-  const cid = String(courseId || '').trim().toUpperCase();
-  return ((data ?? []) as unknown as SubRow[]).filter((sub) =>
-    (sub.products?.courses_included ?? []).map((v) => String(v || '').trim().toUpperCase()).includes(cid),
-  );
+  return (data ?? []) as unknown as SubRow[];
 }
 
+// Live: unrevoked and inside its window — the same test my_course_access() makes.
 function isActiveSubscriptionNow(sub: SubRow): boolean {
-  if (String(sub.status || '').toUpperCase() !== 'ACTIVE') return false;
+  if (sub.revoked_utc) return false;
+  const start = sub.start_utc ? new Date(sub.start_utc).getTime() : NaN;
   const exp = sub.expires_utc ? new Date(sub.expires_utc).getTime() : NaN;
-  if (Number.isNaN(exp)) return false;
-  return exp > Date.now();
+  if (Number.isNaN(start) || Number.isNaN(exp)) return false;
+  const now = Date.now();
+  return start <= now && exp > now;
 }
 
 function isTrialProduct(sub: SubRow): boolean {
-  return String(sub.products?.kind || '').trim().toUpperCase() === 'TRIAL';
+  return String(sub.subscriptions?.products?.kind || '').trim().toUpperCase() === 'TRIAL';
 }
 
 // ── the allowance (legacy getOfflinePackAllowance) ────────────────────

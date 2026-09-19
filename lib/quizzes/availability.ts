@@ -26,3 +26,17 @@ export function getQuizAvailability(quiz: Scheduled, now: Date = new Date()): Av
 
   return 'ACTIVE';
 }
+
+// The one check Start and Retake share (03-quiz-system.md Q2, D45 a):
+// the quiz must be ACTIVE on the server's clock and offer the mode. The
+// words are the spawn's own; Retake refuses with the same ones.
+export function startRefusal(
+  quiz: Scheduled & Pick<Quiz, 'allowed_modes'>,
+  mode: 'instant' | 'timed',
+  now: Date = new Date(),
+): string | null {
+  if (getQuizAvailability(quiz, now) !== 'ACTIVE') return 'This quiz is not open right now.';
+  const modeAllowed = mode === 'instant' ? quiz.allowed_modes !== 'TIMED_ONLY' : quiz.allowed_modes !== 'INSTANT_ONLY';
+  if (!modeAllowed) return 'This mode is not available for this quiz.';
+  return null;
+}
