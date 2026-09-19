@@ -28,7 +28,7 @@ import { getCourseById } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import { getQuizzesForCourse } from '@/lib/quizzes/queries';
 import { getQuizAvailability } from '@/lib/quizzes/availability';
-import type { Quiz } from '@/lib/quizzes/types';
+import type { QuizCard } from '@/lib/quizzes/types';
 import { PageHeader, displayNameOf } from '@/components/shell/page-header';
 import { getAnnouncementsForStudent } from '@/lib/announcements/queries';
 import { AnnouncementBody } from '@/components/announcements/announcement-body';
@@ -60,14 +60,14 @@ function fmtDate(iso: string): string {
 }
 
 // legacy: only ACTIVE and UPCOMING rows reach the previews
-function visibleOf(rows: Quiz[]): Quiz[] {
+function visibleOf(rows: QuizCard[]): QuizCard[] {
   return rows.filter((q) => {
     const a = getQuizAvailability(q);
     return a === 'ACTIVE' || a === 'UPCOMING';
   });
 }
 
-function PreviewCard({ quiz, href, meta }: { quiz: Quiz; href: string; meta: string }) {
+function PreviewCard({ quiz, href, meta }: { quiz: QuizCard; href: string; meta: string }) {
   const avail = getQuizAvailability(quiz);
   return (
     <a className="preview-card" href={href}>

@@ -22,6 +22,7 @@
 'use server';
 
 import { requireStudent } from '@/lib/access';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getItemFilterOptions, getItemsByIds } from '@/lib/bank/queries';
 import { itemsTableFor } from '@/lib/bank/tables';
 import type { ItemFilterOptions } from '@/lib/bank/types';
@@ -264,7 +265,10 @@ export async function spawnQuizAttempt(kind: QuizKind, quizId: string, mode: Att
   if (kind !== 'fixed' && kind !== 'mock') return fail('Unknown quiz kind.');
   if (mode !== 'instant' && mode !== 'timed') return fail('Unknown mode.');
 
-  const quiz = await getQuizById(supabase, kind, quizId);
+  // The full row (item_ids) through the service role — Q1 took the
+  // question list out of the browser roles' reach; the availability and
+  // access checks below are the gate on what the student may start.
+  const quiz = await getQuizById(createServiceRoleClient(), kind, quizId);
   if (!quiz) return fail('Could not start quiz. Please try again.');
   if (getQuizAvailability(quiz) !== 'ACTIVE') return fail('This quiz is not open right now.');
   const modeAllowed = mode === 'instant' ? quiz.allowed_modes !== 'TIMED_ONLY' : quiz.allowed_modes !== 'INSTANT_ONLY';

@@ -61,6 +61,13 @@ export type Quiz = {
   visibility?: MockVisibility;
 };
 
+// What a student's page may hold of a quiz (Q1, 2026-09-19): every
+// column but item_ids and notes, which the browser roles cannot read
+// since 20260919170000_quiz_floor.sql. The list pages, the card and the
+// course page work on this shape; a page that needs the question list
+// asks the server (lib/quizzes/queries getQuizById, service role).
+export type QuizCard = Omit<Quiz, 'item_ids' | 'notes'>;
+
 // The columns legacy's paginated admin list selected (getAllQuizzesPaginated)
 // — the row shape of the fixed-quiz table until the quiz is opened.
 export type QuizListRow = Pick<

@@ -28,7 +28,7 @@ import { Toast } from '@/lib/toast/toast';
 import { abandonAttempt, retakeAttempt, spawnQuizAttempt } from '@/lib/attempts/actions';
 import type { Attempt, AttemptMode } from '@/lib/attempts/types';
 import { getQuizAvailability } from '@/lib/quizzes/availability';
-import type { AllowedModes, Availability, Quiz, QuizKind } from '@/lib/quizzes/types';
+import type { AllowedModes, Availability, QuizCard, QuizKind } from '@/lib/quizzes/types';
 
 type CourseLite = { course_id: string; title: string };
 
@@ -36,7 +36,7 @@ type Props = {
   kind: QuizKind;
   /** the enrolled courses, in catalogue order */
   courses: CourseLite[];
-  quizzesByCourse: Record<string, Quiz[]>;
+  quizzesByCourse: Record<string, QuizCard[]>;
   attemptsByCourse: Record<string, Attempt[]>;
   /** the raw `?course=` — the chip shows only when it names an enrolled course */
   activeCourseFilter: string | null;
@@ -159,7 +159,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
   }
 
   // ── launch (legacy launchQuiz) ──
-  async function launchQuiz(quiz: Quiz, mode: AttemptMode, action: LaunchAction) {
+  async function launchQuiz(quiz: QuizCard, mode: AttemptMode, action: LaunchAction) {
     if (busy) return;
     const key = `${quiz.quiz_id}:${mode}`;
     setBusy(key);
@@ -208,7 +208,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
   }
 
   // ── a mode section (legacy renderModeSection) ──
-  function renderModeSection(quiz: Quiz, mode: AttemptMode, label: string, avail: Availability, attempts: Attempt[]) {
+  function renderModeSection(quiz: QuizCard, mode: AttemptMode, label: string, avail: Availability, attempts: Attempt[]) {
     const modeAttempts = attempts.filter((a) => a.quiz_id === quiz.quiz_id && a.mode === mode);
     const completed = modeAttempts.filter((a) => a.status === 'completed');
     const inProgress = modeAttempts.find((a) => a.status === 'in_progress');
@@ -279,7 +279,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
   }
 
   // ── a quiz card (legacy renderQuizCard) ──
-  function renderQuizCard(quiz: Quiz, avail: Exclude<Availability, 'HIDDEN'>, attempts: Attempt[], now: Date) {
+  function renderQuizCard(quiz: QuizCard, avail: Exclude<Availability, 'HIDDEN'>, attempts: Attempt[], now: Date) {
     let scheduleInfo: React.ReactNode = null;
     if (avail === 'UPCOMING' && quiz.publish_at) {
       scheduleInfo = <div className="schedule-info">📅 Opens on {formatDate(quiz.publish_at)}</div>;
@@ -354,7 +354,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
 
       let filtered = quizzes
         .map((q) => ({ quiz: q, avail: getQuizAvailability(q, now) }))
-        .filter((x): x is { quiz: Quiz; avail: Exclude<Availability, 'HIDDEN'> } => x.avail !== 'HIDDEN');
+        .filter((x): x is { quiz: QuizCard; avail: Exclude<Availability, 'HIDDEN'> } => x.avail !== 'HIDDEN');
 
       if (statusFilter) filtered = filtered.filter(({ avail }) => avail === statusFilter);
       if (modeFilter) filtered = filtered.filter(({ quiz }) => quiz.allowed_modes === modeFilter);

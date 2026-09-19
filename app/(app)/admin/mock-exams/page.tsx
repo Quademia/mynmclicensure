@@ -7,6 +7,7 @@
 
 import type { Metadata } from 'next';
 import { requireAdmin } from '@/lib/access';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getAllCourses } from '@/lib/catalogue/queries';
 import { getAllQuizzes } from '@/lib/quizzes/queries';
 import { PageHeader, displayNameOf } from '@/components/shell/page-header';
@@ -21,7 +22,8 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminMockExamsPage() {
   const { supabase, profile } = await requireAdmin();
-  const [courses, mocks] = await Promise.all([getAllCourses(supabase), getAllQuizzes(supabase, 'mock')]);
+  // Full rows (item_ids, notes) through the service role since Q1.
+  const [courses, mocks] = await Promise.all([getAllCourses(supabase), getAllQuizzes(createServiceRoleClient(), 'mock')]);
 
   return (
     <>

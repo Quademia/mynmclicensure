@@ -404,19 +404,31 @@ using (auth_user_role() = 'ADMIN');
 -- ── slice 5a: fixed quizzes and mock exams ─────────────────────────────
 -- Any signed-in user reads (the student pages filter published + active
 -- themselves); ADMIN inserts and updates; no DELETE, as legacy.
+-- Q1 (20260919170000_quiz_floor.sql): a student reads an active,
+-- published row of a course they hold; the admin reads all. item_ids
+-- and notes are not readable by the browser roles — column-level, the
+-- service role reads them behind the gates.
 create policy quizzes_select on quizzes for select
-using (auth.uid() is not null);
+using (auth_user_role() = 'ADMIN' or (status = 'active' and published and user_has_course(course_id)));
 create policy quizzes_insert on quizzes for insert
 with check (auth_user_role() = 'ADMIN');
 create policy quizzes_update on quizzes for update
 using (auth_user_role() = 'ADMIN');
+revoke select on quizzes from anon, authenticated;
+grant select (quiz_id, course_id, title, n, allowed_modes, shuffle, time_limit_sec,
+              published, publish_at, unpublish_at, status, created_at, updated_at)
+  on quizzes to authenticated;
 
 create policy mock_quizzes_select on mock_quizzes for select
-using (auth.uid() is not null);
+using (auth_user_role() = 'ADMIN' or (status = 'active' and published and user_has_course(course_id)));
 create policy mock_quizzes_insert on mock_quizzes for insert
 with check (auth_user_role() = 'ADMIN');
 create policy mock_quizzes_update on mock_quizzes for update
 using (auth_user_role() = 'ADMIN');
+revoke select on mock_quizzes from anon, authenticated;
+grant select (quiz_id, course_id, title, n, allowed_modes, shuffle, time_limit_sec,
+              published, publish_at, unpublish_at, status, visibility, created_at, updated_at)
+  on mock_quizzes to authenticated;
 
 
 -- ── slice 8: subscriptions ─────────────────────────────────────────────

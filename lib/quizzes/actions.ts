@@ -12,6 +12,7 @@
 'use server';
 
 import { requireAdmin } from '@/lib/access';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getQuizAttemptStats } from '@/lib/attempts/queries';
 import type { QuizAttemptStats } from '@/lib/attempts/types';
 import { getItemsByFilters } from '@/lib/bank/queries';
@@ -39,10 +40,11 @@ export async function loadQuizPage(searchTerm: string, page: number): Promise<Qu
 // no time limit, no schedule and no notes until something re-fetched the
 // whole table. The mock page loaded whole rows and had no such gap. The
 // edit step here reads the full row (legacy getQuizById) for both.
-// Logged as a fix in the 2026-09-13 session entry; not in §9.
+// Logged as a fix in the 2026-09-13 session entry; not in §9. Service
+// role since Q1: the admin's own client cannot read item_ids or notes.
 export async function loadQuiz(kind: QuizKind, quizId: string): Promise<Quiz | null> {
-  const { supabase } = await requireAdmin();
-  return getQuizById(supabase, kind, quizId);
+  await requireAdmin();
+  return getQuizById(createServiceRoleClient(), kind, quizId);
 }
 
 // ── loadPickerItems: the course's whole bank (legacy getItemsByFilters(courseId, {})) ──
@@ -129,8 +131,8 @@ export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
 // The mock-exam page loads its list whole, and both pages re-read the
 // whole table after a save or an archive.
 export async function loadAllQuizzes(kind: QuizKind): Promise<Quiz[]> {
-  const { supabase } = await requireAdmin();
-  return getAllQuizzes(supabase, kind);
+  await requireAdmin();
+  return getAllQuizzes(createServiceRoleClient(), kind);
 }
 
 // ── the attempt-stats box on the details step (legacy openEditQuiz) ───

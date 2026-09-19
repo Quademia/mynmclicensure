@@ -196,14 +196,14 @@ create table if not exists quizzes (
   title          text not null,
   item_ids       text[] not null default '{}',
   n              integer not null default 0,
-  allowed_modes  text not null default 'BOTH',    -- BOTH | INSTANT_ONLY | TIMED_ONLY
+  allowed_modes  text not null default 'BOTH' check (allowed_modes in ('BOTH', 'INSTANT_ONLY', 'TIMED_ONLY')),  -- Q1
   shuffle        boolean not null default false,
   time_limit_sec integer,                         -- null = 1 min per question
   published      boolean not null default false,
   publish_at     timestamptz,
   unpublish_at   timestamptz,
-  status         text not null default 'draft',   -- draft | active | archived
-  notes          text,                            -- admin only
+  status         text not null default 'draft' check (status in ('draft', 'active', 'archived')),  -- Q1
+  notes          text,                            -- admin only; server-only read (Q1)
   created_at     timestamptz default now(),
   updated_at     timestamptz default now()
 );
@@ -213,14 +213,14 @@ create table if not exists mock_quizzes (
   quiz_id        text primary key,
   course_id      text not null references courses (course_id),  -- S4
   title          text not null,
-  n              integer not null,
-  item_ids       text[] not null default '{}',
-  allowed_modes  text not null default 'BOTH',
+  n              integer not null default 0,     -- default since Q1
+  item_ids       text[] not null default '{}',   -- server-only read (Q1)
+  allowed_modes  text not null default 'BOTH' check (allowed_modes in ('BOTH', 'INSTANT_ONLY', 'TIMED_ONLY')),  -- Q1
   shuffle        boolean not null default false,
   time_limit_sec integer,
-  status         text not null default 'draft',   -- draft | active | archived
+  status         text not null default 'draft' check (status in ('draft', 'active', 'archived')),  -- Q1
   published      boolean not null default false,
-  visibility     text not null default 'ALL',     -- ALL | PAID | TRIAL; stored, never set or checked (legacy)
+  visibility     text not null default 'ALL' check (visibility in ('ALL', 'PAID', 'TRIAL')),  -- kept as the premium gate's flag (Sam, 2026-09-18); Q1 CHECK
   publish_at     timestamptz,
   unpublish_at   timestamptz,
   notes          text,

@@ -9,6 +9,7 @@
 
 import type { Metadata } from 'next';
 import { requireAdmin } from '@/lib/access';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getAllCourses } from '@/lib/catalogue/queries';
 import { getAllQuizzes } from '@/lib/quizzes/queries';
 import { PageHeader, displayNameOf } from '@/components/shell/page-header';
@@ -23,11 +24,12 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminAttemptsPage() {
   const { supabase, profile } = await requireAdmin();
+  const serviceDb = createServiceRoleClient(); // full quiz rows (Q1)
 
   const [courses, fixed, mocks] = await Promise.all([
     getAllCourses(supabase),
-    getAllQuizzes(supabase, 'fixed'),
-    getAllQuizzes(supabase, 'mock'),
+    getAllQuizzes(serviceDb, 'fixed'),
+    getAllQuizzes(serviceDb, 'mock'),
   ]);
 
   const quizTitles: Record<string, string> = {};
