@@ -233,6 +233,10 @@ export function ConfirmationClient() {
         renderError('Payment amount mismatch. Please contact support with your reference.', 'AMOUNT_MISMATCH');
         return;
       }
+      if (!out.ok && out.error === 'currency_mismatch') {
+        renderError('Payment currency mismatch. Please contact support with your reference.', 'CURRENCY_MISMATCH');
+        return;
+      }
       if (!out.ok && out.error === 'payment_failed') {
         renderError(out.failure_note || 'This payment is marked as failed. Please contact support with your reference.', 'FAILED');
         return;

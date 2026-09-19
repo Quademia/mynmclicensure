@@ -103,7 +103,7 @@ export type VerifyResult =
   | { ok: false; error: 'payment_failed'; status: 'FAILED'; reference: string; failure_note: string }
   | {
       ok: false;
-      error: 'missing_reference' | 'rate_limited' | 'payment_not_found' | 'amount_mismatch' | 'verify_failed';
+      error: 'missing_reference' | 'rate_limited' | 'payment_not_found' | 'amount_mismatch' | 'currency_mismatch' | 'verify_failed';
       reference: string;
       message: string;
     };

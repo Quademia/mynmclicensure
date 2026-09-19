@@ -296,7 +296,7 @@ create table if not exists payments (
   activated_utc         timestamptz,
   subscription_id       text references subscriptions (subscription_id),   -- S4; null until activation
   failure_note          text,
-  raw                   jsonb,                                              -- { init, verify, setup_complete, flow, … }
+  raw                   jsonb,                                              -- { init, verify, setup_complete, flow, … } — init and verify TRIMMED (D32, lib/payments/trim.ts): no card bin / expiry / authorization_code / IP
   setup_token           text,
   setup_created_utc     timestamptz,
   setup_completed_utc   timestamptz,
