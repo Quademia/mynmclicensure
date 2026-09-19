@@ -30,7 +30,7 @@
 import type { Metadata } from 'next';
 import { requireStudent } from '@/lib/access';
 import { getCourses } from '@/lib/catalogue/queries';
-import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
+import { getStudentCourseAccess, getUpcomingAccess } from '@/lib/subscriptions/queries';
 import { getRecentAttempts } from '@/lib/attempts/queries';
 import type { AttemptListRow, AttemptMode } from '@/lib/attempts/types';
 import { getAnnouncementsForStudent, getStudentNoticeStates } from '@/lib/announcements/queries';
@@ -111,12 +111,13 @@ function AttemptsTable({ attempts }: { attempts: AttemptListRow[] }) {
 export default async function StudentDashboardPage() {
   const { supabase, profile } = await requireStudent();
 
-  const [accessMap, courses, attempts, announcements, states] = await Promise.all([
+  const [accessMap, courses, attempts, announcements, states, upcoming] = await Promise.all([
     getStudentCourseAccess(supabase, profile.user_id),
     getCourses(supabase),
     getRecentAttempts(supabase, profile.user_id),
     getAnnouncementsForStudent(supabase, profile),
     getStudentNoticeStates(supabase, profile.user_id),
+    getUpcomingAccess(supabase, profile.user_id),
   ]);
 
   // legacy checkProfileCompletion: the strip is offered when either is blank
@@ -146,7 +147,17 @@ export default async function StudentDashboardPage() {
         {profileComplete ? null : <ProfileNudge />}
 
         {/* 2. Subscription status bar */}
-        {longest === null ? (
+        {longest === null && upcoming !== null ? (
+          // Nothing live, but a row still to start (02 C3b): a paid
+          // receipt queued behind one that was revoked, or a future-dated
+          // grant. Say when, rather than offer an upgrade they hold.
+          <div className="subscription-bar warning">
+            <div>
+              <div className="sub-label">Subscription</div>
+              <div className="sub-name">{upcoming.productName} access starts {fmtExpiry(upcoming.starts)}</div>
+            </div>
+          </div>
+        ) : longest === null ? (
           <div className="subscription-bar expired">
             <div>
               <div className="sub-label">Subscription</div>

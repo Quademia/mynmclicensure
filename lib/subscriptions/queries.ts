@@ -45,6 +45,29 @@ export const getStudentCourseAccess = cache(async function getStudentCourseAcces
   return result;
 });
 
+// ── the dashboard's "starts later" line (02 C3b) ───────────────────────
+// The student's earliest course row still to start — a receipt queued
+// behind one that has since been revoked or run out, or a future-dated
+// grant. Own rows only; null when nothing is coming.
+export async function getUpcomingAccess(db: ServerSupabaseClient, userId: string): Promise<{ starts: string; productName: string } | null> {
+  const { data, error } = await db
+    .from('course_access')
+    .select('start_utc, subscriptions ( products ( name ) )')
+    .eq('user_id', userId)
+    .is('revoked_utc', null)
+    .gt('start_utc', nowIso())
+    .order('start_utc')
+    .limit(1)
+    .maybeSingle();
+  if (error) {
+    console.error('getUpcomingAccess:', error);
+    return null;
+  }
+  const row = data as unknown as { start_utc: string; subscriptions: { products: { name: string } | null } | null } | null;
+  if (!row) return null;
+  return { starts: row.start_utc, productName: row.subscriptions?.products?.name || 'Your' };
+}
+
 // ── the admin list (legacy loadData) ───────────────────────────────────
 export async function getAllSubscriptions(db: ServerSupabaseClient): Promise<SubscriptionListRow[]> {
   const { data, error } = await db

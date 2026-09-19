@@ -1,21 +1,28 @@
 // lib/subscriptions/access-rows.ts
 //
-// The entitlement rows (02 C2, rebuild.md §8 S8): one course_access row
-// per course of a receipt's product, carrying the receipt's dates. The
-// receipt (the subscriptions row) is written first by its own path; each
-// path then calls one of these with the service role — there is no
-// browser write path on course_access (the migration revoked it).
+// The entitlement rows (02 C2, C3a, C3b; rebuild.md §8 S8): one
+// course_access row per course of a receipt's product. The receipt (the
+// subscriptions row) is written first by its own path; each path then
+// calls one of these with the service role — there is no browser write
+// path on course_access (the migration revoked it).
 //
-// The queued start (C3a, ruling 3 ON — Sam, 2026-09-19, no switch): for
-// each course of a paid or free receipt, the student's latest live end
-// on that course from a non-trial receipt; when it is later than the
-// receipt's start, the new row starts there and keeps the receipt's
-// length, so days already held are never lost. A trial carries nothing
-// forward and its own rows never queue (ruling 2): trial rows run on
-// the receipt's dates. The receipt keeps the purchase dates; the rows
-// are the access. A receipt that is not ACTIVE gets revoked_utc
-// stamped, so the rows say what the status says — the gate reads rows
-// only.
+// THE CHAIN (Sam, 2026-09-19, option 2). For one student and one course,
+// the paid and free receipts form a chain ordered by their earliest
+// allowed start — the "floor": the admin's requested start when Grant
+// named one, else the moment the receipt was made (created_utc). Each
+// link starts at the later of its floor and the previous link's end,
+// and keeps its own length. repackAccess() recomputes the chain after
+// every write, so a revoke pulls the links behind it forward, an
+// extension pushes them back, and no student ever loses a paid day
+// whatever order an admin did things in. Trials sit outside the chain
+// (ruling 2): a trial row runs from its floor and pushes nothing.
+// A REVOKED receipt's rows are stamped and leave the chain; ACTIVE and
+// EXPIRED receipts are links (an EXPIRED one has already run out).
+//
+// THE RECEIPT'S WINDOW. After every write the receipt's start_utc is its
+// earliest row start and its expires_utc its latest row end (Sam,
+// 2026-09-19: the subscription row is the paper trail, so its dates must
+// summarise its rows). created_utc keeps when it was made.
 //
 // Server only.
 
@@ -33,49 +40,15 @@ export type Receipt = {
   status: string;
 };
 
-async function productCoursesAndKind(db: ServiceDb, productId: string): Promise<{ courses: string[]; kind: string }> {
-  const { data, error } = await db.from('products').select('kind, product_courses ( course_id )').eq('product_id', productId).maybeSingle();
-  if (error) throw new Error(`course_access: product read failed: ${error.message}`);
-  const row = data as { kind: string | null; product_courses: { course_id: string }[] | null } | null;
-  return {
-    courses: (row?.product_courses ?? []).map((r) => r.course_id),
-    kind: String(row?.kind || '').toUpperCase(),
-  };
-}
-
-/**
- * The student's latest live end per course from non-trial receipts —
- * what a new row queues behind. Rows ending before `fromIso` cannot
- * push anything, so they are left out.
- */
-async function latestLiveEnds(db: ServiceDb, userId: string, courses: string[], fromIso: string): Promise<Record<string, string>> {
-  const { data, error } = await db
-    .from('course_access')
-    .select('course_id, expires_utc, subscriptions ( products ( kind ) )')
-    .eq('user_id', userId)
-    .in('course_id', courses)
-    .is('revoked_utc', null)
-    .gt('expires_utc', fromIso);
-  if (error) throw new Error(`course_access: read failed: ${error.message}`);
-  type Row = { course_id: string; expires_utc: string; subscriptions: { products: { kind: string | null } | null } | null };
-  const ends: Record<string, string> = {};
-  for (const r of (data ?? []) as unknown as Row[]) {
-    if (String(r.subscriptions?.products?.kind || '').toUpperCase() === 'TRIAL') continue;
-    if (!ends[r.course_id] || r.expires_utc > ends[r.course_id]) ends[r.course_id] = r.expires_utc;
-  }
-  return ends;
-}
-
 /** A receipt's window: the earliest row start and the latest row end. */
 export type AccessWindow = { start_utc: string; expires_utc: string };
 
-/**
- * The receipt's dates follow its rows (Sam, 2026-09-19: the subscription
- * row is the paper trail, so its window must summarise its rows —
- * every reader of the receipt then shows a true date). created_utc keeps
- * when the receipt was made. Returns the window written, or null when
- * the receipt has no rows.
- */
+async function productCourses(db: ServiceDb, productId: string): Promise<string[]> {
+  const { data, error } = await db.from('product_courses').select('course_id').eq('product_id', productId);
+  if (error) throw new Error(`course_access: product_courses read failed: ${error.message}`);
+  return (data ?? []).map((r) => r.course_id as string);
+}
+
 async function setReceiptWindow(db: ServiceDb, subscriptionId: string): Promise<AccessWindow | null> {
   const { data, error } = await db.from('course_access').select('start_utc, expires_utc').eq('subscription_id', subscriptionId);
   if (error) throw new Error(`course_access: read failed: ${error.message}`);
@@ -90,114 +63,179 @@ async function setReceiptWindow(db: ServiceDb, subscriptionId: string): Promise<
   return window;
 }
 
+type ChainRow = {
+  access_id: number;
+  course_id: string;
+  start_utc: string;
+  expires_utc: string;
+  revoked_utc: string | null;
+  subscriptions: {
+    subscription_id: string;
+    status: string;
+    created_utc: string;
+    requested_start_utc: string | null;
+    products: { kind: string | null } | null;
+  } | null;
+};
+
 /**
- * A fresh receipt: one row per course of its product, queued behind the
- * course's current end; then the receipt's window set from the rows.
- * Returns the window (the receipt's own dates when nothing queued).
+ * The rule. Re-packs the student's chain on each of the courses and
+ * sets the window of every receipt those rows belong to.
+ */
+export async function repackAccess(db: ServiceDb, userId: string, courseIds: string[]): Promise<void> {
+  const courses = [...new Set(courseIds)];
+  if (!courses.length) return;
+  const { data, error } = await db
+    .from('course_access')
+    .select('access_id, course_id, start_utc, expires_utc, revoked_utc, subscriptions ( subscription_id, status, created_utc, requested_start_utc, products ( kind ) )')
+    .eq('user_id', userId)
+    .in('course_id', courses);
+  if (error) throw new Error(`course_access: read failed: ${error.message}`);
+  const rows = (data ?? []) as unknown as ChainRow[];
+
+  const stamp = nowIso();
+  const updates: { access_id: number; start_utc: string; expires_utc: string; revoked_utc: string | null }[] = [];
+  const floorOf = (r: ChainRow) => new Date(r.subscriptions?.requested_start_utc || r.subscriptions?.created_utc || r.start_utc).getTime();
+
+  for (const course of courses) {
+    const onCourse = rows.filter((r) => r.course_id === course);
+    const revoked = onCourse.filter((r) => r.subscriptions?.status === 'REVOKED');
+    const trials = onCourse.filter((r) => r.subscriptions?.status !== 'REVOKED' && String(r.subscriptions?.products?.kind || '').toUpperCase() === 'TRIAL');
+    const chain = onCourse
+      .filter((r) => r.subscriptions?.status !== 'REVOKED' && String(r.subscriptions?.products?.kind || '').toUpperCase() !== 'TRIAL')
+      .sort((a, b) => floorOf(a) - floorOf(b) || (a.subscriptions?.subscription_id || '').localeCompare(b.subscriptions?.subscription_id || ''));
+
+    for (const r of revoked) {
+      if (!r.revoked_utc) updates.push({ access_id: r.access_id, start_utc: r.start_utc, expires_utc: r.expires_utc, revoked_utc: stamp });
+    }
+    for (const r of trials) {
+      const start = floorOf(r);
+      const end = start + (new Date(r.expires_utc).getTime() - new Date(r.start_utc).getTime());
+      const next = { start_utc: new Date(start).toISOString(), expires_utc: new Date(end).toISOString(), revoked_utc: null };
+      if (next.start_utc !== r.start_utc || next.expires_utc !== r.expires_utc || r.revoked_utc) updates.push({ access_id: r.access_id, ...next });
+    }
+    let prevEnd = -Infinity;
+    for (const r of chain) {
+      const length = new Date(r.expires_utc).getTime() - new Date(r.start_utc).getTime();
+      const start = Math.max(floorOf(r), prevEnd);
+      const end = start + length;
+      prevEnd = end;
+      const next = { start_utc: new Date(start).toISOString(), expires_utc: new Date(end).toISOString(), revoked_utc: null };
+      if (next.start_utc !== r.start_utc || next.expires_utc !== r.expires_utc || r.revoked_utc) updates.push({ access_id: r.access_id, ...next });
+    }
+  }
+
+  for (const u of updates) {
+    const { access_id, ...fields } = u;
+    const { error: updateError } = await db.from('course_access').update(fields).eq('access_id', access_id);
+    if (updateError) throw new Error(`course_access: update failed: ${updateError.message}`);
+  }
+
+  const receipts = new Set(rows.map((r) => r.subscriptions?.subscription_id).filter((id): id is string => Boolean(id)));
+  for (const id of receipts) await setReceiptWindow(db, id);
+}
+
+/**
+ * A fresh receipt: one row per course of its product on the receipt's
+ * own dates, then the chain re-packed (a queued start comes out of
+ * that) and the receipt's window set. Returns the window.
  */
 export async function writeAccessRows(db: ServiceDb, receipt: Receipt): Promise<AccessWindow> {
-  const { courses, kind } = await productCoursesAndKind(db, receipt.product_id);
+  const courses = await productCourses(db, receipt.product_id);
   if (!courses.length) return { start_utc: receipt.start_utc, expires_utc: receipt.expires_utc };
-  const revoked = receipt.status === 'ACTIVE' ? null : nowIso();
-  const lengthMs = new Date(receipt.expires_utc).getTime() - new Date(receipt.start_utc).getTime();
-  const ends = kind === 'TRIAL' || revoked ? {} : await latestLiveEnds(db, receipt.user_id, courses, receipt.start_utc);
-
-  const rows = courses.map((course_id) => {
-    const queuedBehind = ends[course_id];
-    const start = queuedBehind && queuedBehind > receipt.start_utc ? queuedBehind : receipt.start_utc;
-    const expires = start === receipt.start_utc ? receipt.expires_utc : new Date(new Date(start).getTime() + lengthMs).toISOString();
-    return {
+  const { error } = await db.from('course_access').insert(
+    courses.map((course_id) => ({
       user_id: receipt.user_id,
       course_id,
       subscription_id: receipt.subscription_id,
-      start_utc: start,
-      expires_utc: expires,
-      revoked_utc: revoked,
-    };
-  });
-  const { error } = await db.from('course_access').insert(rows);
+      start_utc: receipt.start_utc,
+      expires_utc: receipt.expires_utc,
+      revoked_utc: receipt.status === 'REVOKED' ? nowIso() : null,
+    })),
+  );
   if (error) throw new Error(`course_access: insert failed: ${error.message}`);
+  await repackAccess(db, receipt.user_id, courses);
   return (await setReceiptWindow(db, receipt.subscription_id)) ?? { start_utc: receipt.start_utc, expires_utc: receipt.expires_utc };
 }
 
-/**
- * A receipt that may already have rows (the Paystack replay guard, or
- * one written before C2): write them only when none exist, so a retry
- * heals a missing set without moving one that is there.
- */
+/** A receipt that may already have rows (the Paystack replay guard): write them only when none exist. */
 export async function ensureAccessRows(db: ServiceDb, receipt: Receipt): Promise<void> {
-  const { data: existing, error } = await db
-    .from('course_access')
-    .select('access_id')
-    .eq('subscription_id', receipt.subscription_id)
-    .limit(1);
+  const { data, error } = await db.from('course_access').select('access_id').eq('subscription_id', receipt.subscription_id).limit(1);
   if (error) throw new Error(`course_access: read failed: ${error.message}`);
-  if (!existing?.length) await writeAccessRows(db, receipt);
+  if (!data?.length) await writeAccessRows(db, receipt);
 }
 
 /**
- * An edited receipt (admin Update): its rows move by exactly the change
- * made to the receipt — each row's start shifts by the receipt's start
- * change, each row's end by the receipt's end change — so a queued
- * start is kept and the rows of the student's OTHER receipts are never
- * touched (ruling 4: an edit overlaps rather than shifts the queue).
- * The status follows (ACTIVE clears the stamp; anything else stamps
- * once). A changed product replaces the rows through the fresh-grant
- * rule. A receipt with no rows gets them. Nothing on a row is set by
- * hand (C3b, Sam, 2026-09-19: rows are written by rule).
- *
- * Why not "delete and queue again": Sam's 2026-09-19 walk edited the
- * OLDER of two receipts, and re-queuing sent its rows behind the newer
- * receipt that had itself queued behind the older one — the student
- * lost every course for a month. A queue is chronological by purchase
- * and cannot be recomputed from a later edit.
+ * An edited receipt (admin Update). A changed start is the admin's
+ * requested start — the receipt's new floor. A changed window length
+ * changes every row's length by the same amount. A changed product
+ * replaces the rows. Then the chain is re-packed on every course the
+ * receipt touched before or after, and the windows follow. The status
+ * flows through the re-pack (REVOKED stamps, ACTIVE or EXPIRED clears).
  */
 export async function rewriteAccessRows(db: ServiceDb, before: Receipt, after: Receipt): Promise<void> {
-  if (after.product_id !== before.product_id) {
-    const { error } = await db.from('course_access').delete().eq('subscription_id', after.subscription_id);
-    if (error) throw new Error(`course_access: delete failed: ${error.message}`);
-    await writeAccessRows(db, after);
-    return;
+  if (after.start_utc !== before.start_utc) {
+    const { error } = await db.from('subscriptions').update({ requested_start_utc: after.start_utc }).eq('subscription_id', after.subscription_id);
+    if (error) throw new Error(`subscriptions: requested start update failed: ${error.message}`);
   }
 
-  const { data: rows, error: readError } = await db
+  const { data: current, error: readError } = await db
     .from('course_access')
-    .select('access_id, start_utc, expires_utc')
+    .select('access_id, course_id, start_utc, expires_utc')
     .eq('subscription_id', after.subscription_id);
   if (readError) throw new Error(`course_access: read failed: ${readError.message}`);
-  if (!rows?.length) {
-    await writeAccessRows(db, after);
+  const rows = (current ?? []) as { access_id: number; course_id: string; start_utc: string; expires_utc: string }[];
+  const touched = new Set(rows.map((r) => r.course_id));
+
+  if (after.product_id !== before.product_id || !rows.length) {
+    if (rows.length) {
+      const { error } = await db.from('course_access').delete().eq('subscription_id', after.subscription_id);
+      if (error) throw new Error(`course_access: delete failed: ${error.message}`);
+    }
+    const courses = await productCourses(db, after.product_id);
+    if (courses.length) {
+      const { error } = await db.from('course_access').insert(
+        courses.map((course_id) => ({
+          user_id: after.user_id,
+          course_id,
+          subscription_id: after.subscription_id,
+          start_utc: after.start_utc,
+          expires_utc: after.expires_utc,
+          revoked_utc: null,
+        })),
+      );
+      if (error) throw new Error(`course_access: insert failed: ${error.message}`);
+      for (const c of courses) touched.add(c);
+    }
+    await repackAccess(db, after.user_id, [...touched]);
     return;
   }
 
-  const startShift = new Date(after.start_utc).getTime() - new Date(before.start_utc).getTime();
-  const endShift = new Date(after.expires_utc).getTime() - new Date(before.expires_utc).getTime();
-  for (const row of rows as { access_id: number; start_utc: string; expires_utc: string }[]) {
-    const start = new Date(new Date(row.start_utc).getTime() + startShift);
-    let expires = new Date(new Date(row.expires_utc).getTime() + endShift);
-    if (expires <= start) expires = new Date(start.getTime() + 1000); // the CHECK: an end never before its start
-    const { error } = await db
-      .from('course_access')
-      .update({ start_utc: start.toISOString(), expires_utc: expires.toISOString() })
-      .eq('access_id', row.access_id);
-    if (error) throw new Error(`course_access: update failed: ${error.message}`);
+  const lengthDelta =
+    new Date(after.expires_utc).getTime() - new Date(after.start_utc).getTime() - (new Date(before.expires_utc).getTime() - new Date(before.start_utc).getTime());
+  if (lengthDelta !== 0) {
+    for (const r of rows) {
+      let expires = new Date(new Date(r.expires_utc).getTime() + lengthDelta);
+      const start = new Date(r.start_utc);
+      if (expires <= start) expires = new Date(start.getTime() + 1000); // the CHECK: an end never before its start
+      const { error } = await db.from('course_access').update({ expires_utc: expires.toISOString() }).eq('access_id', r.access_id);
+      if (error) throw new Error(`course_access: update failed: ${error.message}`);
+    }
   }
-
-  if (after.status === 'ACTIVE') {
-    const { error } = await db.from('course_access').update({ revoked_utc: null }).eq('subscription_id', after.subscription_id);
-    if (error) throw new Error(`course_access: update failed: ${error.message}`);
-  } else {
-    await revokeAccessRows(db, after.subscription_id);
-  }
-  await setReceiptWindow(db, after.subscription_id);
+  await repackAccess(db, after.user_id, [...touched]);
 }
 
-/** Revoke: stamp the receipt's live rows once; rows already stamped keep their date. */
+/** Revoke: the receipt's rows are stamped and leave the chain; the links behind them move up. */
 export async function revokeAccessRows(db: ServiceDb, subscriptionId: string): Promise<void> {
-  const { error } = await db
+  const { data, error } = await db.from('course_access').select('user_id, course_id').eq('subscription_id', subscriptionId);
+  if (error) throw new Error(`course_access: read failed: ${error.message}`);
+  const rows = (data ?? []) as { user_id: string; course_id: string }[];
+  if (!rows.length) return;
+  const { error: stampError } = await db
     .from('course_access')
     .update({ revoked_utc: nowIso() })
     .eq('subscription_id', subscriptionId)
     .is('revoked_utc', null);
-  if (error) throw new Error(`course_access: revoke failed: ${error.message}`);
+  if (stampError) throw new Error(`course_access: revoke failed: ${stampError.message}`);
+  await repackAccess(db, rows[0].user_id, rows.map((r) => r.course_id));
 }

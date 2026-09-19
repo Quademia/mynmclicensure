@@ -253,8 +253,10 @@ create table if not exists subscriptions (
   expiry_reminded boolean not null default false,
   source          text not null default 'PAYMENT',   -- PAYMENT | PAYSTACK | ADMIN | SELF_TRIAL_SIGNUP
   source_ref      text,
-  created_utc     timestamptz not null default now()  -- 02 C3b (Sam, 2026-09-19): when the receipt was made;
+  created_utc     timestamptz not null default now(), -- 02 C3b (Sam, 2026-09-19): when the receipt was made;
                                                       -- start_utc / expires_utc are its access window, set from its course_access rows
+  requested_start_utc timestamptz                     -- 02 C3b (Sam, 2026-09-19): the admin's chosen start on Grant — the
+                                                      -- receipt's floor in the course chain; null = created_utc
 );
 create index if not exists subscriptions_user_id_idx on subscriptions (user_id);
 create index if not exists subscriptions_user_product_status_idx on subscriptions (user_id, product_id, status);

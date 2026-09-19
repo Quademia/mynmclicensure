@@ -108,13 +108,16 @@ export async function grantSubscription(userIdIn: string, productIdIn: string, s
   };
   const { error } = await supabase.from('subscriptions').insert({
     ...receipt,
+    // A chosen start date is the receipt's floor in the chain (C3b);
+    // empty means the moment it was made.
+    requested_start_utc: startDate ? startIso : null,
     source: 'ADMIN',
     source_ref: 'admin_grant',
     expiry_reminded: false,
   });
   if (error) return fail(error.message);
-  // One course row per course of the product, each queued behind the
-  // course's current end (02 C2, C3a).
+  // One course row per course of the product, then the chain re-packed
+  // (02 C2, C3a, C3b).
   try {
     await writeAccessRows(createServiceRoleClient(), receipt);
   } catch (err) {

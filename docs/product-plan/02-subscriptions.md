@@ -209,6 +209,23 @@ One line each; the full text with proof is in
   latest row end after every write, and a new column records the
   moment of the grant or purchase. The admin list and panel show
   "Granted".
+- **The chain (Sam, 2026-09-19, option 2; replaces ruling 4;
+  `requested_start_utc` ticked in §8 S8).** Sam's walk revoked the live
+  receipt while a paid one was queued behind it, and ruling 4 as
+  written ("rows queued behind keep their dates") left the student
+  with a paid receipt and no access for three weeks. The queue is a
+  courtesy so days are not wasted, not a penalty. Ruled: for one
+  student and one course, the paid and free receipts form a **chain**
+  in order of their floor — the admin's requested start when Grant
+  named one, else the moment the receipt was made; each link starts at
+  the later of its floor and the previous link's end and keeps its
+  length; **every write re-packs the chain** (a revoke pulls the links
+  behind it forward, an extension pushes them back), so what a student
+  holds never depends on the order an admin did things in, and no paid
+  day is lost. Trials sit outside the chain. An EXPIRED receipt stays
+  a link (it has run out already); a REVOKED one leaves. The narrow
+  fix (pull forward on revoke only) was offered and passed over: it
+  left the extension case.
 - **The product stays the single unit of sale.** Course-level pricing
   (a price per course, products as bundles, a basket) weighed and
   parked; S8's shapes already fit it if it returns (2026-09-18).
@@ -381,18 +398,23 @@ Code only.
   end, and its state — Live, Queued (starts later), Ended, Revoked.
   Read-only; loaded when the panel opens through a Server Action behind
   the admin gate, refreshed after an Edit or a Revoke.
-- **Edit moves the rows by the change.** Update no longer copies the
-  receipt's dates onto its rows; each row's start shifts by the
-  receipt's start change and each row's end by its end change, so a
-  queued start survives and the student's other receipts are never
-  touched (ruling 4). A changed product replaces the rows through the
-  fresh-grant rule; the status follows. The Paystack replay guard keeps
-  its write-if-none. **The first build re-queued the rows instead
-  (delete, then write through the grant rule) and Sam's walk broke it
-  the same hour:** he edited the *older* of two receipts, and its rows
-  queued behind the newer receipt that had queued behind it — the
-  student lost every course for a month. A queue is chronological by
-  purchase; it cannot be recomputed from a later edit.
+- **Every write re-packs the chain** (the ruling above): `repackAccess`
+  in `lib/subscriptions/access-rows.ts` is called at the end of Grant,
+  Paystack activation, the trial, Update and Revoke, for the courses
+  the receipt touches; then every touched receipt's window is set from
+  its rows. Update: a changed start becomes the receipt's requested
+  start (its floor); a changed window length changes each row's length
+  by the same amount; a changed product replaces the rows; the status
+  flows through the re-pack. The Paystack replay guard keeps its
+  write-if-none. **Two earlier shapes fell in Sam's walks the same
+  day:** the first re-queued a receipt's rows on edit and sent the
+  older receipt behind the newer one (a month with no access); the
+  second moved rows by the edit's delta and left a revoke's gap (a paid
+  receipt queued behind a revoked one, three weeks with no access).
+- **The dashboard's "starts later" line.** When nothing is live but a
+  row is still to start, the subscription bar says "RN Full access
+  starts 13 Oct 2026" instead of offering an upgrade the student
+  already holds (`getUpcomingAccess`).
 - **The receipt's window follows its rows** (the ruling above): after
   every write the receipt's start is the earliest row start and its
   expiry the latest row end, so the receipt, the email, the profile
@@ -404,13 +426,15 @@ Code only.
 - **Not built, by the ruling:** ticks on Grant, per-row dates, a
   single-row Revoke, the hand-picked grant.
 
-**Done when:** the panel on a receipt lists its courses with the dates
-the rows hold and the right state word; an Edit that extends the
-older of two receipts moves only that receipt's rows and leaves the
-newer receipt's queued rows where they are (an overlap, not a gap); an
-Edit that extends the newer, queued receipt keeps its queued start; an
-Edit to REVOKED stamps them and back to ACTIVE clears the stamp;
-Revoke's stamp shows in the panel.
+**Done when** (the five chain cases, by running the writers on dev and
+in the browser): buy RN Full while Free is live → RN Full starts when
+Free ends; revoke Free → RN Full starts on its purchase day and the
+dashboard is live at once; extend Free by a month → RN Full starts a
+month later and keeps 365 days; a third receipt goes on the end;
+revoke the middle one → the last moves up. Plus: a trial pushes
+nothing and is pushed by nothing; the panel shows each row with the
+right state word; the receipt's window equals its rows; a student with
+only a future row sees "starts …" on the dashboard, not Subscribe.
 
 ### Later, under this doc
 

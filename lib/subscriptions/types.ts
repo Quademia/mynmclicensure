@@ -28,6 +28,8 @@ export type Subscription = {
   source: SubscriptionSource;
   source_ref: string | null;
   created_utc: string;
+  /** The admin's chosen start on Grant — the receipt's floor in the chain; null = created_utc (C3b). */
+  requested_start_utc: string | null;
 };
 
 // The admin page's list row: the subscription with the student and the
