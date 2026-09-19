@@ -340,6 +340,6 @@ A product change under the ⭐ rule, sliced when Sam picks it.
 
 | Slice | Date |
 |---|---|
-| C1 The link table | ⬜ |
+| C1 The link table | ✅ 2026-09-19 (`20260919200000_product_courses.sql`; proven on dev by SQL — 32 of 32 products with rows, a bad course id refused, the gate unchanged for both dev students; Sam moved on without a defect) |
 | C2 The access rows | ⬜ after S2 (Sam, 2026-09-19) |
 | C3 Stacking on, the admin forms follow the rows | ⬜ after cutover |
