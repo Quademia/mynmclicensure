@@ -39,7 +39,7 @@ sorted around (Sam, 2026-09-18). The findings are
 still the vanilla-JS site served from the `qacademy-gamma` repo; its
 code stays here under `legacy/` as a reference — it says what the old
 app did, and Sam decides whether the new app should do the same. The
-feature docs `00–07` are the **living plan per feature** (Sam,
+feature docs `00–08` are the **living plan per feature** (Sam,
 2026-09-19, replacing the 2026-09-12 ruling that they were not build
 plans): each holds what the feature does today, what the diagnosis
 found, Sam's rulings, and the sliced plan with the doc's own slice
@@ -81,7 +81,7 @@ stack and the source of the plumbing. MyTeacher follows later.
 - `scripts/` — the lint baseline and the migration runner.
 - `public/` — static assets.
 - `docs/product-plan/` — flat: the rebuild plan, the feature specs
-  `00–07`, the mock-exams reference, and the gamma-era plans kept for
+  `00–08`, the mock-exams reference, and the gamma-era plans kept for
   history. One folder until there is a reason to separate.
 - `sessions/` — period logs. `legacy/` — the old product, read-only.
 

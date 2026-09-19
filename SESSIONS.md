@@ -23,7 +23,7 @@ should stay rich.
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
 - 2026-09-19 — 02 rewritten as the living plan; S8 built whole: C1 link table, C2 access rows, C3a queued start, C3b the chain; two C3b shapes fell to walks
-  - ↳ product_courses · course_access no browser write · one live definition · receipt = paper trail, window from rows · created_utc, requested_start_utc ticked · no per-course admin edits · chain re-packed on every write · nine on prod
+  - ↳ product_courses · course_access · receipt = paper trail, window from rows · created_utc, requested_start_utc · no per-course admin edits · chain re-packed on every write · one Grant dialog · S2 ticked, 08 opened · nine on prod
 
 - 2026-09-19 — S9+S10 auth floor, D32+D36 Paystack trim, 03 Q1+Q2 quiz floor and lifecycle built, walked, merged; docs 00–07 become the living plans
   - ↳ five functions revoked · IP in the limiter · fail closed · users row frozen · email unique · card data trimmed · quiz reads course-scoped · restore→draft · mock list paged · one palette already · course codes stay · S2 before S8

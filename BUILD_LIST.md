@@ -69,6 +69,7 @@ the gamma-era list it replaces is in git history and in `qacademy-gamma`.
 ### Decisions still open in rebuild.md
 
 - ✅ §8 S1 user primary key — keep `U_` ids, add the FK — 2026-09-11
+- ✅ §8 S2 one items table, `question_bank` (D22) — ticked 2026-09-19; the build is 08-question-bank.md B1
 - ⬜ §8 S3 attempts blobs → JSONB / arrays
 - ✅ §8 S4 foreign keys on licensure tables — 2026-09-11, as each table lands
 - ✅ §8 S6 populate `sessions.ip_hash` — 2026-09-11
@@ -91,7 +92,7 @@ the work that surfaced it; Sam orders them. A finding in
 
 ### Plans by feature doc
 
-The feature docs `00–07` are the living plan per feature (Sam,
+The feature docs `00–08` are the living plan per feature (Sam,
 2026-09-19); a doc rewritten into that shape gets a section here with
 its own slice ids. The flat lists below keep the items no doc has
 taken yet.
@@ -114,6 +115,12 @@ taken yet.
 - ⬜ A1 The floor — announcements_for_me(), the table admin-only to read, scope_level text[], CHECKs, the hot-read index (S12, S13; D46, D48)
 - ⬜ A2 The notice state — read_at / clicked_at / dismissed_at, a key to the announcement, server-side writes, the strip's ✕ dismisses (S12; D47)
 - ⬜ A3 Residue — the body stored once and the <br> per edit ended, keys for the scope arrays, the unused read removed (D48) — later
+
+#### [08-question-bank.md](docs/product-plan/08-question-bank.md)
+
+- ⬜ B1 One table — question_bank with a course key, the eleven copied in and dropped, one gate per statement (S2; D22)
+- ⬜ B2 The answers server-only — column revoke on the one table, the builders' search server-side (D8, D9); after S7
+- ⬜ B3 The admin bank page paged and filtered server-side, fifty at a time (D11) — later
 
 ### The legacy check — gaps found 2026-09-16
 
@@ -208,7 +215,7 @@ what the diagnosis and the perf investigation surfaced.
 - ⬜ Speed: ~34 in-page links are plain anchors, so a click discards the page and re-runs every query; MyNclex uses next/link in 48 files, this app in 3 (perf investigation, 2026-09-16)
 - ⬜ Speed: the unread badge is two serial queries and finishes last on every student page — one query, still counting distinct threads (perf investigation, 2026-09-16)
 - ⬜ Speed: the student layout's three queries block every student page, including pages needing none of them (perf investigation, 2026-09-16)
-- ⬜ Speed: the item-bank policy re-runs user_has_course() per row — ~230 ms per Quiz Builder course pick now, ~2.2 s per read at a 10,000-row course; eleven ALTER POLICY lines, no data change (perf investigation, 2026-09-16)
+- → Speed: the item-bank policy re-runs user_has_course() per row — ~230 ms per Quiz Builder course pick now, ~2.2 s per read at a 10,000-row course; eleven ALTER POLICY lines, no data change (perf investigation, 2026-09-16)
 - ⬜ Scale: admin Bulk Send and the admin inbox collect every matching student id into one .in() list — exceeds the API limit around 2,000–5,000 students and returns nothing rather than erroring (perf investigation, 2026-09-16)
 - ⬜ Scale: the admin Attempts page computes its analytics from at most 5,000 loaded rows — past that it silently reports numbers from an arbitrary slice; wrong, not late (perf investigation, 2026-09-16)
 - ⬜ Speed: fixed-quizzes and mock-exams select every attempt column, answer blob included, only to count answers — 400 KB–1 MB per load on a phone (perf investigation, 2026-09-16)
