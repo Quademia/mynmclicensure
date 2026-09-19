@@ -92,43 +92,32 @@ export async function writeAccessRows(db: ServiceDb, receipt: Receipt): Promise<
 }
 
 /**
- * An edited receipt (admin Update): its rows take the receipt's dates
- * and its status (ACTIVE clears revoked_utc — an admin correction;
- * anything else stamps it once). A queued row is put on the receipt's
- * dates by this — the admin asked for those dates; editing a row on its
- * own is C3b. The course set is kept (ruling 1, bought means kept)
- * unless the product itself changed, in which case the old product's
- * rows go and the new product's are written. A receipt with no rows yet
- * (the Paystack replay guard, or one written before C2) gets them.
+ * A receipt that may already have rows (the Paystack replay guard, or
+ * one written before C2): write them only when none exist, so a retry
+ * heals a missing set without moving one that is there.
  */
-export async function syncAccessRows(db: ServiceDb, receipt: Receipt, productChanged: boolean): Promise<void> {
-  if (productChanged) {
-    const { error } = await db.from('course_access').delete().eq('subscription_id', receipt.subscription_id);
-    if (error) throw new Error(`course_access: delete failed: ${error.message}`);
-    await writeAccessRows(db, receipt);
-    return;
-  }
-
-  const { data: existing, error: readError } = await db
+export async function ensureAccessRows(db: ServiceDb, receipt: Receipt): Promise<void> {
+  const { data: existing, error } = await db
     .from('course_access')
     .select('access_id')
     .eq('subscription_id', receipt.subscription_id)
     .limit(1);
-  if (readError) throw new Error(`course_access: read failed: ${readError.message}`);
-  if (!existing?.length) {
-    await writeAccessRows(db, receipt);
-    return;
-  }
+  if (error) throw new Error(`course_access: read failed: ${error.message}`);
+  if (!existing?.length) await writeAccessRows(db, receipt);
+}
 
-  const dates = { start_utc: receipt.start_utc, expires_utc: receipt.expires_utc };
-  if (receipt.status === 'ACTIVE') {
-    const { error } = await db.from('course_access').update({ ...dates, revoked_utc: null }).eq('subscription_id', receipt.subscription_id);
-    if (error) throw new Error(`course_access: update failed: ${error.message}`);
-    return;
-  }
-  const { error: datesError } = await db.from('course_access').update(dates).eq('subscription_id', receipt.subscription_id);
-  if (datesError) throw new Error(`course_access: update failed: ${datesError.message}`);
-  await revokeAccessRows(db, receipt.subscription_id);
+/**
+ * An edited receipt (admin Update): its rows are written again through
+ * the same rule as a fresh grant — the receipt's own rows go first, so
+ * the new ones queue behind the student's OTHER receipts, never behind
+ * themselves. The receipt's product, dates and status all flow through
+ * writeAccessRows; nothing on a row is set by hand (C3b, Sam,
+ * 2026-09-19: rows are written by rule, the admin edits receipts).
+ */
+export async function rewriteAccessRows(db: ServiceDb, receipt: Receipt): Promise<void> {
+  const { error } = await db.from('course_access').delete().eq('subscription_id', receipt.subscription_id);
+  if (error) throw new Error(`course_access: delete failed: ${error.message}`);
+  await writeAccessRows(db, receipt);
 }
 
 /** Revoke: stamp the receipt's live rows once; rows already stamped keep their date. */

@@ -25,13 +25,14 @@ import { subscriptionAssignedEmail } from '@/lib/email/templates/subscription-as
 import { subscriptionRevokedEmail } from '@/lib/email/templates/subscription-revoked';
 import { appOrigin } from '@/lib/site/app-origin';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { revokeAccessRows, syncAccessRows, writeAccessRows } from './access-rows';
+import { revokeAccessRows, rewriteAccessRows, writeAccessRows } from './access-rows';
 import { addDaysIso, dateOnlyToEndIso, dateOnlyToStartIso, isDateOnlyString, nowIso } from './dates';
 import { makeSubscriptionId } from './ids';
 import { getSubscriptionById, searchStudents } from './queries';
 import {
   ADMIN_SUB_SOURCES,
   SUB_STATUSES,
+  type AccessRow,
   type ActionResult,
   type GrantResult,
   type StudentHit,
@@ -191,14 +192,18 @@ export async function updateSubscription(input: UpdateSubscriptionInput): Promis
     .update({ product_id: productId, start_utc: startIso, expires_utc: expiresIso, status, source, source_ref: finalSourceRef })
     .eq('subscription_id', subscriptionId);
   if (error) return fail(error.message);
-  // The receipt's course rows follow the edit: its dates and status; a
-  // changed product replaces the course set (02 C2).
+  // The receipt's course rows are written again by the same rule as a
+  // grant — product, dates and status flow through it; a queued start
+  // survives (02 C2, C3b).
   try {
-    await syncAccessRows(
-      createServiceRoleClient(),
-      { subscription_id: subscriptionId, user_id: existing.user_id, product_id: productId, start_utc: startIso, expires_utc: expiresIso, status },
-      productId !== existing.product_id,
-    );
+    await rewriteAccessRows(createServiceRoleClient(), {
+      subscription_id: subscriptionId,
+      user_id: existing.user_id,
+      product_id: productId,
+      start_utc: startIso,
+      expires_utc: expiresIso,
+      status,
+    });
   } catch (err) {
     return fail(`Subscription updated, but its course access rows failed: ${err instanceof Error ? err.message : String(err)}`);
   }
@@ -247,6 +252,26 @@ async function sendRevokedEmail(db: ServerSupabaseClient, sub: Subscription): Pr
   } catch (err) {
     console.error('[subscriptions] revoke email failed for', sub.subscription_id, err);
   }
+}
+
+// ── the panel's course rows (02 C3b) ───────────────────────────────────
+// A receipt's course_access rows with the course title, oldest course
+// first; read as the admin (the table's ADMIN policy). Read-only: rows
+// are written by rule, never from this page.
+export async function loadAccessRows(subscriptionIdIn: string): Promise<AccessRow[]> {
+  const { supabase } = await requireAdmin();
+  const subscriptionId = String(subscriptionIdIn || '').trim();
+  if (!subscriptionId) return [];
+  const { data, error } = await supabase
+    .from('course_access')
+    .select('access_id, course_id, start_utc, expires_utc, revoked_utc, courses ( title )')
+    .eq('subscription_id', subscriptionId)
+    .order('course_id');
+  if (error) {
+    console.error('loadAccessRows:', error);
+    return [];
+  }
+  return (data ?? []) as unknown as AccessRow[];
 }
 
 // ── POST /admin/subscriptions/sync-expired ─────────────────────────────

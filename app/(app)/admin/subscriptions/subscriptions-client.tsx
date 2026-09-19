@@ -25,12 +25,13 @@ import { Toast } from '@/lib/toast/toast';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import {
   grantSubscription,
+  loadAccessRows,
   revokeSubscription,
   searchStudentsAction,
   syncExpiredSubscriptions,
   updateSubscription,
 } from '@/lib/subscriptions/actions';
-import { SUB_STATUSES, type StudentHit, type SubscriptionListRow } from '@/lib/subscriptions/types';
+import { SUB_STATUSES, type AccessRow, type StudentHit, type SubscriptionListRow } from '@/lib/subscriptions/types';
 import type { Product, Program } from '@/lib/catalogue/types';
 
 type Msg = { text: string; tone: 'error' | 'success' } | null;
@@ -48,6 +49,15 @@ function fmtDate(iso: string): string {
 
 function fmtDateLong(d: Date): string {
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+// A course row's state word (02 C3b): a date, not a status — the same
+// test the gate makes.
+function accessRowState(r: AccessRow, now: Date): { word: string; cls: string } {
+  if (r.revoked_utc) return { word: 'Revoked', cls: 'REVOKED' };
+  if (new Date(r.expires_utc) <= now) return { word: 'Ended', cls: 'EXPIRED' };
+  if (new Date(r.start_utc) > now) return { word: 'Queued', cls: 'queued' };
+  return { word: 'Live', cls: 'ACTIVE' };
 }
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -142,6 +152,17 @@ export function SubscriptionsClient({
   const [panelId, setPanelId] = useState<string | null>(null);
   const panelSub = panelId ? subscriptions.find((s) => s.subscription_id === panelId) ?? null : null;
   const closePanel = () => setPanelId(null);
+  // The receipt's course rows (02 C3b): loaded when the panel opens and
+  // again after an Edit or a Revoke; null while loading.
+  const [panelRows, setPanelRows] = useState<AccessRow[] | null>(null);
+  function loadPanelRows(subscriptionId: string) {
+    setPanelRows(null);
+    loadAccessRows(subscriptionId).then(setPanelRows);
+  }
+  function openPanel(subscriptionId: string) {
+    setPanelId(subscriptionId);
+    loadPanelRows(subscriptionId);
+  }
 
   // ── Grant dialog ──
   const [grantOpen, setGrantOpen] = useState(false);
@@ -290,6 +311,7 @@ export function SubscriptionsClient({
     }
     setEditBusy('saved');
     ok('✅ Subscription updated successfully.');
+    loadPanelRows(editId);
     router.refresh();
     window.setTimeout(() => {
       setEditId(null);
@@ -458,7 +480,7 @@ export function SubscriptionsClient({
                   const count = userSubCount[s.user_id];
                   const expiring = isExpiringSoon(s);
                   return (
-                    <tr key={s.subscription_id} className={first ? 'group-first' : 'group-continuation'} onClick={() => setPanelId(s.subscription_id)}>
+                    <tr key={s.subscription_id} className={first ? 'group-first' : 'group-continuation'} onClick={() => openPanel(s.subscription_id)}>
                       {first ? (
                         <td>
                           <div className="cell-name">
@@ -520,6 +542,26 @@ export function SubscriptionsClient({
                     {panelSub.source_ref ? (
                       <div className="detail-row"><span className="key">Reference</span><span className="val small">{panelSub.source_ref}</span></div>
                     ) : null}
+                  </div>
+                  <div className="detail-section">
+                    <h4>Course access</h4>
+                    {panelRows === null ? (
+                      <div className="detail-empty">Loading…</div>
+                    ) : panelRows.length === 0 ? (
+                      <div className="detail-empty">No course rows on this subscription.</div>
+                    ) : (
+                      panelRows.map((r) => {
+                        const state = accessRowState(r, now);
+                        return (
+                          <div className="detail-row" key={r.access_id}>
+                            <span className="key" title={r.course_id}>{r.courses?.title || r.course_id}</span>
+                            <span className="val small">
+                              {fmtDate(r.start_utc)} → {fmtDate(r.expires_utc)} <span className={`chip ${state.cls}`}>{state.word}</span>
+                            </span>
+                          </div>
+                        );
+                      })
+                    )}
                   </div>
                 </div>
                 <div className="panel-actions">

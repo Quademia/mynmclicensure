@@ -183,6 +183,21 @@ One line each; the full text with proof is in
      courses ticked; Update lists the receipt's rows, each editable;
      Revoke takes a receipt or one row. Read-only rows in the dialogs
      before cutover, editing after.
+- **Rows are written by rule, never by hand (Sam, 2026-09-19;
+  replaces ruling 6 and retires ruling 5's hand-picked grant).** The
+  receipt is what was bought or granted and the admin list shows it;
+  the rows are what is held, per course, and the gate reads only them.
+  Grant, Paystack and the trial write rows; Edit rewrites them through
+  the same queuing rule; Revoke stamps them. Grant stays whole-product
+  (a single course is its standalone product; "more days on one
+  course" is a standalone grant plus a receipt edit; a recurring
+  bespoke bundle becomes a product). No hand-picked grant, so
+  `product_id` stays NOT NULL. Per-course editing is **deferred, not
+  refused**: a row already has its own dates and stamp, so a dialog
+  and a hand-set marker can be added on this storage if a real support
+  case after launch asks for it. The reasoning: an admin-edited row is
+  a second writer on the row, the receipt stops explaining its rows,
+  and the cases it serves are already reachable.
 - **The product stays the single unit of sale.** Course-level pricing
   (a price per course, products as bundles, a basket) weighed and
   parked; S8's shapes already fit it if it returns (2026-09-18).
@@ -344,16 +359,30 @@ example's GP 665 falls out of the rows; Paystack activation of a
 second purchase creates a second receipt, no extension; the dashboard
 shows each course's latest end.
 
-#### C3b — The admin dialogs follow the rows (rulings 5, 6)
+#### C3b — The panel shows the rows; Edit re-queues them (the 2026-09-19 ruling)
 
-- **Grant** lists the product's courses ticked, an untick allowed; a
-  hand-picked grant (courses and days, no product) writes a receipt
-  with no product, source ADMIN and the admin's note —
-  `subscriptions.product_id` nullable lands here.
-- **Update** lists the receipt's rows, each editable — "give Ama 14
-  more days on GP", which no tool does today.
-- **Revoke** takes a receipt or one row.
-- The Users page's Assign shares Grant's form.
+Reshaped on 2026-09-19 from "the admin dialogs follow the rows" (per-row
+editing, a hand-picked grant, single-row Revoke) to the ruling above.
+Code only.
+
+- **The panel shows the rows.** Under a receipt on the admin
+  Subscriptions page, one line per course: the course, its start and
+  end, and its state — Live, Queued (starts later), Ended, Revoked.
+  Read-only; loaded when the panel opens through a Server Action behind
+  the admin gate, refreshed after an Edit or a Revoke.
+- **Edit re-queues the rows.** Update no longer copies the receipt's
+  dates onto its rows; it deletes the receipt's rows and writes them
+  again through the same rule as Grant, so they queue behind the
+  student's other receipts and a queued start survives an edit. The
+  Paystack replay guard keeps its write-if-none.
+- **Not built, by the ruling:** ticks on Grant, per-row dates, a
+  single-row Revoke, the hand-picked grant.
+
+**Done when:** the panel on a receipt lists its courses with the dates
+the rows hold and the right state word; an Edit that changes a
+receipt's dates moves its rows and keeps them queued behind another
+receipt on the same course; an Edit to REVOKED stamps them and back
+to ACTIVE clears the stamp; Revoke's stamp shows in the panel.
 
 ### Later, under this doc
 
@@ -381,4 +410,4 @@ shows each course's latest end.
 | C1 The link table | ✅ 2026-09-19 (`20260919200000_product_courses.sql`; proven on dev by SQL — 32 of 32 products with rows, a bad course id refused, the gate unchanged for both dev students; Sam moved on without a defect) |
 | C2 The access rows | ✅ 2026-09-19 (`20260919230000_course_access.sql` + `…233000_course_access_grants.sql`; before S2 — Sam; proven on dev by SQL, walked by Sam on an RM Trial grant: the rows and the per-course ends, GP the later end not the sum) |
 | C3a The queued start | ✅ 2026-09-19 (code only; proven on dev by running the writer — RN_FULL queued behind the FREE receipt, RM_FULL's GP behind that, the RM courses starting today past the trial; walked by Sam: an RN_FULL grant, the dashboard's ends) |
-| C3b The admin dialogs follow the rows | ⬜ when Sam picks it (2026-09-19) |
+| C3b The panel shows the rows; Edit re-queues them | ⬜ |

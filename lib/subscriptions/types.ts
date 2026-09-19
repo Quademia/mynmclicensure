@@ -57,6 +57,17 @@ export type StudentHit = {
   program_id: string | null;
 };
 
+// A receipt's course rows as the admin panel shows them (02 C3b): the
+// course_access row with the course's title joined.
+export type AccessRow = {
+  access_id: number;
+  course_id: string;
+  start_utc: string;
+  expires_utc: string;
+  revoked_utc: string | null;
+  courses: { title: string } | null;
+};
+
 // legacy getStudentCourseAccess(): { course_id: { totalDays, expires } }.
 export type CourseAccess = { totalDays: number; expires: string };
 export type CourseAccessMap = Record<string, CourseAccess>;

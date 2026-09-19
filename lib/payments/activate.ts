@@ -15,7 +15,7 @@
 //
 // Server only.
 
-import { syncAccessRows, writeAccessRows } from '@/lib/subscriptions/access-rows';
+import { ensureAccessRows, writeAccessRows } from '@/lib/subscriptions/access-rows';
 import { addDaysIso, nowIso } from '@/lib/subscriptions/dates';
 import { makeSubscriptionId } from '@/lib/subscriptions/ids';
 import type { Subscription } from '@/lib/subscriptions/types';
@@ -33,7 +33,7 @@ export async function activatePaymentForUser(db: ServiceDb, payment: Payment, us
   if (existingByRef) {
     // The course rows (02 C2) — written here too, so a retry after a
     // failure between the receipt and its rows heals itself.
-    await syncAccessRows(db, existingByRef, false);
+    await ensureAccessRows(db, existingByRef);
     await patchPayment(db, payment.reference, {
       user_id: user.user_id,
       subscription_id: existingByRef.subscription_id,
