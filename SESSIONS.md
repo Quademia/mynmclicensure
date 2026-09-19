@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-19 — S9+S10 auth floor, D32+D36 Paystack trim, 03 Q1+Q2 quiz floor and lifecycle built, walked, merged; docs 00–07 become the living plans
+  - ↳ five functions revoked · IP in the limiter · fail closed · users row frozen · email unique · card data trimmed · quiz reads course-scoped · restore→draft · mock list paged · one palette already · course codes stay · S2 before S8
+
 - 2026-09-18 — D31–D36 ruled; messaging, quiz/announcement and config groups traced (D37–D51); S11, S12, S13 ticked; table sweep complete; no code
   - ↳ pay-first kept, account at PAID · raw stripped · Paystack sweep of INIT · one limiter · Bulk Send parked · question reports · mock = premium design item · levels kept · config admin-only · grant all schema-wide · design system opened
 
