@@ -102,7 +102,8 @@ taken yet.
 - ✅ C1 The link table — product_courses with keys, the Products page and five readers on it (S8; D16) — 2026-09-19
 - ✅ C2 The access rows — course_access from five writers, one-lookup gate, stored dates (S8; D13–D17, D20) — 2026-09-19
 - ✅ C3a The queued start — a row starts at the course's non-trial end; the extend branches gone (ruling 3) — 2026-09-19
-- ✅ C3b The panel shows a receipt's rows; the chain re-packed on every write; receipt window from rows — 2026-09-19
+- ✅ C3b The panel shows a receipt's rows; the chain re-packed on every write; window from rows — 2026-09-19
+- ✅ (unplanned) One Grant dialog for Subscriptions and the Users drawer, the preview by the chain — 2026-09-19
 
 #### [03-quiz-system.md](docs/product-plan/03-quiz-system.md)
 
@@ -118,7 +119,7 @@ taken yet.
 
 #### [08-question-bank.md](docs/product-plan/08-question-bank.md)
 
-- ⬜ B1 One table — question_bank with a course key, the eleven copied in and dropped, one gate per statement (S2; D22)
+- ✅ B1 One table — question_bank with a course key, the eleven copied in and dropped, one gate a statement — 2026-09-19
 - ⬜ B2 The answers server-only — column revoke on the one table, the builders' search server-side (D8, D9); after S7
 - ⬜ B3 The admin bank page paged and filtered server-side, fifty at a time (D11) — later
 

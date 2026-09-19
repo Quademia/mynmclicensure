@@ -196,6 +196,6 @@ unchanged.
 
 | Slice | Date |
 |---|---|
-| B1 One table | ⬜ |
+| B1 One table | ✅ 2026-09-19 (`20260920010000_question_bank.sql`; proven on dev — 5,281 rows, the eleven gone, 2,401 visible to the RN student and none of RM's, EXPLAIN a hashed SubPlan once per statement; walked by Sam: the builder, the runner, the admin bank page, packs, the picker) |
 | B2 The answers server-only | ⬜ after S7 |
 | B3 The admin page paged | ⬜ later |

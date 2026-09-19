@@ -240,6 +240,16 @@ above sit at the repo root; the audience grouping inside them is kept.
 - **A desktop-app worktree has no `node_modules`** — `npm ci` in it —
   and gets a COPY of `.env.local` when created; a key added to the
   main checkout's file later must be copied across by hand.
+- **A new table in `licensure_gh` starts with `grant all` to the browser
+  roles** (the schema's default privileges): `revoke insert, update,
+  delete` still leaves TRUNCATE, REFERENCES and TRIGGER with `anon` and
+  `authenticated`. A table with no browser write path gets `revoke all`
+  then the one grant it needs; check `information_schema.role_table_grants`
+  after the apply.
+- **Migrate before the readers hot-reload.** `next dev` picks up an
+  edited reader within seconds; a migration applied minutes later leaves
+  every open page erroring in between. Run `npm run db:migrate` the
+  moment the readers are written, or migrate first.
 - **Migrations are applied by this repo's own runner**
   (`npm run db:migrate`, `scripts/db-migrate.mjs`), recorded in
   `licensure_gh.migrations`. Never `supabase db push`, never the MCP

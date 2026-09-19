@@ -425,6 +425,14 @@ Code only.
   admin list gains a Granted column and the panel a "Granted on" line.
 - **Not built, by the ruling:** ticks on Grant, per-row dates, a
   single-row Revoke, the hand-picked grant.
+- **One Grant dialog (unplanned, 2026-09-19).** The Users drawer's
+  Assign and the Subscriptions page's Grant were two legacy forms
+  calling one action; now one component
+  (`components/admin/grant-dialog.tsx`) opened from both, the student
+  pre-filled from a panel or the drawer, and a **preview by the chain
+  rule** (`previewGrant` → `planAccessRows`, the packing shared with
+  the writer) listing each course with the dates it would get — the
+  old "expires on" line was wrong whenever the student held a course.
 
 **Done when** (the five chain cases, by running the writers on dev and
 in the browser): buy RN Full while Free is live → RN Full starts when
