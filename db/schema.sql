@@ -132,17 +132,28 @@ create table if not exists levels (
 );
 
 -- ── products (slice 3) ─────────────────────────────────────────────────
+-- courses_included (a text[] of course-id words, no key) was dropped by
+-- 02 C1 (2026-09-19, §8 S8); what a product unlocks is product_courses.
 create table if not exists products (
   product_id          text primary key,
   name                text not null,
   kind                text not null default 'PAID',     -- PAID | TRIAL | FREE
   status              text not null default 'active',   -- active | archived
-  courses_included    text[] not null,
   price_minor         integer not null,
   currency            text not null default 'GHS',
   duration_days       integer not null,
   telegram_group_keys text[]
 );
+
+-- ── product_courses (02 C1, §8 S8 the definition side) ─────────────────
+-- What a product unlocks, one row per course. No dates, no status — a
+-- definition carries no time; the entitlement side (course_access) is C2.
+create table if not exists product_courses (
+  product_id text not null references products (product_id),
+  course_id  text not null references courses (course_id),
+  primary key (product_id, course_id)
+);
+create index if not exists product_courses_course_id_idx on product_courses (course_id);
 
 -- ── config (slice 3) ───────────────────────────────────────────────────
 create table if not exists config (

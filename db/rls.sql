@@ -350,6 +350,15 @@ with check (auth_user_role() = 'ADMIN');
 create policy products_update on products for update
 using (auth_user_role() = 'ADMIN');
 
+-- product_courses (02 C1): mirrors products — anyone reads, an ADMIN
+-- inserts or deletes; a link row is a pair, never updated.
+create policy product_courses_select on product_courses for select
+using (true);
+create policy product_courses_insert on product_courses for insert
+with check (auth_user_role() = 'ADMIN');
+create policy product_courses_delete on product_courses for delete
+using (auth_user_role() = 'ADMIN');
+
 -- config: any signed-in user reads; admin insert, update AND delete.
 create policy config_select on config for select
 using (auth.uid() is not null);
@@ -364,7 +373,9 @@ using (auth_user_role() = 'ADMIN');
 -- The entitlement gate (rebuild.md §9 defect 3), filled in by slice 8:
 -- an ADMIN, or a student with an ACTIVE, unexpired subscription whose
 -- product includes the course. Slice 4a created it allowing any
--- signed-in user; the signature has not changed.
+-- signed-in user; the signature has not changed. Since 02 C1
+-- (2026-09-19) the product's courses come from product_courses, not
+-- the dropped courses_included array.
 create or replace function user_has_course(p_course_id text)
 returns boolean
 language sql
@@ -377,11 +388,11 @@ as $$
     or exists (
       select 1
       from subscriptions s
-      join products p on p.product_id = s.product_id
+      join product_courses pc on pc.product_id = s.product_id
       where s.user_id = auth_user_id()
         and s.status = 'ACTIVE'
         and s.expires_utc > now()
-        and p_course_id = any (p.courses_included)
+        and pc.course_id = p_course_id
     )
   )
 $$;

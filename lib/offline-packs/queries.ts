@@ -100,7 +100,7 @@ function shuffleArray<T>(arr: T[]): T[] {
 
 // ── the student's subscriptions that cover the course ─────────────────
 // legacy getSubscriptionsForOfflineCourse — every status, joined to the
-// product; filtered by courses_included in code.
+// product; filtered by the product's product_courses rows in code (02 C1).
 type SubRow = {
   subscription_id: string;
   user_id: string;
@@ -109,13 +109,13 @@ type SubRow = {
   expires_utc: string | null;
   status: string | null;
   source: string | null;
-  products: { product_id: string; name: string; kind: string | null; courses_included: string[] | null } | null;
+  products: { product_id: string; name: string; kind: string | null; product_courses: { course_id: string }[] | null } | null;
 };
 
 async function getSubscriptionsForOfflineCourse(db: ServerSupabaseClient, userId: string, courseId: string): Promise<SubRow[]> {
   const { data, error } = await db
     .from('subscriptions')
-    .select('subscription_id, user_id, product_id, start_utc, expires_utc, status, source, products ( product_id, name, kind, courses_included )')
+    .select('subscription_id, user_id, product_id, start_utc, expires_utc, status, source, products ( product_id, name, kind, product_courses ( course_id ) )')
     .eq('user_id', userId);
   if (error) {
     console.error('getSubscriptionsForOfflineCourse:', error);
@@ -123,7 +123,7 @@ async function getSubscriptionsForOfflineCourse(db: ServerSupabaseClient, userId
   }
   const cid = String(courseId || '').trim().toUpperCase();
   return ((data ?? []) as unknown as SubRow[]).filter((sub) =>
-    (sub.products?.courses_included ?? []).map((v) => String(v || '').trim().toUpperCase()).includes(cid),
+    (sub.products?.product_courses ?? []).some((r) => String(r.course_id || '').trim().toUpperCase() === cid),
   );
 }
 

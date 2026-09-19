@@ -108,7 +108,17 @@ export async function saveProduct(input: {
   if (input.isNew && !productId) return fail('Product ID is required.');
   if (!name) return fail('Product name is required.');
   if (!duration) return fail('Duration (days) is required.');
-  if (!input.courses.length) return fail('Please select at least one course.');
+  const wanted = [...new Set(input.courses.map((c) => c.trim().toUpperCase()).filter(Boolean))];
+  if (!wanted.length) return fail('Please select at least one course.');
+
+  // The courses must exist before the product is written, so a bad id
+  // never leaves a product with half its list; the key on
+  // product_courses is the floor beneath this check (02 C1).
+  const { data: known, error: coursesError } = await supabase.from('courses').select('course_id').in('course_id', wanted);
+  if (coursesError) return fail(coursesError.message);
+  const knownIds = new Set((known ?? []).map((r) => r.course_id as string));
+  const unknown = wanted.filter((c) => !knownIds.has(c));
+  if (unknown.length) return fail(`Unknown course: ${unknown.join(', ')}`);
 
   const payload = {
     name,
@@ -117,13 +127,28 @@ export async function saveProduct(input: {
     price_minor: Math.round(priceInput * 100),
     currency: input.currency,
     duration_days: duration,
-    courses_included: input.courses,
     telegram_group_keys: input.telegramKeys.length ? input.telegramKeys : null,
   };
   const { error } = input.isNew
     ? await supabase.from('products').insert({ ...payload, product_id: productId })
     : await supabase.from('products').update(payload).eq('product_id', productId);
   if (error) return fail(error.message);
+
+  // The link rows follow the ticks: rows no longer ticked go, new ticks
+  // are added, the rest stay.
+  const { data: current, error: linksError } = await supabase.from('product_courses').select('course_id').eq('product_id', productId);
+  if (linksError) return fail(linksError.message);
+  const have = new Set((current ?? []).map((r) => r.course_id as string));
+  const toDelete = [...have].filter((c) => !wanted.includes(c));
+  const toInsert = wanted.filter((c) => !have.has(c));
+  if (toDelete.length) {
+    const { error: delError } = await supabase.from('product_courses').delete().eq('product_id', productId).in('course_id', toDelete);
+    if (delError) return fail(delError.message);
+  }
+  if (toInsert.length) {
+    const { error: insError } = await supabase.from('product_courses').insert(toInsert.map((course_id) => ({ product_id: productId, course_id })));
+    if (insError) return fail(insError.message);
+  }
 
   revalidatePath('/admin/products');
   return { ok: true };

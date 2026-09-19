@@ -24,9 +24,10 @@ import type { ActiveSubscriptionWithProduct, CourseAccessMap, StudentHit, Subscr
 export async function getStudentCourseAccess(db: ServerSupabaseClient, userId: string): Promise<CourseAccessMap> {
   const now = new Date();
 
+  // The product's courses are its product_courses rows (02 C1).
   const { data, error } = await db
     .from('subscriptions')
-    .select('*, products ( product_id, name, kind, courses_included )')
+    .select('*, products ( product_id, name, kind, product_courses ( course_id ) )')
     .eq('user_id', userId)
     .eq('status', 'ACTIVE');
 
@@ -35,17 +36,18 @@ export async function getStudentCourseAccess(db: ServerSupabaseClient, userId: s
     return {};
   }
 
-  type Row = Subscription & { products: { courses_included: string[] | null } | null };
+  type Row = Subscription & { products: { product_courses: { course_id: string }[] | null } | null };
   const courseMap: Record<string, { totalDays: number; expires: Date }> = {};
 
-  for (const sub of (data ?? []) as Row[]) {
-    if (!sub.products?.courses_included) continue;
+  for (const sub of (data ?? []) as unknown as Row[]) {
+    const courseIds = (sub.products?.product_courses ?? []).map((r) => r.course_id);
+    if (!courseIds.length) continue;
 
     const remainingMs = new Date(sub.expires_utc).getTime() - now.getTime();
     const remainingDays = Math.max(0, Math.ceil(remainingMs / (1000 * 60 * 60 * 24)));
     if (remainingDays === 0) continue;
 
-    for (const courseId of sub.products.courses_included) {
+    for (const courseId of courseIds) {
       if (!courseMap[courseId]) {
         courseMap[courseId] = {
           totalDays: remainingDays,

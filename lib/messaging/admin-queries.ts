@@ -120,15 +120,16 @@ export async function searchStudentsForMessaging(db: ServerSupabaseClient, q: st
 }
 
 // ── a student's entitled courses (legacy ntLoadUserCourses) ────────────
+// The product's courses are its product_courses rows (02 C1).
 export async function getStudentCourseIds(db: ServerSupabaseClient, userId: string): Promise<string[]> {
-  const { data, error } = await db.from('subscriptions').select('product_id, products ( courses_included )').eq('user_id', userId).eq('status', 'ACTIVE');
+  const { data, error } = await db.from('subscriptions').select('product_id, products ( product_courses ( course_id ) )').eq('user_id', userId).eq('status', 'ACTIVE');
   if (error) {
     console.error('getStudentCourseIds:', error);
     return [];
   }
   const ids = new Set<string>();
-  for (const s of (data ?? []) as unknown as { products: { courses_included: string[] | null } | null }[]) {
-    for (const c of s.products?.courses_included ?? []) ids.add(c);
+  for (const s of (data ?? []) as unknown as { products: { product_courses: { course_id: string }[] | null } | null }[]) {
+    for (const r of s.products?.product_courses ?? []) ids.add(r.course_id);
   }
   return Array.from(ids);
 }
@@ -161,7 +162,7 @@ export async function resolveRecipients(db: ServerSupabaseClient, scope: Recipie
   let userIds = (data ?? []).map((u) => u.user_id as string);
   if (!userIds.length) return [];
 
-  type SubRow = { user_id: string; products: { kind: string | null; courses_included: string[] | null } | null };
+  type SubRow = { user_id: string; products: { kind: string | null; product_courses: { course_id: string }[] | null } | null };
 
   if (scope.subscription_kinds?.length) {
     const { data: subs } = await db.from('subscriptions').select('user_id, products ( kind )').eq('status', 'ACTIVE').in('user_id', userIds);
@@ -175,11 +176,11 @@ export async function resolveRecipients(db: ServerSupabaseClient, scope: Recipie
   }
 
   if (scope.course_ids?.length) {
-    const { data: subs } = await db.from('subscriptions').select('user_id, products ( courses_included )').eq('status', 'ACTIVE').in('user_id', userIds);
+    const { data: subs } = await db.from('subscriptions').select('user_id, products ( product_courses ( course_id ) )').eq('status', 'ACTIVE').in('user_id', userIds);
     const want = new Set(scope.course_ids);
     const matched = new Set<string>();
     for (const s of (subs ?? []) as unknown as SubRow[]) {
-      if ((s.products?.courses_included ?? []).some((c) => want.has(c))) matched.add(s.user_id);
+      if ((s.products?.product_courses ?? []).some((r) => want.has(r.course_id))) matched.add(s.user_id);
     }
     userIds = userIds.filter((id) => matched.has(id));
   }

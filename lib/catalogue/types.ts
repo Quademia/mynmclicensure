@@ -36,7 +36,8 @@ export type Product = {
   name: string;
   kind: ProductKind;
   status: ProductStatus;
-  courses_included: string[];
+  /** The courses the product unlocks — product_courses rows, sorted by id (02 C1). */
+  courses: string[];
   price_minor: number;
   currency: string;
   duration_days: number;
