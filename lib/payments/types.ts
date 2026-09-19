@@ -58,7 +58,9 @@ export type PaymentUser = {
   phone_number?: string | null;
 };
 
-export type ActivationMode = 'existing_by_ref' | 'extended' | 'created';
+// 'extended' (the Worker's same-product extension) went with 02 C3a: a
+// renewal is a receipt of its own whose course rows queue.
+export type ActivationMode = 'existing_by_ref' | 'created';
 
 // ── init-public / init-upgrade ─────────────────────────────────────────
 export type InitPublicInput = {

@@ -1,14 +1,15 @@
 // lib/payments/activate.ts
 //
 // The Worker's activatePaymentForUser(), transcribed (rebuild.md §7.1).
-// Three modes, checked in this order:
+// Two modes, checked in this order:
 //   existing_by_ref — a subscription with source PAYSTACK and this
 //                     reference already exists (the replay guard): reuse
 //                     it, keep the row's original activated_utc;
-//   extended        — an ACTIVE, unexpired subscription for the same
-//                     product: add the product's duration_days to its
-//                     expiry, reset expiry_reminded, stamp the reference;
-//   created         — a fresh row from now.
+//   created         — a fresh receipt from now; its course rows queue
+//                     behind whatever the student already holds
+//                     (02 C3a). The Worker's third mode — extending a
+//                     same-product receipt — went with C3a: a renewal is
+//                     a receipt of its own, and the rows carry the days.
 // The product lookup here does NOT require the product to be active.
 // Every write is the service role's: the payer may have no session.
 //
@@ -45,51 +46,7 @@ export async function activatePaymentForUser(db: ServiceDb, payment: Payment, us
   const product = await getProductForPayment(db, payment.product_id, false);
   if (!product) throw new Error('Activation failed: product not found');
 
-  const currentTime = nowIso();
-
-  // Same product, ACTIVE and unexpired → extend from its expiry.
-  const { data: activeSameProduct, error: findError } = await db
-    .from('subscriptions')
-    .select('*')
-    .eq('user_id', user.user_id)
-    .eq('product_id', payment.product_id)
-    .eq('status', 'ACTIVE')
-    .gt('expires_utc', currentTime)
-    .order('expires_utc', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (findError) throw new Error(`Supabase select failed on subscriptions: ${findError.message}`);
-
-  if (activeSameProduct) {
-    const current = activeSameProduct as Subscription;
-    const { data: updatedSub, error } = await db
-      .from('subscriptions')
-      .update({
-        expires_utc: addDaysIso(current.expires_utc, product.duration_days),
-        status: 'ACTIVE',
-        source: 'PAYSTACK',
-        source_ref: payment.reference,
-        expiry_reminded: false,
-      })
-      .eq('subscription_id', current.subscription_id)
-      .select('*')
-      .single();
-    if (error) throw new Error(`Supabase patch failed on subscriptions: ${error.message}`);
-
-    const sub = updatedSub as Subscription;
-    // The receipt's course rows take the new end with it (02 C2; the
-    // extend branch itself goes when stacking turns on, C3).
-    await syncAccessRows(db, sub, false);
-    await patchPayment(db, payment.reference, {
-      user_id: user.user_id,
-      subscription_id: sub.subscription_id,
-      status: 'ACTIVATED',
-      activated_utc: nowIso(),
-    });
-    return { mode: 'extended', subscription: sub };
-  }
-
-  const startIso = currentTime;
+  const startIso = nowIso();
   const { data: newSub, error: insertError } = await db
     .from('subscriptions')
     .insert({
@@ -108,7 +65,8 @@ export async function activatePaymentForUser(db: ServiceDb, payment: Payment, us
   if (insertError) throw new Error(`Supabase insert failed on subscriptions: ${insertError.message}`);
 
   const sub = newSub as Subscription;
-  // One course row per course of the product, the receipt's dates (02 C2).
+  // One course row per course of the product, each queued behind the
+  // course's current end (02 C2, C3a).
   await writeAccessRows(db, sub);
   await patchPayment(db, payment.reference, {
     user_id: user.user_id,

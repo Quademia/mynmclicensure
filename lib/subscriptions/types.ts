@@ -63,8 +63,9 @@ export type CourseAccessMap = Record<string, CourseAccess>;
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
-// grant: the Worker said which of its two paths ran.
-export type GrantResult = { ok: true; mode: 'extended_existing' | 'created_new' } | { ok: false; error: string };
+// grant: the Worker said which of its two paths ran; since 02 C3a there
+// is one path (a fresh receipt, its rows queued), so the mode went.
+export type GrantResult = ActionResult;
 
 // sync-expired: the Worker returned the count.
 export type SyncResult = { ok: true; updatedCount: number } | { ok: false; error: string };

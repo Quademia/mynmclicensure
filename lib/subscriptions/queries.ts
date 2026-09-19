@@ -3,8 +3,9 @@
 // The subscription reads, transcribed one for one: getStudentCourseAccess
 // from legacy js/mynmclicensure-api.js; the admin list's joined select
 // from admin/subscriptions.html; the Grant dialog's student search from
-// the same page; getSubscriptionById and
-// getActiveSubscriptionForUserProduct from the payments Worker. Each
+// the same page; getSubscriptionById from the payments Worker (its
+// getActiveSubscriptionForUserProduct — the extend / duplicate test —
+// went with 02 C3a). Each
 // takes the caller's per-request client and, as legacy, fails open: an
 // error is logged and an empty result returned.
 //
@@ -84,30 +85,6 @@ export async function getSubscriptionById(db: ServerSupabaseClient, subscription
   const { data, error } = await db.from('subscriptions').select('*').eq('subscription_id', subscriptionId).maybeSingle();
   if (error) {
     console.error('getSubscriptionById:', error);
-    return null;
-  }
-  return (data as Subscription | null) ?? null;
-}
-
-/** An ACTIVE, unexpired row for this user and product — the extend / duplicate test. */
-export async function getActiveSubscriptionForUserProduct(
-  db: ServerSupabaseClient,
-  userId: string,
-  productId: string,
-  excludeSubscriptionId = '',
-): Promise<Subscription | null> {
-  let query = db
-    .from('subscriptions')
-    .select('*')
-    .eq('user_id', userId)
-    .eq('product_id', productId)
-    .eq('status', 'ACTIVE')
-    .gt('expires_utc', nowIso());
-  if (excludeSubscriptionId) query = query.neq('subscription_id', excludeSubscriptionId);
-
-  const { data, error } = await query.limit(1).maybeSingle();
-  if (error) {
-    console.error('getActiveSubscriptionForUserProduct:', error);
     return null;
   }
   return (data as Subscription | null) ?? null;

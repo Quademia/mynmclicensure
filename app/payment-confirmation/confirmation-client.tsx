@@ -72,7 +72,6 @@ function ls(): Storage | null {
 }
 
 function describeActivationMode(mode: ActivationMode | '' | undefined): string {
-  if (mode === 'extended') return 'Payment confirmed. Your existing subscription has been extended.';
   if (mode === 'created') return 'Payment confirmed. Your access is now active.';
   if (mode === 'existing_by_ref') return 'This payment was already confirmed earlier. Your access is active.';
   return 'Payment confirmed. Your access is now active.';

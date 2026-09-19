@@ -28,7 +28,7 @@ import { createServiceRoleClient } from '@/lib/supabase/server';
 import { revokeAccessRows, syncAccessRows, writeAccessRows } from './access-rows';
 import { addDaysIso, dateOnlyToEndIso, dateOnlyToStartIso, isDateOnlyString, nowIso } from './dates';
 import { makeSubscriptionId } from './ids';
-import { getActiveSubscriptionForUserProduct, getSubscriptionById, searchStudents } from './queries';
+import { getSubscriptionById, searchStudents } from './queries';
 import {
   ADMIN_SUB_SOURCES,
   SUB_STATUSES,
@@ -85,29 +85,11 @@ export async function grantSubscription(userIdIn: string, productIdIn: string, s
   const durationDays = Number(product.duration_days || 0);
   if (!durationDays || durationDays <= 0) return fail('Product duration is invalid');
 
-  // Same product already active and unexpired → EXTEND from its expiry
-  // (or from now, if somehow past), never a duplicate row.
-  const existing = await getActiveSubscriptionForUserProduct(supabase, userId, productId);
-  if (existing) {
-    const currentExpiryMs = new Date(existing.expires_utc).getTime();
-    const baseIso = currentExpiryMs > Date.now() ? existing.expires_utc : nowIso();
-    const newExpiry = addDaysIso(baseIso, durationDays);
-    const { error } = await supabase
-      .from('subscriptions')
-      .update({ expires_utc: newExpiry, status: 'ACTIVE', source: 'ADMIN', source_ref: 'admin_grant' })
-      .eq('subscription_id', existing.subscription_id);
-    if (error) return fail(error.message);
-    // The receipt's course rows take the new end (02 C2).
-    try {
-      await syncAccessRows(createServiceRoleClient(), { ...existing, expires_utc: newExpiry, status: 'ACTIVE' }, false);
-    } catch (err) {
-      return fail(`Subscription extended, but its course access rows failed: ${err instanceof Error ? err.message : String(err)}`);
-    }
-    await sendAssignedEmail(supabase, targetUser, product, existing.subscription_id);
-    return { ok: true, mode: 'extended_existing' };
-  }
-
-  // A fresh row: from now, or from midnight UTC of the chosen day.
+  // A fresh receipt every time: from now, or from midnight UTC of the
+  // chosen day. The Worker's "same product still active → extend its
+  // expiry" branch went with 02 C3a — the receipt's course rows queue
+  // behind whatever the student already holds, so a renewal loses
+  // nothing and a receipt records one grant.
   let startIso = nowIso();
   if (startDate) {
     startIso = dateOnlyToStartIso(startDate);
@@ -130,14 +112,15 @@ export async function grantSubscription(userIdIn: string, productIdIn: string, s
     expiry_reminded: false,
   });
   if (error) return fail(error.message);
-  // One course row per course of the product, the receipt's dates (02 C2).
+  // One course row per course of the product, each queued behind the
+  // course's current end (02 C2, C3a).
   try {
     await writeAccessRows(createServiceRoleClient(), receipt);
   } catch (err) {
     return fail(`Subscription saved, but its course access rows failed: ${err instanceof Error ? err.message : String(err)}`);
   }
   await sendAssignedEmail(supabase, targetUser, product, subscriptionId);
-  return { ok: true, mode: 'created_new' };
+  return { ok: true };
 }
 
 // SUBSCRIPTION_ASSIGNED — legacy submitGrant's email: the student's name
@@ -198,10 +181,8 @@ export async function updateSubscription(input: UpdateSubscriptionInput): Promis
   if (!startIso || !expiresIso) return fail('Start and expiry dates are required');
   if (new Date(expiresIso).getTime() <= new Date(startIso).getTime()) return fail('Expiry date must be after start date');
 
-  if (status === 'ACTIVE' && new Date(expiresIso).getTime() > Date.now()) {
-    const duplicate = await getActiveSubscriptionForUserProduct(supabase, existing.user_id, productId, subscriptionId);
-    if (duplicate) return fail('Another active unexpired subscription already exists for this user and product');
-  }
+  // The Worker refused a second ACTIVE receipt for the same product;
+  // under the queued rows (02 C3a) a second receipt is a renewal.
 
   const finalSourceRef = source === 'ADMIN' ? sourceRefInput || 'admin_grant' : sourceRefInput || null;
 

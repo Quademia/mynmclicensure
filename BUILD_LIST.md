@@ -100,7 +100,8 @@ taken yet.
 
 - ✅ C1 The link table — product_courses with keys, the Products page and five readers on it (S8; D16) — 2026-09-19
 - ✅ C2 The access rows — course_access from five writers, one-lookup gate, stored dates (S8; D13–D17, D20) — 2026-09-19
-- ⬜ C3 Stacking on, admin forms per row — queued start, hand-picked grant, row edits (rulings 3, 5, 6); Sam's pick
+- ⬜ C3a The queued start — a new row starts at the course's current non-trial end; the extend branches go (ruling 3)
+- ⬜ C3b The admin dialogs per row — Grant ticks courses, hand-picked grant, Update per row, Revoke a row (rulings 5, 6)
 
 #### [03-quiz-system.md](docs/product-plan/03-quiz-system.md)
 

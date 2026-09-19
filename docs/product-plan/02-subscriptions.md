@@ -314,21 +314,46 @@ Ruling 3 put this after cutover under the like-for-like rule; with the
 port finished that rule no longer holds, and C3 is code on C1 and C2's
 tables. **Buildable whenever Sam picks it (Sam, 2026-09-19)** — one
 rule from day one is simpler to explain than a change after launch.
-Sliced then into two: the queued start, then the admin dialogs.
+Split into two (Sam, 2026-09-19): C3a the queued start, C3b the admin
+dialogs.
 
-- **Queued start.** For each course the student already holds, the new
-  row starts at the course's current latest live end; a new course
-  starts today. The extend branches in activation and Grant go — a
-  same-product renewal, a cross-product overlap and a new course
-  become one rule. The worked example (Ama, RN Full then RM Full) in
-  the diagnosis is the test.
+#### C3a — The queued start (ruling 3 on, code only)
+
+- For each course of a paid or free receipt, the new row starts at the
+  student's latest live end on that course from a **non-trial**
+  receipt when that end is later than the receipt's start; otherwise
+  on the receipt's start. The row keeps the receipt's length. A trial
+  carries nothing forward and a trial's own rows never queue (ruling
+  2). **The receipt keeps the purchase dates; the rows are the
+  access** (Sam, 2026-09-19). **No on-off switch** — simply on (Sam,
+  2026-09-19).
+- The two "extend the same product's receipt" branches go (Paystack
+  activation, admin Grant): a renewal is a receipt of its own. Update
+  stops refusing a second ACTIVE receipt for the same product. The
+  `extended` activation mode and the confirmation page's line for it
+  go; Grant's result loses its mode.
+- An admin Update still puts a receipt's rows on the receipt's dates
+  (the admin asked for those dates); editing one row is C3b.
+
+**Done when** (SQL on dev, rolled back where it writes): a second
+RN_FULL grant to a student whose GP row ends on day 24 writes GP
+starting on day 24 and ending on day 389, the two RN courses likewise;
+a course the student does not hold starts today; a grant beside a
+trial-only row starts today (the trial pushes nothing); the worked
+example's GP 665 falls out of the rows; Paystack activation of a
+second purchase creates a second receipt, no extension; the dashboard
+shows each course's latest end.
+
+#### C3b — The admin dialogs follow the rows (rulings 5, 6)
+
 - **Grant** lists the product's courses ticked, an untick allowed; a
   hand-picked grant (courses and days, no product) writes a receipt
-  with no product, source ADMIN and the admin's note.
+  with no product, source ADMIN and the admin's note —
+  `subscriptions.product_id` nullable lands here.
 - **Update** lists the receipt's rows, each editable — "give Ama 14
   more days on GP", which no tool does today.
 - **Revoke** takes a receipt or one row.
-- A trial still does not stack (ruling 2).
+- The Users page's Assign shares Grant's form.
 
 ### Later, under this doc
 
@@ -355,4 +380,5 @@ Sliced then into two: the queued start, then the admin dialogs.
 |---|---|
 | C1 The link table | ✅ 2026-09-19 (`20260919200000_product_courses.sql`; proven on dev by SQL — 32 of 32 products with rows, a bad course id refused, the gate unchanged for both dev students; Sam moved on without a defect) |
 | C2 The access rows | ✅ 2026-09-19 (`20260919230000_course_access.sql` + `…233000_course_access_grants.sql`; before S2 — Sam; proven on dev by SQL, walked by Sam on an RM Trial grant: the rows and the per-course ends, GP the later end not the sum) |
-| C3 Stacking on, the admin forms follow the rows | ⬜ when Sam picks it (2026-09-19) |
+| C3a The queued start | ⬜ |
+| C3b The admin dialogs follow the rows | ⬜ when Sam picks it (2026-09-19) |
