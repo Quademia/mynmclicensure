@@ -24,7 +24,6 @@
 import { requireStudent } from '@/lib/access';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getItemFilterOptions, getItemsByIds } from '@/lib/bank/queries';
-import { itemsTableFor } from '@/lib/bank/tables';
 import type { ItemFilterOptions } from '@/lib/bank/types';
 import { getConfig } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
@@ -61,7 +60,6 @@ export type BuilderCourseLoad =
 
 export async function loadBuilderCourse(courseId: string): Promise<BuilderCourseLoad> {
   const { supabase, profile } = await requireStudent();
-  if (!itemsTableFor(courseId)) return fail('Unknown course.');
 
   const access = await getStudentCourseAccess(supabase, profile.user_id);
   if (!access[courseId]) return fail('You do not have an active subscription for this course.');
@@ -84,7 +82,6 @@ export async function spawnBuilderAttempt(
   meta: BuilderMeta,
 ): Promise<SpawnResult> {
   const { supabase, profile } = await requireStudent();
-  if (!itemsTableFor(courseId)) return fail('Unknown course.');
   if (mode !== 'instant' && mode !== 'timed') return fail('Unknown mode.');
 
   const access = await getStudentCourseAccess(supabase, profile.user_id);

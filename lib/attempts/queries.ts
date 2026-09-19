@@ -10,7 +10,6 @@
 // their user; the runner's ownership check is in lib/attempts/runner-load.
 
 import type { ServerSupabaseClient } from '@/lib/access';
-import { itemsTableFor } from '@/lib/bank/tables';
 import { HISTORY_PAGE_SIZE, RECENT_ATTEMPTS_LIMIT, type Attempt, type AttemptListRow, type BuilderItem, type HistoryFilters, type HistoryPage, type QuizAttemptStats } from './types';
 
 // The admin details step's attempt-stats box (legacy openEditQuiz's
@@ -73,11 +72,10 @@ export async function getStudentAttempts(
 // and counts on, by item id. (The SELECT policy through user_has_course()
 // returns nothing for a course the student cannot access.)
 export async function getBuilderCourseItems(db: ServerSupabaseClient, courseId: string): Promise<BuilderItem[]> {
-  const table = itemsTableFor(courseId);
-  if (!table) return [];
   const { data, error } = await db
-    .from(table)
+    .from('question_bank')
     .select('item_id, subject, maintopic, subtopic, difficulty, question_type, stem, rationale')
+    .eq('course_id', courseId)
     .order('item_id');
   if (error) {
     console.error('getBuilderCourseItems:', error);

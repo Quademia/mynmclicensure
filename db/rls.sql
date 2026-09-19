@@ -410,20 +410,21 @@ as $$
   )
 $$;
 
--- items_* (all eleven; the migration loops). Read through the gate with
--- the table's own course id; ADMIN insert, update and delete, as legacy.
-create policy items_gp_select on items_gp for select
-using (user_has_course('GP'));
-create policy items_gp_insert on items_gp for insert
+-- question_bank (one table since 08 B1, 2026-09-19; was items_* × 11
+-- with `user_has_course('<course>')` per table). The read tests the
+-- caller's courses as a set, which Postgres evaluates once per statement
+-- rather than once per row; ADMIN insert, update and delete, as legacy.
+create policy question_bank_select on question_bank for select
+using (
+  auth_user_role() = 'ADMIN'
+  or course_id in (select m.course_id from my_course_access() m)
+);
+create policy question_bank_insert on question_bank for insert
 with check (auth_user_role() = 'ADMIN');
-create policy items_gp_update on items_gp for update
+create policy question_bank_update on question_bank for update
 using (auth_user_role() = 'ADMIN');
-create policy items_gp_delete on items_gp for delete
+create policy question_bank_delete on question_bank for delete
 using (auth_user_role() = 'ADMIN');
--- … × 11: items_rn_med ('RN_MED'), items_rn_surg, items_rm_ped_obs_hrn,
--- items_rm_mid, items_rphn_pphn, items_rphn_disease_ctrl,
--- items_rmhn_psych_nurs, items_rmhn_psych_ppharm, items_nac_basic_clin,
--- items_nac_basic_prev.
 
 -- ── slice 5a: fixed quizzes and mock exams ─────────────────────────────
 -- Any signed-in user reads (the student pages filter published + active

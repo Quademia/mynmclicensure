@@ -163,16 +163,13 @@ create table if not exists config (
   updated_at  timestamptz default now()
 );
 
--- ── the question bank (slice 4a) ───────────────────────────────────────
--- Eleven tables of one shape, one per course (rebuild.md §8 S2, kept):
---   items_gp, items_rn_med, items_rn_surg,
---   items_rm_ped_obs_hrn, items_rm_mid,
---   items_rphn_pphn, items_rphn_disease_ctrl,
---   items_rmhn_psych_nurs, items_rmhn_psych_ppharm,
---   items_nac_basic_clin, items_nac_basic_prev
--- The migration creates them in a loop; the shape, written once:
-create table if not exists items_gp (
+-- ── the question bank (slice 4a; one table since 08 B1, §8 S2) ─────────
+-- Was eleven tables of this shape, one per course (items_gp, items_rn_med,
+-- …); merged into question_bank on 2026-09-19 with course_id → courses,
+-- the ids unchanged. A new course is a courses row and an import.
+create table if not exists question_bank (
   item_id         text primary key,
+  course_id       text not null references courses (course_id),
   question_type   text not null default 'MCQ',   -- MCQ | TF | SATA
   stem            text not null,
   option_a        text, fb_a text,
@@ -192,8 +189,13 @@ create table if not exists items_gp (
   batch_id        text,
   shuffle_options boolean not null default true   -- false for TF
 );
--- Six indexes per table: maintopic, subtopic, subject, difficulty,
--- question_type, batch_id (items_<t>_<column>_idx).
+create index if not exists question_bank_course_id_idx     on question_bank (course_id);
+create index if not exists question_bank_maintopic_idx     on question_bank (course_id, maintopic);
+create index if not exists question_bank_subtopic_idx      on question_bank (course_id, subtopic);
+create index if not exists question_bank_subject_idx       on question_bank (course_id, subject);
+create index if not exists question_bank_difficulty_idx    on question_bank (course_id, difficulty);
+create index if not exists question_bank_question_type_idx on question_bank (course_id, question_type);
+create index if not exists question_bank_batch_id_idx      on question_bank (course_id, batch_id);
 
 -- Storage bucket (global namespace, hence the prefix):
 -- licensure-gh-rationale-images — public read, 2 MB limit, server uploads only.

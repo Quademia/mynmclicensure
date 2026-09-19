@@ -16,7 +16,6 @@ import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getQuizAttemptStats } from '@/lib/attempts/queries';
 import type { QuizAttemptStats } from '@/lib/attempts/types';
 import { getItemsByFilters } from '@/lib/bank/queries';
-import { itemsTableFor } from '@/lib/bank/tables';
 import type { Item } from '@/lib/bank/types';
 import { getAllQuizzesPaginated, getQuizById } from './queries';
 import {
@@ -61,7 +60,6 @@ export async function loadQuiz(kind: QuizKind, quizId: string): Promise<Quiz | n
 // ── loadPickerItems: the course's whole bank (legacy getItemsByFilters(courseId, {})) ──
 export async function loadPickerItems(courseId: string): Promise<Item[]> {
   const { supabase } = await requireAdmin();
-  if (!itemsTableFor(courseId)) return [];
   return getItemsByFilters(supabase, courseId, {});
 }
 

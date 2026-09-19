@@ -11,7 +11,19 @@
 // user_has_course()); every read here still names its table.
 
 import type { createClient } from '@/lib/supabase/server';
-import { itemsTableFor } from './tables';
+// One table since 08 B1 (2026-09-19): question_bank, filtered by
+// course_id. The eleven per-course tables and the helper that chose one
+// (lib/bank/tables.ts) are gone; a course with no rows reads as empty.
+
+/** The admin writes' guard: the course must exist (the key on question_bank is the floor). */
+export async function courseExists(db: Db, courseId: string): Promise<boolean> {
+  const { data, error } = await db.from('courses').select('course_id').eq('course_id', courseId).maybeSingle();
+  if (error) {
+    console.error('courseExists:', error);
+    return false;
+  }
+  return Boolean(data);
+}
 import type { Item, ItemFilterOptions, ItemFilters } from './types';
 
 type Db = Awaited<ReturnType<typeof createClient>>;
@@ -30,10 +42,8 @@ const EMPTY_OPTIONS: ItemFilterOptions = {
 // by hand to match the quiz's item_ids; so does this.
 export async function getItemsByIds(db: Db, courseId: string, itemIds: string[]): Promise<Item[]> {
   if (!itemIds || itemIds.length === 0) return [];
-  const table = itemsTableFor(courseId);
-  if (!table) return [];
 
-  const { data, error } = await db.from(table).select('*').in('item_id', itemIds);
+  const { data, error } = await db.from('question_bank').select('*').eq('course_id', courseId).in('item_id', itemIds);
   if (error) {
     console.error('getItemsByIds:', error);
     return [];
@@ -47,10 +57,7 @@ export async function getItemsByIds(db: Db, courseId: string, itemIds: string[])
 // The admin picker's read (and the bank page's "load the course"): every
 // filter is an equality; the keyword is an ilike across every text field.
 export async function getItemsByFilters(db: Db, courseId: string, filters: ItemFilters = {}): Promise<Item[]> {
-  const table = itemsTableFor(courseId);
-  if (!table) return [];
-
-  let query = db.from(table).select('*');
+  let query = db.from('question_bank').select('*').eq('course_id', courseId);
   if (filters.subject) query = query.eq('subject', filters.subject);
   if (filters.maintopic) query = query.eq('maintopic', filters.maintopic);
   if (filters.subtopic) query = query.eq('subtopic', filters.subtopic);
@@ -81,12 +88,10 @@ export async function getItemsByFilters(db: Db, courseId: string, filters: ItemF
 
 // Distinct real values for the dropdowns and chips, from the course's rows.
 export async function getItemFilterOptions(db: Db, courseId: string): Promise<ItemFilterOptions> {
-  const table = itemsTableFor(courseId);
-  if (!table) return EMPTY_OPTIONS;
-
   const { data, error } = await db
-    .from(table)
-    .select('subject, maintopic, subtopic, difficulty, question_type, batch_id');
+    .from('question_bank')
+    .select('subject, maintopic, subtopic, difficulty, question_type, batch_id')
+    .eq('course_id', courseId);
   if (error) {
     console.error('getItemFilterOptions:', error);
     return EMPTY_OPTIONS;

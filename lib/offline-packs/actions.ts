@@ -15,7 +15,6 @@
 
 import { requireStudent } from '@/lib/access';
 import { getItemsByIds } from '@/lib/bank/queries';
-import { itemsTableFor } from '@/lib/bank/tables';
 import { getConfig } from '@/lib/catalogue/queries';
 import { buildOfflineOwnerLabel, buildOfflinePackDefaultName, buildOfflinePackDisplayLabel, maskEmailForOffline, ownerNameOf, safeArray } from './labels';
 import { getOfflinePackAllowance, listOfflinePacks, pickOfflinePackItemIds } from './queries';
@@ -43,7 +42,7 @@ function makeOfflinePackId(): string {
 export async function prepareOfflinePack(courseId: string, poolItemIds: string[], n: number): Promise<PrepareResult> {
   const { supabase, profile } = await requireStudent();
   const safeCourseId = String(courseId || '').trim().toUpperCase();
-  if (!itemsTableFor(safeCourseId)) return { ok: false, reason: 'missing_course_id', allowance: null };
+  if (!safeCourseId) return { ok: false, reason: 'missing_course_id', allowance: null };
 
   const allowance = await getOfflinePackAllowance(supabase, profile.user_id, safeCourseId);
   if (!allowance.success) return { ok: false, reason: allowance.blocked_reason || 'allowance_check_failed', allowance };
@@ -70,7 +69,7 @@ export async function createOfflinePack(input: CreatePackInput): Promise<CreateP
   const safeCourseId = String(input.course_id || '').trim().toUpperCase();
   const safeIds = safeArray(input.item_ids);
 
-  if (!safeCourseId || !itemsTableFor(safeCourseId)) {
+  if (!safeCourseId) {
     return { ok: false, reason: 'missing_course_id', message: 'Course is required.', allowance: null };
   }
   if (!safeIds.length) {

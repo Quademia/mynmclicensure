@@ -14,7 +14,7 @@ import { requireAdmin } from '@/lib/access';
 import { rowToPayload, type CsvRow } from './csv';
 import { uploadRationaleImage } from './images';
 import { getItemFilterOptions, getItemsByFilters } from './queries';
-import { itemsTableFor } from './tables';
+import { courseExists } from './queries';
 import {
   OPTION_LETTERS,
   RATIONALE_IMAGE_MAX_BYTES,
@@ -31,7 +31,7 @@ function fail(error: string): ActionResult {
 // ── onCourseChange: the whole course plus the two dropdowns ────────────
 export async function loadCourseItems(courseId: string): Promise<CourseItemsResult> {
   const { supabase } = await requireAdmin();
-  if (!itemsTableFor(courseId)) return { ok: false, error: 'Unknown course.' };
+  if (!courseId.trim()) return { ok: false, error: 'Unknown course.' };
 
   const [items, options] = await Promise.all([
     getItemsByFilters(supabase, courseId, {}),
@@ -67,8 +67,8 @@ export type SaveQuestionInput = {
 
 export async function saveQuestion(input: SaveQuestionInput, image: FormData | null): Promise<ActionResult> {
   const { supabase } = await requireAdmin();
-  const table = itemsTableFor(input.courseId);
-  if (!table) return fail('Unknown course.');
+  const courseId = String(input.courseId || '').trim().toUpperCase();
+  if (!(await courseExists(supabase, courseId))) return fail('Unknown course.');
 
   const itemId = input.itemId.trim();
   const stem = input.stem.trim();
@@ -95,6 +95,7 @@ export async function saveQuestion(input: SaveQuestionInput, image: FormData | n
 
   const payload: Record<string, unknown> = {
     item_id: itemId,
+    course_id: courseId,
     question_type: input.questionType,
     stem,
     correct,
@@ -114,8 +115,8 @@ export async function saveQuestion(input: SaveQuestionInput, image: FormData | n
   }
 
   const { error } = input.isNew
-    ? await supabase.from(table).insert(payload)
-    : await supabase.from(table).update(payload).eq('item_id', itemId);
+    ? await supabase.from('question_bank').insert(payload)
+    : await supabase.from('question_bank').update(payload).eq('item_id', itemId);
   if (error) return fail('Save failed: ' + error.message);
 
   return { ok: true };
@@ -129,14 +130,15 @@ export async function saveQuestion(input: SaveQuestionInput, image: FormData | n
 // wrote it to the browser console, which a Server Action cannot reach.
 const IMPORT_BATCH = 50;
 
-export async function importItems(courseId: string, rows: CsvRow[]): Promise<ImportResult> {
+export async function importItems(courseIdIn: string, rows: CsvRow[]): Promise<ImportResult> {
   const { supabase } = await requireAdmin();
-  const table = itemsTableFor(courseId);
-  if (!table) return { ok: false, error: 'Unknown course.' };
+  const courseId = String(courseIdIn || '').trim().toUpperCase();
+  if (!(await courseExists(supabase, courseId))) return { ok: false, error: 'Unknown course.' };
 
+  // Every row lands in the one table under the page's course (08 B1).
   const payloads = rows
     .filter((r) => r.stem && r.correct && (r.option_a || r.option_b))
-    .map((r) => rowToPayload({ ...r, item_id: r.item_id || `${courseId.replace(/_/g, '')}_${Date.now()}` }));
+    .map((r) => ({ ...rowToPayload({ ...r, item_id: r.item_id || `${courseId.replace(/_/g, '')}_${Date.now()}` }), course_id: courseId }));
   if (!payloads.length) return { ok: true, successCount: 0, failCount: 0, errors: [] };
 
   let successCount = 0;
@@ -144,7 +146,7 @@ export async function importItems(courseId: string, rows: CsvRow[]): Promise<Imp
   const errors: string[] = [];
   for (let i = 0; i < payloads.length; i += IMPORT_BATCH) {
     const batch = payloads.slice(i, i + IMPORT_BATCH);
-    const { error } = await supabase.from(table).upsert(batch, { onConflict: 'item_id' });
+    const { error } = await supabase.from('question_bank').upsert(batch, { onConflict: 'item_id' });
     if (error) {
       failCount += batch.length;
       errors.push(error.message);
@@ -159,10 +161,9 @@ export async function importItems(courseId: string, rows: CsvRow[]): Promise<Imp
 // ── confirmDelete ──────────────────────────────────────────────────────
 export async function deleteQuestion(courseId: string, itemId: string): Promise<ActionResult> {
   const { supabase } = await requireAdmin();
-  const table = itemsTableFor(courseId);
-  if (!table) return fail('Unknown course.');
+  if (!String(courseId || '').trim()) return fail('Unknown course.');
 
-  const { error } = await supabase.from(table).delete().eq('item_id', itemId);
+  const { error } = await supabase.from('question_bank').delete().eq('item_id', itemId).eq('course_id', String(courseId).trim().toUpperCase());
   if (error) return fail('Delete failed: ' + error.message);
   return { ok: true };
 }
