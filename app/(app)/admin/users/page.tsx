@@ -16,6 +16,7 @@ import { EMPTY_USER_FILTERS } from '@/lib/users/types';
 import { PageHeader, displayNameOf } from '@/components/shell/page-header';
 import { UsersClient } from './users-client';
 import '@/styles/admin-users.css';
+import '@/styles/admin-grant-dialog.css';
 
 export const metadata: Metadata = {
   title: 'Users | MyNMCLicensure',

@@ -11,19 +11,19 @@
 //
 // Changed on the way, on Sam's rulings (2026-09-15): the drawer's
 // Assign calls slice 8's grantSubscription instead of inserting a row
-// from the browser (§9 #24 — extends an existing subscription, never a
-// duplicate); a `?user_id=` in the address opens the drawer (§9 #23);
-// the role filter has no Teacher option (§9 #12); the drawer's inline
-// alert is the shared toast (UI convention #1); prices through
-// formatMinor() (#4).
+// from the browser (§9 #24); a `?user_id=` in the address opens the
+// drawer (§9 #23); the role filter has no Teacher option (§9 #12); the
+// drawer's inline alert is the shared toast (UI convention #1).
+// Since 2026-09-19 (Sam): Assign opens the same Grant dialog the
+// Subscriptions page uses (components/admin/grant-dialog.tsx), the
+// student pre-filled, in place of the legacy inline form.
 
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Toast } from '@/lib/toast/toast';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
-import { formatMinor } from '@/lib/money/format-minor';
-import { grantSubscription } from '@/lib/subscriptions/actions';
+import { GrantDialog } from '@/components/admin/grant-dialog';
 import { getUserDetailAction, listUsersAction, sendPasswordResetAction, setUserActive } from '@/lib/users/actions';
 import { EMPTY_USER_FILTERS, USER_ROLE_OPTIONS, type UserDetail, type UserFilters, type UserListRow, type UsersPage } from '@/lib/users/types';
 import type { Product, Program } from '@/lib/catalogue/types';
@@ -108,16 +108,16 @@ export function UsersClient({
   // read the clock during render (react-hooks/purity).
   const [loadedAt, setLoadedAt] = useState(0);
   const [detailLoading, setDetailLoading] = useState(false);
-  const [assignOpen, setAssignOpen] = useState(false);
-  const [assignProduct, setAssignProduct] = useState('');
-  const [assignStart, setAssignStart] = useState('');
+  // Assign opens the shared Grant dialog with the drawer's student
+  // pre-filled (components/admin/grant-dialog.tsx), remounted by key.
+  const [grantOpen, setGrantOpen] = useState(false);
+  const [grantKey, setGrantKey] = useState(0);
   const [busy, setBusy] = useState(false);
 
   async function openPanel(userId: string) {
     setPanelOpen(true);
     setDetail(null);
     setDetailLoading(true);
-    setAssignOpen(false);
     try {
       const d = await getUserDetailAction(userId);
       setLoadedAt(Date.now());
@@ -130,7 +130,6 @@ export function UsersClient({
 
   function closePanel() {
     setPanelOpen(false);
-    setAssignOpen(false);
     setDetail(null);
   }
 
@@ -147,28 +146,15 @@ export function UsersClient({
     if (searchTimer.current) window.clearTimeout(searchTimer.current);
   }, []);
 
-  async function submitAssign() {
+  function openGrant() {
+    setGrantKey((k) => k + 1);
+    setGrantOpen(true);
+  }
+
+  async function afterGrant() {
     if (!detail) return;
-    if (!assignProduct) {
-      setMsg({ text: 'Please select a product.', tone: 'error' });
-      return;
-    }
-    setBusy(true);
-    try {
-      const result = await grantSubscription(detail.user_id, assignProduct, assignStart);
-      if (!result.ok) {
-        setMsg({ text: result.error, tone: 'error' });
-        return;
-      }
-      setMsg({ text: 'Subscription assigned successfully!', tone: 'success' });
-      setAssignOpen(false);
-      setAssignProduct('');
-      setAssignStart('');
-      await openPanel(detail.user_id);
-      await loadUsers(filtersRef.current, 0, false);
-    } finally {
-      setBusy(false);
-    }
+    await openPanel(detail.user_id);
+    await loadUsers(filtersRef.current, 0, false);
   }
 
   async function handlePasswordReset() {
@@ -377,23 +363,7 @@ export function UsersClient({
                   <div className="panel-section">
                     <div className="panel-section-title">Actions</div>
                     <div className="panel-actions">
-                      <button type="button" className="btn-action" onClick={() => setAssignOpen((v) => !v)}>🎟️ Assign Subscription</button>
-                      <div className={`assign-form${assignOpen ? ' open' : ''}`}>
-                        <select id="assignProduct" value={assignProduct} onChange={(e) => setAssignProduct(e.target.value)}>
-                          <option value="">Select a product...</option>
-                          {products.map((p) => (
-                            <option key={p.product_id} value={p.product_id}>
-                              {p.name}
-                              {p.price_minor > 0 ? ` — ${formatMinor(p.price_minor, p.currency)}` : ' — Free'} ({p.duration_days}d)
-                            </option>
-                          ))}
-                        </select>
-                        <input type="date" id="assignStartDate" title="Start date (leave blank for today)" value={assignStart} onChange={(e) => setAssignStart(e.target.value)} />
-                        <div className="assign-form-actions">
-                          <button type="button" className="btn-sm btn-sm-primary" disabled={busy} onClick={submitAssign}>Confirm</button>
-                          <button type="button" className="btn-sm btn-sm-cancel" onClick={() => setAssignOpen(false)}>Cancel</button>
-                        </div>
-                      </div>
+                      <button type="button" className="btn-action" disabled={busy} onClick={openGrant}>🎟️ Assign Subscription</button>
 
                       <button type="button" className="btn-action" disabled={busy} onClick={handlePasswordReset}>🔑 Send Password Reset Email</button>
 
@@ -408,6 +378,16 @@ export function UsersClient({
           </div>
         </div>
       </BodyPortal>
+
+      <GrantDialog
+        key={grantKey}
+        open={grantOpen}
+        preset={detail ? { user_id: detail.user_id, name: displayName(detail), email: detail.email || '' } : null}
+        products={products}
+        notify={(text, tone) => setMsg({ text, tone })}
+        onClose={() => setGrantOpen(false)}
+        onGranted={afterGrant}
+      />
     </div>
   );
 }

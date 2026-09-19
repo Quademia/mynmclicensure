@@ -83,10 +83,6 @@
 .usr-overlay .history-table tr:last-child td { border-bottom: none; }
 
 .usr-overlay .panel-actions { display: flex; flex-direction: column; gap: 10px; }
-.usr-overlay .assign-form { display: none; padding: 14px; background: var(--bg); border-radius: var(--radius); border: 1px solid var(--border); }
-.usr-overlay .assign-form.open { display: block; }
-.usr-overlay .assign-form select, .usr-overlay .assign-form input { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; font-family: inherit; margin-bottom: 10px; background: var(--white); }
-.usr-overlay .assign-form-actions { display: flex; gap: 8px; }
 .usr-overlay .btn-sm { padding: 8px 16px; border-radius: var(--radius); font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; border: none; }
 .usr-overlay .btn-sm:disabled { opacity: 0.6; cursor: not-allowed; }
 .usr-overlay .btn-sm-primary { background: var(--primary); color: var(--white); }

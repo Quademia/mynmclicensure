@@ -74,6 +74,11 @@ export type AccessRow = {
   courses: { title: string } | null;
 };
 
+// The Grant dialog's preview (02 C3b): each course of the product with
+// the start and end the chain would give it.
+export type PreviewRow = { course_id: string; title: string; start_utc: string; expires_utc: string };
+export type PreviewResult = { ok: true; rows: PreviewRow[] } | { ok: false; error: string };
+
 // legacy getStudentCourseAccess(): { course_id: { totalDays, expires } }.
 export type CourseAccess = { totalDays: number; expires: string };
 export type CourseAccessMap = Record<string, CourseAccess>;

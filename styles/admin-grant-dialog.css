@@ -1,0 +1,49 @@
+/* The one Grant dialog (components/admin/grant-dialog.tsx), portalled to
+   <body> under .grant-dialog; loaded by the admin Subscriptions and
+   Users pages. The modal, form and student-search rules are the
+   Subscriptions page's, scoped here so the Users page needs nothing
+   else. */
+
+.grant-dialog .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 200; align-items: center; justify-content: center; padding: 16px; }
+.grant-dialog .modal-overlay.show { display: flex; }
+.grant-dialog .modal { background: var(--white); border-radius: var(--radius); width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2); }
+.grant-dialog .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.grant-dialog .modal-header h3 { font-size: 16px; font-weight: 700; margin: 0; }
+.grant-dialog .panel-close { background: none; border: none; cursor: pointer; font-size: 22px; color: var(--text-muted); line-height: 1; }
+.grant-dialog .panel-close:hover { color: var(--danger); }
+.grant-dialog .modal-body { padding: 24px; }
+.grant-dialog .modal-body p.note { font-size: 13px; color: var(--text-muted); margin: 0; }
+.grant-dialog .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+
+.grant-dialog .btn { display: inline-block; padding: 9px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; border: none; transition: 0.2s; }
+.grant-dialog .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.grant-dialog .btn-primary { background: var(--primary); color: white; }
+.grant-dialog .btn-primary:hover { background: var(--primary-dark); }
+.grant-dialog .btn-ghost { background: none; border: 1px solid var(--border); color: var(--text); }
+.grant-dialog .btn-ghost:hover { background: var(--bg); }
+
+.grant-dialog .form-group { margin-bottom: 16px; }
+.grant-dialog .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.grant-dialog .form-group input,
+.grant-dialog .form-group select { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; font-family: inherit; color: var(--text); box-sizing: border-box; background: var(--white); }
+.grant-dialog .form-group input:focus,
+.grant-dialog .form-group select:focus { outline: none; border-color: var(--primary); }
+.grant-dialog .form-hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+.grant-dialog .user-search-results { border: 1px solid var(--border); border-radius: var(--radius); max-height: 200px; overflow-y: auto; background: var(--white); display: none; }
+.grant-dialog .user-search-results.show { display: block; }
+.grant-dialog .user-result-item { padding: 10px 14px; cursor: pointer; border-bottom: 1px solid var(--border); font-size: 13px; }
+.grant-dialog .user-result-item:last-child { border-bottom: none; }
+.grant-dialog .user-result-item:hover { background: var(--primary-light); }
+.grant-dialog .user-result-item .name { font-weight: 600; }
+.grant-dialog .user-result-item .meta { color: var(--text-muted); font-size: 12px; }
+.grant-dialog .selected-user-badge { display: none; padding: 8px 12px; background: var(--primary-light); border: 1px solid var(--primary); border-radius: var(--radius); font-size: 13px; font-weight: 600; color: var(--primary); margin-top: 6px; align-items: center; justify-content: space-between; gap: 8px; }
+.grant-dialog .selected-user-badge.show { display: flex; }
+.grant-dialog .selected-user-badge button { background: none; border: none; cursor: pointer; color: var(--primary); font-size: 16px; line-height: 1; }
+
+/* the preview: each course with the dates the chain would give it */
+.grant-dialog .grant-preview { padding: 10px 14px; background: var(--primary-light); border-radius: var(--radius); font-size: 13px; color: var(--primary); margin-bottom: 16px; }
+.grant-dialog .grant-preview.error { background: #fef2f2; color: var(--danger); }
+.grant-dialog .grant-preview-title { font-weight: 600; margin-bottom: 6px; }
+.grant-dialog .grant-preview-row { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; }
+.grant-dialog .grant-preview-row .dates { white-space: nowrap; }

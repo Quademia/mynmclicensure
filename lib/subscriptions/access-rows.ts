@@ -18,6 +18,8 @@
 // (ruling 2): a trial row runs from its floor and pushes nothing.
 // A REVOKED receipt's rows are stamped and leave the chain; ACTIVE and
 // EXPIRED receipts are links (an EXPIRED one has already run out).
+// planAccessRows() runs the same packing over a receipt that does not
+// exist yet — the Grant dialog's preview.
 //
 // THE RECEIPT'S WINDOW. After every write the receipt's start_utc is its
 // earliest row start and its expires_utc its latest row end (Sam,
@@ -43,10 +45,17 @@ export type Receipt = {
 /** A receipt's window: the earliest row start and the latest row end. */
 export type AccessWindow = { start_utc: string; expires_utc: string };
 
-async function productCourses(db: ServiceDb, productId: string): Promise<string[]> {
-  const { data, error } = await db.from('product_courses').select('course_id').eq('product_id', productId);
-  if (error) throw new Error(`course_access: product_courses read failed: ${error.message}`);
-  return (data ?? []).map((r) => r.course_id as string);
+/** One course of a receipt as the chain would place it. */
+export type PlannedRow = { course_id: string; start_utc: string; expires_utc: string };
+
+async function productCoursesAndKind(db: ServiceDb, productId: string): Promise<{ courses: string[]; kind: string }> {
+  const { data, error } = await db.from('products').select('kind, product_courses ( course_id )').eq('product_id', productId).maybeSingle();
+  if (error) throw new Error(`course_access: product read failed: ${error.message}`);
+  const row = data as { kind: string | null; product_courses: { course_id: string }[] | null } | null;
+  return {
+    courses: (row?.product_courses ?? []).map((r) => r.course_id).sort(),
+    kind: String(row?.kind || '').toUpperCase(),
+  };
 }
 
 async function setReceiptWindow(db: ServiceDb, subscriptionId: string): Promise<AccessWindow | null> {
@@ -63,6 +72,8 @@ async function setReceiptWindow(db: ServiceDb, subscriptionId: string): Promise<
   return window;
 }
 
+// ── the packing itself, pure ──────────────────────────────────────────
+
 type ChainRow = {
   access_id: number;
   course_id: string;
@@ -78,57 +89,64 @@ type ChainRow = {
   } | null;
 };
 
-/**
- * The rule. Re-packs the student's chain on each of the courses and
- * sets the window of every receipt those rows belong to.
- */
-export async function repackAccess(db: ServiceDb, userId: string, courseIds: string[]): Promise<void> {
-  const courses = [...new Set(courseIds)];
-  if (!courses.length) return;
+type Placement = { start_utc: string; expires_utc: string; revoked_utc: string | null };
+
+async function readChainRows(db: ServiceDb, userId: string, courses: string[]): Promise<ChainRow[]> {
   const { data, error } = await db
     .from('course_access')
     .select('access_id, course_id, start_utc, expires_utc, revoked_utc, subscriptions ( subscription_id, status, created_utc, requested_start_utc, products ( kind ) )')
     .eq('user_id', userId)
     .in('course_id', courses);
   if (error) throw new Error(`course_access: read failed: ${error.message}`);
-  const rows = (data ?? []) as unknown as ChainRow[];
+  return (data ?? []) as unknown as ChainRow[];
+}
 
-  const stamp = nowIso();
-  const updates: { access_id: number; start_utc: string; expires_utc: string; revoked_utc: string | null }[] = [];
+/** Where every row on these courses belongs under the rule, keyed by access_id. */
+function packRows(rows: ChainRow[], courses: string[], stamp: string): Map<number, Placement> {
+  const placed = new Map<number, Placement>();
+  const kindOf = (r: ChainRow) => String(r.subscriptions?.products?.kind || '').toUpperCase();
   const floorOf = (r: ChainRow) => new Date(r.subscriptions?.requested_start_utc || r.subscriptions?.created_utc || r.start_utc).getTime();
+  const lengthOf = (r: ChainRow) => new Date(r.expires_utc).getTime() - new Date(r.start_utc).getTime();
 
   for (const course of courses) {
     const onCourse = rows.filter((r) => r.course_id === course);
-    const revoked = onCourse.filter((r) => r.subscriptions?.status === 'REVOKED');
-    const trials = onCourse.filter((r) => r.subscriptions?.status !== 'REVOKED' && String(r.subscriptions?.products?.kind || '').toUpperCase() === 'TRIAL');
-    const chain = onCourse
-      .filter((r) => r.subscriptions?.status !== 'REVOKED' && String(r.subscriptions?.products?.kind || '').toUpperCase() !== 'TRIAL')
-      .sort((a, b) => floorOf(a) - floorOf(b) || (a.subscriptions?.subscription_id || '').localeCompare(b.subscriptions?.subscription_id || ''));
-
-    for (const r of revoked) {
-      if (!r.revoked_utc) updates.push({ access_id: r.access_id, start_utc: r.start_utc, expires_utc: r.expires_utc, revoked_utc: stamp });
+    for (const r of onCourse.filter((r) => r.subscriptions?.status === 'REVOKED')) {
+      placed.set(r.access_id, { start_utc: r.start_utc, expires_utc: r.expires_utc, revoked_utc: r.revoked_utc ?? stamp });
     }
-    for (const r of trials) {
+    for (const r of onCourse.filter((r) => r.subscriptions?.status !== 'REVOKED' && kindOf(r) === 'TRIAL')) {
       const start = floorOf(r);
-      const end = start + (new Date(r.expires_utc).getTime() - new Date(r.start_utc).getTime());
-      const next = { start_utc: new Date(start).toISOString(), expires_utc: new Date(end).toISOString(), revoked_utc: null };
-      if (next.start_utc !== r.start_utc || next.expires_utc !== r.expires_utc || r.revoked_utc) updates.push({ access_id: r.access_id, ...next });
+      placed.set(r.access_id, { start_utc: new Date(start).toISOString(), expires_utc: new Date(start + lengthOf(r)).toISOString(), revoked_utc: null });
     }
+    const chain = onCourse
+      .filter((r) => r.subscriptions?.status !== 'REVOKED' && kindOf(r) !== 'TRIAL')
+      .sort((a, b) => floorOf(a) - floorOf(b) || (a.subscriptions?.subscription_id || '').localeCompare(b.subscriptions?.subscription_id || ''));
     let prevEnd = -Infinity;
     for (const r of chain) {
-      const length = new Date(r.expires_utc).getTime() - new Date(r.start_utc).getTime();
       const start = Math.max(floorOf(r), prevEnd);
-      const end = start + length;
+      const end = start + lengthOf(r);
       prevEnd = end;
-      const next = { start_utc: new Date(start).toISOString(), expires_utc: new Date(end).toISOString(), revoked_utc: null };
-      if (next.start_utc !== r.start_utc || next.expires_utc !== r.expires_utc || r.revoked_utc) updates.push({ access_id: r.access_id, ...next });
+      placed.set(r.access_id, { start_utc: new Date(start).toISOString(), expires_utc: new Date(end).toISOString(), revoked_utc: null });
     }
   }
+  return placed;
+}
 
-  for (const u of updates) {
-    const { access_id, ...fields } = u;
-    const { error: updateError } = await db.from('course_access').update(fields).eq('access_id', access_id);
-    if (updateError) throw new Error(`course_access: update failed: ${updateError.message}`);
+/**
+ * The rule, applied. Re-packs the student's chain on each of the
+ * courses and sets the window of every receipt those rows belong to.
+ */
+export async function repackAccess(db: ServiceDb, userId: string, courseIds: string[]): Promise<void> {
+  const courses = [...new Set(courseIds)];
+  if (!courses.length) return;
+  const rows = await readChainRows(db, userId, courses);
+  const placed = packRows(rows, courses, nowIso());
+
+  for (const r of rows) {
+    const next = placed.get(r.access_id);
+    if (!next) continue;
+    if (next.start_utc === r.start_utc && next.expires_utc === r.expires_utc && next.revoked_utc === r.revoked_utc) continue;
+    const { error } = await db.from('course_access').update(next).eq('access_id', r.access_id);
+    if (error) throw new Error(`course_access: update failed: ${error.message}`);
   }
 
   const receipts = new Set(rows.map((r) => r.subscriptions?.subscription_id).filter((id): id is string => Boolean(id)));
@@ -136,12 +154,49 @@ export async function repackAccess(db: ServiceDb, userId: string, courseIds: str
 }
 
 /**
+ * The Grant dialog's preview: where a receipt that does not exist yet
+ * would land, by the same packing. requestedStart is the admin's chosen
+ * start, or null for "from now". Nothing is written.
+ */
+export async function planAccessRows(
+  db: ServiceDb,
+  userId: string,
+  productId: string,
+  durationDays: number,
+  requestedStart: string | null,
+): Promise<PlannedRow[]> {
+  const { courses, kind } = await productCoursesAndKind(db, productId);
+  if (!courses.length) return [];
+  const now = nowIso();
+  const floor = requestedStart || now;
+  const expires = new Date(new Date(floor).getTime() + durationDays * 24 * 60 * 60 * 1000).toISOString();
+  const rows = await readChainRows(db, userId, courses);
+  const ghost: ChainRow['subscriptions'] = {
+    subscription_id: '~planned',
+    status: 'ACTIVE',
+    created_utc: now,
+    requested_start_utc: requestedStart,
+    products: { kind },
+  };
+  courses.forEach((course_id, i) => {
+    rows.push({ access_id: -(i + 1), course_id, start_utc: floor, expires_utc: expires, revoked_utc: null, subscriptions: ghost });
+  });
+  const placed = packRows(rows, courses, now);
+  return courses.map((course_id, i) => {
+    const p = placed.get(-(i + 1))!;
+    return { course_id, start_utc: p.start_utc, expires_utc: p.expires_utc };
+  });
+}
+
+// ── the writers ───────────────────────────────────────────────────────
+
+/**
  * A fresh receipt: one row per course of its product on the receipt's
  * own dates, then the chain re-packed (a queued start comes out of
  * that) and the receipt's window set. Returns the window.
  */
 export async function writeAccessRows(db: ServiceDb, receipt: Receipt): Promise<AccessWindow> {
-  const courses = await productCourses(db, receipt.product_id);
+  const { courses } = await productCoursesAndKind(db, receipt.product_id);
   if (!courses.length) return { start_utc: receipt.start_utc, expires_utc: receipt.expires_utc };
   const { error } = await db.from('course_access').insert(
     courses.map((course_id) => ({
@@ -192,7 +247,7 @@ export async function rewriteAccessRows(db: ServiceDb, before: Receipt, after: R
       const { error } = await db.from('course_access').delete().eq('subscription_id', after.subscription_id);
       if (error) throw new Error(`course_access: delete failed: ${error.message}`);
     }
-    const courses = await productCourses(db, after.product_id);
+    const { courses } = await productCoursesAndKind(db, after.product_id);
     if (courses.length) {
       const { error } = await db.from('course_access').insert(
         courses.map((course_id) => ({

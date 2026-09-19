@@ -15,6 +15,7 @@ import { getAllSubscriptions } from '@/lib/subscriptions/queries';
 import { PageHeader, displayNameOf } from '@/components/shell/page-header';
 import { SubscriptionsClient } from './subscriptions-client';
 import '@/styles/admin-subscriptions.css';
+import '@/styles/admin-grant-dialog.css';
 
 export const metadata: Metadata = {
   title: 'Subscriptions | MyNMCLicensure',

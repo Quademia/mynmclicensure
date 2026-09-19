@@ -25,7 +25,7 @@ import { subscriptionAssignedEmail } from '@/lib/email/templates/subscription-as
 import { subscriptionRevokedEmail } from '@/lib/email/templates/subscription-revoked';
 import { appOrigin } from '@/lib/site/app-origin';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { revokeAccessRows, rewriteAccessRows, writeAccessRows } from './access-rows';
+import { planAccessRows, revokeAccessRows, rewriteAccessRows, writeAccessRows } from './access-rows';
 import { addDaysIso, dateOnlyToEndIso, dateOnlyToStartIso, isDateOnlyString, nowIso } from './dates';
 import { makeSubscriptionId } from './ids';
 import { getSubscriptionById, searchStudents } from './queries';
@@ -34,6 +34,7 @@ import {
   SUB_STATUSES,
   type AccessRow,
   type ActionResult,
+  type PreviewResult,
   type GrantResult,
   type StudentHit,
   type Subscription,
@@ -253,6 +254,38 @@ async function sendRevokedEmail(db: ServerSupabaseClient, sub: Subscription): Pr
     );
   } catch (err) {
     console.error('[subscriptions] revoke email failed for', sub.subscription_id, err);
+  }
+}
+
+// ── the Grant dialog's preview (02 C3b) ────────────────────────────────
+// Where a grant would land, course by course, by the same packing the
+// writer uses — nothing written. The dialog calls this as the admin
+// picks a student, a product and a start date.
+export async function previewGrant(userIdIn: string, productIdIn: string, startDateIn: string): Promise<PreviewResult> {
+  await requireAdmin();
+  const userId = String(userIdIn || '').trim();
+  const productId = upper(productIdIn);
+  const startDate = String(startDateIn || '').trim();
+  if (!userId || !productId) return fail('Pick a student and a product.');
+
+  const db = createServiceRoleClient();
+  const { data: product } = await db.from('products').select('duration_days').eq('product_id', productId).maybeSingle();
+  const durationDays = Number(product?.duration_days || 0);
+  if (!durationDays) return fail('Product not found or its duration is invalid');
+
+  let requestedStart: string | null = null;
+  if (startDate) {
+    requestedStart = dateOnlyToStartIso(startDate) || null;
+    if (!requestedStart) return fail('Start date must be YYYY-MM-DD');
+  }
+
+  try {
+    const planned = await planAccessRows(db, userId, productId, durationDays, requestedStart);
+    const { data: titles } = await db.from('courses').select('course_id, title').in('course_id', planned.map((p) => p.course_id));
+    const titleOf = new Map((titles ?? []).map((c) => [c.course_id as string, c.title as string]));
+    return { ok: true, rows: planned.map((p) => ({ ...p, title: titleOf.get(p.course_id) || p.course_id })) };
+  } catch (err) {
+    return fail(err instanceof Error ? err.message : String(err));
   }
 }
 

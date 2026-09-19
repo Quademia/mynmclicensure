@@ -106,7 +106,6 @@
 .subs-overlay .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
 .subs-overlay .student-label { background: var(--bg); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 16px; font-size: 13px; font-weight: 700; }
 .subs-overlay .date-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.subs-overlay .duration-preview { padding: 10px 14px; background: var(--primary-light); border-radius: var(--radius); font-size: 13px; color: var(--primary); margin-bottom: 16px; }
 
 /* ── Buttons ── */
 .subs .btn, .subs-overlay .btn { display: inline-block; padding: 9px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; border: none; transition: 0.2s; }
@@ -129,17 +128,6 @@
 .subs-overlay .form-group select:focus { outline: none; border-color: var(--primary); }
 .subs-overlay .form-hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 
-/* ── Student search in the Grant dialog ── */
-.subs-overlay .user-search-results { border: 1px solid var(--border); border-radius: var(--radius); max-height: 200px; overflow-y: auto; background: var(--white); display: none; }
-.subs-overlay .user-search-results.show { display: block; }
-.subs-overlay .user-result-item { padding: 10px 14px; cursor: pointer; border-bottom: 1px solid var(--border); font-size: 13px; }
-.subs-overlay .user-result-item:last-child { border-bottom: none; }
-.subs-overlay .user-result-item:hover { background: var(--primary-light); }
-.subs-overlay .user-result-item .name { font-weight: 600; }
-.subs-overlay .user-result-item .meta { color: var(--text-muted); font-size: 12px; }
-.subs-overlay .selected-user-badge { display: none; padding: 8px 12px; background: var(--primary-light); border: 1px solid var(--primary); border-radius: var(--radius); font-size: 13px; font-weight: 600; color: var(--primary); margin-top: 6px; align-items: center; justify-content: space-between; gap: 8px; }
-.subs-overlay .selected-user-badge.show { display: flex; }
-.subs-overlay .selected-user-badge button { background: none; border: none; cursor: pointer; color: var(--primary); font-size: 16px; line-height: 1; }
 
 .subs .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
 .subs .empty-state p { font-size: 15px; margin: 0 0 4px; }
