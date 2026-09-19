@@ -370,19 +370,28 @@ Code only.
   end, and its state — Live, Queued (starts later), Ended, Revoked.
   Read-only; loaded when the panel opens through a Server Action behind
   the admin gate, refreshed after an Edit or a Revoke.
-- **Edit re-queues the rows.** Update no longer copies the receipt's
-  dates onto its rows; it deletes the receipt's rows and writes them
-  again through the same rule as Grant, so they queue behind the
-  student's other receipts and a queued start survives an edit. The
-  Paystack replay guard keeps its write-if-none.
+- **Edit moves the rows by the change.** Update no longer copies the
+  receipt's dates onto its rows; each row's start shifts by the
+  receipt's start change and each row's end by its end change, so a
+  queued start survives and the student's other receipts are never
+  touched (ruling 4). A changed product replaces the rows through the
+  fresh-grant rule; the status follows. The Paystack replay guard keeps
+  its write-if-none. **The first build re-queued the rows instead
+  (delete, then write through the grant rule) and Sam's walk broke it
+  the same hour:** he edited the *older* of two receipts, and its rows
+  queued behind the newer receipt that had queued behind it — the
+  student lost every course for a month. A queue is chronological by
+  purchase; it cannot be recomputed from a later edit.
 - **Not built, by the ruling:** ticks on Grant, per-row dates, a
   single-row Revoke, the hand-picked grant.
 
 **Done when:** the panel on a receipt lists its courses with the dates
-the rows hold and the right state word; an Edit that changes a
-receipt's dates moves its rows and keeps them queued behind another
-receipt on the same course; an Edit to REVOKED stamps them and back
-to ACTIVE clears the stamp; Revoke's stamp shows in the panel.
+the rows hold and the right state word; an Edit that extends the
+older of two receipts moves only that receipt's rows and leaves the
+newer receipt's queued rows where they are (an overlap, not a gap); an
+Edit that extends the newer, queued receipt keeps its queued start; an
+Edit to REVOKED stamps them and back to ACTIVE clears the stamp;
+Revoke's stamp shows in the panel.
 
 ### Later, under this doc
 

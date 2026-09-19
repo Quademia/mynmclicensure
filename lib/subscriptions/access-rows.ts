@@ -107,17 +107,59 @@ export async function ensureAccessRows(db: ServiceDb, receipt: Receipt): Promise
 }
 
 /**
- * An edited receipt (admin Update): its rows are written again through
- * the same rule as a fresh grant — the receipt's own rows go first, so
- * the new ones queue behind the student's OTHER receipts, never behind
- * themselves. The receipt's product, dates and status all flow through
- * writeAccessRows; nothing on a row is set by hand (C3b, Sam,
- * 2026-09-19: rows are written by rule, the admin edits receipts).
+ * An edited receipt (admin Update): its rows move by exactly the change
+ * made to the receipt — each row's start shifts by the receipt's start
+ * change, each row's end by the receipt's end change — so a queued
+ * start is kept and the rows of the student's OTHER receipts are never
+ * touched (ruling 4: an edit overlaps rather than shifts the queue).
+ * The status follows (ACTIVE clears the stamp; anything else stamps
+ * once). A changed product replaces the rows through the fresh-grant
+ * rule. A receipt with no rows gets them. Nothing on a row is set by
+ * hand (C3b, Sam, 2026-09-19: rows are written by rule).
+ *
+ * Why not "delete and queue again": Sam's 2026-09-19 walk edited the
+ * OLDER of two receipts, and re-queuing sent its rows behind the newer
+ * receipt that had itself queued behind the older one — the student
+ * lost every course for a month. A queue is chronological by purchase
+ * and cannot be recomputed from a later edit.
  */
-export async function rewriteAccessRows(db: ServiceDb, receipt: Receipt): Promise<void> {
-  const { error } = await db.from('course_access').delete().eq('subscription_id', receipt.subscription_id);
-  if (error) throw new Error(`course_access: delete failed: ${error.message}`);
-  await writeAccessRows(db, receipt);
+export async function rewriteAccessRows(db: ServiceDb, before: Receipt, after: Receipt): Promise<void> {
+  if (after.product_id !== before.product_id) {
+    const { error } = await db.from('course_access').delete().eq('subscription_id', after.subscription_id);
+    if (error) throw new Error(`course_access: delete failed: ${error.message}`);
+    await writeAccessRows(db, after);
+    return;
+  }
+
+  const { data: rows, error: readError } = await db
+    .from('course_access')
+    .select('access_id, start_utc, expires_utc')
+    .eq('subscription_id', after.subscription_id);
+  if (readError) throw new Error(`course_access: read failed: ${readError.message}`);
+  if (!rows?.length) {
+    await writeAccessRows(db, after);
+    return;
+  }
+
+  const startShift = new Date(after.start_utc).getTime() - new Date(before.start_utc).getTime();
+  const endShift = new Date(after.expires_utc).getTime() - new Date(before.expires_utc).getTime();
+  for (const row of rows as { access_id: number; start_utc: string; expires_utc: string }[]) {
+    const start = new Date(new Date(row.start_utc).getTime() + startShift);
+    let expires = new Date(new Date(row.expires_utc).getTime() + endShift);
+    if (expires <= start) expires = new Date(start.getTime() + 1000); // the CHECK: an end never before its start
+    const { error } = await db
+      .from('course_access')
+      .update({ start_utc: start.toISOString(), expires_utc: expires.toISOString() })
+      .eq('access_id', row.access_id);
+    if (error) throw new Error(`course_access: update failed: ${error.message}`);
+  }
+
+  if (after.status === 'ACTIVE') {
+    const { error } = await db.from('course_access').update({ revoked_utc: null }).eq('subscription_id', after.subscription_id);
+    if (error) throw new Error(`course_access: update failed: ${error.message}`);
+  } else {
+    await revokeAccessRows(db, after.subscription_id);
+  }
 }
 
 /** Revoke: stamp the receipt's live rows once; rows already stamped keep their date. */

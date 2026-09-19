@@ -101,7 +101,7 @@ taken yet.
 - ✅ C1 The link table — product_courses with keys, the Products page and five readers on it (S8; D16) — 2026-09-19
 - ✅ C2 The access rows — course_access from five writers, one-lookup gate, stored dates (S8; D13–D17, D20) — 2026-09-19
 - ✅ C3a The queued start — a row starts at the course's non-trial end; the extend branches gone (ruling 3) — 2026-09-19
-- ⬜ C3b The panel shows a receipt's course rows; Edit re-queues them by rule — no per-row editing (Sam, 2026-09-19)
+- ⬜ C3b The panel shows a receipt's course rows; Edit moves them by the change — no per-row editing (Sam, 2026-09-19)
 
 #### [03-quiz-system.md](docs/product-plan/03-quiz-system.md)
 

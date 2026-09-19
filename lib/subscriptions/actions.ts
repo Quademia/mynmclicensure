@@ -192,11 +192,10 @@ export async function updateSubscription(input: UpdateSubscriptionInput): Promis
     .update({ product_id: productId, start_utc: startIso, expires_utc: expiresIso, status, source, source_ref: finalSourceRef })
     .eq('subscription_id', subscriptionId);
   if (error) return fail(error.message);
-  // The receipt's course rows are written again by the same rule as a
-  // grant — product, dates and status flow through it; a queued start
-  // survives (02 C2, C3b).
+  // The receipt's course rows move by the change made here — a queued
+  // start is kept, other receipts' rows untouched (02 C2, C3b, ruling 4).
   try {
-    await rewriteAccessRows(createServiceRoleClient(), {
+    await rewriteAccessRows(createServiceRoleClient(), existing, {
       subscription_id: subscriptionId,
       user_id: existing.user_id,
       product_id: productId,
