@@ -236,6 +236,6 @@ both tables get the same fixes.
 
 | Slice | Date |
 |---|---|
-| Q1 The floor | ⬜ |
+| Q1 The floor | ✅ 2026-09-19 (`20260919170000_quiz_floor.sql`; walked by Sam: both student lists, Start, the course previews, admin Edit, Mock Exams, Attempts) |
 | Q2 The lifecycle rules | ⬜ |
 | Q3 Mock exams as a premium exam experience | design item, not sliced |
