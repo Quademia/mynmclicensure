@@ -56,6 +56,7 @@ export default async function StudentMockExamsPage({ searchParams }: { searchPar
         quizzesByCourse={quizzesByCourse}
         attemptsByCourse={attemptsByCourse}
         activeCourseFilter={String(course || '') || null}
+        serverNow={new Date().toISOString()}
       />
     </>
   );

@@ -25,7 +25,7 @@ export default async function AdminFixedQuizzesPage() {
   const { supabase, profile } = await requireAdmin();
   const [courses, first] = await Promise.all([
     getAllCourses(supabase),
-    getAllQuizzesPaginated(supabase, '', 0, 50),
+    getAllQuizzesPaginated(supabase, 'fixed', '', 0, 50),
   ]);
 
   return (

@@ -28,7 +28,7 @@ import { itemsTableFor } from '@/lib/bank/tables';
 import type { ItemFilterOptions } from '@/lib/bank/types';
 import { getConfig } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
-import { getQuizAvailability } from '@/lib/quizzes/availability';
+import { startRefusal } from '@/lib/quizzes/availability';
 import { getQuizById } from '@/lib/quizzes/queries';
 import type { QuizKind } from '@/lib/quizzes/types';
 import { makeAttemptId } from './ids';
@@ -270,9 +270,8 @@ export async function spawnQuizAttempt(kind: QuizKind, quizId: string, mode: Att
   // access checks below are the gate on what the student may start.
   const quiz = await getQuizById(createServiceRoleClient(), kind, quizId);
   if (!quiz) return fail('Could not start quiz. Please try again.');
-  if (getQuizAvailability(quiz) !== 'ACTIVE') return fail('This quiz is not open right now.');
-  const modeAllowed = mode === 'instant' ? quiz.allowed_modes !== 'TIMED_ONLY' : quiz.allowed_modes !== 'INSTANT_ONLY';
-  if (!modeAllowed) return fail('This mode is not available for this quiz.');
+  const refusal = startRefusal(quiz, mode);
+  if (refusal) return fail(refusal);
 
   const access = await getStudentCourseAccess(supabase, profile.user_id);
   if (!access[quiz.course_id]) return fail('You do not have an active subscription for this course.');
@@ -320,7 +319,9 @@ export async function spawnQuizAttempt(kind: QuizKind, quizId: string, mode: Att
 
 // retakeAttempt: a fresh attempt on the same questions in the same order,
 // linked back through origin_attempt_id. The origin must be the
-// student's own and completed.
+// student's own and completed — and, since Q2 (D45 a), the quiz it came
+// from must still be startable: the same check Start makes, on the
+// server's clock. A builder attempt has no quiz and no schedule.
 export async function retakeAttempt(originAttemptId: string): Promise<SpawnResult> {
   const { supabase, profile } = await requireStudent();
 
@@ -331,6 +332,14 @@ export async function retakeAttempt(originAttemptId: string): Promise<SpawnResul
 
   const access = await getStudentCourseAccess(supabase, profile.user_id);
   if (!access[origin.course_id]) return fail('You do not have an active subscription for this course.');
+
+  const kind = await quizKindOfAttempt(supabase, origin);
+  if (kind && origin.quiz_id) {
+    const quiz = await getQuizById(createServiceRoleClient(), kind, origin.quiz_id);
+    if (!quiz) return fail('This quiz is not open right now.');
+    const refusal = startRefusal(quiz, origin.mode);
+    if (refusal) return fail(refusal);
+  }
 
   const attemptId = makeAttemptId();
   const { error } = await supabase.from('attempts').insert({
@@ -351,6 +360,20 @@ export async function retakeAttempt(originAttemptId: string): Promise<SpawnResul
   });
   if (error) return fail(error.message);
   return { ok: true, attemptId };
+}
+
+// Which quiz table an attempt's quiz lives in: its own source, or — for
+// a retake, whose source is 'retake' — the source of the attempt it was
+// taken from, followed back through origin_attempt_id. A builder
+// attempt has no quiz: null.
+async function quizKindOfAttempt(db: Parameters<typeof getAttemptById>[0], attempt: Attempt): Promise<QuizKind | null> {
+  let current: Attempt | null = attempt;
+  for (let hops = 0; current && hops < 20; hops++) {
+    if (current.source === 'fixed' || current.source === 'mock') return current.source;
+    if (current.source !== 'retake' || !current.origin_attempt_id) return null;
+    current = await getAttemptById(db, current.origin_attempt_id);
+  }
+  return null;
 }
 
 // abandonAttempt: the list pages' inline update — status to abandoned on

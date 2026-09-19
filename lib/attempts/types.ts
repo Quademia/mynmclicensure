@@ -95,9 +95,19 @@ export type FinishResult = { ok: true; score: Score } | { ok: false; error: stri
 
 export type TimedStartResult = { ok: true; startedIso: string } | { ok: false; error: string };
 
-// The admin details step's attempt-stats box (legacy: Total Attempts,
-// Completed, Avg Score) — read by lib/attempts/queries getQuizAttemptStats.
-export type QuizAttemptStats = { total: number; completed: number; avgScore: number };
+// The admin details step's attempt-stats box — read by
+// lib/attempts/queries getQuizAttemptStats. Legacy showed Total,
+// Completed, Avg Score over every row with the quiz id; since Q2 (D45 e)
+// the rows are the quiz's own table's, and first sittings, retakes and
+// abandons are shown apart. `total` is every row on the quiz.
+export type QuizAttemptStats = {
+  total: number;
+  firstSittings: number;
+  retakes: number;
+  abandoned: number;
+  completed: number;
+  avgScore: number;
+};
 
 // ── the learning history page (7a) ─────────────────────────────────────
 // legacy getStudentAttemptsPaginated selected the card-visible columns

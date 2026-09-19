@@ -197,8 +197,8 @@ question list and notes; the course page's quiz previews unchanged.
 - **Not in this slice:** an in-progress attempt on a mock that closes
   (D45 g) — answered by the premium design, where a closed window
   submits what is in progress; until then it stays as it is. The 5a
-  fix that made admin Edit load the whole row (D45 h) — kept;
-  recorded here as the ruling once Sam confirms.
+  fix that made admin Edit load the whole row (D45 h) — **kept (Sam,
+  2026-09-19)**: Edit would otherwise open empty.
 
 **Done when:** Retake on a closed or archived quiz is refused with the
 Start message; a card's UPCOMING / CLOSED badge follows the server's

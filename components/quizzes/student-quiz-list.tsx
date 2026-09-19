@@ -16,9 +16,11 @@
 // convention #1); the Abandon confirm box stays the browser's, with
 // legacy's words (Sam, 2026-09-11: dialogs stay as legacy has them).
 //
-// The accordions render after mount behind legacy's "Loading…" line:
-// availability and the dates are computed against the browser's clock
-// and locale, as legacy computed them.
+// The accordions render after mount behind legacy's "Loading…" line.
+// Since Q2 (03-quiz-system.md, D45 b) availability is computed against
+// the SERVER's clock — the page passes the time it rendered at — so the
+// card and the Start button that the server judges always agree; the
+// date strings still format in the browser's locale, as legacy.
 
 'use client';
 
@@ -40,6 +42,8 @@ type Props = {
   attemptsByCourse: Record<string, Attempt[]>;
   /** the raw `?course=` — the chip shows only when it names an enrolled course */
   activeCourseFilter: string | null;
+  /** the server's clock at render (ISO) — the one availability is judged on (Q2) */
+  serverNow: string;
 };
 
 type Msg = { text: string; tone: 'error' | 'success' } | null;
@@ -110,7 +114,7 @@ function formatDate(iso: string): string {
   });
 }
 
-export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCourse, activeCourseFilter }: Props) {
+export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCourse, activeCourseFilter, serverNow }: Props) {
   const W = WORDS[kind];
   const router = useRouter();
 
@@ -344,7 +348,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
       );
     }
 
-    const now = new Date();
+    const now = new Date(serverNow);
     const coursesToShow = activeCourseFilter ? courses.filter((c) => c.course_id === activeCourseFilter) : courses;
 
     return coursesToShow.map((course) => {

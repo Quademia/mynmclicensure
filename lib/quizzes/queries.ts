@@ -51,19 +51,21 @@ export async function getQuizzesForCourse(db: ServerSupabaseClient, kind: QuizKi
   return (data ?? []) as unknown as QuizCard[];
 }
 
-// getAllQuizzesPaginated: the fixed-quiz admin list, fifty at a time,
-// newest first, the search an ilike on title or quiz_id. Legacy selected
-// only the list's columns (no item_ids); so does this — the admin's own
-// client reads it.
+// getAllQuizzesPaginated: an admin list, fifty at a time, newest first,
+// the search an ilike on title or quiz_id. Legacy paged the fixed list
+// this way and selected only the list's columns (no item_ids); since Q2
+// (D45 f) the mock list pages the same way instead of loading the whole
+// table and reporting its length. The admin's own client reads it.
 export async function getAllQuizzesPaginated(
   db: ServerSupabaseClient,
+  kind: QuizKind,
   searchTerm = '',
   page = 0,
   pageSize = 50,
 ): Promise<QuizPage> {
   let query = db
-    .from('quizzes')
-    .select('quiz_id, course_id, title, status, published, allowed_modes, n, created_at', { count: 'exact' })
+    .from(QUIZ_TABLES[kind])
+    .select('quiz_id, course_id, title, status, published, allowed_modes, n, created_at, publish_at, unpublish_at', { count: 'exact' })
     .order('created_at', { ascending: false });
 
   if (searchTerm) {
@@ -82,9 +84,9 @@ export async function getAllQuizzesPaginated(
 }
 
 // getAllQuizzes / getAllMockQuizzes: every row, every course, every
-// status — by course then title. The mock-exam admin list (whole) and
-// the attempts analytics page (slice 14). Full rows: service role,
-// behind requireAdmin().
+// status — by course then title. The attempts analytics page's title
+// map (slice 14); the mock admin list left it for the paged read in Q2.
+// Full rows: service role, behind requireAdmin().
 export async function getAllQuizzes(db: ServiceDb, kind: QuizKind): Promise<Quiz[]> {
   const { data, error } = await db.from(QUIZ_TABLES[kind]).select('*').order('course_id').order('title');
   if (error) {

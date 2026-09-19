@@ -68,11 +68,14 @@ export type Quiz = {
 // asks the server (lib/quizzes/queries getQuizById, service role).
 export type QuizCard = Omit<Quiz, 'item_ids' | 'notes'>;
 
-// The columns legacy's paginated admin list selected (getAllQuizzesPaginated)
-// — the row shape of the fixed-quiz table until the quiz is opened.
+// The columns the paginated admin list selects (getAllQuizzesPaginated)
+// — the row shape of both admin tables until the quiz is opened. Legacy
+// paged the fixed list this way and loaded the mock list whole; since
+// Q2 (D45 f) both page, and the schedule columns ride along for the
+// mock table's Schedule column.
 export type QuizListRow = Pick<
   Quiz,
-  'quiz_id' | 'course_id' | 'title' | 'status' | 'published' | 'allowed_modes' | 'n' | 'created_at'
+  'quiz_id' | 'course_id' | 'title' | 'status' | 'published' | 'allowed_modes' | 'n' | 'created_at' | 'publish_at' | 'unpublish_at'
 >;
 
 // The availability state machine's four answers (legacy getQuizAvailability).

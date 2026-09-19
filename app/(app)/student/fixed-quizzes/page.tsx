@@ -57,6 +57,7 @@ export default async function StudentFixedQuizzesPage({ searchParams }: { search
         quizzesByCourse={quizzesByCourse}
         attemptsByCourse={attemptsByCourse}
         activeCourseFilter={String(course || '') || null}
+        serverNow={new Date().toISOString()}
       />
     </>
   );

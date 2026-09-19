@@ -7,9 +7,8 @@
 
 import type { Metadata } from 'next';
 import { requireAdmin } from '@/lib/access';
-import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getAllCourses } from '@/lib/catalogue/queries';
-import { getAllQuizzes } from '@/lib/quizzes/queries';
+import { getAllQuizzesPaginated } from '@/lib/quizzes/queries';
 import { PageHeader, displayNameOf } from '@/components/shell/page-header';
 import { QuizManager } from '@/components/quizzes/quiz-manager';
 import '@/styles/admin-quizzes.css';
@@ -22,8 +21,9 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminMockExamsPage() {
   const { supabase, profile } = await requireAdmin();
-  // Full rows (item_ids, notes) through the service role since Q1.
-  const [courses, mocks] = await Promise.all([getAllCourses(supabase), getAllQuizzes(createServiceRoleClient(), 'mock')]);
+  // The first page of fifty with an exact count, like the fixed list
+  // (Q2, D45 f) — legacy loaded the whole table and reported its length.
+  const [courses, first] = await Promise.all([getAllCourses(supabase), getAllQuizzesPaginated(supabase, 'mock', '', 0, 50)]);
 
   return (
     <>
@@ -32,7 +32,7 @@ export default async function AdminMockExamsPage() {
         subtitle="Create and manage mock exams for exam periods"
         userName={displayNameOf(profile)}
       />
-      <QuizManager kind="mock" courses={courses} initialRows={mocks} initialTotal={mocks.length} />
+      <QuizManager kind="mock" courses={courses} initialRows={first.quizzes} initialTotal={first.total} />
     </>
   );
 }
