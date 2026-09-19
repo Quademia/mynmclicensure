@@ -272,14 +272,19 @@ create policy programs_select on programs for select using (true);
 drop policy if exists schools_select on schools;
 create policy schools_select on schools for select using (true);
 
--- users: own row, or admin. No delete.
+-- users: own row, or admin. No browser insert or delete (S10): the
+-- profile row is inserted by the server; there was never a delete.
+-- Update is column-level — the profile page's fields only — with the
+-- users_update policy as the floor beneath the grant.
 drop policy if exists users_select on users;
 create policy users_select on users for select
 using (auth.uid() = auth_id or auth_user_role() = 'ADMIN');
 
-drop policy if exists users_insert on users;
-create policy users_insert on users for insert
-with check (auth.uid() = auth_id and role = 'STUDENT');
+revoke insert on users from anon, authenticated;
+revoke delete on users from anon, authenticated;
+revoke update on users from anon, authenticated;
+grant update (forename, surname, name, phone_number, avatar_url, level, cohort, school_id, school_other)
+  on users to authenticated;
 
 drop policy if exists users_update on users;
 create policy users_update on users for update
@@ -300,7 +305,13 @@ drop policy if exists sessions_select on sessions;
 create policy sessions_select on sessions for select
 using (user_id = auth_user_id() or auth_user_role() = 'ADMIN');
 
--- auth_events, reset_requests: RLS on, no policies. Functions only.
+-- auth_events, reset_requests: RLS on, no policies. Functions only —
+-- and since S9 the five functions answer to the service role only:
+revoke execute on function log_auth_event(text, text, text, text, text, text, text, text, text) from public, anon, authenticated;
+revoke execute on function check_login_rate_limit(text, text, text)                            from public, anon, authenticated;
+revoke execute on function check_reset_rate_limit(text)                                        from public, anon, authenticated;
+revoke execute on function log_reset_request(text, text, text, text, text)                     from public, anon, authenticated;
+revoke execute on function mark_reset_used(text)                                               from public, anon, authenticated;
 
 
 -- ── slice 3: catalogue and config ──────────────────────────────────────

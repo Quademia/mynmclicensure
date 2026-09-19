@@ -27,7 +27,6 @@ export type Profile = {
   role: string;
   active: boolean;
   avatar_url: string | null;
-  must_change_password: boolean;
   signup_source: string | null;
   created_utc: string | null;
   last_login_utc: string | null;

@@ -25,8 +25,7 @@ create table if not exists schools (
 create table if not exists users (
   user_id              text primary key,                 -- 'U_' + 16 hex
   auth_id              uuid not null unique references auth.users (id) on delete cascade,  -- S1
-  username             text,
-  email                text not null,
+  email                text not null,                    -- lowercased by trigger, unique on lower(email) (S10)
   phone_number         text,
   name                 text,
   forename             text,
@@ -37,7 +36,6 @@ create table if not exists users (
   role                 text not null default 'STUDENT',  -- STUDENT | ADMIN
   active               boolean not null default true,
   avatar_url           text,
-  must_change_password boolean not null default false,   -- carried, unused (§9 #8)
   signup_source        text default 'SUPABASE_AUTH',     -- SUPABASE_AUTH | PAYSTACK_SETUP
   created_utc          timestamptz default now(),
   last_login_utc       timestamptz,
@@ -45,6 +43,22 @@ create table if not exists users (
   school_other         text,
   referral_source      text
 );
+-- S10 (20260919120000_auth_floor.sql): email lowercased on every write,
+-- one account per address. username and must_change_password dropped (S9).
+create or replace function users_email_lower()
+returns trigger
+language plpgsql
+set search_path = licensure_gh
+as $$
+begin
+  new.email := lower(trim(new.email));
+  return new;
+end;
+$$;
+create trigger users_email_lower
+  before insert or update of email on users
+  for each row execute function users_email_lower();
+create unique index if not exists users_email_lower_idx on users (lower(email));
 
 -- ── sessions ───────────────────────────────────────────────────────────
 -- Device sessions for the concurrent-login cap (2). Never deleted:
@@ -77,10 +91,12 @@ create table if not exists auth_events (
   ua_hash       text,
   device_label  text,
   fail_reason   text,                                    -- INVALID_CREDENTIALS | RATE_LIMITED | NO_ACCOUNT
-  created_utc   timestamptz not null default now()
+  created_utc   timestamptz not null default now(),
+  ip_hash       text                                     -- S9: the limiter's third key
 );
 create index if not exists auth_events_identifier_created on auth_events (identifier, created_utc);
 create index if not exists auth_events_fp_hash_created    on auth_events (fp_hash, created_utc) where fp_hash is not null;
+create index if not exists auth_events_ip_hash_created    on auth_events (ip_hash, created_utc) where ip_hash is not null;
 create index if not exists auth_events_user_id_created    on auth_events (user_id, created_utc) where user_id is not null;
 create index if not exists auth_events_created            on auth_events (created_utc);
 

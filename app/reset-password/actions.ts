@@ -3,14 +3,15 @@
 // Finishes a password reset — legacy reset-password.html's submit
 // handler on the server. The page has already turned the emailed link
 // into a session, so the cookie client sees the student whose password
-// is changing. Then, as legacy: clear must_change_password (§9 #8, the
-// column is carried and cleared, nothing more), mark the reset request
-// used, and sign out so the student lands on /login clean and signs in
-// with the new password.
+// is changing. Then mark the reset request used (through the service
+// role — §8 S9 revoked the function from the browser roles) and sign
+// out so the student lands on /login clean and signs in with the new
+// password. The must_change_password clear that legacy did here went
+// with the column (S9; §9 #8 closed).
 
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { markResetUsed } from '@/lib/auth/events';
 
 type ResetResult = { ok: true } | { ok: false; error: string };
@@ -39,10 +40,8 @@ export async function completeResetAction(formData: FormData): Promise<ResetResu
     return { ok: false, error: error.message };
   }
 
-  await supabase.from('users').update({ must_change_password: false }).eq('auth_id', user.id);
-
   if (user.email) {
-    await markResetUsed(supabase, user.email);
+    await markResetUsed(createServiceRoleClient(), user.email);
   }
 
   await supabase.auth.signOut();

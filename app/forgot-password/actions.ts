@@ -1,8 +1,9 @@
 // app/forgot-password/actions.ts
 //
 // Legacy forgot-password.html's submit handler on the server: reset
-// rate limit (3 per email per 60 min, fail open) → Supabase sends the
-// reset email → the request is logged with its status. The reply is
+// rate limit (3 per email per 60 min; fails closed since D30) → Supabase
+// sends the reset email → the request is logged with its status. The
+// limit and the log go through the service role (§8 S9). The reply is
 // neutral whatever happened to the address — "if that email is
 // registered" — so the form cannot be used to find out who has an
 // account.
@@ -14,7 +15,7 @@
 'use server';
 
 import { createClient as createPlainClient } from '@supabase/supabase-js';
-import { createClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { makeEventId } from '@/lib/auth/ids';
 import { requestInfo, requestOrigin } from '@/lib/auth/request-info';
 import { checkResetRateLimit, logResetRequest, retryMessage } from '@/lib/auth/events';
@@ -26,16 +27,20 @@ export async function forgotPasswordAction(formData: FormData): Promise<ForgotRe
   const fpHash = optionalString(formData.get('fp_hash'));
   if (!email) return { ok: false, error: 'Please enter your email address.' };
 
-  const supabase = await createClient();
+  const serviceDb = createServiceRoleClient();
   const info = await requestInfo();
   const requestId = makeEventId();
 
-  const limited = await checkResetRateLimit(supabase, email);
-  if (limited) {
-    await logResetRequest(supabase, requestId, email, 'RATE_LIMITED', fpHash, info.deviceLabel);
+  const check = await checkResetRateLimit(serviceDb, email);
+  if (check.status === 'error') {
+    // Fail closed (D30): the check broke, so the request is refused.
+    return { ok: false, error: 'Something went wrong. Please try again.' };
+  }
+  if (check.status === 'limited') {
+    await logResetRequest(serviceDb, requestId, email, 'RATE_LIMITED', fpHash, info.deviceLabel);
     return {
       ok: false,
-      error: retryMessage('Too many reset requests.', limited.retryAfterSeconds),
+      error: retryMessage('Too many reset requests.', check.retryAfterSeconds),
     };
   }
 
@@ -58,11 +63,11 @@ export async function forgotPasswordAction(formData: FormData): Promise<ForgotRe
   });
 
   if (error) {
-    await logResetRequest(supabase, requestId, email, 'EMAIL_FAILED', fpHash, info.deviceLabel);
+    await logResetRequest(serviceDb, requestId, email, 'EMAIL_FAILED', fpHash, info.deviceLabel);
     return { ok: false, error: error.message };
   }
 
-  await logResetRequest(supabase, requestId, email, 'EMAIL_SENT', fpHash, info.deviceLabel);
+  await logResetRequest(serviceDb, requestId, email, 'EMAIL_SENT', fpHash, info.deviceLabel);
   return { ok: true };
 }
 

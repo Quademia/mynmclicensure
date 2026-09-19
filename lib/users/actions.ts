@@ -4,8 +4,9 @@
 // requireAdmin(): a page of users for a filter change or Load More
 // (legacy loadUsers re-queried from the browser); the drawer's read;
 // Deactivate and Reactivate (legacy deactivateUser / activateUser — a
-// bare `active` flip as the signed-in admin, the ADMIN update policy is
-// the floor); Send Password Reset Email (legacy sendPasswordReset —
+// bare `active` flip, written with the service role behind
+// requireAdmin() since §8 S10 froze `active` for the browser roles);
+// Send Password Reset Email (legacy sendPasswordReset —
 // Supabase's reset mail, sent from the server now through the same
 // implicit-flow client the forgot-password page uses, the link on this
 // site's own address; no rate limit, as legacy's admin path had none,
@@ -18,6 +19,7 @@
 
 import { createClient as createPlainClient } from '@supabase/supabase-js';
 import { requireAdmin } from '@/lib/access';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { appOrigin } from '@/lib/site/app-origin';
 import { getUserDetail, getUsersPaginated } from './queries';
 import type { ActionResult, UserDetail, UserFilters, UsersPage } from './types';
@@ -35,11 +37,11 @@ export async function getUserDetailAction(userIdIn: string): Promise<UserDetail 
 }
 
 export async function setUserActive(userIdIn: string, active: boolean): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
+  await requireAdmin();
   const userId = String(userIdIn || '').trim();
   if (!userId) return { ok: false, error: 'User is required' };
 
-  const { error } = await supabase.from('users').update({ active: Boolean(active) }).eq('user_id', userId);
+  const { error } = await createServiceRoleClient().from('users').update({ active: Boolean(active) }).eq('user_id', userId);
   if (error) {
     console.error('setUserActive:', error);
     return { ok: false, error: error.message };

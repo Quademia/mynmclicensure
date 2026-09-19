@@ -76,12 +76,15 @@ export async function registerAction(formData: FormData): Promise<RegisterResult
     return { ok: false, error: error?.message ?? 'Signup failed. Please try again.' };
   }
 
-  // Step 2: the profile row, as the new user (users_insert policy).
+  // Step 2: the profile row, through the service role (§8 S10 / D27 —
+  // the browser roles cannot insert into users any more, and this no
+  // longer depends on "Confirm email" being off). Email lowercased as
+  // Auth stores it; the table's trigger does the same (D26).
   const userId = makeUserId();
-  const { error: profileError } = await supabase.from('users').insert({
+  const { error: profileError } = await createServiceRoleClient().from('users').insert({
     user_id: userId,
     auth_id: data.user.id,
-    email,
+    email: email.toLowerCase(),
     forename,
     surname,
     name: `${forename} ${surname}`,
