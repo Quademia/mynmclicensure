@@ -66,10 +66,38 @@ async function latestLiveEnds(db: ServiceDb, userId: string, courses: string[], 
   return ends;
 }
 
-/** A fresh receipt: one row per course of its product, queued behind the course's current end. */
-export async function writeAccessRows(db: ServiceDb, receipt: Receipt): Promise<void> {
+/** A receipt's window: the earliest row start and the latest row end. */
+export type AccessWindow = { start_utc: string; expires_utc: string };
+
+/**
+ * The receipt's dates follow its rows (Sam, 2026-09-19: the subscription
+ * row is the paper trail, so its window must summarise its rows —
+ * every reader of the receipt then shows a true date). created_utc keeps
+ * when the receipt was made. Returns the window written, or null when
+ * the receipt has no rows.
+ */
+async function setReceiptWindow(db: ServiceDb, subscriptionId: string): Promise<AccessWindow | null> {
+  const { data, error } = await db.from('course_access').select('start_utc, expires_utc').eq('subscription_id', subscriptionId);
+  if (error) throw new Error(`course_access: read failed: ${error.message}`);
+  const rows = (data ?? []) as AccessWindow[];
+  if (!rows.length) return null;
+  const window = {
+    start_utc: rows.map((r) => r.start_utc).sort()[0],
+    expires_utc: rows.map((r) => r.expires_utc).sort().at(-1)!,
+  };
+  const { error: updateError } = await db.from('subscriptions').update(window).eq('subscription_id', subscriptionId);
+  if (updateError) throw new Error(`subscriptions: window update failed: ${updateError.message}`);
+  return window;
+}
+
+/**
+ * A fresh receipt: one row per course of its product, queued behind the
+ * course's current end; then the receipt's window set from the rows.
+ * Returns the window (the receipt's own dates when nothing queued).
+ */
+export async function writeAccessRows(db: ServiceDb, receipt: Receipt): Promise<AccessWindow> {
   const { courses, kind } = await productCoursesAndKind(db, receipt.product_id);
-  if (!courses.length) return;
+  if (!courses.length) return { start_utc: receipt.start_utc, expires_utc: receipt.expires_utc };
   const revoked = receipt.status === 'ACTIVE' ? null : nowIso();
   const lengthMs = new Date(receipt.expires_utc).getTime() - new Date(receipt.start_utc).getTime();
   const ends = kind === 'TRIAL' || revoked ? {} : await latestLiveEnds(db, receipt.user_id, courses, receipt.start_utc);
@@ -89,6 +117,7 @@ export async function writeAccessRows(db: ServiceDb, receipt: Receipt): Promise<
   });
   const { error } = await db.from('course_access').insert(rows);
   if (error) throw new Error(`course_access: insert failed: ${error.message}`);
+  return (await setReceiptWindow(db, receipt.subscription_id)) ?? { start_utc: receipt.start_utc, expires_utc: receipt.expires_utc };
 }
 
 /**
@@ -160,6 +189,7 @@ export async function rewriteAccessRows(db: ServiceDb, before: Receipt, after: R
   } else {
     await revokeAccessRows(db, after.subscription_id);
   }
+  await setReceiptWindow(db, after.subscription_id);
 }
 
 /** Revoke: stamp the receipt's live rows once; rows already stamped keep their date. */

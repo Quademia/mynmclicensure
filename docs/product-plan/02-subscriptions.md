@@ -198,6 +198,17 @@ One line each; the full text with proof is in
   case after launch asks for it. The reasoning: an admin-edited row is
   a second writer on the row, the receipt stops explaining its rows,
   and the cases it serves are already reachable.
+- **The receipt's dates are its access window; `created_utc` is when
+  it was made (Sam, 2026-09-19, the column ticked in §8 S8).** Sam's
+  reading of C3a: the subscription row used to be the entitlement and
+  is now the paper trail, so once a row can queue, the receipt's start
+  and expiry stopped meaning anything the gate enforces — and the
+  admin list, the panel, the "access assigned" email, the profile
+  panel and the Upgrade page all quote them. So the row writer sets
+  the receipt's start to its earliest row start and its expiry to its
+  latest row end after every write, and a new column records the
+  moment of the grant or purchase. The admin list and panel show
+  "Granted".
 - **The product stays the single unit of sale.** Course-level pricing
   (a price per course, products as bundles, a basket) weighed and
   parked; S8's shapes already fit it if it returns (2026-09-18).
@@ -382,6 +393,14 @@ Code only.
   queued behind the newer receipt that had queued behind it — the
   student lost every course for a month. A queue is chronological by
   purchase; it cannot be recomputed from a later edit.
+- **The receipt's window follows its rows** (the ruling above): after
+  every write the receipt's start is the earliest row start and its
+  expiry the latest row end, so the receipt, the email, the profile
+  panel and the Upgrade page quote the access. `created_utc` (one
+  migration, `20260919235000_subscriptions_created_utc.sql`, the
+  existing receipts backfilled from their start and their windows
+  rewritten from their rows) records when the receipt was made; the
+  admin list gains a Granted column and the panel a "Granted on" line.
 - **Not built, by the ruling:** ticks on Grant, per-row dates, a
   single-row Revoke, the hand-picked grant.
 

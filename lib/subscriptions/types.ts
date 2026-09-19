@@ -14,6 +14,9 @@ export type SubscriptionStatus = (typeof SUB_STATUSES)[number];
 export const ADMIN_SUB_SOURCES = ['SELF_TRIAL_SIGNUP', 'PAYSTACK', 'ADMIN'] as const;
 export type SubscriptionSource = (typeof ADMIN_SUB_SOURCES)[number] | 'PAYMENT';
 
+// The receipt (02 C3b, Sam 2026-09-19): start_utc / expires_utc are its
+// access window, set from its course rows by the row writer; created_utc
+// is when it was made.
 export type Subscription = {
   subscription_id: string;
   user_id: string;
@@ -24,13 +27,14 @@ export type Subscription = {
   expiry_reminded: boolean;
   source: SubscriptionSource;
   source_ref: string | null;
+  created_utc: string;
 };
 
 // The admin page's list row: the subscription with the student and the
-// product joined, exactly the columns legacy selected.
+// product joined, exactly the columns legacy selected, plus created_utc.
 export type SubscriptionListRow = Pick<
   Subscription,
-  'subscription_id' | 'user_id' | 'product_id' | 'start_utc' | 'expires_utc' | 'status' | 'source' | 'source_ref'
+  'subscription_id' | 'user_id' | 'product_id' | 'start_utc' | 'expires_utc' | 'status' | 'source' | 'source_ref' | 'created_utc'
 > & {
   users: {
     user_id: string;

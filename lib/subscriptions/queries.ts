@@ -50,7 +50,7 @@ export async function getAllSubscriptions(db: ServerSupabaseClient): Promise<Sub
   const { data, error } = await db
     .from('subscriptions')
     .select(
-      'subscription_id, user_id, product_id, start_utc, expires_utc, status, source, source_ref, ' +
+      'subscription_id, user_id, product_id, start_utc, expires_utc, status, source, source_ref, created_utc, ' +
         'users ( user_id, name, forename, surname, email, program_id ), ' +
         'products ( name, kind, duration_days )',
     )

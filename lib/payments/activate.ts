@@ -66,8 +66,9 @@ export async function activatePaymentForUser(db: ServiceDb, payment: Payment, us
 
   const sub = newSub as Subscription;
   // One course row per course of the product, each queued behind the
-  // course's current end (02 C2, C3a).
-  await writeAccessRows(db, sub);
+  // course's current end; the receipt's window then follows its rows,
+  // and so does what this returns (02 C2, C3a, C3b).
+  Object.assign(sub, await writeAccessRows(db, sub));
   await patchPayment(db, payment.reference, {
     user_id: user.user_id,
     subscription_id: sub.subscription_id,
