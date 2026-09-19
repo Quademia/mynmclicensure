@@ -1377,6 +1377,11 @@ raw toggle stays and shows the stripped copy (legacy had the toggle).
 A one-time scrub of the rows already on dev and prod when it is
 built. Early in the build order — it reaches every payer from day one
 and is one trim function plus the scrub. Queued in BUILD_LIST.
+**Built 2026-09-19** (Claude): `lib/payments/trim.ts` allow-lists both
+replies; verify's two raw writes and both init steps use it; the scrub
+is `20260919150000_payments_raw_scrub.sql`, applied on dev (zero rows
+there), prod at the next release. Proven with a full Paystack-shaped
+reply: none of nineteen sensitive tokens survive the trim.
 
 ---
 
@@ -1527,7 +1532,9 @@ a note on mismatch, when the row is next touched (D32 or D31).
 **Status.** Ruled (Sam, 2026-09-18): **add the check now, as a rider
 on D32.** One comparison beside the amount check; a mismatch is
 FAILED with a note, as an amount mismatch is. Queued with D32 in
-BUILD_LIST.
+BUILD_LIST. **Built 2026-09-19** with D32: `currency_mismatch` beside
+`amount_mismatch` in `lib/payments/verify.ts`, named on the
+confirmation page.
 
 ---
 

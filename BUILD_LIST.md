@@ -161,7 +161,7 @@ what the diagnosis and the perf investigation surfaced.
 - ✅ Profile: the photo is one file per student overwritten in place and the cached old one kept showing — a version stamp on the saved address (Sam, 2026-09-14)
 - ⬜ Payments: the server creates the account at PAID and queues a set-password link; the setup token, its two columns and the rescue go; the form shrinks to a password (D31, Sam 2026-09-18)
 - ⬜ Payments: verify answers status and product to anyone; a same-browser cookie set at init shows the password form, otherwise the emailed link (D33, Sam 2026-09-18)
-- ⬜ Payments: strip Paystack's reply before saving — keep channel, card_type, last4; scrub the rows on both projects; currency checked at verify (D32 + D36, Sam 2026-09-18)
+- ✅ Payments: Paystack's replies trimmed before saving — channel, card_type, last4 kept; the scrub migration on dev, prod at the next release; currency checked at verify (D32 + D36) — 2026-09-19
 - ⬜ Payments: a nightly sweep verifies stale INIT rows with Paystack — paid ones activated, the rest ABANDONED, never deleted; SETUP_REQUIRED goes (D34, Sam 2026-09-18)
 - ⬜ Payments: one limit per action, verify counted per reference, the confirmation poll uncounted, fail closed (D35, Sam 2026-09-18) — closes §9 #22
 - ⬜ One limiter for the app: the counter table as the general tally, a rule per door in config; first doors e.g. register, messages, both builders, photo upload; shaped at build (Sam, 2026-09-18)
