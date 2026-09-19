@@ -237,5 +237,5 @@ both tables get the same fixes.
 | Slice | Date |
 |---|---|
 | Q1 The floor | ✅ 2026-09-19 (`20260919170000_quiz_floor.sql`; walked by Sam: both student lists, Start, the course previews, admin Edit, Mock Exams, Attempts) |
-| Q2 The lifecycle rules | ⬜ |
+| Q2 The lifecycle rules | ✅ 2026-09-19 (code only; walked by Sam: the paged mock list, the six-figure stats box, archive → restore to draft, Retake refused on a closed quiz) |
 | Q3 Mock exams as a premium exam experience | design item, not sliced |

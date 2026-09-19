@@ -99,7 +99,7 @@ taken yet.
 #### [03-quiz-system.md](docs/product-plan/03-quiz-system.md)
 
 - ✅ Q1 The floor — course-scoped reads of active published rows, item_ids and notes server-only, CHECKs (S12; D44, D48) — 2026-09-19
-- ⬜ Q2 The lifecycle rules — one availability check on the server clock, archive one-way, saveQuiz validation, stats by table, the mock list paged (D45)
+- ✅ Q2 The lifecycle rules — one availability check on the server clock, archive one-way, saveQuiz validation, stats by table, the mock list paged (D45) — 2026-09-19
 - ⏸ Q3 Mock exams as a premium exam experience — a design item, ingredients noted, none decided (Sam, 2026-09-18)
 
 #### [05-announcements.md](docs/product-plan/05-announcements.md)
