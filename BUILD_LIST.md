@@ -110,7 +110,7 @@ taken yet.
 - ✅ Q1 The floor — course-scoped reads of active published rows, item_ids and notes server-only, CHECKs (S12; D44, D48) — 2026-09-19
 - ✅ Q2 The lifecycle rules — one availability check on the server clock, archive one-way, saveQuiz validation, stats by table, the mock list paged (D45) — 2026-09-19
 - ⏸ Q3 Mock exams as a premium exam experience — a design item, ingredients noted, none decided (Sam, 2026-09-18)
-- ⬜ Q4 The questions as rows — attempt_items and offline_pack_items copied at creation, two clocks on the header (S7)
+- ✅ Q4 The questions as rows — attempt_items and offline_pack_items copied at creation, two clocks on the header (S7) — 2026-09-20
 - ⬜ Q5 The answers as rows, the write door — grading in SQL, no browser writes, save per tap, server expiry (S7; D6, D7)
 - ⬜ Q6 The seal — the public half live, one row's key at Check Answer, review unsealed, the console refused (S7; D5)
 - ⬜ Q7 SATA partial credit — the rule, then the three-state display (Sam, 2026-09-20) — after S7

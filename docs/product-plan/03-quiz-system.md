@@ -458,7 +458,7 @@ one-line experiment, reverted).
 | Q1 The floor | ✅ 2026-09-19 (`20260919170000_quiz_floor.sql`; walked by Sam: both student lists, Start, the course previews, admin Edit, Mock Exams, Attempts) |
 | Q2 The lifecycle rules | ✅ 2026-09-19 (code only; walked by Sam: the paged mock list, the six-figure stats box, archive → restore to draft, Retake refused on a closed quiz) |
 | Q3 Mock exams as a premium exam experience | design item, not sliced |
-| Q4 The questions as rows | ⬜ |
+| Q4 The questions as rows | ✅ 2026-09-20 (`20260920120000_attempt_items.sql`; walked as student4: builder attempt, fixed quiz, retake in the origin's order, pack built and rendered from its rows, history and My Packs) |
 | Q5 The answers as rows and the write door | ⬜ |
 | Q6 The seal | ⬜ |
 | Q7 SATA partial credit | later, after S7 |
