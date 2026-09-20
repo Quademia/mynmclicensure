@@ -131,8 +131,8 @@ taken yet.
 
 Every legacy page compared with its ported route; nothing missing outright. Detail and the minor list: `sessions/2026-09.md`, the legacy check entry. Numbered as reported to Sam; 1–4 first.
 
-- ⬜ 1 Runner autosave restarts its 60 s timer on every answer or flag — steady answering never autosaves; a timed exam loses answers on a closed tab
-- ⬜ 2 Runner: a dropped connection at Submit, Save & Resume Later or the timed auto-submit leaves the spinner forever — legacy showed the score
+- ✅ 1 Runner autosave restarts its 60 s timer on every answer — closed by 03 Q5: one save per question, half a second after the tap — 2026-09-20
+- ✅ 2 Runner: a dropped connection at Submit leaves the spinner forever — closed by 03 Q5: a toast, the button back, the auto-submit retries — 2026-09-20
 - ⬜ 3 Question Bank: an MCQ with answer C–F switched to TF shows "A (True)" but saves the old letter — every student marked wrong on it
 - ⬜ 4 Register: the "N-day free trial — no card required" hint never shows — `trialDays` still null, waiting on slice 8
 - ⬜ 5 Sidebar badge, My Courses and name / photo load once in the layout — stale across sidebar clicks; dropdown open state carries across pages
