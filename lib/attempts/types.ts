@@ -7,6 +7,8 @@
 // the Server Actions return. Constants live here, not in actions.ts — a
 // 'use server' module exports only async functions.
 
+import type { Item } from '@/lib/bank/types';
+
 export type AttemptMode = 'instant' | 'timed';
 export type AttemptSource = 'fixed' | 'builder' | 'retake' | 'mock';
 export type AttemptStatus = 'in_progress' | 'completed' | 'abandoned';
@@ -32,7 +34,35 @@ export type Attempt = {
   display_label: string | null;
   /** a JSON string of AnswerRecord[] */
   answers_json: string;
+  /** when the attempt was created */
   ts_iso: string | null;
+  /** the timed clock's anchor, set once by the start function (03 Q5 writes it) */
+  started_utc: string | null;
+  /** finish, expiry (the true deadline) or abandon (03 Q5 writes it) */
+  ended_utc: string | null;
+};
+
+// One row of attempt_items (03 Q4): the question as the bank served it
+// the day the attempt was created — copied table to table, never
+// updated — plus the answer group the server writes (Q5). Extends Item
+// so the runner and the scoring helpers take it unchanged: course_id is
+// the attempt's and batch_id is null on a snapshot (readAttemptItems
+// fills both in). The secret half (correct, rationale, rationale_img,
+// fb_a–fb_f) is revoked from the browser role at the grant, so the rows
+// are read with the service role after an ownership check.
+export type AttemptItem = Item & {
+  attempt_item_id: number;
+  attempt_id: string;
+  position: number;
+  /** a letter, or a comma list for SATA (the `correct` convention); null = unanswered */
+  chosen: string | null;
+  flagged: boolean;
+  sata_checked: boolean;
+  time_spent_s: number | null;
+  is_correct: boolean | null;
+  score_awarded: number | null;
+  answered_utc: string | null;
+  graded_utc: string | null;
 };
 
 // One entry per item in answers_json (legacy buildAnswersJson). MCQ / TF:

@@ -13,15 +13,15 @@
 // Server-only (it reads config and the bank); not a Server Action.
 
 import { getConfig } from '@/lib/catalogue/queries';
-import { getItemsByIds } from '@/lib/bank/queries';
-import type { Item } from '@/lib/bank/types';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import type { AuthGateResult } from '@/lib/access';
-import { getAttemptById } from './queries';
+import { getAttemptById, readAttemptItems } from './queries';
 import {
   RUNNER_AUTOSAVE_SEC_DEFAULT,
   RUNNER_QUESTIONS_PER_PAGE_DEFAULT,
   type Attempt,
+  type AttemptItem,
   type AttemptMode,
 } from './types';
 
@@ -31,7 +31,7 @@ export type RunnerLoad =
   | {
       kind: 'ok';
       attempt: Attempt;
-      items: Item[];
+      items: AttemptItem[];
       questionsPerPage: number;
       autosaveMs: number;
       reviewMode: boolean;
@@ -116,9 +116,11 @@ export async function loadRunner(
   const questionsPerPage = Number(config.runner_questions_per_page) || RUNNER_QUESTIONS_PER_PAGE_DEFAULT;
   const autosaveMs = (Number(config.runner_autosave_interval_sec) || RUNNER_AUTOSAVE_SEC_DEFAULT) * 1000;
 
-  // CHECK 10 — Items exist (in the attempt's order)
-  const itemIds = (attempt.item_ids || '').split(',').filter(Boolean);
-  const items = await getItemsByIds(supabase, attempt.course_id, itemIds);
+  // CHECK 10 — Items exist (in the attempt's order). Since 03 Q4 the
+  // attempt's own rows, not the live bank: read with the service role,
+  // which is safe here because CHECK 4 above settled ownership (or the
+  // caller is an admin in preview).
+  const items = await readAttemptItems(createServiceRoleClient(), attempt);
   if (!items.length) {
     return {
       kind: 'error',

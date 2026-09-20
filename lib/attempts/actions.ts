@@ -31,7 +31,7 @@ import { startRefusal } from '@/lib/quizzes/availability';
 import { getQuizById } from '@/lib/quizzes/queries';
 import type { QuizKind } from '@/lib/quizzes/types';
 import { makeAttemptId } from './ids';
-import { getAttemptById, getBuilderCourseItems, getStudentAttemptsPaginated } from './queries';
+import { getAttemptById, getBuilderCourseItems, getStudentAttemptsPaginated, readAttemptItems } from './queries';
 import { computeScore, recomputeAnswers } from './scoring';
 import {
   BUILDER_MAX_QUESTIONS_DEFAULT,
@@ -51,6 +51,47 @@ import {
 
 function fail(error: string): { ok: false; error: string } {
   return { ok: false, error };
+}
+
+// ── the one creator (03 Q4) ────────────────────────────────────────────
+// The header and one attempt_items row per question, the questions
+// copied table to table from question_bank in the given order, in one
+// database function. EXECUTE is revoked from the browser roles, so the
+// call goes through the service role — after the caller's own gates
+// (requireStudent, the course access, the quiz's availability). An id
+// the bank no longer has is dropped by the function, as getItemsByIds
+// dropped it before; none resolving is a refusal, and no header is left.
+type CreateAttemptArgs = {
+  attemptId: string;
+  userId: string;
+  courseId: string;
+  itemIds: string[];
+  mode: AttemptMode;
+  source: 'builder' | 'fixed' | 'mock' | 'retake';
+  quizId: string | null;
+  durationMin: number | null;
+  displayLabel: string | null;
+  originAttemptId: string | null;
+};
+
+async function createAttemptRows(args: CreateAttemptArgs): Promise<SpawnResult> {
+  const { error } = await createServiceRoleClient().rpc('create_attempt', {
+    p_attempt_id: args.attemptId,
+    p_user_id: args.userId,
+    p_course_id: args.courseId,
+    p_item_ids: args.itemIds,
+    p_mode: args.mode,
+    p_source: args.source,
+    p_quiz_id: args.quizId,
+    p_duration_min: args.durationMin,
+    p_display_label: args.displayLabel,
+    p_origin_attempt_id: args.originAttemptId,
+  });
+  if (error) {
+    console.error('create_attempt:', error);
+    return fail('Could not start this attempt. Please try again.');
+  }
+  return { ok: true, attemptId: args.attemptId };
 }
 
 // ── the builder's course load (legacy handleCourseChange's two reads) ──
@@ -107,24 +148,18 @@ export async function spawnBuilderAttempt(
   const override = Number(meta.duration_min_override);
   const durationMin = override > 0 ? override : Math.ceil(orderedIds.length * minutesPerQuestion);
 
-  const attemptId = makeAttemptId();
-  const { error } = await supabase.from('attempts').insert({
-    attempt_id: attemptId,
-    user_id: profile.user_id,
-    quiz_id: null,
-    course_id: courseId,
+  return createAttemptRows({
+    attemptId: makeAttemptId(),
+    userId: profile.user_id,
+    courseId,
+    itemIds: orderedIds,
     mode,
     source: 'builder',
-    item_ids: orderedIds.join(','),
-    n: orderedIds.length,
-    status: 'in_progress',
-    ts_iso: new Date().toISOString(),
-    duration_min: durationMin,
-    answers_json: JSON.stringify([]),
-    display_label: String(meta.display_label || '').trim() || null,
+    quizId: null,
+    durationMin,
+    displayLabel: String(meta.display_label || '').trim() || null,
+    originAttemptId: null,
   });
-  if (error) return fail(error.message);
-  return { ok: true, attemptId };
 }
 
 // ── saveAttemptProgress (the instant runner's autosave and exits) ──────
@@ -211,8 +246,9 @@ export async function finishAttempt(attemptId: string, answers: AnswerRecord[], 
   if (attempt.user_id !== profile.user_id) return fail('This quiz attempt does not belong to your account.');
   if (attempt.status !== 'in_progress') return fail('This attempt has already been submitted.');
 
-  const itemIds = (attempt.item_ids || '').split(',').filter(Boolean);
-  const items = await getItemsByIds(supabase, attempt.course_id, itemIds);
+  // The attempt's own rows, not the live bank (03 Q4): the score is
+  // computed against the questions as they were served.
+  const items = await readAttemptItems(createServiceRoleClient(), attempt);
   if (!items.length) return fail('The questions for this quiz could not be loaded.');
 
   const recomputed = recomputeAnswers(items, answers);
@@ -292,33 +328,30 @@ export async function spawnQuizAttempt(kind: QuizKind, quizId: string, mode: Att
   if (quiz.shuffle) orderedIds = secureShuffle(orderedIds);
   if (!orderedIds.length) return fail('This quiz has no questions yet.');
 
-  const attemptId = makeAttemptId();
   const timeLimitSec = quiz.time_limit_sec || quiz.n * 60;
 
-  const { error } = await supabase.from('attempts').insert({
-    attempt_id: attemptId,
-    user_id: profile.user_id,
-    quiz_id: quiz.quiz_id,
-    course_id: quiz.course_id,
+  return createAttemptRows({
+    attemptId: makeAttemptId(),
+    userId: profile.user_id,
+    courseId: quiz.course_id,
+    itemIds: orderedIds,
     mode,
     source: kind,
-    item_ids: orderedIds.join(','),
-    n: orderedIds.length,
-    status: 'in_progress',
-    ts_iso: new Date().toISOString(),
-    duration_min: Math.ceil(timeLimitSec / 60),
-    answers_json: JSON.stringify([]),
-    display_label: quiz.title,
+    quizId: quiz.quiz_id,
+    durationMin: Math.ceil(timeLimitSec / 60),
+    displayLabel: quiz.title,
+    originAttemptId: null,
   });
-  if (error) return fail(error.message);
-  return { ok: true, attemptId };
 }
 
 // retakeAttempt: a fresh attempt on the same questions in the same order,
 // linked back through origin_attempt_id. The origin must be the
 // student's own and completed — and, since Q2 (D45 a), the quiz it came
 // from must still be startable: the same check Start makes, on the
-// server's clock. A builder attempt has no quiz and no schedule.
+// server's clock. A builder attempt has no quiz and no schedule. Since
+// 03 Q4 the order comes from the origin's own rows, and the new sitting
+// copies each question fresh from the live bank (Sam, 2026-09-20): it
+// records what it was shown today; the origin keeps what it saw.
 export async function retakeAttempt(originAttemptId: string): Promise<SpawnResult> {
   const { supabase, profile } = await requireStudent();
 
@@ -338,25 +371,21 @@ export async function retakeAttempt(originAttemptId: string): Promise<SpawnResul
     if (refusal) return fail(refusal);
   }
 
-  const attemptId = makeAttemptId();
-  const { error } = await supabase.from('attempts').insert({
-    attempt_id: attemptId,
-    user_id: profile.user_id,
-    quiz_id: origin.quiz_id,
-    course_id: origin.course_id,
+  const originItems = await readAttemptItems(createServiceRoleClient(), origin);
+  if (!originItems.length) return fail('Could not create retake. Please try again.');
+
+  return createAttemptRows({
+    attemptId: makeAttemptId(),
+    userId: profile.user_id,
+    courseId: origin.course_id,
+    itemIds: originItems.map((i) => i.item_id),
     mode: origin.mode,
     source: 'retake',
-    item_ids: origin.item_ids,
-    n: origin.n,
-    status: 'in_progress',
-    ts_iso: new Date().toISOString(),
-    duration_min: origin.duration_min,
-    answers_json: JSON.stringify([]),
-    display_label: origin.display_label,
-    origin_attempt_id: origin.attempt_id,
+    quizId: origin.quiz_id,
+    durationMin: origin.duration_min,
+    displayLabel: origin.display_label,
+    originAttemptId: origin.attempt_id,
   });
-  if (error) return fail(error.message);
-  return { ok: true, attemptId };
 }
 
 // Which quiz table an attempt's quiz lives in: its own source, or — for

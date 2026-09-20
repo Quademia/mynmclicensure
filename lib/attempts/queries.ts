@@ -10,7 +10,32 @@
 // their user; the runner's ownership check is in lib/attempts/runner-load.
 
 import type { ServerSupabaseClient } from '@/lib/access';
-import { HISTORY_PAGE_SIZE, RECENT_ATTEMPTS_LIMIT, type Attempt, type AttemptListRow, type BuilderItem, type HistoryFilters, type HistoryPage, type QuizAttemptStats } from './types';
+import type { createServiceRoleClient } from '@/lib/supabase/server';
+import { HISTORY_PAGE_SIZE, RECENT_ATTEMPTS_LIMIT, type Attempt, type AttemptItem, type AttemptListRow, type BuilderItem, type HistoryFilters, type HistoryPage, type QuizAttemptStats } from './types';
+
+type ServiceDb = ReturnType<typeof createServiceRoleClient>;
+
+// The attempt's own questions (03 Q4): attempt_items in position order,
+// each row as the bank served it when the attempt was created. Read
+// with the SERVICE ROLE after the caller's ownership check — the secret
+// half is revoked from the browser role at the grant, and both callers
+// (the runner's loader, the finish path) need it. Empty on an error.
+export async function readAttemptItems(db: ServiceDb, attempt: Pick<Attempt, 'attempt_id' | 'course_id'>): Promise<AttemptItem[]> {
+  const { data, error } = await db
+    .from('attempt_items')
+    .select('*')
+    .eq('attempt_id', attempt.attempt_id)
+    .order('position', { ascending: true });
+  if (error) {
+    console.error('readAttemptItems:', error);
+    return [];
+  }
+  return ((data ?? []) as Omit<AttemptItem, 'course_id' | 'batch_id'>[]).map((row) => ({
+    ...row,
+    course_id: attempt.course_id,
+    batch_id: null,
+  }));
+}
 
 // The admin details step's attempt-stats box (legacy openEditQuiz's
 // inline read on both admin quiz pages). Since Q2 (D45 e) the read is

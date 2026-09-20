@@ -323,10 +323,12 @@ The read side. On screen nothing changes.
   longer has (as `getItemsByIds` does today); raises if none resolve;
   returns the attempt id with its `n`. `create_offline_pack(...)` the
   same for a pack. EXECUTE revoked from the browser roles.
-- Dev's 21 attempts and 3 packs: `attempt_items` and
-  `offline_pack_items` filled from the live bank where the ids still
-  resolve, in the stored order. `item_ids` and `answers_json` stay
-  until Q5.
+- **No backfill (Sam, 2026-09-20): the existing attempts and packs are
+  deleted** — dev's 21 and 3, and prod's test sittings when the file
+  runs there; D5 leaves both tables empty on launch day regardless. An
+  old row would otherwise sit on the history pages with a Resume that
+  finds no rows. `item_ids` and `answers_json` stay on the header until
+  Q5.
 - The two snapshots and `db/README.md` updated.
 
 **Code.** The four creators (`spawnBuilderAttempt`, `spawnQuizAttempt`

@@ -284,10 +284,12 @@ create table if not exists course_access (
 create index if not exists course_access_user_course_live_idx on course_access (user_id, course_id) where revoked_utc is null;
 create index if not exists course_access_subscription_idx on course_access (subscription_id);
 
--- ── attempts (slice 6a) ────────────────────────────────────────────────
--- One row per run. item_ids and answers_json stay TEXT (§8 S3 unticked).
--- No content copy (D5). quiz_id names a row in quizzes OR mock_quizzes
--- and is null for the builder, so it carries no key.
+-- ── attempts (slice 6a; 03 Q4 the two clocks) ──────────────────────────
+-- One row per run — the header. item_ids and answers_json are the
+-- pointer-list era's blobs, kept until 03 Q5 moves the answers into
+-- attempt_items and drops them (§8 S7). No content copy (D5). quiz_id
+-- names a row in quizzes OR mock_quizzes and is null for the builder, so
+-- it carries no key. started_utc / ended_utc are written by Q5.
 create table if not exists attempts (
   attempt_id        text primary key,                                  -- 'ATT_' + ms + '_' + 7 hex
   user_id           text not null references users (user_id),         -- S4
@@ -307,13 +309,106 @@ create table if not exists attempts (
   origin_attempt_id text references attempts (attempt_id),             -- S4; the retake chain
   display_label     text,
   answers_json      text not null default '[]',
-  ts_iso            timestamptz default now()
+  ts_iso            timestamptz default now(),                          -- created
+  started_utc       timestamptz,                                        -- 03 Q4; the timed clock's anchor (Q5 writes)
+  ended_utc         timestamptz                                         -- 03 Q4; finish, expiry or abandon (Q5 writes)
 );
 create index if not exists attempts_user_id_idx   on attempts (user_id);
 create index if not exists attempts_quiz_id_idx   on attempts (quiz_id);
 create index if not exists attempts_course_id_idx on attempts (course_id);
 create index if not exists attempts_status_idx    on attempts (status);
 create index if not exists attempts_user_quiz_mode_status_idx on attempts (user_id, quiz_id, mode, status);
+
+-- ── attempt_items (03 Q4; §8 S7) ────────────────────────────────────────
+-- One row per question of an attempt: the question as the bank served it
+-- when the attempt was created — copied table to table by
+-- create_attempt(), never updated — plus the answer group the server
+-- writes (Q5). One row holds the snapshot and the answer (Sam,
+-- 2026-09-20). item_id has NO key to question_bank on purpose: the
+-- snapshot is the truth, and editing or deleting the bank row must never
+-- touch history. The secret half (correct, rationale, rationale_img,
+-- fb_a–fb_f) is revoked from the browser roles at the grant (rls.sql).
+create table if not exists attempt_items (
+  attempt_item_id bigint generated always as identity primary key,
+  attempt_id      text not null references attempts (attempt_id) on delete cascade,
+  position        integer not null,
+  item_id         text not null,
+  question_type   text not null,
+  stem            text not null,
+  option_a        text, option_b text, option_c text,
+  option_d        text, option_e text, option_f text,
+  marks           numeric not null default 1,
+  shuffle_options boolean not null default true,
+  correct         text not null,
+  rationale       text,
+  rationale_img   text,
+  fb_a            text, fb_b text, fb_c text,
+  fb_d            text, fb_e text, fb_f text,
+  subject         text,
+  maintopic       text,
+  subtopic        text,
+  difficulty      text,
+  chosen          text,                             -- a letter, or a comma list for SATA; null = unanswered
+  flagged         boolean not null default false,
+  sata_checked    boolean not null default false,
+  time_spent_s    integer,
+  is_correct      boolean,                          -- the server's, at Check Answer or finish
+  score_awarded   numeric,
+  answered_utc    timestamptz,
+  graded_utc      timestamptz,
+  constraint attempt_items_position_check check (position > 0),
+  constraint attempt_items_attempt_position_key unique (attempt_id, position)
+);
+create index if not exists attempt_items_item_id_idx on attempt_items (item_id);
+
+-- ── offline_packs (slice 13a) and offline_pack_items (03 Q4) ───────────
+-- A pack's header (the migration 20260914200000; item_ids dropped by
+-- 03 Q4) and one row per question, the pack's own copy so a later bank
+-- edit or delete never changes a saved pack (D12). No answer group and
+-- no seal: a pack carries its key by design and is read by its owner on
+-- the server. updated_utc is kept by a trigger (the migration).
+create table if not exists offline_packs (
+  pack_id        text primary key,                                   -- 'PACK_' + ms + '_' + 8 hex
+  user_id        text not null references users (user_id),          -- S4
+  course_id      text not null references courses (course_id),      -- S4
+  pack_name      text not null,
+  selection_mode text not null default 'topics',                     -- topics | concept
+  maintopics     text[] not null default '{}',
+  subtopics      text[] not null default '{}',
+  difficulties   text[] not null default '{}',
+  question_types text[] not null default '{}',
+  concept_query  text,
+  display_label  text,
+  question_count integer not null,
+  watermark      jsonb not null default '{}',
+  status         text not null default 'active',
+  created_utc    timestamptz not null default now(),
+  updated_utc    timestamptz not null default now()
+);
+create table if not exists offline_pack_items (
+  pack_item_id    bigint generated always as identity primary key,
+  pack_id         text not null references offline_packs (pack_id) on delete cascade,
+  position        integer not null,
+  item_id         text not null,
+  question_type   text not null,
+  stem            text not null,
+  option_a        text, option_b text, option_c text,
+  option_d        text, option_e text, option_f text,
+  marks           numeric not null default 1,
+  shuffle_options boolean not null default true,
+  correct         text not null,
+  rationale       text,
+  rationale_img   text,
+  fb_a            text, fb_b text, fb_c text,
+  fb_d            text, fb_e text, fb_f text,
+  subject         text,
+  maintopic       text,
+  subtopic        text,
+  difficulty      text,
+  constraint offline_pack_items_position_check check (position > 0),
+  constraint offline_pack_items_pack_position_key unique (pack_id, position)
+);
+create index if not exists offline_pack_items_item_id_idx on offline_pack_items (item_id);
 
 -- ── payments (slice 9a) ────────────────────────────────────────────────
 -- No content copy (D5). Every write is the server's (service role); an

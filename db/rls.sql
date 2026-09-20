@@ -483,6 +483,39 @@ with check (attempts.user_id = auth_user_id());
 create policy attempts_update on attempts for update
 using (attempts.user_id = auth_user_id());
 
+-- ── 03 Q4: attempt_items and offline_pack_items ────────────────────────
+-- A student reads the rows of their own attempts (the owner tested as a
+-- set, once per statement) or an admin every row; no browser write path
+-- on either table (the grants: `revoke all`, then SELECT back). On
+-- attempt_items the SELECT is column-level and EXCLUDES the secret half
+-- — correct, rationale, rationale_img, fb_a–fb_f — so a console query
+-- for the key mid-exam is refused by the database; the server reads
+-- those columns with the service role after its ownership check.
+-- offline_pack_items is readable whole: a pack carries its key by design.
+-- Every write is create_attempt() / create_offline_pack() (EXECUTE
+-- revoked from the browser roles; the service role calls them) and,
+-- from Q5, the save / grade / finish functions.
+create policy attempt_items_select on attempt_items for select
+using (
+  auth_user_role() = 'ADMIN'
+  or attempt_id in (select a.attempt_id from attempts a where a.user_id = auth_user_id())
+);
+create policy offline_pack_items_select on offline_pack_items for select
+using (
+  auth_user_role() = 'ADMIN'
+  or pack_id in (select p.pack_id from offline_packs p where p.user_id = auth_user_id())
+);
+
+-- offline_packs (slice 13a): own rows or ADMIN read; own-row insert and
+-- update policies remain from the migration, though since 03 Q4 the
+-- only writer is create_offline_pack() through the service role.
+create policy offline_packs_select on offline_packs for select
+using (offline_packs.user_id = auth_user_id() or auth_user_role() = 'ADMIN');
+create policy offline_packs_insert on offline_packs for insert
+with check (offline_packs.user_id = auth_user_id());
+create policy offline_packs_update on offline_packs for update
+using (offline_packs.user_id = auth_user_id());
+
 -- ── slice 9a: payments and the rate limit ──────────────────────────────
 -- payments: ADMIN reads; no INSERT or UPDATE policy on purpose — every
 -- write comes from the Server Actions in lib/payments/ with the service
