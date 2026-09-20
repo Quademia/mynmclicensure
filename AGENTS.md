@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-09-19. Rules for **any** assistant working in this
+Last updated: 2026-09-20. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What is built and
@@ -250,6 +250,11 @@ above sit at the repo root; the audience grouping inside them is kept.
   edited reader within seconds; a migration applied minutes later leaves
   every open page erroring in between. Run `npm run db:migrate` the
   moment the readers are written, or migrate first.
+- **Next memoises an identical fetch within one render.** A Server
+  Component that reads a row, writes through a function, then reads the
+  same row again with the same client gets the FIRST read back (03 Q5:
+  the expired exam's page still showed the preflight). Re-read through a
+  different client (the service role) or return what the write returned.
 - **Migrations are applied by this repo's own runner**
   (`npm run db:migrate`, `scripts/db-migrate.mjs`), recorded in
   `licensure_gh.migrations`. Never `supabase db push`, never the MCP
