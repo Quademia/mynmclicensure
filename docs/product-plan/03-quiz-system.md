@@ -449,6 +449,76 @@ one-line experiment, reverted).
   Learning History items on BUILD_LIST — runner and history work that
   belongs here when queued.
 
+### The runner as a player (captured 2026-09-20; to be discussed when it comes up)
+
+Sam's observation after S7: MyNclex's runner is a player — it reads the
+attempt header (intent, mode, duration) and behaves, and does not care
+where the attempt came from; the source changes only where Exit goes.
+Now that a sitting carries its own rows, ours can be the same thing
+cleanly. Captured here, not ruled; the conversation is for when it comes
+up, after 08 B2.
+
+**What the runner does today.** One component
+(`components/runner/quiz-runner.tsx`) fed by two routes
+(`/runner/instant`, `/runner/timed`) through one loader
+(`lib/attempts/runner-load.ts`, the ten preflight checks). It obeys
+the header: the mode decides practice or exam behaviour, `duration_min`
+the clock, `display_label` the title, `status` live or review; the rows
+give the questions and their order. It never reads the source — a
+fixed quiz, a builder quiz, a retake and a mock play identically for
+the same mode. Since Q5 it saves one patch per question half a second
+after the tap; since Q6 it receives the public half of each row and a
+secrets map the server fills (one question at Check Answer in
+practice, none in a live exam, all in review). Admin preview runs in
+memory and writes nothing.
+
+**Where it falls short of the player, found 2026-09-20:**
+
+- **The mode is in the URL as well as the row.** Two routes, one per
+  mode, a leftover of legacy's two HTML pages; the loader bounces an
+  attempt to the other route when they disagree (CHECK 6). MyNclex has
+  one route, `/session/[attempt_id]`.
+- **Exit always goes to Fixed Quizzes**, whatever the source — a
+  builder quiz exits there too. Legacy did the same; MyNclex resolves
+  the exit from the source.
+- **The words are keyed by mode only** (`WORDS.instant` /
+  `WORDS.timed`); nothing per source, so a mock is "Exam Quiz".
+- **The first Check Answer waits on a cold Worker** (1.7 s seen on
+  dev). Before Q6 the feedback was instant because the browser held
+  the key; now it asks the server. A pending state on the option while
+  the check is in flight.
+- **The builders load a whole course into the browser** to filter and
+  count (D9) — not the runner's, and it is 08 B2's; noted here because
+  it is the one bank read left on the student side.
+
+**What MyNclex's runner has that ours does not** (reference, not plan;
+read 2026-09-20): one route; the exit resolved per source; an intent
+(STUDY / EXAM) and five modes collapsing into three behaviours (per-
+question submit with the rationale at once; answers saved as drafts
+and everything revealed at finish; sequential, no going back); a per-
+question-type component (nine types there, three here); the mobile
+layout (a bottom bar, the grid as a sheet); a runner tutorial in a
+no-writes sandbox; an engagement clock that pauses when the student
+looks away. Its student-facing word is "session" or "sitting" while
+its storage says attempt; ours says attempt on screen too (legacy's
+word). Whether the screen word changes is a copy decision, mattering
+most for the exam.
+
+**Candidate slices, to be ruled on when the conversation happens:**
+
+- **Q8 — the runner as a player.** One route, the mode and the exit
+  read from the header (the exit per source: the builder back to the
+  builder, a quiz to its list), CHECK 6 gone, the two pages one; the
+  words per mode still. Small — an afternoon; no storage change.
+- **Q9 — the Check Answer pending state.** The picked option shows it
+  is being checked until the reply lands; a failure already toasts.
+  Small.
+- **With Q3's design, as instructions on the header the runner obeys:**
+  results withheld until a date (the seal already knows how to hold the
+  secret half back); no retake; one sitting in a window; a sequential
+  mode (parked on BUILD_LIST as a new feature); the screen word for an
+  exam sitting.
+
 ---
 
 ## 5. Ladder
@@ -462,3 +532,5 @@ one-line experiment, reverted).
 | Q5 The answers as rows and the write door | ✅ 2026-09-20 (`20260920150000_attempt_answers.sql`; walked as student4: per-tap saves and a flag read back, a reload restoring them, finish at 4 / 10, an exam closed at its deadline on the next open, a failed Submit's toast with the runner unlocked) |
 | Q6 The seal | ✅ 2026-09-20 (code only; walked as student4: a live exam's page with 0 keys, the closed exam's with 10, a practice quiz reloaded with exactly the 2 checked, the review filled from the finish reply) |
 | Q7 SATA partial credit | later, after S7 |
+| Q8 The runner as a player | candidate, captured 2026-09-20; ruled when it comes up, after 08 B2 |
+| Q9 The Check Answer pending state | candidate, captured 2026-09-20 |

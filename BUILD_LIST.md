@@ -114,6 +114,8 @@ taken yet.
 - ✅ Q5 The answers as rows, the write door — grading in SQL, no browser writes, save per tap (S7; D6, D7) — 2026-09-20
 - ✅ Q6 The seal — the public half live, one key at Check Answer, review unsealed, console refused (S7; D5) — 2026-09-20
 - ⬜ Q7 SATA partial credit — the rule, then the three-state display (Sam, 2026-09-20) — after S7
+- ⬜ Q8 The runner as a player — one route, mode and exit from the header (captured 2026-09-20; ruled after 08 B2)
+- ⬜ Q9 The Check Answer pending state — the option shows it is being checked until the reply lands (2026-09-20)
 
 #### [05-announcements.md](docs/product-plan/05-announcements.md)
 
