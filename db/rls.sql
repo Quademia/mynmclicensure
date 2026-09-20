@@ -473,15 +473,17 @@ using (auth_user_role() = 'ADMIN');
 create policy course_access_select on course_access for select
 using (user_id = auth_user_id() or auth_user_role() = 'ADMIN');
 
--- ── slice 6a: attempts ─────────────────────────────────────────────────
--- Own rows or ADMIN read; own-row insert and update; no DELETE, as
--- legacy. The runner's Server Actions write as the signed-in student.
+-- ── slice 6a: attempts (03 Q5: read only from the browser) ─────────────
+-- Own rows or ADMIN read. The own-row INSERT and UPDATE policies of the
+-- port went with 03 Q5 (D7): the browser roles hold SELECT alone (the
+-- default "grant all" taken back), and every write is a SECURITY
+-- DEFINER function the service role calls after the Server Action's
+-- gate — create_attempt, start_timed_attempt, save_answers,
+-- check_answer, finish_attempt, expire_attempt, abandon_attempt — each
+-- taking the caller's user id and refusing a row that is not theirs or
+-- an attempt not in progress. Grading is grade_answer() in SQL.
 create policy attempts_select on attempts for select
 using (attempts.user_id = auth_user_id() or auth_user_role() = 'ADMIN');
-create policy attempts_insert on attempts for insert
-with check (attempts.user_id = auth_user_id());
-create policy attempts_update on attempts for update
-using (attempts.user_id = auth_user_id());
 
 -- ── 03 Q4: attempt_items and offline_pack_items ────────────────────────
 -- A student reads the rows of their own attempts (the owner tested as a
@@ -494,7 +496,8 @@ using (attempts.user_id = auth_user_id());
 -- offline_pack_items is readable whole: a pack carries its key by design.
 -- Every write is create_attempt() / create_offline_pack() (EXECUTE
 -- revoked from the browser roles; the service role calls them) and,
--- from Q5, the save / grade / finish functions.
+-- since Q5, save_answers() / check_answer() / finish_attempt() /
+-- expire_attempt() on the answer group.
 create policy attempt_items_select on attempt_items for select
 using (
   auth_user_role() = 'ADMIN'

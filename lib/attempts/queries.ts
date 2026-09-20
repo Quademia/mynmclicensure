@@ -11,7 +11,7 @@
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import type { createServiceRoleClient } from '@/lib/supabase/server';
-import { HISTORY_PAGE_SIZE, RECENT_ATTEMPTS_LIMIT, type Attempt, type AttemptItem, type AttemptListRow, type BuilderItem, type HistoryFilters, type HistoryPage, type QuizAttemptStats } from './types';
+import { HISTORY_PAGE_SIZE, RECENT_ATTEMPTS_LIMIT, type Attempt, type AttemptItem, type AttemptListRow, type AttemptWithProgress, type BuilderItem, type HistoryFilters, type HistoryPage, type QuizAttemptStats } from './types';
 
 type ServiceDb = ReturnType<typeof createServiceRoleClient>;
 
@@ -77,12 +77,15 @@ export async function getAttemptById(db: ServerSupabaseClient, attemptId: string
   return (data as Attempt | null) ?? null;
 }
 
-/** A student's attempts, newest first; one course when asked (the list pages, 5b). */
+/** A student's attempts, newest first; one course when asked (the list
+ * pages, 5b). Since 03 Q5 each in-progress attempt carries the count of
+ * its answered rows for the card's "N of M answered" (legacy counted the
+ * answers_json records); a second read, the student's own rows. */
 export async function getStudentAttempts(
   db: ServerSupabaseClient,
   userId: string,
   courseId: string | null = null,
-): Promise<Attempt[]> {
+): Promise<AttemptWithProgress[]> {
   let query = db.from('attempts').select('*').eq('user_id', userId).order('ts_iso', { ascending: false });
   if (courseId) query = query.eq('course_id', courseId);
   const { data, error } = await query;
@@ -90,7 +93,20 @@ export async function getStudentAttempts(
     console.error('getStudentAttempts:', error);
     return [];
   }
-  return (data ?? []) as Attempt[];
+  const attempts = (data ?? []) as Attempt[];
+
+  const open = attempts.filter((a) => a.status === 'in_progress').map((a) => a.attempt_id);
+  const counts: Record<string, number> = {};
+  if (open.length) {
+    const { data: rows, error: rowsError } = await db
+      .from('attempt_items')
+      .select('attempt_id')
+      .in('attempt_id', open)
+      .not('chosen', 'is', null);
+    if (rowsError) console.error('getStudentAttempts rows:', rowsError);
+    for (const r of (rows ?? []) as { attempt_id: string }[]) counts[r.attempt_id] = (counts[r.attempt_id] ?? 0) + 1;
+  }
+  return attempts.map((a) => ({ ...a, answered_count: counts[a.attempt_id] ?? 0 }));
 }
 
 // The builder's whole-course read: the light columns the wizard filters

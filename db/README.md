@@ -72,7 +72,9 @@ in a chat.
   re-read from the bank. `item_id` on those rows has no key to the bank
   on purpose. The secret half of `attempt_items` is revoked from the
   browser roles; every write to the attempt tables is a function the
-  service role calls.
+  service role calls. Since 03 Q5 the answers are the same rows' answer
+  group (no `answers_json`, no `item_ids`), the browser roles hold
+  SELECT alone on `attempts`, and grading is `grade_answer()` in SQL.
 - Storage buckets are global to the project, so they carry the
   `licensure-gh-` prefix and are created by the migration that needs
   them (`insert into storage.buckets`). One so far:

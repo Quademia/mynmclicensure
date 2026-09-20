@@ -12,12 +12,19 @@
 // answer and the SATA "Check Answer" gate (instant); flags; the question
 // grid as a desktop column or a phone overlay, with All / Flagged views;
 // the Inline / Standalone / Hide feedback switch remembered in the
-// browser; autosave on the config interval and on every page turn and
-// flag; the exit dialog (save and resume later, or submit and exit);
+// browser; the exit dialog (save and resume later, or submit and exit);
 // submit with legacy's two confirm() questions; the score card; review
 // mode; the admin preview path (no writes). Scores shown after submit
-// are the server's (finishAttempt recomputes); before that the browser's
-// own arithmetic drives the live feedback, from the same functions.
+// are the database's (finish_attempt grades every row in SQL); before
+// that the browser's own arithmetic drives the live feedback.
+//
+// Saving, since 03 Q5: one patch per question, half a second after the
+// last tap on it (legacy's autosave timer restarted on every answer, so
+// steady answering never saved — legacy-check gap 1); a flag and a page
+// turn flush at once; instant mode's Check Answer (the pick itself for
+// MCQ / TF, the button for SATA) is one server call that writes and
+// grades the row. A failed Submit shows a toast and lets the student
+// try again (gap 2). The browser holds no write on any attempt table.
 //
 // "Send feedback" under each question (slice 12a): builds legacy's
 // reference text — the stem, the options as shown and the student's
@@ -32,25 +39,30 @@
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
-import { finishAttempt, markTimedAttemptStarted, saveAttemptProgress, saveTimedAttemptProgress } from '@/lib/attempts/actions';
+import { Toast } from '@/lib/toast/toast';
+import { checkAnswer, expireAttempt, finishAttempt, saveAnswers, startTimedAttempt } from '@/lib/attempts/actions';
 import { RunnerError } from './runner-error';
 import {
-  buildAnswersJson,
+  chosenToStored,
   computeScore,
   countAnswered,
   displayLetter,
   getShuffledOptions,
   gradeFor,
-  hydrateAnswers,
+  hydrateFromRows,
+  isCorrectAnswer,
   type OptionView,
 } from '@/lib/attempts/scoring';
-import type { Attempt, AttemptMode, ChosenMap, FlagMap, Score } from '@/lib/attempts/types';
-import type { Item } from '@/lib/bank/types';
+import type { AnswerPatch, Attempt, AttemptItem, AttemptMode, ChosenMap, FlagMap, Score } from '@/lib/attempts/types';
 
 type FeedbackMode = 'inline' | 'standalone' | 'hide';
 type ViewMode = 'ALL' | 'FLAGGED';
 
 const FEEDBACK_KEY = 'qa_feedback_mode';
+/** A question's save lands this long after the last tap on it. */
+const SAVE_DEBOUNCE_MS = 500;
+/** The timed auto-submit, when it fails, tries again after this long. */
+const AUTO_SUBMIT_RETRY_MS = 10_000;
 const SKIP_KEY: Record<AttemptMode, string> = { instant: 'qa_skip_preflight', timed: 'qa_skip_preflight_timed' };
 const QUIZZES_PAGE = '/student/fixed-quizzes';
 
@@ -102,15 +114,13 @@ export function QuizRunner({
   attempt,
   items,
   questionsPerPage,
-  autosaveMs,
   reviewMode,
   previewMode,
 }: {
   mode: AttemptMode;
   attempt: Attempt;
-  items: Item[];
+  items: AttemptItem[];
   questionsPerPage: number;
-  autosaveMs: number;
   reviewMode: boolean;
   previewMode: boolean;
 }) {
@@ -119,7 +129,7 @@ export function QuizRunner({
   const label = attempt.display_label || W.title;
 
   // ── state (legacy ANSW / FLAGS / SATA_EVAL / LOCKED / …) ──
-  const hydrated = useMemo(() => hydrateAnswers(attempt.answers_json), [attempt.answers_json]);
+  const hydrated = useMemo(() => hydrateFromRows(items), [items]);
   const [answers, setAnswers] = useState<ChosenMap>(hydrated.answers);
   const [flags, setFlags] = useState<FlagMap>(hydrated.flags);
   const [sataChecked, setSataChecked] = useState<FlagMap>(hydrated.sataChecked);
@@ -139,9 +149,16 @@ export function QuizRunner({
   const [skipNextTime, setSkipNextTime] = useState(false);
   const [status, setStatus] = useState('Initialising…');
   const [saving, setSaving] = useState<string>('');
+  const [toast, setToast] = useState<string | null>(null);
+  const dismissToast = useCallback(() => setToast(null), []);
   const startedAtRef = useRef<number | null>(null);
   const startingRef = useRef(false);
   const finishingRef = useRef(false);
+  const lastAutoSubmitRef = useRef(0);
+  // The save queue (03 Q5): one pending patch per question, flushed half
+  // a second after the last tap, or at once by a flag or a page turn.
+  const pendingRef = useRef<Map<string, AnswerPatch>>(new Map());
+  const flushTimerRef = useRef<number | null>(null);
   const totalSeconds = (attempt.duration_min || items.length) * 60;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
   const [timeUp, setTimeUp] = useState(false);
@@ -189,7 +206,7 @@ export function QuizRunner({
         setPhase('preflight');
         setStatus(
           mode === 'timed'
-            ? attempt.time_taken_s !== null
+            ? attempt.started_utc !== null
               ? 'You have an in-progress exam. Click Resume Exam when ready.'
               : 'Read the exam details carefully then click Start Exam when ready.'
             : hasProgress()
@@ -214,8 +231,8 @@ export function QuizRunner({
       try {
         // Admin preview runs only in memory and never stamps an attempt.
         const result = previewMode
-          ? { ok: true as const, startedIso: attempt.time_taken_s !== null && attempt.ts_iso ? attempt.ts_iso : new Date().toISOString() }
-          : await markTimedAttemptStarted(attempt.attempt_id);
+          ? { ok: true as const, startedIso: attempt.started_utc ?? new Date().toISOString() }
+          : await startTimedAttempt(attempt.attempt_id);
         if (!result.ok) {
           setStartError(result.error);
           return;
@@ -236,7 +253,7 @@ export function QuizRunner({
     setPage(0);
     setViewMode('ALL');
     if (mode === 'timed') {
-      setStatus(attempt.time_taken_s !== null
+      setStatus(attempt.started_utc !== null
         ? 'Resuming your in-progress exam. Your saved answers have been restored.'
         : '');
     } else if (skipped && hasProgress()) setStatus('Resuming your in-progress attempt. Your saved answers have been restored.');
@@ -267,18 +284,49 @@ export function QuizRunner({
   const score = serverScore ?? localScore;
   const showAlways = locked || reviewMode || finishSent;
 
-  // ── save (legacy saveInProgress) ──
+  // ── save (03 Q5; legacy saveInProgress) ──
+  // Best effort: a failed flush is logged, its patches kept for the next
+  // flush, and Submit surfaces a real error.
+  const flushSaves = useCallback(async (): Promise<boolean> => {
+    if (flushTimerRef.current !== null) {
+      window.clearTimeout(flushTimerRef.current);
+      flushTimerRef.current = null;
+    }
+    if (previewMode) return true;
+    const rows = [...pendingRef.current.values()];
+    pendingRef.current = new Map();
+    if (!rows.length) return true;
+    const result = await saveAnswers(attempt.attempt_id, rows);
+    if (!result.ok) {
+      console.warn('saveAnswers failed:', result.error);
+      for (const r of rows) if (!pendingRef.current.has(r.item_id)) pendingRef.current.set(r.item_id, r);
+    }
+    return result.ok;
+  }, [previewMode, attempt.attempt_id]);
+
+  function queueSave(patch: AnswerPatch, immediate = false) {
+    if (previewMode || locked || reviewMode) return;
+    const prev = pendingRef.current.get(patch.item_id) ?? { item_id: patch.item_id };
+    pendingRef.current.set(patch.item_id, { ...prev, ...patch });
+    if (flushTimerRef.current !== null) window.clearTimeout(flushTimerRef.current);
+    if (immediate) {
+      flushTimerRef.current = null;
+      void flushSaves();
+      return;
+    }
+    flushTimerRef.current = window.setTimeout(() => {
+      flushTimerRef.current = null;
+      void flushSaves();
+    }, SAVE_DEBOUNCE_MS);
+  }
+
   const saveProgress = useCallback(
     async (showMsg: boolean) => {
-      if (previewMode) return true;
-      const records = buildAnswersJson(items, answers, flags, mode === 'instant' ? sataChecked : undefined);
-      const result = mode === 'timed'
-        ? await saveTimedAttemptProgress(attempt.attempt_id, records)
-        : await saveAttemptProgress(attempt.attempt_id, records);
-      if (showMsg) setStatus(result.ok ? W.savedLog : 'Save failed: ' + result.error);
-      return result.ok;
+      const ok = await flushSaves();
+      if (showMsg) setStatus(ok ? W.savedLog : 'Save failed. Please check your connection and try again.');
+      return ok;
     },
-    [previewMode, items, answers, flags, sataChecked, mode, attempt.attempt_id, W.savedLog],
+    [flushSaves, W.savedLog],
   );
 
   // Read the latest answers on expiry without restarting the interval
@@ -305,15 +353,6 @@ export function QuizRunner({
       document.removeEventListener('visibilitychange', wake);
     };
   }, [mode, booted, locked, reviewMode]);
-
-  // legacy startAutosave / autosaveTick: every AUTOSAVE_MS while running.
-  useEffect(() => {
-    if (!booted || locked || reviewMode || previewMode) return;
-    const id = window.setInterval(() => {
-      void saveProgress(false);
-    }, autosaveMs);
-    return () => window.clearInterval(id);
-  }, [booted, locked, reviewMode, previewMode, autosaveMs, saveProgress]);
 
   // legacy beforeunload guard
   useEffect(() => {
@@ -355,12 +394,12 @@ export function QuizRunner({
   }
 
   // ── answering ──
-  function choose(item: Item, letter: string, checked: boolean) {
+  function choose(item: AttemptItem, letter: string, checked: boolean) {
     if (locked || reviewMode) return;
     if (item.question_type === 'SATA') {
+      const current = Array.isArray(answers[item.item_id]) ? [...(answers[item.item_id] as string[])] : [];
+      const next = checked ? (current.includes(letter) ? current : [...current, letter]) : current.filter((l) => l !== letter);
       setAnswers((a) => {
-        const current = Array.isArray(a[item.item_id]) ? [...(a[item.item_id] as string[])] : [];
-        const next = checked ? (current.includes(letter) ? current : [...current, letter]) : current.filter((l) => l !== letter);
         const copy = { ...a };
         if (next.length) copy[item.item_id] = next;
         else delete copy[item.item_id];
@@ -368,25 +407,39 @@ export function QuizRunner({
       });
       // instant: the reveal waits for Check Answer again
       setSataChecked((s) => ({ ...s, [item.item_id]: false }));
+      queueSave({ item_id: item.item_id, chosen: chosenToStored(next), sata_checked: false });
+      return;
+    }
+    setAnswers((a) => ({ ...a, [item.item_id]: letter }));
+    if (mode === 'instant' && !previewMode) {
+      // The pick is the check for an MCQ / TF (legacy revealed on answer):
+      // the server writes and grades the row; a failure falls back to the
+      // plain save so the answer still lands.
+      void checkAnswer(item.attempt_item_id, letter).then((r) => {
+        if (!r.ok) queueSave({ item_id: item.item_id, chosen: letter });
+      });
     } else {
-      setAnswers((a) => ({ ...a, [item.item_id]: letter }));
+      queueSave({ item_id: item.item_id, chosen: letter });
     }
   }
 
-  function checkSata(item: Item) {
+  function checkSata(item: AttemptItem) {
     const chosen = answers[item.item_id];
     if (!Array.isArray(chosen) || chosen.length === 0) return;
     setSataChecked((s) => ({ ...s, [item.item_id]: true }));
+    if (previewMode) return;
+    // The check writes the answer itself; a pending save for this row
+    // would only overwrite sata_checked with false.
+    pendingRef.current.delete(item.item_id);
+    void checkAnswer(item.attempt_item_id, chosen, true).then((r) => {
+      if (!r.ok) queueSave({ item_id: item.item_id, chosen: chosenToStored(chosen), sata_checked: true });
+    });
   }
 
-  function toggleFlag(item: Item) {
-    const next = { ...flags, [item.item_id]: !flags[item.item_id] };
-    setFlags(next);
-    if (!previewMode) {
-      const records = buildAnswersJson(items, answers, next, mode === 'instant' ? sataChecked : undefined);
-      if (mode === 'timed') void saveTimedAttemptProgress(attempt.attempt_id, records);
-      else void saveAttemptProgress(attempt.attempt_id, records);
-    }
+  function toggleFlag(item: AttemptItem) {
+    const next = !flags[item.item_id];
+    setFlags((f) => ({ ...f, [item.item_id]: next }));
+    queueSave({ item_id: item.item_id, flagged: next }, true);
   }
 
   // ── submit (legacy confirmSubmit / submitQuiz) ──
@@ -404,27 +457,41 @@ export function QuizRunner({
     void submitQuiz();
   }
 
-  async function submitQuiz(autoSubmit = false) {
-    if (finishSent || locked || finishingRef.current) return;
+  // Submit (or the exam's auto-submit): the pending saves first, then one
+  // call — finish_attempt grades every row, expire_attempt closes an exam
+  // at its deadline. A failure unlocks the runner and shows a toast; the
+  // answers are saved, so trying again loses nothing (gap 2). The
+  // auto-submit retries on its own every AUTO_SUBMIT_RETRY_MS.
+  async function submitQuiz(autoSubmit = false): Promise<boolean> {
+    if (finishSent || locked || finishingRef.current) return false;
+    if (autoSubmit && Date.now() - lastAutoSubmitRef.current < AUTO_SUBMIT_RETRY_MS) return false;
+    lastAutoSubmitRef.current = Date.now();
     finishingRef.current = true;
-    if (autoSubmit) setTimeUp(true);
     setExitOpen(false);
     setGridOverlayOpen(false);
-    setFinishSent(true);
-    setLocked(true);
     setSaving('submitting');
 
     const timeTakenS = startedAtRef.current ? Math.round((Date.now() - startedAtRef.current) / 1000) : null;
 
     if (!previewMode) {
-      const records = buildAnswersJson(items, answers, flags, mode === 'instant' ? sataChecked : undefined);
-      const result = await finishAttempt(attempt.attempt_id, records, timeTakenS);
-      if (result.ok) setServerScore(result.score);
-      else setStatus('Warning: Could not save your results. ' + result.error);
+      await flushSaves();
+      const result = autoSubmit ? await expireAttempt(attempt.attempt_id) : await finishAttempt(attempt.attempt_id, timeTakenS);
+      if (!result.ok) {
+        finishingRef.current = false;
+        setSaving('');
+        setToast(`Could not submit: ${result.error} Your answers are saved — please try again.`);
+        setStatus('Submit failed. Your answers are saved; please try again.');
+        return false;
+      }
+      setServerScore(result.score);
     }
+    if (autoSubmit) setTimeUp(true);
+    setFinishSent(true);
+    setLocked(true);
     setSaving('');
     setScoreCardOpen(true);
     setStatus(autoSubmit ? 'Time is up. Your exam has been submitted automatically.' : W.submittedLog);
+    return true;
   }
 
   function reviewAnswers() {
@@ -450,7 +517,8 @@ export function QuizRunner({
 
   async function submitAndExit() {
     setExitOpen(false);
-    await submitQuiz();
+    const done = await submitQuiz();
+    if (!done) return;
     window.setTimeout(() => {
       window.location.href = QUIZZES_PAGE;
     }, 1500);
@@ -484,10 +552,7 @@ export function QuizRunner({
       if (flags[item.item_id]) classes.push('has-flag');
       if (locked || reviewMode) {
         if (!has) classes.push('omitted');
-        else {
-          const rec = buildAnswersJson([item], answers, flags)[0];
-          classes.push(rec.is_correct ? 'correct' : 'incorrect');
-        }
+        else classes.push(isCorrectAnswer(item, chosen) ? 'correct' : 'incorrect');
       } else {
         if (has) classes.push('answered');
         if (flags[item.item_id]) classes.push('flagged');
@@ -524,7 +589,7 @@ export function QuizRunner({
     </div>
   );
 
-  function renderQuestion(item: Item, globalIdx: number) {
+  function renderQuestion(item: AttemptItem, globalIdx: number) {
     const opts = shuffled[item.item_id] || [];
     const isSATA = item.question_type === 'SATA';
     const chosenRaw = answers[item.item_id];
@@ -637,7 +702,7 @@ export function QuizRunner({
   }
 
   // ── Send feedback (legacy buildFriendlyRefText + the button) ──
-  function buildFeedbackRef(item: Item, globalIdx: number, opts: OptionView[], chosenRaw: ChosenMap[string] | undefined): string {
+  function buildFeedbackRef(item: AttemptItem, globalIdx: number, opts: OptionView[], chosenRaw: ChosenMap[string] | undefined): string {
     const lines: string[] = [];
     lines.push(`Quademia — Question feedback (${mode === 'timed' ? 'Timed' : 'Instant'} quiz)`);
     lines.push(`Course: ${attempt.display_label || attempt.course_id || ''}`);
@@ -673,7 +738,7 @@ export function QuizRunner({
     return lines.join('\n');
   }
 
-  function sendFeedback(item: Item, globalIdx: number, opts: OptionView[], chosenRaw: ChosenMap[string] | undefined) {
+  function sendFeedback(item: AttemptItem, globalIdx: number, opts: OptionView[], chosenRaw: ChosenMap[string] | undefined) {
     const ref = buildFeedbackRef(item, globalIdx, opts, chosenRaw);
     const url =
       `/student/messages?course_id=${encodeURIComponent(attempt.course_id)}` +
@@ -763,7 +828,7 @@ export function QuizRunner({
                 <div className="preflight-warning">⚠️ <strong>Exam mode:</strong> The timer starts when you click Start. No feedback is shown during the exam — you will see your results and explanations after submission. You cannot pause the timer.</div>
               ) : <p className="preflight-text">{W.preflightText}</p>}
               <div className="preflight-actions">
-                <button type="button" className="btn btn-primary" onClick={onPreflightStart}>{(mode === 'timed' ? attempt.time_taken_s !== null : hasProgress()) ? W.resume : W.start}</button>
+                <button type="button" className="btn btn-primary" onClick={onPreflightStart}>{(mode === 'timed' ? attempt.started_utc !== null : hasProgress()) ? W.resume : W.start}</button>
                 <button type="button" className="btn btn-ghost" onClick={() => window.history.back()}>Cancel</button>
                 <label className="preflight-skip">
                   <input type="checkbox" checked={skipNextTime} onChange={(e) => setSkipNextTime(e.target.checked)} /> Don&apos;t show this again
@@ -841,6 +906,7 @@ export function QuizRunner({
       ) : null}
 
       <BodyPortal>
+        <Toast message={toast} onDismiss={dismissToast} />
         <div className="runner-overlay">
           {gridOverlayOpen ? (
             <div className="overlay-backdrop" onClick={(e) => { if (e.target === e.currentTarget) setGridOverlayOpen(false); }}>

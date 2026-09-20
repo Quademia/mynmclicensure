@@ -3,7 +3,7 @@
 // The admin Attempts analytics page's reads (slice 14b), transcribed
 // from legacy js/mynmclicensure-api.js (the three read-only helpers
 // added 2026-06-04): getAttemptsWindow — the lightweight column set,
-// never answers_json or item_ids, newest first, capped at 5,000 rows so
+// never the question rows, newest first, capped at 5,000 rows so
 // an "All time" fetch cannot run away — and countAttempts, an exact
 // head count within [from, to). The detail read is lib/attempts/queries'
 // getAttemptById. Each takes the admin gate's client — the ADMIN SELECT

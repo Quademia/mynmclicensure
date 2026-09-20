@@ -284,34 +284,36 @@ create table if not exists course_access (
 create index if not exists course_access_user_course_live_idx on course_access (user_id, course_id) where revoked_utc is null;
 create index if not exists course_access_subscription_idx on course_access (subscription_id);
 
--- ── attempts (slice 6a; 03 Q4 the two clocks) ──────────────────────────
--- One row per run — the header. item_ids and answers_json are the
--- pointer-list era's blobs, kept until 03 Q5 moves the answers into
--- attempt_items and drops them (§8 S7). No content copy (D5). quiz_id
--- names a row in quizzes OR mock_quizzes and is null for the builder, so
--- it carries no key. started_utc / ended_utc are written by Q5.
+-- ── attempts (slice 6a; 03 Q4 the two clocks; 03 Q5 the blobs gone) ───
+-- One row per run — the header; the questions and the answers are
+-- attempt_items rows (§8 S7). No content copy (D5). quiz_id names a row
+-- in quizzes OR mock_quizzes and is null for the builder, so it carries
+-- no key. The score columns, time_taken_s, status and ended_utc are
+-- written by finish_attempt() / expire_attempt() / abandon_attempt();
+-- started_utc by start_timed_attempt(); the browser role reads only.
 create table if not exists attempts (
   attempt_id        text primary key,                                  -- 'ATT_' + ms + '_' + 7 hex
   user_id           text not null references users (user_id),         -- S4
   quiz_id           text,
   course_id         text not null references courses (course_id),     -- S4
-  mode              text not null,                                     -- instant | timed
-  source            text not null,                                     -- fixed | builder | retake | mock
-  item_ids          text not null,                                     -- comma-joined, in the attempt's order
+  mode              text not null,                                     -- instant | timed (CHECK)
+  source            text not null,                                     -- fixed | builder | retake | mock (CHECK)
   n                 integer not null,
   seed              text,
   duration_min      integer,
-  status            text not null default 'in_progress',               -- in_progress | completed | abandoned
+  status            text not null default 'in_progress',               -- in_progress | completed | abandoned (CHECK)
   score_raw         numeric,
   score_total       numeric,
   score_pct         numeric,
   time_taken_s      integer,
   origin_attempt_id text references attempts (attempt_id),             -- S4; the retake chain
   display_label     text,
-  answers_json      text not null default '[]',
   ts_iso            timestamptz default now(),                          -- created
-  started_utc       timestamptz,                                        -- 03 Q4; the timed clock's anchor (Q5 writes)
-  ended_utc         timestamptz                                         -- 03 Q4; finish, expiry or abandon (Q5 writes)
+  started_utc       timestamptz,                                        -- the timed clock's anchor, set once
+  ended_utc         timestamptz,                                        -- finish (now), expiry (the deadline) or abandon
+  constraint attempts_status_check check (status in ('in_progress', 'completed', 'abandoned')),
+  constraint attempts_mode_check   check (mode in ('instant', 'timed')),
+  constraint attempts_source_check check (source in ('fixed', 'builder', 'retake', 'mock'))
 );
 create index if not exists attempts_user_id_idx   on attempts (user_id);
 create index if not exists attempts_quiz_id_idx   on attempts (quiz_id);
@@ -323,8 +325,9 @@ create index if not exists attempts_user_quiz_mode_status_idx on attempts (user_
 -- One row per question of an attempt: the question as the bank served it
 -- when the attempt was created — copied table to table by
 -- create_attempt(), never updated — plus the answer group the server
--- writes (Q5). One row holds the snapshot and the answer (Sam,
--- 2026-09-20). item_id has NO key to question_bank on purpose: the
+-- writes through save_answers() / check_answer() / finish_attempt()
+-- (03 Q5, grading in SQL by grade_answer()). One row holds the snapshot
+-- and the answer (Sam, 2026-09-20). item_id has NO key to question_bank on purpose: the
 -- snapshot is the truth, and editing or deleting the bank row must never
 -- touch history. The secret half (correct, rationale, rationale_img,
 -- fb_a–fb_f) is revoked from the browser roles at the grant (rls.sql).

@@ -20,8 +20,6 @@ export type Attempt = {
   course_id: string;
   mode: AttemptMode;
   source: AttemptSource;
-  /** comma-joined item ids, in the attempt's order */
-  item_ids: string;
   n: number;
   seed: string | null;
   duration_min: number | null;
@@ -32,8 +30,6 @@ export type Attempt = {
   time_taken_s: number | null;
   origin_attempt_id: string | null;
   display_label: string | null;
-  /** a JSON string of AnswerRecord[] */
-  answers_json: string;
   /** when the attempt was created */
   ts_iso: string | null;
   /** the timed clock's anchor, set once by the start function (03 Q5 writes it) */
@@ -65,22 +61,45 @@ export type AttemptItem = Item & {
   graded_utc: string | null;
 };
 
-// One entry per item in answers_json (legacy buildAnswersJson). MCQ / TF:
-// `chosen` is a letter; SATA: an array of letters; unanswered: null.
-export type AnswerRecord = {
+// What the runner sends save_answers() (03 Q5): one patch per question,
+// every key but item_id optional — an absent key leaves that column
+// alone. `chosen` is the stored convention: a letter, or a comma list for
+// SATA; null clears it.
+export type AnswerPatch = {
   item_id: string;
-  chosen: string | string[] | null;
-  correct: string | string[];
-  is_correct: boolean;
-  flagged: boolean;
-  /** instant mode only: the learner pressed "Check Answer" on a SATA item */
+  chosen?: string | null;
+  flagged?: boolean;
   sata_checked?: boolean;
-  time_spent_s: number | null;
+  time_spent_s?: number | null;
 };
 
-// The runner's state maps, hydrated from answers_json.
+// The runner's state maps, hydrated from the attempt's rows. MCQ / TF:
+// a letter; SATA: an array of letters.
 export type ChosenMap = Record<string, string | string[]>;
 export type FlagMap = Record<string, boolean>;
+
+/** An attempt with the count of its answered rows (the quiz cards' "N of M answered"). */
+export type AttemptWithProgress = Attempt & { answered_count: number };
+
+/** The admin Attempts page's detail modal. */
+export type AttemptDetail = Attempt & { answered_count: number };
+
+// check_answer()'s reply: the grade for the one row and its secret half
+// (Q6 renders the feedback from this; Q5 records it).
+export type CheckResult =
+  | {
+      ok: true;
+      isCorrect: boolean;
+      scoreAwarded: number;
+      secret: {
+        correct: string;
+        rationale: string | null;
+        rationale_img: string | null;
+        fb_a: string | null; fb_b: string | null; fb_c: string | null;
+        fb_d: string | null; fb_e: string | null; fb_f: string | null;
+      };
+    }
+  | { ok: false; error: string };
 
 // The config keys with the legacy fallbacks (equal to seed_data.sql).
 export const RUNNER_QUESTIONS_PER_PAGE_DEFAULT = 1;

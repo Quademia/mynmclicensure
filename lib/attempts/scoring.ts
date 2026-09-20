@@ -2,16 +2,15 @@
 //
 // The runner's arithmetic, transcribed from legacy runner/instant.html
 // and runner/timed.html (the same functions in both): which options an
-// item shows and in what order, whether a letter is correct, the score,
-// and the answers_json record. Plain TypeScript with no server or client
-// marker, because both halves use it: the runner in the browser for the
-// live feedback and the grid, and finishAttempt() on the server, which
-// recomputes the score and every is_correct from the items before
-// saving (rebuild.md §12 slice 6, Sam 2026-09-13) — the browser's number
-// is never trusted.
+// item shows and in what order, whether a letter is correct, the score
+// the browser shows before submit, and the attempt's rows back into the
+// runner's maps. Plain TypeScript with no server or client marker. Since
+// 03 Q5 the score that counts is the database's — finish_attempt()
+// grades every row in SQL (grade_answer(), the same rule as
+// isCorrectAnswer here) — and the browser's number is never written.
 
 import type { Item } from '@/lib/bank/types';
-import type { AnswerRecord, ChosenMap, FlagMap, Score } from './types';
+import type { AttemptItem, ChosenMap, FlagMap, Score } from './types';
 
 export type OptionView = {
   letter: string;
@@ -80,7 +79,9 @@ export function countAnswered(items: Item[], answers: ChosenMap): number {
   return items.filter((item) => hasAnswer(item, answers[item.item_id])).length;
 }
 
-function isCorrectAnswer(item: Item, chosen: string | string[] | null | undefined): boolean {
+// The browser's own grading, for the live feedback before submit — the
+// same rule as grade_answer() in SQL, which is the one that counts.
+export function isCorrectAnswer(item: Item, chosen: string | string[] | null | undefined): boolean {
   const correct = (item.correct || '').toLowerCase();
   if (item.question_type === 'SATA') {
     const correctLetters = correct.split(',').map((s) => s.trim()).sort();
@@ -102,69 +103,33 @@ export function computeScore(items: Item[], answers: ChosenMap): Score {
   return { raw, total, pct: total > 0 ? Math.round((raw / total) * 100) : 0 };
 }
 
-// legacy buildAnswersJson: one record per item, in the attempt's order.
-export function buildAnswersJson(
-  items: Item[],
-  answers: ChosenMap,
-  flags: FlagMap,
-  sataChecked?: FlagMap,
-): AnswerRecord[] {
-  return items.map((item) => {
-    const chosen = answers[item.item_id] ?? null;
-    const correct =
-      item.question_type === 'SATA'
-        ? (item.correct || '').split(',').map((s) => s.trim())
-        : (item.correct || '').toLowerCase();
-    const record: AnswerRecord = {
-      item_id: item.item_id,
-      chosen,
-      correct,
-      is_correct: isCorrectAnswer(item, chosen),
-      flagged: Boolean(flags[item.item_id]),
-      time_spent_s: null,
-    };
-    if (sataChecked) record.sata_checked = Boolean(sataChecked[item.item_id]);
-    return record;
-  });
+// The stored `chosen` (a letter, or a comma list for SATA — the bank's
+// own convention for `correct`) and the runner's value for it.
+export function chosenToStored(v: string | string[] | null | undefined): string | null {
+  if (v === null || v === undefined) return null;
+  const s = Array.isArray(v) ? v.map((x) => String(x).trim()).filter(Boolean).join(',') : String(v).trim();
+  return s || null;
 }
 
-// legacy hydrateAnswers: the saved records back into the three maps.
-export function hydrateAnswers(answersJson: string): { answers: ChosenMap; flags: FlagMap; sataChecked: FlagMap } {
+function chosenFromStored(item: Item, stored: string | null): string | string[] | null {
+  if (!stored) return null;
+  if (item.question_type === 'SATA') return stored.split(',').map((s) => s.trim()).filter(Boolean);
+  return stored;
+}
+
+// The attempt's rows back into the runner's three maps (03 Q5; legacy
+// hydrateAnswers read them from answers_json).
+export function hydrateFromRows(items: AttemptItem[]): { answers: ChosenMap; flags: FlagMap; sataChecked: FlagMap } {
   const answers: ChosenMap = {};
   const flags: FlagMap = {};
   const sataChecked: FlagMap = {};
-  try {
-    const saved = JSON.parse(answersJson || '[]') as Partial<AnswerRecord>[];
-    for (const a of saved) {
-      if (!a.item_id) continue;
-      if (a.chosen !== null && a.chosen !== undefined && a.chosen !== '') answers[a.item_id] = a.chosen;
-      if (a.flagged) flags[a.item_id] = true;
-      if (a.sata_checked) sataChecked[a.item_id] = true;
-    }
-  } catch (e) {
-    console.warn('hydrateAnswers error:', e);
+  for (const row of items) {
+    const chosen = chosenFromStored(row, row.chosen);
+    if (chosen !== null && (!Array.isArray(chosen) || chosen.length > 0)) answers[row.item_id] = chosen;
+    if (row.flagged) flags[row.item_id] = true;
+    if (row.sata_checked) sataChecked[row.item_id] = true;
   }
   return { answers, flags, sataChecked };
-}
-
-// The server's recomputation at finish: the browser's records, with
-// `correct` and `is_correct` replaced by what the items say, and any
-// record for an item not in the attempt dropped.
-export function recomputeAnswers(items: Item[], submitted: AnswerRecord[]): AnswerRecord[] {
-  const byId = new Map(submitted.map((a) => [a.item_id, a]));
-  const answers: ChosenMap = {};
-  const flags: FlagMap = {};
-  const sataChecked: FlagMap = {};
-  let anySata = false;
-  for (const item of items) {
-    const a = byId.get(item.item_id);
-    if (!a) continue;
-    if (a.chosen !== null && a.chosen !== undefined && a.chosen !== '') answers[item.item_id] = a.chosen;
-    if (a.flagged) flags[item.item_id] = true;
-    if (a.sata_checked !== undefined) anySata = true;
-    if (a.sata_checked) sataChecked[item.item_id] = true;
-  }
-  return buildAnswersJson(items, answers, flags, anySata ? sataChecked : undefined);
 }
 
 // legacy showScoreCard's grade line.

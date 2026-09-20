@@ -12,7 +12,7 @@
 import { requireAdmin } from '@/lib/access';
 import { countAttempts, getAttemptsWindow, type AttemptsWindow } from './admin-queries';
 import { getAttemptById } from './queries';
-import type { Attempt } from './types';
+import type { AttemptDetail } from './types';
 
 export type HeadlineCounts = { total: number; today: number; week: number; month: number };
 
@@ -37,9 +37,19 @@ export async function attemptsWindowAction(fromIso: string | null, toIso: string
   return getAttemptsWindow(supabase, iso(fromIso), iso(toIso));
 }
 
-export async function attemptDetailAction(attemptIdIn: string): Promise<Attempt | null> {
+// The detail modal: the header plus the count of answered rows (since
+// 03 Q5 the answers are attempt_items rows; the admin reads every row).
+export async function attemptDetailAction(attemptIdIn: string): Promise<AttemptDetail | null> {
   const { supabase } = await requireAdmin();
   const attemptId = String(attemptIdIn || '').trim();
   if (!attemptId) return null;
-  return getAttemptById(supabase, attemptId);
+  const attempt = await getAttemptById(supabase, attemptId);
+  if (!attempt) return null;
+  const { count, error } = await supabase
+    .from('attempt_items')
+    .select('attempt_item_id', { count: 'exact', head: true })
+    .eq('attempt_id', attemptId)
+    .not('chosen', 'is', null);
+  if (error) console.error('attemptDetailAction rows:', error);
+  return { ...attempt, answered_count: Number(count ?? 0) };
 }
