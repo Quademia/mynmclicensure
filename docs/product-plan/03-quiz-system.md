@@ -459,6 +459,6 @@ one-line experiment, reverted).
 | Q2 The lifecycle rules | ✅ 2026-09-19 (code only; walked by Sam: the paged mock list, the six-figure stats box, archive → restore to draft, Retake refused on a closed quiz) |
 | Q3 Mock exams as a premium exam experience | design item, not sliced |
 | Q4 The questions as rows | ✅ 2026-09-20 (`20260920120000_attempt_items.sql`; walked as student4: builder attempt, fixed quiz, retake in the origin's order, pack built and rendered from its rows, history and My Packs) |
-| Q5 The answers as rows and the write door | ⬜ |
-| Q6 The seal | ⬜ |
+| Q5 The answers as rows and the write door | ✅ 2026-09-20 (`20260920150000_attempt_answers.sql`; walked as student4: per-tap saves and a flag read back, a reload restoring them, finish at 4 / 10, an exam closed at its deadline on the next open, a failed Submit's toast with the runner unlocked) |
+| Q6 The seal | ✅ 2026-09-20 (code only; walked as student4: a live exam's page with 0 keys, the closed exam's with 10, a practice quiz reloaded with exactly the 2 checked, the review filled from the finish reply) |
 | Q7 SATA partial credit | later, after S7 |
