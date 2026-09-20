@@ -16,25 +16,22 @@ import { HISTORY_PAGE_SIZE, RECENT_ATTEMPTS_LIMIT, type Attempt, type AttemptIte
 type ServiceDb = ReturnType<typeof createServiceRoleClient>;
 
 // The attempt's own questions (03 Q4): attempt_items in position order,
-// each row as the bank served it when the attempt was created. Read
-// with the SERVICE ROLE after the caller's ownership check — the secret
-// half is revoked from the browser role at the grant, and both callers
-// (the runner's loader, the finish path) need it. Empty on an error.
-export async function readAttemptItems(db: ServiceDb, attempt: Pick<Attempt, 'attempt_id' | 'course_id'>): Promise<AttemptItem[]> {
+// each row as the bank served it when the attempt was created, the
+// secret half included. Read with the SERVICE ROLE after the caller's
+// ownership check — the secret half is revoked from the browser role at
+// the grant. The loader seals the rows before they reach the runner
+// (lib/attempts/seal.ts). Empty on an error.
+export async function readAttemptItems(db: ServiceDb, attemptId: string): Promise<AttemptItem[]> {
   const { data, error } = await db
     .from('attempt_items')
     .select('*')
-    .eq('attempt_id', attempt.attempt_id)
+    .eq('attempt_id', attemptId)
     .order('position', { ascending: true });
   if (error) {
     console.error('readAttemptItems:', error);
     return [];
   }
-  return ((data ?? []) as Omit<AttemptItem, 'course_id' | 'batch_id'>[]).map((row) => ({
-    ...row,
-    course_id: attempt.course_id,
-    batch_id: null,
-  }));
+  return (data ?? []) as AttemptItem[];
 }
 
 // The admin details step's attempt-stats box (legacy openEditQuiz's

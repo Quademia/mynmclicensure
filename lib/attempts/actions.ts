@@ -33,6 +33,7 @@ import type { QuizKind } from '@/lib/quizzes/types';
 import { makeAttemptId } from './ids';
 import { getAttemptById, getBuilderCourseItems, getStudentAttemptsPaginated, readAttemptItems } from './queries';
 import { chosenToStored } from './scoring';
+import { secretsOf } from './seal';
 import {
   BUILDER_MAX_QUESTIONS_DEFAULT,
   BUILDER_MINUTES_PER_QUESTION_DEFAULT,
@@ -250,10 +251,12 @@ function scoreOf(data: unknown): { raw: number; total: number; pct: number } | n
 
 // Submit: every row graded from its final answer, the header summed,
 // completed. timeTakenS is the browser's stopwatch for an instant
-// attempt; an exam's time is the server clock's.
+// attempt; an exam's time is the server clock's. The sitting being over,
+// the reply carries every question's secret half for the review (Q6).
 export async function finishAttempt(attemptId: string, timeTakenS: number | null): Promise<FinishResult> {
   const { profile } = await requireStudent();
-  const { data, error } = await createServiceRoleClient().rpc('finish_attempt', {
+  const svc = createServiceRoleClient();
+  const { data, error } = await svc.rpc('finish_attempt', {
     p_attempt_id: attemptId,
     p_user_id: profile.user_id,
     p_time_taken_s: timeTakenS === null ? null : Math.max(0, Math.floor(Number(timeTakenS) || 0)),
@@ -261,21 +264,22 @@ export async function finishAttempt(attemptId: string, timeTakenS: number | null
   if (error) return fail(rpcError(error, 'Could not submit this attempt.'));
   const score = scoreOf(data);
   if (!score) return fail('Could not submit this attempt.');
-  return { ok: true, score };
+  return { ok: true, score, secrets: secretsOf(await readAttemptItems(svc, attemptId)) };
 }
 
 // The exam's clock ran out: closed at the true deadline. The function
 // refuses while the server's clock says time is left.
 export async function expireAttempt(attemptId: string): Promise<FinishResult> {
   const { profile } = await requireStudent();
-  const { data, error } = await createServiceRoleClient().rpc('expire_attempt', {
+  const svc = createServiceRoleClient();
+  const { data, error } = await svc.rpc('expire_attempt', {
     p_attempt_id: attemptId,
     p_user_id: profile.user_id,
   });
   if (error) return fail(rpcError(error, 'Could not submit this exam.'));
   const score = scoreOf(data);
   if (!score) return fail('Could not submit this exam.');
-  return { ok: true, score };
+  return { ok: true, score, secrets: secretsOf(await readAttemptItems(svc, attemptId)) };
 }
 
 // ── the list pages (5b) ────────────────────────────────────────────────
@@ -376,7 +380,7 @@ export async function retakeAttempt(originAttemptId: string): Promise<SpawnResul
     if (refusal) return fail(refusal);
   }
 
-  const originItems = await readAttemptItems(createServiceRoleClient(), origin);
+  const originItems = await readAttemptItems(createServiceRoleClient(), origin.attempt_id);
   if (!originItems.length) return fail('Could not create retake. Please try again.');
 
   return createAttemptRows({

@@ -9,24 +9,31 @@
 // grades every row in SQL (grade_answer(), the same rule as
 // isCorrectAnswer here) — and the browser's number is never written.
 
-import type { Item } from '@/lib/bank/types';
-import type { AttemptItem, ChosenMap, FlagMap, Score } from './types';
+import type { ChosenMap, FlagMap, SealedItem, SecretHalf } from './types';
 
+// An option as shown: its letter and text. The feedback and the
+// correctness are the secret half's, looked up at render (Q6).
 export type OptionView = {
   letter: string;
   text: string;
-  fb: string;
-  isCorrect: boolean;
 };
 
 const LETTERS = ['a', 'b', 'c', 'd', 'e', 'f'] as const;
 
-export function isCorrectOption(item: Item, letter: string): boolean {
-  const correct = (item.correct || '').toLowerCase();
-  if (item.question_type === 'SATA') {
-    return correct.split(',').map((s) => s.trim()).includes(letter);
+/** Is `letter` one of the correct options? `correct` is the secret half's key. */
+export function isCorrectOption(questionType: string, correct: string | null | undefined, letter: string): boolean {
+  const key = (correct || '').toLowerCase();
+  if (questionType === 'SATA') {
+    return key.split(',').map((s) => s.trim()).includes(letter);
   }
-  return correct === letter;
+  return key === letter;
+}
+
+/** The secret half's feedback line for a letter, or ''. */
+export function optionFeedback(secret: SecretHalf | null | undefined, letter: string): string {
+  if (!secret) return '';
+  const key = `fb_${letter}` as keyof SecretHalf;
+  return String(secret[key] || '');
 }
 
 // legacy stringToSeed: a 32-bit string hash, Math.imul(31, h) + code.
@@ -54,12 +61,12 @@ export function seededShuffle<T>(arr: T[], seed: number): T[] {
 // legacy getShuffledOptions: the item's filled options, shuffled when the
 // item says so, with attempt_id + item_id as the seed — the same order on
 // every render and every resume of this attempt.
-export function getShuffledOptions(item: Item, attemptId: string): OptionView[] {
+export function getShuffledOptions(item: SealedItem, attemptId: string): OptionView[] {
   const opts: OptionView[] = [];
   for (const letter of LETTERS) {
     const text = item[`option_${letter}`];
     if (!text) continue;
-    opts.push({ letter, text, fb: item[`fb_${letter}`] || '', isCorrect: isCorrectOption(item, letter) });
+    opts.push({ letter, text });
   }
   if (!item.shuffle_options) return opts;
   return seededShuffle(opts, stringToSeed(attemptId + item.item_id));
@@ -70,37 +77,28 @@ export function displayLetter(index: number, fallbackLetter: string): string {
   return index >= 0 ? String.fromCharCode(65 + index) : String(fallbackLetter || '').toUpperCase();
 }
 
-function hasAnswer(item: Item, chosen: string | string[] | undefined): boolean {
+function hasAnswer(item: Pick<SealedItem, 'question_type'>, chosen: string | string[] | undefined): boolean {
   if (item.question_type === 'SATA') return Array.isArray(chosen) && chosen.length > 0;
   return Boolean(chosen);
 }
 
-export function countAnswered(items: Item[], answers: ChosenMap): number {
+export function countAnswered(items: SealedItem[], answers: ChosenMap): number {
   return items.filter((item) => hasAnswer(item, answers[item.item_id])).length;
 }
 
-// The browser's own grading, for the live feedback before submit — the
-// same rule as grade_answer() in SQL, which is the one that counts.
-export function isCorrectAnswer(item: Item, chosen: string | string[] | null | undefined): boolean {
-  const correct = (item.correct || '').toLowerCase();
-  if (item.question_type === 'SATA') {
-    const correctLetters = correct.split(',').map((s) => s.trim()).sort();
+// The browser's grading of one answer against a key it has been handed
+// (the grid's colouring in review, before the server's is_correct is
+// consulted) — the same rule as grade_answer() in SQL, which is the one
+// that counts. There is no browser-side score any more: the score card
+// shows what finish_attempt() returned or the header stores.
+export function isCorrectAnswer(questionType: string, correct: string | null | undefined, chosen: string | string[] | null | undefined): boolean {
+  const key = (correct || '').toLowerCase();
+  if (questionType === 'SATA') {
+    const correctLetters = key.split(',').map((s) => s.trim()).filter(Boolean).sort();
     const chosenLetters = Array.isArray(chosen) ? [...chosen].sort() : [];
     return JSON.stringify(correctLetters) === JSON.stringify(chosenLetters);
   }
-  return typeof chosen === 'string' && chosen.length > 0 && chosen.toLowerCase() === correct;
-}
-
-// legacy computeScore: marks-weighted; SATA all-or-nothing.
-export function computeScore(items: Item[], answers: ChosenMap): Score {
-  let raw = 0;
-  let total = 0;
-  for (const item of items) {
-    const marks = Number(item.marks) || 1;
-    total += marks;
-    if (isCorrectAnswer(item, answers[item.item_id])) raw += marks;
-  }
-  return { raw, total, pct: total > 0 ? Math.round((raw / total) * 100) : 0 };
+  return typeof chosen === 'string' && chosen.length > 0 && chosen.toLowerCase() === key;
 }
 
 // The stored `chosen` (a letter, or a comma list for SATA — the bank's
@@ -111,7 +109,7 @@ export function chosenToStored(v: string | string[] | null | undefined): string 
   return s || null;
 }
 
-function chosenFromStored(item: Item, stored: string | null): string | string[] | null {
+function chosenFromStored(item: Pick<SealedItem, 'question_type'>, stored: string | null): string | string[] | null {
   if (!stored) return null;
   if (item.question_type === 'SATA') return stored.split(',').map((s) => s.trim()).filter(Boolean);
   return stored;
@@ -119,7 +117,7 @@ function chosenFromStored(item: Item, stored: string | null): string | string[] 
 
 // The attempt's rows back into the runner's three maps (03 Q5; legacy
 // hydrateAnswers read them from answers_json).
-export function hydrateFromRows(items: AttemptItem[]): { answers: ChosenMap; flags: FlagMap; sataChecked: FlagMap } {
+export function hydrateFromRows(items: SealedItem[]): { answers: ChosenMap; flags: FlagMap; sataChecked: FlagMap } {
   const answers: ChosenMap = {};
   const flags: FlagMap = {};
   const sataChecked: FlagMap = {};

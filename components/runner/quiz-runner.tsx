@@ -26,6 +26,14 @@
 // grades the row. A failed Submit shows a toast and lets the student
 // try again (gap 2). The browser holds no write on any attempt table.
 //
+// The seal, since 03 Q6 (D5): the questions arrive as SealedItem — no
+// key, no rationale, no per-option feedback — and the secret half lives
+// in `secrets`, a map the server fills: empty for a live exam, the
+// questions already checked for a live instant attempt, every question
+// in review. Check Answer's reply and the finish reply add to it. The
+// type has no `correct`, so nothing here can read the key off a
+// question; a timed exam's page source carries none.
+//
 // "Send feedback" under each question (slice 12a): builds legacy's
 // reference text — the stem, the options as shown and the student's
 // current answer, never the correct one — saves progress, then opens
@@ -44,16 +52,17 @@ import { checkAnswer, expireAttempt, finishAttempt, saveAnswers, startTimedAttem
 import { RunnerError } from './runner-error';
 import {
   chosenToStored,
-  computeScore,
   countAnswered,
   displayLetter,
   getShuffledOptions,
   gradeFor,
   hydrateFromRows,
   isCorrectAnswer,
+  isCorrectOption,
+  optionFeedback,
   type OptionView,
 } from '@/lib/attempts/scoring';
-import type { AnswerPatch, Attempt, AttemptItem, AttemptMode, ChosenMap, FlagMap, Score } from '@/lib/attempts/types';
+import type { AnswerPatch, Attempt, AttemptMode, ChosenMap, FlagMap, Score, SealedItem, SecretsMap } from '@/lib/attempts/types';
 
 type FeedbackMode = 'inline' | 'standalone' | 'hide';
 type ViewMode = 'ALL' | 'FLAGGED';
@@ -113,13 +122,15 @@ export function QuizRunner({
   mode,
   attempt,
   items,
+  secrets: initialSecrets,
   questionsPerPage,
   reviewMode,
   previewMode,
 }: {
   mode: AttemptMode;
   attempt: Attempt;
-  items: AttemptItem[];
+  items: SealedItem[];
+  secrets: SecretsMap;
   questionsPerPage: number;
   reviewMode: boolean;
   previewMode: boolean;
@@ -130,6 +141,7 @@ export function QuizRunner({
 
   // ── state (legacy ANSW / FLAGS / SATA_EVAL / LOCKED / …) ──
   const hydrated = useMemo(() => hydrateFromRows(items), [items]);
+  const [secrets, setSecrets] = useState<SecretsMap>(initialSecrets);
   const [answers, setAnswers] = useState<ChosenMap>(hydrated.answers);
   const [flags, setFlags] = useState<FlagMap>(hydrated.flags);
   const [sataChecked, setSataChecked] = useState<FlagMap>(hydrated.sataChecked);
@@ -280,8 +292,13 @@ export function QuizRunner({
   const unanswered = Math.max(0, items.length - answered);
   const pct = items.length > 0 ? Math.round((answered / items.length) * 100) : 0;
   const showSubmit = !locked && !reviewMode && viewMode === 'ALL' && safePage >= allPageCount - 1;
-  const localScore = computeScore(items, answers);
-  const score = serverScore ?? localScore;
+  // The score is the database's: the finish reply, or the header's stored
+  // figures in review. No browser-side arithmetic (Q6 — it has no key).
+  const storedScore: Score | null =
+    attempt.score_pct !== null && attempt.score_raw !== null && attempt.score_total !== null
+      ? { raw: Number(attempt.score_raw), total: Number(attempt.score_total), pct: Number(attempt.score_pct) }
+      : null;
+  const score: Score = serverScore ?? storedScore ?? { raw: 0, total: 0, pct: 0 };
   const showAlways = locked || reviewMode || finishSent;
 
   // ── save (03 Q5; legacy saveInProgress) ──
@@ -394,7 +411,7 @@ export function QuizRunner({
   }
 
   // ── answering ──
-  function choose(item: AttemptItem, letter: string, checked: boolean) {
+  function choose(item: SealedItem, letter: string, checked: boolean) {
     if (locked || reviewMode) return;
     if (item.question_type === 'SATA') {
       const current = Array.isArray(answers[item.item_id]) ? [...(answers[item.item_id] as string[])] : [];
@@ -413,17 +430,22 @@ export function QuizRunner({
     setAnswers((a) => ({ ...a, [item.item_id]: letter }));
     if (mode === 'instant' && !previewMode) {
       // The pick is the check for an MCQ / TF (legacy revealed on answer):
-      // the server writes and grades the row; a failure falls back to the
-      // plain save so the answer still lands.
+      // the server writes and grades the row and returns its secret half,
+      // which is what reveals the feedback (Q6). A failure falls back to
+      // the plain save so the answer still lands, and says so.
       void checkAnswer(item.attempt_item_id, letter).then((r) => {
-        if (!r.ok) queueSave({ item_id: item.item_id, chosen: letter });
+        if (r.ok) setSecrets((s) => ({ ...s, [item.item_id]: r.secret }));
+        else {
+          queueSave({ item_id: item.item_id, chosen: letter });
+          setToast(`Could not check this answer: ${r.error}`);
+        }
       });
     } else {
       queueSave({ item_id: item.item_id, chosen: letter });
     }
   }
 
-  function checkSata(item: AttemptItem) {
+  function checkSata(item: SealedItem) {
     const chosen = answers[item.item_id];
     if (!Array.isArray(chosen) || chosen.length === 0) return;
     setSataChecked((s) => ({ ...s, [item.item_id]: true }));
@@ -432,11 +454,15 @@ export function QuizRunner({
     // would only overwrite sata_checked with false.
     pendingRef.current.delete(item.item_id);
     void checkAnswer(item.attempt_item_id, chosen, true).then((r) => {
-      if (!r.ok) queueSave({ item_id: item.item_id, chosen: chosenToStored(chosen), sata_checked: true });
+      if (r.ok) setSecrets((s) => ({ ...s, [item.item_id]: r.secret }));
+      else {
+        queueSave({ item_id: item.item_id, chosen: chosenToStored(chosen), sata_checked: true });
+        setToast(`Could not check this answer: ${r.error}`);
+      }
     });
   }
 
-  function toggleFlag(item: AttemptItem) {
+  function toggleFlag(item: SealedItem) {
     const next = !flags[item.item_id];
     setFlags((f) => ({ ...f, [item.item_id]: next }));
     queueSave({ item_id: item.item_id, flagged: next }, true);
@@ -484,6 +510,9 @@ export function QuizRunner({
         return false;
       }
       setServerScore(result.score);
+      // The sitting is over: every question's secret half arrives with
+      // the score, so the review renders without a reload (Q6).
+      setSecrets((s) => ({ ...s, ...result.secrets }));
     }
     if (autoSubmit) setTimeUp(true);
     setFinishSent(true);
@@ -552,7 +581,13 @@ export function QuizRunner({
       if (flags[item.item_id]) classes.push('has-flag');
       if (locked || reviewMode) {
         if (!has) classes.push('omitted');
-        else classes.push(isCorrectAnswer(item, chosen) ? 'correct' : 'incorrect');
+        else {
+          // The server's grade on the row first; the key from the secrets
+          // map when the row was graded before the final answer changed.
+          const secret = secrets[item.item_id];
+          const right = secret ? isCorrectAnswer(item.question_type, secret.correct, chosen) : item.is_correct === true;
+          classes.push(right ? 'correct' : 'incorrect');
+        }
       } else {
         if (has) classes.push('answered');
         if (flags[item.item_id]) classes.push('flagged');
@@ -589,19 +624,29 @@ export function QuizRunner({
     </div>
   );
 
-  function renderQuestion(item: AttemptItem, globalIdx: number) {
-    const opts = shuffled[item.item_id] || [];
+  function renderQuestion(item: SealedItem, globalIdx: number) {
+    const shown = shuffled[item.item_id] || [];
     const isSATA = item.question_type === 'SATA';
     const chosenRaw = answers[item.item_id];
     const hasAnswer = isSATA ? Array.isArray(chosenRaw) && chosenRaw.length > 0 : Boolean(chosenRaw);
-    // legacy canReveal: instant reveals on answer (SATA after Check Answer); timed only when locked / review.
-    const canReveal = mode === 'instant'
+    // The secret half, if the server has sent it for this question (Q6).
+    const secret = secrets[item.item_id] ?? null;
+    // legacy canReveal: instant reveals on answer (SATA after Check Answer);
+    // timed only when locked / review — and, since Q6, only once the
+    // secret half is here: without it there is nothing to reveal.
+    const wantsReveal = mode === 'instant'
       ? isSATA ? showAlways || (hasAnswer && Boolean(sataChecked[item.item_id])) : showAlways || hasAnswer
       : locked || reviewMode;
+    const canReveal = wantsReveal && secret !== null;
     const disabled = locked || reviewMode;
 
-    const rat = (item.rationale || '').trim();
-    const imgUrl = (item.rationale_img || '').trim();
+    const opts = shown.map((o) => ({
+      ...o,
+      fb: optionFeedback(secret, o.letter),
+      isCorrect: secret ? isCorrectOption(item.question_type, secret.correct, o.letter) : false,
+    }));
+    const rat = (secret?.rationale || '').trim();
+    const imgUrl = (secret?.rationale_img || '').trim();
     const optFbs = opts.filter((o) => o.fb);
     const showRationale = canReveal && feedbackMode !== 'hide' && (rat || (feedbackMode === 'standalone' && optFbs.length > 0) || imgUrl);
 
@@ -702,7 +747,7 @@ export function QuizRunner({
   }
 
   // ── Send feedback (legacy buildFriendlyRefText + the button) ──
-  function buildFeedbackRef(item: AttemptItem, globalIdx: number, opts: OptionView[], chosenRaw: ChosenMap[string] | undefined): string {
+  function buildFeedbackRef(item: SealedItem, globalIdx: number, opts: OptionView[], chosenRaw: ChosenMap[string] | undefined): string {
     const lines: string[] = [];
     lines.push(`Quademia — Question feedback (${mode === 'timed' ? 'Timed' : 'Instant'} quiz)`);
     lines.push(`Course: ${attempt.display_label || attempt.course_id || ''}`);
@@ -738,7 +783,7 @@ export function QuizRunner({
     return lines.join('\n');
   }
 
-  function sendFeedback(item: AttemptItem, globalIdx: number, opts: OptionView[], chosenRaw: ChosenMap[string] | undefined) {
+  function sendFeedback(item: SealedItem, globalIdx: number, opts: OptionView[], chosenRaw: ChosenMap[string] | undefined) {
     const ref = buildFeedbackRef(item, globalIdx, opts, chosenRaw);
     const url =
       `/student/messages?course_id=${encodeURIComponent(attempt.course_id)}` +

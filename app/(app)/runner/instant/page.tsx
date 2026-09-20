@@ -44,6 +44,7 @@ export default async function InstantRunnerPage({ searchParams }: { searchParams
       mode="instant"
       attempt={load.attempt}
       items={load.items}
+      secrets={load.secrets}
       questionsPerPage={load.questionsPerPage}
       reviewMode={load.reviewMode}
       previewMode={load.previewMode}

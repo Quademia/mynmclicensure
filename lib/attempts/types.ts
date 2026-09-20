@@ -7,7 +7,7 @@
 // the Server Actions return. Constants live here, not in actions.ts — a
 // 'use server' module exports only async functions.
 
-import type { Item } from '@/lib/bank/types';
+import type { QuestionType } from '@/lib/bank/types';
 
 export type AttemptMode = 'instant' | 'timed';
 export type AttemptSource = 'fixed' | 'builder' | 'retake' | 'mock';
@@ -40,26 +40,64 @@ export type Attempt = {
 
 // One row of attempt_items (03 Q4): the question as the bank served it
 // the day the attempt was created — copied table to table, never
-// updated — plus the answer group the server writes (Q5). Extends Item
-// so the runner and the scoring helpers take it unchanged: course_id is
-// the attempt's and batch_id is null on a snapshot (readAttemptItems
-// fills both in). The secret half (correct, rationale, rationale_img,
-// fb_a–fb_f) is revoked from the browser role at the grant, so the rows
-// are read with the service role after an ownership check.
-export type AttemptItem = Item & {
+// updated — plus the answer group the server writes (Q5). The row is
+// split in two types by the seal (Q6; D5):
+//
+//   SealedItem  — the public half and the answer group. What a LIVE
+//                 runner receives. The type has no `correct`, so runner
+//                 code cannot read the key off a question: the key
+//                 arrives only through the secrets map the server fills.
+//   SecretHalf  — the key, the rationale and the per-option feedback.
+//                 Sent for one question at a time in instant mode (the
+//                 check_answer reply, and on resume the rows already
+//                 graded), for none of them in a live exam, and for all
+//                 of them in review. Revoked from the browser role at the
+//                 grant, so a console query is refused by the database.
+//   AttemptItem — the whole row, server-side only (readAttemptItems with
+//                 the service role after an ownership check).
+//
+// lib/attempts/seal.ts holds the two column lists — the one place the
+// row is cut.
+export type SecretHalf = {
+  /** "b" for MCQ / TF; "a,c,e" for SATA */
+  correct: string;
+  rationale: string | null;
+  rationale_img: string | null;
+  fb_a: string | null; fb_b: string | null; fb_c: string | null;
+  fb_d: string | null; fb_e: string | null; fb_f: string | null;
+};
+
+export type SealedItem = {
   attempt_item_id: number;
   attempt_id: string;
   position: number;
+  item_id: string;
+  question_type: QuestionType;
+  stem: string;
+  option_a: string | null; option_b: string | null; option_c: string | null;
+  option_d: string | null; option_e: string | null; option_f: string | null;
+  marks: number;
+  shuffle_options: boolean;
+  subject: string | null;
+  maintopic: string | null;
+  subtopic: string | null;
+  difficulty: string | null;
   /** a letter, or a comma list for SATA (the `correct` convention); null = unanswered */
   chosen: string | null;
   flagged: boolean;
   sata_checked: boolean;
   time_spent_s: number | null;
+  /** the server's grade: at Check Answer in instant mode, at finish otherwise */
   is_correct: boolean | null;
   score_awarded: number | null;
   answered_utc: string | null;
   graded_utc: string | null;
 };
+
+export type AttemptItem = SealedItem & SecretHalf;
+
+/** The secret halves the runner holds, by item id. */
+export type SecretsMap = Record<string, SecretHalf>;
 
 // What the runner sends save_answers() (03 Q5): one patch per question,
 // every key but item_id optional — an absent key leaves that column
@@ -87,18 +125,7 @@ export type AttemptDetail = Attempt & { answered_count: number };
 // check_answer()'s reply: the grade for the one row and its secret half
 // (Q6 renders the feedback from this; Q5 records it).
 export type CheckResult =
-  | {
-      ok: true;
-      isCorrect: boolean;
-      scoreAwarded: number;
-      secret: {
-        correct: string;
-        rationale: string | null;
-        rationale_img: string | null;
-        fb_a: string | null; fb_b: string | null; fb_c: string | null;
-        fb_d: string | null; fb_e: string | null; fb_f: string | null;
-      };
-    }
+  | { ok: true; isCorrect: boolean; scoreAwarded: number; secret: SecretHalf }
   | { ok: false; error: string };
 
 // The config keys with the legacy fallbacks (equal to seed_data.sql).
@@ -140,7 +167,8 @@ export type ActionResult = { ok: true } | { ok: false; error: string };
 
 export type SpawnResult = { ok: true; attemptId: string } | { ok: false; error: string };
 
-export type FinishResult = { ok: true; score: Score } | { ok: false; error: string };
+/** Finish and expire return the score and, the sitting being over, every question's secret half (Q6). */
+export type FinishResult = { ok: true; score: Score; secrets: SecretsMap } | { ok: false; error: string };
 
 export type TimedStartResult = { ok: true; startedIso: string } | { ok: false; error: string };
 

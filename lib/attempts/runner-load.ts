@@ -17,20 +17,27 @@ import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import type { AuthGateResult } from '@/lib/access';
 import { getAttemptById, readAttemptItems } from './queries';
+import { sealItem, secretOf } from './seal';
 import {
   RUNNER_QUESTIONS_PER_PAGE_DEFAULT,
   type Attempt,
-  type AttemptItem,
   type AttemptMode,
+  type SealedItem,
+  type SecretsMap,
 } from './types';
 
+// The seal (Q6; D5): the runner receives the rows cut to their public
+// half, and a secrets map — empty for a live exam; the questions already
+// graded for a live instant attempt (so Check Answer's feedback survives
+// a reload); every question in review and admin preview.
 export type RunnerLoad =
   | { kind: 'error'; title: string; message: string }
   | { kind: 'redirect'; to: string }
   | {
       kind: 'ok';
       attempt: Attempt;
-      items: AttemptItem[];
+      items: SealedItem[];
+      secrets: SecretsMap;
       questionsPerPage: number;
       reviewMode: boolean;
       previewMode: boolean;
@@ -140,8 +147,8 @@ export async function loadRunner(
   // attempt's own rows, not the live bank: read with the service role,
   // which is safe here because CHECK 4 above settled ownership (or the
   // caller is an admin in preview).
-  const items = await readAttemptItems(createServiceRoleClient(), attempt);
-  if (!items.length) {
+  const rows = await readAttemptItems(createServiceRoleClient(), attempt.attempt_id);
+  if (!rows.length) {
     return {
       kind: 'error',
       title: 'No Questions',
@@ -151,5 +158,14 @@ export async function loadRunner(
     };
   }
 
-  return { kind: 'ok', attempt, items, questionsPerPage, reviewMode, previewMode };
+  // The cut. A live sitting gets the public half; the secret half goes
+  // only where the rule allows it.
+  const unsealAll = reviewMode || previewMode || attempt.status !== 'in_progress';
+  const items = rows.map(sealItem);
+  const secrets: SecretsMap = {};
+  for (const row of rows) {
+    if (unsealAll || (attempt.mode === 'instant' && row.graded_utc !== null)) secrets[row.item_id] = secretOf(row);
+  }
+
+  return { kind: 'ok', attempt, items, secrets, questionsPerPage, reviewMode, previewMode };
 }
