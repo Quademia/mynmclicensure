@@ -189,6 +189,14 @@ unchanged.
   midwifery shortfall, the set-size targets).
 - A course *filter* on the admin bank page over every course at once
   (search the whole bank) — cheap once the table is one.
+- **The free pool's door** (`09-free-account-and-gamification.md`
+  F1): a free-forever account practises on a set-aside pool, per
+  programme, with no `course_access` rows. The cheapest shape is a
+  "free" mark on `question_bank` rows and a second door on the read
+  policy — a row marked free readable by any signed-in student. That
+  is a change to the gate, the security floor, so it is a `rebuild.md`
+  §8 row (a candidate S14) before it is built, and the importer learns
+  the mark. Captured 2026-09-20 from Sam's cloud session; not ruled.
 
 ---
 

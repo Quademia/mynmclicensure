@@ -92,7 +92,7 @@ the work that surfaced it; Sam orders them. A finding in
 
 ### Plans by feature doc
 
-The feature docs `00–08` are the living plan per feature (Sam,
+The feature docs `00–09` are the living plan per feature (Sam,
 2026-09-19); a doc rewritten into that shape gets a section here with
 its own slice ids. The flat lists below keep the items no doc has
 taken yet.
@@ -116,6 +116,17 @@ taken yet.
 - ⬜ Q7 SATA partial credit — the rule, then the three-state display (Sam, 2026-09-20) — after S7
 - ⬜ Q8 The runner as a player — one route, mode and exit from the header (captured 2026-09-20; ruled after 08 B2)
 - ⬜ Q9 The Check Answer pending state — the option shows it is being checked until the reply lands (2026-09-20)
+
+#### [09-free-account-and-gamification.md](docs/product-plan/09-free-account-and-gamification.md)
+
+Decided in principle in a cloud session on 2026-09-20; candidates, none sliced, the open questions in the doc's §4.
+
+- ⬜ F1 The pool and its door — a free mark on the bank and a second door on the read policy; a §8 row first
+- ⬜ F2 The free account — no course_access rows, the builder and runner on the pool, the dashboard's free-vs-trial line
+- ⬜ F3 Landing and copy — "free practice questions, forever"; the trial and the products as the route to the full bank
+- ⬜ G1 Streak, points, leaderboard — derived from the graded rows, no new tables; after the NMC Prep walk
+- ⬜ G2 The daily challenge — five a day per programme from the free pool, a new attempt source; after G1
+- ⬜ G3 Tiers — names on point bands; later
 
 #### [05-announcements.md](docs/product-plan/05-announcements.md)
 
@@ -186,6 +197,7 @@ what the diagnosis and the perf investigation surfaced.
 - ✅ Auth holes under S10: the users row's browser INSERT gone and UPDATE cut to the profile fields (D25), email lowercased and unique (D26), the profile insert server-side (D27) — 2026-09-19
 - ⬜ Retention: a nightly pg_cron purge of inactive `sessions` and old `auth_events` rows, window from a config value, as MyNclex does (D29; on auth item 9's clock)
 - ⬜ Design system: one shared palette already (MyNclex's tokens file was copied from this app); the foundation is that file extended with status tokens, copied here as styles/tokens.css; the shell per product; the sales pages' second teal Sam's call; the doc after Claude Design's mockups (inventory 2026-09-19)
+- ⬜ Design system, the components: Radix primitives under our own CSS, or the current structure — Sam to look and decide; Tailwind is not part of it (cloud session, 2026-09-20)
 - ⬜ Courses: the form suggests a code from programme + title, overwritable, the code stays the key; drop the dead page_slug column when the table is next touched; S2 (one items table) before S8 (Sam, 2026-09-19)
 - ⬜ A deactivated account signs in, is logged LOGIN_SUCCESS, and is thrown out by the gate too fast to read anything — refuse at login with "This account has been deactivated", log it as a refusal, so the login-events page can show it (seen in Sam's S10 test, 2026-09-19)
 - ⏸ Course-level pricing (a standalone price per course, products as bundles, a basket later) — the product stays the single unit of sale; revisit when the course count makes a product per course a chore (Sam, 2026-09-18)
