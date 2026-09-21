@@ -67,8 +67,18 @@ Day-to-day admin work includes:
 - [05 — Announcements](05-announcements.md) — how admin sends targeted notices to students
 - [06 — Offline Packs](06-offline-packs.md) — how students study without internet
 - [07 — Messaging](07-messaging.md) — how the built-in support chat works
-- [08 — Teacher Assess](08-teacher-assess.md) — how the MyTeacher product works
-- [09 — Teacher Academic Structure](09-teacher-academic-structure.md) — programmes, cohorts, courses, and how quizzes are reused across classes
+- [08 — Question Bank](08-question-bank.md) — the items, the importer, and the gate on them
+- [09 — Free Account and Gamification](09-free-account-and-gamification.md) — the retention layer: a free-forever floor, streaks and a daily challenge
+
+The two MyTeacher docs that used to sit at 08 and 09 (Teacher Assess,
+Teacher Academic Structure) went with the rest of MyTeacher when the
+repo was reshaped (rebuild.md slice 0, 2026-09-10). MyTeacher is its own
+product and will have its own repo; nothing here describes it.
+
+Beyond this numbered set: [rebuild.md](rebuild.md) is the port's plan
+and its §8 the storage decisions; [post-rebuild-diagnosis.md](post-rebuild-diagnosis.md)
+is the register of findings, with *Where each finding lives* as the map
+from a finding to the surface that owns it.
 
 ---
 
