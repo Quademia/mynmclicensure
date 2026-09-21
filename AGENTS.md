@@ -169,6 +169,20 @@ above sit at the repo root; the audience grouping inside them is kept.
    MyTeacher read them live. The one exception is the read-only content
    copy in `rebuild.md` §6.6 and the cutover script in §11.
 8. **Do not edit `legacy/`.** It is the reference. Deleted at cutover.
+9. **A slice that touches a table takes that table's grants back.** Not
+   just a table it creates — one it changes at all. `revoke all` from
+   `anon` and `authenticated`, then grant back the one thing that table
+   actually needs from the browser (usually SELECT, often on a column
+   list; frequently nothing, because the writes go through the service
+   role behind a gate). Drop the policies that policed a privilege no
+   role holds any more. This is diagnosis finding **D43**, which is
+   schema-wide because the vanilla era needed it — the browser *was*
+   the application — and which is closed surface by surface rather than
+   in one sweep (Sam, 2026-09-21). Check
+   `information_schema.role_table_grants` after the apply. The trap to
+   avoid is the one the record shows: a slice fixes the table's *reads*
+   and leaves its *writes* (02 C1 on `subscriptions`, 03 Q1 on
+   `quizzes`, S10 leaving `users` with TRUNCATE).
 
 ## Known Workarounds (stack-level, carried from MyNclex)
 

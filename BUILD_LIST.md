@@ -192,6 +192,9 @@ its slices were declared complete (Cutover, the Telegram gate), and
 what the diagnosis and the perf investigation surfaced.
 
 - ⬜ 16 Cutover — DNS, live keys, content re-copy, old logins deleted, `legacy/` removed (moved from the rebuild, Sam, 2026-09-16)
+- ⬜ Payments: no Paystack webhook — a payer who loses signal has paid and got nothing until an admin acts (D4)
+- ⬜ Reference data: schools is a regulator's list with no way to change it (D50, unruled since 2026-09-18)
+- ⬜ Reference data: telegram_group_keys is free text and holds junk — no list, no validation (D3)
 - ⬜ Storage hygiene: ~14 columns, the `levels` table and one config row with no reader or writer (list in the 2026-09-18 session entry) — Sam: some have an unbuilt purpose; review one at a time (2026-09-18); the auth group's five settled by the trace and the read-back (S9, items 7 and 8)
 - ✅ Auth holes: EXECUTE revoked on the five auth functions, the limiter counting by IP (D24, S9); the limit checks fail closed (D30) (auth items 2, 3) — 2026-09-19
 - ✅ Auth holes under S10: the users row's browser INSERT gone and UPDATE cut to the profile fields (D25), email lowercased and unique (D26), the profile insert server-side (D27) — 2026-09-19

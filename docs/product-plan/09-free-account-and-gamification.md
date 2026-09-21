@@ -195,3 +195,13 @@ one-off buttons and cards.
 | G1 Streak, points, leaderboard (derived) | candidate; after the NMC Prep walk |
 | G2 The daily challenge | candidate; after G1 |
 | G3 Tiers | later |
+
+---
+
+## Diagnosis findings for this surface
+
+**None.** This surface postdates `post-rebuild-diagnosis.md` — it is a
+new feature from Sam's cloud session of 2026-09-20, not a finding about
+the ported product. Recorded here so the surface-by-surface map is
+complete (2026-09-21); the index is the diagnosis's *Where each finding
+lives*.

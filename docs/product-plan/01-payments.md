@@ -82,3 +82,33 @@ The payment system is designed to keep sensitive information safe:
 - **CORS protection:** The worker only accepts requests from the QAcademy website (qacademy-gamma.pages.dev). Requests from any other website are rejected. If the allowed origin is not configured, all requests are rejected as a safety measure.
 - **Rate limiting:** Each IP address can make at most 5 requests per 60 seconds to the payment endpoints. This prevents automated abuse. Normal students making one payment at a time will never hit this limit.
 - **Token expiry:** Setup tokens expire after 48 hours. Old tokens cannot be reused. Every time admin clicks Retry Activation, a completely new token is generated.
+
+---
+
+## Diagnosis findings for this surface
+
+Grouped here on 2026-09-21 (Sam) so a surface can be worked in one pass.
+The register with full text and proof is `post-rebuild-diagnosis.md`;
+the queue is `BUILD_LIST.md` under *Improvements*. **The text above this
+line still describes the legacy product** — this doc is rewritten into
+the living-plan shape (what it does today · what was found · Sam's
+rulings · the sliced plan) when payments comes up, as 02, 03, 05 and 08
+already have been.
+
+| Finding | What it says | Status |
+|---|---|---|
+| D4 | There is no Paystack webhook; activation depends on the payer's browser coming back. A payer who approves the mobile-money prompt and loses signal has paid and received nothing until an admin intervenes — in a product built for unreliable connectivity | ⬜ **unruled, and queued nowhere until today** |
+| D31 | Pay-first is the root of every carried payments question; alpha had it the other way | ⬜ ruled (Sam, 2026-09-18) — the account created at PAID, the setup token and its two columns gone |
+| D32 | The payment row stores Paystack's whole reply, forever, and shows it to admins | ✅ 2026-09-19 — channel, card_type, last4 kept; prod at the next release |
+| D33 | The reference alone unlocks the payer's personal data and the setup token | ⬜ ruled (Sam, 2026-09-18) — a same-browser cookie, else the emailed link |
+| D34 | Abandoned INIT rows pile up forever, and anyone can make them | ⬜ ruled (Sam, 2026-09-18) — a nightly Paystack sweep; never deleted |
+| D35 | One rate-limit bucket per address for all four payment routes | ⬜ ruled (Sam, 2026-09-18) — one limit per action; closes §9 #22 |
+| D36 | Currency is never checked at verify | ✅ 2026-09-19 |
+
+Also relevant, owned elsewhere: **D2 / D19 / D23** (the three sales doors)
+are in `02-subscriptions.md`; **S8** (course access) is the subscription
+this payment creates.
+
+**The write grants on `payments`** are still the schema's default `grant
+all` to the browser roles (D43) — taken back by the slice that next
+touches this table, per the rule in AGENTS.md.

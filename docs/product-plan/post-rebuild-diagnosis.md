@@ -2922,3 +2922,40 @@ GP* — the latest end among her live GP rows.
 row above is the copy; §8 is the truth. Not yet in `BUILD_LIST.md`. D15
 (the per-request cache) and D19 (column selection on the sales pages) are
 code-only and independent of this row.
+
+---
+
+## Where each finding lives
+
+Added 2026-09-21 (Sam). Every finding above belongs to a **surface**, and
+that surface's doc carries it with its status, so the work can be done
+surface by surface rather than finding by finding. This table is the
+index; the doc is the truth. A finding missing from this table has no
+home — that is the bug it exists to prevent.
+
+| Surface | Findings | Doc |
+|---|---|---|
+| Payments | D4, D31–D36 | [01-payments.md](01-payments.md) |
+| Subscriptions and the shop | D1, D2, D13–D21, D23 | [02-subscriptions.md](02-subscriptions.md) |
+| Quiz system, runner, attempts | D5, D6, D7, D12, D44, D45, D48 | [03-quiz-system.md](03-quiz-system.md) |
+| Access control and auth | D24–D30 | [04-access-control.md](04-access-control.md) |
+| Announcements | D46, D47, D48 | [05-announcements.md](05-announcements.md) |
+| Offline packs | D12, D17 (both closed elsewhere) | [06-offline-packs.md](06-offline-packs.md) |
+| Messaging | D10, D37–D42 | [07-messaging.md](07-messaging.md) |
+| Question bank | D8, D9, D11, D22 | [08-question-bank.md](08-question-bank.md) |
+| Free account and gamification | none — the surface postdates this diagnosis | [09-free-account-and-gamification.md](09-free-account-and-gamification.md) |
+| Reference data (config, schools, levels, telegram keys) | D3, D49, D50, D51 | [00-overview.md](00-overview.md) |
+| **Belongs to every surface** | **D43** | [00-overview.md](00-overview.md) and AGENTS.md rule 9 |
+
+A finding appears under two surfaces where it genuinely spans both: D12
+sits in 03 because the snapshot closed it and in 06 because packs are
+where it bit; D48 covers quizzes and announcements.
+
+**Note on the ids.** `rebuild.md` numbers its own *decisions* D1–D10.
+They are a different series from the *findings* here, and the ids
+collide: D4 there is "like-for-like", D4 here is the missing Paystack
+webhook. Read a "D" by the document it comes from.
+
+**Still unruled by Sam, anywhere:** D4 (no Paystack webhook), D28 (six
+trips before a protected page renders), D50 (schools unmanageable), D3
+(telegram keys free text).

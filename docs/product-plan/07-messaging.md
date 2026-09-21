@@ -45,3 +45,33 @@ Every thread has a context type:
 - **General** — a general support question with no specific course or quiz context
 - **Course** — about a specific course. The thread is tagged with the course ID so admin can see which course the student is asking about.
 - **Question** — about a specific quiz question. The thread includes the question details (stem, options, student's answer) stored as reference text. This reference text is visible to both the student and admin for the life of the thread, making it easy to refer back to the exact question being discussed.
+
+---
+
+## Diagnosis findings for this surface
+
+Grouped here on 2026-09-21 (Sam) so a surface can be worked in one pass.
+The register is `post-rebuild-diagnosis.md`; the queue is
+`BUILD_LIST.md`. **The text above this line still describes the legacy
+product** — rewritten into the living-plan shape when this surface comes
+up.
+
+| Finding | What it says | Status |
+|---|---|---|
+| D10 | The browser's database credential is the stack, not this feature: the browser client does realtime replies and auth, and queries no table | ✔ **no action, recorded so nobody "fixes" it** by removing live replies |
+| D37 | The policies say who may touch a row, not what they may write — a student can insert a message as the admin, edit the admin's replies and rewrite a thread's status (proven on dev) | ⬜ ruled (Sam, 2026-09-18), S11 ticked |
+| D38 | Alpha's five protections were dropped by gamma and not restored by the port | ⬜ ruled, S11 |
+| D39 | The admin inbox reads the whole table, and the failures are silent | ⬜ ruled, S11 — a paged inbox |
+| D40 | A student's thread is built from whatever the browser says, and a link builds one on arrival | ⬜ ruled, S11 |
+| D41 | Two unread rules on the student side, and the admin badge counts closed threads | ⬜ ruled, S11 — read stamps on the thread |
+| D42 | Residue and drift in the two tables | ⬜ ruled, S11 — six columns dropped |
+
+**§8 row:** S11 (messaging storage — the support desk shape) ✅ ticked by
+Sam 2026-09-18, **not yet built**. It is one BUILD_LIST line covering
+D37–D42; when this surface is opened, each finding above should get its
+own slice id here so it can be traced.
+
+Related, owned elsewhere: the **question reports** feature replaces the
+"Send feedback" threads (BUILD_LIST); **Bulk Send** is parked.
+`messages` and `messages_threads` still carry the default write grants
+(D43).
