@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-09-20. Rules for **any** assistant working in this
+Last updated: 2026-09-21. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What is built and
@@ -124,6 +124,12 @@ above sit at the repo root; the audience grouping inside them is kept.
 2. **Confirmation dialogs for destructive or irreversible actions.**
    Centred dialog, dimmed backdrop, backdrop click maps to the safe
    option. Type-to-confirm for the dangerous ones (revoke, delete).
+   **Never `window.confirm`, `window.alert` or `window.prompt`** — the
+   app's own overlay, carrying legacy's words (Sam, 2026-09-21). This
+   replaces the 2026-09-11 "dialogs stay as legacy has them" for the
+   native boxes only: the wording stays legacy's, the box becomes ours.
+   A native box also cannot be answered from the desktop app's browser
+   pane, so any flow behind one is unwalkable by an assistant.
 3. **Every surface works on a phone; student surfaces are the
    priority.** Breakpoint **768px**. Navigation comes from the shared
    drawer in `components/shell/mobile/`; do not hand-roll it. Content
