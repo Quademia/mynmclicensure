@@ -2,31 +2,30 @@
 //
 // The question-bank reads, transcribed one for one from legacy
 // js/mynmclicensure-api.js: getItemsByIds, getItemsByFilters,
-// getItemFilterOptions. Each takes the caller's per-request client and,
-// as legacy, fails open: an error is logged and an empty result returned.
+// getItemFilterOptions. Each takes the caller's client and, as legacy,
+// fails open: an error is logged and an empty result returned.
 //
-// Used by: the admin Question Bank page (4a); the fixed-quiz and
-// mock-exam item pickers (slice 5); the runners and attempt review
-// (slice 6). RLS is the floor (the SELECT policy goes through
-// user_has_course()); every read here still names its table.
-
-import type { createClient } from '@/lib/supabase/server';
 // One table since 08 B1 (2026-09-19): question_bank, filtered by
 // course_id. The eleven per-course tables and the helper that chose one
 // (lib/bank/tables.ts) are gone; a course with no rows reads as empty.
+//
+// Since 08 B2 (2026-09-21) the answer half — correct, rationale,
+// rationale_img and the six feedbacks — is not readable by the browser
+// roles at all, and the admin's own cookie client is one of them. So the
+// reads split by client type, and the type says which is which:
+//   ServiceDb (service role, behind requireAdmin() or requireStudent()
+//     plus the access check) — the whole row, and the concept search.
+//   Db (the caller's cookie client, RLS the gate) — the public columns
+//     only: the filter options and the "does this course have these
+//     ids" check.
+// A read that needs the key cannot be handed a student's client by
+// accident; the compiler refuses it.
 
-/** The admin writes' guard: the course must exist (the key on question_bank is the floor). */
-export async function courseExists(db: Db, courseId: string): Promise<boolean> {
-  const { data, error } = await db.from('courses').select('course_id').eq('course_id', courseId).maybeSingle();
-  if (error) {
-    console.error('courseExists:', error);
-    return false;
-  }
-  return Boolean(data);
-}
+import type { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import type { Item, ItemFilterOptions, ItemFilters } from './types';
 
 type Db = Awaited<ReturnType<typeof createClient>>;
+export type ServiceDb = ReturnType<typeof createServiceRoleClient>;
 
 const EMPTY_OPTIONS: ItemFilterOptions = {
   subjects: [],
@@ -37,26 +36,56 @@ const EMPTY_OPTIONS: ItemFilterOptions = {
   batch_ids: [],
 };
 
-// The runner's read: just the ids it needs, returned in the SAME ORDER as
-// asked. Supabase does not guarantee order with .in(), so legacy sorted
-// by hand to match the quiz's item_ids; so does this.
-export async function getItemsByIds(db: Db, courseId: string, itemIds: string[]): Promise<Item[]> {
-  if (!itemIds || itemIds.length === 0) return [];
-
-  const { data, error } = await db.from('question_bank').select('*').eq('course_id', courseId).in('item_id', itemIds);
+/** The admin writes' guard: the course must exist (the key on question_bank is the floor). */
+export async function courseExists(db: Db, courseId: string): Promise<boolean> {
+  const { data, error } = await db.from('courses').select('course_id').eq('course_id', courseId).maybeSingle();
   if (error) {
-    console.error('getItemsByIds:', error);
+    console.error('courseExists:', error);
+    return false;
+  }
+  return Boolean(data);
+}
+
+// The builders' id check: of the ids the browser sent, which are really
+// this course's? Ids only — before B2 this was getItemsByIds returning
+// whole rows, of which both callers used nothing but item_id. RLS is the
+// gate: a course the student cannot reach returns the empty set, and the
+// caller refuses the build.
+export async function knownItemIds(db: Db, courseId: string, itemIds: string[]): Promise<Set<string>> {
+  if (!itemIds || itemIds.length === 0) return new Set();
+
+  const { data, error } = await db.from('question_bank').select('item_id').eq('course_id', courseId).in('item_id', itemIds);
+  if (error) {
+    console.error('knownItemIds:', error);
+    return new Set();
+  }
+  return new Set((data ?? []).map((r) => (r as { item_id: string }).item_id));
+}
+
+// The builders' concept keyword (08 B2; D9). The wizard has always
+// matched subtopic, main topic, stem and rationale; the last two are no
+// longer in the browser, so the match runs in the database and only item
+// ids come back — never a stem. search_question_bank_ids() takes the
+// keyword as a bound parameter and tests it as a plain case-insensitive
+// substring, which is what String.includes() did over the same rows.
+// Service role: it reads the rationale. The caller's gate is
+// requireStudent() plus the course-access check.
+export async function searchConceptItemIds(db: ServiceDb, courseId: string, query: string): Promise<string[]> {
+  const q = String(query || '').trim();
+  if (!q) return [];
+
+  const { data, error } = await db.rpc('search_question_bank_ids', { p_course_id: courseId, p_query: q });
+  if (error) {
+    console.error('searchConceptItemIds:', error);
     return [];
   }
-
-  const byId = new Map<string, Item>();
-  for (const row of (data ?? []) as Item[]) byId.set(row.item_id, row);
-  return itemIds.map((id) => byId.get(id)).filter((x): x is Item => Boolean(x));
+  return (data ?? []).map((r: { item_id: string }) => r.item_id);
 }
 
 // The admin picker's read (and the bank page's "load the course"): every
 // filter is an equality; the keyword is an ilike across every text field.
-export async function getItemsByFilters(db: Db, courseId: string, filters: ItemFilters = {}): Promise<Item[]> {
+// Whole rows, the key included — service role, behind requireAdmin().
+export async function getItemsByFilters(db: ServiceDb, courseId: string, filters: ItemFilters = {}): Promise<Item[]> {
   let query = db.from('question_bank').select('*').eq('course_id', courseId);
   if (filters.subject) query = query.eq('subject', filters.subject);
   if (filters.maintopic) query = query.eq('maintopic', filters.maintopic);
@@ -86,7 +115,9 @@ export async function getItemsByFilters(db: Db, courseId: string, filters: ItemF
   return (data ?? []) as Item[];
 }
 
-// Distinct real values for the dropdowns and chips, from the course's rows.
+// Distinct real values for the dropdowns and chips, from the course's
+// rows. Criteria columns only, so either client may ask: the student's
+// own (the builders, RLS the gate) and the admin's.
 export async function getItemFilterOptions(db: Db, courseId: string): Promise<ItemFilterOptions> {
   const { data, error } = await db
     .from('question_bank')

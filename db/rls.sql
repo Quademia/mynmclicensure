@@ -413,18 +413,21 @@ $$;
 -- question_bank (one table since 08 B1, 2026-09-19; was items_* × 11
 -- with `user_has_course('<course>')` per table). The read tests the
 -- caller's courses as a set, which Postgres evaluates once per statement
--- rather than once per row; ADMIN insert, update and delete, as legacy.
+-- rather than once per row.
+--
+-- One policy only since 08 B2 (2026-09-21): no browser role holds
+-- INSERT, UPDATE or DELETE on this table any more, so RLS refuses every
+-- write by default and the three admin write policies were dropped —
+-- a policy that can never be reached reads like a live gate. The admin
+-- page writes through the service role behind requireAdmin(). The
+-- column grants beside this are in schema.sql: the answer half
+-- (correct, rationale, rationale_img, fb_a…fb_f) is not readable by
+-- the browser roles, the admin's own cookie client included.
 create policy question_bank_select on question_bank for select
 using (
   auth_user_role() = 'ADMIN'
   or course_id in (select m.course_id from my_course_access() m)
 );
-create policy question_bank_insert on question_bank for insert
-with check (auth_user_role() = 'ADMIN');
-create policy question_bank_update on question_bank for update
-using (auth_user_role() = 'ADMIN');
-create policy question_bank_delete on question_bank for delete
-using (auth_user_role() = 'ADMIN');
 
 -- ── slice 5a: fixed quizzes and mock exams ─────────────────────────────
 -- Any signed-in user reads (the student pages filter published + active

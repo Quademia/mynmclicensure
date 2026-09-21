@@ -134,8 +134,16 @@ export const RUNNER_AUTOSAVE_SEC_DEFAULT = 60;
 export const BUILDER_MAX_QUESTIONS_DEFAULT = 50;
 export const BUILDER_MINUTES_PER_QUESTION_DEFAULT = 1;
 
+// How long both builders wait after the last keystroke before asking the
+// server for the concept keyword's ids (08 B2). Before B2 the match ran
+// in the browser on every keystroke, over text that is no longer there.
+export const CONCEPT_SEARCH_DELAY_MS = 300;
+
 // The builder's light row: legacy getBuilderCourseItems selected only
-// what the wizard filters and counts on.
+// what the wizard filters and counts on. Since 08 B2 that is the
+// criteria and nothing else — the stem and the rationale are gone, so
+// no wizard code can filter on question text by accident; the concept
+// keyword goes to the server and comes back as ids.
 export type BuilderItem = {
   item_id: string;
   subject: string | null;
@@ -143,8 +151,6 @@ export type BuilderItem = {
   subtopic: string | null;
   difficulty: string | null;
   question_type: string;
-  stem: string;
-  rationale: string | null;
 };
 
 // What the builder sends with a build (legacy spawnBuilderAttempt meta).

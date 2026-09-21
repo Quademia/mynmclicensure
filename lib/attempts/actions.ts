@@ -23,7 +23,7 @@
 
 import { requireStudent } from '@/lib/access';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { getItemFilterOptions, getItemsByIds } from '@/lib/bank/queries';
+import { getItemFilterOptions, knownItemIds, searchConceptItemIds } from '@/lib/bank/queries';
 import type { ItemFilterOptions } from '@/lib/bank/types';
 import { getConfig } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
@@ -114,6 +114,31 @@ export async function loadBuilderCourse(courseId: string): Promise<BuilderCourse
   return { ok: true, items, options };
 }
 
+// ── the builders' concept keyword (08 B2; D9) ──────────────────────────
+// Both wizards' step 2 offers a free-text keyword, matched until now in
+// the browser against subtopic, main topic, stem and rationale — which
+// is why the course's question text was shipped at all. The same four
+// fields are matched here, in the database, and only the matching item
+// ids come back; the wizard intersects them with the light rows it
+// already holds, so its chips, counts and pool size are unchanged.
+//
+// The service role reads the rationale, so this gate stands in for RLS:
+// requireStudent(), then the same course-access check loadBuilderCourse
+// makes. Shared by the quiz builder and the offline-pack builder.
+export type ConceptSearchResult = { ok: true; itemIds: string[] } | { ok: false; error: string };
+
+export async function searchBuilderConcepts(courseId: string, query: string): Promise<ConceptSearchResult> {
+  const { supabase, profile } = await requireStudent();
+
+  const access = await getStudentCourseAccess(supabase, profile.user_id);
+  if (!access[courseId]) return fail('You do not have an active subscription for this course.');
+
+  const q = String(query || '').trim();
+  if (!q) return { ok: true, itemIds: [] };
+
+  return { ok: true, itemIds: await searchConceptItemIds(createServiceRoleClient(), courseId, q) };
+}
+
 // ── spawnBuilderAttempt ────────────────────────────────────────────────
 // A builder quiz is always fresh — no resume logic. The item ids arrive
 // already picked and shuffled by the wizard; the count is capped by the
@@ -138,10 +163,9 @@ export async function spawnBuilderAttempt(
   const safeIds = [...new Set(itemIds.map((id) => String(id || '').trim()).filter(Boolean))].slice(0, maxQuestions);
   if (!safeIds.length) return fail('No questions were selected.');
 
-  // The ids must be this course's: a wrong id is dropped, as the
-  // runner's getItemsByIds would drop it later.
-  const items = await getItemsByIds(supabase, courseId, safeIds);
-  const known = new Set(items.map((i) => i.item_id));
+  // The ids must be this course's: a wrong id is dropped, as
+  // create_attempt would drop it later.
+  const known = await knownItemIds(supabase, courseId, safeIds);
   const orderedIds = safeIds.filter((id) => known.has(id));
   if (!orderedIds.length) return fail('No questions were selected.');
 

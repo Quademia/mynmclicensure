@@ -197,6 +197,17 @@ create index if not exists question_bank_difficulty_idx    on question_bank (cou
 create index if not exists question_bank_question_type_idx on question_bank (course_id, question_type);
 create index if not exists question_bank_batch_id_idx      on question_bank (course_id, batch_id);
 
+-- 08 B2 (2026-09-21): the answer half off the browser roles, and every
+-- write with it — the page's Save, Delete and CSV import go through the
+-- service role behind requireAdmin(). anon holds nothing at all.
+revoke all on question_bank from anon, authenticated;
+grant select (
+  item_id, course_id, question_type, stem,
+  option_a, option_b, option_c, option_d, option_e, option_f,
+  marks, shuffle_options,
+  subject, maintopic, subtopic, difficulty, batch_id
+) on question_bank to authenticated;
+
 -- Storage bucket (global namespace, hence the prefix):
 -- licensure-gh-rationale-images — public read, 2 MB limit, server uploads only.
 

@@ -137,7 +137,7 @@ Decided in principle in a cloud session on 2026-09-20; candidates, none sliced, 
 #### [08-question-bank.md](docs/product-plan/08-question-bank.md)
 
 - ✅ B1 One table — question_bank with a course key, the eleven copied in and dropped, one gate a statement — 2026-09-19
-- ⬜ B2 The answers server-only — column revoke on the one table, the builders' search server-side (D8, D9); after S7
+- ✅ B2 Answers server-only — the secret half and write grants off the browser roles, search server-side — 2026-09-21
 - ⬜ B3 The admin bank page paged and filtered server-side, fifty at a time (D11) — later
 
 ### The legacy check — gaps found 2026-09-16
@@ -198,6 +198,8 @@ what the diagnosis and the perf investigation surfaced.
 - ⬜ Retention: a nightly pg_cron purge of inactive `sessions` and old `auth_events` rows, window from a config value, as MyNclex does (D29; on auth item 9's clock)
 - ⬜ Design system: one shared palette already (MyNclex's tokens file was copied from this app); the foundation is that file extended with status tokens, copied here as styles/tokens.css; the shell per product; the sales pages' second teal Sam's call; the doc after Claude Design's mockups (inventory 2026-09-19)
 - ⬜ Design system, the components: Radix primitives under our own CSS, or the current structure — Sam to look and decide; Tailwind is not part of it (cloud session, 2026-09-20)
+- ⬜ The six window.confirm boxes move to one shared overlay confirm, legacy's words kept (Sam, 2026-09-21)
+- ⬜ The four window.prompt boxes and the one alert, all in Announcements — same family, Sam to rule (2026-09-21)
 - ⬜ Courses: the form suggests a code from programme + title, overwritable, the code stays the key; drop the dead page_slug column when the table is next touched; S2 (one items table) before S8 (Sam, 2026-09-19)
 - ⬜ A deactivated account signs in, is logged LOGIN_SUCCESS, and is thrown out by the gate too fast to read anything — refuse at login with "This account has been deactivated", log it as a refusal, so the login-events page can show it (seen in Sam's S10 test, 2026-09-19)
 - ⏸ Course-level pricing (a standalone price per course, products as bundles, a basket later) — the product stays the single unit of sale; revisit when the course count makes a product per course a chore (Sam, 2026-09-18)

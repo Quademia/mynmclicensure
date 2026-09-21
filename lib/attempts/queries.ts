@@ -109,10 +109,17 @@ export async function getStudentAttempts(
 // The builder's whole-course read: the light columns the wizard filters
 // and counts on, by item id. (The SELECT policy through user_has_course()
 // returns nothing for a course the student cannot access.)
+//
+// The stem and the rationale left this list in 08 B2 (2026-09-21; D9):
+// the wizard matched the concept keyword against them in the browser,
+// which meant shipping a whole course's question text to filter on it.
+// The keyword is now searchConceptItemIds() on the server and the
+// browser keeps the criteria columns alone. The rationale is not
+// readable by this client any more in any case.
 export async function getBuilderCourseItems(db: ServerSupabaseClient, courseId: string): Promise<BuilderItem[]> {
   const { data, error } = await db
     .from('question_bank')
-    .select('item_id, subject, maintopic, subtopic, difficulty, question_type, stem, rationale')
+    .select('item_id, subject, maintopic, subtopic, difficulty, question_type')
     .eq('course_id', courseId)
     .order('item_id');
   if (error) {

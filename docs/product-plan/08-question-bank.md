@@ -113,6 +113,18 @@ One line each; the full text with proof is in
 - **Order:** B1 next after the subscriptions stretch, before S7 and
   before A1 — it is the last shape that multiplies other work.
 
+**Sam, 2026-09-21 (with B2):** the table's **write grants go too**. B1
+left `question_bank` with the schema's default `grant all` to `anon`
+and `authenticated` — SELECT, INSERT, UPDATE, DELETE, TRUNCATE,
+REFERENCES, TRIGGER on all 26 columns — with the RLS policies the only
+gate, and TRUNCATE is not subject to RLS. The bank's one write path is
+the admin Question Bank page, so Save, Delete and the CSV import move
+to the service role behind `requireAdmin()` (the S10 shape) and the
+browser roles keep SELECT on the public columns and nothing else. The
+three admin write policies go with the privilege they policed: with no
+role holding the write, RLS refuses by default, and a policy that can
+never be reached reads like a live gate.
+
 ---
 
 ## 4. The plan
@@ -174,6 +186,52 @@ picker.
 not one `correct`; the Quiz Builder's concept search still finds the
 same questions; a build and a pack still work.
 
+**Built 2026-09-21** (`20260921120000_question_bank_secret_half.sql`).
+`revoke all` from both browser roles, then SELECT granted back to
+`authenticated` on the seventeen public columns; `anon` holds nothing.
+The three admin write policies dropped with the write grants (the
+ruling above). `search_question_bank_ids(course, query)` matches the
+wizard's four fields — subtopic, main topic, stem, rationale — with
+`position()`, the keyword a bound parameter: a student's own typing
+cannot reach the query's shape, and there are no LIKE wildcards to
+escape, so it is the browser's `String.includes()` exactly. EXECUTE
+off the browser roles.
+
+Code: `lib/bank/queries.ts` splits by client type — `ServiceDb` for the
+whole row and the search, the cookie client for the filter options and
+the id check — so a read needing the key cannot be handed a student's
+client by accident. `getItemsByIds` became `knownItemIds()` (both
+callers used nothing but `item_id`). `BuilderItem` lost `stem` and
+`rationale`, so no wizard code can filter on question text. Both
+wizards call `searchBuilderConcepts()` 300 ms after the last keystroke,
+hold the previous result while a new one is in flight, show "Searching…"
+and refuse Build until it lands. The admin bank page and the quiz
+picker read and write through the service role.
+
+The one visible change: the concept keyword waits about a third of a
+second instead of filtering as you type. The chips, the counts, the
+topic path and the pool are untouched and still instant.
+
+**Proven on dev** as student4 (GP, RM_MID, RM_PED_OBS_HRN): 540 RM_MID
+stems readable; `select correct`, `select *` and `update` all refused
+with *permission denied for table question_bank*; the search function
+refused. The search equals the old browser match exactly — `labour`
+gives 116 rows both ways with no difference either direction,
+case-insensitive, an empty query matching nothing, and a typed `%`
+matching the 7 rows that literally contain one rather than all 540.
+Walked: the Quiz Builder's keyword (116 on screen, 116 in SQL), its
+chips and the topic path (Labour & Delivery 114), a build into the
+runner with one question answered and its feedback and rationale
+arriving from the server; the offline builder (`breastfeeding`, 33 and
+33) and a pack rendered. The course load now sends six fields a row and
+the search reply bare ids — D9's proof, read off the wire. Admin: the
+page loads 540 with the answers, a question created, edited (writing a
+`rationale`, a column the browser role cannot even read) and deleted,
+a three-row CSV import (MCQ, TF, SATA) landing `correct`, the
+rationales and the feedbacks; the quiz picker loads. Per-course id
+fingerprints before and after the import: GP 601 → 604, the other nine
+byte-identical.
+
 ### B3 — The admin page paged and filtered server-side (D11), later
 
 Fifty at a time with an exact count, the five filters in the query,
@@ -205,5 +263,5 @@ unchanged.
 | Slice | Date |
 |---|---|
 | B1 One table | ✅ 2026-09-19 (`20260920010000_question_bank.sql`; proven on dev — 5,281 rows, the eleven gone, 2,401 visible to the RN student and none of RM's, EXPLAIN a hashed SubPlan once per statement; walked by Sam: the builder, the runner, the admin bank page, packs, the picker) |
-| B2 The answers server-only | ⬜ after S7 |
+| B2 The answers server-only | ✅ 2026-09-21 (`20260921120000_question_bank_secret_half.sql`; the secret half and every write grant off the browser roles, the three write policies with them, the concept search a service-role function; proven on dev and walked both sides — §4) |
 | B3 The admin page paged | ⬜ later |

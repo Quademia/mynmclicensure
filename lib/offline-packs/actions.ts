@@ -14,7 +14,7 @@
 'use server';
 
 import { requireStudent } from '@/lib/access';
-import { getItemsByIds } from '@/lib/bank/queries';
+import { knownItemIds } from '@/lib/bank/queries';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getConfig } from '@/lib/catalogue/queries';
 import { buildOfflineOwnerLabel, buildOfflinePackDefaultName, buildOfflinePackDisplayLabel, maskEmailForOffline, ownerNameOf, safeArray } from './labels';
@@ -94,10 +94,9 @@ export async function createOfflinePack(input: CreatePackInput): Promise<CreateP
   }
 
   // Server-side: every id must be one of the course's items, kept in the
-  // order the pick gave (a wrong id is dropped, as the renderer's
-  // getItemsByIds would drop it later).
-  const items = await getItemsByIds(supabase, safeCourseId, safeIds);
-  const known = new Set(items.map((i) => i.item_id));
+  // order the pick gave (a wrong id is dropped, as create_offline_pack
+  // would drop it later).
+  const known = await knownItemIds(supabase, safeCourseId, safeIds);
   const orderedIds = safeIds.filter((id) => known.has(id));
   if (!orderedIds.length) {
     return { ok: false, reason: 'no_items_match', message: 'No questions were selected.', allowance };
