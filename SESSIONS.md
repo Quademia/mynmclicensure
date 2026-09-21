@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-21 — the record made navigable: every queued BUILD_LIST line moved under the surface that will build it; the diagnosis-to-doc link verified whole
+  - ↳ 76 of 93 lines had no plan · 87 moved verbatim, 170 in 170 out · sections for 00, 01, 04, 06, 07 · homeless → 00, speed and scale one group · 51 findings placed · prod release confirmed · a backspace broke my checker · 91 lines over the cap
+
 - 2026-09-21 — 08 B2: the bank's answer half and every write grant off the browser, the concept search in SQL; every diagnosis finding grouped by surface
   - ↳ revoke all then 17 columns · anon holds nothing · position() not ilike · ids never stems · 300 ms wait · native confirm boxes out · 26 findings had no home · D43 becomes rule 9 · 21 of 27 tables still open · D4 webhook unruled
 

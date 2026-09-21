@@ -43,9 +43,13 @@ feature docs `00–09` are the **living plan per feature** (Sam,
 2026-09-19, replacing the 2026-09-12 ruling that they were not build
 plans): each holds what the feature does today, what the diagnosis
 found, Sam's rulings, and the sliced plan with the doc's own slice
-ids; `BUILD_LIST.md` carries a section per doc. A doc is rewritten
-into that shape when its feature comes up, not before; until then it
-still describes the legacy product (rewritten so far: 03, 05). The
+ids; `BUILD_LIST.md` carries a section per doc, and **every queued line
+sits under the surface that will build it** (Sam, 2026-09-21) — there
+are no flat lists of unhomed work, and a line with no slice id gets one
+when its doc is rewritten. A doc is rewritten into that shape when its
+feature comes up, not before; until then it still describes the legacy
+product above a *Diagnosis findings for this surface* table (rewritten
+so far: 02, 03, 05, 08; 09 was written in the shape). The
 diagnosis stays the register of findings; the feature doc is where a
 finding becomes a slice.
 

@@ -13,7 +13,11 @@ the gamma-era list it replaces is in git history and in `qacademy-gamma`.
   release status (git holds that).
 - **Marks:** ✅ built (with the date) · ⬜ queued · ⏸ parked, with a
   one-line reason · ✖ cancelled.
-- **A section per plan doc.** Slice ids are the doc's own ids.
+- **A section per plan doc.** Slice ids are the doc's own ids. **Every
+  queued line sits under the surface that will build it** (Sam,
+  2026-09-21); a line with no slice id gets one when its doc is
+  rewritten. What belongs to no surface goes under `00-overview`; speed
+  and scale stay one group.
 - **Built means ticked in two places in one commit:** here and in the
   plan doc's ladder.
 - **There is no "next" marker.** Sam decides each session.
