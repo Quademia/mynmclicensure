@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-09-19. Rules for **any** assistant working in this
+Last updated: 2026-09-21. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What is built and
@@ -39,7 +39,7 @@ sorted around (Sam, 2026-09-18). The findings are
 still the vanilla-JS site served from the `qacademy-gamma` repo; its
 code stays here under `legacy/` as a reference — it says what the old
 app did, and Sam decides whether the new app should do the same. The
-feature docs `00–08` are the **living plan per feature** (Sam,
+feature docs `00–09` are the **living plan per feature** (Sam,
 2026-09-19, replacing the 2026-09-12 ruling that they were not build
 plans): each holds what the feature does today, what the diagnosis
 found, Sam's rulings, and the sliced plan with the doc's own slice
@@ -81,7 +81,7 @@ stack and the source of the plumbing. MyTeacher follows later.
 - `scripts/` — the lint baseline and the migration runner.
 - `public/` — static assets.
 - `docs/product-plan/` — flat: the rebuild plan, the feature specs
-  `00–08`, the mock-exams reference, and the gamma-era plans kept for
+  `00–09`, the mock-exams reference, and the gamma-era plans kept for
   history. One folder until there is a reason to separate.
 - `sessions/` — period logs. `legacy/` — the old product, read-only.
 
@@ -124,6 +124,12 @@ above sit at the repo root; the audience grouping inside them is kept.
 2. **Confirmation dialogs for destructive or irreversible actions.**
    Centred dialog, dimmed backdrop, backdrop click maps to the safe
    option. Type-to-confirm for the dangerous ones (revoke, delete).
+   **Never `window.confirm`, `window.alert` or `window.prompt`** — the
+   app's own overlay, carrying legacy's words (Sam, 2026-09-21). This
+   replaces the 2026-09-11 "dialogs stay as legacy has them" for the
+   native boxes only: the wording stays legacy's, the box becomes ours.
+   A native box also cannot be answered from the desktop app's browser
+   pane, so any flow behind one is unwalkable by an assistant.
 3. **Every surface works on a phone; student surfaces are the
    priority.** Breakpoint **768px**. Navigation comes from the shared
    drawer in `components/shell/mobile/`; do not hand-roll it. Content
@@ -163,6 +169,20 @@ above sit at the repo root; the audience grouping inside them is kept.
    MyTeacher read them live. The one exception is the read-only content
    copy in `rebuild.md` §6.6 and the cutover script in §11.
 8. **Do not edit `legacy/`.** It is the reference. Deleted at cutover.
+9. **A slice that touches a table takes that table's grants back.** Not
+   just a table it creates — one it changes at all. `revoke all` from
+   `anon` and `authenticated`, then grant back the one thing that table
+   actually needs from the browser (usually SELECT, often on a column
+   list; frequently nothing, because the writes go through the service
+   role behind a gate). Drop the policies that policed a privilege no
+   role holds any more. This is diagnosis finding **D43**, which is
+   schema-wide because the vanilla era needed it — the browser *was*
+   the application — and which is closed surface by surface rather than
+   in one sweep (Sam, 2026-09-21). Check
+   `information_schema.role_table_grants` after the apply. The trap to
+   avoid is the one the record shows: a slice fixes the table's *reads*
+   and leaves its *writes* (02 C1 on `subscriptions`, 03 Q1 on
+   `quizzes`, S10 leaving `users` with TRUNCATE).
 
 ## Known Workarounds (stack-level, carried from MyNclex)
 
@@ -250,6 +270,11 @@ above sit at the repo root; the audience grouping inside them is kept.
   edited reader within seconds; a migration applied minutes later leaves
   every open page erroring in between. Run `npm run db:migrate` the
   moment the readers are written, or migrate first.
+- **Next memoises an identical fetch within one render.** A Server
+  Component that reads a row, writes through a function, then reads the
+  same row again with the same client gets the FIRST read back (03 Q5:
+  the expired exam's page still showed the preflight). Re-read through a
+  different client (the service role) or return what the write returned.
 - **Migrations are applied by this repo's own runner**
   (`npm run db:migrate`, `scripts/db-migrate.mjs`), recorded in
   `licensure_gh.migrations`. Never `supabase db push`, never the MCP

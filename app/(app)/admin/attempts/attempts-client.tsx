@@ -24,7 +24,7 @@ import { useEffect, useRef, useState } from 'react';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { attemptDetailAction, attemptsWindowAction, headlineCountsAction, type HeadlineCounts } from '@/lib/attempts/admin-actions';
 import type { WindowAttemptRow } from '@/lib/attempts/admin-queries';
-import type { Attempt } from '@/lib/attempts/types';
+import type { AttemptDetail } from '@/lib/attempts/types';
 
 const PASS_PCT = 70;
 const PAGE_SIZE = 50;
@@ -115,7 +115,7 @@ export function AttemptsClient({ courses, quizTitles }: { courses: { course_id: 
 
   // ── the modal ──
   const [modalOpen, setModalOpen] = useState(false);
-  const [detail, setDetail] = useState<Attempt | null | 'loading' | 'failed'>(null);
+  const [detail, setDetail] = useState<AttemptDetail | null | 'loading' | 'failed'>(null);
   const [detailStudent, setDetailStudent] = useState<StudentBits>(null);
 
   function windowFor(p: Preset, from: string, to: string): { fromIso: string | null; toIso: string | null; label: string } {
@@ -274,12 +274,7 @@ export function AttemptsClient({ courses, quizTitles }: { courses: { course_id: 
   let answerCount: string | number = '—';
   let detailScore = '—';
   if (detail && typeof detail === 'object') {
-    try {
-      const arr = JSON.parse(detail.answers_json || '[]');
-      if (Array.isArray(arr)) answerCount = arr.length;
-    } catch {
-      /* legacy: leave the dash */
-    }
+    answerCount = detail.answered_count;
     if (detail.status === 'completed' && detail.score_pct != null) {
       detailScore = `${detail.score_raw ?? '—'} / ${detail.score_total ?? '—'} (${Math.round(detail.score_pct)}%)`;
     }

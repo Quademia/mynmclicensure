@@ -413,18 +413,21 @@ $$;
 -- question_bank (one table since 08 B1, 2026-09-19; was items_* × 11
 -- with `user_has_course('<course>')` per table). The read tests the
 -- caller's courses as a set, which Postgres evaluates once per statement
--- rather than once per row; ADMIN insert, update and delete, as legacy.
+-- rather than once per row.
+--
+-- One policy only since 08 B2 (2026-09-21): no browser role holds
+-- INSERT, UPDATE or DELETE on this table any more, so RLS refuses every
+-- write by default and the three admin write policies were dropped —
+-- a policy that can never be reached reads like a live gate. The admin
+-- page writes through the service role behind requireAdmin(). The
+-- column grants beside this are in schema.sql: the answer half
+-- (correct, rationale, rationale_img, fb_a…fb_f) is not readable by
+-- the browser roles, the admin's own cookie client included.
 create policy question_bank_select on question_bank for select
 using (
   auth_user_role() = 'ADMIN'
   or course_id in (select m.course_id from my_course_access() m)
 );
-create policy question_bank_insert on question_bank for insert
-with check (auth_user_role() = 'ADMIN');
-create policy question_bank_update on question_bank for update
-using (auth_user_role() = 'ADMIN');
-create policy question_bank_delete on question_bank for delete
-using (auth_user_role() = 'ADMIN');
 
 -- ── slice 5a: fixed quizzes and mock exams ─────────────────────────────
 -- Any signed-in user reads (the student pages filter published + active
@@ -473,15 +476,51 @@ using (auth_user_role() = 'ADMIN');
 create policy course_access_select on course_access for select
 using (user_id = auth_user_id() or auth_user_role() = 'ADMIN');
 
--- ── slice 6a: attempts ─────────────────────────────────────────────────
--- Own rows or ADMIN read; own-row insert and update; no DELETE, as
--- legacy. The runner's Server Actions write as the signed-in student.
+-- ── slice 6a: attempts (03 Q5: read only from the browser) ─────────────
+-- Own rows or ADMIN read. The own-row INSERT and UPDATE policies of the
+-- port went with 03 Q5 (D7): the browser roles hold SELECT alone (the
+-- default "grant all" taken back), and every write is a SECURITY
+-- DEFINER function the service role calls after the Server Action's
+-- gate — create_attempt, start_timed_attempt, save_answers,
+-- check_answer, finish_attempt, expire_attempt, abandon_attempt — each
+-- taking the caller's user id and refusing a row that is not theirs or
+-- an attempt not in progress. Grading is grade_answer() in SQL.
 create policy attempts_select on attempts for select
 using (attempts.user_id = auth_user_id() or auth_user_role() = 'ADMIN');
-create policy attempts_insert on attempts for insert
-with check (attempts.user_id = auth_user_id());
-create policy attempts_update on attempts for update
-using (attempts.user_id = auth_user_id());
+
+-- ── 03 Q4: attempt_items and offline_pack_items ────────────────────────
+-- A student reads the rows of their own attempts (the owner tested as a
+-- set, once per statement) or an admin every row; no browser write path
+-- on either table (the grants: `revoke all`, then SELECT back). On
+-- attempt_items the SELECT is column-level and EXCLUDES the secret half
+-- — correct, rationale, rationale_img, fb_a–fb_f — so a console query
+-- for the key mid-exam is refused by the database; the server reads
+-- those columns with the service role after its ownership check.
+-- offline_pack_items is readable whole: a pack carries its key by design.
+-- Every write is create_attempt() / create_offline_pack() (EXECUTE
+-- revoked from the browser roles; the service role calls them) and,
+-- since Q5, save_answers() / check_answer() / finish_attempt() /
+-- expire_attempt() on the answer group.
+create policy attempt_items_select on attempt_items for select
+using (
+  auth_user_role() = 'ADMIN'
+  or attempt_id in (select a.attempt_id from attempts a where a.user_id = auth_user_id())
+);
+create policy offline_pack_items_select on offline_pack_items for select
+using (
+  auth_user_role() = 'ADMIN'
+  or pack_id in (select p.pack_id from offline_packs p where p.user_id = auth_user_id())
+);
+
+-- offline_packs (slice 13a): own rows or ADMIN read; own-row insert and
+-- update policies remain from the migration, though since 03 Q4 the
+-- only writer is create_offline_pack() through the service role.
+create policy offline_packs_select on offline_packs for select
+using (offline_packs.user_id = auth_user_id() or auth_user_role() = 'ADMIN');
+create policy offline_packs_insert on offline_packs for insert
+with check (offline_packs.user_id = auth_user_id());
+create policy offline_packs_update on offline_packs for update
+using (offline_packs.user_id = auth_user_id());
 
 -- ── slice 9a: payments and the rate limit ──────────────────────────────
 -- payments: ADMIN reads; no INSERT or UPDATE policy on purpose — every

@@ -28,7 +28,7 @@ import { useCallback, useState, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { Toast } from '@/lib/toast/toast';
 import { abandonAttempt, retakeAttempt, spawnQuizAttempt } from '@/lib/attempts/actions';
-import type { Attempt, AttemptMode } from '@/lib/attempts/types';
+import type { AttemptWithProgress, AttemptMode } from '@/lib/attempts/types';
 import { getQuizAvailability } from '@/lib/quizzes/availability';
 import type { AllowedModes, Availability, QuizCard, QuizKind } from '@/lib/quizzes/types';
 
@@ -39,7 +39,7 @@ type Props = {
   /** the enrolled courses, in catalogue order */
   courses: CourseLite[];
   quizzesByCourse: Record<string, QuizCard[]>;
-  attemptsByCourse: Record<string, Attempt[]>;
+  attemptsByCourse: Record<string, AttemptWithProgress[]>;
   /** the raw `?course=` — the chip shows only when it names an enrolled course */
   activeCourseFilter: string | null;
   /** the server's clock at render (ISO) — the one availability is judged on (Q2) */
@@ -85,7 +85,7 @@ function runnerHref(mode: AttemptMode, attemptId: string, review = false): strin
 }
 
 // legacy getOverallAttemptState — across both modes, for the filter
-function getOverallAttemptState(quizId: string, attempts: Attempt[]): AttemptFilter {
+function getOverallAttemptState(quizId: string, attempts: AttemptWithProgress[]): AttemptFilter {
   const quizAttempts = attempts.filter((a) => a.quiz_id === quizId);
   if (!quizAttempts.length) return 'not_started';
   if (quizAttempts.some((a) => a.status === 'in_progress')) return 'in_progress';
@@ -93,14 +93,10 @@ function getOverallAttemptState(quizId: string, attempts: Attempt[]): AttemptFil
   return 'not_started';
 }
 
-// legacy countAnswered
-function countAnswered(attempt: Attempt): number {
-  try {
-    const answers = JSON.parse(attempt.answers_json || '[]') as { chosen?: unknown }[];
-    return answers.filter((a) => a.chosen !== null && a.chosen !== undefined && a.chosen !== '').length;
-  } catch {
-    return 0;
-  }
+// legacy countAnswered — since 03 Q5 the count of answered rows, read
+// with the attempt.
+function countAnswered(attempt: AttemptWithProgress): number {
+  return Number(attempt.answered_count) || 0;
 }
 
 // legacy formatDate
@@ -156,7 +152,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
     router.push(W.path);
   }
 
-  function attemptsOf(courseId: string): Attempt[] {
+  function attemptsOf(courseId: string): AttemptWithProgress[] {
     const rows = attemptsByCourse[courseId] || [];
     if (!abandonedIds.size) return rows;
     return rows.map((a) => (abandonedIds.has(a.attempt_id) ? { ...a, status: 'abandoned' as const } : a));
@@ -212,7 +208,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
   }
 
   // ── a mode section (legacy renderModeSection) ──
-  function renderModeSection(quiz: QuizCard, mode: AttemptMode, label: string, avail: Availability, attempts: Attempt[]) {
+  function renderModeSection(quiz: QuizCard, mode: AttemptMode, label: string, avail: Availability, attempts: AttemptWithProgress[]) {
     const modeAttempts = attempts.filter((a) => a.quiz_id === quiz.quiz_id && a.mode === mode);
     const completed = modeAttempts.filter((a) => a.status === 'completed');
     const inProgress = modeAttempts.find((a) => a.status === 'in_progress');
@@ -283,7 +279,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
   }
 
   // ── a quiz card (legacy renderQuizCard) ──
-  function renderQuizCard(quiz: QuizCard, avail: Exclude<Availability, 'HIDDEN'>, attempts: Attempt[], now: Date) {
+  function renderQuizCard(quiz: QuizCard, avail: Exclude<Availability, 'HIDDEN'>, attempts: AttemptWithProgress[], now: Date) {
     let scheduleInfo: React.ReactNode = null;
     if (avail === 'UPCOMING' && quiz.publish_at) {
       scheduleInfo = <div className="schedule-info">📅 Opens on {formatDate(quiz.publish_at)}</div>;

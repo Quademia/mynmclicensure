@@ -19,6 +19,8 @@ export const OFFLINE_PACKS_PER_COURSE_DEFAULT = 5;
 // tenth question.
 export const OWNER_MARK_EVERY = 10;
 
+import type { Item } from '@/lib/bank/types';
+
 export type SelectionMode = 'topics' | 'concept';
 
 export type OfflinePackWatermark = {
@@ -41,12 +43,22 @@ export type OfflinePack = {
   question_types: string[];
   concept_query: string | null;
   display_label: string | null;
-  item_ids: string[];
   question_count: number;
   watermark: Partial<OfflinePackWatermark>;
   status: string;
   created_utc: string;
   updated_utc: string;
+};
+
+// One row of offline_pack_items (03 Q4): the question as the bank
+// served it when the pack was built — the pack's own copy, so a later
+// bank edit or delete never changes a saved pack (D12). Extends Item
+// so the renderer takes it unchanged: course_id is the pack's and
+// batch_id is null on a snapshot (getOfflinePackForRender fills both).
+export type OfflinePackItem = Item & {
+  pack_item_id: number;
+  pack_id: string;
+  position: number;
 };
 
 // legacy getOfflinePackAllowance's blocked_reason values, plus the two the

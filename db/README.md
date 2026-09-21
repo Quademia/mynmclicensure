@@ -65,6 +65,16 @@ in a chat.
   08 B1 (2026-09-19) the bank is one table, `question_bank`, with a
   `course_id`; the migration copied each project's eleven tables in and
   dropped them, so the §6.6 cutover copy now targets the one table.
+- **Attempts and offline packs carry their own copy of each question**
+  (03 Q4, 2026-09-20; §8 S7): `attempt_items` and `offline_pack_items`,
+  one row per question, copied from `question_bank` by
+  `create_attempt()` / `create_offline_pack()` at creation and never
+  re-read from the bank. `item_id` on those rows has no key to the bank
+  on purpose. The secret half of `attempt_items` is revoked from the
+  browser roles; every write to the attempt tables is a function the
+  service role calls. Since 03 Q5 the answers are the same rows' answer
+  group (no `answers_json`, no `item_ids`), the browser roles hold
+  SELECT alone on `attempts`, and grading is `grade_answer()` in SQL.
 - Storage buckets are global to the project, so they carry the
   `licensure-gh-` prefix and are created by the migration that needs
   them (`insert into storage.buckets`). One so far:

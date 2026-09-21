@@ -7,6 +7,8 @@
 // the Server Actions return. Constants live here, not in actions.ts — a
 // 'use server' module exports only async functions.
 
+import type { QuestionType } from '@/lib/bank/types';
+
 export type AttemptMode = 'instant' | 'timed';
 export type AttemptSource = 'fixed' | 'builder' | 'retake' | 'mock';
 export type AttemptStatus = 'in_progress' | 'completed' | 'abandoned';
@@ -18,8 +20,6 @@ export type Attempt = {
   course_id: string;
   mode: AttemptMode;
   source: AttemptSource;
-  /** comma-joined item ids, in the attempt's order */
-  item_ids: string;
   n: number;
   seed: string | null;
   duration_min: number | null;
@@ -30,27 +30,103 @@ export type Attempt = {
   time_taken_s: number | null;
   origin_attempt_id: string | null;
   display_label: string | null;
-  /** a JSON string of AnswerRecord[] */
-  answers_json: string;
+  /** when the attempt was created */
   ts_iso: string | null;
+  /** the timed clock's anchor, set once by the start function (03 Q5 writes it) */
+  started_utc: string | null;
+  /** finish, expiry (the true deadline) or abandon (03 Q5 writes it) */
+  ended_utc: string | null;
 };
 
-// One entry per item in answers_json (legacy buildAnswersJson). MCQ / TF:
-// `chosen` is a letter; SATA: an array of letters; unanswered: null.
-export type AnswerRecord = {
+// One row of attempt_items (03 Q4): the question as the bank served it
+// the day the attempt was created — copied table to table, never
+// updated — plus the answer group the server writes (Q5). The row is
+// split in two types by the seal (Q6; D5):
+//
+//   SealedItem  — the public half and the answer group. What a LIVE
+//                 runner receives. The type has no `correct`, so runner
+//                 code cannot read the key off a question: the key
+//                 arrives only through the secrets map the server fills.
+//   SecretHalf  — the key, the rationale and the per-option feedback.
+//                 Sent for one question at a time in instant mode (the
+//                 check_answer reply, and on resume the rows already
+//                 graded), for none of them in a live exam, and for all
+//                 of them in review. Revoked from the browser role at the
+//                 grant, so a console query is refused by the database.
+//   AttemptItem — the whole row, server-side only (readAttemptItems with
+//                 the service role after an ownership check).
+//
+// lib/attempts/seal.ts holds the two column lists — the one place the
+// row is cut.
+export type SecretHalf = {
+  /** "b" for MCQ / TF; "a,c,e" for SATA */
+  correct: string;
+  rationale: string | null;
+  rationale_img: string | null;
+  fb_a: string | null; fb_b: string | null; fb_c: string | null;
+  fb_d: string | null; fb_e: string | null; fb_f: string | null;
+};
+
+export type SealedItem = {
+  attempt_item_id: number;
+  attempt_id: string;
+  position: number;
   item_id: string;
-  chosen: string | string[] | null;
-  correct: string | string[];
-  is_correct: boolean;
+  question_type: QuestionType;
+  stem: string;
+  option_a: string | null; option_b: string | null; option_c: string | null;
+  option_d: string | null; option_e: string | null; option_f: string | null;
+  marks: number;
+  shuffle_options: boolean;
+  subject: string | null;
+  maintopic: string | null;
+  subtopic: string | null;
+  difficulty: string | null;
+  /** a letter, or a comma list for SATA (the `correct` convention); null = unanswered */
+  chosen: string | null;
   flagged: boolean;
-  /** instant mode only: the learner pressed "Check Answer" on a SATA item */
-  sata_checked?: boolean;
+  sata_checked: boolean;
   time_spent_s: number | null;
+  /** the server's grade: at Check Answer in instant mode, at finish otherwise */
+  is_correct: boolean | null;
+  score_awarded: number | null;
+  answered_utc: string | null;
+  graded_utc: string | null;
 };
 
-// The runner's state maps, hydrated from answers_json.
+export type AttemptItem = SealedItem & SecretHalf;
+
+/** The secret halves the runner holds, by item id. */
+export type SecretsMap = Record<string, SecretHalf>;
+
+// What the runner sends save_answers() (03 Q5): one patch per question,
+// every key but item_id optional — an absent key leaves that column
+// alone. `chosen` is the stored convention: a letter, or a comma list for
+// SATA; null clears it.
+export type AnswerPatch = {
+  item_id: string;
+  chosen?: string | null;
+  flagged?: boolean;
+  sata_checked?: boolean;
+  time_spent_s?: number | null;
+};
+
+// The runner's state maps, hydrated from the attempt's rows. MCQ / TF:
+// a letter; SATA: an array of letters.
 export type ChosenMap = Record<string, string | string[]>;
 export type FlagMap = Record<string, boolean>;
+
+/** An attempt with the count of its answered rows (the quiz cards' "N of M answered"). */
+export type AttemptWithProgress = Attempt & { answered_count: number };
+
+/** The admin Attempts page's detail modal. */
+export type AttemptDetail = Attempt & { answered_count: number };
+
+// check_answer()'s reply: the grade for the one row and its secret half
+// (Q6 renders the feedback from this; Q5 records it).
+export type CheckResult =
+  | { ok: true; isCorrect: boolean; scoreAwarded: number; secret: SecretHalf }
+  | { ok: false; error: string };
 
 // The config keys with the legacy fallbacks (equal to seed_data.sql).
 export const RUNNER_QUESTIONS_PER_PAGE_DEFAULT = 1;
@@ -58,8 +134,16 @@ export const RUNNER_AUTOSAVE_SEC_DEFAULT = 60;
 export const BUILDER_MAX_QUESTIONS_DEFAULT = 50;
 export const BUILDER_MINUTES_PER_QUESTION_DEFAULT = 1;
 
+// How long both builders wait after the last keystroke before asking the
+// server for the concept keyword's ids (08 B2). Before B2 the match ran
+// in the browser on every keystroke, over text that is no longer there.
+export const CONCEPT_SEARCH_DELAY_MS = 300;
+
 // The builder's light row: legacy getBuilderCourseItems selected only
-// what the wizard filters and counts on.
+// what the wizard filters and counts on. Since 08 B2 that is the
+// criteria and nothing else — the stem and the rationale are gone, so
+// no wizard code can filter on question text by accident; the concept
+// keyword goes to the server and comes back as ids.
 export type BuilderItem = {
   item_id: string;
   subject: string | null;
@@ -67,8 +151,6 @@ export type BuilderItem = {
   subtopic: string | null;
   difficulty: string | null;
   question_type: string;
-  stem: string;
-  rationale: string | null;
 };
 
 // What the builder sends with a build (legacy spawnBuilderAttempt meta).
@@ -91,7 +173,8 @@ export type ActionResult = { ok: true } | { ok: false; error: string };
 
 export type SpawnResult = { ok: true; attemptId: string } | { ok: false; error: string };
 
-export type FinishResult = { ok: true; score: Score } | { ok: false; error: string };
+/** Finish and expire return the score and, the sitting being over, every question's secret half (Q6). */
+export type FinishResult = { ok: true; score: Score; secrets: SecretsMap } | { ok: false; error: string };
 
 export type TimedStartResult = { ok: true; startedIso: string } | { ok: false; error: string };
 

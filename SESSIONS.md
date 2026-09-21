@@ -22,6 +22,12 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-21 — 08 B2: the bank's answer half and every write grant off the browser, the concept search in SQL; every diagnosis finding grouped by surface
+  - ↳ revoke all then 17 columns · anon holds nothing · position() not ilike · ids never stems · 300 ms wait · native confirm boxes out · 26 findings had no home · D43 becomes rule 9 · 21 of 27 tables still open · D4 webhook unruled
+
+- 2026-09-20 — S7 built whole as 03 Q4–Q6: questions and answers as rows, a service-role write door, grading in SQL, the seal; runner-as-player captured; doc 09
+  - ↳ one attempt_items row · started_utc / ended_utc · six functions · save per tap · expire at the deadline · gaps 1 + 2 closed · SealedItem, secrets map · Next memoises a fetch · free pool, gamification, Radix from the cloud session
+
 - 2026-09-19 — 02 rewritten; S8 built whole (C1 link table, C2 access rows, C3a queued start, C3b the chain); one Grant dialog; S2 ticked, 08 opened, B1 built
   - ↳ product_courses · course_access · receipt = paper trail, window from rows · created_utc, requested_start_utc · no per-course admin edits · chain re-packed on every write · question_bank one table, gate once per statement · ten on prod
 

@@ -20,8 +20,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
-import { loadBuilderCourse } from '@/lib/attempts/actions';
-import type { BuilderItem } from '@/lib/attempts/types';
+import { loadBuilderCourse, searchBuilderConcepts } from '@/lib/attempts/actions';
+import { CONCEPT_SEARCH_DELAY_MS, type BuilderItem } from '@/lib/attempts/types';
 import type { ItemFilterOptions } from '@/lib/bank/types';
 import { createOfflinePack, prepareOfflinePack } from '@/lib/offline-packs/actions';
 import { allowanceMessageForReason, buildOfflinePackDefaultName, buildOfflinePackDisplayLabel } from '@/lib/offline-packs/labels';
@@ -114,6 +114,14 @@ export function OfflineBuilderClient({
   const [loadedCourse, setLoadedCourse] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // ── the concept keyword's matching ids (08 B2) ──
+  // The rows above no longer carry stems or rationales, so a free-text
+  // keyword is matched by the server and answered with ids. null means
+  // "nothing searched yet"; the previous result stays on screen while a
+  // new one is in flight, so the pool does not blink between keystrokes.
+  const [conceptIds, setConceptIds] = useState<Set<string> | null>(null);
+  const [searching, setSearching] = useState(false);
+
   // ── recent setups, the access dialog, the confirmation box ──
   const [recent, setRecent] = useState<RecentSetup[]>([]);
   const [recentOpen, setRecentOpen] = useState(false);
@@ -131,6 +139,7 @@ export function OfflineBuilderClient({
   // the course does not have, clamp the count.
   const loadCourse = useCallback(
     async (id: string) => {
+      setConceptIds(null);
       if (!id) {
         setItems([]);
         setOptions(null);
@@ -169,24 +178,50 @@ export function OfflineBuilderClient({
 
   const courseTitle = (id: string) => courses.find((c) => c.course_id === id)?.title || id;
 
-  // ── the pools (legacy getStep2FilteredPool / getFilteredPool) ──
-  function conceptMatch(x: BuilderItem, query: string): boolean {
-    return (
-      String(x.subtopic || '').toLowerCase().includes(query) ||
-      String(x.maintopic || '').toLowerCase().includes(query) ||
-      String(x.stem || '').toLowerCase().includes(query) ||
-      String(x.rationale || '').toLowerCase().includes(query)
-    );
-  }
+  // The keyword only does work when concept mode is on and no concept
+  // chip is picked — a chip wins, as it always did.
+  const conceptQuery = selectionMode === 'concept' && selectedConcepts.length === 0 ? conceptSearch.trim() : '';
 
+  // The keyword's ids, a moment after the typing stops (08 B2). The same
+  // four fields legacy matched on — subtopic, main topic, stem,
+  // rationale — are matched in the database now; a reply that arrives
+  // after the query changed again is dropped.
+  useEffect(() => {
+    if (!courseId || courseId !== loadedCourse) return;
+    if (!conceptQuery) {
+      const clear = window.setTimeout(() => {
+        setConceptIds(null);
+        setSearching(false);
+      }, 0);
+      return () => window.clearTimeout(clear);
+    }
+
+    let cancelled = false;
+    const id = window.setTimeout(() => {
+      void (async () => {
+        setSearching(true);
+        const result = await searchBuilderConcepts(courseId, conceptQuery);
+        if (cancelled) return;
+        setConceptIds(new Set(result.ok ? result.itemIds : []));
+        setSearching(false);
+      })();
+    }, CONCEPT_SEARCH_DELAY_MS);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(id);
+    };
+  }, [courseId, loadedCourse, conceptQuery]);
+
+  // ── the pools (legacy getStep2FilteredPool / getFilteredPool) ──
   function step2Pool(): BuilderItem[] {
     let pool = items;
     if (selectionMode === 'topics') {
       if (!useAllTopics && selectedTopics.length) pool = pool.filter((x) => selectedTopics.includes(x.maintopic || ''));
-    } else {
-      const query = conceptSearch.toLowerCase();
-      if (selectedConcepts.length) pool = pool.filter((x) => selectedConcepts.includes(x.subtopic || ''));
-      else if (query) pool = pool.filter((x) => conceptMatch(x, query));
+    } else if (selectedConcepts.length) {
+      pool = pool.filter((x) => selectedConcepts.includes(x.subtopic || ''));
+    } else if (conceptQuery) {
+      pool = conceptIds ? pool.filter((x) => conceptIds.has(x.item_id)) : [];
     }
     return pool;
   }
@@ -215,7 +250,7 @@ export function OfflineBuilderClient({
   else if (n > maxQuestions) countErr = `Reduce the number to ${maxQuestions} or below.`;
   else if (poolSize > 0 && n > poolSize) countErr = `Your current filters support up to ${poolSize} questions.`;
 
-  const ready = Boolean(courseId) && selectionIsValid() && !countErr && poolSize > 0; // legacy buildReady
+  const ready = Boolean(courseId) && selectionIsValid() && !countErr && poolSize > 0 && !searching; // legacy buildReady
 
   const chosenMaintopics = useAllTopics ? options?.maintopics || [] : selectedTopics; // legacy getChosenMaintopics
   const labelMeta = {
@@ -234,6 +269,8 @@ export function OfflineBuilderClient({
   if (courseId) {
     if (!selectionIsValid()) {
       status = selectionMode === 'topics' ? 'Select at least one topic or use all topics.' : 'Choose at least one concept or type a concept keyword.';
+    } else if (searching) {
+      status = 'Searching…';
     } else if (poolSize === 0) {
       status = 'No questions match your current filters. Adjust difficulty or question type.';
     } else if (countErr) {
@@ -278,8 +315,11 @@ export function OfflineBuilderClient({
 
   const topicFilter = topicSearch.toLowerCase();
   const visibleTopics = (options?.maintopics || []).filter((t) => !topicFilter || t.toLowerCase().includes(topicFilter));
-  const conceptQuery = conceptSearch.toLowerCase();
-  const visibleConcepts = (options?.subtopics || []).filter((s) => !conceptQuery || s.toLowerCase().includes(conceptQuery));
+  // The chip list narrows on the typed text too — over the subtopic
+  // names the wizard already holds, so it stays instant whether or not a
+  // keyword search is in flight.
+  const conceptChipFilter = conceptSearch.toLowerCase();
+  const visibleConcepts = (options?.subtopics || []).filter((s) => !conceptChipFilter || s.toLowerCase().includes(conceptChipFilter));
   const difficultyOptions = options?.difficulties.length ? options.difficulties : ['Easy', 'Moderate', 'Hard'];
   const typeOptions = options?.question_types.length ? options.question_types : ['MCQ', 'True/False', 'SATA'];
 
@@ -564,7 +604,7 @@ export function OfflineBuilderClient({
               </div>
               <span className="hint block">Searches across subtopic, stem, rationale and maintopic.</span>
               <div className="concepts-box">
-                {!visibleConcepts.length && !conceptQuery ? (
+                {!visibleConcepts.length && !conceptChipFilter ? (
                   <div className="concepts-empty">Type a keyword to search concepts.</div>
                 ) : !visibleConcepts.length ? (
                   <div className="concepts-empty">No matching concepts.</div>

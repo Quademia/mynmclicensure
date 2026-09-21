@@ -67,5 +67,59 @@ Day-to-day admin work includes:
 - [05 — Announcements](05-announcements.md) — how admin sends targeted notices to students
 - [06 — Offline Packs](06-offline-packs.md) — how students study without internet
 - [07 — Messaging](07-messaging.md) — how the built-in support chat works
-- [08 — Teacher Assess](08-teacher-assess.md) — how the MyTeacher product works
-- [09 — Teacher Academic Structure](09-teacher-academic-structure.md) — programmes, cohorts, courses, and how quizzes are reused across classes
+- [08 — Question Bank](08-question-bank.md) — the items, the importer, and the gate on them
+- [09 — Free Account and Gamification](09-free-account-and-gamification.md) — the retention layer: a free-forever floor, streaks and a daily challenge
+
+The two MyTeacher docs that used to sit at 08 and 09 (Teacher Assess,
+Teacher Academic Structure) went with the rest of MyTeacher when the
+repo was reshaped (rebuild.md slice 0, 2026-09-10). MyTeacher is its own
+product and will have its own repo; nothing here describes it.
+
+Beyond this numbered set: [rebuild.md](rebuild.md) is the port's plan
+and its §8 the storage decisions; [post-rebuild-diagnosis.md](post-rebuild-diagnosis.md)
+is the register of findings, with *Where each finding lives* as the map
+from a finding to the surface that owns it.
+
+---
+
+## Diagnosis findings with no surface of their own
+
+Grouped here on 2026-09-21 (Sam's ruling: fold them into the overview
+rather than open a doc for them). The register is
+`post-rebuild-diagnosis.md`; the queue is `BUILD_LIST.md`. **The text
+above this line still describes the legacy product.**
+
+### Reference data — config, schools, levels, telegram keys
+
+The tables nobody owns: they belong to no feature, so no feature doc
+would ever claim them.
+
+| Finding | What it says | Status |
+|---|---|---|
+| D49 | The config table accepts anything, and the readers trust it in two different ways | ⬜ ruled (Sam, 2026-09-18) — S13, the registry; queued |
+| D50 | `schools` is a regulator's list with no way to change it, in a vocabulary the product does not speak | ⬜ **unruled** — the 2026-09-18/19 session left it "queue or park" |
+| D51 | `levels` has never been read, and level and cohort are free text in three places | ⬜ ruled (Sam, 2026-09-18) — S13; levels kept, cohort becomes a year |
+| D3 | `telegram_group_keys` is free text and already holds junk — no list, no validation, no table behind it | ⬜ **unruled**; related to the Telegram gate (BUILD_LIST 17) |
+
+**§8 row:** S13 (config, levels and cohort — the reference shape) ✅
+ticked by Sam 2026-09-18, not yet built.
+
+### The one finding that belongs to every surface
+
+| Finding | What it says | How it is resolved |
+|---|---|---|
+| D43 | Every table grants the browser roles everything — SELECT, INSERT, UPDATE, DELETE, TRUNCATE — and RLS is the only gate. Schema-wide: the vanilla era needed it, because the browser *was* the application | **surface by surface**, not as one sweep (Sam, 2026-09-21): every table will be touched eventually, and the slice that touches a table takes its grants back to the one thing that table needs. The rule is in AGENTS.md |
+
+It cannot live in a feature doc because it belongs to all of them, and
+that is exactly how it went quiet: it was found on 2026-09-18, recorded
+as "last of the migrations", and never reached `BUILD_LIST.md`.
+
+**Where it stands (dev, 2026-09-21):** of 27 tables, 6 are clean —
+`question_bank` (08 B2), `attempt_items` and `offline_pack_items` (03
+Q4), `attempts` (03 Q5), `course_access` (02 C2), and `migrations`. The
+other 21 still hand the browser roles TRUNCATE. The pattern to watch:
+the clean ones are almost all tables a slice **created**; where a slice
+touched a table that already existed it fixed the reads and left the
+writes — 02 C1 left `subscriptions` and `product_courses` open, 03 Q1
+left `quizzes` and `mock_quizzes` open, S10 left `users` with TRUNCATE.
+That is what the rule is for.

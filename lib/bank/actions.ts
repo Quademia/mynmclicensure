@@ -3,14 +3,22 @@
 // The Question Bank page's writes and its "load a course" read as Server
 // Actions behind the admin gate — legacy admin/question-bank.html did all
 // of this from the browser with direct `db.from(...)` calls. Each action
-// repeats the page's own validation, in its order, with its words, then
-// writes as the signed-in admin (the RLS admin policies are the floor). A
+// repeats the page's own validation, in its order, with its words. A
 // Supabase error comes back as its own message, as the legacy page showed
 // it. The row types and constants live in ./types.
+//
+// Since 08 B2 (2026-09-21) every one of these goes through the service
+// role, after requireAdmin(). The page reads and writes the answer half —
+// correct, the rationale and the six feedbacks — and an admin's cookie
+// client is `authenticated`, the role that half was taken away from; the
+// write grants went with it, so the table has no browser write path at
+// all. The gate is requireAdmin() and the course named in each statement,
+// not RLS (AGENTS.md: RLS is the floor, not the filter).
 
 'use server';
 
 import { requireAdmin } from '@/lib/access';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { rowToPayload, type CsvRow } from './csv';
 import { uploadRationaleImage } from './images';
 import { getItemFilterOptions, getItemsByFilters } from './queries';
@@ -34,7 +42,7 @@ export async function loadCourseItems(courseId: string): Promise<CourseItemsResu
   if (!courseId.trim()) return { ok: false, error: 'Unknown course.' };
 
   const [items, options] = await Promise.all([
-    getItemsByFilters(supabase, courseId, {}),
+    getItemsByFilters(createServiceRoleClient(), courseId, {}),
     getItemFilterOptions(supabase, courseId),
   ]);
   return { ok: true, items, maintopics: options.maintopics, batchIds: options.batch_ids };
@@ -114,9 +122,13 @@ export async function saveQuestion(input: SaveQuestionInput, image: FormData | n
     payload[`fb_${letter}`] = (input.feedback[letter] || '').trim() || null;
   }
 
+  // item_id is the primary key, so the id alone is the whole scope —
+  // one row, or none. (The payload carries course_id, so an admin who
+  // edits an item under another course moves it there, as before B2.)
+  const db = createServiceRoleClient();
   const { error } = input.isNew
-    ? await supabase.from('question_bank').insert(payload)
-    : await supabase.from('question_bank').update(payload).eq('item_id', itemId);
+    ? await db.from('question_bank').insert(payload)
+    : await db.from('question_bank').update(payload).eq('item_id', itemId);
   if (error) return fail('Save failed: ' + error.message);
 
   return { ok: true };
@@ -144,9 +156,10 @@ export async function importItems(courseIdIn: string, rows: CsvRow[]): Promise<I
   let successCount = 0;
   let failCount = 0;
   const errors: string[] = [];
+  const db = createServiceRoleClient();
   for (let i = 0; i < payloads.length; i += IMPORT_BATCH) {
     const batch = payloads.slice(i, i + IMPORT_BATCH);
-    const { error } = await supabase.from('question_bank').upsert(batch, { onConflict: 'item_id' });
+    const { error } = await db.from('question_bank').upsert(batch, { onConflict: 'item_id' });
     if (error) {
       failCount += batch.length;
       errors.push(error.message);
@@ -160,10 +173,14 @@ export async function importItems(courseIdIn: string, rows: CsvRow[]): Promise<I
 
 // ── confirmDelete ──────────────────────────────────────────────────────
 export async function deleteQuestion(courseId: string, itemId: string): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
+  await requireAdmin();
   if (!String(courseId || '').trim()) return fail('Unknown course.');
 
-  const { error } = await supabase.from('question_bank').delete().eq('item_id', itemId).eq('course_id', String(courseId).trim().toUpperCase());
+  const { error } = await createServiceRoleClient()
+    .from('question_bank')
+    .delete()
+    .eq('item_id', itemId)
+    .eq('course_id', String(courseId).trim().toUpperCase());
   if (error) return fail('Delete failed: ' + error.message);
   return { ok: true };
 }

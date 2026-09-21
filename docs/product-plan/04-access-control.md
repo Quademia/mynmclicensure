@@ -142,3 +142,37 @@ Here is how it works in practice:
 - **The payment worker uses a special server key** that bypasses all these rules. This is also intentional and safe — the payment worker runs on a secure server (not in anyone's browser) and needs unrestricted access to create accounts, activate subscriptions, and update payment records.
 
 These rules exist as a safety net. Even if there were a bug in the website code, the database itself would prevent data leaks between users.
+
+---
+
+## Diagnosis findings for this surface
+
+Grouped here on 2026-09-21 (Sam) so a surface can be worked in one pass.
+The register is `post-rebuild-diagnosis.md`; the queue is
+`BUILD_LIST.md`. **The text above this line still describes the legacy
+product** — rewritten into the living-plan shape when this surface comes
+up.
+
+This is the surface the vanilla era shaped most: the browser *was* the
+application, so it held the database credential and every gate had to be
+a row-level policy. The port moved the code to the server; the grants
+and several of the policies came across unchanged.
+
+| Finding | What it says | Status |
+|---|---|---|
+| D24 | The five login and reset functions answer to anyone holding the public key | ✅ 2026-09-19 (S9) |
+| D25 | A student can rewrite their own email, programme and setup columns from the browser | ✅ 2026-09-19 (S10) |
+| D26 | `users.email` is an unconstrained copy stored as typed, while Auth lowercases | ✅ 2026-09-19 (S10) |
+| D27 | Registration depends on a Supabase dashboard setting nobody has recorded | ✅ 2026-09-19 — the profile insert is server-side; the dashboard settings still need recording (a BUILD_LIST line) |
+| D28 | Six trips before a protected page renders | ⬜ **unruled** — §8 has no auth-path row, so the gate cannot change until Sam adds one |
+| D29 | The audit tables are write-only, and the one column that should be written is not | ⬜ `ip_hash` done (S6); the nightly purge is queued on auth item 9's clock |
+| D30 | The rate limits fail open | ✅ 2026-09-19 (S9) |
+
+Owned elsewhere but read here: **D21** (what a student's own credential
+can read) is in `02-subscriptions.md`; **D43** (every table grants the
+browser roles everything) is cross-cutting — see `00-overview.md`.
+
+**§8 rows for this surface:** S1 (user primary key) ✅, S4 (foreign keys)
+✅, S6 (`ip_hash`) ✅, S9 (auth functions) ✅, S10 (the users row's browser
+writes) ✅. `sessions`, `auth_events`, `reset_requests` and `rate_limits`
+still carry the default write grants (D43).

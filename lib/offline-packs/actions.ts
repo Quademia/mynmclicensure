@@ -14,7 +14,8 @@
 'use server';
 
 import { requireStudent } from '@/lib/access';
-import { getItemsByIds } from '@/lib/bank/queries';
+import { knownItemIds } from '@/lib/bank/queries';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getConfig } from '@/lib/catalogue/queries';
 import { buildOfflineOwnerLabel, buildOfflinePackDefaultName, buildOfflinePackDisplayLabel, maskEmailForOffline, ownerNameOf, safeArray } from './labels';
 import { getOfflinePackAllowance, listOfflinePacks, pickOfflinePackItemIds } from './queries';
@@ -93,10 +94,9 @@ export async function createOfflinePack(input: CreatePackInput): Promise<CreateP
   }
 
   // Server-side: every id must be one of the course's items, kept in the
-  // order the pick gave (a wrong id is dropped, as the renderer's
-  // getItemsByIds would drop it later).
-  const items = await getItemsByIds(supabase, safeCourseId, safeIds);
-  const known = new Set(items.map((i) => i.item_id));
+  // order the pick gave (a wrong id is dropped, as create_offline_pack
+  // would drop it later).
+  const known = await knownItemIds(supabase, safeCourseId, safeIds);
   const orderedIds = safeIds.filter((id) => known.has(id));
   if (!orderedIds.length) {
     return { ok: false, reason: 'no_items_match', message: 'No questions were selected.', allowance };
@@ -124,22 +124,24 @@ export async function createOfflinePack(input: CreatePackInput): Promise<CreateP
   const displayLabel = String(input.display_label || '').trim() || buildOfflinePackDisplayLabel(metaForLabels);
   const packName = String(input.pack_name || '').trim() || buildOfflinePackDefaultName(metaForLabels);
 
-  const { error } = await supabase.from('offline_packs').insert({
-    pack_id: packId,
-    user_id: profile.user_id,
-    course_id: safeCourseId,
-    pack_name: packName.slice(0, 120),
-    selection_mode: metaForLabels.selection_mode,
-    maintopics: safeArray(input.maintopics),
-    subtopics: safeArray(input.subtopics),
-    difficulties: safeArray(input.difficulties),
-    question_types: safeArray(input.question_types),
-    concept_query: String(input.concept_query || '').trim() || null,
-    display_label: displayLabel,
-    item_ids: orderedIds,
-    question_count: orderedIds.length,
-    watermark,
-    status: 'active',
+  // The header and one offline_pack_items row per question, the
+  // questions copied from the bank in one database function (03 Q4).
+  // EXECUTE is revoked from the browser roles: the service role, after
+  // the gates above.
+  const { error } = await createServiceRoleClient().rpc('create_offline_pack', {
+    p_pack_id: packId,
+    p_user_id: profile.user_id,
+    p_course_id: safeCourseId,
+    p_item_ids: orderedIds,
+    p_pack_name: packName.slice(0, 120),
+    p_selection_mode: metaForLabels.selection_mode,
+    p_maintopics: safeArray(input.maintopics),
+    p_subtopics: safeArray(input.subtopics),
+    p_difficulties: safeArray(input.difficulties),
+    p_question_types: safeArray(input.question_types),
+    p_concept_query: String(input.concept_query || '').trim() || null,
+    p_display_label: displayLabel,
+    p_watermark: watermark,
   });
   if (error) {
     console.error('createOfflinePack:', error);

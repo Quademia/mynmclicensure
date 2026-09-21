@@ -89,7 +89,6 @@ export default async function OfflinePackPage({ searchParams }: { searchParams: 
   const packId = String(pack_id || '').trim();
 
   let error = '';
-  let warn = '';
   let pack: OfflinePack | null = null;
   let items: Item[] = [];
   let courseTitle = '';
@@ -106,9 +105,6 @@ export default async function OfflinePackPage({ searchParams }: { searchParams: 
       // legacy: the course title from getCourseById, else the id
       const courses = await getCourses(supabase);
       courseTitle = courses.find((c) => c.course_id === pack!.course_id)?.title || pack.course_id;
-      if (load.missing_item_ids.length) {
-        warn = `Some saved questions could not be loaded from the source items table. Missing count: ${load.missing_item_ids.length}.`;
-      }
     }
   }
 
@@ -124,7 +120,6 @@ export default async function OfflinePackPage({ searchParams }: { searchParams: 
       <div className="wrap">
         <RendererToolbar />
 
-        {warn ? <div className="warn">{warn}</div> : null}
         {error ? <div className="err">{error}</div> : null}
 
         {pack ? (

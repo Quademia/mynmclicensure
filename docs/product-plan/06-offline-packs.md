@@ -35,3 +35,24 @@ This keeps each new pack feeling fresh and maximises the study value.
 4. The pack opens in a clean, readable format showing each question with its options
 5. The student can work through the questions at their own pace
 6. No internet connection is needed once the pack is open
+
+---
+
+## Diagnosis findings for this surface
+
+Grouped here on 2026-09-21 (Sam) so a surface can be worked in one pass.
+The register is `post-rebuild-diagnosis.md`. **The text above this line
+still describes the legacy product** — rewritten into the living-plan
+shape when this surface comes up.
+
+| Finding | What it says | Status |
+|---|---|---|
+| D12 | A saved offline pack is a pointer list, not a snapshot — the renderer follows the ids back to the live bank on every open, so an edited or deleted question changes a pack a student already downloaded | ✅ 2026-09-20 — closed by `03-quiz-system.md` Q4: `offline_pack_items` holds one snapshotted row per question and `offline_packs.item_ids` is gone |
+| D17 | Announcements and offline packs each pick "the" subscription by their own rule | ✅ 2026-09-19 — closed by 02 C2, one `course_access` lookup |
+
+This surface has no open diagnosis findings of its own: both were closed
+by slices in other docs, which is why it was never opened. What remains
+for it is on `BUILD_LIST.md` — the renderer printing "Prepared for" twice,
+the course code shown instead of the title once a course is inactive, the
+builder's sticky status line, and the allowance rules. `offline_packs`
+still carries the default write grants (D43).

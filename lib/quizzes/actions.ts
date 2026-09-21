@@ -58,9 +58,12 @@ export async function loadQuiz(kind: QuizKind, quizId: string): Promise<Quiz | n
 }
 
 // ── loadPickerItems: the course's whole bank (legacy getItemsByFilters(courseId, {})) ──
+// Service role since B2, for the same reason as loadQuiz above: the
+// picker shows whole rows, and the admin's own client cannot read the
+// answer half of question_bank any more.
 export async function loadPickerItems(courseId: string): Promise<Item[]> {
-  const { supabase } = await requireAdmin();
-  return getItemsByFilters(supabase, courseId, {});
+  await requireAdmin();
+  return getItemsByFilters(createServiceRoleClient(), courseId, {});
 }
 
 // ── togglePublish ───────────────────────────────────────────────────────

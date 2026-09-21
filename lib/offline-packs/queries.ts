@@ -11,15 +11,15 @@
 // student in the query.
 
 import type { ServerSupabaseClient } from '@/lib/access';
-import { getItemsByIds } from '@/lib/bank/queries';
-import type { Item } from '@/lib/bank/types';
 import { getConfig } from '@/lib/catalogue/queries';
-import type { Allowance, OfflinePack, OfflinePackListRow, OfflinePackPage, PickResult } from './types';
+import type { Allowance, OfflinePack, OfflinePackItem, OfflinePackListRow, OfflinePackPage, PickResult } from './types';
 import { OFFLINE_PACKS_PER_COURSE_DEFAULT } from './types';
 
 // ── the item ids of the student's earlier active packs for the course ──
 // legacy getUsedOfflinePackItemIds; the period start narrows it to the
-// current subscription period when the allowance found one.
+// current subscription period when the allowance found one. Since 03 Q4
+// the ids come from the packs' own rows (offline_pack_items), two reads:
+// the packs, then their rows.
 export async function getUsedOfflinePackItemIds(
   db: ServerSupabaseClient,
   userId: string,
@@ -32,24 +32,30 @@ export async function getUsedOfflinePackItemIds(
 
   let query = db
     .from('offline_packs')
-    .select('item_ids')
+    .select('pack_id')
     .eq('user_id', safeUserId)
     .eq('course_id', safeCourseId)
     .eq('status', 'active');
   if (periodStartIso) query = query.gte('created_utc', periodStartIso);
 
-  const { data, error } = await query;
+  const { data: packs, error } = await query;
   if (error) {
     console.error('getUsedOfflinePackItemIds:', error);
     return new Set();
   }
+  const packIds = (packs ?? []).map((p) => String((p as { pack_id: string }).pack_id || '').trim()).filter(Boolean);
+  if (!packIds.length) return new Set();
+
+  const { data: rows, error: rowsError } = await db.from('offline_pack_items').select('item_id').in('pack_id', packIds);
+  if (rowsError) {
+    console.error('getUsedOfflinePackItemIds rows:', rowsError);
+    return new Set();
+  }
 
   const used = new Set<string>();
-  for (const row of (data ?? []) as { item_ids: string[] | null }[]) {
-    for (const id of row.item_ids ?? []) {
-      const safeId = String(id || '').trim();
-      if (safeId) used.add(safeId);
-    }
+  for (const row of (rows ?? []) as { item_id: string | null }[]) {
+    const safeId = String(row.item_id || '').trim();
+    if (safeId) used.add(safeId);
   }
   return used;
 }
@@ -207,8 +213,12 @@ export async function getOfflinePackAllowance(db: ServerSupabaseClient, userId: 
 }
 
 // ── the renderer's read (legacy getOfflinePackForRender) ──────────────
+// Since 03 Q4 the questions are the pack's own rows, in position order,
+// read as the owner (the student holds SELECT on the whole row — a pack
+// carries its key by design). A pack can no longer lose a question, so
+// the "missing count" of the pointer-list days is gone.
 export type RenderLoad =
-  | { ok: true; pack: OfflinePack; items: Item[]; missing_item_ids: string[] }
+  | { ok: true; pack: OfflinePack; items: OfflinePackItem[] }
   | { ok: false; code: 'pack_lookup_failed' | 'pack_not_found' | 'pack_inactive'; message: string };
 
 export async function getOfflinePackForRender(db: ServerSupabaseClient, userId: string, packId: string): Promise<RenderLoad> {
@@ -223,12 +233,22 @@ export async function getOfflinePackForRender(db: ServerSupabaseClient, userId: 
     return { ok: false, code: 'pack_inactive', message: 'This offline pack is not active.' };
   }
 
-  const savedIds = Array.isArray(pack.item_ids) ? pack.item_ids : [];
-  const items = await getItemsByIds(db, pack.course_id, savedIds);
-  const found = new Set(items.map((it) => String(it.item_id || '').trim()));
-  const missing = savedIds.filter((id) => !found.has(String(id || '').trim()));
+  const { data: rows, error: rowsError } = await db
+    .from('offline_pack_items')
+    .select('*')
+    .eq('pack_id', pack.pack_id)
+    .order('position', { ascending: true });
+  if (rowsError) {
+    console.error('getOfflinePackForRender rows:', rowsError);
+    return { ok: false, code: 'pack_lookup_failed', message: rowsError.message };
+  }
+  const items = ((rows ?? []) as Omit<OfflinePackItem, 'course_id' | 'batch_id'>[]).map((row) => ({
+    ...row,
+    course_id: pack.course_id,
+    batch_id: null,
+  }));
 
-  return { ok: true, pack, items, missing_item_ids: missing };
+  return { ok: true, pack, items };
 }
 
 // ── My Packs' read (legacy listOfflinePacks) ───────────────────────────
