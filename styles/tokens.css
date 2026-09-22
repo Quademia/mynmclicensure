@@ -89,6 +89,24 @@
   /* 6.8:1 on its ground. */
   --badge-warning-ink: #92400e;
 
+  /* ⚠ These two families are NOT from the Claude Design token file.
+     The app uses five badge families and that file names three; the
+     grey and blue below were measured out of the existing rules when
+     DS8 collected them (2026-09-22) and should be fed back to the
+     design system rather than living only here.
+     Grey — a state with no charge: draft, archived, FREE, none. */
+  --badge-neutral-bg: #f3f4f6;
+  --badge-neutral-border: #e5e7eb;
+  /* 7.4:1 on its ground. The #9ca3af some rules used is 2.3:1 and
+     fails, which is why archived text moves onto this. */
+  --badge-neutral-ink: #4b5563;
+  /* Blue — a state that is neither good nor bad: pinned, scheduled,
+     a note. Kept away from the three signal hues on purpose. */
+  --badge-info-bg: #eff6ff;
+  --badge-info-border: #bfdbfe;
+  /* 7.7:1 on its ground. */
+  --badge-info-ink: #1d4ed8;
+
   /* ── Type ─────────────────────────────────────────────────────── */
   /* Inter, from next/font in app/layout.tsx. Named because the app has
      54 distinct font sizes and no scale; four values are ~700 of ~800
@@ -165,12 +183,19 @@
   --space-32: 32px; /* above a page title; around the login card */
 
   /* ── Radius ───────────────────────────────────────────────────── */
-  --radius-sm: 4px;      /* a badge dot's container, a progress bar */
-  --radius-md: 6px;      /* a small button, a control inside a table */
+  /* A label chip — a course code, a programme tag, a payment source.
+     The shape says "this is a name", not "this is a state". */
+  --radius-sm: 4px;
+  /* STATUS badges — ACTIVE, Passed, EXPIRED, draft — and a small
+     button or a control inside a table (Sam, 2026-09-22: status badges
+     are not pills; 6px, which reads as a badge without becoming one). */
+  --radius-md: 6px;
   --radius: 8px;         /* the default: cards, buttons, inputs, dialogs */
   --radius-lg: 12px;     /* a container holding other rounded things */
-  /* Status badges and the subscription pill only. Never a button — a
-     pill button reads as a filter chip in this product. */
+  /* Fully round, whatever the height. Identity and marketing pills, a
+     circular control, the unread count. NOT status badges (Sam,
+     2026-09-22) and never a button — a pill button reads as a filter
+     chip in this product. */
   --radius-pill: 999px;
 
   /* ── Shadow ───────────────────────────────────────────────────── */

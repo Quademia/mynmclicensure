@@ -64,13 +64,24 @@
 .cat .link-btn { font-size: 13px; color: var(--primary); cursor: pointer; background: none; border: none; font-family: inherit; padding: 0; }
 
 /* ── Chips ── */
-.cat .chip, .cat-overlay .chip { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-.cat .chip.active, .cat-overlay .chip.active { background: #f0fdf4; color: var(--success); }
-.cat .chip.draft, .cat-overlay .chip.draft { background: #fff7ed; color: var(--warning); }
-.cat .chip.archived, .cat-overlay .chip.archived { background: #f3f4f6; color: var(--text-muted); }
-.cat .chip.PAID, .cat-overlay .chip.PAID { background: #f0fdf4; color: var(--success); }
-.cat .chip.TRIAL, .cat-overlay .chip.TRIAL { background: var(--primary-light); color: var(--primary); }
-.cat .chip.FREE, .cat-overlay .chip.FREE { background: #f3f4f6; color: var(--text-muted); }
+/* Shape comes from the shared badge in styles/components.css (DS8,
+   2026-09-22). Only this surface's state→colour mapping stays, now on
+   the token triples: a domain word like PAID or TRIAL is this page's
+   vocabulary, not the design system's. */
+.cat .chip.active, .cat-overlay .chip.active,
+.cat .chip.PAID, .cat-overlay .chip.PAID {
+  background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink);
+}
+.cat .chip.draft, .cat-overlay .chip.draft {
+  background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink);
+}
+.cat .chip.archived, .cat-overlay .chip.archived,
+.cat .chip.FREE, .cat-overlay .chip.FREE {
+  background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); color: var(--badge-neutral-ink);
+}
+.cat .chip.TRIAL, .cat-overlay .chip.TRIAL {
+  background: var(--badge-info-bg); border-color: var(--badge-info-border); color: var(--badge-info-ink);
+}
 
 .cat .course-tag, .cat-overlay .course-tag,
 .cat .prog-tag, .cat-overlay .prog-tag { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; background: var(--primary-light); color: var(--primary); margin: 2px; }

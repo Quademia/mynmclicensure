@@ -342,6 +342,42 @@ header and full screen.
 Ships with the dashboard's upgrade route (ruling 4). Walked at 1280 and
 375, both audiences, sidebar open and closed.
 
+### DS8 — One badge (added 2026-09-22)
+
+**This slice was missing from the ladder** and Sam found it by asking
+whether badge corners were now round. Badges are the *larger* of the two
+duplications: the status colours are hardcoded **173 times across 28 of
+the 33 stylesheets**, against the buttons' 30.
+
+**Sam's ruling, 2026-09-22: a status badge is 6px, not a pill.** The
+design system said the opposite — its `--radius-pill` note named status
+badges as a use — so the token's note is corrected here and in the
+Claude Design artifact. **Label chips keep 4px**: a course code, a
+programme tag or a payment source reports a *name*, not a state, and the
+shape is what tells them apart.
+
+One correction made while building it: DS2 did not make anything newly
+round. Those seven places were already `999px` and DS2 only replaced the
+number with the token. Of the seven, exactly one — `.upg .badge` — is a
+status badge and takes 6px; the rest are a circular control, an identity
+pill and marketing chips, none of them states.
+
+**Two token families were missing and are added here**, flagged in
+`tokens.css` as not from the Claude Design file and owed back to it: the
+app uses **five** badge families and that file names three. `neutral`
+(grey — draft, archived, FREE) and `info` (blue — pinned, scheduled).
+Adding them also fixed a real defect: `.ann .pill-archived` set
+`#9ca3af` on grey, which measures 2.3:1 and cannot be read.
+
+The base covers the four class names the markup already uses — `.badge`,
+`.chip`, `.pill`, `.status-chip` — so a surface converts with no change
+to its TSX. Standardising on one name is a later tidy.
+
+Converted with the slice: `.cat` and `.ann`. Their state→colour mapping
+stays on the surface, because a domain word like PAID or TRIAL is that
+page's vocabulary, not the design system's; only the shape and the
+triples are shared.
+
 ### DS6 — The icon set
 
 A 16px outline set, one weight and one grid. The nav's emoji leave the
@@ -381,4 +417,5 @@ stops carrying it in its colour.
 | DS5 The shell becomes A3 | ⬜ |
 | DS6 The icon set | ⬜ |
 | DS7 One name circle | ⬜ |
+| DS8 One badge | ⬜ |
 | Dark mode · content max-width · the avatar's size | ⬜ later |

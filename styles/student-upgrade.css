@@ -48,7 +48,10 @@
 .upg .sub-item { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; background: var(--card); }
 .upg .sub-top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; flex-wrap: wrap; }
 .upg .sub-name { font-weight: 800; font-size: .95rem; color: var(--ink); }
-.upg .badge { display: inline-flex; align-items: center; padding: 5px 10px; border-radius: var(--radius-pill); font-size: .78rem; font-weight: 800; background: var(--badge-success-bg); color: var(--badge-success-ink); border: 1px solid var(--badge-success-border); white-space: nowrap; }
+/* A status badge, so 6px and not a pill (Sam, 2026-09-22). The shape
+   comes from the shared badge in components.css; only the padding and
+   weight this page wants stay. */
+.upg .badge { padding: 5px 10px; font-weight: 800; background: var(--badge-success-bg); color: var(--badge-success-ink); border-color: var(--badge-success-border); }
 .upg .sub-meta { margin-top: 6px; color: var(--muted); font-size: .84rem; line-height: 1.45; }
 .upg .empty { margin-top: 12px; padding: 12px; border-radius: var(--radius); background: var(--surface-page); border: 1px dashed var(--line); color: var(--muted); font-size: .9rem; }
 

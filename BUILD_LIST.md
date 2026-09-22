@@ -267,6 +267,7 @@ storage.
 - ⬜ DS5 The shell becomes A3 — top bar, sidebar collapsible on a cookie, PageHeader's right half off 23 pages
 - ⬜ DS6 The icon set — 16px outline; the nav's emoji leave the labels, NavItem gains an icon field (data, not CSS)
 - ⬜ DS7 One name circle — one component for the four treatments; how a message shows student vs Quademia is unruled
+- ⬜ DS8 One badge — status 6px not a pill (Sam), labels stay 4px; 173 hardcoded colours in 28 files; neutral + info added
 - ⬜ Dark mode — not one prefers-color-scheme rule in the app and one theme in the token file; after the above
 - ⬜ A content max-width above 1440px, where A3's closed sidebar leaves cards and tables past a comfortable measure
 
