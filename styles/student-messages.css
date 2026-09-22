@@ -11,7 +11,7 @@
 
 .smsg .msg-container { max-width: 960px; margin: 0 auto; }
 .smsg .page-header { margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-.smsg .page-header h1 { font-size: 22px; font-weight: 800; color: var(--primary); margin: 0; }
+.smsg .page-header h1 { font-size: 22px; font-weight: 700; color: var(--primary); margin: 0; }
 
 /* ── Split pane ── */
 .smsg .msg-split { display: flex; gap: 0; border: 1px solid var(--border, #e2e8f0); border-radius: 14px; overflow: hidden; background: var(--white, #fff); height: calc(100vh - 140px); min-height: 480px; box-shadow: 0 2px 12px rgba(30, 58, 95, 0.06); }

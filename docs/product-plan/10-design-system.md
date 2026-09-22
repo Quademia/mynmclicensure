@@ -244,7 +244,7 @@ both sides:**
    MyNMCLicensure* like the student's, and which side you are on is a
    small uppercase label above Dashboard — *Admin Panel* (legacy's
    words) and *Student Panel*. Sam is not sure about the label and left
-   it as built; still his to settle.
+   it as built; settled as ruling 12 below.
 7. **The wordmark's weight is on the product.** Order stays brand first
    (the lockup says whose product it is); Quademia is the small muted
    word, MyNMCLicensure the bold navy one.
@@ -280,10 +280,40 @@ slice** — Save & Resume Later and Submit & Exit left by a full load,
 which tripped the tab-close guard, so a student who had just saved was
 told their changes may not be saved (legacy did the same).
 
-**Still unruled, and each blocks a slice below:** how a message
-distinguishes student from admin if the name circle becomes one
-component (DS7); the size scale (DS10); the price weight (DS14); and
-the page emoji (DS15).
+**Sam, 2026-09-22, the third session — three rulings, the assistant's
+recommendations accepted, after the page emoji and the weights were
+counted rather than recalled:**
+
+10. **DS15: the decoration goes, the working glyphs stay.** The 225
+    glyphs outside the two menus are not one thing. About **137 are
+    decoration** — an emoji beside a word that already says it
+    (`💾 Save`, `📌 Pinned`, `✅ Programme created successfully.`, the
+    eight admin dashboard tiles) — and those go: to a drawn icon where
+    the glyph is doing visual work, and to nothing where the sentence
+    and the colour already carry it. About **88 are doing a job** —
+    `→` inside a date range, `←` / `→` on pagination, `✓` as a
+    multi-select tick, `▶` / `▼` as a disclosure triangle, `✕` as a
+    close — and those stay untouched, because deleting them removes
+    meaning rather than decoration.
+11. **DS16: 700 wherever Inter is the font; the landing page keeps
+    800.** See the DS16 section below for the measurement. The 40
+    declarations on Inter surfaces are now 700; `landing.css`'s 12 are
+    left at 800 because the landing page is the one surface not set in
+    Inter, so its 800 is a real heavier face, not a fallback. Sam saw
+    the hero at both weights and kept 800.
+12. **The audience label loses the word "Panel".** Both sidebars keep
+    the label (settling ruling 6); it reads *ADMIN* and *STUDENT*, not
+    *ADMIN PANEL* / *STUDENT PANEL*. The shorter word says the same
+    thing with less furniture.
+
+**Not ruled, and deliberately so:** the landing page being the only
+surface not set in Inter was put to Sam as a candidate slice and
+declined — *"we are going to improve every page again"* (Sam,
+2026-09-22), so it is carried by that pass rather than sliced here.
+
+**Still unruled, and each blocks a slice below:** nothing in the ladder
+above DS11. DS7, DS10, DS14, DS15 and DS16 are settled; DS11 and DS12
+wait on Claude Design's palettes, which Sam is prompting for himself.
 
 **Open ruling — Tailwind (raised 2026-09-22).** Sam asked what Tailwind
 does and whether the app should use it, and set the frame for the
@@ -529,12 +559,62 @@ smallest open question here.
 
 ### DS15 — The page emoji (added 2026-09-22)
 
-DS6 took the emoji out of the two menus. About **160 more** sit in 35
-files of page copy and buttons — `▶ Start Exam`, `💾 Save`, `🟢 Active`,
-the runner's flag and clock, the admin dashboard's counters. They are
-legacy's own words, transcribed as the rules require, so replacing them
-is a copy change on 35 files, not an icon change. Sam to rule whether
-they go, and if so whether to icons from the DS6 set or to plain text.
+DS6 took the emoji out of the two menus. Counted rather than estimated
+on 2026-09-22: **225 glyphs in 34 files** of page copy and buttons, of
+which **137 are decoration** and **88 are working glyphs** (the split,
+and Sam's ruling on it, is ruling 10 above). The earlier figure of
+"about 160 in 35 files" was an estimate from a grep that did not
+separate the two kinds.
+
+Built in two passes, because they need different work:
+
+- **Pass A — the deletions (~60).** Emoji inside a sentence, a toast, a
+  chip or a badge, where the words and the colour already say it:
+  `✅ Programme created successfully.` on an already-green toast,
+  `⚠️ Expiring`, `🟢 Active`, `📝 12 questions`, `Almost done! 👏`.
+  Subtractive; no new icons.
+- **Pass B — the icon swaps (~75).** Buttons, tiles, section headings
+  and empty states, where the glyph is doing visual work. Needs roughly
+  **24 more shapes in `components/shell/icons.tsx`**, from the same
+  Lucide source and by the same method as DS6's 19. The eight admin
+  dashboard tiles need no new shapes at all — `users`, `card`,
+  `banknote`, `package`, `book`, `megaphone`, `clipboard` and
+  `settings` are already in the `NavIcon` union.
+
+Two that are not a one-line swap, flagged rather than decided:
+`styles/runner.css` draws the question grid's 🚩 through CSS
+`content:`, which cannot hold a drawn icon, so that one needs markup;
+and `app/page.tsx` has a `⏱ 22:14` **inside the landing page's drawn
+illustration** — a picture of the app, not app chrome — which stays.
+
+### DS16 — The synthesised weights (added 2026-09-22)
+
+**What was assumed, and what measurement showed.** The slice was opened
+believing a weight the font does not carry is *synthesised* — the
+browser smearing the 700 glyphs wider, muddier on a phone. Measured in
+the running app instead, at 40px in the app's own Inter:
+
+| 400 | 500 | 600 | 700 | 800 | 900 |
+|---|---|---|---|---|---|
+| 405.6px | 408.5px | 411.4px | **414.2px** | **414.2px** | **414.2px** |
+
+700, 800 and 900 render **identically**. Chrome synthesises a bold only
+when no bold face exists at all; with Inter's 700 loaded it simply uses
+it. So the 40 declarations on Inter surfaces were never a visual
+defect, and changing them to 700 changes no pixel. They were changed
+anyway, as hygiene (Sam, ruling 11): the stylesheets stop claiming a
+weight the app does not load, and nothing jumps a step if a real 800 is
+ever added.
+
+**`landing.css` is the exception, and the reason is a separate
+finding.** The landing page is the only surface in the app not set in
+Inter — `styles/landing.css:19` puts it on the device's own font
+(`-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto`). Those
+families **do** carry a heavy face, so its 800 is real: measured on the
+same string, 700 = 395.8px against 800 = 416.3px. Sam saw the hero at
+both and kept 800 — at 700 the headline also re-wraps from four lines
+to two, which is a layout change, not only a weight one. The twelve
+declarations in `landing.css` stay as they are.
 
 ### Later, under this doc
 
@@ -569,6 +649,7 @@ they go, and if so whether to icons from the DS6 set or to plain text.
 | DS12 A scale palette | ⬜ later |
 | DS13 One badge class name | ⬜ later |
 | DS14 The price weight | ✅ 2026-09-22 |
-| DS15 The page emoji | ⬜ Sam to rule |
-| DS16 The 53 fake-bold weights | ⬜ Sam to rule |
+| DS15 The page emoji | ⬜ ruled 2026-09-22; pass A then pass B |
+| DS16 The synthesised weights | ✅ 2026-09-22 — 40 to 700; landing's 12 kept at 800 |
+| The audience label loses "Panel" | ✅ 2026-09-22 (ruling 12) |
 | Dark mode · content max-width · the avatar's size | ⬜ later |

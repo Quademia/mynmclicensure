@@ -11,7 +11,7 @@
 
 .spf .profile-container { max-width: 720px; margin: 0 auto; }
 .spf .page-header { margin-bottom: 24px; }
-.spf .page-header h1 { font-size: 22px; font-weight: 800; color: var(--primary); margin: 0 0 4px; }
+.spf .page-header h1 { font-size: 22px; font-weight: 700; color: var(--primary); margin: 0 0 4px; }
 .spf .page-header p { font-size: 14px; color: var(--text-muted); margin: 0; }
 
 /* ── Panel ── */

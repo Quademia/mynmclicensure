@@ -4,8 +4,8 @@
 // A3 (10-design-system.md DS5) the brand block moved to the top bar's
 // wordmark and the My Account block into the avatar menu, so each is in
 // one place, not both; the sidebar keeps the audience as a small label
-// above Dashboard — "Student Panel" (Sam, 2026-09-22) — and ends at
-// Telegram Channel.
+// above Dashboard — "Student", the word alone without "Panel" (Sam,
+// 2026-09-22) — and ends at Telegram Channel.
 
 'use client';
 
@@ -17,7 +17,7 @@ export function StudentSidebar({ courses, badges }: { courses: SidebarCourse[]; 
   const { closeOnPhone } = useShell();
   return (
     <>
-      <div className="sidebar-audience">Student Panel</div>
+      <div className="sidebar-audience">Student</div>
       <SidebarNav items={STUDENT_NAV} courses={courses} badges={badges} onNavigate={closeOnPhone} />
     </>
   );

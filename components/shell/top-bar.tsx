@@ -3,9 +3,9 @@
 // The A3 top bar (10-design-system.md DS5, Sam 2026-09-22): a 56px
 // white bar on every authenticated page, at every width. Left to
 // right: the hamburger, the wordmark (Quademia, then the product line —
-// "MyNMCLicensure" for a student, "Admin Panel" for an admin; plain
-// type, no logo, AGENTS.md UI convention #5), then at the right the
-// envelope carrying the unread messages count, the bell as a link to
+// "MyNMCLicensure" on both sides since DS5; plain type, no logo,
+// AGENTS.md UI convention #5), then at the right the envelope
+// carrying the unread messages count, the bell as a link to
 // Announcements (plain until announcements have an unread state, doc 05
 // A2), and the avatar, which opens the account menu: the person's name
 // and email, the audience's links (My Profile, Upgrade / Extend for a
@@ -28,7 +28,7 @@ import { NameCircle } from './name-circle';
 export type TopBarLink = { label: string; href: string; accent?: boolean };
 
 export type TopBarProps = {
-  /** The product line beside the brand: "MyNMCLicensure" or "Admin Panel". */
+  /** The product line beside the brand: "MyNMCLicensure" on both sides. */
   product: string;
   messagesHref: string;
   announcementsHref: string;

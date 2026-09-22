@@ -275,8 +275,9 @@ storage.
 - ⬜ DS12 A scale palette — easy / moderate / hard borrows the signal ramp; no gradient vocabulary yet — later
 - ⬜ DS13 One badge class name — .badge / .chip / .pill / .status-chip are one thing under four; markup — later
 - ✅ DS14 The price weight — the token to 700 and the three price rules onto it (they were literals) — 2026-09-22
-- ⬜ DS15 The page emoji — ~160 in 35 files of page copy and buttons (▶ Start, 💾 Save, 🟢 Active); Sam to rule
-- ⬜ DS16 The 53 fake-bold weights — 800 / 900 in 13 stylesheets, none loaded; to 700 as touched (Sam to rule)
+- ⬜ DS15 The page emoji — 225 counted; 137 decoration go (pass A deletes, pass B icons), 88 working glyphs stay
+- ✅ DS16 The synthesised weights — 40 to 700; landing's 12 kept, its 800 is real (not Inter) — 2026-09-22
+- ✅ (unplanned) The audience label loses "Panel" — ADMIN / STUDENT on both sidebars (ruling 12) — 2026-09-22
 - ✅ (unplanned) The app's favicon and home-screen icon — MyNclex's two Quademia icon files copied in with DS7 — 2026-09-22
 - ⬜ Dark mode — not one prefers-color-scheme rule in the app and one theme in the token file; after the above
 - ⬜ A content max-width above 1440px, where A3's closed sidebar leaves cards and tables past a comfortable measure

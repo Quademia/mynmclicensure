@@ -27,10 +27,10 @@
 /* ── Toolbar ── */
 .opr .topbar { background: var(--opr-card); border: 1px solid var(--opr-soft); border-radius: 14px; padding: 10px 12px; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06); display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 12px; }
 .opr .topbar-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.opr .topbar-title { font-size: 15px; font-weight: 900; color: #111827; margin: 0; }
+.opr .topbar-title { font-size: 15px; font-weight: 700; color: #111827; margin: 0; }
 .opr .topbar-sub { font-size: 12px; color: #6b7280; margin: 0; }
 .opr .btnrow { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-.opr .btn { border: 1px solid var(--opr-soft); background: #fff; color: #111827; padding: 8px 10px; border-radius: 12px; cursor: pointer; font-weight: 800; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; font-family: inherit; }
+.opr .btn { border: 1px solid var(--opr-soft); background: #fff; color: #111827; padding: 8px 10px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; font-family: inherit; }
 .opr .btn.primary { background: var(--opr-brand); color: #fff; border-color: transparent; }
 .opr .btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
@@ -40,7 +40,7 @@
 
 /* ── Cards ── */
 .opr .card { background: var(--opr-card); border: 1px solid var(--opr-soft); border-radius: 14px; padding: 14px; margin-top: 12px; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06); }
-.opr .sectionTitle { font-size: 14px; font-weight: 900; margin: 0 0 8px 0; color: #111827; }
+.opr .sectionTitle { font-size: 14px; font-weight: 700; margin: 0 0 8px 0; color: #111827; }
 .opr .divider { height: 1px; background: rgba(0, 0, 0, 0.1); margin: 8px 0 10px 0; }
 .opr .muted { color: #6b7280; }
 .opr .small { font-size: 12px; }
@@ -48,9 +48,9 @@
 /* ── Cover ── */
 .opr .coverRow { display: flex; gap: 14px; align-items: stretch; }
 .opr .logoBox { width: 92px; flex: 0 0 92px; border-radius: 16px; border: 2px solid rgba(45, 125, 114, 0.18); background: rgba(45, 125, 114, 0.04); display: flex; align-items: center; justify-content: center; padding: 10px; }
-.opr .logoMark { width: 54px; height: 54px; border-radius: 16px; background: var(--opr-brand); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; letter-spacing: 0.4px; }
+.opr .logoMark { width: 54px; height: 54px; border-radius: 16px; background: var(--opr-brand); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; letter-spacing: 0.4px; }
 .opr .coverMain { flex: 1; min-width: 0; }
-.opr .coverTitle { margin: 0; font-weight: 900; font-size: 18px; line-height: 1.2; color: #111827; }
+.opr .coverTitle { margin: 0; font-weight: 700; font-size: 18px; line-height: 1.2; color: #111827; }
 .opr .coverSub { margin-top: 6px; font-size: 12px; color: #374151; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .opr .tag { display: inline-flex; align-items: center; padding: 5px 9px; border-radius: 999px; border: 1px solid rgba(0, 0, 0, 0.1); background: #fff; font-size: 12px; color: #111827; }
 .opr .tag b { color: var(--opr-brand); }
@@ -62,7 +62,7 @@
 .opr .kvBox { border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 12px; padding: 10px 12px; background: #fff; font-size: 13px; }
 .opr .kvBox .k { font-size: 11px; color: #6b7280; margin-bottom: 4px; }
 .opr .compactLine { margin-top: 8px; font-size: 12px; line-height: 1.45; color: #111827; padding: 10px 12px; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 12px; background: #fff; white-space: normal; word-break: break-word; }
-.opr .compactLine .label { font-weight: 900; color: #111827; margin-right: 8px; }
+.opr .compactLine .label { font-weight: 700; color: #111827; margin-right: 8px; }
 .opr .compactLine .value { color: #374151; }
 .opr .overviewNote { margin-top: 12px; color: #374151; font-size: 12px; line-height: 1.5; }
 
@@ -70,18 +70,18 @@
 .opr .q { padding: 10px 0; border-bottom: 1px dashed var(--opr-line); break-inside: avoid; page-break-inside: avoid; }
 .opr .q:last-child { border-bottom: none; }
 .opr .qhead { display: flex; gap: 10px; align-items: flex-start; }
-.opr .qno { width: 44px; flex: 0 0 44px; font-weight: 900; color: var(--opr-brand); }
+.opr .qno { width: 44px; flex: 0 0 44px; font-weight: 700; color: var(--opr-brand); }
 .opr .qstem { flex: 1; font-size: 14px; line-height: 1.45; }
 .opr .opts { margin: 8px 0 0 54px; padding: 0; list-style: none; }
 .opr .opt { display: flex; gap: 10px; margin: 6px 0; font-size: 13px; line-height: 1.45; }
-.opr .olabel { width: 22px; flex: 0 0 22px; font-weight: 900; color: #111827; }
+.opr .olabel { width: 22px; flex: 0 0 22px; font-weight: 700; color: #111827; }
 .opr .otext { flex: 1; }
 .opr .metaLine { margin: 8px 0 0 54px; font-size: 12px; color: #374151; display: flex; flex-wrap: wrap; gap: 12px; }
 .opr .metaLine b { color: #111827; }
 
 /* ── Watermark strip ── */
 .opr .ownerSep { margin: 14px 0; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 14px; background: linear-gradient(135deg, rgba(45, 125, 114, 0.06), rgba(0, 0, 0, 0)); padding: 10px 12px; position: relative; overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
-.opr .ownerSep::before { content: attr(data-watermark); position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-18deg); font-weight: 900; font-size: 18px; letter-spacing: 0.4px; color: rgba(0, 0, 0, 0.06); white-space: nowrap; pointer-events: none; }
+.opr .ownerSep::before { content: attr(data-watermark); position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-18deg); font-weight: 700; font-size: 18px; letter-spacing: 0.4px; color: rgba(0, 0, 0, 0.06); white-space: nowrap; pointer-events: none; }
 .opr .ownerSepRow { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; position: relative; }
 .opr .ownerSepSmall { font-size: 12px; color: #374151; }
 .opr .ownerSepChip { font-size: 11px; padding: 5px 9px; border-radius: 999px; border: 1px solid rgba(0, 0, 0, 0.1); background: #fff; color: #111827; white-space: nowrap; }

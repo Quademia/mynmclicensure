@@ -13,7 +13,7 @@
 
 /* Hero */
 .spg .guide-hero { background: linear-gradient(135deg, var(--primary-light), rgba(45, 125, 114, 0.08)); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 24px; margin-bottom: 24px; }
-.spg .guide-hero h1 { font-size: 24px; font-weight: 800; color: var(--primary); margin: 0 0 8px; }
+.spg .guide-hero h1 { font-size: 24px; font-weight: 700; color: var(--primary); margin: 0 0 8px; }
 .spg .guide-hero p { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin: 0; max-width: 65ch; }
 
 /* Section cards */

@@ -65,7 +65,7 @@
 /* Right side */
 .slh .attempt-side { display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; gap: 8px; }
 .slh .score-block { text-align: right; }
-.slh .score-main { font-size: 15px; font-weight: 800; color: var(--primary); }
+.slh .score-main { font-size: 15px; font-weight: 700; color: var(--primary); }
 .slh .score-main.not-done { color: var(--text-muted); font-weight: 500; font-size: 13px; }
 .slh .score-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 

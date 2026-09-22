@@ -20,7 +20,7 @@
 .runner .timer-bar { display: flex; align-items: center; justify-content: space-between; padding: 6px 16px 10px; gap: 10px; }
 .runner .timer-display { display: flex; align-items: center; gap: 8px; }
 .runner .timer-icon { font-size: 14px; }
-.runner .timer-value { font-size: 18px; font-weight: 800; color: white; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; transition: color 0.3s; }
+.runner .timer-value { font-size: 18px; font-weight: 700; color: white; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; transition: color 0.3s; }
 .runner .timer-value.amber { color: #fbbf24; }
 .runner .timer-value.red { color: #f87171; animation: runner-timer-pulse 0.8s infinite; }
 @keyframes runner-timer-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
@@ -162,7 +162,7 @@
 /* ── Score card ── */
 .runner .score-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 28px; text-align: center; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07); margin-bottom: 16px; }
 .runner .score-grade { font-size: 32px; margin-bottom: 8px; }
-.runner .score-text { font-size: 28px; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+.runner .score-text { font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
 .runner .score-pct { font-size: 18px; color: var(--accent); font-weight: 700; margin-bottom: 16px; }
 .runner .score-label { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
 .runner .score-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
