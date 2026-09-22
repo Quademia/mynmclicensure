@@ -108,16 +108,8 @@
 .subs-overlay .date-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
 /* ── Buttons ── */
-.subs .btn, .subs-overlay .btn { display: inline-block; padding: 9px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; border: none; transition: 0.2s; }
-.subs .btn:disabled, .subs-overlay .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.subs .btn-primary, .subs-overlay .btn-primary { background: var(--primary); color: white; }
-.subs .btn-primary:hover, .subs-overlay .btn-primary:hover { background: var(--primary-dark); }
-.subs .btn-danger, .subs-overlay .btn-danger { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
-.subs .btn-danger:hover, .subs-overlay .btn-danger:hover { background: #fee2e2; }
-.subs .btn-ghost, .subs-overlay .btn-ghost { background: none; border: 1px solid var(--border); color: var(--text); }
-.subs .btn-ghost:hover, .subs-overlay .btn-ghost:hover { background: var(--bg); }
-.subs .btn-success, .subs-overlay .btn-success { background: #f0fdf4; color: var(--success); border: 1px solid #bbf7d0; }
-.subs .btn-success:hover, .subs-overlay .btn-success:hover { background: #dcfce7; }
+/* The buttons are the shared family in styles/components.css (DS3,
+   2026-09-22). Only this surface's layout rules for them remain. */
 
 /* ── Forms (dialogs) ── */
 .subs-overlay .form-group { margin-bottom: 16px; }

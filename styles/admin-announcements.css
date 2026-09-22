@@ -59,15 +59,8 @@
 .ann .engage-counts span { display: flex; align-items: center; gap: 3px; }
 
 /* ── Buttons (legacy shared rules, scoped) ── */
-.ann .btn, .ann-overlay .btn { display: inline-block; padding: 9px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; border: none; transition: 0.2s; }
-.ann .btn:disabled, .ann-overlay .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.ann .btn-primary, .ann-overlay .btn-primary { background: var(--primary); color: #fff; }
-.ann .btn-primary:hover, .ann-overlay .btn-primary:hover { background: var(--primary-dark); }
-.ann .btn-ghost, .ann-overlay .btn-ghost { background: none; border: 1px solid var(--border); color: var(--text); }
-.ann .btn-ghost:hover, .ann-overlay .btn-ghost:hover { background: var(--bg); }
-.ann-overlay .btn-warning { background: #fff7ed; color: var(--warning); border: 1px solid #fed7aa; }
-.ann-overlay .btn-warning:hover { background: #ffedd5; }
-.ann .btn-sm { font-size: 12px; padding: 5px 10px; }
+/* The buttons are the shared family in styles/components.css (DS3,
+   2026-09-22). Only this surface's layout rules for them remain. */
 
 /* ── Side panel (portalled) ── */
 .ann-overlay .panel-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.25); z-index: 100; }

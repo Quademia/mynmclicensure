@@ -112,19 +112,9 @@
 .cat-overlay .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; position: sticky; bottom: 0; background: var(--white); }
 
 /* ── Buttons ── */
-.cat .btn, .cat-overlay .btn { display: inline-block; padding: 9px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; border: none; transition: 0.2s; }
-.cat .btn-primary, .cat-overlay .btn-primary { background: var(--primary); color: white; }
-.cat .btn-primary:hover, .cat-overlay .btn-primary:hover { background: var(--primary-dark); }
-.cat .btn-primary:disabled, .cat-overlay .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-.cat .btn-danger, .cat-overlay .btn-danger { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
-.cat .btn-danger:hover, .cat-overlay .btn-danger:hover { background: #fee2e2; }
-.cat .btn-ghost, .cat-overlay .btn-ghost { background: none; border: 1px solid var(--border); color: var(--text); }
-.cat .btn-ghost:hover, .cat-overlay .btn-ghost:hover { background: var(--bg); }
-.cat .btn-warning, .cat-overlay .btn-warning { background: #fff7ed; color: var(--warning); border: 1px solid #fed7aa; }
-.cat .btn-warning:hover, .cat-overlay .btn-warning:hover { background: #ffedd5; }
-.cat .btn-warning:disabled, .cat-overlay .btn-warning:disabled { opacity: 0.6; cursor: not-allowed; }
-.cat .btn-success, .cat-overlay .btn-success { background: #f0fdf4; color: var(--success); border: 1px solid #bbf7d0; }
-.cat .btn-success:hover, .cat-overlay .btn-success:hover { background: #dcfce7; }
+/* The buttons are the shared family in styles/components.css (DS3,
+   2026-09-22). `.cfg` below keeps its own for now — it is the Config
+   surface in this same file and a separate conversion. */
 
 /* ── Form ── */
 .cat-overlay .form-group { margin-bottom: 16px; }

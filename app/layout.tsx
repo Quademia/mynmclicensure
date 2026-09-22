@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import '@/styles/tokens.css';
 import '@/styles/base.css';
+import '@/styles/components.css';
 
 // The product's look comes from legacy/mynmclicensure/css/style.css
 // (rebuild.md §3.2), transcribed into styles/. Inter is the legacy font;
