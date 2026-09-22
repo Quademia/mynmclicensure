@@ -12,7 +12,7 @@ import type { Metadata } from 'next';
 import { requireStudent } from '@/lib/access';
 import { listOfflinePacks } from '@/lib/offline-packs/queries';
 import { MY_PACKS_PAGE_SIZE } from '@/lib/offline-packs/types';
-import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { PageHeader } from '@/components/shell/page-header';
 import { MyPacksClient } from './my-packs-client';
 import '@/styles/student-offline-packs.css';
 
@@ -28,7 +28,7 @@ export default async function MyPacksPage() {
 
   return (
     <>
-      <PageHeader title="My Offline Packs" subtitle="Open, review, and re-download the packs you already created." userName={displayNameOf(profile)} />
+      <PageHeader title="My Offline Packs" subtitle="Open, review, and re-download the packs you already created." />
       <MyPacksClient initialPage={firstPage} />
     </>
   );

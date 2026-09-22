@@ -15,7 +15,7 @@ import { requireStudent } from '@/lib/access';
 import { getConfig, getCourses } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import { OFFLINE_MAX_QUESTIONS_DEFAULT } from '@/lib/offline-packs/types';
-import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { PageHeader } from '@/components/shell/page-header';
 import { OfflineBuilderClient } from './offline-builder-client';
 import '@/styles/student-offline-builder.css';
 
@@ -44,7 +44,7 @@ export default async function OfflineBuilderPage({ searchParams }: { searchParam
 
   return (
     <>
-      <PageHeader title="Offline Pack Builder" subtitle="Build a stored revision pack from one course at a time." userName={displayNameOf(profile)} />
+      <PageHeader title="Offline Pack Builder" subtitle="Build a stored revision pack from one course at a time." />
       <OfflineBuilderClient courses={accessible} maxQuestions={maxQuestions} initialCourseId={initialCourseId} />
     </>
   );

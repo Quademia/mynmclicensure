@@ -9,7 +9,7 @@
 import type { Metadata } from 'next';
 import { requireAdmin } from '@/lib/access';
 import { getAllCourses } from '@/lib/catalogue/queries';
-import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { PageHeader } from '@/components/shell/page-header';
 import { QuestionBankClient } from './question-bank-client';
 import '@/styles/admin-question-bank.css';
 
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function AdminQuestionBankPage() {
-  const { supabase, profile } = await requireAdmin();
+  const { supabase } = await requireAdmin();
   const courses = await getAllCourses(supabase);
 
   return (
@@ -28,7 +28,6 @@ export default async function AdminQuestionBankPage() {
       <PageHeader
         title="Question Bank"
         subtitle="Browse, edit and manage questions across all courses"
-        userName={displayNameOf(profile)}
       />
       <QuestionBankClient courses={courses} />
     </>

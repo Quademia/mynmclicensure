@@ -3,8 +3,10 @@
 // The student sidebar, transcribed from legacy
 // js/mynmclicensure-student-sidebar.js in its order. Two legacy rows
 // are not here: "Teacher Assess" (MyTeacher's, left with the April
-// split) and nothing else — the Telegram row IS here, hidden until
-// slice 17 builds its page (rebuild.md §9 #10).
+// split) and the My Account block that ended the menu — My Profile and
+// Upgrade / Extend are the top bar's avatar menu under A3
+// (10-design-system.md DS5; components/shell/top-bar.tsx). The Telegram
+// row IS here, hidden until slice 17 builds its page (rebuild.md §9 #10).
 
 import type { NavItem } from './types';
 
@@ -41,15 +43,5 @@ export const STUDENT_NAV: NavItem[] = [
     label: '📣 Telegram Channel',
     href: 'https://t.me/QAcademynurseshub',
     external: true,
-  },
-  {
-    key: 'account',
-    label: 'My Account',
-    account: true,
-    dividerAbove: true,
-    children: [
-      { key: 'profile', label: '👤 My Profile', href: `${S}/profile` },
-      { key: 'upgrade', label: '💳 Upgrade / Extend', href: `${S}/upgrade` },
-    ],
   },
 ];

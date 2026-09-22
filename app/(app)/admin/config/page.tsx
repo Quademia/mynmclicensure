@@ -6,7 +6,7 @@
 import type { Metadata } from 'next';
 import { requireAdmin } from '@/lib/access';
 import { getConfigRows } from '@/lib/catalogue/queries';
-import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { PageHeader } from '@/components/shell/page-header';
 import { ConfigClient } from './config-client';
 import '@/styles/admin-catalogue.css';
 
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function AdminConfigPage() {
-  const { supabase, profile } = await requireAdmin();
+  const { supabase } = await requireAdmin();
   const rows = await getConfigRows(supabase);
 
   return (
@@ -25,7 +25,6 @@ export default async function AdminConfigPage() {
       <PageHeader
         title="Platform Config"
         subtitle="Manage platform-wide settings and feature controls"
-        userName={displayNameOf(profile)}
       />
       <ConfigClient rows={rows} />
     </>

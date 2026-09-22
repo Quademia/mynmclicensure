@@ -8,7 +8,7 @@
 import type { Metadata } from 'next';
 import { requireAdmin } from '@/lib/access';
 import { getAllProducts, getCourses, getPrograms } from '@/lib/catalogue/queries';
-import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { PageHeader } from '@/components/shell/page-header';
 import { ProductsClient } from './products-client';
 import '@/styles/admin-catalogue.css';
 
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function AdminProductsPage() {
-  const { supabase, profile } = await requireAdmin();
+  const { supabase } = await requireAdmin();
   const [products, courses, programs] = await Promise.all([
     getAllProducts(supabase),
     getCourses(supabase),
@@ -31,7 +31,6 @@ export default async function AdminProductsPage() {
       <PageHeader
         title="Products"
         subtitle="Manage subscription products and course bundles"
-        userName={displayNameOf(profile)}
       />
       <ProductsClient products={products} courses={courses} programs={programs} />
     </>

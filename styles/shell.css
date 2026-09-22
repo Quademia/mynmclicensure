@@ -1,10 +1,21 @@
 /* styles/shell.css
  *
- * The authenticated chrome — transcribed from legacy
- * mynmclicensure/css/style.css ("Dashboard Layout", "Cards",
- * "Responsive", hamburger, overlay), the dropdown and badge CSS the two
- * sidebar scripts injected at runtime, and the .top-nav / .user-menu /
- * .logout-btn block every page carried inline. Same values, same names.
+ * The authenticated chrome as A3 (10-design-system.md DS5, Sam
+ * 2026-09-22): a 56px white top bar across the whole width, over the
+ * navy sidebar, which opens and closes. The sidebar's own values are
+ * still legacy's — transcribed from mynmclicensure/css/style.css
+ * ("Dashboard Layout", "Cards", "Responsive") and the dropdown and
+ * badge CSS the two sidebar scripts injected at runtime. The
+ * .top-nav / .user-menu / .logout-btn block every page carried is
+ * gone: the name and Sign out live in the top bar's avatar menu.
+ *
+ * Open or closed is a class on .dashboard-wrapper, set by the shell
+ * frame (components/shell/shell-state.tsx):
+ *   .nav-closed      — desktop, the student closed it (the nmc_nav
+ *                      cookie, read on the server so the first paint
+ *                      is already right); the content takes the width.
+ *   .nav-phone-open  — below 768px, the drawer is slid in over the
+ *                      page beneath the bar.
  *
  * Loaded once from app/(app)/layout.tsx.
  */
@@ -13,38 +24,210 @@
 .dashboard-wrapper {
   display: flex;
   min-height: 100vh;
+  padding-top: 56px; /* the top bar */
 }
 
+/* --- Top bar (A3) --- */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  z-index: 1100;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 12px 0 6px;
+}
+
+/* every control is a 44px target; a <button> and a <Link> share it */
+.topbar-btn {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+.topbar-btn:hover {
+  background: var(--bg);
+  color: var(--ink);
+  text-decoration: none;
+}
+.topbar-btn svg { display: block; }
+
+.topbar-toggle .topbar-ico-close { display: none; }
+
+.topbar-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-left: 4px;
+  min-width: 0;
+  white-space: nowrap;
+}
+.topbar-brand b {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--brand-navy);
+}
+.topbar-brand span {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--ink-muted);
+  padding-left: 10px;
+  border-left: 1px solid var(--border);
+}
+.topbar-spacer { flex: 1; }
+
+/* the unread count on the envelope — the sidebar row's number, here so
+   a closed sidebar cannot hide a reply */
+.topbar-count {
+  position: absolute;
+  top: 5px;
+  left: 25px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: var(--radius-pill);
+  background: var(--brand-teal);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 13px;
+  text-align: center;
+  border: 1.5px solid var(--surface);
+}
+
+.topbar-account { position: relative; }
+.topbar-avatar-btn { border-radius: var(--radius-pill); }
+.topbar-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--brand-teal-pale);
+  color: var(--brand-teal-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  overflow: hidden;
+  flex: none;
+}
+.topbar-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.topbar-avatar-btn.pressed .topbar-avatar,
+.topbar-avatar-btn:focus-visible .topbar-avatar {
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--brand-teal);
+}
+
+/* the account menu: name and email, the audience's rows, Sign out */
+.topbar-menu {
+  position: absolute;
+  top: 52px;
+  right: 0;
+  width: 232px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 6px 0;
+  z-index: 1200;
+}
+.topbar-menu-who {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 6px;
+}
+.topbar-menu-who b {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.topbar-menu-who span {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--ink-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.topbar-menu a,
+.topbar-menu button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 14px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: left;
+  text-decoration: none;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.topbar-menu a:hover,
+.topbar-menu button:hover {
+  background: var(--bg);
+  text-decoration: none;
+}
+.topbar-menu a.accent {
+  background: var(--brand-teal-pale);
+  color: var(--brand-teal-hover);
+}
+.topbar-menu hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 6px 0;
+}
+.topbar-menu .topbar-menu-out { color: var(--badge-danger-ink); }
+
+/* --- Sidebar --- */
 .sidebar {
   width: 240px;
   background: var(--primary-dark);
   border-right: 1px solid var(--primary);
-  padding: 24px 0;
+  padding: 12px 0 24px;
   position: fixed;
-  top: 0;
+  top: 56px;
   left: 0;
-  height: 100vh;
+  height: calc(100vh - 56px);
   overflow-y: auto;
+  z-index: 1000;
+  transition: transform 0.25s ease;
 }
-
-.sidebar-logo {
-  padding: 0 24px 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.sidebar-logo h2 {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--white);
-}
-
-.sidebar-logo p {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.sidebar-nav {
-  padding: 16px 0;
+.nav-closed .sidebar {
+  transform: translateX(-100%);
 }
 
 .sidebar-nav a {
@@ -90,11 +273,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.sidebar-account-divider {
-  height: 1px;
-  background: rgba(255, 255, 255, 0.1);
-  margin: 10px 16px;
-}
 .sidebar-dropdown-toggle:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
 .sidebar-dropdown-toggle.active { background: var(--accent); color: #fff; }
 .sidebar-dropdown-arrow { font-size: 11px; transition: transform 0.2s; }
@@ -119,16 +297,6 @@
 .sidebar-dropdown-menu a:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
 .sidebar-dropdown-menu a.active { color: #fff; font-weight: 600; background: transparent; }
 .sidebar-dropdown-loading { padding: 8px 24px 8px 40px; font-size: 12px; color: rgba(255, 255, 255, 0.4); }
-.sidebar-account-avatar-wrap { display: inline-flex; align-items: center; flex-shrink: 0; }
-.sidebar-account-avatar {
-  width: 24px; height: 24px; border-radius: 50%; object-fit: cover;
-}
-.sidebar-account-initials {
-  width: 24px; height: 24px; border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2); color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px; font-weight: 700;
-}
 
 /* --- Messages badge (student .sidebar-msg-badge = admin .admin-msg-badge) --- */
 .sidebar-msg-badge {
@@ -144,12 +312,15 @@
   flex: 1;
   padding: 32px;
   min-width: 0;
+  transition: margin-left 0.25s ease;
+}
+.nav-closed .main-content {
+  margin-left: 0;
 }
 
 .page-header {
   margin-bottom: 28px;
 }
-.page-header-inline { margin-bottom: 0; }
 
 .page-header h1 {
   font-size: 22px;
@@ -162,26 +333,6 @@
   font-size: 14px;
   margin-top: 4px;
 }
-
-/* --- Top nav (every legacy page's inline block) --- */
-.top-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 28px;
-}
-.user-menu { display: flex; align-items: center; gap: 12px; }
-.user-name { font-size: 14px; font-weight: 500; }
-.logout-btn {
-  font-size: 13px;
-  color: var(--text-muted);
-  cursor: pointer;
-  background: none;
-  border: none;
-  font-family: inherit;
-  padding: 0;
-}
-.logout-btn:hover { color: var(--danger); }
 
 /* --- Cards --- */
 .card {
@@ -198,58 +349,49 @@
   gap: 16px;
 }
 
-/* --- Hamburger button — phone only --- */
-.hamburger-btn {
-  display: none;
-  position: fixed;
-  top: 12px;
-  left: 12px;
-  z-index: 1100;
-  background: var(--primary-dark);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  width: 40px;
-  height: 40px;
-  font-size: 20px;
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-}
-
-/* --- Overlay — phone only --- */
+/* --- Overlay — phone only, beneath the bar --- */
 .sidebar-overlay {
   display: none;
   position: fixed;
-  inset: 0;
+  top: 56px;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 999;
-}
-.sidebar-overlay.open {
-  display: block;
 }
 
 /* --- Responsive (UI convention #3, 768px) --- */
 @media (max-width: 768px) {
   .sidebar {
     transform: translateX(-100%);
-    transition: transform 0.25s ease;
-    z-index: 1000;
   }
-  .sidebar.open {
+  .nav-phone-open .sidebar {
     transform: translateX(0);
+  }
+  .nav-phone-open .sidebar-overlay {
+    display: block;
   }
   .main-content {
     margin-left: 0;
     padding: 16px;
-    padding-top: 64px;
   }
-  .hamburger-btn {
-    display: flex;
+  /* the hamburger becomes the close mark while the drawer is out */
+  .nav-phone-open .topbar-toggle .topbar-ico-menu { display: none; }
+  .nav-phone-open .topbar-toggle .topbar-ico-close { display: block; }
+
+  .topbar { padding: 0 6px; }
+  /* the wordmark stacks to save width */
+  .topbar-brand {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
   }
-  .top-nav {
-    flex-wrap: wrap;
-    gap: 8px;
+  .topbar-brand b { font-size: 15px; }
+  .topbar-brand span {
+    font-size: 11px;
+    padding-left: 0;
+    border-left: 0;
+    letter-spacing: 0.02em;
   }
 }

@@ -8,7 +8,7 @@
 
 import type { Metadata } from 'next';
 import { requireStudent } from '@/lib/access';
-import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { PageHeader } from '@/components/shell/page-header';
 import { PortalGuide } from './portal-guide-client';
 import '@/styles/student-portal-guide.css';
 
@@ -19,10 +19,10 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function PortalGuidePage() {
-  const { profile } = await requireStudent();
+  await requireStudent();
   return (
     <>
-      <PageHeader title="Portal Guide" subtitle="How to use Quademia effectively" userName={displayNameOf(profile)} />
+      <PageHeader title="Portal Guide" subtitle="How to use Quademia effectively" />
       <PortalGuide />
     </>
   );

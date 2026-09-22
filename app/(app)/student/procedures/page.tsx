@@ -11,7 +11,7 @@
 import type { Metadata } from 'next';
 import { requireStudent } from '@/lib/access';
 import { getPrograms } from '@/lib/catalogue/queries';
-import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { PageHeader } from '@/components/shell/page-header';
 import { ProceduresClient } from './procedures-client';
 import '@/styles/student-procedures.css';
 
@@ -29,7 +29,7 @@ export default async function ProceduresPage() {
 
   return (
     <>
-      <PageHeader title="Practical Skills — Procedures" subtitle="NMC Ghana procedure manuals for OSCE preparation" userName={displayNameOf(profile)} />
+      <PageHeader title="Practical Skills — Procedures" subtitle="NMC Ghana procedure manuals for OSCE preparation" />
       <ProceduresClient programRaw={programRaw} programName={programName} />
     </>
   );

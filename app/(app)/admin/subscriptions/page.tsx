@@ -12,7 +12,7 @@ import type { Metadata } from 'next';
 import { requireAdmin } from '@/lib/access';
 import { getAllProducts, getPrograms } from '@/lib/catalogue/queries';
 import { getAllSubscriptions } from '@/lib/subscriptions/queries';
-import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { PageHeader } from '@/components/shell/page-header';
 import { SubscriptionsClient } from './subscriptions-client';
 import '@/styles/admin-subscriptions.css';
 import '@/styles/admin-grant-dialog.css';
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function AdminSubscriptionsPage() {
-  const { supabase, profile } = await requireAdmin();
+  const { supabase } = await requireAdmin();
   const [subscriptions, products, programs] = await Promise.all([
     getAllSubscriptions(supabase),
     getAllProducts(supabase),
@@ -33,7 +33,7 @@ export default async function AdminSubscriptionsPage() {
 
   return (
     <>
-      <PageHeader title="Subscriptions" subtitle="Manage all student subscriptions" userName={displayNameOf(profile)} />
+      <PageHeader title="Subscriptions" subtitle="Manage all student subscriptions" />
       <SubscriptionsClient subscriptions={subscriptions} products={products} programs={programs} />
     </>
   );

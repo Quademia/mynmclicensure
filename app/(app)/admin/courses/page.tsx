@@ -6,7 +6,7 @@
 import type { Metadata } from 'next';
 import { requireAdmin } from '@/lib/access';
 import { getAllCourses, getPrograms } from '@/lib/catalogue/queries';
-import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { PageHeader } from '@/components/shell/page-header';
 import { CoursesClient } from './courses-client';
 import '@/styles/admin-catalogue.css';
 
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function AdminCoursesPage() {
-  const { supabase, profile } = await requireAdmin();
+  const { supabase } = await requireAdmin();
   const [courses, programs] = await Promise.all([getAllCourses(supabase), getPrograms(supabase)]);
 
   return (
@@ -25,7 +25,6 @@ export default async function AdminCoursesPage() {
       <PageHeader
         title="Courses & Programmes"
         subtitle="Manage courses and nursing programmes"
-        userName={displayNameOf(profile)}
       />
       <CoursesClient courses={courses} programs={programs} />
     </>

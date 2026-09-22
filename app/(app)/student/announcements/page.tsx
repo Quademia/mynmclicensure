@@ -11,7 +11,6 @@
 import type { Metadata } from 'next';
 import { requireStudent } from '@/lib/access';
 import { getAnnouncementsForStudent, getStudentNoticeStates } from '@/lib/announcements/queries';
-import { displayNameOf } from '@/components/shell/page-header';
 import { AnnouncementsClient } from './announcements-client';
 import '@/styles/student-announcements.css';
 
@@ -30,5 +29,5 @@ export default async function StudentAnnouncementsPage() {
 
   // The page header is rendered by the client half so its subtitle count
   // follows Mark as Read and Dismiss (legacy updated #pageSubtitle in place).
-  return <AnnouncementsClient announcements={announcements} initialStates={states} userName={displayNameOf(profile)} />;
+  return <AnnouncementsClient announcements={announcements} initialStates={states} />;
 }

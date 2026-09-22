@@ -6,11 +6,12 @@
 //   - dropdowns (My Courses, Offline Packs, My Account) that toggle on
 //     click and open by themselves when a child is the current page;
 //   - the My Courses rows from the student's course access ("No courses
-//     found" when empty), the My Account toggle with avatar or initials
-//     and the student's name;
+//     found" when empty);
 //   - the Messages badge (99+ cap), shown only when the count is > 0.
 // Rendered inside the drawer (components/shell/mobile/mobile-drawer.tsx),
-// once, for every width.
+// once, for every width. The My Account toggle legacy ended the student
+// menu with (avatar, name, My Profile, Upgrade / Extend) is the top bar's
+// avatar menu under A3 (10-design-system.md DS5).
 
 'use client';
 
@@ -21,25 +22,6 @@ import type { NavItem } from '@/lib/nav/types';
 
 export type SidebarCourse = { course_id: string; title: string };
 
-export type SidebarUser = {
-  /** forename → name → email → 'My Account', as legacy sidebarSetUser(). */
-  label: string;
-  avatarUrl: string | null;
-};
-
-function initialsOf(label: string): string {
-  return (label || '?')
-    .split(' ')
-    .map((w) => w[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
-}
-
-function isSafeAvatar(url: string | null): url is string {
-  return !!url && /^https?:\/\//.test(url);
-}
-
 function Badge({ count }: { count: number }) {
   if (!count || count <= 0) return null;
   return <span className="sidebar-msg-badge">{count > 99 ? '99+' : String(count)}</span>;
@@ -48,13 +30,11 @@ function Badge({ count }: { count: number }) {
 export function SidebarNav({
   items,
   courses = [],
-  user,
   badges = {},
   onNavigate,
 }: {
   items: NavItem[];
   courses?: SidebarCourse[];
-  user?: SidebarUser;
   badges?: Record<string, number>;
   /** Called when a link is tapped — the drawer closes itself on a phone. */
   onNavigate?: () => void;
@@ -138,8 +118,6 @@ export function SidebarNav({
       rows = (item.children ?? []).map((c) => renderLink(c));
     }
 
-    const label = item.account && user ? user.label || 'My Account' : item.label;
-
     return (
       <div key={item.key} className={`sidebar-dropdown${open ? ' open' : ''}`}>
         <div
@@ -155,17 +133,7 @@ export function SidebarNav({
             }
           }}
         >
-          {item.account && user ? (
-            <span className="sidebar-account-avatar-wrap">
-              {isSafeAvatar(user.avatarUrl) ? (
-                // eslint-disable-next-line @next/next/no-img-element -- a student-supplied URL of unknown host; next/image would need every host allow-listed
-                <img className="sidebar-account-avatar" src={user.avatarUrl} alt="" />
-              ) : (
-                <span className="sidebar-account-initials">{initialsOf(user.label)}</span>
-              )}
-            </span>
-          ) : null}
-          <span className="sidebar-dropdown-label">{label}</span>
+          <span className="sidebar-dropdown-label">{item.label}</span>
           <span className="sidebar-dropdown-arrow">▾</span>
         </div>
         <div className="sidebar-dropdown-menu">{rows}</div>
@@ -179,7 +147,6 @@ export function SidebarNav({
         .filter((i) => !i.hidden)
         .map((item) => (
           <div key={item.key} className="sidebar-item">
-            {item.dividerAbove ? <div className="sidebar-account-divider" /> : null}
             {item.children ? renderDropdown(item) : renderLink(item)}
           </div>
         ))}

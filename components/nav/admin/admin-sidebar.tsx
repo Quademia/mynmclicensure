@@ -1,24 +1,16 @@
 // components/nav/admin/admin-sidebar.tsx
 //
-// The admin sidebar: the shared drawer with the admin menu and the
-// "Admin Panel" header, as legacy.
+// The admin sidebar: the admin menu inside the shared drawer. Under A3
+// (10-design-system.md DS5) the "Admin Panel" header moved to the top
+// bar's wordmark, so the sidebar starts at Dashboard.
 
 'use client';
 
 import { ADMIN_NAV } from '@/lib/nav/admin';
-import { MobileDrawer } from '@/components/shell/mobile/mobile-drawer';
+import { useShell } from '@/components/shell/shell-state';
 import { SidebarNav } from '@/components/nav/shared/sidebar-nav';
 
 export function AdminSidebar({ badges }: { badges: Record<string, number> }) {
-  return (
-    <MobileDrawer
-      header={
-        <>
-          <h2>Quademia</h2>
-          <p>Admin Panel</p>
-        </>
-      }
-      renderNav={(close) => <SidebarNav items={ADMIN_NAV} badges={badges} onNavigate={close} />}
-    />
-  );
+  const { closeOnPhone } = useShell();
+  return <SidebarNav items={ADMIN_NAV} badges={badges} onNavigate={closeOnPhone} />;
 }

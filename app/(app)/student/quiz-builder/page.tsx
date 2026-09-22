@@ -13,7 +13,7 @@ import { requireStudent } from '@/lib/access';
 import { getConfig, getCourses } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import { BUILDER_MAX_QUESTIONS_DEFAULT, BUILDER_MINUTES_PER_QUESTION_DEFAULT } from '@/lib/attempts/types';
-import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { PageHeader } from '@/components/shell/page-header';
 import { QuizBuilderClient } from './quiz-builder-client';
 import '@/styles/student-quiz-builder.css';
 
@@ -44,7 +44,7 @@ export default async function QuizBuilderPage({ searchParams }: { searchParams: 
 
   return (
     <>
-      <PageHeader title="Quiz Builder" subtitle="Build a custom quiz from one course at a time." userName={displayNameOf(profile)} />
+      <PageHeader title="Quiz Builder" subtitle="Build a custom quiz from one course at a time." />
       <QuizBuilderClient
         courses={accessible}
         maxQuestions={maxQuestions}

@@ -29,7 +29,7 @@ import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import { getQuizzesForCourse } from '@/lib/quizzes/queries';
 import { getQuizAvailability } from '@/lib/quizzes/availability';
 import type { QuizCard } from '@/lib/quizzes/types';
-import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { PageHeader } from '@/components/shell/page-header';
 import { getAnnouncementsForStudent } from '@/lib/announcements/queries';
 import { AnnouncementBody } from '@/components/announcements/announcement-body';
 import '@/styles/student-course.css';
@@ -84,7 +84,6 @@ export default async function CoursePage({ params }: { params: Params }) {
   const { supabase, profile } = await requireStudent();
   const { id } = await params;
   const courseId = String(id || '').trim();
-  const userName = displayNameOf(profile);
 
   if (!courseId) redirect('/student/dashboard');
 
@@ -95,7 +94,7 @@ export default async function CoursePage({ params }: { params: Params }) {
   if (!access) {
     return (
       <div className="scp">
-        <PageHeader title="Access Denied" userName={userName} />
+        <PageHeader title="Access Denied" />
         <div className="no-access-card">
           <div className="icon">🔒</div>
           <h2>No Access</h2>
@@ -110,7 +109,7 @@ export default async function CoursePage({ params }: { params: Params }) {
   if (!course) {
     return (
       <div className="scp">
-        <PageHeader title="Course Not Found" userName={userName} />
+        <PageHeader title="Course Not Found" />
       </div>
     );
   }
@@ -131,7 +130,7 @@ export default async function CoursePage({ params }: { params: Params }) {
 
   return (
     <div className="scp">
-      <PageHeader title={course.title} userName={userName} />
+      <PageHeader title={course.title} />
 
       {/* 1. Course header */}
       <div className="course-header">

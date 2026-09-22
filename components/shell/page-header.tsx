@@ -1,35 +1,16 @@
 // components/shell/page-header.tsx
 //
-// The row at the top of every legacy page (23 of them carry it):
-// <div class="top-nav"> — the page title and subtitle on the left, the
-// signed-in name and the Sign out button on the right. Server
-// Component. Sign out is a form POST to /logout, so no link prefetch
-// can ever sign someone out.
+// The row at the top of a page: the title and subtitle. Legacy's
+// <div class="top-nav"> also carried the signed-in name and a Sign out
+// button on the right; under A3 (10-design-system.md DS5) those live in
+// the top bar, so the 23 pages that render this keep only the left
+// half. Server Component.
 
-export function PageHeader({
-  title,
-  subtitle,
-  userName,
-}: {
-  title: string;
-  subtitle?: React.ReactNode;
-  /** forename → name → email, as every legacy page filled #userName. */
-  userName: string;
-}) {
+export function PageHeader({ title, subtitle }: { title: string; subtitle?: React.ReactNode }) {
   return (
-    <div className="top-nav">
-      <div className="page-header page-header-inline">
-        <h1>{title}</h1>
-        {subtitle ? <p>{subtitle}</p> : null}
-      </div>
-      <div className="user-menu">
-        <span className="user-name">{userName}</span>
-        <form method="post" action="/logout">
-          <button type="submit" className="logout-btn">
-            Sign out
-          </button>
-        </form>
-      </div>
+    <div className="page-header">
+      <h1>{title}</h1>
+      {subtitle ? <p>{subtitle}</p> : null}
     </div>
   );
 }

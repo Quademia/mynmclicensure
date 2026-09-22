@@ -39,7 +39,10 @@ a:hover {
 /* --- Toast (UI convention #1) --- */
 .app-toast {
   position: fixed;
-  top: 24px;
+  /* 56px bar + 16px: at z-index 20000 the toast paints OVER the A3 top
+     bar, so it sits below it rather than across the envelope, bell and
+     avatar (10-design-system.md DS5). Phone: 56 + 12 below. */
+  top: 72px;
   right: 24px;
   z-index: 20000;
   display: flex;
@@ -112,7 +115,7 @@ a:hover {
 
 @media (max-width: 768px) {
   .app-toast {
-    top: 12px;
+    top: 68px;
     right: 12px;
     left: 12px;
     max-width: none;

@@ -15,7 +15,7 @@ import { getQuizzesForCourse } from '@/lib/quizzes/queries';
 import { getStudentAttempts } from '@/lib/attempts/queries';
 import type { QuizCard } from '@/lib/quizzes/types';
 import type { AttemptWithProgress } from '@/lib/attempts/types';
-import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { PageHeader } from '@/components/shell/page-header';
 import { StudentQuizList } from '@/components/quizzes/student-quiz-list';
 import '@/styles/student-quizzes.css';
 
@@ -50,7 +50,7 @@ export default async function StudentFixedQuizzesPage({ searchParams }: { search
 
   return (
     <>
-      <PageHeader title="Fixed Quizzes" subtitle="Pre-built quizzes organised by course" userName={displayNameOf(profile)} />
+      <PageHeader title="Fixed Quizzes" subtitle="Pre-built quizzes organised by course" />
       <StudentQuizList
         kind="fixed"
         courses={enrolled}

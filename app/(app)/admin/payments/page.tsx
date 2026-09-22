@@ -23,7 +23,7 @@ import {
   getRevenueRows,
   getTodayRevenue,
 } from '@/lib/payments/admin-queries';
-import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { PageHeader } from '@/components/shell/page-header';
 import { PaymentsClient } from './payments-client';
 import '@/styles/admin-payments.css';
 
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPaymentsPage() {
-  const { supabase, profile } = await requireAdmin();
+  const { supabase } = await requireAdmin();
 
   const [products, programs, counts, today, firstPage, revenueRows] = await Promise.all([
     getAllProducts(supabase),
@@ -47,7 +47,7 @@ export default async function AdminPaymentsPage() {
 
   return (
     <>
-      <PageHeader title="Payments" subtitle="View and manage all payment records" userName={displayNameOf(profile)} />
+      <PageHeader title="Payments" subtitle="View and manage all payment records" />
       <PaymentsClient
         products={products}
         programs={programs}

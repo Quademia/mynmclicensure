@@ -12,7 +12,7 @@ import { requireAdmin } from '@/lib/access';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getAllCourses } from '@/lib/catalogue/queries';
 import { getAllQuizzes } from '@/lib/quizzes/queries';
-import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { PageHeader } from '@/components/shell/page-header';
 import { AttemptsClient } from './attempts-client';
 import '@/styles/admin-attempts.css';
 
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function AdminAttemptsPage() {
-  const { supabase, profile } = await requireAdmin();
+  const { supabase } = await requireAdmin();
   const serviceDb = createServiceRoleClient(); // full quiz rows (Q1)
 
   const [courses, fixed, mocks] = await Promise.all([
@@ -38,7 +38,7 @@ export default async function AdminAttemptsPage() {
 
   return (
     <>
-      <PageHeader title="Attempts" subtitle="See and analyse students' quiz & exam attempts" userName={displayNameOf(profile)} />
+      <PageHeader title="Attempts" subtitle="See and analyse students' quiz & exam attempts" />
       <AttemptsClient courses={courses.map((c) => ({ course_id: c.course_id, title: c.title }))} quizTitles={quizTitles} />
     </>
   );

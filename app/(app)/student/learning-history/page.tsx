@@ -12,7 +12,7 @@ import { requireStudent } from '@/lib/access';
 import { getCourses } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import { getStudentAttemptsPaginated } from '@/lib/attempts/queries';
-import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { PageHeader } from '@/components/shell/page-header';
 import { LearningHistoryClient } from './learning-history-client';
 import '@/styles/student-learning-history.css';
 
@@ -46,7 +46,7 @@ export default async function LearningHistoryPage({ searchParams }: { searchPara
 
   return (
     <>
-      <PageHeader title="Learning History" subtitle="All your quiz attempts across courses" userName={displayNameOf(profile)} />
+      <PageHeader title="Learning History" subtitle="All your quiz attempts across courses" />
       <LearningHistoryClient courses={enrolled} initialCourseId={initialCourseId} initialPage={firstPage} />
     </>
   );

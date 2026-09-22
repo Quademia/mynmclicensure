@@ -8,7 +8,9 @@
 // The My Courses rows are the active courses the student's subscriptions
 // cover (legacy populateCourseDropdown(courseAccessMap, allCourses) —
 // slice 8). The Messages badge is legacy getUnreadCountForUser — the
-// student's open threads holding a message not yet read (slice 12a).
+// student's open threads holding a message not yet read (slice 12a);
+// under A3 the same count sits on the top bar's envelope, so a closed
+// sidebar cannot hide a reply (10-design-system.md DS5).
 
 import { requireStudent } from '@/lib/access';
 import { AppShell } from '@/components/shell/app-shell';
@@ -33,13 +35,18 @@ export default async function StudentLayout({ children }: { children: React.Reac
 
   return (
     <AppShell
-      sidebar={
-        <StudentSidebar
-          user={{ label: displayNameOf(profile) || 'My Account', avatarUrl: profile.avatar_url }}
-          courses={courses}
-          badges={{ messages: unread }}
-        />
-      }
+      sidebar={<StudentSidebar courses={courses} badges={{ messages: unread }} />}
+      topBar={{
+        product: 'MyNMCLicensure',
+        messagesHref: '/student/messages',
+        announcementsHref: '/student/announcements',
+        unread,
+        user: { name: displayNameOf(profile), email: profile.email, avatarUrl: profile.avatar_url },
+        menuLinks: [
+          { label: 'My Profile', href: '/student/profile' },
+          { label: 'Upgrade / Extend', href: '/student/upgrade', accent: true },
+        ],
+      }}
     >
       {children}
     </AppShell>

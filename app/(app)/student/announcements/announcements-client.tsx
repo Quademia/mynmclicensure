@@ -34,11 +34,9 @@ function fmtDate(iso: string | null): string {
 export function AnnouncementsClient({
   announcements,
   initialStates,
-  userName,
 }: {
   announcements: Announcement[];
   initialStates: StudentNoticeMap;
-  userName: string;
 }) {
   const [states, setStates] = useState<StudentNoticeMap>(initialStates);
   const [tab, setTab] = useState<Tab>('all');
@@ -108,7 +106,7 @@ export function AnnouncementsClient({
 
   return (
     <>
-      <PageHeader title="Announcements" subtitle={`${total} announcement${total !== 1 ? 's' : ''} · ${unread} unread`} userName={userName} />
+      <PageHeader title="Announcements" subtitle={`${total} announcement${total !== 1 ? 's' : ''} · ${unread} unread`} />
       <div className="sann">
         <div className="tab-bar">
           {tabs.map((t) => (

@@ -11,7 +11,7 @@ import type { Metadata } from 'next';
 import { requireAdmin } from '@/lib/access';
 import { getAllCourses } from '@/lib/catalogue/queries';
 import { getAllQuizzesPaginated } from '@/lib/quizzes/queries';
-import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { PageHeader } from '@/components/shell/page-header';
 import { QuizManager } from '@/components/quizzes/quiz-manager';
 import '@/styles/admin-quizzes.css';
 
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function AdminFixedQuizzesPage() {
-  const { supabase, profile } = await requireAdmin();
+  const { supabase } = await requireAdmin();
   const [courses, first] = await Promise.all([
     getAllCourses(supabase),
     getAllQuizzesPaginated(supabase, 'fixed', '', 0, 50),
@@ -33,7 +33,6 @@ export default async function AdminFixedQuizzesPage() {
       <PageHeader
         title="Fixed Quizzes"
         subtitle="Build and manage pre-set quiz assessments for all courses"
-        userName={displayNameOf(profile)}
       />
       <QuizManager kind="fixed" courses={courses} initialRows={first.quizzes} initialTotal={first.total} />
     </>

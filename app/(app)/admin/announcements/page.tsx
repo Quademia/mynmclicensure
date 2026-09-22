@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function AdminAnnouncementsPage() {
-  const { supabase, profile } = await requireAdmin();
+  const { supabase } = await requireAdmin();
   const [announcements, engage, programs, courses, products, cohorts] = await Promise.all([
     getAllAnnouncements(supabase),
     getEngagementCounts(supabase),
@@ -36,7 +36,7 @@ export default async function AdminAnnouncementsPage() {
   return (
     <>
       {/* legacy: adminName = forename || name || 'Admin' */}
-      <PageHeader title="Announcements" subtitle="Create and manage platform announcements" userName={profile.forename || profile.name || 'Admin'} />
+      <PageHeader title="Announcements" subtitle="Create and manage platform announcements" />
       <AnnouncementsClient
         announcements={announcements}
         engage={engage}

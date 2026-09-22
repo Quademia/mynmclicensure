@@ -13,7 +13,7 @@ import { requireAdmin } from '@/lib/access';
 import { getPrograms, getProducts } from '@/lib/catalogue/queries';
 import { getUsersPaginated } from '@/lib/users/queries';
 import { EMPTY_USER_FILTERS } from '@/lib/users/types';
-import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { PageHeader } from '@/components/shell/page-header';
 import { UsersClient } from './users-client';
 import '@/styles/admin-users.css';
 import '@/styles/admin-grant-dialog.css';
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function AdminUsersPage({ searchParams }: { searchParams: Promise<{ user_id?: string }> }) {
-  const { supabase, profile } = await requireAdmin();
+  const { supabase } = await requireAdmin();
   const { user_id } = await searchParams;
 
   const [programs, products, firstPage] = await Promise.all([
@@ -36,7 +36,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
 
   return (
     <>
-      <PageHeader title="Users" subtitle="Search, view and manage all platform users" userName={displayNameOf(profile)} />
+      <PageHeader title="Users" subtitle="Search, view and manage all platform users" />
       <UsersClient programs={programs} products={products} firstPage={firstPage} openUserId={String(user_id || '').trim()} />
     </>
   );

@@ -13,7 +13,7 @@ import { getQuizzesForCourse } from '@/lib/quizzes/queries';
 import { getStudentAttempts } from '@/lib/attempts/queries';
 import type { QuizCard } from '@/lib/quizzes/types';
 import type { AttemptWithProgress } from '@/lib/attempts/types';
-import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { PageHeader } from '@/components/shell/page-header';
 import { StudentQuizList } from '@/components/quizzes/student-quiz-list';
 import '@/styles/student-quizzes.css';
 
@@ -49,7 +49,7 @@ export default async function StudentMockExamsPage({ searchParams }: { searchPar
 
   return (
     <>
-      <PageHeader title="Mock Exams" subtitle="Time-limited exam simulations for exam periods" userName={displayNameOf(profile)} />
+      <PageHeader title="Mock Exams" subtitle="Time-limited exam simulations for exam periods" />
       <StudentQuizList
         kind="mock"
         courses={enrolled}

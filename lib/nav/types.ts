@@ -25,8 +25,4 @@ export type NavItem = {
   hidden?: boolean;
   /** "My Courses": rows come from the student's course access at runtime. */
   dynamic?: 'courses';
-  /** "My Account": avatar/initials + the student's name as the toggle. */
-  account?: boolean;
-  /** A thin rule above this item (the legacy .sidebar-account-divider). */
-  dividerAbove?: boolean;
 };

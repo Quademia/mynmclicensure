@@ -12,7 +12,7 @@
 
 import { requireAdmin } from '@/lib/access';
 import { getDashboardCounts, getRecentUsers } from '@/lib/users/queries';
-import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { PageHeader } from '@/components/shell/page-header';
 import '@/styles/admin-dashboard.css';
 
 export const dynamic = 'force-dynamic';
@@ -42,7 +42,6 @@ export default async function AdminDashboardPage() {
       <PageHeader
         title="Admin Dashboard"
         subtitle={`Welcome back, ${profile.forename || 'Admin'}!`}
-        userName={displayNameOf(profile)}
       />
 
       <div className="stats-grid">

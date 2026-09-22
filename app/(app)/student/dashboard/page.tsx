@@ -28,6 +28,7 @@
 //     does; the map's expiry is today plus that count, so the two agree.
 
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { requireStudent } from '@/lib/access';
 import { getCourses } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess, getUpcomingAccess } from '@/lib/subscriptions/queries';
@@ -35,7 +36,7 @@ import { getRecentAttempts } from '@/lib/attempts/queries';
 import type { AttemptListRow, AttemptMode } from '@/lib/attempts/types';
 import { getAnnouncementsForStudent, getStudentNoticeStates } from '@/lib/announcements/queries';
 import { AnnouncementsStrip } from '@/components/announcements/announcements-strip';
-import { PageHeader, displayNameOf } from '@/components/shell/page-header';
+import { PageHeader } from '@/components/shell/page-header';
 import { ProfileNudge } from './profile-nudge';
 import '@/styles/student-dashboard.css';
 
@@ -139,7 +140,6 @@ export default async function StudentDashboardPage() {
       <PageHeader
         title="Dashboard"
         subtitle={`Welcome back, ${profile.forename || 'Student'}!`}
-        userName={displayNameOf(profile)}
       />
 
       <div className="sdash">
@@ -168,13 +168,23 @@ export default async function StudentDashboardPage() {
             </a>
           </div>
         ) : (
+          // The active state carries its own Upgrade / Extend (Sam,
+          // 2026-09-22, 10-design-system.md ruling 4): the sidebar row
+          // that used to lead there moved into the top bar's avatar
+          // menu with DS5, and a student watching their days run down
+          // must not have to hunt for the way to renew.
           <div className={`subscription-bar${subWarning ? ' warning' : ''}`}>
             <div>
               <div className="sub-label">Platform Access</div>
               <div className="sub-name">Active</div>
             </div>
-            <div className={`sub-expiry${subWarning ? ' warning' : ''}`}>
-              {expiryLabel(longest.totalDays, longest.expires)}
+            <div className="sub-right">
+              <div className={`sub-expiry${subWarning ? ' warning' : ''}`}>
+                {expiryLabel(longest.totalDays, longest.expires)}
+              </div>
+              <Link href="/student/upgrade" className="btn btn-primary sub-cta">
+                Upgrade / Extend
+              </Link>
             </div>
           </div>
         )}
