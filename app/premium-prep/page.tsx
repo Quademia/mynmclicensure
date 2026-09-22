@@ -12,6 +12,8 @@
 import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { getPrograms, getProducts } from '@/lib/catalogue/queries';
+import { PublicTopBar } from '@/components/shell/public-top-bar';
+import { PublicFooter } from '@/components/shell/public-footer';
 import { PremiumPrepClient } from './premium-prep-client';
 import '@/styles/premium-prep.css';
 
@@ -25,5 +27,15 @@ export default async function PremiumPrepPage() {
   const supabase = await createClient();
   const [programs, products] = await Promise.all([getPrograms(supabase), getProducts(supabase)]);
 
-  return <PremiumPrepClient programs={programs} products={products} />;
+  // The bar and the footer are Server Components rendered AROUND the
+  // client half, not from inside it (2026-09-22): they ship no
+  // JavaScript, and the footer reads the parent-site origin and the
+  // clock on the server, where neither is a hydration risk.
+  return (
+    <div className="prep-page">
+      <PublicTopBar />
+      <PremiumPrepClient programs={programs} products={products} />
+      <PublicFooter />
+    </div>
+  );
 }

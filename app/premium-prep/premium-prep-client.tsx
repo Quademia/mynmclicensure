@@ -246,13 +246,6 @@ export function PremiumPrepClient({ programs, products }: { programs: Program[];
       <Toast message={msg?.text ?? null} tone={msg?.tone} onDismiss={dismiss} />
 
       <div className="wrap">
-        <div className="topbar">
-          <div><strong>Quademia</strong></div>
-          <div>
-            Already have an account? <a href="/login">Sign in</a>
-          </div>
-        </div>
-
         <section className="hero">
           <div className="prep-eyebrow">NMC 2026 Premium Prep</div>
 

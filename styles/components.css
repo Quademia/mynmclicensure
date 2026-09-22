@@ -58,6 +58,17 @@
 .btn-ghost { background: none; border: 1px solid var(--border); color: var(--ink); }
 .btn-ghost:hover:not(:disabled) { background: var(--surface-page); }
 
+/* The outlined secondary (2026-09-22, with the public top bar). The
+   family had a filled primary and a grey-bordered ghost, and nothing in
+   between: an action that is clearly secondary to the filled one but
+   still branded. The landing page had been carrying it privately as
+   `.btn-nav-outline` — navy edge, navy word, fills navy on hover — and
+   promoting it is what let the public bar use the shared family instead
+   of a fourth set of bespoke buttons. Distinct from .btn-ghost, which
+   is neutral: use ghost to retreat, outline to offer. */
+.btn-outline { background: transparent; border: 1.5px solid var(--brand-navy); color: var(--brand-navy); }
+.btn-outline:hover:not(:disabled) { background: var(--brand-navy); color: var(--surface); }
+
 /* The soft signal variants. Each carries its whole badge triple, and
    the ink token rather than the raw signal colour — the raw ones are
    too light for text (see the notes in tokens.css). */
@@ -342,3 +353,63 @@
 .name-circle-sm { width: 28px; height: 28px; font-size: 11px; }
 .name-circle-md { width: 32px; height: 32px; font-size: 12px; }
 .name-circle-lg { width: 80px; height: 80px; font-size: 28px; }
+
+/* ── The public top bar and footer (2026-09-22) ────────────────────
+   The signed-out siblings of the DS5 shell. Shared by the landing page,
+   /premium-prep and any public page that follows; unprefixed, like the
+   rest of this file, so a surface can still keep its own and win on
+   specificity (the DS3 rule). Every colour is a token: the landing
+   page's local --navy / --teal block held the SAME hex values as the
+   global brand tokens, so nothing moved a pixel in the extraction. */
+
+.pubbar {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: 0 var(--space-24);            /* the page gutter */
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.pubbar-brand { display: flex; align-items: baseline; gap: 10px; min-width: 0; text-decoration: none; }
+.pubbar-brand span { font-size: 13px; font-weight: 600; line-height: 1.2; color: var(--ink-muted); }
+.pubbar-brand b { font-size: 16px; font-weight: 700; color: var(--brand-navy); white-space: nowrap; }
+.pubbar-spacer { flex: 1 1 auto; }
+.pubbar-actions { display: flex; align-items: center; gap: var(--space-10); }
+.pubbar-link {
+  font-size: var(--type-meta-size);
+  font-weight: 700;
+  color: var(--brand-teal);
+  text-decoration: none;
+  padding: 4px 0;
+  border-bottom: 1.5px solid transparent;
+  transition: border-color .15s;
+}
+.pubbar-link:hover { border-bottom-color: var(--brand-teal); }
+
+/* The phone keeps the brand and the one action that starts an account.
+   Sign In goes rather than Register Free: someone who already has an
+   account can reach /login from the page's own copy, and a visitor who
+   does not is the one the bar is for. Matches the landing page's old
+   680px rule, moved to the app's 768px breakpoint. */
+@media (max-width: 768px) {
+  .pubbar { padding: 0 var(--space-16); }   /* the phone gutter */
+  .pubbar-link, .pubbar .btn-outline { display: none; }
+}
+
+.pubfoot {
+  background: var(--brand-navy-dark);
+  color: var(--ink-on-navy);
+  text-align: center;
+  padding: var(--space-24) var(--space-24);
+  font-size: var(--type-meta-size);
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pubfoot a { color: var(--ink-on-navy); text-decoration: none; font-size: var(--type-meta-size); }
+.pubfoot a:hover { color: var(--surface); }

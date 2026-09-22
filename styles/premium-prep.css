@@ -37,8 +37,6 @@
 
 .prep .wrap { max-width: 1050px; margin: 0 auto; padding: 24px 16px 48px; }
 
-.prep .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-.prep .topbar a { color: var(--brand); text-decoration: none; font-weight: 700; }
 
 .prep .hero {
   position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 24px;
@@ -111,3 +109,8 @@
 @media (max-width: 860px) {
   .prep .hero-grid, .prep .grid-2, .prep .program-list { grid-template-columns: 1fr; }
 }
+
+/* The page wrapper the shared bar and footer sit in (2026-09-22). The
+   column keeps the footer at the bottom on a short page — `margin-top:
+   auto` on .pubfoot needs a flex column above it to push against. */
+.prep-page { display: flex; flex-direction: column; min-height: 100vh; }

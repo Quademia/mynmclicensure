@@ -59,6 +59,12 @@
      repeats its neighbour. 2.5:1 on white — it fails on every ground
      here, so nothing a reader must read may be set in it. */
   --ink-faint: #9ca3af;
+  /* Secondary text ON a navy ground — the public footer's only use so
+     far. The ink tokens above are all measured against white and the
+     page, and none of them is legible on --brand-navy-dark; this is the
+     muted blue the landing page's footer already used as a literal,
+     lifted into the file when the footer became a shared component. */
+  --ink-on-navy: #5a7a94;
 
   /* ── Surfaces ─────────────────────────────────────────────────── */
   /* Every hairline: card edges, table rules, inputs at rest, dividers. */

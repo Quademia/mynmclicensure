@@ -18,7 +18,8 @@
 
 import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { parentSiteOrigin } from '@/lib/site/parent-site';
+import { PublicTopBar } from '@/components/shell/public-top-bar';
+import { PublicFooter } from '@/components/shell/public-footer';
 import '@/styles/landing.css';
 
 export const metadata: Metadata = {
@@ -33,24 +34,13 @@ export default async function LandingPage() {
   const supabase = await createClient();
   const { data, error } = await supabase.from('programs').select('program_id, program_name').order('program_id');
   const programs = (error ? [] : (data ?? [])) as ProgCard[];
-  const parentSite = parentSiteOrigin();
 
   return (
     <div className="landing">
-      {/* NAV */}
-      <nav>
-        <div className="nav-brand">
-          <div className="nav-brand-text">
-            <span className="nav-brand-name">Quademia</span>
-            <span className="nav-brand-sub">MyNMCLicensure · NMC Licensure Prep</span>
-          </div>
-        </div>
-        <div className="nav-actions">
-          <a href="/subscribe" className="nav-link">Subscribe</a>
-          <a href="/login"><button type="button" className="btn-nav-outline">Sign In</button></a>
-          <a href="/register"><button type="button" className="btn-nav-solid">Register Free</button></a>
-        </div>
-      </nav>
+      {/* NAV — the shared public bar (2026-09-22). The tagline that used
+          to sit under the brand here moves to the hero: a bar shown to
+          someone halfway through paying should not carry marketing. */}
+      <PublicTopBar showSubscribe />
 
       {/* HERO */}
       <section className="hero">
@@ -386,11 +376,8 @@ export default async function LandingPage() {
         <p className="cta-sub">Already registered? <a href="/subscribe">Subscribe to paid access →</a></p>
       </div>
 
-      {/* FOOTER */}
-      <footer>
-        <a href={parentSite}>← Back to Quademia</a>
-        <span>&copy; 2026 Quademia. All rights reserved.</span>
-      </footer>
+      {/* FOOTER — shared, and its year is computed rather than typed */}
+      <PublicFooter />
     </div>
   );
 }

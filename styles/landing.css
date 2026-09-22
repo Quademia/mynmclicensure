@@ -24,19 +24,6 @@
 .landing img { max-width: 100%; height: auto; display: block; }
 
 /* NAV */
-.landing nav { background: rgba(255, 255, 255, .95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-.landing .nav-brand { display: flex; align-items: center; gap: 12px; }
-.landing .nav-brand-text { display: flex; flex-direction: column; }
-.landing .nav-brand-name { font-size: 13px; font-weight: 800; color: var(--navy); line-height: 1.2; }
-.landing .nav-brand-sub { font-size: 11px; color: var(--muted); }
-.landing .nav-actions { display: flex; align-items: center; gap: 10px; }
-.landing .nav-link { font-size: 13px; font-weight: 700; color: var(--teal); padding: 4px 0; border-bottom: 1.5px solid transparent; transition: border-color .15s; }
-.landing .nav-link:hover { border-bottom-color: var(--teal); }
-.landing .btn-nav-outline { padding: 7px 18px; border: 1.5px solid var(--navy); border-radius: 7px; font-size: 13px; font-weight: 700; color: var(--navy); background: transparent; cursor: pointer; transition: all .15s; font-family: inherit; }
-.landing .btn-nav-outline:hover { background: var(--navy); color: var(--white); }
-.landing .btn-nav-solid { padding: 7px 18px; border: 1.5px solid var(--teal); border-radius: 7px; font-size: 13px; font-weight: 700; color: var(--white); background: var(--teal); cursor: pointer; transition: all .15s; font-family: inherit; }
-.landing .btn-nav-solid:hover { background: var(--teal-light); border-color: var(--teal-light); }
-@media (max-width: 680px) { .landing .nav-link, .landing .btn-nav-outline { display: none; } }
 
 /* HERO */
 .landing .hero { background: var(--navy-deep); color: var(--white); padding: 5rem 2rem 0; overflow: hidden; position: relative; }
@@ -170,6 +157,3 @@
 .landing .cta-sub { margin-top: 1.25rem; font-size: 13px; color: rgba(255, 255, 255, .45); position: relative; }
 .landing .cta-sub a { color: #7ecdc6; font-weight: 700; }
 
-.landing footer { background: var(--navy-dark); color: #5a7a94; text-align: center; padding: 1.5rem 2rem; font-size: 13px; margin-top: auto; display: flex; flex-direction: column; gap: 6px; }
-.landing footer a { color: var(--muted); font-size: 13px; }
-.landing footer a:hover { color: var(--white); }
