@@ -211,6 +211,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⬜ A1 The floor — announcements_for_me(), the table admin-only to read, scope_level text[], CHECKs, the hot-read index (S12, S13; D46, D48)
 - ⬜ A2 The notice state — read_at / clicked_at / dismissed_at, a key to the announcement, server-side writes, the strip's ✕ dismisses (S12; D47)
 - ⬜ A3 Residue — the body stored once and the <br> per edit ended, keys for the scope arrays, the unused read removed (D48) — later
+- ⬜ A4 A real quiz-link picker for the editor — the dead Quiz Link tool and its false alert left with DS4 (2026-09-22)
 
 *Not yet sliced — each gets an id when the doc is rewritten:*
 
@@ -260,20 +261,21 @@ retired (B1). Ids are `DS`, two letters, because a bare `D` collides with
 `rebuild.md` D1–D10 and the diagnosis's D-numbers. No slice here touches
 storage.
 
-- ⬜ DS1 The foundation — tokens.css: 23 colours, 10 type styles, 10 spaces, 5 radii, 3 shadows; old names aliased
-- ⬜ DS2 The retired teal out (B1) — 9 stylesheets, 52 uses, 46 as rgba(11,122,117); .qa-page's aliases collapse
-- ⬜ DS3 One button — 30 of 33 stylesheets define their own; the shared family, then page by page as each is touched
-- ⬜ DS4 One dialog — the 9 confirms, 4 prompts as 2, the stale alert out; Escape and a focus trap; Radix unruled
-- ⬜ DS5 The shell becomes A3 — top bar, sidebar collapsible on a cookie, PageHeader's right half off 23 pages
-- ⬜ DS6 The icon set — 16px outline; the nav's emoji leave the labels, NavItem gains an icon field (data, not CSS)
+- ✅ DS1 The foundation — tokens.css: 23 colours, 10 type styles, 10 spaces, 5 radii, 3 shadows; old names — 2026-09-22
+- ✅ DS2 The retired teal out (B1) — 9 stylesheets, 52 uses, 46 written as rgba; .qa-page aliases collapsed — 2026-09-22
+- ✅ DS3 One button — the shared family in components.css, 15 surfaces converted; the rest as touched — 2026-09-22
+- ✅ DS4 One dialog — on the browser <dialog>; 9 confirms, 4 prompts as 2, alert out; type-to-confirm ×2 — 2026-09-22
+- ✅ DS5 The shell becomes A3 — top bar, sidebar on a cookie, PageHeader halved on 23 pages, Upgrade on bar — 2026-09-22
+- ✅ DS6 The icon set — 19 Lucide shapes in icons.tsx, the nav's 27 emoji out, NavItem.icon; sidebar only — 2026-09-22
 - ⬜ DS7 One name circle — one component for the four treatments; how a message shows student vs Quademia is unruled
-- ⬜ DS8 One badge — status 6px not a pill (Sam), labels stay 4px; 173 colours in 28 files; neutral + info added
-- ⬜ DS9 The eight surfaces the shared button cannot reach — standalone .btn-start / .btn-send; markup, not CSS
+- ✅ DS8 One badge — status 6px not a pill (Sam), labels stay 4px; 13 surfaces converted, 173 → 115 — 2026-09-22
+- ⏸ DS9 The eight surfaces the shared button cannot reach — as each is touched (ruling 9); .btn-lite + .btn-link added
 - ⬜ DS10 The button size scale — eight sizes survive DS3; small / medium / large, 44px for a student action
 - ⬜ DS11 A categorical palette — colour that means a kind, not a state: MCQ / TF / SATA, mock / fixed, the modes
 - ⬜ DS12 A scale palette — easy / moderate / hard borrows the signal ramp; no gradient vocabulary yet — later
 - ⬜ DS13 One badge class name — .badge / .chip / .pill / .status-chip are one thing under four; markup — later
 - ⬜ DS14 The price weight — Inter loads 400-700 and the price style is 800, so it falls back; add it or drop to 700
+- ⬜ DS15 The page emoji — ~160 in 35 files of page copy and buttons (▶ Start, 💾 Save, 🟢 Active); Sam to rule
 - ⬜ Dark mode — not one prefers-color-scheme rule in the app and one theme in the token file; after the above
 - ⬜ A content max-width above 1440px, where A3's closed sidebar leaves cards and tables past a comfortable measure
 

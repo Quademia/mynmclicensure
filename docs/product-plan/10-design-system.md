@@ -263,11 +263,27 @@ both sides:**
    (`.btn-lite`) and the text-link button (`.btn-link`) — join
    `components.css` now, so a touched surface has somewhere to land.
 
-**Still unruled, and each blocks a slice below:** Radix or hand-built
-(DS4); how a message distinguishes student from admin if the name circle
-becomes one component (DS7); and the new wording for the one confirm
-message that names OK and Cancel, which cannot survive a dialog with
-real button labels (DS4).
+**Sam, 2026-09-22, DS4 — five rulings, the assistant's recommendations
+accepted:** the dialog is built on the **browser's own `<dialog>`
+element**, not Radix and not a hand-written focus trap (the earlier
+claim that this repo carried MyNclex's confirm primitive was wrong — it
+carries only the body portal, and MyNclex writes each box by hand with
+no Escape and no focus handling); the flagged-questions confirm reads
+*"You still have N flagged questions"* with **Go back and review** /
+**Submit anyway**, the blanks one *"You have N unanswered questions"*
+with **Go back** / **Submit anyway**; **type-to-confirm on the two
+deletes that cannot be undone** (config key, question), plain confirms
+for archive, restore and abandon; the **Quiz Link tool is removed** with
+its false alert and a real picker is queued under `05-announcements`
+(A4); and the runner's **false leave-page warning is fixed in the same
+slice** — Save & Resume Later and Submit & Exit left by a full load,
+which tripped the tab-close guard, so a student who had just saved was
+told their changes may not be saved (legacy did the same).
+
+**Still unruled, and each blocks a slice below:** how a message
+distinguishes student from admin if the name circle becomes one
+component (DS7); the size scale (DS10); the price weight (DS14); and
+the page emoji (DS15).
 
 **Open ruling — Tailwind (raised 2026-09-22).** Sam asked what Tailwind
 does and whether the app should use it, and set the frame for the
@@ -372,11 +388,22 @@ the four prompts become **two** "Insert link" dialogs with a URL and a
 text field each, rather than four sequential boxes; and the stale
 *"once the quiz engine is built"* alert goes.
 
-**Escape, a focus trap and focus return come with it** — on Radix's
-Dialog or hand-written, which is Sam's open call. Either way the ten
-surfaces claiming `aria-modal` migrate onto it as each is touched, and
-the promise stops being empty. This also makes those flows walkable by
-an assistant for the first time.
+**Escape, a focus trap and focus return come with it** — from the
+browser's own `<dialog>` element opened with `showModal()` (Sam,
+2026-09-22; §3), which traps focus, closes on Escape, makes the page
+inert, paints in the top layer and hands focus back, with no package
+and no focus code of ours. The ten surfaces claiming `aria-modal`
+migrate onto it as each is touched (ruling 9), and the promise stops
+being empty. This also makes those flows walkable by an assistant for
+the first time.
+
+*Built 2026-09-22:* `lib/overlays/shared/dialog.tsx` (the element;
+Escape caught on keydown because Chrome fires the element's `cancel`
+only with user activation), `confirm-dialog.tsx` (`useConfirm()` — a
+promise, so a call site keeps its `if (!(await confirm(…))) return`
+shape), `link-dialog.tsx`; the look in `components.css` as `.dlg*`, 420px
+as drawn. Six surfaces converted; the runner's Leave-this-quiz panel
+moved onto it too.
 
 ### DS5 — The shell becomes A3
 
@@ -500,6 +527,15 @@ list — more font bytes for students on paid data, against the doc's own
 first principle — or the style drops to 700. Sam's call, and the
 smallest open question here.
 
+### DS15 — The page emoji (added 2026-09-22)
+
+DS6 took the emoji out of the two menus. About **160 more** sit in 35
+files of page copy and buttons — `▶ Start Exam`, `💾 Save`, `🟢 Active`,
+the runner's flag and clock, the admin dashboard's counters. They are
+legacy's own words, transcribed as the rules require, so replacing them
+is a copy change on 35 files, not an icon change. Sam to rule whether
+they go, and if so whether to icons from the DS6 set or to plain text.
+
 ### Later, under this doc
 
 - **Dark mode.** The product has not one `prefers-color-scheme` rule and
@@ -519,18 +555,19 @@ smallest open question here.
 
 | Slice | Date |
 |---|---|
-| DS1 The foundation — `tokens.css` | ⬜ |
-| DS2 The retired teal out (B1) | ⬜ |
-| DS3 One button | ⬜ |
-| DS4 One dialog, the native boxes out | ⬜ |
-| DS5 The shell becomes A3 | ⬜ |
-| DS6 The icon set | ⬜ |
+| DS1 The foundation — `tokens.css` | ✅ 2026-09-22 |
+| DS2 The retired teal out (B1) | ✅ 2026-09-22 |
+| DS3 One button | ✅ 2026-09-22 — the family; surfaces as touched |
+| DS4 One dialog, the native boxes out | ✅ 2026-09-22 |
+| DS5 The shell becomes A3 | ✅ 2026-09-22 |
+| DS6 The icon set | ✅ 2026-09-22 — sidebar; page emoji are DS15 |
 | DS7 One name circle | ⬜ |
-| DS8 One badge | ⬜ |
-| DS9 The surfaces the shared button cannot reach | ⬜ |
+| DS8 One badge | ✅ 2026-09-22 — 13 surfaces; the rest as touched |
+| DS9 The surfaces the shared button cannot reach | ⏸ as each is touched (ruling 9) |
 | DS10 The button size scale | ⬜ |
 | DS11 A categorical palette | ⬜ |
 | DS12 A scale palette | ⬜ later |
 | DS13 One badge class name | ⬜ later |
 | DS14 The price weight | ⬜ |
+| DS15 The page emoji | ⬜ Sam to rule |
 | Dark mode · content max-width · the avatar's size | ⬜ later |
