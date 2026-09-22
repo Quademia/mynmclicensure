@@ -12,7 +12,7 @@
 .spg .guide-layout { display: grid; grid-template-columns: 1fr 220px; gap: 24px; align-items: start; }
 
 /* Hero */
-.spg .guide-hero { background: linear-gradient(135deg, var(--primary-light), rgba(11, 122, 117, 0.08)); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 24px; margin-bottom: 24px; }
+.spg .guide-hero { background: linear-gradient(135deg, var(--primary-light), rgba(45, 125, 114, 0.08)); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 24px; margin-bottom: 24px; }
 .spg .guide-hero h1 { font-size: 24px; font-weight: 800; color: var(--primary); margin: 0 0 8px; }
 .spg .guide-hero p { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin: 0; max-width: 65ch; }
 
@@ -28,7 +28,7 @@
 .spg .guide-inner-card ol { margin: 0; padding-left: 18px; }
 .spg .guide-inner-card li { margin-bottom: 4px; }
 .spg .guide-inner-card li:last-child { margin-bottom: 0; }
-.spg .guide-tip { margin-top: 10px; padding: 10px 12px; border-radius: var(--radius); border: 1px solid rgba(11, 122, 117, 0.2); background: rgba(11, 122, 117, 0.05); font-size: 13px; color: var(--text); line-height: 1.5; }
+.spg .guide-tip { margin-top: 10px; padding: 10px 12px; border-radius: var(--radius); border: 1px solid rgba(45, 125, 114, 0.2); background: rgba(45, 125, 114, 0.05); font-size: 13px; color: var(--text); line-height: 1.5; }
 
 /* FAQ accordion */
 .spg .faq-list { display: flex; flex-direction: column; gap: 8px; }
@@ -41,7 +41,7 @@
 .spg .faq-item.open .faq-icon { color: var(--accent); border-color: var(--accent); }
 
 /* CTA footer */
-.spg .guide-cta { background: linear-gradient(135deg, var(--primary-light), rgba(11, 122, 117, 0.08)); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.spg .guide-cta { background: linear-gradient(135deg, var(--primary-light), rgba(45, 125, 114, 0.08)); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
 .spg .guide-cta h3 { font-size: 16px; font-weight: 700; color: var(--primary); margin: 0 0 4px; }
 .spg .guide-cta p { font-size: 13px; color: var(--text-muted); margin: 0; }
 .spg .guide-cta-actions { display: flex; flex-wrap: wrap; gap: 8px; }

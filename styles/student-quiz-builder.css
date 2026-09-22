@@ -85,7 +85,7 @@
 .qbld .topic-chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); flex-shrink: 0; transition: background 0.13s; }
 .qbld .topic-chip.picked .dot { background: var(--accent); }
 .qbld .topic-chip-count { font-size: 11px; font-weight: 600; color: var(--text-muted); background: var(--bg); border: 1px solid var(--border); padding: 1px 6px; border-radius: 999px; margin-left: auto; flex-shrink: 0; }
-.qbld .topic-chip.picked .topic-chip-count { color: var(--accent); border-color: rgba(11, 122, 117, 0.2); background: rgba(11, 122, 117, 0.08); }
+.qbld .topic-chip.picked .topic-chip-count { color: var(--accent); border-color: rgba(45, 125, 114, 0.2); background: rgba(45, 125, 114, 0.08); }
 .qbld .use-all-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .qbld .use-all-row label { font-size: 13px; color: var(--text); cursor: pointer; }
 .qbld .chips-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; min-height: 0; }
@@ -101,7 +101,7 @@
 .qbld .concept-item:hover { background: var(--bg); color: var(--text); }
 .qbld .concept-item.picked { background: var(--primary-light); color: var(--primary); font-weight: 600; }
 .qbld .concept-item-count { font-size: 11px; font-weight: 600; color: var(--text-muted); background: var(--bg); border: 1px solid var(--border); padding: 1px 6px; border-radius: 999px; flex-shrink: 0; }
-.qbld .concept-item.picked .concept-item-count { color: var(--accent); border-color: rgba(11, 122, 117, 0.2); background: rgba(11, 122, 117, 0.08); }
+.qbld .concept-item.picked .concept-item-count { color: var(--accent); border-color: rgba(45, 125, 114, 0.2); background: rgba(45, 125, 114, 0.08); }
 
 /* ── Difficulty & Type ── */
 .qbld .checks-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -111,7 +111,7 @@
 .qbld .check-item label { font-size: 13px; color: var(--text); cursor: pointer; margin: 0; }
 .qbld .check-item input { accent-color: var(--accent); }
 .qbld .check-item-count { font-size: 11px; font-weight: 600; color: var(--text-muted); background: var(--white); border: 1px solid var(--border); padding: 1px 6px; border-radius: 999px; margin-left: auto; flex-shrink: 0; }
-.qbld .check-item.picked .check-item-count { color: var(--accent); border-color: rgba(11, 122, 117, 0.2); background: rgba(11, 122, 117, 0.08); }
+.qbld .check-item.picked .check-item-count { color: var(--accent); border-color: rgba(45, 125, 114, 0.2); background: rgba(45, 125, 114, 0.08); }
 
 /* ── Pool bar ── */
 .qbld .pool-bar { display: flex; align-items: center; justify-content: space-between; background: var(--primary-light); border: 1px solid rgba(45, 125, 114, 0.2); border-radius: 8px; padding: 10px 16px; margin-top: 20px; }

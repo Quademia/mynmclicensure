@@ -89,7 +89,7 @@
 .opb .topic-chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); flex-shrink: 0; transition: background 0.13s; }
 .opb .topic-chip.picked .dot { background: var(--accent); }
 .opb .topic-chip-count { font-size: 11px; font-weight: 600; color: var(--text-muted); background: var(--bg); border: 1px solid var(--border); padding: 1px 6px; border-radius: 999px; margin-left: auto; flex-shrink: 0; }
-.opb .topic-chip.picked .topic-chip-count { color: var(--accent); border-color: rgba(11, 122, 117, 0.2); background: rgba(11, 122, 117, 0.08); }
+.opb .topic-chip.picked .topic-chip-count { color: var(--accent); border-color: rgba(45, 125, 114, 0.2); background: rgba(45, 125, 114, 0.08); }
 .opb .use-all-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .opb .use-all-row label { font-size: 13px; color: var(--text); cursor: pointer; }
 .opb .chips-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; min-height: 0; }
@@ -105,7 +105,7 @@
 .opb .concept-item:hover { background: var(--bg); color: var(--text); }
 .opb .concept-item.picked { background: var(--primary-light); color: var(--primary); font-weight: 600; }
 .opb .concept-item-count { font-size: 11px; font-weight: 600; color: var(--text-muted); background: var(--bg); border: 1px solid var(--border); padding: 1px 6px; border-radius: 999px; flex-shrink: 0; }
-.opb .concept-item.picked .concept-item-count { color: var(--accent); border-color: rgba(11, 122, 117, 0.2); background: rgba(11, 122, 117, 0.08); }
+.opb .concept-item.picked .concept-item-count { color: var(--accent); border-color: rgba(45, 125, 114, 0.2); background: rgba(45, 125, 114, 0.08); }
 
 /* ── Difficulty & Type ── */
 .opb .checks-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -115,7 +115,7 @@
 .opb .check-item label { font-size: 13px; color: var(--text); cursor: pointer; margin: 0; }
 .opb .check-item input { accent-color: var(--accent); }
 .opb .check-item-count { font-size: 11px; font-weight: 600; color: var(--text-muted); background: var(--white); border: 1px solid var(--border); padding: 1px 6px; border-radius: 999px; margin-left: auto; flex-shrink: 0; }
-.opb .check-item.picked .check-item-count { color: var(--accent); border-color: rgba(11, 122, 117, 0.2); background: rgba(11, 122, 117, 0.08); }
+.opb .check-item.picked .check-item-count { color: var(--accent); border-color: rgba(45, 125, 114, 0.2); background: rgba(45, 125, 114, 0.08); }
 
 /* ── Pool bar ── */
 .opb .pool-bar { display: flex; align-items: center; justify-content: space-between; background: var(--primary-light); border: 1px solid rgba(45, 125, 114, 0.2); border-radius: 8px; padding: 10px 16px; margin-top: 20px; }
@@ -167,7 +167,7 @@
 .opb-overlay .modal-card h3 { margin: 0 0 8px; font-size: 20px; color: var(--primary); }
 .opb-overlay .modal-card p { margin: 0 0 18px; color: var(--text-muted); font-size: 14px; line-height: 1.6; }
 .opb-overlay .modal-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-.opb-overlay .rule-box { border: 1px solid rgba(11, 122, 117, 0.14); background: var(--primary-light); border-radius: 14px; padding: 14px; margin-bottom: 14px; font-size: 13px; line-height: 1.65; color: var(--text); }
+.opb-overlay .rule-box { border: 1px solid rgba(45, 125, 114, 0.14); background: var(--primary-light); border-radius: 14px; padding: 14px; margin-bottom: 14px; font-size: 13px; line-height: 1.65; color: var(--text); }
 .opb-overlay .kv-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 .opb-overlay .pill { display: inline-flex; align-items: center; gap: 8px; background: #f3f4f6; color: var(--text); border-radius: 999px; padding: 8px 12px; font-size: 12px; font-weight: 700; }
 .opb-overlay .field { margin-bottom: 8px; }

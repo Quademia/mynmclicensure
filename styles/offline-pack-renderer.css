@@ -10,7 +10,7 @@
  */
 
 .opr {
-  --opr-brand: #0b7a75;
+  --opr-brand: var(--brand-teal);
   --opr-ink: #1f2a28;
   --opr-bg: #f6f8f7;
   --opr-card: #ffffff;
@@ -47,7 +47,7 @@
 
 /* ── Cover ── */
 .opr .coverRow { display: flex; gap: 14px; align-items: stretch; }
-.opr .logoBox { width: 92px; flex: 0 0 92px; border-radius: 16px; border: 2px solid rgba(11, 122, 117, 0.18); background: rgba(11, 122, 117, 0.04); display: flex; align-items: center; justify-content: center; padding: 10px; }
+.opr .logoBox { width: 92px; flex: 0 0 92px; border-radius: 16px; border: 2px solid rgba(45, 125, 114, 0.18); background: rgba(45, 125, 114, 0.04); display: flex; align-items: center; justify-content: center; padding: 10px; }
 .opr .logoMark { width: 54px; height: 54px; border-radius: 16px; background: var(--opr-brand); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; letter-spacing: 0.4px; }
 .opr .coverMain { flex: 1; min-width: 0; }
 .opr .coverTitle { margin: 0; font-weight: 900; font-size: 18px; line-height: 1.2; color: #111827; }
@@ -80,7 +80,7 @@
 .opr .metaLine b { color: #111827; }
 
 /* ── Watermark strip ── */
-.opr .ownerSep { margin: 14px 0; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 14px; background: linear-gradient(135deg, rgba(11, 122, 117, 0.06), rgba(0, 0, 0, 0)); padding: 10px 12px; position: relative; overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
+.opr .ownerSep { margin: 14px 0; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 14px; background: linear-gradient(135deg, rgba(45, 125, 114, 0.06), rgba(0, 0, 0, 0)); padding: 10px 12px; position: relative; overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
 .opr .ownerSep::before { content: attr(data-watermark); position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-18deg); font-weight: 900; font-size: 18px; letter-spacing: 0.4px; color: rgba(0, 0, 0, 0.06); white-space: nowrap; pointer-events: none; }
 .opr .ownerSepRow { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; position: relative; }
 .opr .ownerSepSmall { font-size: 12px; color: #374151; }

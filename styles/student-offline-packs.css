@@ -18,7 +18,7 @@
 .opk .btn-primary { background: var(--accent); color: #fff; }
 .opk .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
 .opk .btn-ghost { background: #f3f4f6; color: var(--text); }
-.opk .btn-lite { background: var(--primary-light); color: var(--accent); border: 1px solid rgba(11, 122, 117, 0.16); }
+.opk .btn-lite { background: var(--primary-light); color: var(--accent); border: 1px solid rgba(45, 125, 114, 0.16); }
 .opk .btn-lite:disabled { opacity: 0.55; cursor: not-allowed; }
 
 .opk .filters-head, .opk .stats-head, .opk .grid-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
@@ -39,7 +39,7 @@
 .opk .pack-card { position: relative; border: 1px solid var(--border); border-radius: 16px; background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-height: 220px; }
 .opk .pack-card.inactive { background: #fafafa; opacity: 0.82; }
 .opk .pack-status { position: absolute; top: 14px; right: 14px; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; text-transform: capitalize; }
-.opk .pack-status.active { background: #e7f6f4; color: #0b7a75; }
+.opk .pack-status.active { background: var(--brand-teal-pale); color: var(--brand-teal-hover); }
 .opk .pack-status.archived { background: #f3f4f6; color: #6b7280; }
 .opk .pack-status.deleted { background: #fef2f2; color: #b91c1c; }
 .opk .pack-course { font-size: 12px; color: var(--text-muted); margin-right: 74px; }

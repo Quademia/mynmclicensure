@@ -2,68 +2,80 @@
  *
  * The public subscribe page — legacy/mynmclicensure/subscribe.html's
  * inline <style>, scoped under `.subp` so its own tokens never leak.
- * Same values. Gone: `.banner` (the shared toast) and `.paused-panel`
- * (the switch was lifted, Sam, 2026-09-11).
+ * Gone: `.banner` (the shared toast) and `.paused-panel` (the switch
+ * was lifted, Sam, 2026-09-11).
+ *
+ * 2026-09-22, DS2 (Sam's B1 ruling): the marketing look is retired.
+ * The `#0b7a75` teal, the page and hero gradients, the 18–24px radii,
+ * the big soft shadow and the slate greys are gone; the page's own
+ * names now point at the app's tokens. The names are kept because they
+ * are scoped to this page; they go when DS3 reaches this surface.
+ * Structure, spacing and copy are untouched.
  */
 
 .subp {
-  --brand: #0b7a75; --brand-dark: #096460; --ink: #0f172a; --muted: #64748b;
-  --bg: #f8fafc; --card: #ffffff; --line: #e2e8f0; --soft: #f1f5f9;
-  --danger: #b42318; --danger-bg: #fff5f5; --ok: #166534; --ok-bg: #f0fdf4;
-  --shadow: 0 18px 45px rgba(15, 23, 42, .08); --radius: 18px;
+  --brand: var(--brand-teal);
+  --brand-dark: var(--brand-teal-hover);
+  --muted: var(--ink-muted);
+  --card: var(--surface);
+  --line: var(--border);
+  --soft: var(--surface-page);
+  --danger: var(--status-danger);
+  --danger-bg: var(--badge-danger-bg);
+  --ok: var(--badge-success-ink);
+  --ok-bg: var(--badge-success-bg);
+  --shadow: var(--shadow-sm);
 
   min-height: 100vh;
   font-family: var(--font-inter), Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--ink);
-  background: linear-gradient(180deg, #eef8f7 0%, #f8fafc 36%, #f8fafc 100%);
+  background: var(--surface-page);
 }
 .subp * { box-sizing: border-box; }
 
 .subp .wrap { max-width: 980px; margin: 0 auto; padding: 28px 16px 32px; }
 
-.subp .card { background: var(--card); border: 1px solid rgba(15, 23, 42, .06); border-radius: 24px; box-shadow: var(--shadow); overflow: hidden; }
+.subp .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
 
 .subp .hero {
   padding: 24px 22px 18px;
-  background:
-    radial-gradient(circle at top right, rgba(11, 122, 117, .12), transparent 35%),
-    linear-gradient(135deg, #f6fffe 0%, #ffffff 100%);
-  border-bottom: 1px solid rgba(15, 23, 42, .06);
+  background: var(--brand-teal-pale);
+  border-bottom: 1px solid var(--line);
 }
-.subp .eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 999px; background: #ecfdf5; color: #065f46; border: 1px solid rgba(6, 95, 70, .10); font-size: .78rem; font-weight: 800; letter-spacing: .02em; }
+.subp .eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: var(--radius-pill); background: var(--badge-success-bg); color: var(--badge-success-ink); border: 1px solid var(--badge-success-border); font-size: .78rem; font-weight: 800; letter-spacing: .02em; }
 .subp h1 { margin: 14px 0 8px; font-size: clamp(1.6rem, 2.2vw, 2.2rem); line-height: 1.1; }
 .subp .sub { margin: 0; max-width: 760px; color: var(--muted); font-size: .98rem; line-height: 1.6; }
 
 .subp .grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 18px; padding: 20px; }
 @media (max-width: 860px) { .subp .grid { grid-template-columns: 1fr; } }
 
-.subp .panel { border: 1px solid var(--line); border-radius: 18px; background: #fff; padding: 18px; }
+.subp .panel { border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); padding: 18px; }
 .subp .panel h2 { margin: 0 0 6px; font-size: 1.02rem; }
 .subp .panel p { margin: 0; color: var(--muted); line-height: 1.55; font-size: .92rem; }
 
-.subp .signed-in { margin: 16px 20px 0; padding: 13px 14px; border-radius: 16px; background: #eff6ff; border: 1px solid rgba(37, 99, 235, .12); color: #1d4ed8; line-height: 1.45; font-size: .92rem; }
+.subp .signed-in { margin: 16px 20px 0; padding: 13px 14px; border-radius: var(--radius); background: #eff6ff; border: 1px solid rgba(37, 99, 235, .12); color: #1d4ed8; line-height: 1.45; font-size: .92rem; }
 .subp .signed-in a { font-weight: 900; color: inherit; }
 
 .subp .field { margin-top: 14px; }
-.subp .label { display: block; margin-bottom: 6px; font-size: .84rem; font-weight: 800; color: #334155; }
-.subp .input, .subp .select { width: 100%; padding: 12px 13px; border-radius: 12px; border: 1px solid var(--line); background: #fff; font-size: .96rem; outline: none; font-family: inherit; color: inherit; }
-.subp .input:focus, .subp .select:focus { border-color: rgba(11, 122, 117, .45); box-shadow: 0 0 0 4px rgba(11, 122, 117, .10); }
+.subp .label { display: block; margin-bottom: 6px; font-size: .84rem; font-weight: 800; color: var(--ink-muted); }
+.subp .input, .subp .select { width: 100%; padding: 12px 13px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--card); font-size: .96rem; outline: none; font-family: inherit; color: inherit; }
+.subp .input:focus, .subp .select:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(45, 125, 114, .18); }
 .subp .hint { margin-top: 6px; color: var(--muted); font-size: .82rem; line-height: 1.4; }
 
-.subp .priceBox { margin-top: 16px; padding: 14px; border-radius: 16px; border: 1px solid var(--line); background: var(--soft); }
+.subp .priceBox { margin-top: 16px; padding: 14px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--soft); }
 .subp .priceLabel { color: var(--muted); font-size: .78rem; margin-bottom: 4px; }
 .subp .priceValue { font-size: 1.2rem; font-weight: 900; color: var(--ink); }
 .subp .priceMeta { margin-top: 4px; color: var(--muted); font-size: .84rem; }
 
 .subp .checks { display: grid; gap: 10px; margin-top: 16px; }
-.subp .check { display: flex; gap: 10px; align-items: flex-start; padding: 11px 12px; border: 1px solid var(--line); border-radius: 14px; background: #fff; font-size: .9rem; line-height: 1.45; color: #334155; }
+.subp .check { display: flex; gap: 10px; align-items: flex-start; padding: 11px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); font-size: .9rem; line-height: 1.45; color: var(--ink); }
 .subp .dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; background: var(--brand); flex: 0 0 10px; }
 
 .subp .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
-.subp .btn { appearance: none; border: none; border-radius: 999px; padding: 13px 18px; font-size: .95rem; font-weight: 900; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 7px; font-family: inherit; }
-.subp .btn-primary { background: var(--brand); color: #fff; box-shadow: 0 10px 22px rgba(11, 122, 117, .22); flex: 1 1 240px; }
+.subp .btn { appearance: none; border: none; border-radius: var(--radius); padding: 13px 18px; font-size: .95rem; font-weight: 900; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 7px; font-family: inherit; }
+.subp .btn-primary { background: var(--brand); color: var(--surface); flex: 1 1 240px; }
 .subp .btn-primary:hover { background: var(--brand-dark); }
-.subp .btn-secondary { background: #fff; color: var(--ink); border: 1px solid var(--line); flex: 1 1 180px; }
+.subp .btn-secondary { background: var(--card); color: var(--ink); border: 1px solid var(--line); flex: 1 1 180px; }
 .subp .btn:disabled { opacity: .72; cursor: not-allowed; }
 
 .subp .footerLinks { margin-top: 12px; font-size: .88rem; color: var(--muted); }

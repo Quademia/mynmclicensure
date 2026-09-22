@@ -278,8 +278,16 @@ gradient ground — and join the app's tokens. The five that use the
 colour only in `rgba()` focus rings and shadows follow. **52
 occurrences, 9 files**, per the table in §1.
 
-The `.qa-page` aliases in `auth.css` and `landing.css` collapse into the
-global names in the same pass: identical values, so nothing moves.
+`auth.css` and `landing.css` were named here for the same pass, on the
+grounds that their `.qa-page` and `.landing` blocks only rename the
+global tokens. **Checked at build on 2026-09-22: they do not.** Both
+carry values with no global equivalent (`--navy-deep`, `--teal-light`,
+`--teal-mid`) and two that are near-misses rather than matches —
+`--teal-dark` `#245f56` against `--brand-teal-hover` `#235f56`, and
+`--teal-soft` `#e7f3f1` against `--brand-teal-pale` `#edf6f5` — plus
+navy-tinted shadows of their own. Collapsing them is therefore not
+value-neutral, and neither file carries the retired teal. **They move
+to DS3**, where the button and badge work reaches them anyway.
 
 **Proof:** `grep -riE '#0b7a75|rgba\( *11, *122, *117' styles/` returns
 nothing, and the four sales pages are walked at both widths.
