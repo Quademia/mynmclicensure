@@ -78,18 +78,20 @@
   min-width: 0;
   white-space: nowrap;
 }
+/* brand quiet on the left, the product carries the weight (Sam,
+   2026-09-22: the product is the focus; the order keeps it Quademia's) */
+.topbar-brand span {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--ink-muted);
+}
 .topbar-brand b {
   font-size: 16px;
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: -0.01em;
   color: var(--brand-navy);
-}
-.topbar-brand span {
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.2;
-  color: var(--ink-muted);
   padding-left: 10px;
   border-left: 1px solid var(--border);
 }
@@ -401,11 +403,13 @@
     align-items: flex-start;
     gap: 1px;
   }
-  .topbar-brand b { font-size: 15px; }
   .topbar-brand span {
     font-size: 11px;
+    letter-spacing: 0.02em;
+  }
+  .topbar-brand b {
+    font-size: 15px;
     padding-left: 0;
     border-left: 0;
-    letter-spacing: 0.02em;
   }
 }

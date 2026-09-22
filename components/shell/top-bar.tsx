@@ -88,9 +88,11 @@ export function TopBar({ product, messagesHref, announcementsHref, unread, user,
         <IconClose className="topbar-ico-close" />
       </button>
 
+      {/* brand first, product bold: the order says whose product it is,
+          the weight says which one you are in (Sam, 2026-09-22) */}
       <div className="topbar-brand">
-        <b>Quademia</b>
-        <span>{product}</span>
+        <span>Quademia</span>
+        <b>{product}</b>
       </div>
 
       <div className="topbar-spacer" />
