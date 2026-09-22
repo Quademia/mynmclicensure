@@ -481,7 +481,7 @@ export function QuizManager({
     setSaving(false);
     if (!result.ok) return err(result.error);
 
-    ok(isEdit ? `✅ ${W.Noun} updated successfully.` : `✅ ${W.Noun} created successfully.`);
+    ok(isEdit ? `${W.Noun} updated successfully.` : `${W.Noun} created successfully.`);
     setCurrentTitle(form.title.trim());
     setPage(0);
     await reloadList(currentSearch, 0, false);
@@ -863,7 +863,7 @@ export function QuizManager({
               <h4>Settings</h4>
               <div className="detail-row"><span className="detail-label">Allowed Modes</span><span className="detail-value">{MODE_LABELS[form.modes]}</span></div>
               <div className="detail-row"><span className="detail-label">Status</span><span className="detail-value"><span className={`chip ${form.status}`}>{form.status}</span></span></div>
-              <div className="detail-row"><span className="detail-label">Published</span><span className="detail-value">{form.published ? '✅ Yes' : '❌ No'}</span></div>
+              <div className="detail-row"><span className="detail-label">Published</span><span className="detail-value">{form.published ? 'Yes' : 'No'}</span></div>
               <div className="detail-row"><span className="detail-label">Shuffle</span><span className="detail-value">{form.shuffle ? 'Yes — randomised per attempt' : 'No — fixed order'}</span></div>
               <div className="detail-row"><span className="detail-label">Time Limit</span><span className="detail-value">{timeLimitText}</span></div>
             </div>

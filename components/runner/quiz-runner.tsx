@@ -84,7 +84,7 @@ const WORDS = {
     start: '▶ Start Quiz',
     resume: '▶ Resume Attempt',
     preflightText: 'Practice mode gives you immediate feedback after each answer. You can flag questions, navigate freely and review your answers at the end.',
-    reviewBanner: '📖 Review Mode — Answers are read-only. You are reviewing a completed attempt.',
+    reviewBanner: 'Review Mode — Answers are read-only. You are reviewing a completed attempt.',
     submit: 'Submit Quiz',
     flaggedEmptySub: 'Flag questions during the quiz, then switch back here to review only those questions.',
     exitTitle: 'Leave this quiz?',
@@ -99,7 +99,7 @@ const WORDS = {
     start: '🎯 Start Exam',
     resume: '🎯 Resume Exam',
     preflightText: '',
-    reviewBanner: '📖 Review Mode — Answers are read-only. You are reviewing a completed exam attempt.',
+    reviewBanner: 'Review Mode — Answers are read-only. You are reviewing a completed exam attempt.',
     submit: 'Submit Exam',
     flaggedEmptySub: 'Flag questions during the exam, then switch back here to review only those questions.',
     exitTitle: 'Leave this exam?',
@@ -682,7 +682,7 @@ export function QuizRunner({
           {flags[item.item_id] ? <span className="q-flag-indicator">🚩</span> : null}
         </div>
         <div className="q-stem">{item.stem}</div>
-        {isSATA ? <div className="sata-hint">⚠️ Select ALL that apply</div> : null}
+        {isSATA ? <div className="sata-hint">Select ALL that apply</div> : null}
 
         <div className="opts">
           {opts.map((opt, j) => {
@@ -887,13 +887,13 @@ export function QuizRunner({
               <div className="preflight-logo">Quademia Nurses Hub</div>
               <div className="preflight-title">{label}</div>
               <div className="preflight-meta">
-                <span className="pre-chip">📝 {items.length} questions</span>
-                <span className={`pre-chip${mode === 'timed' ? ' warning' : ''}`}>⏱ {attempt.duration_min || Math.ceil(items.length)} {mode === 'timed' ? 'minutes' : 'min suggested'}</span>
-                {mode === 'instant' ? <span className="pre-chip">📖 {feedbackModeLabel(feedbackMode)}</span> : null}
-                <span className="pre-chip">{mode === 'timed' ? '🎯 ' : ''}{W.modeWord} Mode</span>
+                <span className="pre-chip">{items.length} questions</span>
+                <span className={`pre-chip${mode === 'timed' ? ' warning' : ''}`}>{attempt.duration_min || Math.ceil(items.length)} {mode === 'timed' ? 'minutes' : 'min suggested'}</span>
+                {mode === 'instant' ? <span className="pre-chip">{feedbackModeLabel(feedbackMode)}</span> : null}
+                <span className="pre-chip">{W.modeWord} Mode</span>
               </div>
               {mode === 'timed' ? (
-                <div className="preflight-warning">⚠️ <strong>Exam mode:</strong> The timer starts when you click Start. No feedback is shown during the exam — you will see your results and explanations after submission. You cannot pause the timer.</div>
+                <div className="preflight-warning"><strong>Exam mode:</strong> The timer starts when you click Start. No feedback is shown during the exam — you will see your results and explanations after submission. You cannot pause the timer.</div>
               ) : <p className="preflight-text">{W.preflightText}</p>}
               <div className="preflight-actions">
                 <button type="button" className="btn btn-primary btn-lg" onClick={onPreflightStart}>{(mode === 'timed' ? attempt.started_utc !== null : hasProgress()) ? W.resume : W.start}</button>
@@ -906,7 +906,7 @@ export function QuizRunner({
           ) : null}
 
           {reviewMode ? <div className="review-banner">{W.reviewBanner}</div> : null}
-          {timeUp ? <div className="timeup-banner">⏰ Time is up! Your exam has been automatically submitted.</div> : null}
+          {timeUp ? <div className="timeup-banner">Time is up! Your exam has been automatically submitted.</div> : null}
 
           {phase === 'quiz' && desktopGridHidden ? (
             <button type="button" className="show-grid-btn" onClick={() => setDesktopGridHidden(false)}>📋 Show Grid</button>

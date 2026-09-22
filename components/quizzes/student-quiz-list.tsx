@@ -72,9 +72,9 @@ const WORDS: Record<
 };
 
 const BADGE: Record<Exclude<Availability, 'HIDDEN'>, string> = {
-  ACTIVE: '🟢 Active',
-  UPCOMING: '🕐 Upcoming',
-  CLOSED: '🔒 Closed',
+  ACTIVE: 'Active',
+  UPCOMING: 'Upcoming',
+  CLOSED: 'Closed',
 };
 
 function subscribeNever(): () => void {
@@ -292,15 +292,15 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
   function renderQuizCard(quiz: QuizCard, avail: Exclude<Availability, 'HIDDEN'>, attempts: AttemptWithProgress[], now: Date) {
     let scheduleInfo: React.ReactNode = null;
     if (avail === 'UPCOMING' && quiz.publish_at) {
-      scheduleInfo = <div className="schedule-info">📅 Opens on {formatDate(quiz.publish_at)}</div>;
+      scheduleInfo = <div className="schedule-info">Opens on {formatDate(quiz.publish_at)}</div>;
     }
     if (avail === 'CLOSED' && quiz.unpublish_at) {
-      scheduleInfo = <div className="schedule-info">🔒 Closed on {formatDate(quiz.unpublish_at)}</div>;
+      scheduleInfo = <div className="schedule-info">Closed on {formatDate(quiz.unpublish_at)}</div>;
     }
     if (kind === 'mock' && avail === 'ACTIVE' && quiz.unpublish_at) {
       const closesAt = new Date(quiz.unpublish_at);
       const daysRemaining = Math.max(0, Math.ceil((closesAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
-      scheduleInfo = <div className="schedule-info">⏳ Closes in {daysRemaining} day{daysRemaining !== 1 ? 's' : ''}</div>;
+      scheduleInfo = <div className="schedule-info">Closes in {daysRemaining} day{daysRemaining !== 1 ? 's' : ''}</div>;
     }
 
     const timeLimitSec = quiz.time_limit_sec || quiz.n * 60;
@@ -316,9 +316,9 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
           <div>
             <div className="quiz-card-title">{quiz.title}</div>
             <div className="quiz-card-meta">
-              <span className="quiz-meta-item">📝 {quiz.n} questions</span>
-              <span className="quiz-meta-item">⏱ {timeLimitMin} min</span>
-              {quiz.shuffle ? <span className="quiz-meta-item">🔀 Shuffled</span> : null}
+              <span className="quiz-meta-item">{quiz.n} questions</span>
+              <span className="quiz-meta-item">{timeLimitMin} min</span>
+              {quiz.shuffle ? <span className="quiz-meta-item">Shuffled</span> : null}
             </div>
           </div>
           <span className={`avail-badge ${avail}`}>{BADGE[avail]}</span>

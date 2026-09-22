@@ -225,7 +225,7 @@ export function SubscriptionsClient({
       return err(result.error);
     }
     setEditBusy('saved');
-    ok('✅ Subscription updated successfully.');
+    ok('Subscription updated successfully.');
     loadPanelRows(editId);
     router.refresh();
     window.setTimeout(() => {
@@ -351,7 +351,7 @@ export function SubscriptionsClient({
           </select>
         </div>
         <button type="button" className={`filter-toggle${showExpiring ? ' active' : ''}`} onClick={() => setShowExpiring((v) => !v)}>
-          ⚠️ Expiring Soon
+          Expiring Soon
         </button>
         <div className="filter-actions">
           <button type="button" className="btn btn-ghost" onClick={clearFilters}>Clear</button>
@@ -410,7 +410,7 @@ export function SubscriptionsClient({
                       )}
                       <td className={first ? 'cell-13' : 'cell-muted'}>{u?.program_id || '—'}</td>
                       <td className="cell-product">{s.products?.name || s.product_id || '—'}</td>
-                      <td>{expiring ? <span className="chip expiring">⚠️ Expiring</span> : <span className={`chip ${shownStatus(s)}`}>{shownStatus(s)}</span>}</td>
+                      <td>{expiring ? <span className="chip expiring">Expiring</span> : <span className={`chip ${shownStatus(s)}`}>{shownStatus(s)}</span>}</td>
                       <td className="cell-13 cell-muted">{fmtDate(s.created_utc)}</td>
                       <td className="cell-13">{fmtDate(s.start_utc)}</td>
                       <td className={`cell-13${expiring ? ' cell-expiring' : ''}`}>{fmtDate(s.expires_utc)}</td>

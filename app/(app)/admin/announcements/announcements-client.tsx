@@ -404,7 +404,7 @@ export function AnnouncementsClient({
                       </td>
                       <td>
                         <span className={`pill pill-${ds}`}>{ds}</span>
-                        {a.pinned ? <span className="pill pill-pinned pinned-gap">📌 Pinned</span> : null}
+                        {a.pinned ? <span className="pill pill-pinned pinned-gap">Pinned</span> : null}
                       </td>
                       <td className="cell-13">{a.scope_audience === 'ALL' || !a.scope_audience ? 'Everyone' : a.scope_audience}</td>
                       <td className="cell-muted">{schedule}</td>
@@ -481,7 +481,7 @@ export function AnnouncementsClient({
                   </select>
                   {status === 'draft' || status === 'archived' ? (
                     <div className="status-warning">
-                      ⚠️ This announcement is set to <strong>{status === 'draft' ? 'Draft' : 'Archived'}</strong> — students will not see it until you change the status to Active.
+                      This announcement is set to <strong>{status === 'draft' ? 'Draft' : 'Archived'}</strong> — students will not see it until you change the status to Active.
                     </div>
                   ) : null}
                 </div>
@@ -508,7 +508,7 @@ export function AnnouncementsClient({
               <div className="toggle-box">
                 <div className="toggle-row">
                   <div>
-                    <div className="toggle-label">📌 Pin to top</div>
+                    <div className="toggle-label">Pin to top</div>
                     <div className="toggle-hint">Always appears above others</div>
                   </div>
                   <label className="toggle-switch">
@@ -635,7 +635,7 @@ export function AnnouncementsClient({
               </div>
 
               <div className="audience-summary">
-                👥 This announcement will be shown to {summaryParts.map((part, i) => <span key={i}>{i > 0 ? ', ' : ''}{part}</span>)}.
+                This announcement will be shown to {summaryParts.map((part, i) => <span key={i}>{i > 0 ? ', ' : ''}{part}</span>)}.
               </div>
             </div>
 

@@ -201,7 +201,7 @@ export function UsersClient({
       daysLeft < 0
         ? `Expired ${expiry.toLocaleDateString('en-GB')}`
         : daysLeft <= 7
-          ? `⚠️ Expires in ${daysLeft} day${daysLeft === 1 ? '' : 's'}`
+          ? `Expires in ${daysLeft} day${daysLeft === 1 ? '' : 's'}`
           : `Expires ${fmtDay(sub.expires_utc)}`;
   }
 

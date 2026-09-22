@@ -134,8 +134,8 @@ export function AnnouncementsClient({
                     <div>
                       <div className="card-title-row">
                         <span className="card-title">{a.title}</span>
-                        {a.pinned ? <span className="pin-badge">📌 Pinned</span> : null}
-                        {isRead ? <span className="read-badge">✅ Read</span> : null}
+                        {a.pinned ? <span className="pin-badge">Pinned</span> : null}
+                        {isRead ? <span className="read-badge">Read</span> : null}
                       </div>
                       <div className="card-date">{fmtDate(a.created_at)}</div>
                     </div>

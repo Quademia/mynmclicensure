@@ -61,7 +61,7 @@ function fmtAttemptDate(iso: string | null): string {
 
 // legacy: `⚠️ Expires in N day(s)` under eight days, the date otherwise
 function expiryLabel(days: number, expiresIso: string): string {
-  return days <= 7 ? `⚠️ Expires in ${days} day${days === 1 ? '' : 's'}` : `Expires ${fmtExpiry(expiresIso)}`;
+  return days <= 7 ? `Expires in ${days} day${days === 1 ? '' : 's'}` : `Expires ${fmtExpiry(expiresIso)}`;
 }
 
 // 7a's runnerHref, on the attempt's own mode (Sam, 2026-09-16)

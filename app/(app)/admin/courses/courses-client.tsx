@@ -70,7 +70,7 @@ export function CoursesClient({ courses, programs }: { courses: Course[]; progra
     const result = await saveProgram({ isNew, programId: isNew ? progForm.progId : editingProgId!, name: progForm.name });
     setProgSaving(false);
     if (!result.ok) return setMsg({ text: result.error, tone: 'error' });
-    setMsg({ text: `✅ Programme ${isNew ? 'created' : 'updated'} successfully.`, tone: 'success' });
+    setMsg({ text: `Programme ${isNew ? 'created' : 'updated'} successfully.`, tone: 'success' });
     setProgModal(false);
     closePanel();
     router.refresh();
@@ -142,7 +142,7 @@ export function CoursesClient({ courses, programs }: { courses: Course[]; progra
     });
     setCourseSaving(false);
     if (!result.ok) return setMsg({ text: result.error, tone: 'error' });
-    setMsg({ text: `✅ Course ${isNew ? 'created' : 'updated'} successfully.`, tone: 'success' });
+    setMsg({ text: `Course ${isNew ? 'created' : 'updated'} successfully.`, tone: 'success' });
     setCourseModal(false);
     closePanel();
     router.refresh();

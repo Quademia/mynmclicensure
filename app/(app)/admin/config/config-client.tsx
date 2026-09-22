@@ -60,7 +60,7 @@ function ConfigCard({ row, notify, onDeleted }: { row: ConfigRow; notify: (m: Ms
     const confirmed = await confirm({
       title: `Delete config key "${row.key}"?`,
       body:
-        `⚠️ WARNING: If any part of the platform code references this key it will break silently.\n\n` +
+        `WARNING: If any part of the platform code references this key it will break silently.\n\n` +
         `Only proceed if you are certain nothing depends on this key.`,
       confirmLabel: 'Delete key',
       danger: true,
@@ -84,7 +84,7 @@ function ConfigCard({ row, notify, onDeleted }: { row: ConfigRow; notify: (m: Ms
       <div className="config-card-header">
         <div className="config-card-left">
           <div className="config-key">{row.key}</div>
-          <div className="config-warning">⚠️ Key is read-only — referenced by platform code</div>
+          <div className="config-warning">Key is read-only — referenced by platform code</div>
           <div className="config-updated" suppressHydrationWarning>Last updated: {fmtUpdated(updatedAt)}</div>
         </div>
       </div>
@@ -183,7 +183,7 @@ export function ConfigClient({ rows }: { rows: ConfigRow[] }) {
               <p>Add a new key-value pair to the config table. Use this to prepare settings for code you are about to write.</p>
 
               <div className="modal-warning">
-                ⚠️ Choose the key name carefully — once code references it, renaming or deleting it will break that feature.
+                Choose the key name carefully — once code references it, renaming or deleting it will break that feature.
               </div>
 
               <div className="form-group">

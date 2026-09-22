@@ -121,7 +121,7 @@ export function GrantDialog({ open, products, preset, onClose, onGranted, notify
       return notify(result.error, 'error');
     }
     setBusy('granted');
-    notify('✅ Subscription granted successfully.', 'success');
+    notify('Subscription granted successfully.', 'success');
     onGranted?.();
     window.setTimeout(onClose, 1500);
   }
@@ -181,7 +181,7 @@ export function GrantDialog({ open, products, preset, onClose, onGranted, notify
               ) : previewNote ? (
                 <div className="grant-preview error">{previewNote}</div>
               ) : null}
-              <p className="note">📧 A confirmation email will be sent to the student automatically.</p>
+              <p className="note">A confirmation email will be sent to the student automatically.</p>
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>

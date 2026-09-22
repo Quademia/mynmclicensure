@@ -194,7 +194,7 @@ export function PaymentsClient({
       }
 
       if (data.status === 'ACTIVATED') {
-        setMsg({ text: '✅ Activation successful! Subscription has been created.', tone: 'success' });
+        setMsg({ text: 'Activation successful! Subscription has been created.', tone: 'success' });
         setRetryState('done');
       } else if (data.status === 'SETUP_REQUIRED') {
         setMsg({ text: 'Payment verified but no account found yet. Student needs to complete setup.', tone: 'info' });
@@ -219,7 +219,7 @@ export function PaymentsClient({
     const url = `${origin}/payment-confirmation?reference=${encodeURIComponent(reference)}&setup_token=${encodeURIComponent(setupToken)}`;
     navigator.clipboard
       .writeText(url)
-      .then(() => setMsg({ text: '📋 Setup link copied to clipboard. Send it to the student.', tone: 'success' }))
+      .then(() => setMsg({ text: 'Setup link copied to clipboard. Send it to the student.', tone: 'success' }))
       .catch(() => setMsg({ text: 'Could not copy. URL: ' + url, tone: 'error' }));
   }
 

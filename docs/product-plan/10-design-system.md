@@ -568,11 +568,22 @@ separate the two kinds.
 
 Built in two passes, because they need different work:
 
-- **Pass A — the deletions (~60).** Emoji inside a sentence, a toast, a
-  chip or a badge, where the words and the colour already say it:
+- **Pass A — the deletions.** ✅ 2026-09-22: **52 glyphs off 50 lines in
+  18 files**. Emoji inside a sentence, a toast, a chip or a badge, where
+  the words and the colour already say it:
   `✅ Programme created successfully.` on an already-green toast,
   `⚠️ Expiring`, `🟢 Active`, `📝 12 questions`, `Almost done! 👏`.
-  Subtractive; no new icons.
+  Subtractive; no new icons. Every class the glyph left behind was
+  checked for a background and a colour first, so nothing lost its only
+  signal — `.chip.expiring`, `.csv-report-row.ok` / `.err`,
+  `.config-warning`, `.sata-hint`, `.preflight-warning`,
+  `.timeup-banner`, `.pill-pinned`, `.pin-badge`, `.read-badge`, and
+  the two `Expires in N days` strings, which are rendered inside a
+  `.warning` class on both call sites.
+- **The score emoji stay** (`lib/attempts/scoring.ts`: `🎉 Excellent!`,
+  `👍 Good effort!`, `📖 Needs more practice`, `📚 Keep practising!`).
+  Sam, 2026-09-22: that is a student reading their own result, and
+  there the emoji is doing emotional work, not decoration.
 - **Pass B — the icon swaps (~75).** Buttons, tiles, section headings
   and empty states, where the glyph is doing visual work. Needs roughly
   **24 more shapes in `components/shell/icons.tsx`**, from the same

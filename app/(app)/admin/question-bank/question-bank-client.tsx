@@ -503,8 +503,8 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
                       <div className="q-rationale">{img}</div>
                     ) : null}
                     <div className="q-topics">
-                      {item.subject ? <span className="q-topic-pill">📖 {item.subject}</span> : null}
-                      {item.maintopic ? <span className="q-topic-pill">🏷 {item.maintopic}</span> : null}
+                      {item.subject ? <span className="q-topic-pill">{item.subject}</span> : null}
+                      {item.maintopic ? <span className="q-topic-pill">{item.maintopic}</span> : null}
                       {item.subtopic ? <span className="q-topic-pill">• {item.subtopic}</span> : null}
                     </div>
                   </div>

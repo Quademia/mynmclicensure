@@ -196,7 +196,7 @@ export function ProductsClient({
     setSaving(false);
     if (!result.ok) return setMsg({ text: result.error, tone: 'error' });
 
-    setMsg({ text: `✅ Product ${isNew ? 'created' : 'updated'} successfully.`, tone: 'success' });
+    setMsg({ text: `Product ${isNew ? 'created' : 'updated'} successfully.`, tone: 'success' });
     setTgInput('');
     closeModal();
     closePanel();

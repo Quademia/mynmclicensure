@@ -45,10 +45,10 @@ export function AnnouncementsStrip({ announcements, states }: { announcements: A
       </div>
       <div>
         {announcements.length === 0 ? (
-          <div className="announcements-empty">🔔 Nothing from us yet — check back soon.</div>
+          <div className="announcements-empty">Nothing from us yet — check back soon.</div>
         ) : unread.length === 0 ? (
           <>
-            <div className="announcements-empty">🎉 You&apos;re all caught up!</div>
+            <div className="announcements-empty">You&apos;re all caught up!</div>
             <a href="/student/announcements" className="announcements-footer">View all announcements →</a>
           </>
         ) : (

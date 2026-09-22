@@ -111,7 +111,7 @@ export function RegisterForm({ programs, schools }: { programs: ProgramOption[];
       {/* Touchpoint 1: confirm before creating */}
       <div className={`reg-modal-overlay${confirming ? ' show' : ''}`}>
         <div className="reg-modal" role="dialog" aria-modal="true">
-          <h3>Almost done! 👏</h3>
+          <h3>Almost done!</h3>
           <p>
             Please remember the <strong>email</strong> and <strong>password</strong>{' '}
             you just entered — you&apos;ll need them every time you sign in.

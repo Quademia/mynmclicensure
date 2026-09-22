@@ -78,7 +78,7 @@ export function CsvImportModal({
       <div className="qb-modal">
         <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="csvModalTitle">
           <div className="modal-card">
-            <h3 id="csvModalTitle">📥 Import Questions from CSV</h3>
+            <h3 id="csvModalTitle">Import Questions from CSV</h3>
             <p>Download the template, fill it in with your questions, then upload it here. The system will validate each row and report any errors.</p>
 
             <div className="modal-template">
@@ -94,9 +94,9 @@ export function CsvImportModal({
               {error ? <div className="csv-report-row err">{error}</div> : null}
               {outcome ? (
                 <>
-                  <div className="csv-report-row ok">✅ {outcome.successCount} question{outcome.successCount !== 1 ? 's' : ''} imported successfully.</div>
+                  <div className="csv-report-row ok">{outcome.successCount} question{outcome.successCount !== 1 ? 's' : ''} imported successfully.</div>
                   {outcome.failCount ? (
-                    <div className="csv-report-row err">❌ {outcome.failCount} row(s) failed — {outcome.errors.join('; ') || 'see the server log for details.'}</div>
+                    <div className="csv-report-row err">{outcome.failCount} row(s) failed — {outcome.errors.join('; ') || 'see the server log for details.'}</div>
                   ) : null}
                 </>
               ) : parsed ? (
