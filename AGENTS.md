@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-09-22. Rules for **any** assistant working in this
+Last updated: 2026-09-22 (fourth session). Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What is built and
@@ -331,6 +331,31 @@ above sit at the repo root; the audience grouping inside them is kept.
   the check that actually exercises them; for CSS, render a proof sheet
   from the repo's own stylesheets and screenshot it, rather than
   trusting the markup to be right. Never a temp file left in `public/`.
+- **A new hardcoded colour in a stylesheet is refused by a pre-commit
+  guard** (`scripts/css-baseline.mjs`, `.css-baseline.json`, 2026-09-22).
+  It is `lint-baseline.mjs`'s shape for CSS: the literals already there
+  are frozen, and `npm run css:check` fails only when a count goes UP. A
+  count going DOWN is a surface converted under ruling 9 — bank it with
+  `npm run css:baseline`. Use a token from `tokens.css`, or add one
+  there and use it from there. ⚠ **The guard checks colours only. It
+  does NOT check that a token resolves**, and an unresolved token is
+  silently dropped by the browser: `--space-5` and `--space-7` do not
+  exist — the space tokens are named by their **pixel value**
+  (`--space-16`, `--space-24`) — so `padding: 0 var(--space-7)` became no
+  padding at all, and a button sat flush against the edge of a 375px
+  screen. After writing CSS, check every `var(--…)` against `tokens.css`.
+- **`courses_select` is `auth.uid() is not null`**, so a signed-out
+  visitor reads NOTHING from `courses` — no titles and no
+  `program_scope`. A public page that needs either reads them with the
+  service role; the failure is silent otherwise, because a missing title
+  falls through to the id and a missing scope makes every product look
+  like everyone's. Opening the policy is the cleaner fix and needs its
+  own §8 row (unruled, 2026-09-22).
+- **A row of chips that scrolls sideways hides the chosen one** when the
+  choice is a link: the page reloads scrolled to the left, so the chip
+  just tapped is off-screen. Wrap the row and shorten the labels
+  instead — the one thing the row must show is which one is on
+  (2026-09-22, caught only at 375px).
 - **Migrations are applied by this repo's own runner**
   (`npm run db:migrate`, `scripts/db-migrate.mjs`), recorded in
   `licensure_gh.migrations`. Never `supabase db push`, never the MCP

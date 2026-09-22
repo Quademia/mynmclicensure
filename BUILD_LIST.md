@@ -84,6 +84,8 @@ the gamma-era list it replaces is in git history and in `qacademy-gamma`.
 - ✅ §8 S11 messaging storage — browser writes revoked, service-role writes, read stamps on the thread, CHECKs, six columns dropped (D37–D42) — 2026-09-18
 - ✅ §8 S12 quiz, mock and announcement storage — course-scoped quiz reads without item_ids, announcements_for_me(), three notice timestamps (D44, D46–D48) — 2026-09-18
 - ✅ §8 S13 config, levels and cohort — config admin-only with a registry read by the service role, users.level keyed to levels, cohort a year (D49, D51) — 2026-09-18
+- ✅ §8 S14 the premium marker — `products.is_premium` replaces the `_2026_PREP` id suffix (it carried a year and had no price gate); rule 9 took `products`' grants back to SELECT, the admin writes moved to the service role, two dead policies dropped (D23 item 4) — 2026-09-22
+- ⬜ §8 has no row for `courses_select` — the policy is `auth.uid() is not null`, so a signed-out visitor reads nothing from `courses`; `/premium-prep` and `/subscribe` both work around it with a service-role read, and D23 item 5 (a sales row lists its courses) cannot be met on any public page without it (2026-09-22)
 
 ## Improvements
 
@@ -150,6 +152,12 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ C3a The queued start — a row starts at the course's non-trial end; the extend branches gone (ruling 3) — 2026-09-19
 - ✅ C3b The panel shows a receipt's rows; the chain re-packed on every write; window from rows — 2026-09-19
 - ✅ (unplanned) One Grant dialog for Subscriptions and the Users drawer, the preview by the chain — 2026-09-19
+- ✅ (unplanned) The selling pages become cards — `/premium-prep` five cards, `/subscribe` the shop with a programme chooser that reorders and does not filter; both Server Components with no client half (660 lines deleted); D23 items 1, 2 and 5 built, item 3 built as `lib/catalogue/for-sale.ts` — 2026-09-22
+- ⬜ D23 item 3 is not closed — only `/subscribe` calls the one "for sale" helper; `/student/upgrade` keeps its own copy and `/premium-prep` its own inline filter (2026-09-22)
+- ⬜ The product card is duplicated between `.prep-*` and `.subp-*` — a shared card belongs in `components.css` beside `.btn` and `.badge`, and a third copy arrives with the checkout (2026-09-22)
+- ⬜ The checkout — one route, `/checkout/<product_id>`, for every product; both selling pages already point at it. Email and phone move here; the programme is prefilled from the product but shown and editable, because it becomes the student's ACCOUNT programme and D23 item 1 lets anyone buy any product (Sam, 2026-09-22)
+- ⬜ A premium-ticked product whose id matches no programme is dropped in silence on `/premium-prep` — the admin sees "updated successfully" and it never appears (2026-09-22, unruled)
+- ⬜ Desktop: a side rail of tickable filters (programme and similar) instead of the chip row (Sam, 2026-09-22)
 
 *Not yet sliced — each gets an id when the doc is rewritten:*
 
@@ -279,6 +287,7 @@ storage.
 - ✅ DS16 The synthesised weights — 40 to 700; landing's 12 kept, its 800 is real (not Inter) — 2026-09-22
 - ✅ (unplanned) The audience label loses "Panel" — ADMIN / STUDENT on both sidebars (ruling 12) — 2026-09-22
 - ✅ (unplanned) The app's favicon and home-screen icon — MyNclex's two Quademia icon files copied in with DS7 — 2026-09-22
+- ✅ (unplanned) One public top bar and one footer — `public-top-bar.tsx` / `public-footer.tsx`, the signed-out siblings of DS5, on the landing page and `/premium-prep` in the same commit; `.btn-outline` promoted into the family; the footer's year computed, not typed — 2026-09-22
 - ⬜ DS17 The ~15 name chips still on .badge — both builders, premium-prep, upgrade; most sit on DS9 surfaces
 - ⬜ DS18 Product kind (PAID / FREE / TRIAL) borrows the state colours — a kind by DS11, unmapped; Sam to rule
 - ⬜ Dark mode — not one prefers-color-scheme rule in the app and one theme in the token file; after the above

@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-22 — the CSS guard, is_premium with products' grants back (S14), one public bar and footer, and the two selling pages rebuilt as cards
+  - ↳ S14 option A · products SELECT-only, 2 policies dropped · premium ids renamed on dev · public bar + footer as Server Components · 660 client lines deleted · D23 1/2/5 · telegram keys leak closed · checkout next
+
 - 2026-09-22 — the design system finished: the page emoji out onto 44 drawn icons, four badge names collapsed to one, and Claude Design's two palettes built
   - ↳ synthesised bold was never synthesised · landing not in Inter · 225 glyphs not 160 · a rename cannot see a runtime class · 153 renames · 29 of 48 tokens already matched · DS17, DS18 opened
 
