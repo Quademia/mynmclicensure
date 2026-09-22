@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import '@/styles/tokens.css';
 import '@/styles/base.css';
 
 // The product's look comes from legacy/mynmclicensure/css/style.css

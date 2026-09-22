@@ -1,31 +1,17 @@
 /* styles/base.css
  *
- * The product's tokens and reset, transcribed from
- * legacy/mynmclicensure/css/style.css (Variables + Reset + body + a).
- * Loaded once from app/layout.tsx. The Inter font comes from next/font in
- * that layout rather than the legacy @import, so the CSS variable
- * --font-inter is set there.
+ * The product's reset, transcribed from
+ * legacy/mynmclicensure/css/style.css (Reset + body + a).
+ * Loaded once from app/layout.tsx, AFTER styles/tokens.css. The Inter
+ * font comes from next/font in that layout rather than the legacy
+ * @import, so the CSS variable --font-inter is set there.
  *
  * Plus the toast (lib/toast/toast.tsx), which every surface uses.
+ *
+ * The tokens left this file for styles/tokens.css on 2026-09-22
+ * (10-design-system.md DS1), which declares the new names and keeps
+ * every name that used to live here as an alias.
  */
-
-:root {
-  --primary: #1e3a5f;
-  --primary-dark: #142d4c;
-  --primary-light: #edf6f5;
-  --accent: #2d7d72;
-  --success: #16a34a;
-  --danger: #dc2626;
-  --warning: #d97706;
-  --text: #111827;
-  --text-muted: #6b7280;
-  --border: #e5e7eb;
-  --bg: #f9fafb;
-  --white: #ffffff;
-  --radius: 8px;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
-}
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -63,7 +49,7 @@ a:hover {
   padding: 12px 14px;
   border-radius: 10px;
   background: var(--white);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.11);
+  box-shadow: var(--shadow-lg);
   font-size: 13px;
   line-height: 1.45;
   animation: app-toast-in 180ms ease-out;

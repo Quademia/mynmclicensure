@@ -1,0 +1,218 @@
+/* styles/tokens.css — 10-design-system.md DS1
+ *
+ * The product's named values: 23 colours, 10 type styles, 10 spacing
+ * steps, 5 radii, 3 shadows. From the Claude Design system built off
+ * this repo at d5ee034 (2026-09-19, revised 2026-09-22), whose token
+ * file is the source; the contrast figures in the notes below were
+ * measured there and re-checked here.
+ *
+ * Loaded from app/layout.tsx BEFORE base.css, which keeps the reset,
+ * body, a and the toast.
+ *
+ * ── Why the old names are still here ──────────────────────────────
+ * The stylesheets name the OLD tokens 1,862 times. Renaming would
+ * break every one, so the bottom of this file declares each old name
+ * as an alias onto its new one. Nothing moves on the day this lands.
+ * A surface adopts the new names when work takes us to it; the alias
+ * block is deleted when the last old name goes. Two exceptions, both
+ * deliberate and both flagged at the aliases: --shadow and --shadow-md
+ * change value, because the design system lightened all three shadows
+ * on Sam's brief.
+ *
+ * ⚠ --type-price-weight is 800 and next/font loads 400–700 in
+ * app/layout.tsx, so it will fall back until either 800 is added to
+ * that list or the token drops to 700. Unruled; see DS1 in the doc.
+ */
+
+:root {
+  /* ── Brand ────────────────────────────────────────────────────── */
+  /* Structure: shells, primary buttons, headings with weight. 11.5:1 on white. */
+  --brand-navy: #1e3a5f;
+  /* The dark sidebar in shells A1 and A3; a primary button pressed.
+     White on it is 13.9:1, menu text at 70% white 7.5:1. */
+  --brand-navy-dark: #142d4c;
+  /* The accent — action: links, the active sidebar row, focus rings.
+     4.9:1 on white; only 4.45:1 on --brand-teal-pale, so teal text on
+     the pale tint uses --brand-teal-hover instead. */
+  --brand-teal: #2d7d72;
+  /* Hover and press for anything teal. 7.4:1 on white, 6.7:1 on the
+     pale tint — this is the token for teal text on a teal ground. */
+  --brand-teal-hover: #235f56;
+  /* Teal at rest: the active row's ground, selected states, quiet info
+     panels. Body text on it is 16.1:1; --ink-muted is not (4.4:1), so
+     a tinted row uses full --ink. */
+  --brand-teal-pale: #edf6f5;
+
+  /* ── Ink ──────────────────────────────────────────────────────── */
+  /* Body text and headings. 17:1 on the page ground. */
+  --ink: #111827;
+  /* Secondary text: table meta, helper lines, a card's tagline. 4.8:1
+     on white, 4.6:1 on the page. Keep at 13px and up, never on a tint. */
+  --ink-muted: #6b7280;
+  /* Non-essential only: placeholders, a disabled label, an icon that
+     repeats its neighbour. 2.5:1 on white — it fails on every ground
+     here, so nothing a reader must read may be set in it. */
+  --ink-faint: #9ca3af;
+
+  /* ── Surfaces ─────────────────────────────────────────────────── */
+  /* Every hairline: card edges, table rules, inputs at rest, dividers. */
+  --border: #e5e7eb;
+  /* Card, table, drawer, dialog and top-bar ground. Every white
+     surface is this token, never a literal #fff. */
+  --surface: #ffffff;
+  /* The page behind the cards. Never used for a card, so a card always
+     separates from the page. */
+  --surface-page: #f9fafb;
+
+  /* ── Status signals ───────────────────────────────────────────── */
+  /* A shape or a large number, never body text: 3.3:1 on white. */
+  --status-success: #16a34a;
+  /* Destructive button text, a failed score, the dialog's action. 4.8:1. */
+  --status-danger: #dc2626;
+  /* An expiring subscription, an UPCOMING quiz. 3.2:1 on white, so it
+     carries meaning through a badge, not through text colour alone. */
+  --status-warning: #d97706;
+
+  /* ── Badge tints ──────────────────────────────────────────────── */
+  /* A badge always carries all three of its triple. The border is what
+     keeps it reading as a badge in a greyscale screenshot. */
+  --badge-success-bg: #f0fdf4;
+  --badge-success-border: #bbf7d0;
+  /* 6.8:1 on its ground — this is why badge text is never --status-success. */
+  --badge-success-ink: #166534;
+  --badge-danger-bg: #fef2f2;
+  --badge-danger-border: #fecaca;
+  /* 5.9:1 on its ground, 6.5:1 on white. */
+  --badge-danger-ink: #b91c1c;
+  --badge-warning-bg: #fffbeb;
+  --badge-warning-border: #fde68a;
+  /* 6.8:1 on its ground. */
+  --badge-warning-ink: #92400e;
+
+  /* ── Type ─────────────────────────────────────────────────────── */
+  /* Inter, from next/font in app/layout.tsx. Named because the app has
+     54 distinct font sizes and no scale; four values are ~700 of ~800
+     uses, so the scale exists and only lacked names. */
+
+  /* The one title at the top of a screen. Phone drops it to 22px. */
+  --type-page-title-size: 28px;
+  --type-page-title-line: 34px;
+  --type-page-title-weight: 700;
+  --type-page-title-track: -0.02em;
+
+  /* The amount on a product card, always through formatMinor(). */
+  --type-price-size: 36px;
+  --type-price-line: 40px;
+  --type-price-weight: 800;
+  --type-price-track: -0.02em;
+
+  /* The label above a band of cards — Platform Access, My Courses. */
+  --type-section-title-size: 15px;
+  --type-section-title-line: 20px;
+  --type-section-title-weight: 700;
+
+  /* A course, quiz or product name inside its card. */
+  --type-card-title-size: 14px;
+  --type-card-title-line: 19px;
+  --type-card-title-weight: 600;
+
+  /* Reading text: a dialog's paragraph, a guide page, an announcement. */
+  --type-body-size: 15px;
+  --type-body-line: 24px;
+  --type-body-weight: 400;
+
+  /* Body text carrying the answer — a name in a drawer header, a count. */
+  --type-body-strong-size: 15px;
+  --type-body-strong-line: 24px;
+  --type-body-strong-weight: 600;
+
+  /* The interface voice: buttons, input labels, sidebar rows, table
+     headers. The most-used style in the product. */
+  --type-ui-size: 13px;
+  --type-ui-line: 18px;
+  --type-ui-weight: 600;
+
+  /* What a reader types or reads inside an input, and table cells. */
+  --type-field-size: 14px;
+  --type-field-line: 20px;
+  --type-field-weight: 400;
+
+  /* Supporting detail: a schedule line, a timestamp, a question count. */
+  --type-meta-size: 12px;
+  --type-meta-line: 17px;
+  --type-meta-weight: 500;
+
+  /* Badge text only, set in capitals. Never a sentence. */
+  --type-micro-size: 11px;
+  --type-micro-line: 15px;
+  --type-micro-weight: 700;
+  --type-micro-track: 0.04em;
+
+  /* ── Spacing ──────────────────────────────────────────────────── */
+  /* Derived from measured use across the 33 stylesheets, which declare
+     no spacing variables: gaps cluster on 8, 10, 12 and 6; padding on
+     16 and 24. Use these going forward — the existing sheets are full
+     of off-scale values. */
+  --space-2: 2px;   /* a badge dot from its word */
+  --space-4: 4px;   /* inside a badge or pill; an icon from its label */
+  --space-6: 6px;   /* a card title from the meta line under it */
+  --space-8: 8px;   /* the default gap: buttons, list rows, label→input */
+  --space-10: 10px; /* between sidebar rows; a table cell's padding */
+  --space-12: 12px; /* between cards in a grid on a phone */
+  --space-16: 16px; /* card padding on a phone; card gap on desktop */
+  --space-20: 20px; /* between the bands of a dashboard */
+  --space-24: 24px; /* card padding on desktop; the page gutter */
+  --space-32: 32px; /* above a page title; around the login card */
+
+  /* ── Radius ───────────────────────────────────────────────────── */
+  --radius-sm: 4px;      /* a badge dot's container, a progress bar */
+  --radius-md: 6px;      /* a small button, a control inside a table */
+  --radius: 8px;         /* the default: cards, buttons, inputs, dialogs */
+  --radius-lg: 12px;     /* a container holding other rounded things */
+  /* Status badges and the subscription pill only. Never a button — a
+     pill button reads as a filter chip in this product. */
+  --radius-pill: 999px;
+
+  /* ── Shadow ───────────────────────────────────────────────────── */
+  /* Three steps by how far off the page a thing sits, and never more
+     than one at a time. */
+  /* A card at rest — barely visible, which is the point: the border
+     does the separating. */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  /* A card on hover, the top bar over a scrolled page, the toast. */
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  /* Anything over a dimmed page: the confirm dialog, the user drawer,
+     the phone nav drawer. */
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.11);
+}
+
+/* ══ The old names, aliased ═══════════════════════════════════════
+ * Every name base.css used to declare, pointing at its new token, so
+ * the 1,862 existing uses keep working unchanged. --border and
+ * --radius are not here because they kept both their name and their
+ * value and are declared above.
+ *
+ * Delete a line here when the last surface using it has moved.
+ */
+:root {
+  --primary: var(--brand-navy);
+  --primary-dark: var(--brand-navy-dark);
+  --primary-light: var(--brand-teal-pale);
+  --accent: var(--brand-teal);
+  --success: var(--status-success);
+  --danger: var(--status-danger);
+  --warning: var(--status-warning);
+  --text: var(--ink);
+  --text-muted: var(--ink-muted);
+  --bg: var(--surface-page);
+  --white: var(--surface);
+
+  /* ⚠ The two that change value, on Sam's brief to the design system:
+   *   --shadow    was 0 1px 3px rgba(0, 0, 0, 0.10)  → now .06
+   *   --shadow-md was 0 4px 6px rgba(0, 0, 0, 0.07)  → now 4px 12px .08
+   * Every card in the app leans on --shadow, so this is the one visible
+   * change in DS1. Revert these two lines to the old values if Sam
+   * prefers the heavier shadow.
+   */
+  --shadow: var(--shadow-sm);
+}
