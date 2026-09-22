@@ -39,7 +39,7 @@ sorted around (Sam, 2026-09-18). The findings are
 still the vanilla-JS site served from the `qacademy-gamma` repo; its
 code stays here under `legacy/` as a reference — it says what the old
 app did, and Sam decides whether the new app should do the same. The
-feature docs `00–09` are the **living plan per feature** (Sam,
+feature docs `00–10` are the **living plan per feature** (Sam,
 2026-09-19, replacing the 2026-09-12 ruling that they were not build
 plans): each holds what the feature does today, what the diagnosis
 found, Sam's rulings, and the sliced plan with the doc's own slice
@@ -49,7 +49,7 @@ are no flat lists of unhomed work, and a line with no slice id gets one
 when its doc is rewritten. A doc is rewritten into that shape when its
 feature comes up, not before; until then it still describes the legacy
 product above a *Diagnosis findings for this surface* table (rewritten
-so far: 02, 03, 05, 08; 09 was written in the shape). The
+so far: 02, 03, 05, 08; 09 and 10 were written in the shape). The
 diagnosis stays the register of findings; the feature doc is where a
 finding becomes a slice.
 
@@ -85,7 +85,7 @@ stack and the source of the plumbing. MyTeacher follows later.
 - `scripts/` — the lint baseline and the migration runner.
 - `public/` — static assets.
 - `docs/product-plan/` — flat: the rebuild plan, the feature specs
-  `00–09`, the mock-exams reference, and the gamma-era plans kept for
+  `00–10`, the mock-exams reference, and the gamma-era plans kept for
   history. One folder until there is a reason to separate.
 - `sessions/` — period logs. `legacy/` — the old product, read-only.
 

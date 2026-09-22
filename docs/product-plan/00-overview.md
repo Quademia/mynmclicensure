@@ -69,6 +69,7 @@ Day-to-day admin work includes:
 - [07 — Messaging](07-messaging.md) — how the built-in support chat works
 - [08 — Question Bank](08-question-bank.md) — the items, the importer, and the gate on them
 - [09 — Free Account and Gamification](09-free-account-and-gamification.md) — the retention layer: a free-forever floor, streaks and a daily challenge
+- [10 — Design System](10-design-system.md) — the tokens, the shared components and the app shell
 
 The two MyTeacher docs that used to sit at 08 and 09 (Teacher Assess,
 Teacher Academic Structure) went with the rest of MyTeacher when the

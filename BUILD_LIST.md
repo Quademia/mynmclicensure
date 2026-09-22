@@ -96,7 +96,7 @@ the work that surfaced it; Sam orders them. A finding in
 
 ### Plans by feature doc
 
-The feature docs `00–09` are the living plan per feature (Sam,
+The feature docs `00–10` are the living plan per feature (Sam,
 2026-09-19); a doc rewritten into that shape gets a section here with
 its own slice ids. **Every queued line sits under the surface that will
 build it** (Sam, 2026-09-21) — the three lists that used to hold them
@@ -109,11 +109,11 @@ gets one when its doc is rewritten into the living-plan shape.
 
 #### [00-overview.md](docs/product-plan/00-overview.md)
 
-Reference data (config, schools, levels, telegram keys), the shell, and
-everything that belongs to no single surface — the design system, the
-dialogs, cutover, the Telegram gate (Sam, 2026-09-21).
+Reference data (config, schools, levels, telegram keys) and everything
+that belongs to no single surface — cutover, the Telegram gate (Sam,
+2026-09-21). The design system, the shell and the dialogs left for
+`10-design-system.md` when it was opened (Sam, 2026-09-22).
 
-- ⬜ 5 Sidebar badge, My Courses and name / photo load once in the layout — stale across sidebar clicks; dropdown open state carries across pages
 - ⬜ 13 A failed database read shows "No config keys found." (Config) and "No active subscriptions found yet." (Upgrade) instead of an error
 - ⬜ About 40 minor or cosmetic differences (titles, wording, focus, scroll, spinners) — listed in the session entry; Sam's call whether to tidy
 - ⬜ Five legacy bugs the rebuild fixed without a record (history Retake, "%" in Send feedback, inbox unread, picker Subtopic filter, timed pre-Start save) — keep, Sam to confirm
@@ -123,10 +123,6 @@ dialogs, cutover, the Telegram gate (Sam, 2026-09-21).
 - ⬜ Reference data: schools is a regulator's list with no way to change it (D50, unruled since 2026-09-18)
 - ⬜ Reference data: telegram_group_keys is free text and holds junk — no list, no validation (D3)
 - ⬜ Storage hygiene: ~14 columns, the `levels` table and one config row with no reader or writer (list in the 2026-09-18 session entry) — Sam: some have an unbuilt purpose; review one at a time (2026-09-18); the auth group's five settled by the trace and the read-back (S9, items 7 and 8)
-- ⬜ Design system: one shared palette already (MyNclex's tokens file was copied from this app); the foundation is that file extended with status tokens, copied here as styles/tokens.css; the shell per product; the sales pages' second teal Sam's call; the doc after Claude Design's mockups (inventory 2026-09-19)
-- ⬜ Design system, the components: Radix primitives under our own CSS, or the current structure — Sam to look and decide; Tailwind is not part of it (cloud session, 2026-09-20)
-- ⬜ The six window.confirm boxes move to one shared overlay confirm, legacy's words kept (Sam, 2026-09-21)
-- ⬜ The four window.prompt boxes and the one alert, all in Announcements — same family, Sam to rule (2026-09-21)
 - ⬜ Before cutover: Resend's free plan caps the account shared with MyNclex at 100 emails a day (MyNclex's notes); re-registration day would pass it and lose the rest — the Pro upgrade first (slice 10, 2026-09-16)
 - ⬜ 17 Telegram gate — Connect page, link codes, bot Worker on the DB, allowlist from subscriptions (moved from the rebuild, Sam, 2026-09-16)
 - ⬜ Procedures: the thirteen NMC manual links are fixed in the page; move them to a table with an admin management page (slice 7c, 2026-09-14)
@@ -256,6 +252,27 @@ Decided in principle in a cloud session on 2026-09-20; candidates, none sliced, 
 - ⬜ G1 Streak, points, leaderboard — derived from the graded rows, no new tables; after the NMC Prep walk
 - ⬜ G2 The daily challenge — five a day per programme from the free pool, a new attempt source; after G1
 - ⬜ G3 Tiers — names on point bands; later
+
+#### [10-design-system.md](docs/product-plan/10-design-system.md)
+
+Opened 2026-09-22 with the shell decided as A3 and the sales-page look
+retired (B1). Ids are `DS`, two letters, because a bare `D` collides with
+`rebuild.md` D1–D10 and the diagnosis's D-numbers. No slice here touches
+storage.
+
+- ⬜ DS1 The foundation — tokens.css: 23 colours, 10 type styles, 10 spaces, 5 radii, 3 shadows; old names aliased
+- ⬜ DS2 The retired teal out (B1) — 9 stylesheets, 52 uses, 46 as rgba(11,122,117); .qa-page's aliases collapse
+- ⬜ DS3 One button — 30 of 33 stylesheets define their own; the shared family, then page by page as each is touched
+- ⬜ DS4 One dialog — the 9 confirms, 4 prompts as 2, the stale alert out; Escape and a focus trap; Radix unruled
+- ⬜ DS5 The shell becomes A3 — top bar, sidebar collapsible on a cookie, PageHeader's right half off 23 pages
+- ⬜ DS6 The icon set — 16px outline; the nav's emoji leave the labels, NavItem gains an icon field (data, not CSS)
+- ⬜ DS7 One name circle — one component for the four treatments; how a message shows student vs Quademia is unruled
+- ⬜ Dark mode — not one prefers-color-scheme rule in the app and one theme in the token file; after the above
+- ⬜ A content max-width above 1440px, where A3's closed sidebar leaves cards and tables past a comfortable measure
+
+*Not yet sliced:*
+
+- ⬜ 5 Sidebar badge, My Courses and name / photo load once in the layout — stale across sidebar clicks; dropdown open state carries across pages
 
 #### Speed and scale — no doc, kept as one group
 
