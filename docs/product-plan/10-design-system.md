@@ -777,9 +777,11 @@ declarations in `landing.css` stay as they are.
 | DS10 The button size scale | ✅ 2026-09-22 — the scale; surfaces as touched |
 | DS11 A categorical palette | ✅ 2026-09-22 — sky / indigo / plum; retake and modes stay grey |
 | DS12 A scale palette | ✅ 2026-09-22 — navy filling by weight, three bars (Sam kept navy) |
-| DS13 One badge class name | ✅ 2026-09-22 — 153 renames onto `.badge`; the state/name sort waits for DS11 |
+| DS13 One badge class name | ✅ 2026-09-22 — 153 renames onto `.badge`; DS11 then sorted 20 of the kind sites |
 | DS14 The price weight | ✅ 2026-09-22 |
 | DS15 The page emoji | ✅ 2026-09-22 — 52 deleted, 65 to icons, 5 kept |
 | DS16 The synthesised weights | ✅ 2026-09-22 — 40 to 700; landing's 12 kept at 800 |
 | The audience label loses "Panel" | ✅ 2026-09-22 (ruling 12) |
+| DS17 The ~15 name chips still on `.badge` | ⬜ most sit on DS9 surfaces |
+| DS18 Product kind borrows the state colours | ⬜ Sam to rule |
 | Dark mode · content max-width · the avatar's size | ⬜ later |

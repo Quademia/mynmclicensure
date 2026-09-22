@@ -304,6 +304,33 @@ above sit at the repo root; the audience grouping inside them is kept.
   same row again with the same client gets the FIRST read back (03 Q5:
   the expired exam's page still showed the preflight). Re-read through a
   different client (the service role) or return what the write returned.
+- **A weight the loaded font does not carry is NOT synthesised — the
+  browser uses the nearest weight it does have.** Chrome synthesises a
+  bold only when the family has no bold face at all; Inter loads 400–700
+  here, so `font-weight: 800` and `900` render as pixel-identical to
+  700. Measured, 2026-09-22: the same string at 40px is 405.6 / 408.5 /
+  411.4 / 414.2 / 414.2 / 414.2px at 400 / 500 / 600 / 700 / 800 / 900.
+  DS16 was opened calling those declarations a visual defect; they were
+  not. Measure the rendered width before calling a weight a defect —
+  and note the landing page is the one surface **not** on Inter
+  (`styles/landing.css:19` puts it on the device's own font), where 800
+  *is* a real heavier face.
+- **A class name assembled at runtime is invisible to a rename.** DS13
+  renamed `` `pill pill-${ds}` `` only half — the base, not the prefix —
+  and missed two `Record<string, string>` maps holding `'chip-mcq'` and
+  friends as plain strings in a `.ts` file. Neither throws; both show
+  only as a badge quietly losing its colour. After any class rename,
+  run both halves of the check: for every element carrying the base
+  class, confirm its **other** classes still resolve to a rule; then
+  list any modifier in the CSS that no markup uses. **The second list
+  is where a runtime-assembled name hides.**
+- **Most surfaces cannot be verified by eye from here.** The desktop
+  app's browser pane signs in as a student, so `/admin` bounces and every
+  authenticated student page needs Sam to sign the pane in. For a change
+  across many such pages, `npm run build` (webpack, all 50 routes) is
+  the check that actually exercises them; for CSS, render a proof sheet
+  from the repo's own stylesheets and screenshot it, rather than
+  trusting the markup to be right. Never a temp file left in `public/`.
 - **Migrations are applied by this repo's own runner**
   (`npm run db:migrate`, `scripts/db-migrate.mjs`), recorded in
   `licensure_gh.migrations`. Never `supabase db push`, never the MCP

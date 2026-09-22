@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-22 — the design system finished: the page emoji out onto 44 drawn icons, four badge names collapsed to one, and Claude Design's two palettes built
+  - ↳ synthesised bold was never synthesised · landing not in Inter · 225 glyphs not 160 · a rename cannot see a runtime class · 153 renames · 29 of 48 tokens already matched · DS17, DS18 opened
+
 - 2026-09-22 — the design system built to its end: shell A3, icons, one dialog on the browser element, one name circle with the real logo, sizes, price weight
   - ↳ Sam decides only from what is offered · Tailwind reopened · vector Q used then taken back · no favicon before · message circles never showed · price token unread · 53 fake bolds · DS9 as touched · sidebar-to-top tried, reverted
 
