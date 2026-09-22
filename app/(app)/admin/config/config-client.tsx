@@ -7,6 +7,7 @@
 // alerts are toasts (UI convention #1).
 
 'use client';
+import { useConfirm } from '@/lib/overlays/shared/confirm-dialog';
 
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -52,12 +53,19 @@ function ConfigCard({ row, notify, onDeleted }: { row: ConfigRow; notify: (m: Ms
     window.setTimeout(() => setSaved(false), 2500);
   }
 
+  // DS4: legacy's three-paragraph warning, in the app's dialog; the key
+  // is typed back before Delete enables (a delete cannot be undone).
+  const [confirm, confirmDialog] = useConfirm();
   async function deleteRow() {
-    const confirmed = window.confirm(
-      `Delete config key "${row.key}"?\n\n` +
+    const confirmed = await confirm({
+      title: `Delete config key "${row.key}"?`,
+      body:
         `⚠️ WARNING: If any part of the platform code references this key it will break silently.\n\n` +
         `Only proceed if you are certain nothing depends on this key.`,
-    );
+      confirmLabel: 'Delete key',
+      danger: true,
+      typeToConfirm: row.key,
+    });
     if (!confirmed) return;
     setBusy(true);
     const result = await deleteConfigRow(row.key);
@@ -72,6 +80,7 @@ function ConfigCard({ row, notify, onDeleted }: { row: ConfigRow; notify: (m: Ms
 
   return (
     <div className="config-card">
+      {confirmDialog}
       <div className="config-card-header">
         <div className="config-card-left">
           <div className="config-key">{row.key}</div>

@@ -11,8 +11,9 @@
 // settings with a helper line, and makes its ids differently.
 //
 // Messages are toasts (UI convention #1) where legacy used the inline
-// .alert boxes; Archive / Restore keeps the browser's own confirm box
-// with legacy's words (Sam, 2026-09-11: dialogs stay as legacy has them).
+// .alert boxes; Archive / Restore asks in the app's own dialog with
+// legacy's words (DS4, 2026-09-22 — the native box went with UI
+// convention #2's 2026-09-21 change).
 //
 // Not here, by rebuild.md §12 (slice 5): the Preview button — it never
 // worked (§9 #16). The attempt-stats box on the details step (edit mode
@@ -25,6 +26,7 @@
 // the full row (lib/quizzes/actions loadQuiz) for both pages.
 
 'use client';
+import { useConfirm } from '@/lib/overlays/shared/confirm-dialog';
 
 import { useCallback, useEffect, useState } from 'react';
 import { Toast } from '@/lib/toast/toast';
@@ -389,11 +391,16 @@ export function QuizManager({
   // legacy archiveCurrentQuiz toggled archived ↔ active, so a restored
   // draft came back active (D45 c). Since Q2: archive from any status,
   // restore lands on draft — active is chosen on the form and saved.
-  // Behind the browser's confirm, as legacy.
+  // Behind a confirm carrying legacy's words, in the app's dialog (DS4).
+  const [confirm, confirmDialog] = useConfirm();
   async function archiveOrRestore() {
     if (!currentQuizId) return;
     const newStatus: QuizStatus = currentStatus === 'archived' ? 'draft' : 'archived';
-    if (!window.confirm(newStatus === 'archived' ? W.confirmArchive : W.confirmRestore)) return;
+    const goOn = await confirm({
+      title: newStatus === 'archived' ? W.confirmArchive : W.confirmRestore,
+      confirmLabel: newStatus === 'archived' ? 'Archive' : 'Restore',
+    });
+    if (!goOn) return;
     const result = await setQuizStatus(kind, currentQuizId, newStatus);
     if (!result.ok) return err(result.error);
     setCurrentStatus(newStatus);
@@ -512,6 +519,7 @@ export function QuizManager({
   return (
     <div className="qm">
       <Toast message={msg?.text ?? null} tone={msg?.tone} onDismiss={dismiss} />
+      {confirmDialog}
 
       {/* Breadcrumb */}
       <div className="breadcrumb">

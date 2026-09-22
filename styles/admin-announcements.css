@@ -111,7 +111,6 @@
 .ann-overlay .editor-toolbar { display: flex; gap: 4px; flex-wrap: wrap; padding: 6px 8px; background: var(--bg); border: 1px solid var(--border); border-bottom: none; border-radius: var(--radius) var(--radius) 0 0; }
 .ann-overlay .editor-toolbar button { padding: 4px 10px; font-size: 12px; font-weight: 500; border: 1px solid var(--border); border-radius: 4px; background: var(--white); cursor: pointer; font-family: inherit; color: var(--text); transition: background 0.15s; }
 .ann-overlay .editor-toolbar button:hover { background: var(--primary-light); border-color: var(--accent); }
-.ann-overlay .editor-toolbar button.dead { opacity: 0.5; }
 .ann-overlay .editor-toolbar .sep { width: 1px; background: var(--border); margin: 2px 4px; }
 .ann-overlay #fieldBody { border-radius: 0 0 var(--radius) var(--radius); min-height: 130px; resize: vertical; }
 .ann-overlay .preview-box { min-height: 80px; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; color: var(--text); background: var(--bg); line-height: 1.6; }

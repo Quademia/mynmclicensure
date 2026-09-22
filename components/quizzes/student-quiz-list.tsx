@@ -23,6 +23,7 @@
 // date strings still format in the browser's locale, as legacy.
 
 'use client';
+import { useConfirm } from '@/lib/overlays/shared/confirm-dialog';
 
 import { useCallback, useState, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
@@ -196,9 +197,18 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
   }
 
   // ── abandon (legacy abandonAttempt) ──
+  const [confirm, confirmDialog] = useConfirm();
   async function abandon(attemptId: string) {
     if (busy) return;
-    if (!window.confirm('Are you sure you want to abandon this attempt? Your progress will be lost.')) return;
+    // legacy's words in the app's dialog (DS4)
+    const ok = await confirm({
+      title: 'Abandon this attempt?',
+      body: 'Are you sure you want to abandon this attempt? Your progress will be lost.',
+      confirmLabel: 'Abandon attempt',
+      cancelLabel: 'Keep going',
+      danger: true,
+    });
+    if (!ok) return;
     setBusy(attemptId);
     const result = await abandonAttempt(attemptId);
     setBusy(null);
@@ -387,6 +397,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
   return (
     <div className="sqz">
       <Toast message={msg?.text ?? null} tone={msg?.tone} onDismiss={clearMsg} />
+      {confirmDialog}
 
       {/* Filter chip (shows when ?course= names an enrolled course) */}
       <div className={`filter-chip-bar ${filterCourse ? 'show' : ''}`}>

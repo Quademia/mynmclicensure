@@ -43,6 +43,8 @@
 // "QAcademy"; the brand is Quademia (AGENTS.md UI convention #5).
 
 'use client';
+import { Dialog } from '@/lib/overlays/shared/dialog';
+import { useConfirm } from '@/lib/overlays/shared/confirm-dialog';
 
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -371,10 +373,17 @@ export function QuizRunner({
     };
   }, [mode, booted, locked, reviewMode]);
 
-  // legacy beforeunload guard
+  // legacy beforeunload guard — for a closed tab or a typed address, not
+  // for our own exit. Save & Resume Later and Submit & Exit leave by a
+  // full load, which used to trip this guard too, so a student who had
+  // just saved was told their changes may not be saved (legacy did the
+  // same; fixed with DS4, Sam 2026-09-22). The ref is set in the exit
+  // handlers before they navigate.
+  const leavingRef = useRef(false);
   useEffect(() => {
     if (!booted || locked || reviewMode) return;
     const handler = (e: BeforeUnloadEvent) => {
+      if (leavingRef.current) return;
       e.preventDefault();
       e.returnValue = '';
     };
@@ -469,15 +478,27 @@ export function QuizRunner({
   }
 
   // ── submit (legacy confirmSubmit / submitQuiz) ──
-  function confirmSubmit() {
+  // In the app's dialog (DS4). Legacy's flagged message said "Click
+  // Cancel to go back and review them, or OK to continue", which cannot
+  // survive buttons with real labels; Sam's wording (2026-09-22) puts the
+  // two choices on the buttons instead.
+  const [confirm, confirmDialog] = useConfirm();
+  async function confirmSubmit() {
     if (flaggedCount > 0) {
-      const goOn = window.confirm(
-        `You still have ${flaggedCount} flagged question${flaggedCount !== 1 ? 's' : ''}. Click Cancel to go back and review them, or OK to continue.`,
-      );
+      const goOn = await confirm({
+        title: `You still have ${flaggedCount} flagged question${flaggedCount !== 1 ? 's' : ''}`,
+        confirmLabel: 'Submit anyway',
+        cancelLabel: 'Go back and review',
+      });
       if (!goOn) return;
     }
     if (unanswered > 0) {
-      const goOn = window.confirm(`You have ${unanswered} unanswered question${unanswered !== 1 ? 's' : ''}. Submit anyway?`);
+      const goOn = await confirm({
+        title: `You have ${unanswered} unanswered question${unanswered !== 1 ? 's' : ''}`,
+        body: 'Submit anyway?',
+        confirmLabel: 'Submit anyway',
+        cancelLabel: 'Go back',
+      });
       if (!goOn) return;
     }
     void submitQuiz();
@@ -541,6 +562,7 @@ export function QuizRunner({
     setSaving('Saving your progress…');
     await saveProgress(false);
     setSaving('');
+    leavingRef.current = true;
     window.location.href = QUIZZES_PAGE;
   }
 
@@ -549,6 +571,7 @@ export function QuizRunner({
     const done = await submitQuiz();
     if (!done) return;
     window.setTimeout(() => {
+      leavingRef.current = true;
       window.location.href = QUIZZES_PAGE;
     }, 1500);
   }
@@ -952,6 +975,7 @@ export function QuizRunner({
 
       <BodyPortal>
         <Toast message={toast} onDismiss={dismissToast} />
+        {confirmDialog}
         <div className="runner-overlay">
           {gridOverlayOpen ? (
             <div className="overlay-backdrop" onClick={(e) => { if (e.target === e.currentTarget) setGridOverlayOpen(false); }}>
@@ -966,19 +990,16 @@ export function QuizRunner({
             </div>
           ) : null}
 
-          {exitOpen ? (
-            <div className="overlay-backdrop">
-              <div className="exit-panel">
-                <h3>{W.exitTitle}</h3>
-                <p>{W.exitText}</p>
-                <div className="exit-actions">
-                  <button type="button" className="btn btn-ghost" onClick={saveAndExit}>💾 Save &amp; Resume Later</button>
-                  <button type="button" className="btn btn-danger" onClick={submitAndExit}>✓ Submit &amp; Exit</button>
-                  <button type="button" className="btn btn-ghost" onClick={() => setExitOpen(false)}>Cancel</button>
-                </div>
-              </div>
+          {/* the exit choice (slice 6a), on the shared dialog since DS4; a
+              choice of three stacks full-width */}
+          <Dialog open={exitOpen} onClose={() => setExitOpen(false)} title={W.exitTitle}>
+            <p className="dlg-text">{W.exitText}</p>
+            <div className="dlg-actions stack">
+              <button type="button" className="btn btn-ghost" onClick={saveAndExit}>💾 Save &amp; Resume Later</button>
+              <button type="button" className="btn btn-danger" onClick={submitAndExit}>✓ Submit &amp; Exit</button>
+              <button type="button" className="btn btn-ghost" onClick={() => setExitOpen(false)}>Cancel</button>
             </div>
-          ) : null}
+          </Dialog>
 
           {imgOverlay ? (
             <div className="img-overlay-backdrop" onClick={(e) => { if (e.target === e.currentTarget) setImgOverlay(''); }}>

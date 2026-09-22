@@ -219,10 +219,6 @@
 }
 
 /* ── Exit dialog ── */
-.runner-overlay .exit-panel { background: var(--white); border-radius: 14px; width: 90%; max-width: 380px; padding: 24px; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25); }
-.runner-overlay .exit-panel h3 { font-size: 16px; font-weight: 700; color: var(--primary); margin: 0 0 8px; }
-.runner-overlay .exit-panel p { font-size: 13px; color: var(--text-muted); margin: 0 0 20px; line-height: 1.5; }
-.runner-overlay .exit-actions { display: flex; flex-direction: column; gap: 10px; }
 .runner-overlay .btn { padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: opacity 0.15s; }
 .runner-overlay .btn-primary { background: var(--accent); color: white; }
 .runner-overlay .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }

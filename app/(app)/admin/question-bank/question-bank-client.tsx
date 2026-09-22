@@ -18,6 +18,7 @@
 // saved." — the "created" branch is unreachable in the legacy script.
 
 'use client';
+import { useConfirm } from '@/lib/overlays/shared/confirm-dialog';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Toast } from '@/lib/toast/toast';
@@ -344,9 +345,19 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
     setMsg({ text: 'Question saved.', tone: 'success' });
   }
 
+  // DS4: legacy's words in the app's dialog; the id is typed back before
+  // Delete enables (a delete cannot be undone).
+  const [confirm, confirmDialog] = useConfirm();
   async function confirmDelete() {
     if (!currentId) return;
-    if (!window.confirm(`Delete question ${currentId}? This cannot be undone.`)) return;
+    const ok = await confirm({
+      title: `Delete question ${currentId}?`,
+      body: 'This cannot be undone.',
+      confirmLabel: 'Delete question',
+      danger: true,
+      typeToConfirm: currentId,
+    });
+    if (!ok) return;
     const result = await deleteQuestion(courseId, currentId);
     if (!result.ok) return setMsg({ text: result.error, tone: 'error' });
     setItems((rows) => rows.filter((i) => i.item_id !== currentId));
@@ -360,6 +371,7 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
   return (
     <div className="qb">
       <Toast message={msg?.text ?? null} tone={msg?.tone} onDismiss={dismiss} />
+      {confirmDialog}
       {csvOpen ? (
         <CsvImportModal
           courseId={courseId}

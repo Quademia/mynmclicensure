@@ -26,6 +26,7 @@
 // debounce intended.
 
 'use client';
+import { LinkDialog } from '@/lib/overlays/shared/link-dialog';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -218,26 +219,25 @@ export function AnnouncementsClient({
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  function insertLink() {
-    const url = window.prompt('Link URL:', 'https://');
-    if (!url) return;
-    const text = window.prompt('Link text:', '') || url;
+  // DS4: the four window.prompt() boxes (URL then text, twice) are two
+  // "Insert" dialogs with both fields at once; the labels are the
+  // prompts' words. The Quiz Link tool is gone with its alert — the
+  // alert said the quiz engine was not built, which stopped being true
+  // in slice 5; a real quiz-link picker is a line under 05-announcements.
+  const [linkDialog, setLinkDialog] = useState<'link' | 'button' | null>(null);
+
+  function insertLink({ url, text }: { url: string; text: string }) {
     const ta = bodyRef.current;
     const pos = ta ? ta.selectionStart : body.length;
-    setBody(body.slice(0, pos) + `<a href="${url}">${escapeHtml(text)}</a>` + body.slice(pos));
+    setBody(body.slice(0, pos) + `<a href="${url}">${escapeHtml(text || url)}</a>` + body.slice(pos));
+    setLinkDialog(null);
     ta?.focus();
   }
 
-  function insertButton() {
-    const url = window.prompt('Button URL:', 'https://');
-    if (!url) return;
-    const text = window.prompt('Button label:', 'Open') || 'Open';
-    setBody(body + (body ? '\n' : '') + `<a href="${url}" data-qa="btn">${escapeHtml(text)}</a>`);
+  function insertButton({ url, text }: { url: string; text: string }) {
+    setBody(body + (body ? '\n' : '') + `<a href="${url}" data-qa="btn">${escapeHtml(text || 'Open')}</a>`);
+    setLinkDialog(null);
     bodyRef.current?.focus();
-  }
-
-  function insertQuizPlaceholder() {
-    window.alert('Quiz link insertion will be available once the quiz engine is built.');
   }
 
   // legacy updateCharCount: visible characters only
@@ -330,6 +330,23 @@ export function AnnouncementsClient({
   return (
     <div className="ann">
       <Toast message={msg?.text ?? null} tone={msg?.tone} onDismiss={dismiss} />
+      <LinkDialog
+        open={linkDialog === 'link'}
+        title="Insert link"
+        urlLabel="Link URL:"
+        textLabel="Link text:"
+        onSubmit={insertLink}
+        onCancel={() => setLinkDialog(null)}
+      />
+      <LinkDialog
+        open={linkDialog === 'button'}
+        title="Insert button"
+        urlLabel="Button URL:"
+        textLabel="Button label:"
+        textDefault="Open"
+        onSubmit={insertButton}
+        onCancel={() => setLinkDialog(null)}
+      />
 
       {/* Stats */}
       <div className="stats-row">
@@ -436,10 +453,8 @@ export function AnnouncementsClient({
                   <button type="button" onClick={() => wrapTag('strong')}><b>B</b></button>
                   <button type="button" onClick={() => wrapTag('em')}><i>I</i></button>
                   <div className="sep" />
-                  <button type="button" onClick={insertLink}>🔗 Link</button>
-                  <button type="button" onClick={insertButton}>🔲 Button</button>
-                  <div className="sep" />
-                  <button type="button" className="dead" disabled onClick={insertQuizPlaceholder}>📝 Quiz Link</button>
+                  <button type="button" onClick={() => setLinkDialog('link')}>🔗 Link</button>
+                  <button type="button" onClick={() => setLinkDialog('button')}>🔲 Button</button>
                 </div>
                 <textarea id="fieldBody" ref={bodyRef} rows={6} placeholder="Write your announcement body here." value={body} onChange={(e) => setBody(e.target.value)} />
                 <p className="form-hint right" style={{ color: charColor }}>{charCount} character{charCount !== 1 ? 's' : ''}</p>

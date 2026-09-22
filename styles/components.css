@@ -159,3 +159,74 @@
   font-weight: 600;
   white-space: nowrap;
 }
+
+/* ── The dialog (DS4) ──────────────────────────────────────────────
+ * One centred panel on a dimmed backdrop, on the browser's <dialog>
+ * element (lib/overlays/shared/dialog.tsx). The backdrop is the
+ * element's own ::backdrop, so it needs no z-index: the top layer sits
+ * above everything. 420px as Claude Design drew it; the panel corner
+ * is --radius-lg because it holds other rounded things.
+ */
+.dlg {
+  border: 0;
+  padding: 0;
+  margin: auto;
+  width: min(420px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: auto;
+}
+.dlg::backdrop { background: rgba(17, 24, 39, 0.5); }
+.dlg-body { padding: var(--space-24); }
+.dlg-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--ink);
+}
+.dlg-text {
+  margin: var(--space-8) 0 0;
+  font-size: var(--type-field-size);
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+.dlg-text b, .dlg-text strong { color: var(--ink); }
+.dlg-field {
+  display: block;
+  margin-top: var(--space-16);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.dlg-input {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-6);
+  padding: 9px 12px;
+  font: inherit;
+  font-weight: 400;
+  font-size: var(--type-field-size);
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.dlg-input:focus {
+  outline: none;
+  border-color: var(--brand-teal);
+  box-shadow: 0 0 0 3px rgba(45, 125, 114, 0.14);
+}
+.dlg-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-8);
+  flex-wrap: wrap;
+  margin-top: var(--space-20);
+}
+/* a choice of three (the runner's Leave this quiz?) stacks full-width */
+.dlg-actions.stack { flex-direction: column; }
+.dlg-actions.stack .btn { width: 100%; }
