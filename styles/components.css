@@ -82,6 +82,30 @@
 }
 .btn-success:hover:not(:disabled) { background: #dcfce7; }
 
+/* The pale teal tint (DS9, Sam 2026-09-22): a quiet secondary action
+   that still reads as "yours to press" — Learning History's Review, My
+   Packs' Open. Teal ink on the pale ground is the hover shade, because
+   --brand-teal itself is only 4.45:1 there (tokens.css). */
+.btn-lite {
+  background: var(--brand-teal-pale);
+  color: var(--brand-teal-hover);
+  border: 1px solid rgba(45, 125, 114, 0.16);
+}
+.btn-lite:hover:not(:disabled) { background: #d9ebe8; }
+
+/* The text-link button (DS9): a bare underlined word, no box — the quiz
+   list's Abandon and Retake. `.danger` for the destructive one. */
+.btn-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: var(--type-meta-size);
+  color: var(--brand-teal);
+  text-decoration: underline;
+}
+.btn-link:hover:not(:disabled) { color: var(--brand-navy); }
+.btn-link.danger { color: var(--badge-danger-ink); }
+
 /* The small size, as the converted surfaces already had it. */
 .btn-sm { padding: 5px 10px; font-size: var(--type-meta-size); }
 

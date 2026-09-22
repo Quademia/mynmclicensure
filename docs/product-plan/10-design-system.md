@@ -236,6 +236,33 @@ assistant.
    where renewing is harder than today, so they belong in one slice.
 5. **The design system gets this doc.**
 
+**Sam, 2026-09-22, the second session — five more, after seeing DS5 on
+both sides:**
+
+6. **One wordmark on both bars, the audience in the sidebar.** The
+   admin bar had read *Quademia | Admin Panel*; it reads *Quademia |
+   MyNMCLicensure* like the student's, and which side you are on is a
+   small uppercase label above Dashboard — *Admin Panel* (legacy's
+   words) and *Student Panel*. Sam is not sure about the label and left
+   it as built; still his to settle.
+7. **The wordmark's weight is on the product.** Order stays brand first
+   (the lockup says whose product it is); Quademia is the small muted
+   word, MyNMCLicensure the bold navy one.
+8. **The full-width bar stays.** Sam asked to see the open sidebar run
+   to the top with the bar starting at its edge and the wordmark in the
+   navy. Built, looked at in both states, reverted the same hour: the
+   hamburger jumped 240px on every toggle and the wordmark lived in two
+   colours. A3 as Claude Design drew it stands.
+9. **The sweep is CSS-only; a surface whose markup must change joins the
+   system when it is next touched.** Narrows ruling 7 of the morning
+   ("sweep everything in one pass") for DS9: the eight surfaces with
+   standalone button classes wait, because DS4, DS10 and DS11 may still
+   change what a button is, and converting sixty buttons twice is worse
+   than eight pages reading off-system for a while. The two looks those
+   surfaces use that the family lacked — the pale teal tint
+   (`.btn-lite`) and the text-link button (`.btn-link`) — join
+   `components.css` now, so a touched surface has somewhere to land.
+
 **Still unruled, and each blocks a slice below:** Radix or hand-built
 (DS4); how a message distinguishes student from admin if the name circle
 becomes one component (DS7); and the new wording for the one confirm
