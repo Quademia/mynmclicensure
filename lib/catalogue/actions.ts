@@ -3,9 +3,24 @@
 // The catalogue writes — the legacy admin pages' direct `db.from(...)`
 // inserts and updates (products.html, courses.html, config.html) as
 // Server Actions behind the admin gate. Each repeats the page's own
-// validation, in its order, with its words, then writes as the signed-in
-// admin (the RLS admin policies are the floor). A Supabase error comes
-// back as its own message, which is what the legacy pages showed.
+// validation, in its order, with its words. A Supabase error comes back
+// as its own message, which is what the legacy pages showed.
+//
+// ⚠ THE PRODUCT WRITES GO THROUGH THE SERVICE ROLE (§8 S14, 2026-09-22).
+// They used to write as the signed-in admin, with the RLS admin policies
+// as the floor. S14 took `products`' grants back from the browser roles
+// — anon and authenticated hold SELECT and nothing else — so a cookie
+// client can no longer write the table at all, and the two policies that
+// policed those privileges were dropped with it. The gate is unchanged:
+// requireAdmin() still decides who may call these, and it is now the ONLY
+// thing that does, which is why it must stay the first line of each.
+//
+// `product_courses` and `courses` still carry the schema's vanilla-era
+// grants and are written by the same service-role client here purely so
+// one function does not juggle two clients. Their own grants are
+// untouched and wait their turn under ruling 9.
+//
+// The config writes below are unchanged and still write as the admin.
 //
 // A 'use server' module exports only async functions; the row types and
 // constants live in ./types.
@@ -14,6 +29,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { requireAdmin } from '@/lib/access';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import type { ActionResult, CourseStatus, ProductKind, ProductStatus } from './types';
 
 function fail(error: string): ActionResult {
@@ -96,10 +112,15 @@ export async function saveProduct(input: {
   price: string;
   currency: string;
   duration: string;
+  /** Premium Prep marker (§8 S14) — a subset of kind PAID, not a kind. */
+  isPremium: boolean;
   courses: string[];
   telegramKeys: string[];
 }): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
+  // The gate first and the gate alone: S14 left no RLS policy behind this
+  // write, so returning early here is the whole of the protection.
+  await requireAdmin();
+  const supabase = createServiceRoleClient();
   const productId = input.productId.trim().toUpperCase();
   const name = input.name.trim();
   const priceInput = parseFloat(input.price) || 0;
@@ -127,6 +148,7 @@ export async function saveProduct(input: {
     price_minor: Math.round(priceInput * 100),
     currency: input.currency,
     duration_days: duration,
+    is_premium: input.isPremium,
     telegram_group_keys: input.telegramKeys.length ? input.telegramKeys : null,
   };
   const { error } = input.isNew
@@ -155,8 +177,8 @@ export async function saveProduct(input: {
 }
 
 export async function setProductStatus(productId: string, status: ProductStatus): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
-  const { error } = await supabase.from('products').update({ status }).eq('product_id', productId);
+  await requireAdmin();
+  const { error } = await createServiceRoleClient().from('products').update({ status }).eq('product_id', productId);
   if (error) return fail(error.message);
   revalidatePath('/admin/products');
   return { ok: true };

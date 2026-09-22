@@ -38,6 +38,8 @@ type Form = {
   price: string;
   currency: string;
   duration: string;
+  /** Premium Prep marker (§8 S14). A subset of PAID, not a kind. */
+  isPremium: boolean;
   courses: string[];
   tgKeys: string[];
 };
@@ -50,6 +52,7 @@ const EMPTY_FORM: Form = {
   price: '',
   currency: 'GHS',
   duration: '',
+  isPremium: false,
   courses: [],
   tgKeys: [],
 };
@@ -126,6 +129,7 @@ export function ProductsClient({
       price: p.price_minor != null ? (p.price_minor / 100).toFixed(2) : '',
       currency: p.currency || 'GHS',
       duration: p.duration_days ? String(p.duration_days) : '',
+      isPremium: p.is_premium === true,
       courses: p.courses,
       tgKeys: [...(p.telegram_group_keys || [])],
     });
@@ -191,6 +195,7 @@ export function ProductsClient({
       price: form.price,
       currency: form.currency,
       duration: form.duration,
+      isPremium: form.isPremium,
       courses: form.courses,
       telegramKeys: tgKeys,
     });
@@ -483,6 +488,23 @@ export function ProductsClient({
                     <input id="fieldDuration" type="number" placeholder="365" min="1" value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })} />
                     <p className="form-hint">e.g. 365 = 1 year</p>
                   </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="check-inline" htmlFor="fieldIsPremium">
+                    <input
+                      id="fieldIsPremium"
+                      type="checkbox"
+                      checked={form.isPremium}
+                      onChange={(e) => setForm({ ...form, isPremium: e.target.checked })}
+                    />
+                    Premium Prep product
+                  </label>
+                  <p className="form-hint">
+                    Shows this product on the Premium Prep page. Until now that page found its
+                    products by reading the id for a <code>_2026_PREP</code> ending, which would
+                    have stopped working in 2027.
+                  </p>
                 </div>
 
                 <div className="form-group">

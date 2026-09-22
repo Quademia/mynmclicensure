@@ -23,13 +23,35 @@ import { formatMinor } from '@/lib/money/format-minor';
 import { initPublicPayment } from '@/lib/payments/init-public';
 import type { Product, Program } from '@/lib/catalogue/types';
 
-const PREP_SUFFIX = '_2026_PREP';
-
 type PremiumProgram = { program_id: string; program_name: string; product: Product };
 type Msg = { text: string; tone: 'error' | 'success' | 'info' } | null;
 
-// One premium product per programme (v1): the cheapest whose id is
-// `<PROGRAM_ID>_2026_PREP`, for a programme that exists.
+// ⚠ WHICH PROGRAMME A PREMIUM PRODUCT BELONGS TO IS STILL READ FROM ITS
+// ID, and that is deliberate rather than finished. S14 replaced the
+// *premium test* — `id ends with _2026_PREP`, a rule carrying a year that
+// would have broken in 2027 — with `products.is_premium`. It did not
+// replace the *grouping*, which still needs to know that RN_2026_PREP is
+// the RN programme's product. D23 item 2 (2026-09-18) rules the real
+// answer: a product matches a programme when any of its courses is sat by
+// that programme, through `courses.program_scope`, ignoring the courses
+// every programme sits. That needs course data this page does not load,
+// so it belongs to the shop slice, not here. Until then the programme is
+// the longest known programme id the product id starts with — no year in
+// it, so nothing expires, but still a naming convention.
+function programOfProductId(
+  productId: string,
+  programMap: Map<string, { program_id: string; program_name: string }>,
+): string | null {
+  let best: string | null = null;
+  for (const pid of programMap.keys()) {
+    // `NACNAP_2026_PREP` must match NACNAP, not NAC, so the longest wins.
+    if (productId.startsWith(`${pid}_`) && (best === null || pid.length > best.length)) best = pid;
+  }
+  return best;
+}
+
+// One premium product per programme (v1): the cheapest product carrying
+// is_premium, for a programme that exists.
 function getPremiumPrograms(programs: Program[], products: Product[]): PremiumProgram[] {
   const programMap = new Map<string, { program_id: string; program_name: string }>();
   for (const p of programs) {
@@ -40,9 +62,12 @@ function getPremiumPrograms(programs: Program[], products: Product[]): PremiumPr
   const grouped = new Map<string, Product[]>();
   for (const product of products) {
     const productId = String(product.product_id || '').trim().toUpperCase();
-    if (!productId.endsWith(PREP_SUFFIX)) continue;
-    const programId = productId.slice(0, -PREP_SUFFIX.length);
-    if (!programMap.has(programId)) continue;
+    if (product.is_premium !== true) continue;
+    // The price gate the other two doors have always had and this page
+    // never did: a zero-price product was selectable and payable here.
+    if (Number(product.price_minor || 0) <= 0) continue;
+    const programId = programOfProductId(productId, programMap);
+    if (!programId) continue;
     const normalized: Product = {
       ...product,
       product_id: productId,
@@ -280,7 +305,7 @@ export function PremiumPrepClient({ programs, products }: { programs: Program[];
             <div className="program-list">
               {premiumPrograms.length === 0 ? (
                 <div className="empty">
-                  No active Premium Prep products were found. Confirm the premium product IDs end with <strong>_2026_PREP</strong> and are active.
+                  No active Premium Prep products were found. Check that the products are active, priced, and ticked as <strong>Premium Prep</strong> on the admin Products page.
                 </div>
               ) : filtered.length === 0 ? (
                 <div className="empty">No matching premium programmes found.</div>

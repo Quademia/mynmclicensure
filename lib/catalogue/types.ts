@@ -41,6 +41,13 @@ export type Product = {
   price_minor: number;
   currency: string;
   duration_days: number;
+  /**
+   * Premium Prep marker (§8 S14, 2026-09-22). Replaces the `_2026_PREP`
+   * id suffix the page used to parse: the suffix carried a year and had
+   * no price gate. A subset of `kind: 'PAID'`, never a kind of its own —
+   * `kind` already carries TRIAL / FREE / PAID.
+   */
+  is_premium: boolean;
   telegram_group_keys: string[] | null;
 };
 

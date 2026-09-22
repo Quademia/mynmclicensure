@@ -2,9 +2,12 @@
 //
 // The server half: the programmes and the ACTIVE products, read with
 // the anon client (both readable before login), handed to the client
-// half, which is the page's two-step script. The match between a
-// programme and its premium product is the legacy naming rule — the
-// product id ends in `_2026_PREP` — carried as is (Sam, 2026-09-11).
+// half, which is the page's two-step script. Which products are premium
+// is `products.is_premium` since §8 S14 (2026-09-22); the legacy naming
+// rule it replaced — the id ending `_2026_PREP` (Sam, 2026-09-11) —
+// carried a year and would have expired in 2027. Which PROGRAMME a
+// premium product belongs to is still read from its id; D23 item 2 rules
+// the real answer and it belongs to the shop slice.
 
 import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';

@@ -142,6 +142,7 @@ create table if not exists products (
   price_minor         integer not null,
   currency            text not null default 'GHS',
   duration_days       integer not null,
+  is_premium          boolean not null default false,   -- §8 S14; a subset of PAID, not a kind
   telegram_group_keys text[]
 );
 

@@ -1,7 +1,7 @@
 -- db/rls.sql — the readable statement of the current policies and the
 -- SECURITY DEFINER functions in `licensure_gh`. Regenerated from
 -- db/migrations/ whenever a migration changes one. NEVER applied directly.
--- Last regenerated: 2026-09-15, after 20260915150000_messaging.sql.
+-- Last regenerated: 2026-09-22, after 20260922140000_products_is_premium.sql.
 
 -- ── helper functions for the policies ──────────────────────────────────
 -- SECURITY DEFINER so a policy on users can ask about users without
@@ -342,13 +342,18 @@ with check (auth_user_role() = 'ADMIN');
 create policy levels_update on levels for update
 using (auth_user_role() = 'ADMIN');
 
--- products: readable before login (the public Premium Prep page); admin writes.
+-- products: readable before login (the public Premium Prep page and
+-- /subscribe read the catalogue as anon); no browser write path since
+-- §8 S14 (the grants, not a policy — the migration revoked everything
+-- from anon and authenticated and granted SELECT back). The admin writes
+-- go through the service role behind requireAdmin(), so products_insert
+-- and products_update were DROPPED with that migration: they policed a
+-- privilege no role holds any more. `requireAdmin()` in
+-- lib/catalogue/actions.ts is now the whole of the protection on that
+-- write path — there is no RLS backstop beneath it, the same shape as
+-- payments and course_access.
 create policy products_select on products for select
 using (true);
-create policy products_insert on products for insert
-with check (auth_user_role() = 'ADMIN');
-create policy products_update on products for update
-using (auth_user_role() = 'ADMIN');
 
 -- product_courses (02 C1): mirrors products — anyone reads, an ADMIN
 -- inserts or deletes; a link row is a pair, never updated.
