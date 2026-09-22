@@ -525,6 +525,42 @@ medium / large, with the design system's own rule that a student action
 is **44px** for touch while admin surfaces may be dense. Needs Sam, and
 is better drawn than argued.
 
+### DS11 / DS12 — built 2026-09-22
+
+✅ Both, from Claude Design's `KindPalette` and `ScalePalette`, after Sam
+confirmed the artifact was finished and ruled **navy over the stone
+alternative** for the scale.
+
+**19 tokens** into `styles/tokens.css` — nine `kind-*`, nine `scale-*`
+and `--scale-bar-off` — at the artifact's exact values. Checked first:
+of the 48 colour tokens in that file, **29 were already in the repo and
+all 29 matched to the digit**, so the two are genuinely in step and this
+was an addition rather than a reconciliation.
+
+**Two class families** in `components.css`: `.label-chip` gained the
+border it needed plus `-sky`, `-indigo`, `-plum`, `-neutral`; and
+`.scale-chip` with `-1/-2/-3` and the `.scale-bars` glyph. **Twenty call
+sites** through `components/shell/chips.tsx`, which holds the four maps
+(question type, attempt source, difficulty step, mode icon) and the two
+components, so a hue is decided in one file rather than at each site.
+
+**Thirteen borrowed-signal rules deleted** — `.att .badge.mock`,
+`.qm .badge.INSTANT_ONLY`, `.slh .badge.source-retake` and the rest.
+Every `.badge.X` rule left in the app is a genuine state.
+
+Two things that fell out in our favour: the mode chips want Lucide `zap`
+and `timer`, which the artifact expected to be "the set's 20th and 21st"
+— DS15 pass B had already added both that afternoon; and the artifact's
+rule that *a state is a 6px badge, a kind is a 4px label chip* is
+exactly the sort DS13 had just left ready, on a base with one name.
+
+**Left alone, and flagged rather than decided:** product kind
+(`PAID` / `FREE` / `TRIAL` in `admin-catalogue.css`, and `TRIAL` in
+`admin-subscriptions.css`) is a *kind* by the same reasoning and still
+borrows the state colours — a `PAID` product draws as ACTIVE green, a
+`FREE` one as archived grey. The artifact's mapping does not cover it,
+so extending the palette there is a ruling nobody has made. **⬜ Sam.**
+
 ### DS11 — A categorical palette (added 2026-09-22)
 
 The token set has three signal colours and no vocabulary for a colour
@@ -739,8 +775,8 @@ declarations in `landing.css` stay as they are.
 | DS8 One badge | ✅ 2026-09-22 — 13 surfaces; the rest as touched |
 | DS9 The surfaces the shared button cannot reach | ⏸ as each is touched (ruling 9) |
 | DS10 The button size scale | ✅ 2026-09-22 — the scale; surfaces as touched |
-| DS11 A categorical palette | ⬜ |
-| DS12 A scale palette | ⬜ later |
+| DS11 A categorical palette | ✅ 2026-09-22 — sky / indigo / plum; retake and modes stay grey |
+| DS12 A scale palette | ✅ 2026-09-22 — navy filling by weight, three bars (Sam kept navy) |
 | DS13 One badge class name | ✅ 2026-09-22 — 153 renames onto `.badge`; the state/name sort waits for DS11 |
 | DS14 The price weight | ✅ 2026-09-22 |
 | DS15 The page emoji | ✅ 2026-09-22 — 52 deleted, 65 to icons, 5 kept |

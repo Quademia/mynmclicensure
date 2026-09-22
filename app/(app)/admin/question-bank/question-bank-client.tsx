@@ -36,6 +36,7 @@ import {
 } from '@/lib/bank/types';
 import type { Course } from '@/lib/catalogue/types';
 import { Icon } from '@/components/shell/icons';
+import { KindChip, ScaleChip, QUESTION_TYPE_HUE, DIFFICULTY_STEP } from '@/components/shell/chips';
 
 type Msg = { text: string; tone: 'error' | 'success' } | null;
 
@@ -80,8 +81,6 @@ const EMPTY_FORM: Form = {
   shuffle: true,
 };
 
-const TYPE_BADGE: Record<string, string> = { MCQ: 'badge-mcq', TF: 'badge-tf', SATA: 'badge-sata' };
-const DIFF_BADGE: Record<string, string> = { Easy: 'badge-easy', Moderate: 'badge-moderate', Hard: 'badge-hard' };
 
 function correctLetters(item: Item): string[] {
   return item.question_type === 'SATA'
@@ -479,9 +478,11 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
                     <div className="q-card-header">
                       <div className="q-card-meta">
                         <span className="q-id">{item.item_id}</span>
-                        <span className={`badge ${TYPE_BADGE[item.question_type] || 'badge-default'}`}>{item.question_type || '—'}</span>
-                        {item.difficulty ? <span className={`badge ${DIFF_BADGE[item.difficulty] || 'badge-default'}`}>{item.difficulty}</span> : null}
-                        {item.marks && Number(item.marks) !== 1 ? <span className="badge badge-default">{item.marks} marks</span> : null}
+                        <KindChip hue={QUESTION_TYPE_HUE[item.question_type]}>{item.question_type || '—'}</KindChip>
+                        {item.difficulty && DIFFICULTY_STEP[item.difficulty]
+                          ? <ScaleChip step={DIFFICULTY_STEP[item.difficulty]}>{item.difficulty}</ScaleChip>
+                          : item.difficulty ? <KindChip>{item.difficulty}</KindChip> : null}
+                        {item.marks && Number(item.marks) !== 1 ? <KindChip>{item.marks} marks</KindChip> : null}
                       </div>
                       <button type="button" className="q-edit-btn" onClick={(e) => { e.stopPropagation(); openEdit(item); }}><Icon name="pencil" />Edit</button>
                     </div>

@@ -53,6 +53,7 @@ import { Toast } from '@/lib/toast/toast';
 import { checkAnswer, expireAttempt, finishAttempt, saveAnswers, startTimedAttempt } from '@/lib/attempts/actions';
 import { RunnerError } from './runner-error';
 import { Icon } from '@/components/shell/icons';
+import { KindChip, QUESTION_TYPE_HUE } from '@/components/shell/chips';
 import {
   chosenToStored,
   countAnswered,
@@ -678,7 +679,7 @@ export function QuizRunner({
       <div key={item.item_id} className="q-block">
         <div className="q-meta">
           <span className="q-num">Q{globalIdx + 1} / {items.length}</span>
-          <span className="q-type-chip">{item.question_type}</span>
+          <KindChip hue={QUESTION_TYPE_HUE[item.question_type]}>{item.question_type}</KindChip>
           {item.maintopic ? <span className="q-topic">{item.maintopic}{item.subtopic ? ` › ${item.subtopic}` : ''}</span> : null}
           {flags[item.item_id] ? <span className="q-flag-indicator"><Icon name="flag" /></span> : null}
         </div>

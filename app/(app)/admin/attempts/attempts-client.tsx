@@ -25,6 +25,7 @@ import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { attemptDetailAction, attemptsWindowAction, headlineCountsAction, type HeadlineCounts } from '@/lib/attempts/admin-actions';
 import type { WindowAttemptRow } from '@/lib/attempts/admin-queries';
 import type { AttemptDetail } from '@/lib/attempts/types';
+import { KindChip, ATTEMPT_SOURCE_HUE } from '@/components/shell/chips';
 
 const PASS_PCT = 70;
 const PAGE_SIZE = 50;
@@ -476,7 +477,7 @@ export function AttemptsClient({ courses, quizTitles }: { courses: { course_id: 
                       <div className="st-name">{studentName(a.users, a.user_id)}</div>
                       <div className="st-email">{studentEmail(a.users)}</div>
                     </td>
-                    <td><span className={`badge ${a.source}`}>{typeLabel(a.source)}</span></td>
+                    <td><KindChip hue={ATTEMPT_SOURCE_HUE[a.source]}>{typeLabel(a.source)}</KindChip></td>
                     <td>{quizTitle(a)}</td>
                     <td className="cell-muted">{courseMap[a.course_id] || a.course_id}</td>
                     <td className="cell-12">{a.mode === 'timed' ? 'Exam' : 'Practice'}</td>

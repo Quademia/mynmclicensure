@@ -56,11 +56,6 @@
 .slh .badge.status-in_progress { background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink); }
 .slh .badge.status-abandoned { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); color: var(--badge-neutral-ink); }
 
-.slh .badge.mode-instant { background: #e8fdf8; border-color: #c7f0e7; color: #0a6c67; }
-.slh .badge.mode-timed { background: #fff7ed; border-color: #fde2c5; color: #92400e; }
-.slh .badge.source-fixed { background: #eef2ff; border-color: #c4d4ff; color: #1d3e8a; }
-.slh .badge.source-builder { background: #fdf4ff; border-color: #e9d5ff; color: #6b21a8; }
-.slh .badge.source-retake { background: #fff1f2; border-color: #fecdd3; color: #9f1239; }
 
 /* Right side */
 .slh .attempt-side { display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; gap: 8px; }

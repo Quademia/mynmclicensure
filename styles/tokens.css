@@ -95,11 +95,11 @@
   /* 6.8:1 on its ground. */
   --badge-warning-ink: #92400e;
 
-  /* ⚠ These two families are NOT from the Claude Design token file.
-     The app uses five badge families and that file names three; the
-     grey and blue below were measured out of the existing rules when
-     DS8 collected them (2026-09-22) and should be fed back to the
-     design system rather than living only here.
+  /* These two families were measured out of the existing rules when DS8
+     collected them (2026-09-22), because the app uses five badge
+     families and the Claude Design token file named three. They have
+     since been fed back: the design system's token file carries both at
+     these exact values (checked against it 2026-09-22, DS11).
      Grey — a state with no charge: draft, archived, FREE, none. */
   --badge-neutral-bg: #f3f4f6;
   --badge-neutral-border: #e5e7eb;
@@ -112,6 +112,56 @@
   --badge-info-border: #bfdbfe;
   /* 7.7:1 on its ground. */
   --badge-info-ink: #1d4ed8;
+
+  /* ── Kind tints (DS11) ────────────────────────────────────────── */
+  /* Colour that means a KIND, not a state. Question types, quiz kinds
+     and the modes had no hue of their own, so they borrowed the signal
+     three — a green TF read as "passed", a red TIMED_ONLY as a failure.
+     From the Claude Design token file; three hues, not four, because a
+     measured fourth (violet 273°) sat within ΔE 17–18 of indigo and
+     plum, too close to tell apart at 11px.
+
+     A hue means something only inside its family, and the word always
+     rides with it. Info blue (224°) lies between sky and indigo; the
+     SHAPE separates them — a state is a 6px badge, a kind is a 4px
+     label chip — and the two never share a list in this app. */
+  --kind-sky-bg: #f0f9ff;
+  --kind-sky-border: #bae6fd;
+  /* 7.1:1 on its ground, 7.6:1 on white, 6.9:1 on the pale teal. */
+  --kind-sky-ink: #075985;
+  --kind-indigo-bg: #eef2ff;
+  --kind-indigo-border: #c7d2fe;
+  /* 8.9:1 on its ground. */
+  --kind-indigo-ink: #3730a3;
+  --kind-plum-bg: #fdf4ff;
+  --kind-plum-border: #f5d0fe;
+  /* 7.7:1 on its ground. */
+  --kind-plum-ink: #86198f;
+
+  /* ── Scale steps (DS12) ───────────────────────────────────────── */
+  /* Easy / moderate / hard is an ORDER, not a verdict, and it was the
+     one place the signal hues meant a gradient — so hard read as an
+     error. One hue filling by weight instead, in the product's own
+     navy, which means nothing else in a chip. The three-bar glyph
+     beside the word carries the order on its own, so the scale survives
+     a greyscale screenshot and colour-blind eyes; the fill reinforces
+     it. Sam kept navy over the stone alternative (2026-09-22). */
+  --scale-1-bg: #ffffff;
+  /* An outline step, so the edge has to hold as a shape: 3.7:1 on white
+     and 3.4:1 on the pale teal, over the 3:1 a boundary needs. */
+  --scale-1-border: #6f86a6;
+  /* 11.5:1 on its ground. */
+  --scale-1-ink: #1e3a5f;
+  --scale-2-bg: #dde6f0;
+  --scale-2-border: #6f86a6;
+  /* 11.0:1 on its ground. */
+  --scale-2-ink: #142d4c;
+  --scale-3-bg: #1e3a5f;
+  --scale-3-border: #1e3a5f;
+  /* 11.5:1 on its ground. */
+  --scale-3-ink: #ffffff;
+  /* The unfilled bars. */
+  --scale-bar-off: #c9d4e2;
 
   /* ── Type ─────────────────────────────────────────────────────── */
   /* Inter, from next/font in app/layout.tsx. Named because the app has

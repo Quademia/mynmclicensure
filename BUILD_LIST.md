@@ -271,8 +271,8 @@ storage.
 - ✅ DS8 One badge — status 6px not a pill (Sam), labels stay 4px; 13 surfaces converted, 173 → 115 — 2026-09-22
 - ⏸ DS9 The eight surfaces the shared button cannot reach — as each is touched (ruling 9); .btn-lite + .btn-link added
 - ✅ DS10 The button size scale — small / medium / large, large 44px; ten student forward buttons on it — 2026-09-22
-- ⬜ DS11 A categorical palette — colour that means a kind, not a state: MCQ / TF / SATA, mock / fixed, the modes
-- ⬜ DS12 A scale palette — easy / moderate / hard borrows the signal ramp; no gradient vocabulary yet — later
+- ✅ DS11 A categorical palette — sky / indigo / plum; retake and the modes stay grey; 19 tokens — 2026-09-22
+- ✅ DS12 A scale palette — easy / moderate / hard as navy filling by weight, three bars (Sam: navy) — 2026-09-22
 - ✅ DS13 One badge class name — 153 renames onto .badge; the state/name sort left to DS11 — 2026-09-22
 - ✅ DS14 The price weight — the token to 700 and the three price rules onto it (they were literals) — 2026-09-22
 - ✅ DS15 The page emoji — 52 deleted, 65 to drawn icons, 88 working glyphs and 5 kept; 27 new shapes — 2026-09-22

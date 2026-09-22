@@ -52,6 +52,7 @@ import {
 import { DIFFICULTIES, type Item } from '@/lib/bank/types';
 import type { Course } from '@/lib/catalogue/types';
 import { Icon } from '@/components/shell/icons';
+import { KindChip, ScaleChip, QUESTION_TYPE_HUE, DIFFICULTY_STEP, MODE_ICON } from '@/components/shell/chips';
 
 type Msg = { text: string; tone: 'error' | 'success' } | null;
 
@@ -615,7 +616,7 @@ export function QuizManager({
                           <div className="row-id">{r.quiz_id}</div>
                         </td>
                         <td>{courseTitle(r.course_id)}</td>
-                        <td><span className={`badge ${r.allowed_modes}`}>{MODE_LABELS[r.allowed_modes] || r.allowed_modes}</span></td>
+                        <td><KindChip icon={MODE_ICON[r.allowed_modes]}>{MODE_LABELS[r.allowed_modes] || r.allowed_modes}</KindChip></td>
                         <td className="row-n">{r.n}</td>
                         {kind === 'mock' ? <td className="row-schedule">{formatSchedule(r)}</td> : null}
                         <td><span className={`badge ${r.status}`}>{r.status}</span></td>
@@ -799,10 +800,10 @@ export function QuizManager({
                             <tr key={i.item_id} className={sel ? 'selected-row' : ''} onClick={() => toggleItem(i)}>
                               <td><input type="checkbox" checked={sel} onClick={(e) => e.stopPropagation()} onChange={() => toggleItem(i)} /></td>
                               <td className="mono">{i.item_id}</td>
-                              <td><span className="badge plain">{i.question_type}</span></td>
+                              <td><KindChip hue={QUESTION_TYPE_HUE[i.question_type]}>{i.question_type}</KindChip></td>
                               <td><span className="item-stem-short" title={i.stem}>{i.stem}</span></td>
                               <td className="muted">{i.maintopic || '—'}</td>
-                              <td><span className="badge plain">{i.difficulty || '—'}</span></td>
+                              <td>{i.difficulty && DIFFICULTY_STEP[i.difficulty] ? <ScaleChip step={DIFFICULTY_STEP[i.difficulty]}>{i.difficulty}</ScaleChip> : <KindChip>—</KindChip>}</td>
                             </tr>
                           );
                         })
@@ -881,7 +882,7 @@ export function QuizManager({
                   <span className="review-item-num">{idx + 1}.</span>
                   <span className="review-item-id">{item.item_id}</span>
                   <span className="review-item-stem">{item.stem}</span>
-                  <span className="badge plain">{item.question_type}</span>
+                  <KindChip hue={QUESTION_TYPE_HUE[item.question_type]}>{item.question_type}</KindChip>
                   <button type="button" className="review-item-remove" title="Remove" onClick={() => removeFromReview(item.item_id)}>×</button>
                 </div>
               ))}

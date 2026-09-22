@@ -25,6 +25,7 @@ import { Toast } from '@/lib/toast/toast';
 import { loadHistoryPage, retakeAttempt } from '@/lib/attempts/actions';
 import type { AttemptListRow, AttemptMode, HistoryFilters, HistoryPage } from '@/lib/attempts/types';
 import { Icon } from '@/components/shell/icons';
+import { KindChip, ATTEMPT_SOURCE_HUE, MODE_ICON } from '@/components/shell/chips';
 
 type CourseLite = { course_id: string; title: string };
 
@@ -228,10 +229,10 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
           </div>
           <div className="attempt-title">{title}</div>
           <div className="chips-row">
-            {a.mode ? <span className={`badge mode-${a.mode}`}>{a.mode === 'timed' ? 'Timed' : 'Instant'}</span> : null}
+            {a.mode ? <KindChip icon={MODE_ICON[a.mode]}>{a.mode === 'timed' ? 'Timed' : 'Instant'}</KindChip> : null}
             {a.status ? <span className={`badge status-${a.status}`}>{formatStatus(a.status)}</span> : null}
-            {a.source ? <span className={`badge source-${a.source}`}>{formatSource(a.source)}</span> : null}
-            {a.n ? <span className="badge">{a.n} Q</span> : null}
+            {a.source ? <KindChip hue={ATTEMPT_SOURCE_HUE[a.source]}>{formatSource(a.source)}</KindChip> : null}
+            {a.n ? <KindChip>{a.n} Q</KindChip> : null}
           </div>
         </div>
 

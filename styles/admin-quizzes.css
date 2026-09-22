@@ -65,10 +65,6 @@
 .qm .badge.draft { background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink); }
 .qm .badge.archived { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); color: var(--badge-neutral-ink); }
 
-.qm .badge.BOTH { background: var(--brand-teal-pale); color: var(--brand-teal-hover); }
-.qm .badge.INSTANT_ONLY { background: #f0fdf4; color: #15803d; }
-.qm .badge.TIMED_ONLY { background: #fef2f2; color: #b91c1c; }
-.qm .badge.plain { background: var(--badge-neutral-bg); color: var(--ink); font-size: 10px; }
 
 /* ── Publish toggle ── */
 .qm .toggle { position: relative; width: 36px; height: 20px; cursor: pointer; display: inline-block; }
