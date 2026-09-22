@@ -24,3 +24,14 @@ npm run --silent lint:staged || {
   echo "Bypass with --no-verify only if you mean it, and note it in the log."
   exit 1
 }
+
+# The same guard for the stylesheets, which ESLint cannot see at all. Refuses a
+# NEW hardcoded colour in staged CSS — see scripts/css-baseline.mjs for why the
+# 597 already there are not this hook's business.
+npm run --silent css:staged || {
+  echo ""
+  echo "Commit refused: a new hardcoded colour in the stylesheets."
+  echo "Use a token from styles/tokens.css, or add one there and use it from there."
+  echo "Bypass with --no-verify only if you mean it, and note it in the log."
+  exit 1
+}
