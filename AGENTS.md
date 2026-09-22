@@ -261,6 +261,19 @@ above sit at the repo root; the audience grouping inside them is kept.
 - **The middleware's "signed-in user leaves /login" bounce is GET-only.**
   A Server Action posted to /login (finishing a Google or magic-link
   return) arrives WITH a user and must reach the action.
+- **Never pipe a long-running server's output into a command that
+  exits.** `npm run dev | head -40` looks harmless and is not: once
+  `head` has its forty lines it exits, and the next write blocks
+  forever. The server keeps port 3000 but serves nothing, and the
+  symptom is a `curl` that hangs rather than an error (2026-09-22).
+  Start it bare and read the captured output file.
+- **A shared component's rules are unprefixed so a surface can keep its
+  own and win on specificity** — that is what makes converting one
+  surface at a time safe (`styles/components.css`). The trap: a surface
+  that keeps a **background** on its base defeats the shared variants,
+  because `.spf .btn` out-ranks `.btn-primary`. A converted surface may
+  keep its **size**; if it keeps a colour, the filled variants must be
+  restated there (2026-09-22, caught by walking the page).
 - **A desktop-app worktree has no `node_modules`** — `npm ci` in it —
   and gets a COPY of `.env.local` when created; a key added to the
   main checkout's file later must be copied across by hand.

@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-22 — the design system opened as doc 10 and four slices built: tokens, the retired look out, one button, one badge, both swept; the shell is A3
+  - ↳ CD's 89-file system found finished, record said pending 3 sessions · B1 · gradient sidebar tried live, rejected · A3 is Sam's own · badges 6px not pills · sweep replaces page-by-page · 4 contrast defects · 173→115 · none ticked
+
 - 2026-09-21 — the record made navigable: every queued BUILD_LIST line moved under the surface that will build it; the diagnosis-to-doc link verified whole
   - ↳ 76 of 93 lines had no plan · 87 moved verbatim, 170 in 170 out · sections for 00, 01, 04, 06, 07 · homeless → 00, speed and scale one group · 51 findings placed · prod release confirmed · a backspace broke my checker · 91 lines over the cap
 
