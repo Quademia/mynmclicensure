@@ -268,6 +268,19 @@
   color: var(--white);
 }
 
+/* the row's icon (DS6): 16px, the label's ink, a touch quieter at
+   rest so the word leads; full strength on hover and on the active row */
+.sidebar-nav .nav-icon {
+  flex: none;
+  opacity: 0.85;
+}
+.sidebar-nav a:hover .nav-icon,
+.sidebar-nav a.active .nav-icon,
+.sidebar-dropdown-toggle:hover .nav-icon,
+.sidebar-dropdown-toggle.active .nav-icon {
+  opacity: 1;
+}
+
 /* --- Sidebar dropdowns (injected by the legacy student sidebar) --- */
 .sidebar-dropdown { position: relative; }
 .sidebar-dropdown-toggle {
