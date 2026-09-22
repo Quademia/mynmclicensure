@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-22 — the design system built to its end: shell A3, icons, one dialog on the browser element, one name circle with the real logo, sizes, price weight
+  - ↳ Sam decides only from what is offered · Tailwind reopened · vector Q used then taken back · no favicon before · message circles never showed · price token unread · 53 fake bolds · DS9 as touched · sidebar-to-top tried, reverted
+
 - 2026-09-22 — the design system opened as doc 10 and four slices built: tokens, the retired look out, one button, one badge, both swept; the shell is A3
   - ↳ CD's 89-file system found finished, record said pending 3 sessions · B1 · gradient sidebar tried live, rejected · A3 is Sam's own · badges 6px not pills · sweep replaces page-by-page · 4 contrast defects · 173→115 · none ticked
 

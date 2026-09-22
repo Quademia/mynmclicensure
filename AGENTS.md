@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-09-21. Rules for **any** assistant working in this
+Last updated: 2026-09-22. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What is built and
@@ -274,6 +274,18 @@ above sit at the repo root; the audience grouping inside them is kept.
   because `.spf .btn` out-ranks `.btn-primary`. A converted surface may
   keep its **size**; if it keeps a colour, the filled variants must be
   restated there (2026-09-22, caught by walking the page).
+- **The shared dialog is the browser's own `<dialog>` opened with
+  `showModal()`** (`lib/overlays/shared/dialog.tsx`, DS4): focus trap,
+  Escape, inert page, top layer and focus return come from the element.
+  Catch Escape on `keydown`, not on the element's `cancel` event —
+  Chrome fires `cancel` only with user activation, so a synthesised key
+  press (the pane's) closes the box without telling React. A confirm
+  at a call site is `if (!(await confirm({…}))) return;` from
+  `useConfirm()`; never `window.confirm`.
+- **A token is not a change until a rule reads it.** `tokens.css` DS1
+  aliased the old names; it did not make the new ones used. The price
+  weight was changed at the token and three price rules had literals
+  (2026-09-22). Grep the readers before calling a token change done.
 - **A desktop-app worktree has no `node_modules`** — `npm ci` in it —
   and gets a COPY of `.env.local` when created; a key added to the
   main checkout's file later must be copied across by hand.
@@ -384,6 +396,17 @@ slice on the branch.
   proposing a fix; Sam prices the fix on that.
 - Discussion is never authorisation. "What do you think?" gets a view;
   only "proceed" starts a build.
+- **Sam decides only from what is offered** (his words, 2026-09-22), so
+  an option left out is a decision made for him. Every choice of tool,
+  library or approach comes in three parts: what the world does, what
+  fits Quademia (code written only by assistants across sessions, which
+  he cannot read to check), and what it costs from here — then a
+  recommendation, and a note when the recommendation defends what is
+  already built. Look at how MyNclex does it first.
+- **An asset in an artifact is a proposal until Sam adopts it.** The
+  vector Q of 2026-08-12 was used as the logo and taken back the same
+  day; the symbol is the painted Q MyNclex carries as `app/icon.png`.
+  A logo, a palette, a drawing: ask before it reaches a reader.
 
 ## Two assistants, one repo
 
