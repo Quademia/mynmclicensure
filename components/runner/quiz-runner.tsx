@@ -896,7 +896,7 @@ export function QuizRunner({
                 <div className="preflight-warning">⚠️ <strong>Exam mode:</strong> The timer starts when you click Start. No feedback is shown during the exam — you will see your results and explanations after submission. You cannot pause the timer.</div>
               ) : <p className="preflight-text">{W.preflightText}</p>}
               <div className="preflight-actions">
-                <button type="button" className="btn btn-primary" onClick={onPreflightStart}>{(mode === 'timed' ? attempt.started_utc !== null : hasProgress()) ? W.resume : W.start}</button>
+                <button type="button" className="btn btn-primary btn-lg" onClick={onPreflightStart}>{(mode === 'timed' ? attempt.started_utc !== null : hasProgress()) ? W.resume : W.start}</button>
                 <button type="button" className="btn btn-ghost" onClick={() => window.history.back()}>Cancel</button>
                 <label className="preflight-skip">
                   <input type="checkbox" checked={skipNextTime} onChange={(e) => setSkipNextTime(e.target.checked)} /> Don&apos;t show this again
@@ -946,7 +946,7 @@ export function QuizRunner({
                 <span className="page-pill">{viewMode === 'FLAGGED' ? 'Flagged • ' : ''}Page {safePage + 1} / {totalPages}</span>
                 <div className="page-nav-right">
                   <button type="button" className="btn btn-ghost" disabled={safePage >= totalPages - 1 || source.length === 0} onClick={nextPage}>Next →</button>
-                  {showSubmit ? <button type="button" className="btn btn-primary" onClick={confirmSubmit}>{W.submit}</button> : null}
+                  {showSubmit ? <button type="button" className="btn btn-primary btn-lg" onClick={confirmSubmit}>{W.submit}</button> : null}
                 </div>
               </div>
             </div>

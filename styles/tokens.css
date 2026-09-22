@@ -19,9 +19,9 @@
  * change value, because the design system lightened all three shadows
  * on Sam's brief.
  *
- * ⚠ --type-price-weight is 800 and next/font loads 400–700 in
- * app/layout.tsx, so it will fall back until either 800 is added to
- * that list or the token drops to 700. Unruled; see DS1 in the doc.
+ * --type-price-weight was 800 while next/font (app/layout.tsx) loads
+ * 400–700, so the price fell back to a synthesised bold. Sam set it to
+ * 700 on 2026-09-22 (DS14) rather than ship a fifth font file.
  */
 
 :root {
@@ -127,7 +127,7 @@
   /* The amount on a product card, always through formatMinor(). */
   --type-price-size: 36px;
   --type-price-line: 40px;
-  --type-price-weight: 800;
+  --type-price-weight: 700; /* was 800; Sam 2026-09-22 (DS14): bold, not a fifth font file */
   --type-price-track: -0.02em;
 
   /* The label above a band of cards — Platform Access, My Courses. */

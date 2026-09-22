@@ -199,7 +199,7 @@ export function SubscribeClient({ programs, products, signedIn }: { programs: Pr
               </div>
 
               <div className="actions">
-                <button className="btn btn-primary" id="payBtn" type="button" disabled={payDisabled} onClick={startPayment}>
+                <button className="btn btn-primary btn-lg" id="payBtn" type="button" disabled={payDisabled} onClick={startPayment}>
                   {busy ? 'Starting payment…' : 'Proceed to Payment'}
                 </button>
                 <a className="btn btn-secondary" href="/login">Already have an account? Log in</a>

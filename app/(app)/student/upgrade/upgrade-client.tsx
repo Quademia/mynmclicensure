@@ -186,7 +186,7 @@ export function UpgradeClient({
               </div>
 
               <div className="actions">
-                <button className="btn btn-primary" id="payBtn" type="button" disabled={busy || !productId} onClick={startUpgradePayment}>
+                <button className="btn btn-primary btn-lg" id="payBtn" type="button" disabled={busy || !productId} onClick={startUpgradePayment}>
                   {busy ? 'Starting payment…' : 'Proceed to Payment'}
                 </button>
                 <a className="btn btn-secondary" href="/student/dashboard">Back to Dashboard</a>

@@ -55,7 +55,7 @@
 .prep .point { border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 12px 14px; font-size: 14px; line-height: 1.45; }
 .prep .hero-card { border: 1px solid var(--line); background: var(--card); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow-sm); }
 .prep .price-kicker { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 800; margin-bottom: 8px; }
-.prep .hero-price { font-size: 34px; font-weight: 900; color: var(--brand); line-height: 1; margin-bottom: 8px; }
+.prep .hero-price { font-size: 34px; font-weight: var(--type-price-weight); color: var(--brand); line-height: 1; margin-bottom: 8px; }
 .prep .hero-note { color: var(--muted); font-size: 14px; line-height: 1.5; margin-bottom: 14px; }
 .prep .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 

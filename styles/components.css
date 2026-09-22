@@ -106,8 +106,15 @@
 .btn-link:hover:not(:disabled) { color: var(--brand-navy); }
 .btn-link.danger { color: var(--badge-danger-ink); }
 
-/* The small size, as the converted surfaces already had it. */
+/* ── The size scale (DS10, Sam 2026-09-22): three, not eight ──────
+   small — an action inside a row or a card corner (Edit, Retry, Load
+   more); medium — the base above, the default; large — 44px tall, the
+   standard minimum for a fingertip on a phone, for anything a student
+   presses to move forward: Start, Next, Submit, Subscribe. A surface
+   that still restates its own padding keeps it (ruling 9); min-height
+   still makes a large button 44px there. */
 .btn-sm { padding: 5px 10px; font-size: var(--type-meta-size); }
+.btn-lg { min-height: 44px; padding: 11px 22px; font-size: var(--type-field-size); }
 
 /* ── The badge (DS8) ───────────────────────────────────────────────
  * A badge reports a STATE — ACTIVE, Passed, draft, EXPIRED. 6px, not a

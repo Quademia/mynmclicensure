@@ -394,7 +394,7 @@ export function PremiumPrepClient({ programs, products }: { programs: Program[];
 
             <div className="actions-row">
               <button className="btn btn-secondary" type="button" onClick={() => showOnly('programs')}>Back</button>
-              <button className="btn btn-primary" type="button" disabled={paying} onClick={beginPayment}>
+              <button className="btn btn-primary btn-lg" type="button" disabled={paying} onClick={beginPayment}>
                 {paying ? 'Starting payment…' : 'Continue to Payment'}
               </button>
             </div>

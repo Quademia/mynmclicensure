@@ -334,7 +334,7 @@ export function PortalGuide() {
               <p>Get full access and premium support for your 2026 licensure preparation.</p>
             </div>
             <div className="guide-cta-actions">
-              <Link href="/student/upgrade" className="btn btn-primary">Upgrade Access</Link>
+              <Link href="/student/upgrade" className="btn btn-primary btn-lg">Upgrade Access</Link>
               <Link href="/student/messages" className="btn btn-secondary">Message Support</Link>
             </div>
           </div>

@@ -163,7 +163,7 @@ export default async function StudentDashboardPage() {
               <div className="sub-label">Subscription</div>
               <div className="sub-name">No active subscription</div>
             </div>
-            <a href="/student/upgrade" className="btn btn-primary sub-cta">
+            <a href="/student/upgrade" className="btn btn-primary btn-lg sub-cta">
               Subscribe Now
             </a>
           </div>
@@ -182,7 +182,7 @@ export default async function StudentDashboardPage() {
               <div className={`sub-expiry${subWarning ? ' warning' : ''}`}>
                 {expiryLabel(longest.totalDays, longest.expires)}
               </div>
-              <Link href="/student/upgrade" className="btn btn-primary sub-cta">
+              <Link href="/student/upgrade" className="btn btn-primary btn-lg sub-cta">
                 Upgrade / Extend
               </Link>
             </div>
@@ -257,7 +257,7 @@ export default async function StudentDashboardPage() {
             Build your own practice session by selecting topics, difficulty levels, and number of questions from your
             enrolled courses. Ideal for targeted revision, weak-area focus, or quick daily drills.
           </p>
-          <a href="/student/quiz-builder" className="btn btn-primary promo-btn">
+          <a href="/student/quiz-builder" className="btn btn-primary btn-lg promo-btn">
             Launch Quiz Builder &rarr;
           </a>
         </div>
@@ -269,7 +269,7 @@ export default async function StudentDashboardPage() {
             View the official NMC Ghana procedure manuals (component tasks) for your programme and other programmes. Use
             this page to support your practical skills and OSCE preparation.
           </p>
-          <a href="/student/procedures" className="btn btn-primary promo-btn">
+          <a href="/student/procedures" className="btn btn-primary btn-lg promo-btn">
             Open NMC Procedures Page &rarr;
           </a>
         </div>
