@@ -561,13 +561,14 @@ they go, and if so whether to icons from the DS6 set or to plain text.
 | DS4 One dialog, the native boxes out | ✅ 2026-09-22 |
 | DS5 The shell becomes A3 | ✅ 2026-09-22 |
 | DS6 The icon set | ✅ 2026-09-22 — sidebar; page emoji are DS15 |
-| DS7 One name circle | ⬜ |
+| DS7 One name circle | ✅ 2026-09-22 |
 | DS8 One badge | ✅ 2026-09-22 — 13 surfaces; the rest as touched |
 | DS9 The surfaces the shared button cannot reach | ⏸ as each is touched (ruling 9) |
-| DS10 The button size scale | ⬜ |
+| DS10 The button size scale | ✅ 2026-09-22 — the scale; surfaces as touched |
 | DS11 A categorical palette | ⬜ |
 | DS12 A scale palette | ⬜ later |
 | DS13 One badge class name | ⬜ later |
-| DS14 The price weight | ⬜ |
+| DS14 The price weight | ✅ 2026-09-22 |
 | DS15 The page emoji | ⬜ Sam to rule |
+| DS16 The 53 fake-bold weights | ⬜ Sam to rule |
 | Dark mode · content max-width · the avatar's size | ⬜ later |

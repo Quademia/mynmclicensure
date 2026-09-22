@@ -267,15 +267,17 @@ storage.
 - ✅ DS4 One dialog — on the browser <dialog>; 9 confirms, 4 prompts as 2, alert out; type-to-confirm ×2 — 2026-09-22
 - ✅ DS5 The shell becomes A3 — top bar, sidebar on a cookie, PageHeader halved on 23 pages, Upgrade on bar — 2026-09-22
 - ✅ DS6 The icon set — 19 Lucide shapes in icons.tsx, the nav's 27 emoji out, NavItem.icon; sidebar only — 2026-09-22
-- ⬜ DS7 One name circle — one component for the four treatments; how a message shows student vs Quademia is unruled
+- ✅ DS7 One name circle — photo, else initials on the teal-navy blend; the logo where Quademia speaks — 2026-09-22
 - ✅ DS8 One badge — status 6px not a pill (Sam), labels stay 4px; 13 surfaces converted, 173 → 115 — 2026-09-22
 - ⏸ DS9 The eight surfaces the shared button cannot reach — as each is touched (ruling 9); .btn-lite + .btn-link added
-- ⬜ DS10 The button size scale — eight sizes survive DS3; small / medium / large, 44px for a student action
+- ✅ DS10 The button size scale — small / medium / large, large 44px; ten student forward buttons on it — 2026-09-22
 - ⬜ DS11 A categorical palette — colour that means a kind, not a state: MCQ / TF / SATA, mock / fixed, the modes
 - ⬜ DS12 A scale palette — easy / moderate / hard borrows the signal ramp; no gradient vocabulary yet — later
 - ⬜ DS13 One badge class name — .badge / .chip / .pill / .status-chip are one thing under four; markup — later
-- ⬜ DS14 The price weight — Inter loads 400-700 and the price style is 800, so it falls back; add it or drop to 700
+- ✅ DS14 The price weight — the token to 700 and the three price rules onto it (they were literals) — 2026-09-22
 - ⬜ DS15 The page emoji — ~160 in 35 files of page copy and buttons (▶ Start, 💾 Save, 🟢 Active); Sam to rule
+- ⬜ DS16 The 53 fake-bold weights — 800 / 900 in 13 stylesheets, none loaded; to 700 as touched (Sam to rule)
+- ✅ (unplanned) The app's favicon and home-screen icon — MyNclex's two Quademia icon files copied in with DS7 — 2026-09-22
 - ⬜ Dark mode — not one prefers-color-scheme rule in the app and one theme in the token file; after the above
 - ⬜ A content max-width above 1440px, where A3's closed sidebar leaves cards and tables past a comfortable measure
 
