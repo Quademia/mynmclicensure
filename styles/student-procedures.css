@@ -37,8 +37,10 @@
 .spr .btn-toggle { padding: 5px 12px; font-size: 12px; border-radius: 999px; background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); cursor: pointer; font-weight: 500; font-family: inherit; }
 .spr .btn-toggle:hover { background: var(--border); }
 
-/* legacy css/style.css .btn / .btn-primary, scoped */
-.spr .btn { display: inline-block; padding: 10px 20px; border-radius: var(--radius); font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; border: none; transition: background-color 0.2s; text-align: center; }
-.spr .btn-primary { background-color: var(--primary); color: var(--white); width: 100%; padding: 12px; }
-.spr .btn-primary:hover { background-color: var(--primary-dark); }
+/* Buttons: the shared family in styles/components.css (DS3 sweep,
+   2026-09-22). This surface keeps its size — 14px at 10px 20px is the
+   student touch target, against the shared family's denser admin
+   default — and the full-width primary, which is layout. */
+.spr .btn { padding: 10px 20px; font-size: 14px; }
+.spr .btn-primary { width: 100%; padding: 12px; }
 .spr .proc-actions a, .spr .manual-row-actions a { text-decoration: none; }

@@ -20,13 +20,14 @@
 .qm .breadcrumb .sep { color: var(--border); }
 
 /* ── Buttons ── */
-.qm .btn { padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: opacity 0.15s; }
-.qm .btn:hover { opacity: 0.88; }
-.qm .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.qm .btn-primary { background: var(--accent); color: var(--white); }
-.qm .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
-.qm .btn-danger { background: var(--danger); color: var(--white); }
-.qm .btn-sm { padding: 5px 12px; font-size: 12px; }
+/* Buttons: the shared family in styles/components.css (DS3 sweep,
+   2026-09-22). Two of this surface's rules disagreed with the design
+   system and are dropped rather than kept: its primary was teal where
+   navy carries primary buttons, and its danger was a solid red fill
+   where the only solid danger in the product is the confirm dialog's
+   action. Both now come from the shared family. Sizes stay. */
+.qm .btn { padding: 8px 18px; }
+.qm .btn-sm { padding: 5px 12px; }
 
 /* ── Filters bar ── */
 .qm .filters-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-bottom: 20px; padding: 16px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); }

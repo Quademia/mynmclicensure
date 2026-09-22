@@ -15,12 +15,9 @@
 .grant-dialog .modal-body p.note { font-size: 13px; color: var(--text-muted); margin: 0; }
 .grant-dialog .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
 
-.grant-dialog .btn { display: inline-block; padding: 9px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; border: none; transition: 0.2s; }
-.grant-dialog .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.grant-dialog .btn-primary { background: var(--primary); color: white; }
-.grant-dialog .btn-primary:hover { background: var(--primary-dark); }
-.grant-dialog .btn-ghost { background: none; border: 1px solid var(--border); color: var(--text); }
-.grant-dialog .btn-ghost:hover { background: var(--bg); }
+/* Buttons: the shared family in styles/components.css (DS3 sweep,
+   2026-09-22). Its base was already byte-identical to the shared one,
+   so nothing stays. */
 
 .grant-dialog .form-group { margin-bottom: 16px; }
 .grant-dialog .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }

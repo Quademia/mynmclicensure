@@ -52,11 +52,17 @@
 .spf .badge-muted { background: rgba(0, 0, 0, 0.06); color: var(--text-muted); }
 
 /* ── Buttons ── */
-.spf .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; border: 1px solid var(--border); background: #fff; color: var(--text); cursor: pointer; font-family: inherit; transition: background 0.15s; }
-.spf .btn:hover { background: var(--bg); }
-.spf .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.spf .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
-.spf .btn-primary:hover { background: var(--primary-dark); }
+/* Buttons: the shared family in styles/components.css (DS3 sweep,
+   2026-09-22). This surface's plain .btn is an OUTLINE button, where
+   the shared base has no border, so that stays with its padding.
+   ⚠ Because `.spf .btn` out-ranks the unprefixed `.btn-primary`, the
+   filled variant has to be restated here or it inherits this base's
+   white ground — which is exactly what happened on the first pass and
+   was caught by walking the page. */
+.spf .btn { padding: 7px 14px; border: 1px solid var(--border); background: var(--surface); color: var(--ink); }
+.spf .btn:hover { background: var(--surface-page); }
+.spf .btn-primary { background: var(--brand-navy); color: var(--surface); border-color: var(--brand-navy); }
+.spf .btn-primary:hover { background: var(--brand-navy-dark); }
 
 /* ── Edit / Save bar ── */
 .spf .edit-btn { cursor: pointer; font-size: 14px; padding: 4px 8px; border-radius: 6px; }

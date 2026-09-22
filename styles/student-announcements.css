@@ -39,12 +39,9 @@
 .sann .card-body a:not([data-qa='btn']) { color: var(--accent); text-decoration: underline; }
 
 .sann .card-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.sann .btn { display: inline-block; padding: 7px 14px; border-radius: var(--radius); font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; border: none; transition: background-color 0.2s; }
-.sann .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.sann .btn-primary { background-color: var(--primary); color: var(--white); }
-.sann .btn-primary:hover { background-color: var(--primary-dark); }
-.sann .btn-ghost { background: none; border: 1px solid var(--border); color: var(--text); }
-.sann .btn-ghost:hover { background: var(--bg); }
+/* Buttons: the shared family in styles/components.css (DS3 sweep,
+   2026-09-22). Only this surface's tighter padding stays. */
+.sann .btn { padding: 7px 14px; }
 
 .sann .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 14px; }
 .sann .empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; }

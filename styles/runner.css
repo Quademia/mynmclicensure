@@ -134,14 +134,20 @@
 .runner .watermark { font-size: 11px; font-weight: 700; color: var(--accent); opacity: 0.6; padding: 3px 8px; border: 1px solid var(--border); border-radius: 20px; }
 
 /* ── Buttons ── */
-.runner .btn { padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: opacity 0.15s; }
-.runner .btn:hover { opacity: 0.88; }
-.runner .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.runner .btn-primary { background: var(--accent); color: white; }
-.runner .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
-.runner .btn-danger { background: var(--danger); color: white; }
-.runner .btn-flag { background: #f1f5f9; color: var(--text-muted); border: 1px solid var(--border); padding: 5px 12px; font-size: 12px; border-radius: 6px; }
-.runner .btn-flag.flagged { background: #fef3c7; color: var(--warning); border-color: #fde68a; }
+/* Buttons: the shape comes from the shared family in
+   styles/components.css (DS3 sweep, 2026-09-22). The COLOURS stay here
+   on purpose. The runner's primary is teal, and the design system can
+   be read either way — navy "carries primary buttons", teal carries
+   "anything a student is meant to press next", which is exactly what
+   Next and Submit are. This is the highest-stakes student surface, so
+   the question goes to 03-quiz-system.md Q8 rather than being settled
+   by a sweep. Its solid danger is the abandon action and reads as the
+   confirm dialog's exception. */
+.runner .btn-primary { background: var(--brand-teal); color: var(--surface); }
+.runner .btn-primary:hover:not(:disabled) { background: var(--brand-teal-hover); }
+.runner .btn-danger { background: var(--status-danger); color: var(--surface); border-color: var(--status-danger); }
+.runner .btn-flag { background: var(--surface-page); color: var(--ink-muted); border: 1px solid var(--border); padding: 5px 12px; font-size: var(--type-meta-size); border-radius: var(--radius-md); }
+.runner .btn-flag.flagged { background: var(--badge-warning-bg); color: var(--badge-warning-ink); border-color: var(--badge-warning-border); }
 
 /* ── Page nav ── */
 .runner .page-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; gap: 10px; flex-wrap: wrap; }

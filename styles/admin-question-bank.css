@@ -33,13 +33,10 @@
 .qb .result-count { font-size: 13px; color: var(--text-muted); }
 
 /* ── Buttons ── */
-.qb .btn { padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: opacity 0.15s; }
-.qb .btn:hover { opacity: 0.85; }
-.qb .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.qb .btn-primary { background: var(--accent); color: white; }
-.qb .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--primary); }
-.qb .btn-danger { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
-.qb .btn-sm { padding: 5px 10px; font-size: 12px; }
+/* Buttons: the shared family in styles/components.css (DS3 sweep,
+   2026-09-22). Its primary was teal; navy carries primary buttons, so
+   that comes from the shared family now. Sizes stay. */
+.qb .btn { padding: 8px 16px; }
 
 /* ── Question cards ── */
 .qb .q-list { display: flex; flex-direction: column; gap: 12px; }
@@ -165,8 +162,5 @@
 .qb-modal .csv-label { font-size: 13px; font-weight: 600; color: var(--primary); display: block; margin-bottom: 6px; }
 .qb-modal .csv-file { font-size: 13px; border: 1px solid var(--border); padding: 8px; border-radius: 6px; width: 100%; box-sizing: border-box; font-family: inherit; }
 .qb-modal .csv-summary { font-weight: 600; margin-bottom: 8px; font-size: 13px; }
-.qb-modal .btn { padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: opacity 0.15s; }
-.qb-modal .btn:hover { opacity: 0.85; }
-.qb-modal .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.qb-modal .btn-primary { background: var(--accent); color: white; }
-.qb-modal .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--primary); }
+/* The CSV import modal's buttons: the shared family, same as above. */
+.qb-modal .btn { padding: 8px 16px; }

@@ -12,10 +12,10 @@
  * inside its wrapper.
  */
 
-.att .btn { padding: 8px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: opacity 0.15s; }
-.att .btn:hover { opacity: 0.88; }
-.att .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
-.att .btn-sm { padding: 5px 12px; font-size: 12px; }
+/* Buttons: the shared family in styles/components.css (DS3 sweep,
+   2026-09-22). Only this surface's sizes stay. */
+.att .btn { padding: 8px 18px; }
+.att .btn-sm { padding: 5px 12px; }
 
 .att .section-title { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 28px 0 12px; }
 

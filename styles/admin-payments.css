@@ -77,13 +77,14 @@
 .pay .revenue-total { font-size: 13px; font-weight: 600; color: var(--primary); margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
 
 /* ── Buttons ── */
-.pay .btn, .pay-overlay .btn { padding: 9px 16px; border-radius: var(--radius); font-size: 13px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: opacity 0.15s; white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
-.pay .btn:hover, .pay-overlay .btn:hover { opacity: 0.88; }
-.pay .btn:disabled, .pay-overlay .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.pay .btn-primary, .pay-overlay .btn-primary { background: var(--primary); color: #fff; }
-.pay .btn-accent, .pay-overlay .btn-accent { background: var(--accent); color: #fff; }
-.pay .btn-ghost, .pay-overlay .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
-.pay .btn-warn, .pay-overlay .btn-warn { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
+/* Buttons: the shared family in styles/components.css (DS3 sweep,
+   2026-09-22). This surface's own padding stays, and `.btn-warn` —
+   which is the shared `.btn-warning` under a different class name the
+   markup uses; standardising the name is a later tidy. */
+.pay .btn, .pay-overlay .btn { padding: 9px 16px; white-space: nowrap; }
+.pay .btn-warn, .pay-overlay .btn-warn {
+  background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink);
+}
 
 /* ── Side panel (portalled) ── */
 .pay-overlay .overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.35); z-index: 200; }
