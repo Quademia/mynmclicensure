@@ -255,7 +255,8 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 
 Decided in principle in a cloud session on 2026-09-20; candidates, none sliced, the open questions in the doc's §4.
 
-- ⬜ F1 The pool and its door — a free mark on the bank and a second door on the read policy; a §8 row first
+- ⬜ What the trial gives, before F1 is sliced — a 7-day programme trial or `WELCOME_TRIAL`'s General Paper only. The 60 days are a stopgap from 2026-05-27, when the paid plans were paused and the trials bumped 7 → 60 the same day; the pause ends at cutover. Six active products are unreachable today: `WELCOME_TRIAL` and five `*_FULL_FREE` (30 days, the whole programme free), neither linked from a programme nor named in any code — Sam's view is the `*_FULL_FREE` stay admin-grant-only. Nothing needs deleting: `status` is one column (Sam, 2026-09-22)
+- ⬜ F1 The pool and its door — a free mark on the bank and a second door on the read policy; a §8 row first (renumbered S15 — S14 was taken 2026-09-22)
 - ⬜ F2 The free account — no course_access rows, the builder and runner on the pool, the dashboard's free-vs-trial line
 - ⬜ F3 Landing and copy — "free practice questions, forever"; the trial and the products as the route to the full bank
 - ⬜ G1 Streak, points, leaderboard — derived from the graded rows, no new tables; after the NMC Prep walk

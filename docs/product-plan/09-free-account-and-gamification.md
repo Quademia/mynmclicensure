@@ -111,9 +111,38 @@ still reach the top ten in a good week.
   rows ("free", tagged by programme) and a second door on the read
   policy: a row marked free is readable by any signed-in student. That
   changes the SQL policy, the security floor, so it is a `rebuild.md` §8
-  row before it is built (a candidate S14, under 08). A separate pool
+  row before it is built (**a candidate S15, under 08** — this said S14
+  until 2026-09-22, when S14 was taken by the premium marker). A separate pool
   table is the alternative; it keeps the bank's policy untouched at the
   cost of a second importer path.
+- **What the trial gives, which this doc depends on and does not set**
+  (opened 2026-09-22). The free-forever account is positioned here as
+  retention, with the trial and the paid products as the only route to
+  the real bank — but the trial currently gives **60 days of the entire
+  programme bank**, a quarter of Premium Prep's 240 days, for nothing.
+  A free pool of sample questions adds little on top of that, and the
+  paid tier competes with its own giveaway. **The 60 days were a
+  stopgap, not a decision:** traced to 2026-05-27, when gamma paused its
+  paid plans (`dfc5545`) and the same day bumped every programme trial
+  from 7 days to 60 and dropped "7 Day" from their names (`e7a0ae6`),
+  so Sam's audience kept something free while he was building MyNclex.
+  The pause ends at cutover; the 60 days have outlived their reason. The
+  stale "7" in `rebuild.md` §3.2 and doc 02 is the ORIGINAL intent, not
+  an error.
+  Sam's question, 2026-09-22: a **7-day programme trial** (the whole
+  programme, briefly) or **`WELCOME_TRIAL`** (General Paper only, 7
+  days)? The recommendation given was the programme trial, because
+  General Paper is the one paper every programme sits — the least
+  differentiated content — so it cannot answer "is this good for MY
+  exam", which is what a buyer is deciding; because `GP_ONLY` is itself
+  a product sold at GHS 59; and because once this doc's free pool
+  exists, a 7-day taste of one course adds little on top of *forever*,
+  while the programme trial is the step the pool cannot replace. The
+  case against: if the pool is never built, General-Paper-only is the
+  safer floor, leaving the professional banks unexposed. **The two
+  decisions are coupled and neither is made.** Nothing needs retiring
+  either way — `products.status` is one column, and `getProducts`
+  already filters on it, so a product is hidden and restored in a click.
 - **Pool size per programme and its refresh.** Unlimited practice on a
   fixed pool runs dry — fifty a day finishes three hundred in a week.
   The pool needs a size that lasts and a refresh habit, perhaps monthly.
