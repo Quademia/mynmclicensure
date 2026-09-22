@@ -112,10 +112,15 @@
 .runner .opt-body { flex: 1; min-width: 0; }
 .runner .opt-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .runner .opt-text { font-size: 14px; color: var(--primary); line-height: 1.5; }
-.runner .chip { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-.runner .chip-correct { background: #dcfce7; color: #15803d; }
-.runner .chip-chosen { background: #fef9c3; color: #854d0e; }
-.runner .chip-wrong { background: #fee2e2; color: #dc2626; }
+/* Badges: shape from the shared family in styles/components.css (DS8
+   sweep, 2026-09-22). These three mark a student's answer in review —
+   correct, what they chose, wrong — which is the clearest state in the
+   product, so all three take the token triples. `wrong` was #dc2626 on
+   #fee2e2, 3.9:1, and now reads at 5.9:1. */
+.runner .chip { padding: 2px 8px; font-weight: 700; }
+.runner .chip-correct { background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink); }
+.runner .chip-chosen { background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink); }
+.runner .chip-wrong { background: var(--badge-danger-bg); border-color: var(--badge-danger-border); color: var(--badge-danger-ink); }
 .runner .opt-fb { margin-top: 8px; padding: 8px 10px; border-left: 3px solid var(--border); background: #f8fafc; border-radius: 0 6px 6px 0; font-size: 13px; color: #374151; line-height: 1.5; }
 
 /* ── Rationale block ── */

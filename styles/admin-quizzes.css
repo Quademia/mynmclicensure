@@ -56,14 +56,19 @@
 .qm .load-more-wrap { text-align: center; margin: 16px 0; }
 
 /* ── Chips ── */
-.qm .chip { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-.qm .chip.active { background: #dcfce7; color: #15803d; }
-.qm .chip.draft { background: #fef9c3; color: #854d0e; }
-.qm .chip.archived { background: #f1f5f9; color: #64748b; }
-.qm .chip.BOTH { background: var(--primary-light); color: var(--primary); }
+/* Badges: shape from the shared family in styles/components.css (DS8
+   sweep, 2026-09-22). The three LIFECYCLE chips take the token
+   triples. The three MODE chips — BOTH, INSTANT_ONLY, TIMED_ONLY — are
+   a category, not a state, and keep their hues: a red TIMED_ONLY must
+   not read as a failure. */
+.qm .chip.active { background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink); }
+.qm .chip.draft { background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink); }
+.qm .chip.archived { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); color: var(--badge-neutral-ink); }
+
+.qm .chip.BOTH { background: var(--brand-teal-pale); color: var(--brand-teal-hover); }
 .qm .chip.INSTANT_ONLY { background: #f0fdf4; color: #15803d; }
-.qm .chip.TIMED_ONLY { background: #fef2f2; color: #dc2626; }
-.qm .chip.plain { background: #f1f5f9; color: var(--primary); font-size: 10px; }
+.qm .chip.TIMED_ONLY { background: #fef2f2; color: #b91c1c; }
+.qm .chip.plain { background: var(--badge-neutral-bg); color: var(--ink); font-size: 10px; }
 
 /* ── Publish toggle ── */
 .qm .toggle { position: relative; width: 36px; height: 20px; cursor: pointer; display: inline-block; }
