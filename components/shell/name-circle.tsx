@@ -8,20 +8,24 @@
 //     in white on the teal-to-navy blend borrowed from MyNclex's tutor
 //     circle (--avatar-gradient). Students and admins alike: an admin
 //     signed in is a person.
-//   · QUADEMIA — the Q mark, wherever Quademia itself is the speaker
-//     (a reply in Messages today; anywhere later). Messaging is the one
-//     place both kinds sit in one view, which is what the second kind
-//     is for.
+//   · QUADEMIA — the Quademia logo, wherever Quademia itself is the
+//     speaker (a reply in Messages today; anywhere later). Messaging is
+//     the one place both kinds sit in one view, which is what the
+//     second kind is for.
+//
+// The logo is the painted Q on the teal disc — public/images/
+// quademia-mark.png, the same file as app/icon.png, the mark MyNclex
+// has carried since 2026-08-22. It is Sam's symbol; the vector redraw
+// in the 2026-08-12 artifact was a proposal and was never adopted
+// (Sam, 2026-09-22), so it is not used anywhere.
 //
 // Sizes are named classes rather than an inline width, so a surface's
 // phone rule can still shrink one (the profile's 80 → 64). The look is
 // in styles/components.css (.name-circle*).
 
-import { QuademiaMark } from './quademia-mark';
-
 export type NameCircleSize = 'xs' | 'sm' | 'md' | 'lg';
 
-const PX: Record<NameCircleSize, number> = { xs: 26, sm: 28, md: 32, lg: 80 };
+const QUADEMIA_MARK = '/images/quademia-mark.png';
 
 /** Two uppercase initials, as the profile page and the sidebar drew them. */
 export function initialsOf(name: string): string {
@@ -50,7 +54,7 @@ export function NameCircle({
   name?: string;
   avatarUrl?: string | null;
   size?: NameCircleSize;
-  /** For a photo; initials and the mark are decorative beside a name. */
+  /** For a photo; initials and the logo are decorative beside a name. */
   alt?: string;
   className?: string;
 }) {
@@ -61,7 +65,8 @@ export function NameCircle({
   if (who === 'quademia') {
     return (
       <span className={cls}>
-        <QuademiaMark size={PX[size]} />
+        {/* eslint-disable-next-line @next/next/no-img-element -- a 512px static asset drawn at 26–32px; next/image adds nothing here */}
+        <img src={QUADEMIA_MARK} alt={alt || 'Quademia'} />
       </span>
     );
   }
