@@ -16,15 +16,16 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const { supabase, profile } = await requireAdmin();
   const unread = await getUnreadCountForAdmin(supabase);
 
-  // The same A3 bar as the student's (10-design-system.md DS5): "Admin
-  // Panel" as the product line, the admin unread count on the envelope,
+  // The same A3 bar as the student's (10-design-system.md DS5): the same
+  // wordmark — which side you are on is the sidebar's label, "Admin
+  // Panel" (Sam, 2026-09-22) — the admin unread count on the envelope,
   // the bell to the admin Announcements page, and an avatar menu of just
   // the name and Sign out — an admin has no profile page and no upgrade.
   return (
     <AppShell
       sidebar={<AdminSidebar badges={{ messages: unread }} />}
       topBar={{
-        product: 'Admin Panel',
+        product: 'MyNMCLicensure',
         messagesHref: '/admin/messages',
         announcementsHref: '/admin/announcements',
         unread,
