@@ -202,7 +202,10 @@ Claude Design system exists.
 
 **Sam, 2026-09-20** (cloud session). The component question is **Radix
 primitives under our own CSS, or the current structure** — Sam to look
-and decide. **Tailwind is never part of either repo.**
+and decide. ~~**Tailwind is never part of either repo.**~~ Corrected by
+Sam on 2026-09-22: what he meant during the port was *do not port the
+wrong things in*; it was not a ruling against Tailwind for ever. The
+question is reopened below as an open ruling.
 
 **Sam, 2026-09-21.** The native `confirm`, `alert` and `prompt` boxes
 go; the app's own overlay carries legacy's words (`AGENTS.md` UI
@@ -238,6 +241,35 @@ assistant.
 becomes one component (DS7); and the new wording for the one confirm
 message that names OK and Cancel, which cannot survive a dialog with
 real button labels (DS4).
+
+**Open ruling — Tailwind (raised 2026-09-22).** Sam asked what Tailwind
+does and whether the app should use it, and set the frame for the
+answer: he decides only from what the assistant offers, so an option
+left out is a decision made for him. The position, in the three parts
+he asked every such choice to carry:
+
+- *What the world does.* For a new Next.js app today Tailwind is the
+  most common choice; plain CSS as this app is written is the older,
+  still respectable one. Neither is wrong.
+- *What fits Quademia.* Code here is written only by assistants across
+  many sessions, and Sam cannot read it to check, so the material that
+  drifts least is the one that fits. Tailwind has a real edge there:
+  the styling sits in the same file as the page, so an assistant
+  editing a page sees all of it and there is no separate stylesheet to
+  forget. The 173 hardcoded badge colours DS8 measured are exactly the
+  drift plain CSS invites. With Tailwind the design system is not added
+  on top: the tokens live in its config, the components are React with
+  Tailwind's words inside, and the 33 stylesheets go away.
+- *What it costs from here.* A rewrite of every page's styling — weeks
+  of sessions with nothing new for students until it is done — not a
+  plugin. MyNclex has Tailwind installed and, in the files read, unused;
+  its chrome is plain CSS with named classes.
+
+The assistant's recommendation: starting today, Tailwind with a
+component layer; from where the app is, finish this design system in
+CSS, which removes most of the drift for a fraction of the cost, and
+put Tailwind to Sam as a ruling for the next product that starts fresh
+(MyTeacher's rebuild), since the stack is shared. Sam has not ruled.
 
 ---
 
