@@ -25,6 +25,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Toast } from '@/lib/toast/toast';
+import { NameCircle } from '@/components/shell/name-circle';
 import { createClient } from '@/lib/supabase/client';
 import { ensureThreadAction, listStudentThreadsAction, markThreadReadAction, sendMessageAction, threadMessagesAction } from '@/lib/messaging/actions';
 import { MESSAGE_MAX_LEN, type Message, type StudentThread, type ThreadDeepLink } from '@/lib/messaging/types';
@@ -111,12 +112,13 @@ function RefText({ raw }: { raw: string }) {
 }
 
 export function MessagesClient({
-  studentInitial,
+  student,
   courses,
   initialThreads,
   deepLink,
 }: {
-  studentInitial: string;
+  /** The signed-in student, for their name circle (DS7): photo, else initials. */
+  student: { name: string; avatarUrl: string | null };
   courses: CourseBit[];
   initialThreads: StudentThread[];
   deepLink: ThreadDeepLink;
@@ -488,9 +490,11 @@ export function MessagesClient({
                         <div key={`g${i}`} className={`msg-group ${b.group.sender}`}>
                           {b.group.items.map((m) => (
                             <div key={m.message_id} className="msg-row">
-                              <div className={`msg-avatar ${b.group.sender === 'student' ? 'student-av' : 'admin-av'}`}>
-                                {b.group.sender === 'student' ? studentInitial : 'QA'}
-                              </div>
+                              {b.group.sender === 'student' ? (
+                                <NameCircle name={student.name} avatarUrl={student.avatarUrl} size="sm" className="msg-avatar" />
+                              ) : (
+                                <NameCircle who="quademia" size="sm" className="msg-avatar" />
+                              )}
                               <div className={`bubble ${b.group.sender}`} style={m.message_id.startsWith('temp-') ? { opacity: 0.7 } : undefined}>
                                 {linkify(m.body_text)}
                               </div>

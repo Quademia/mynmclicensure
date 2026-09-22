@@ -42,7 +42,7 @@ export default async function StudentMessagesPage({ searchParams }: { searchPara
 
   return (
     <MessagesClient
-      studentInitial={(profile.name || profile.forename || 'S').charAt(0).toUpperCase()}
+      student={{ name: profile.forename || profile.name || 'Student', avatarUrl: profile.avatar_url }}
       courses={courses.map((c) => ({ course_id: c.course_id, title: c.title }))}
       initialThreads={threads}
       deepLink={deepLink}

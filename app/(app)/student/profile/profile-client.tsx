@@ -21,6 +21,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Toast } from '@/lib/toast/toast';
+import { NameCircle } from '@/components/shell/name-circle';
 import { saveAcademicDetails, savePersonalDetails } from '@/lib/profile/actions';
 import { PROFILE_IMAGE_MAX_BYTES, PROFILE_LEVELS, type ProfileSubscription, type SchoolOption } from '@/lib/profile/types';
 
@@ -39,19 +40,6 @@ type ProfileFields = {
 };
 
 type Msg = { text: string; tone: 'error' | 'success' } | null;
-
-function initialsOf(name: string): string {
-  return (name || '?')
-    .split(' ')
-    .map((w) => w[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
-}
-
-function isSafeUrl(url: string | null): url is string {
-  return !!url && (/^https?:\/\//.test(url) || url.startsWith('data:image/'));
-}
 
 function fmtDate(iso: string | null): string {
   return iso ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
@@ -253,12 +241,13 @@ export function ProfileClient({
           <div className="panel-body">
             <div className={`avatar-wrap${personalEditing ? ' editing' : ''}`}>
               <div>
-                {isSafeUrl(avatarSrc) ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- the student's own upload or a preview data: URL
-                  <img className="avatar-img" src={avatarSrc} alt={photoPreview ? 'Preview' : 'Profile'} />
-                ) : (
-                  <div className="avatar-initials">{initialsOf(displayName)}</div>
-                )}
+                <NameCircle
+                  name={displayName}
+                  avatarUrl={avatarSrc}
+                  size="lg"
+                  alt={photoPreview ? 'Preview' : 'Profile'}
+                  className="avatar-circle"
+                />
               </div>
               <div className="avatar-info">
                 <div className="avatar-name">{displayName}</div>

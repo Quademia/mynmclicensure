@@ -230,3 +230,36 @@
 /* a choice of three (the runner's Leave this quiz?) stacks full-width */
 .dlg-actions.stack { flex-direction: column; }
 .dlg-actions.stack .btn { width: 100%; }
+
+/* ── The name circle (DS7) ─────────────────────────────────────────
+ * One circle for a person — photo, else initials on --avatar-gradient —
+ * and one for Quademia, the Q mark (components/shell/name-circle.tsx).
+ * Sizes are classes so a surface's phone rule can still shrink one.
+ */
+.name-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  border-radius: 50%;
+  overflow: hidden;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+.name-circle.is-person {
+  background: var(--avatar-gradient);
+  color: #fff;
+}
+.name-circle.is-quademia { background: none; }
+.name-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.name-circle svg { display: block; width: 100%; height: 100%; }
+.name-circle-xs { width: 26px; height: 26px; font-size: 10px; }
+.name-circle-sm { width: 28px; height: 28px; font-size: 11px; }
+.name-circle-md { width: 32px; height: 32px; font-size: 12px; }
+.name-circle-lg { width: 80px; height: 80px; font-size: 28px; }

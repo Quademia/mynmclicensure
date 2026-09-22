@@ -42,6 +42,12 @@
      panels. Body text on it is 16.1:1; --ink-muted is not (4.4:1), so
      a tinted row uses full --ink. */
   --brand-teal-pale: #edf6f5;
+  /* A person's name circle (DS7, Sam 2026-09-22): the diagonal blend
+     from teal into navy, borrowed from MyNclex's tutor circle. White
+     initials on it: 4.9:1 at the teal end, 11.5:1 at the navy. Not from
+     Claude Design; the blend was rejected for the sidebar (2026-09-22)
+     and kept for the circle it was drawn for. */
+  --avatar-gradient: linear-gradient(135deg, var(--brand-teal) 0%, var(--brand-navy) 100%);
 
   /* ── Ink ──────────────────────────────────────────────────────── */
   /* Body text and headings. 17:1 on the page ground. */

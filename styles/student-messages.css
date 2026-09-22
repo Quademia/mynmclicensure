@@ -75,10 +75,11 @@
 .smsg .msg-row { display: flex; gap: 8px; align-items: flex-end; max-width: 72%; }
 .smsg .msg-group.student .msg-row { flex-direction: row-reverse; margin-left: auto; }
 .smsg .msg-group.admin .msg-row { margin-right: auto; }
-.smsg .msg-avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; color: #fff; }
-.smsg .msg-avatar.student-av { background: var(--accent); }
-.smsg .msg-avatar.admin-av { background: var(--primary); }
-.smsg .msg-group .msg-row:not(:last-of-type) .msg-avatar { visibility: hidden; }
+/* the circle on the LAST row of a group only. Legacy wrote
+   `:not(:last-child)`, and the port `:not(:last-of-type)` — both hide
+   every circle, because .msg-time sits after the rows as a sibling div,
+   so no row is ever last. Found by the DS7 walk (2026-09-22). */
+.smsg .msg-group .msg-row:has(+ .msg-row) .msg-avatar { visibility: hidden; }
 .smsg .bubble { padding: 8px 12px; border-radius: 14px; font-size: 13px; line-height: 1.45; word-wrap: break-word; white-space: pre-wrap; }
 .smsg .bubble.student { background: var(--accent, #2d7d72); color: #fff; border-bottom-right-radius: 4px; }
 .smsg .bubble.admin { background: var(--primary-light, #edf6f5); color: var(--primary); border-bottom-left-radius: 4px; }

@@ -29,6 +29,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Toast } from '@/lib/toast/toast';
+import { NameCircle } from '@/components/shell/name-circle';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { createClient } from '@/lib/supabase/client';
 import {
@@ -658,7 +659,11 @@ export function AdminMessagesClient({
                           return (
                             <div key={m.message_id} className={`feed-msg${isAdmin ? ' is-admin' : ''}`}>
                               <div className="feed-header">
-                                <div className={`feed-avatar ${isAdmin ? 'admin-av' : 'student-av'}`}>{isAdmin ? 'A' : feedName.charAt(0).toUpperCase()}</div>
+                                {isAdmin ? (
+                                  <NameCircle who="quademia" size="xs" className="feed-avatar" />
+                                ) : (
+                                  <NameCircle name={feedName} avatarUrl={activeUser?.avatar_url} size="xs" className="feed-avatar" />
+                                )}
                                 <span className={`feed-name${isAdmin ? ' admin-name' : ''}`}>{isAdmin ? 'You (Admin)' : feedName}</span>
                                 <span className="feed-time">{formatTimeShort(m.created_at)}</span>
                               </div>

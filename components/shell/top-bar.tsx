@@ -23,6 +23,7 @@ import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useShell } from './shell-state';
 import { IconBell, IconClose, IconEnvelope, IconMenu } from './icons';
+import { NameCircle } from './name-circle';
 
 export type TopBarLink = { label: string; href: string; accent?: boolean };
 
@@ -37,20 +38,6 @@ export type TopBarProps = {
   /** The menu rows between the name and Sign out. */
   menuLinks: TopBarLink[];
 };
-
-/** Two uppercase initials, as the sidebar's account block drew them. */
-function initialsOf(label: string): string {
-  return (label || '?')
-    .split(' ')
-    .map((w) => w[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
-}
-
-function isSafeAvatar(url: string | null): url is string {
-  return !!url && /^https?:\/\//.test(url);
-}
 
 export function TopBar({ product, messagesHref, announcementsHref, unread, user, menuLinks }: TopBarProps) {
   const { toggle } = useShell();
@@ -115,14 +102,7 @@ export function TopBar({ product, messagesHref, announcementsHref, unread, user,
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((o) => !o)}
         >
-          <span className="topbar-avatar">
-            {isSafeAvatar(user.avatarUrl) ? (
-              // eslint-disable-next-line @next/next/no-img-element -- a student-supplied URL of unknown host; next/image would need every host allow-listed
-              <img src={user.avatarUrl} alt="" />
-            ) : (
-              initialsOf(user.name)
-            )}
-          </span>
+          <NameCircle name={user.name} avatarUrl={user.avatarUrl} size="md" className="topbar-avatar" />
         </button>
 
         {menuOpen ? (

@@ -29,7 +29,7 @@ import type { LatestMessage, Thread } from './types';
 export type AdminThreadFilters = { search: string; contextType: string; status: string };
 export const EMPTY_ADMIN_FILTERS: AdminThreadFilters = { search: '', contextType: '', status: '' };
 
-export type ThreadUser = { user_id: string; name: string | null; forename: string | null; surname: string | null; email: string; program_id: string | null };
+export type ThreadUser = { user_id: string; name: string | null; forename: string | null; surname: string | null; email: string; program_id: string | null; avatar_url: string | null };
 
 export type AdminThread = Thread & { users: ThreadUser | null; latest: LatestMessage | null; unread: boolean };
 
@@ -63,7 +63,7 @@ export async function getAdminThreads(db: ServerSupabaseClient, filters: AdminTh
 
   let query = db
     .from('messages_threads')
-    .select('*, users ( user_id, name, forename, surname, email, program_id )')
+    .select('*, users ( user_id, name, forename, surname, email, program_id, avatar_url )')
     .order('last_message_at', { ascending: false });
   if (filters.status) query = query.eq('status', filters.status);
   if (filters.contextType) query = query.eq('context_type', filters.contextType);
@@ -107,7 +107,7 @@ export async function getUnreadCountForAdmin(db: ServerSupabaseClient): Promise<
 // ── searchStudentsForMessaging (the New Thread dialog) ─────────────────
 export async function searchStudentsForMessaging(db: ServerSupabaseClient, q: string): Promise<StudentHit[]> {
   const term = String(q || '').trim();
-  let query = db.from('users').select('user_id, name, forename, surname, email, program_id').eq('active', true).order('name');
+  let query = db.from('users').select('user_id, name, forename, surname, email, program_id, avatar_url').eq('active', true).order('name');
   if (term) {
     const like = `%${term}%`;
     query = query.or(`name.ilike.${like},forename.ilike.${like},surname.ilike.${like},email.ilike.${like}`);

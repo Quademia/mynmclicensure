@@ -77,9 +77,6 @@
 .amsg .feed-msg { padding: 10px 0; }
 .amsg .feed-msg + .feed-msg { border-top: 1px solid rgba(0, 0, 0, 0.04); }
 .amsg .feed-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-.amsg .feed-avatar { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; color: #fff; }
-.amsg .feed-avatar.student-av { background: var(--accent); }
-.amsg .feed-avatar.admin-av { background: var(--primary); }
 .amsg .feed-name { font-size: 12px; font-weight: 700; color: var(--primary); }
 .amsg .feed-name.admin-name { color: var(--accent); }
 .amsg .feed-time { font-size: 10px; color: var(--text-muted); }

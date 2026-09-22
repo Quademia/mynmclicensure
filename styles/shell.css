@@ -118,26 +118,8 @@
 
 .topbar-account { position: relative; }
 .topbar-avatar-btn { border-radius: var(--radius-pill); }
-.topbar-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--brand-teal-pale);
-  color: var(--brand-teal-hover);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
-  overflow: hidden;
-  flex: none;
-}
-.topbar-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
+/* the circle itself is the shared name circle (DS7, components.css);
+   only the pressed / focus ring is the bar's */
 .topbar-avatar-btn.pressed .topbar-avatar,
 .topbar-avatar-btn:focus-visible .topbar-avatar {
   box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--brand-teal);
