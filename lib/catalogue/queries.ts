@@ -31,6 +31,19 @@ export async function getPrograms(db: Db): Promise<Program[]> {
 // them and the row is flattened to `courses`, sorted by id.
 const PRODUCT_SELECT = '*, product_courses ( course_id )';
 
+// ⚠ THE PUBLIC LIST NAMES ITS COLUMNS (D19 / D23 item 5, 2026-09-22).
+// `*` sent `telegram_group_keys` to every signed-out visitor of
+// /subscribe and /premium-prep — all 32 products' worth, readable in the
+// page source without an account. Those keys are the join keys for the
+// Premium Prep study groups, and they are the ONE thing a premium
+// product has that Full Access does not (§8 S14). The Telegram gate is
+// not built yet (BUILD_LIST item 17), so nothing could be joined with
+// them today; the day it ships, `*` would have handed the benefit away
+// for free. The admin's getAllProducts below keeps `*` — the Products
+// page edits the keys, and it is behind requireAdmin().
+const PUBLIC_PRODUCT_SELECT =
+  'product_id, name, kind, status, price_minor, currency, duration_days, is_premium, product_courses ( course_id )';
+
 type ProductRow = Omit<Product, 'courses'> & { product_courses: { course_id: string }[] | null };
 
 function flattenProducts(rows: ProductRow[]): Product[] {
@@ -40,9 +53,14 @@ function flattenProducts(rows: ProductRow[]): Product[] {
   }));
 }
 
-/** Active products only, by name. The public pages and the trial grant. */
+/**
+ * Active products only, by name. The public pages and the trial grant.
+ * Columns named, not `*` — see PUBLIC_PRODUCT_SELECT above. The returned
+ * rows therefore carry no `telegram_group_keys`; the one reader of that
+ * field is the admin Products page, which uses getAllProducts.
+ */
 export async function getProducts(db: Db): Promise<Product[]> {
-  const { data, error } = await db.from('products').select(PRODUCT_SELECT).eq('status', 'active').order('name');
+  const { data, error } = await db.from('products').select(PUBLIC_PRODUCT_SELECT).eq('status', 'active').order('name');
   if (error) {
     console.error('getProducts:', error);
     return [];

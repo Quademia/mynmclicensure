@@ -1,116 +1,166 @@
 /* styles/premium-prep.css
  *
- * The public Premium Prep page — legacy/mynmclicensure/premium-prep.html's
- * inline <style>, scoped under `.prep` so its own tokens never leak.
- * Gone: `.btn.is-paused` / `.paused-pill` — the paused switch was
- * lifted for the rebuild (Sam, 2026-09-11).
+ * The public Premium Prep page, rebuilt 2026-09-22 (Sam) on the design
+ * system. The file it replaces was the legacy page's inline <style>:
+ * a two-step wizard, a search box, a six-field form and a private
+ * palette. DS2 had already retired the marketing look here (the third
+ * palette, three radial gradients and the blurred hero glow); this pass
+ * removes what was holding them up.
  *
- * 2026-09-22, DS2 (Sam's B1 ruling): the marketing look is retired.
- * This page carried the heaviest of it — a third private palette of
- * green-greys, three layered radial gradients on the hero plus a
- * blurred glow behind it, and 14–24px radii. All of it is gone; the
- * page's own names now point at the app's tokens. The `.hero::before`
- * glow is removed rather than emptied, since it existed only to carry
- * that gradient. Structure, spacing and copy are otherwise untouched.
+ * ⚠ NO LOCAL TOKEN BLOCK. The old file aliased eight of the app's tokens
+ * behind its own names (--brand, --muted, --card, --line, --soft …), a
+ * DS2 measure that let the page convert without touching its markup.
+ * The markup is new, so the aliases go with it: every rule below names
+ * the app's token directly. This is what DS2's headers meant by "the
+ * aliases survive only until DS3 reaches the surface".
  *
- * Teal text on the pale teal ground uses --brand-teal-hover, not
+ * ⚠ NOTHING HERE RESTATES A SHARED COMPONENT. The buttons are
+ * `.btn .btn-accent .btn-lg` and the duration is `.badge
+ * .badge-neutral`, both straight from components.css — so this surface
+ * is NOT one of the eight DS9 still has to reach. The only button rule
+ * below is a layout one (full width inside the card), which ruling 9
+ * explicitly allows a converted surface to keep.
+ *
+ * Teal text on a pale teal ground uses --brand-teal-hover, not
  * --brand-teal: the design system measures the latter at 4.45:1 there,
- * which just misses.
+ * which just misses AA.
  */
 
-.prep {
-  --brand: var(--brand-teal);
-  --muted: var(--ink-muted);
-  --card: var(--surface);
-  --line: var(--border);
-  --soft: var(--surface-page);
-  --danger: var(--status-danger);
-  --ok: var(--badge-success-ink);
-  --warning: var(--status-warning);
-  --shadow: var(--shadow-sm);
-
-  min-height: 100vh;
-  font-family: var(--font-inter), Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
-  background: var(--surface-page); color: var(--ink);
-}
-.prep * { box-sizing: border-box; }
-
-.prep .wrap { max-width: 1050px; margin: 0 auto; padding: 24px 16px 48px; }
-
-
-.prep .hero {
-  position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 24px;
-  background: var(--brand-teal-pale);
-  box-shadow: var(--shadow); margin-bottom: 18px;
-}
-.prep .hero > * { position: relative; z-index: 1; }
-
-.prep .prep-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: var(--radius-pill); background: var(--surface); color: var(--brand-teal-hover); font-size: 12px; font-weight: 700; letter-spacing: .02em; margin-bottom: 12px; }
-.prep h1 { margin: 0 0 10px; font-size: clamp(28px, 4vw, 42px); line-height: 1.1; }
-.prep .sub { margin: 0 0 14px; color: var(--muted); line-height: 1.6; max-width: 760px; }
-.prep .hero-grid { display: grid; grid-template-columns: 1.25fr .95fr; gap: 18px; align-items: start; }
-.prep .hero-points { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
-.prep .point { border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 12px 14px; font-size: 14px; line-height: 1.45; }
-.prep .hero-card { border: 1px solid var(--line); background: var(--card); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow-sm); }
-.prep .price-kicker { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; margin-bottom: 8px; }
-.prep .hero-price { font-size: 34px; font-weight: var(--type-price-weight); color: var(--brand); line-height: 1; margin-bottom: 8px; }
-.prep .hero-note { color: var(--muted); font-size: 14px; line-height: 1.5; margin-bottom: 14px; }
-.prep .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-
-.prep .btn { appearance: none; border: none; border-radius: var(--radius); padding: 13px 16px; font-size: 15px; font-weight: 700; cursor: pointer; transition: .18s ease; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; }
-.prep .btn:hover { transform: translateY(-1px); }
-.prep .btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
-.prep .btn-primary { background: var(--brand); color: var(--surface); }
-.prep .btn-secondary { background: var(--brand-teal-pale); color: var(--brand-teal-hover); border: 1px solid var(--border); }
-
-.prep .panel { display: none; margin-top: 18px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--card); box-shadow: var(--shadow); overflow: hidden; }
-.prep .panel.on { display: block; }
-.prep .panel-head { padding: 18px 18px 10px; border-bottom: 1px solid var(--line); background: var(--surface-page); }
-.prep .step-pill { display: inline-flex; align-items: center; padding: 6px 10px; border-radius: var(--radius-pill); background: var(--brand-teal-pale); color: var(--brand-teal-hover); font-size: 12px; font-weight: 700; margin-bottom: 8px; }
-.prep .panel-head h2 { margin: 0 0 6px; font-size: 22px; }
-.prep .panel-head p { margin: 0; color: var(--muted); line-height: 1.55; }
-.prep .panel-body { padding: 18px; }
-
-.prep .search-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
-.prep .search-box { flex: 1; min-width: 260px; }
-.prep .count { font-size: 13px; color: var(--muted); font-weight: 700; }
-
-.prep .input, .prep .select { width: 100%; min-height: 48px; border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; font: inherit; color: inherit; background: var(--card); outline: none; }
-.prep .input:focus, .prep .select:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(45, 125, 114, .18); }
-
-.prep .program-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.prep .program-card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); padding: 16px; cursor: pointer; transition: .18s ease; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; min-height: 110px; font: inherit; color: inherit; text-align: left; }
-.prep .program-card:hover { transform: translateY(-1px); border-color: var(--brand); box-shadow: var(--shadow-md); }
-.prep .program-card.selected { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(45, 125, 114, .18); background: var(--brand-teal-pale); }
-.prep .program-name { font-weight: 700; font-size: 16px; margin-bottom: 6px; }
-.prep .program-meta { color: var(--muted); font-size: 13px; line-height: 1.5; }
-.prep .check { min-width: 34px; height: 34px; border-radius: var(--radius-pill); display: grid; place-items: center; font-weight: 700; border: 1px solid var(--line); color: var(--ink-faint); background: var(--card); }
-.prep .program-card.selected .check { background: var(--brand); border-color: var(--brand); color: var(--surface); }
-
-.prep .summary { margin-top: 16px; border: 1px solid var(--line); background: var(--surface-page); border-radius: var(--radius); padding: 16px; }
-.prep .summary-title { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; font-weight: 700; color: var(--muted); margin-bottom: 10px; }
-.prep .summary-main { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; flex-wrap: wrap; }
-.prep .summary-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-.prep .summary-sub { color: var(--muted); font-size: 14px; line-height: 1.5; }
-.prep .summary-price { font-size: 22px; font-weight: 700; color: var(--brand); white-space: nowrap; }
-.prep .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-.prep .badge { border: 1px solid var(--line); background: var(--card); border-radius: var(--radius-pill); padding: 8px 10px; font-size: 12px; color: var(--ink); font-weight: 700; }
-
-.prep .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.prep .grid-2.gap-top { margin-top: 16px; }
-.prep .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
-.prep .field label { font-size: 14px; font-weight: 700; }
-.prep .hint { color: var(--muted); font-size: 12px; line-height: 1.45; }
-
-.prep .actions-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
-
-.prep .empty { padding: 18px; border: 1px dashed var(--line); border-radius: var(--radius); color: var(--muted); background: var(--surface-page); font-weight: 700; }
-
-@media (max-width: 860px) {
-  .prep .hero-grid, .prep .grid-2, .prep .program-list { grid-template-columns: 1fr; }
-}
-
-/* The page wrapper the shared bar and footer sit in (2026-09-22). The
-   column keeps the footer at the bottom on a short page — `margin-top:
-   auto` on .pubfoot needs a flex column above it to push against. */
 .prep-page { display: flex; flex-direction: column; min-height: 100vh; }
+
+.prep {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: var(--space-32) var(--space-16) var(--space-32);
+  background: var(--surface-page);
+  color: var(--ink);
+}
+
+/* ── The hero ───────────────────────────────────────────────────── */
+
+.prep-hero { max-width: 660px; margin-bottom: var(--space-32); }
+
+.prep-eyebrow {
+  display: inline-block;
+  padding: var(--space-6) var(--space-12);
+  border-radius: var(--radius-pill);
+  background: var(--brand-teal-pale);
+  color: var(--brand-teal-hover);
+  font-size: var(--type-meta-size);
+  font-weight: 700;
+  letter-spacing: .02em;
+  margin-bottom: var(--space-12);
+}
+
+.prep-hero h1 {
+  font-size: 2rem;
+  line-height: 1.15;
+  font-weight: 700;
+  color: var(--brand-navy);
+  margin: 0 0 var(--space-12);
+  letter-spacing: -.02em;
+}
+
+/* The offer, in one sentence. Full-strength ink, because it is the
+   thing the page exists to say. */
+.prep-lede { font-size: var(--type-field-size); line-height: 1.6; color: var(--ink); margin: 0 0 var(--space-10); }
+.prep-sub { font-size: var(--type-meta-size); line-height: 1.6; color: var(--ink-muted); margin: 0; }
+
+/* ── The cards ──────────────────────────────────────────────────── */
+
+.prep-grid {
+  list-style: none;
+  margin: 0 0 var(--space-32);
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-16);
+}
+
+.prep-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-24);
+  box-shadow: var(--shadow-sm);
+}
+
+.prep-card-name {
+  font-size: var(--type-field-size);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--brand-navy);
+  margin: 0 0 var(--space-12);
+}
+
+/* Price and duration read as one line: the amount, then what it buys.
+   A price with no period beside it is the upgrade page's mistake. */
+.prep-price { display: flex; align-items: baseline; gap: var(--space-10); margin: 0 0 var(--space-16); flex-wrap: wrap; }
+.prep-amount { font-size: 1.65rem; font-weight: 700; color: var(--brand-teal-hover); letter-spacing: -.01em; }
+
+.prep-unlocks { font-size: var(--type-meta-size); font-weight: 600; color: var(--ink); margin: 0 0 var(--space-6); }
+
+.prep-courses { list-style: none; margin: 0 0 var(--space-24); padding: 0; flex: 1 1 auto; }
+.prep-courses li {
+  position: relative;
+  padding-left: var(--space-20);
+  font-size: var(--type-meta-size);
+  line-height: 1.7;
+  color: var(--ink-muted);
+}
+/* The tick is drawn, not an emoji (DS15). A pseudo-element keeps it out
+   of the accessibility tree, where it would be read on every line. */
+.prep-courses li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: .62em;
+  width: 9px;
+  height: 5px;
+  border-left: 2px solid var(--brand-teal);
+  border-bottom: 2px solid var(--brand-teal);
+  transform: rotate(-45deg);
+}
+
+/* Layout only — the skin is .btn .btn-accent .btn-lg (ruling 9). */
+.prep-cta { width: 100%; margin-top: auto; }
+
+/* ── The note under the cards ───────────────────────────────────── */
+
+.prep-note {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-24);
+}
+.prep-note h2 { font-size: var(--type-field-size); font-weight: 700; color: var(--brand-navy); margin: 0 0 var(--space-8); }
+.prep-note p { font-size: var(--type-meta-size); line-height: 1.7; color: var(--ink-muted); margin: 0; }
+.prep-note a, .prep-empty a { color: var(--brand-teal-hover); font-weight: 600; }
+
+.prep-empty {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-32) var(--space-24);
+  text-align: center;
+  color: var(--ink-muted);
+  font-size: var(--type-field-size);
+  margin: 0 0 var(--space-32);
+}
+
+/* ── The phone (AGENTS.md UI convention #3, 768px) ──────────────── */
+
+@media (max-width: 768px) {
+  .prep { padding: var(--space-24) var(--space-16) var(--space-32); }
+  .prep-hero { margin-bottom: var(--space-24); }
+  .prep-hero h1 { font-size: 1.6rem; }
+  /* One card per row below 768px rather than waiting for the 300px
+     track to fail — two 300px cards plus the gap overflow a 375px
+     screen, and a card that is cut off reads as a broken page. */
+  .prep-grid { grid-template-columns: 1fr; gap: var(--space-12); }
+  .prep-card { padding: var(--space-16); }
+}
