@@ -16,6 +16,7 @@ import { useRef, useState } from 'react';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { importItems } from '@/lib/bank/actions';
 import { csvTemplate, parseCsv, type CsvParseResult } from '@/lib/bank/csv';
+import { Icon } from '@/components/shell/icons';
 
 export function CsvImportModal({
   courseId,
@@ -82,7 +83,7 @@ export function CsvImportModal({
             <p>Download the template, fill it in with your questions, then upload it here. The system will validate each row and report any errors.</p>
 
             <div className="modal-template">
-              <button type="button" className="btn btn-ghost" onClick={downloadTemplate}>⬇ Download CSV Template</button>
+              <button type="button" className="btn btn-ghost" onClick={downloadTemplate}><Icon name="download" />Download CSV Template</button>
             </div>
 
             <div className="form-group">

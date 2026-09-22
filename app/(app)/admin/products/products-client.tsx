@@ -26,6 +26,7 @@ import {
   type ProductStatus,
   type Program,
 } from '@/lib/catalogue/types';
+import { Icon } from '@/components/shell/icons';
 
 type Msg = { text: string; tone: 'error' | 'success' } | null;
 
@@ -349,7 +350,7 @@ export function ProductsClient({
                     </td>
                     <td>
                       {(p.telegram_group_keys || []).length
-                        ? (p.telegram_group_keys || []).map((k) => <span key={k} className="tg-tag">✈️ {k}</span>)
+                        ? (p.telegram_group_keys || []).map((k) => <span key={k} className="tg-tag"><Icon name="send" size={12} />{k}</span>)
                         : <span className="cell-muted">—</span>}
                     </td>
                   </tr>
@@ -398,14 +399,14 @@ export function ProductsClient({
                     <h4>Telegram Groups</h4>
                     <div className="detail-tags">
                       {(panelProduct.telegram_group_keys || []).length
-                        ? (panelProduct.telegram_group_keys || []).map((k) => <span key={k} className="tg-tag">✈️ {k}</span>)
+                        ? (panelProduct.telegram_group_keys || []).map((k) => <span key={k} className="tg-tag"><Icon name="send" size={12} />{k}</span>)
                         : <span className="detail-empty">None</span>}
                     </div>
                   </div>
                 </div>
                 <div className="panel-actions">
                   <button type="button" className="btn btn-ghost" onClick={closePanel}>Close</button>
-                  <button type="button" className="btn btn-primary" onClick={() => openEditModal(panelProduct.product_id)}>✏️ Edit</button>
+                  <button type="button" className="btn btn-primary" onClick={() => openEditModal(panelProduct.product_id)}><Icon name="pencil" />Edit</button>
                   {panelProduct.status === 'active' ? (
                     <button type="button" className="btn btn-warning" onClick={() => setArchiveTarget({ id: panelProduct.product_id, name: panelProduct.name })}>Archive</button>
                   ) : (

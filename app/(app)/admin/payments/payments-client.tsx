@@ -42,6 +42,7 @@ import {
 } from '@/lib/payments/admin-queries';
 import type { PaymentStatus } from '@/lib/payments/types';
 import type { Product, Program } from '@/lib/catalogue/types';
+import { Icon } from '@/components/shell/icons';
 
 type Msg = { text: string; tone: 'error' | 'success' | 'info' } | null;
 
@@ -445,15 +446,15 @@ export function PaymentsClient({
                 <div className="panel-actions">
                   <button type="button" className="btn btn-ghost" onClick={closePanel}>Close</button>
                   {panel.users?.user_id ? (
-                    <a className="btn btn-ghost" href={`/admin/users?user_id=${encodeURIComponent(panel.users.user_id)}`}>👤 View Student</a>
+                    <a className="btn btn-ghost" href={`/admin/users?user_id=${encodeURIComponent(panel.users.user_id)}`}><Icon name="user" />View Student</a>
                   ) : null}
                   {panel.status === 'PAID' || panel.status === 'SETUP_REQUIRED' ? (
                     <button type="button" className="btn btn-warn" disabled={retryState !== 'idle'} onClick={() => retryActivation(panel.reference)}>
-                      {retryState === 'busy' ? 'Retrying…' : retryState === 'done' ? 'Activated ✓' : '⚡ Retry Activation'}
+                      {retryState === 'busy' ? 'Retrying…' : retryState === 'done' ? 'Activated ✓' : <><Icon name="zap" />Retry Activation</>}
                     </button>
                   ) : null}
                   {panel.status === 'SETUP_REQUIRED' && panel.setup_token ? (
-                    <button type="button" className="btn btn-accent" onClick={() => copySetupLink(panel.reference, panel.setup_token || '')}>📋 Copy Setup Link</button>
+                    <button type="button" className="btn btn-accent" onClick={() => copySetupLink(panel.reference, panel.setup_token || '')}><Icon name="clipboard" />Copy Setup Link</button>
                   ) : null}
                 </div>
               </>

@@ -38,6 +38,7 @@ import { htmlToText, newlinesToParagraphs, sanitiseHtml } from '@/lib/announceme
 import { LEVELS, type Announcement, type EngageMap } from '@/lib/announcements/types';
 import type { Course, Product, Program } from '@/lib/catalogue/types';
 import type { StudentHit } from '@/lib/subscriptions/types';
+import { Icon } from '@/components/shell/icons';
 
 type Msg = { text: string; tone: 'error' | 'success' } | null;
 type SelectedUser = { user_id: string; name: string };
@@ -410,7 +411,7 @@ export function AnnouncementsClient({
                       <td className="cell-muted">{schedule}</td>
                       <td>
                         <div className="engage-counts">
-                          <span title="Read">✅ {ec.read}</span><span title="Clicked">👆 {ec.clicked}</span><span title="Dismissed">✕ {ec.dismissed}</span>
+                          <span title="Read"><Icon name="check-circle" size={13} />{ec.read}</span><span title="Clicked"><Icon name="pointer" size={13} />{ec.clicked}</span><span title="Dismissed"><Icon name="x" size={13} />{ec.dismissed}</span>
                         </div>
                       </td>
                       <td className="cell-flags">{a.dismissible ? <span>dismissible</span> : null}</td>
@@ -453,8 +454,8 @@ export function AnnouncementsClient({
                   <button type="button" onClick={() => wrapTag('strong')}><b>B</b></button>
                   <button type="button" onClick={() => wrapTag('em')}><i>I</i></button>
                   <div className="sep" />
-                  <button type="button" onClick={() => setLinkDialog('link')}>🔗 Link</button>
-                  <button type="button" onClick={() => setLinkDialog('button')}>🔲 Button</button>
+                  <button type="button" onClick={() => setLinkDialog('link')}><Icon name="link" />Link</button>
+                  <button type="button" onClick={() => setLinkDialog('button')}><Icon name="square" />Button</button>
                 </div>
                 <textarea id="fieldBody" ref={bodyRef} rows={6} placeholder="Write your announcement body here." value={body} onChange={(e) => setBody(e.target.value)} />
                 <p className="form-hint right" style={{ color: charColor }}>{charCount} character{charCount !== 1 ? 's' : ''}</p>

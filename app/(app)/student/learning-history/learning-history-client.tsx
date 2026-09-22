@@ -24,6 +24,7 @@ import { useRouter } from 'next/navigation';
 import { Toast } from '@/lib/toast/toast';
 import { loadHistoryPage, retakeAttempt } from '@/lib/attempts/actions';
 import type { AttemptListRow, AttemptMode, HistoryFilters, HistoryPage } from '@/lib/attempts/types';
+import { Icon } from '@/components/shell/icons';
 
 type CourseLite = { course_id: string; title: string };
 
@@ -247,7 +248,7 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
               title={isInProgress ? 'Continue this attempt' : 'Only available for in-progress attempts'}
               onClick={() => router.push(runnerHref(a.mode, a.attempt_id))}
             >
-              ▶ Resume
+              <Icon name="play" />Resume
             </button>
             <button
               type="button"
@@ -256,7 +257,7 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
               title={isCompleted ? 'Review your answers' : 'Complete this attempt first'}
               onClick={() => router.push(runnerHref(a.mode, a.attempt_id, true))}
             >
-              👁 Review
+              <Icon name="eye" />Review
             </button>
             <button
               type="button"
@@ -265,7 +266,7 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
               title={isCompleted ? 'Retake with same questions' : 'Complete this attempt first'}
               onClick={() => handleRetake(a)}
             >
-              {isRetaking ? '…Starting' : '↩ Retake'}
+              {isRetaking ? '…Starting' : <><Icon name="refresh" />Retake</>}
             </button>
           </div>
         </div>
@@ -353,12 +354,12 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
         <div className="attempt-list">
           {!mounted ? (
             <div className="empty-state">
-              <div className="empty-icon">📊</div>
+              <div className="empty-icon"><Icon name="chart" size={36} /></div>
               <p>Loading your history…</p>
             </div>
           ) : filtered.length === 0 ? (
             <div className="empty-state">
-              <div className="empty-icon">📊</div>
+              <div className="empty-icon"><Icon name="chart" size={36} /></div>
               <p>No attempts match your filters.<br />Try adjusting the filters above.</p>
             </div>
           ) : (

@@ -35,6 +35,7 @@ import {
   type QuestionType,
 } from '@/lib/bank/types';
 import type { Course } from '@/lib/catalogue/types';
+import { Icon } from '@/components/shell/icons';
 
 type Msg = { text: string; tone: 'error' | 'success' } | null;
 
@@ -438,7 +439,7 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
           </span>
         </div>
         <div className="toolbar-right">
-          <button type="button" className="btn btn-ghost" disabled={!courseId} onClick={openCsvModal}>📥 Import CSV</button>
+          <button type="button" className="btn btn-ghost" disabled={!courseId} onClick={openCsvModal}><Icon name="upload" />Import CSV</button>
           <button type="button" className="btn btn-primary" disabled={!courseId} onClick={openNew}>+ New Question</button>
         </div>
       </div>
@@ -447,11 +448,11 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
       <div className="qb-layout">
         <div>
           {!courseId ? (
-            <div className="empty-state"><div className="icon">📚</div><p>Select a course above to load questions.</p></div>
+            <div className="empty-state"><div className="icon"><Icon name="book" size={36} /></div><p>Select a course above to load questions.</p></div>
           ) : loading ? (
-            <div className="empty-state"><div className="icon">⏳</div><p>Loading questions…</p></div>
+            <div className="empty-state"><div className="icon"><Icon name="hourglass" size={36} /></div><p>Loading questions…</p></div>
           ) : filtered.length === 0 ? (
-            <div className="empty-state"><div className="icon">🔍</div><p>No questions match the current filters.</p></div>
+            <div className="empty-state"><div className="icon"><Icon name="search" size={36} /></div><p>No questions match the current filters.</p></div>
           ) : (
             <div className="q-list">
               {shown.map((item) => {
@@ -482,7 +483,7 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
                         {item.difficulty ? <span className={`chip ${DIFF_CHIP[item.difficulty] || 'chip-default'}`}>{item.difficulty}</span> : null}
                         {item.marks && Number(item.marks) !== 1 ? <span className="chip chip-default">{item.marks} marks</span> : null}
                       </div>
-                      <button type="button" className="q-edit-btn" onClick={(e) => { e.stopPropagation(); openEdit(item); }}>Edit ✏️</button>
+                      <button type="button" className="q-edit-btn" onClick={(e) => { e.stopPropagation(); openEdit(item); }}><Icon name="pencil" />Edit</button>
                     </div>
                     <div className="q-stem">{item.stem}</div>
                     <div className="q-options">
@@ -673,10 +674,10 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
           </div>
 
           <div className="panel-actions">
-            <button type="button" className="btn btn-primary" disabled={saving} onClick={save}>{saving ? 'Saving…' : '💾 Save'}</button>
+            <button type="button" className="btn btn-primary" disabled={saving} onClick={save}>{saving ? 'Saving…' : <><Icon name="save" />Save</>}</button>
             <button type="button" className="btn btn-ghost" onClick={closePanel}>Cancel</button>
             {!isNew ? (
-              <button type="button" className="btn btn-danger btn-delete" onClick={confirmDelete}>🗑 Delete</button>
+              <button type="button" className="btn btn-danger btn-delete" onClick={confirmDelete}><Icon name="trash" />Delete</button>
             ) : null}
           </div>
         </div>

@@ -51,6 +51,7 @@ import {
 } from '@/lib/quizzes/types';
 import { DIFFICULTIES, type Item } from '@/lib/bank/types';
 import type { Course } from '@/lib/catalogue/types';
+import { Icon } from '@/components/shell/icons';
 
 type Msg = { text: string; tone: 'error' | 'success' } | null;
 
@@ -104,7 +105,7 @@ const WORDS = {
     backToList: '← Back to Quizzes',
     reviewDetails: 'Quiz Details',
     reviewItems: 'Questions in this Quiz',
-    saveButton: '💾 Save Quiz',
+    saveButton: 'Save Quiz',
     noun: 'quiz',
     Noun: 'Quiz',
     confirmArchive: 'Archive this quiz?',
@@ -125,7 +126,7 @@ const WORDS = {
     backToList: '← Back to Mock Exams',
     reviewDetails: 'Mock Exam Details',
     reviewItems: 'Questions in this Mock Exam',
-    saveButton: '💾 Save Mock Exam',
+    saveButton: 'Save Mock Exam',
     noun: 'mock exam',
     Noun: 'Mock exam',
     confirmArchive: 'Archive this mock exam?',
@@ -890,7 +891,7 @@ export function QuizManager({
           <div className="pane-actions">
             <button type="button" className="btn btn-ghost" onClick={() => goToPane(3)}>← Back to Questions</button>
             <div className="spacer" />
-            <button type="button" className="btn btn-primary" disabled={saving} onClick={save}>{saving ? 'Saving…' : W.saveButton}</button>
+            <button type="button" className="btn btn-primary" disabled={saving} onClick={save}>{saving ? 'Saving…' : <><Icon name="save" />{W.saveButton}</>}</button>
           </div>
         </div>
       ) : null}

@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { AnnouncementBody } from './announcement-body';
 import { recordNoticeState } from '@/lib/announcements/actions';
 import type { Announcement, StudentNoticeMap } from '@/lib/announcements/types';
+import { Icon } from '@/components/shell/icons';
 
 export function AnnouncementsStrip({ announcements, states }: { announcements: Announcement[]; states: StudentNoticeMap }) {
   const [cleared, setCleared] = useState<Record<string, 'fading' | 'gone'>>({});
@@ -40,7 +41,7 @@ export function AnnouncementsStrip({ announcements, states }: { announcements: A
   return (
     <div className="announcements-block">
       <div className="announcements-block-header">
-        <span className="announcements-block-title">📢 Announcements</span>
+        <span className="announcements-block-title"><Icon name="megaphone" />Announcements</span>
         <span className="announcements-block-count">{totalUnread > 0 ? `${totalUnread} unread` : ''}</span>
       </div>
       <div>

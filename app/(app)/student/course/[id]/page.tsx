@@ -33,6 +33,7 @@ import { PageHeader } from '@/components/shell/page-header';
 import { getAnnouncementsForStudent } from '@/lib/announcements/queries';
 import { AnnouncementBody } from '@/components/announcements/announcement-body';
 import '@/styles/student-course.css';
+import { Icon } from '@/components/shell/icons';
 
 export const dynamic = 'force-dynamic';
 
@@ -96,7 +97,7 @@ export default async function CoursePage({ params }: { params: Params }) {
       <div className="scp">
         <PageHeader title="Access Denied" />
         <div className="no-access-card">
-          <div className="icon">🔒</div>
+          <div className="icon"><Icon name="lock" size={36} /></div>
           <h2>No Access</h2>
           <p>You do not have an active subscription for this course.</p>
           <a href="/student/dashboard" className="btn btn-primary">Back to Dashboard</a>
@@ -151,14 +152,14 @@ export default async function CoursePage({ params }: { params: Params }) {
       {/* Message us button (slice 12's page) */}
       <div className="message-row">
         <a className="btn-message-course" href={`/student/messages?course_id=${encodeURIComponent(courseId)}`}>
-          💬 Message us about this course
+          <Icon name="message" />Message us about this course
         </a>
       </div>
 
       {/* 2. Fixed Quizzes */}
       <div className="section-card">
         <div className="section-card-header">
-          <span className="section-card-title">📝 Fixed Quizzes</span>
+          <span className="section-card-title"><Icon name="clipboard" />Fixed Quizzes</span>
           <span className="section-card-badge">{fixed.length ? `${fixed.length} available` : ''}</span>
         </div>
         {!fixed.length ? (
@@ -181,7 +182,7 @@ export default async function CoursePage({ params }: { params: Params }) {
       {/* 3. Mock Exams */}
       <div className="section-card">
         <div className="section-card-header">
-          <span className="section-card-title">🎯 Mock Exams</span>
+          <span className="section-card-title"><Icon name="target" />Mock Exams</span>
           <span className="section-card-badge">{mocks.length ? `${mocks.length} available` : ''}</span>
         </div>
         {!mocks.length ? (
@@ -203,10 +204,10 @@ export default async function CoursePage({ params }: { params: Params }) {
       {/* 4. Quiz Builder shortcut */}
       <div className="section-card">
         <div className="section-card-header">
-          <span className="section-card-title">🔧 Quiz Builder</span>
+          <span className="section-card-title"><Icon name="wrench" />Quiz Builder</span>
         </div>
         <a href={`/student/quiz-builder?course=${encodeURIComponent(courseId)}`} className="builder-shortcut">
-          <div className="builder-shortcut-icon">🔧</div>
+          <div className="builder-shortcut-icon"><Icon name="wrench" size={22} /></div>
           <div className="builder-shortcut-text">
             <div className="title">Build a Custom Quiz</div>
             <div className="sub">Create a practice quiz filtered to this course</div>
@@ -217,7 +218,7 @@ export default async function CoursePage({ params }: { params: Params }) {
       {/* 4. Course Announcements */}
       <div className="section-card">
         <div className="section-card-header">
-          <span className="section-card-title">📢 Course Announcements</span>
+          <span className="section-card-title"><Icon name="megaphone" />Course Announcements</span>
           <span className="section-card-badge">
             {courseAnnouncements.length ? `${courseAnnouncements.length} announcement${courseAnnouncements.length !== 1 ? 's' : ''}` : ''}
           </span>

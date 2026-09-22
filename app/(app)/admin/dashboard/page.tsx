@@ -13,19 +13,23 @@
 import { requireAdmin } from '@/lib/access';
 import { getDashboardCounts, getRecentUsers } from '@/lib/users/queries';
 import { PageHeader } from '@/components/shell/page-header';
+import { Icon } from '@/components/shell/icons';
+import type { IconName } from '@/lib/nav/types';
 import '@/styles/admin-dashboard.css';
 
 export const dynamic = 'force-dynamic';
 
-const QUICK_LINKS: { href: string; icon: string; label: string }[] = [
-  { href: '/admin/users', icon: '👥', label: 'Manage Users' },
-  { href: '/admin/subscriptions', icon: '💳', label: 'Subscriptions' },
-  { href: '/admin/payments', icon: '💰', label: 'Payments' },
-  { href: '/admin/products', icon: '📦', label: 'Products' },
-  { href: '/admin/courses', icon: '📚', label: 'Courses' },
-  { href: '/admin/announcements', icon: '📢', label: 'Announcements' },
-  { href: '/admin/fixed-quizzes', icon: '📝', label: 'Fixed Quizzes' },
-  { href: '/admin/config', icon: '⚙️', label: 'Config' },
+// The eight tiles name an icon the way a sidebar row does (DS15 pass B),
+// so the two menus into the same page draw the same shapes.
+const QUICK_LINKS: { href: string; icon: IconName; label: string }[] = [
+  { href: '/admin/users', icon: 'users', label: 'Manage Users' },
+  { href: '/admin/subscriptions', icon: 'card', label: 'Subscriptions' },
+  { href: '/admin/payments', icon: 'banknote', label: 'Payments' },
+  { href: '/admin/products', icon: 'package', label: 'Products' },
+  { href: '/admin/courses', icon: 'book', label: 'Courses' },
+  { href: '/admin/announcements', icon: 'megaphone', label: 'Announcements' },
+  { href: '/admin/fixed-quizzes', icon: 'clipboard', label: 'Fixed Quizzes' },
+  { href: '/admin/config', icon: 'settings', label: 'Config' },
 ];
 
 function fmtDay(iso: string | null): string {
@@ -55,7 +59,7 @@ export default async function AdminDashboardPage() {
       <div className="admin-quick-links">
         {QUICK_LINKS.map((q) => (
           <a key={q.href} href={q.href} className="admin-quick-link">
-            <div className="admin-quick-link-icon">{q.icon}</div>
+            <div className="admin-quick-link-icon"><Icon name={q.icon} size={22} /></div>
             <div className="admin-quick-link-label">{q.label}</div>
           </a>
         ))}

@@ -15,6 +15,7 @@ import { Toast } from '@/lib/toast/toast';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { saveCourse, saveProgram, setCourseStatus } from '@/lib/catalogue/actions';
 import { COURSE_STATUSES, type Course, type CourseStatus, type Program } from '@/lib/catalogue/types';
+import { Icon } from '@/components/shell/icons';
 
 type Msg = { text: string; tone: 'error' | 'success' } | null;
 type Tab = 'programmes' | 'courses';
@@ -160,8 +161,8 @@ export function CoursesClient({ courses, programs }: { courses: Course[]; progra
 
       {/* Tabs */}
       <div className="tabs">
-        <button type="button" className={`tab-btn${tab === 'programmes' ? ' active' : ''}`} onClick={() => setTab('programmes')}>🎓 Programmes</button>
-        <button type="button" className={`tab-btn${tab === 'courses' ? ' active' : ''}`} onClick={() => setTab('courses')}>📚 Courses</button>
+        <button type="button" className={`tab-btn${tab === 'programmes' ? ' active' : ''}`} onClick={() => setTab('programmes')}><Icon name="graduation" />Programmes</button>
+        <button type="button" className={`tab-btn${tab === 'courses' ? ' active' : ''}`} onClick={() => setTab('courses')}><Icon name="book" />Courses</button>
       </div>
 
       {/* ══ PROGRAMMES TAB ══ */}
@@ -342,7 +343,7 @@ export function CoursesClient({ courses, programs }: { courses: Course[]; progra
                 </div>
                 <div className="panel-actions">
                   <button type="button" className="btn btn-ghost" onClick={closePanel}>Close</button>
-                  <button type="button" className="btn btn-primary" onClick={() => openEditProgModal(panelProg.program_id)}>✏️ Edit</button>
+                  <button type="button" className="btn btn-primary" onClick={() => openEditProgModal(panelProg.program_id)}><Icon name="pencil" />Edit</button>
                 </div>
               </>
             )}
@@ -371,7 +372,7 @@ export function CoursesClient({ courses, programs }: { courses: Course[]; progra
                 </div>
                 <div className="panel-actions">
                   <button type="button" className="btn btn-ghost" onClick={closePanel}>Close</button>
-                  <button type="button" className="btn btn-primary" onClick={() => openEditCourseModal(panelCourse.course_id)}>✏️ Edit</button>
+                  <button type="button" className="btn btn-primary" onClick={() => openEditCourseModal(panelCourse.course_id)}><Icon name="pencil" />Edit</button>
                   {panelCourse.status !== 'archived' ? (
                     <button type="button" className="btn btn-warning" onClick={() => updateCourseStatus(panelCourse.course_id, 'archived')}>Archive</button>
                   ) : (

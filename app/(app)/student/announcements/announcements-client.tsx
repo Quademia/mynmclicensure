@@ -17,14 +17,16 @@ import { PageHeader } from '@/components/shell/page-header';
 import { AnnouncementBody } from '@/components/announcements/announcement-body';
 import { recordNoticeState } from '@/lib/announcements/actions';
 import type { Announcement, NoticeState, StudentNoticeMap } from '@/lib/announcements/types';
+import { Icon } from '@/components/shell/icons';
+import type { IconName } from '@/lib/nav/types';
 
 type Tab = 'all' | 'unread' | 'read' | 'dismissed';
 
-const EMPTY: Record<Tab, { icon: string; text: string }> = {
-  all: { icon: '📭', text: 'No announcements at the moment.' },
-  unread: { icon: '🎉', text: "You're all caught up — no unread announcements." },
-  read: { icon: '📭', text: 'No read announcements yet.' },
-  dismissed: { icon: '🗑️', text: 'No dismissed announcements.' },
+const EMPTY: Record<Tab, { icon: IconName; text: string }> = {
+  all: { icon: 'inbox', text: 'No announcements at the moment.' },
+  unread: { icon: 'check-circle', text: "You're all caught up — no unread announcements." },
+  read: { icon: 'inbox', text: 'No read announcements yet.' },
+  dismissed: { icon: 'trash', text: 'No dismissed announcements.' },
 };
 
 function fmtDate(iso: string | null): string {
@@ -117,7 +119,7 @@ export function AnnouncementsClient({
         <div className="announce-list">
           {!visible.length ? (
             <div className="empty-state">
-              <div className="empty-icon">{EMPTY[tab].icon}</div>
+              <div className="empty-icon"><Icon name={EMPTY[tab].icon} size={40} /></div>
               <p>{EMPTY[tab].text}</p>
             </div>
           ) : (
@@ -144,7 +146,7 @@ export function AnnouncementsClient({
                   <div className="card-actions">
                     {!isRead ? (
                       <button type="button" className="btn btn-primary" disabled={Boolean(b)} onClick={() => markRead(a.announcement_id)}>
-                        {b === 'saving' ? 'Saving…' : '✅ Mark as Read'}
+                        {b === 'saving' ? 'Saving…' : <><Icon name="check-circle" />Mark as Read</>}
                       </button>
                     ) : null}
                     {a.dismissible ? (

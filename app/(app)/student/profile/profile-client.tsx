@@ -24,6 +24,7 @@ import { Toast } from '@/lib/toast/toast';
 import { NameCircle } from '@/components/shell/name-circle';
 import { saveAcademicDetails, savePersonalDetails } from '@/lib/profile/actions';
 import { PROFILE_IMAGE_MAX_BYTES, PROFILE_LEVELS, type ProfileSubscription, type SchoolOption } from '@/lib/profile/types';
+import { Icon } from '@/components/shell/icons';
 
 type ProfileFields = {
   forename: string | null;
@@ -236,7 +237,7 @@ export function ProfileClient({
         <div className={`panel${personalEditing ? ' editing' : ''}`} ref={personalRef}>
           <div className="panel-head">
             <h2>Personal Details</h2>
-            <span className="edit-btn" title="Edit" onClick={() => setPersonalEditing(true)}>✎</span>
+            <span className="edit-btn" title="Edit" onClick={() => setPersonalEditing(true)}><Icon name="pencil" size={14} /></span>
           </div>
           <div className="panel-body">
             <div className={`avatar-wrap${personalEditing ? ' editing' : ''}`}>
@@ -289,7 +290,7 @@ export function ProfileClient({
         <div className={`panel${academicEditing ? ' editing' : ''}`} ref={academicRef}>
           <div className="panel-head">
             <h2>Academic Details</h2>
-            <span className="edit-btn" title="Edit" onClick={() => setAcademicEditing(true)}>✎</span>
+            <span className="edit-btn" title="Edit" onClick={() => setAcademicEditing(true)}><Icon name="pencil" size={14} /></span>
           </div>
           <div className="panel-body">
             <div className="profile-row">

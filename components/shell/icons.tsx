@@ -387,6 +387,21 @@ function inner(name: IconName) {
           <rect width="7" height="7" x="3" y="14" rx="1" />
         </>
       );
+    case 'upload':
+      return (
+        <>
+          <path d="M12 3v12" />
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <path d="m17 8-5-5-5 5" />
+        </>
+      );
+    case 'x':
+      return (
+        <>
+          <path d="M18 6 6 18" />
+          <path d="m6 6 12 12" />
+        </>
+      );
     case 'play':
       return (
         <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />

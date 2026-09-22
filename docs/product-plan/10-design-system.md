@@ -584,19 +584,56 @@ Built in two passes, because they need different work:
   `👍 Good effort!`, `📖 Needs more practice`, `📚 Keep practising!`).
   Sam, 2026-09-22: that is a student reading their own result, and
   there the emoji is doing emotional work, not decoration.
-- **Pass B — the icon swaps (~75).** Buttons, tiles, section headings
-  and empty states, where the glyph is doing visual work. Needs roughly
-  **24 more shapes in `components/shell/icons.tsx`**, from the same
-  Lucide source and by the same method as DS6's 19. The eight admin
-  dashboard tiles need no new shapes at all — `users`, `card`,
-  `banknote`, `package`, `book`, `megaphone`, `clipboard` and
-  `settings` are already in the `NavIcon` union.
+- **Pass B — the icon swaps.** ✅ 2026-09-22: **65 glyphs in 25 files**,
+  on **27 new shapes** in `components/shell/icons.tsx` (44 in the file
+  now), from the same Lucide source and by the same method as DS6's 19.
+  The eight admin dashboard tiles needed no new shapes at all —
+  `users`, `card`, `banknote`, `package`, `book`, `megaphone`,
+  `clipboard` and `settings` were already there, so the tiles now draw
+  what the sidebar draws.
 
-Two that are not a one-line swap, flagged rather than decided:
-`styles/runner.css` draws the question grid's 🚩 through CSS
-`content:`, which cannot hold a drawn icon, so that one needs markup;
-and `app/page.tsx` has a `⏱ 22:14` **inside the landing page's drawn
-illustration** — a picture of the app, not app chrome — which stays.
+  The union is **`IconName`** now, not `NavIcon`: it is the app's set,
+  not the navigation's. `NavIcon` survives as an alias so `NavItem.icon`
+  still reads well, and the sidebar's file-private `Icon` helper became
+  `RowIcon` so the name `Icon` means one thing.
+  `<Icon name="…" size={16}>` is the component; `<NavIcon>` is it
+  wearing the sidebar's class.
+
+  **CSS was the quiet half.** The shared `.btn` was already
+  `inline-flex` with a gap, so every button using it needed nothing.
+  Twenty-one other rules did: a class holding a glyph was sized with
+  `font-size`, which means nothing to an SVG, so each became a flex box
+  with a colour — the empty states (`.qb`, `.sann`, `.slh`, `.sqz`), the
+  section and card titles, `.tab-btn`, `.btn-action`, `.q-edit-btn`,
+  `.act-btn`, `.tg-tag`, `.edit-btn`, `.btn-message-course`, the
+  announcement editor's toolbar, and the runner's `.hbtn`,
+  `.timer-icon`, `.q-flag-indicator` and `.error-icon`.
+
+**Four things inside pass B that went past a straight swap**, recorded
+because each was a judgement rather than the ruling:
+
+1. **`▶` went where it sat beside a drawn icon.** It was in the keep
+   list as a disclosure triangle, and stays one on *Show raw payload*.
+   But on `▶ Start Quiz`, `▶ Start Practice` and `▶ Resume` it is a
+   play icon doing the job `🎯` does beside it, and one button with a
+   triangle next to one with a drawn icon reads as broken. Those three
+   take a `play` shape; `↩ Retake` took `refresh` for the same reason.
+2. **`✕` became an `x` icon in one place only** — the announcement
+   engagement counters, where it is the third of three and the other
+   two are icons. Everywhere else `✕` is still `✕`.
+3. **"Review Answers" in practice mode gained an icon** it never had,
+   matching its exam-mode twin; the same for `Edit ✏️` in the question
+   bank, whose glyph moved from after the word to before it, like every
+   other Edit button in the app.
+4. **The question grid's flag is a 7px amber dot, not a flag.**
+   `styles/runner.css` drew it with CSS `content: '🚩'` at 10px, which
+   cannot hold a drawn icon and was barely legible. The dot has a white
+   ring so it reads on every cell state.
+
+**What stays, and why** — five glyphs, all deliberate: the four score
+emoji above, and `app/page.tsx`'s `⏱ 22:14`, which sits **inside the
+landing page's drawn illustration** — a picture of the app, not app
+chrome.
 
 ### DS16 — The synthesised weights (added 2026-09-22)
 
@@ -660,7 +697,7 @@ declarations in `landing.css` stay as they are.
 | DS12 A scale palette | ⬜ later |
 | DS13 One badge class name | ⬜ later |
 | DS14 The price weight | ✅ 2026-09-22 |
-| DS15 The page emoji | ⬜ ruled 2026-09-22; pass A then pass B |
+| DS15 The page emoji | ✅ 2026-09-22 — 52 deleted, 65 to icons, 5 kept |
 | DS16 The synthesised weights | ✅ 2026-09-22 — 40 to 700; landing's 12 kept at 800 |
 | The audience label loses "Panel" | ✅ 2026-09-22 (ruling 12) |
 | Dark mode · content max-width · the avatar's size | ⬜ later |

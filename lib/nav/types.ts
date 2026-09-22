@@ -62,7 +62,9 @@ export type IconName =
   | 'check-circle'
   | 'grid'
   | 'pointer'
-  | 'play';
+  | 'play'
+  | 'upload'
+  | 'x';
 
 /** The nav row's icon. Every icon name is allowed; see IconName. */
 export type NavIcon = IconName;

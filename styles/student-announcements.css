@@ -44,5 +44,5 @@
 .sann .btn { padding: 7px 14px; }
 
 .sann .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 14px; }
-.sann .empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; }
+.sann .empty-state .empty-icon { display: flex; justify-content: center; color: var(--text-muted); margin-bottom: 12px; }
 .sann .empty-state p { margin: 0; }

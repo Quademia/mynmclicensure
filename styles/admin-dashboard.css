@@ -21,7 +21,7 @@
 .adash .admin-quick-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 32px; }
 .adash .admin-quick-link { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; text-align: center; cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; text-decoration: none; color: var(--text); display: block; }
 .adash .admin-quick-link:hover { box-shadow: var(--shadow-md); border-color: var(--primary); text-decoration: none; color: var(--primary); }
-.adash .admin-quick-link-icon { font-size: 24px; margin-bottom: 8px; }
+.adash .admin-quick-link-icon { display: flex; justify-content: center; color: var(--primary); margin-bottom: 8px; }
 .adash .admin-quick-link-label { font-size: 13px; font-weight: 500; }
 
 .adash .table-scroll { overflow-x: auto; }

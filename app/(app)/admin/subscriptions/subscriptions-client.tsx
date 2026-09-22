@@ -27,6 +27,8 @@ import { loadAccessRows, revokeSubscription, syncExpiredSubscriptions, updateSub
 import { SUB_STATUSES, type AccessRow, type SubscriptionListRow } from '@/lib/subscriptions/types';
 import type { Product, Program } from '@/lib/catalogue/types';
 import { GrantDialog, type GrantPreset } from '@/components/admin/grant-dialog';
+import { Icon } from '@/components/shell/icons';
+import type { IconName } from '@/lib/nav/types';
 
 type Msg = { text: string; tone: 'error' | 'success' } | null;
 
@@ -250,24 +252,31 @@ export function SubscriptionsClient({
   }
 
   // ── Sync Status ──
-  const [syncLabel, setSyncLabel] = useState('🔄 Sync Status');
+  // The button's face is an icon and a word, so it is one piece of state
+  // rather than a string with a glyph in it (DS15 pass B). A null icon is
+  // the mid-flight "Syncing…", which has nothing to draw.
+  const SYNC_IDLE: { icon: IconName | null; text: string } = { icon: 'refresh', text: 'Sync Status' };
+  const [sync, setSync] = useState(SYNC_IDLE);
   const [syncing, setSyncing] = useState(false);
 
   async function syncStatus() {
     setSyncing(true);
-    setSyncLabel('Syncing…');
+    setSync({ icon: null, text: 'Syncing…' });
     const result = await syncExpiredSubscriptions();
     if (!result.ok) {
       err('Sync failed: ' + result.error);
       setSyncing(false);
-      setSyncLabel('🔄 Sync Status');
+      setSync(SYNC_IDLE);
       return;
     }
-    setSyncLabel(result.updatedCount > 0 ? `✅ ${result.updatedCount} updated` : '✅ Up to date');
+    setSync({
+      icon: 'check-circle',
+      text: result.updatedCount > 0 ? `${result.updatedCount} updated` : 'Up to date',
+    });
     router.refresh();
     window.setTimeout(() => {
       setSyncing(false);
-      setSyncLabel('🔄 Sync Status');
+      setSync(SYNC_IDLE);
     }, 1800);
   }
 
@@ -355,7 +364,7 @@ export function SubscriptionsClient({
         </button>
         <div className="filter-actions">
           <button type="button" className="btn btn-ghost" onClick={clearFilters}>Clear</button>
-          <button type="button" className="btn btn-ghost" disabled={syncing} onClick={syncStatus}>{syncLabel}</button>
+          <button type="button" className="btn btn-ghost" disabled={syncing} onClick={syncStatus}>{sync.icon ? <Icon name={sync.icon} /> : null}{sync.text}</button>
           <button type="button" className="btn btn-primary" onClick={openGrantModal}>+ Grant Subscription</button>
         </div>
       </div>
@@ -484,7 +493,7 @@ export function SubscriptionsClient({
                 </div>
                 <div className="panel-actions">
                   <button type="button" className="btn btn-ghost" onClick={closePanel}>Close</button>
-                  <button type="button" className="btn btn-primary" onClick={() => openEditModal(panelSub.subscription_id)}>✏️ Edit</button>
+                  <button type="button" className="btn btn-primary" onClick={() => openEditModal(panelSub.subscription_id)}><Icon name="pencil" />Edit</button>
                   <button type="button" className="btn btn-success" onClick={() => openGrantForUser(panelSub.user_id, panelName, panelSub.users?.email || '')}>+ Grant Subscription</button>
                   {panelSub.status === 'ACTIVE' ? (
                     <button type="button" className="btn btn-danger" onClick={() => setRevokeTarget({ id: panelSub.subscription_id, name: panelName })}>Cancel Subscription</button>

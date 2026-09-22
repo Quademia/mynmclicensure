@@ -39,6 +39,7 @@ import { AnnouncementsStrip } from '@/components/announcements/announcements-str
 import { PageHeader } from '@/components/shell/page-header';
 import { ProfileNudge } from './profile-nudge';
 import '@/styles/student-dashboard.css';
+import { Icon } from '@/components/shell/icons';
 
 export const dynamic = 'force-dynamic';
 
@@ -192,7 +193,7 @@ export default async function StudentDashboardPage() {
         {/* 3. Stay-connected channels */}
         <div className="channels-card">
           <div className="channels-card-text">
-            <span className="channels-card-title">📣 Stay connected</span>
+            <span className="channels-card-title"><Icon name="megaphone" />Stay connected</span>
             <span className="channels-card-sub">
               Join our channels for updates, tips &amp; announcements — don&apos;t miss anything.
             </span>

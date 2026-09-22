@@ -42,7 +42,7 @@
 .usr .status-dot.inactive, .usr-overlay .status-dot.inactive { background: var(--danger); }
 
 /* ── Buttons (page and drawer) ── */
-.usr .btn-action, .usr-overlay .btn-action { width: 100%; padding: 10px 16px; border-radius: var(--radius); font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; border: 1px solid var(--border); background: var(--white); color: var(--text); text-align: left; transition: background 0.15s; }
+.usr .btn-action, .usr-overlay .btn-action { display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 16px; border-radius: var(--radius); font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; border: 1px solid var(--border); background: var(--white); color: var(--text); text-align: left; transition: background 0.15s; }
 .usr .btn-action:hover, .usr-overlay .btn-action:hover { background: var(--bg); }
 .usr .btn-action:disabled, .usr-overlay .btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
 .usr .btn-action.load-more { margin-top: 16px; text-align: center; }

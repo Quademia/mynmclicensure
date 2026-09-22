@@ -94,7 +94,7 @@
 /* ── Empty states ── */
 .sqz .loading-line { color: var(--text-muted); font-size: 14px; padding: 20px 0; }
 .sqz .empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 14px; }
-.sqz .empty-state .empty-icon { font-size: 36px; margin-bottom: 12px; }
+.sqz .empty-state .empty-icon { display: flex; justify-content: center; color: var(--text-muted); margin-bottom: 12px; }
 .sqz .no-quizzes { text-align: center; padding: 28px 20px; color: var(--text-muted); font-size: 13px; border: 2px dashed var(--border); border-radius: var(--radius); }
 
 /* ── Phone ── */

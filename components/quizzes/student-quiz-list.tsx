@@ -32,6 +32,8 @@ import { abandonAttempt, retakeAttempt, spawnQuizAttempt } from '@/lib/attempts/
 import type { AttemptWithProgress, AttemptMode } from '@/lib/attempts/types';
 import { getQuizAvailability } from '@/lib/quizzes/availability';
 import type { AllowedModes, Availability, QuizCard, QuizKind } from '@/lib/quizzes/types';
+import { Icon } from '@/components/shell/icons';
+import type { IconName } from '@/lib/nav/types';
 
 type CourseLite = { course_id: string; title: string };
 
@@ -55,17 +57,17 @@ type LaunchAction = 'start' | 'resume' | 'retake';
 
 const WORDS: Record<
   QuizKind,
-  { path: string; emptyIcon: string; countNoun: (n: number) => string; noneForCourse: string }
+  { path: string; emptyIcon: IconName; countNoun: (n: number) => string; noneForCourse: string }
 > = {
   fixed: {
     path: '/student/fixed-quizzes',
-    emptyIcon: '📝',
+    emptyIcon: 'clipboard',
     countNoun: (n) => `${n} quiz${n !== 1 ? 'zes' : ''}`,
     noneForCourse: 'No quizzes available for this course yet.',
   },
   mock: {
     path: '/student/mock-exams',
-    emptyIcon: '🎯',
+    emptyIcon: 'target',
     countNoun: (n) => `${n} exam${n !== 1 ? 's' : ''}`,
     noneForCourse: 'No mock exams available for this course.',
   },
@@ -260,7 +262,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
       actions = (
         <div className="mode-actions">
           <button type="button" className={`btn-start ${mode === 'instant' ? 'practice' : 'exam'}`} disabled={isBusy} onClick={() => launchQuiz(quiz, mode, 'retake')}>
-            🔁 Retake
+            <Icon name="refresh" />Retake
           </button>
           <button type="button" className="btn-link" onClick={() => reviewAttempt(completed[0].attempt_id, mode)}>Review last</button>
         </div>
@@ -269,7 +271,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
       actions = (
         <div className="mode-actions">
           <button type="button" className={`btn-start ${mode === 'instant' ? 'practice' : 'exam'}`} disabled={isBusy} onClick={() => launchQuiz(quiz, mode, 'start')}>
-            {mode === 'instant' ? '▶ Start Practice' : '🎯 Start Exam'}
+            <Icon name={mode === 'instant' ? 'play' : 'target'} />{mode === 'instant' ? 'Start Practice' : 'Start Exam'}
           </button>
         </div>
       );
@@ -339,7 +341,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
     if (!courses.length) {
       return (
         <div className="empty-state">
-          <div className="empty-icon">{W.emptyIcon}</div>
+          <div className="empty-icon"><Icon name={W.emptyIcon} size={36} /></div>
           <p>You are not enrolled in any courses yet.</p>
         </div>
       );
@@ -348,7 +350,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
     if (kind === 'mock' && !courses.some((c) => (quizzesByCourse[c.course_id] || []).length > 0)) {
       return (
         <div className="empty-state">
-          <div className="empty-icon">{W.emptyIcon}</div>
+          <div className="empty-icon"><Icon name={W.emptyIcon} size={36} /></div>
           <p>No mock exams available right now. Mock exams are published during exam periods — check back closer to your exam date.</p>
         </div>
       );

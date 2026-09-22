@@ -27,6 +27,7 @@ import { GrantDialog } from '@/components/admin/grant-dialog';
 import { getUserDetailAction, listUsersAction, sendPasswordResetAction, setUserActive } from '@/lib/users/actions';
 import { EMPTY_USER_FILTERS, USER_ROLE_OPTIONS, type UserDetail, type UserFilters, type UserListRow, type UsersPage } from '@/lib/users/types';
 import type { Product, Program } from '@/lib/catalogue/types';
+import { Icon } from '@/components/shell/icons';
 
 type Msg = { text: string; tone: 'error' | 'success' } | null;
 
@@ -363,12 +364,12 @@ export function UsersClient({
                   <div className="panel-section">
                     <div className="panel-section-title">Actions</div>
                     <div className="panel-actions">
-                      <button type="button" className="btn-action" disabled={busy} onClick={openGrant}>🎟️ Assign Subscription</button>
+                      <button type="button" className="btn-action" disabled={busy} onClick={openGrant}><Icon name="ticket" />Assign Subscription</button>
 
-                      <button type="button" className="btn-action" disabled={busy} onClick={handlePasswordReset}>🔑 Send Password Reset Email</button>
+                      <button type="button" className="btn-action" disabled={busy} onClick={handlePasswordReset}><Icon name="key" />Send Password Reset Email</button>
 
                       <button type="button" className={`btn-action ${detail.active ? 'danger' : 'success'}`} disabled={busy} onClick={handleToggleActive}>
-                        {detail.active ? '🚫 Deactivate Account' : '✅ Reactivate Account'}
+                        <Icon name={detail.active ? 'ban' : 'check-circle'} />{detail.active ? 'Deactivate Account' : 'Reactivate Account'}
                       </button>
                     </div>
                   </div>
