@@ -12,6 +12,7 @@ import { useConfirm } from '@/lib/overlays/shared/confirm-dialog';
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Toast } from '@/lib/toast/toast';
+import { Icon } from '@/components/shell/icons';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { addConfigKey, deleteConfigRow, saveConfigRow } from '@/lib/catalogue/actions';
 import type { ConfigRow } from '@/lib/catalogue/types';
@@ -101,8 +102,8 @@ function ConfigCard({ row, notify, onDeleted }: { row: ConfigRow; notify: (m: Ms
       </div>
 
       <div className="config-card-actions">
-        <button type="button" className="btn btn-primary btn-sm" disabled={busy} onClick={saveRow}>💾 Save</button>
-        <button type="button" className="btn btn-danger btn-sm" disabled={busy} onClick={deleteRow}>🗑 Delete</button>
+        <button type="button" className="btn btn-primary btn-sm" disabled={busy} onClick={saveRow}><Icon name="save" />Save</button>
+        <button type="button" className="btn btn-danger btn-sm" disabled={busy} onClick={deleteRow}><Icon name="trash" />Delete</button>
         <span className={`config-save-status${saved ? ' show' : ''}`}>✓ Saved</span>
       </div>
     </div>
@@ -152,7 +153,7 @@ export function ConfigClient({ rows }: { rows: ConfigRow[] }) {
       <Toast message={msg?.text ?? null} tone={msg?.tone} onDismiss={dismiss} />
 
       <div className="config-intro">
-        <div className="config-intro-icon">⚠️</div>
+        <div className="config-intro-icon"><Icon name="alert" size={20} /></div>
         <div className="config-intro-text">
           <strong>Handle with care.</strong> Every key in this table is referenced by the platform&apos;s code.
           Editing a value takes effect immediately. Deleting or renaming a key will cause any code that

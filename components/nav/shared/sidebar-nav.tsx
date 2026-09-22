@@ -24,7 +24,7 @@ import { NavIcon } from '@/components/shell/icons';
 export type SidebarCourse = { course_id: string; title: string };
 
 /** The row's icon (DS6), or nothing for a child row. */
-function Icon({ item }: { item: NavItem }) {
+function RowIcon({ item }: { item: NavItem }) {
   return item.icon ? <NavIcon name={item.icon} /> : null;
 }
 
@@ -80,7 +80,7 @@ export function SidebarNav({
           className={className}
           onClick={onNavigate}
         >
-          <Icon item={item} />
+          <RowIcon item={item} />
           {item.label}
         </a>
       );
@@ -92,7 +92,7 @@ export function SidebarNav({
         className={[className, isActive(item.href) ? 'active' : ''].filter(Boolean).join(' ') || undefined}
         onClick={onNavigate}
       >
-        <Icon item={item} />
+        <RowIcon item={item} />
         {item.label} {badge}
       </Link>
     );
@@ -141,7 +141,7 @@ export function SidebarNav({
             }
           }}
         >
-          <Icon item={item} />
+          <RowIcon item={item} />
           <span className="sidebar-dropdown-label">{item.label}</span>
           <span className="sidebar-dropdown-arrow">▾</span>
         </div>

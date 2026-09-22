@@ -52,6 +52,7 @@ import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { Toast } from '@/lib/toast/toast';
 import { checkAnswer, expireAttempt, finishAttempt, saveAnswers, startTimedAttempt } from '@/lib/attempts/actions';
 import { RunnerError } from './runner-error';
+import { Icon } from '@/components/shell/icons';
 import {
   chosenToStored,
   countAnswered,
@@ -81,8 +82,8 @@ const WORDS = {
   instant: {
     title: 'Practice Quiz',
     modeWord: 'Practice',
-    start: '▶ Start Quiz',
-    resume: '▶ Resume Attempt',
+    start: 'Start Quiz',
+    resume: 'Resume Attempt',
     preflightText: 'Practice mode gives you immediate feedback after each answer. You can flag questions, navigate freely and review your answers at the end.',
     reviewBanner: 'Review Mode — Answers are read-only. You are reviewing a completed attempt.',
     submit: 'Submit Quiz',
@@ -96,8 +97,8 @@ const WORDS = {
   timed: {
     title: 'Exam Quiz',
     modeWord: 'Exam',
-    start: '🎯 Start Exam',
-    resume: '🎯 Resume Exam',
+    start: 'Start Exam',
+    resume: 'Resume Exam',
     preflightText: '',
     reviewBanner: 'Review Mode — Answers are read-only. You are reviewing a completed exam attempt.',
     submit: 'Submit Exam',
@@ -679,7 +680,7 @@ export function QuizRunner({
           <span className="q-num">Q{globalIdx + 1} / {items.length}</span>
           <span className="q-type-chip">{item.question_type}</span>
           {item.maintopic ? <span className="q-topic">{item.maintopic}{item.subtopic ? ` › ${item.subtopic}` : ''}</span> : null}
-          {flags[item.item_id] ? <span className="q-flag-indicator">🚩</span> : null}
+          {flags[item.item_id] ? <span className="q-flag-indicator"><Icon name="flag" /></span> : null}
         </div>
         <div className="q-stem">{item.stem}</div>
         {isSATA ? <div className="sata-hint">Select ALL that apply</div> : null}
@@ -757,7 +758,7 @@ export function QuizRunner({
         <div className="q-footer">
           <div className="q-footer-left">
             <button type="button" className={`btn btn-flag${flags[item.item_id] ? ' flagged' : ''}`} disabled={disabled} onClick={() => toggleFlag(item)}>
-              {flags[item.item_id] ? '🚩 Unflag' : '⚑ Flag'}
+              <Icon name="flag" />{flags[item.item_id] ? 'Unflag' : 'Flag'}
             </button>
             <button type="button" className="btn-sm-link" onClick={() => sendFeedback(item, globalIdx, opts, chosenRaw)}>
               Send feedback
@@ -846,7 +847,7 @@ export function QuizRunner({
           <div className="header-brand">Quademia</div>
           <div className="header-title">{label}</div>
           <div className="header-actions">
-            <button type="button" className="hbtn hbtn-ghost" onClick={openGrid}>📋 Question Grid</button>
+            <button type="button" className="hbtn hbtn-ghost" onClick={openGrid}><Icon name="grid" />Question Grid</button>
             <button type="button" className="hbtn hbtn-danger" onClick={handleExit}>Exit</button>
           </div>
         </div>
@@ -857,7 +858,7 @@ export function QuizRunner({
         {mode === 'timed' && !locked && !reviewMode ? (
           <div className="timer-bar">
             <div className="timer-display" role="timer" aria-label={`${timerText} remaining`}>
-              <span className="timer-icon">⏱</span>
+              <span className="timer-icon"><Icon name="timer" /></span>
               <span className={`timer-value ${timerColor}`}>{timerText}</span>
               <span className="timer-label">remaining</span>
             </div>
@@ -896,7 +897,10 @@ export function QuizRunner({
                 <div className="preflight-warning"><strong>Exam mode:</strong> The timer starts when you click Start. No feedback is shown during the exam — you will see your results and explanations after submission. You cannot pause the timer.</div>
               ) : <p className="preflight-text">{W.preflightText}</p>}
               <div className="preflight-actions">
-                <button type="button" className="btn btn-primary btn-lg" onClick={onPreflightStart}>{(mode === 'timed' ? attempt.started_utc !== null : hasProgress()) ? W.resume : W.start}</button>
+                <button type="button" className="btn btn-primary btn-lg" onClick={onPreflightStart}>
+                  <Icon name={mode === 'timed' ? 'target' : 'play'} />
+                  {(mode === 'timed' ? attempt.started_utc !== null : hasProgress()) ? W.resume : W.start}
+                </button>
                 <button type="button" className="btn btn-ghost" onClick={() => window.history.back()}>Cancel</button>
                 <label className="preflight-skip">
                   <input type="checkbox" checked={skipNextTime} onChange={(e) => setSkipNextTime(e.target.checked)} /> Don&apos;t show this again
@@ -909,7 +913,7 @@ export function QuizRunner({
           {timeUp ? <div className="timeup-banner">Time is up! Your exam has been automatically submitted.</div> : null}
 
           {phase === 'quiz' && desktopGridHidden ? (
-            <button type="button" className="show-grid-btn" onClick={() => setDesktopGridHidden(false)}>📋 Show Grid</button>
+            <button type="button" className="show-grid-btn" onClick={() => setDesktopGridHidden(false)}><Icon name="grid" />Show Grid</button>
           ) : null}
 
           {/* Score card */}
@@ -921,7 +925,8 @@ export function QuizRunner({
               <div className="score-label">{grade.label}</div>
               <div className="score-actions">
                 <button type="button" className={`btn ${mode === 'timed' ? 'btn-primary' : 'btn-ghost'}`} onClick={reviewAnswers}>
-                  {mode === 'timed' ? '📖 Review Answers & Feedback' : 'Review Answers'}
+                  <Icon name="book-open" />
+                  {mode === 'timed' ? 'Review Answers & Feedback' : 'Review Answers'}
                 </button>
                 <button type="button" className={`btn ${mode === 'timed' ? 'btn-ghost' : 'btn-primary'}`} onClick={() => router.push(QUIZZES_PAGE)}>Back to Quizzes</button>
               </div>
@@ -970,7 +975,7 @@ export function QuizRunner({
 
       {/* Floating grid button (phone) */}
       {phase === 'quiz' ? (
-        <button type="button" className="fab-grid" onClick={openGrid}>📋 Question Grid</button>
+        <button type="button" className="fab-grid" onClick={openGrid}><Icon name="grid" />Question Grid</button>
       ) : null}
 
       <BodyPortal>
@@ -995,7 +1000,7 @@ export function QuizRunner({
           <Dialog open={exitOpen} onClose={() => setExitOpen(false)} title={W.exitTitle}>
             <p className="dlg-text">{W.exitText}</p>
             <div className="dlg-actions stack">
-              <button type="button" className="btn btn-ghost" onClick={saveAndExit}>💾 Save &amp; Resume Later</button>
+              <button type="button" className="btn btn-ghost" onClick={saveAndExit}><Icon name="save" />Save &amp; Resume Later</button>
               <button type="button" className="btn btn-danger" onClick={submitAndExit}>✓ Submit &amp; Exit</button>
               <button type="button" className="btn btn-ghost" onClick={() => setExitOpen(false)}>Cancel</button>
             </div>

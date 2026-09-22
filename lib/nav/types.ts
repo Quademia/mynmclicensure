@@ -6,10 +6,18 @@
 // one file.
 
 /**
- * The icon set's names (10-design-system.md DS6). Each has a drawing in
- * components/shell/icons.tsx; a name not listed here fails the build.
+ * The icon set's names (10-design-system.md DS6, widened by DS15 pass B).
+ * Each has a drawing in components/shell/icons.tsx; a name not listed
+ * here fails the build.
+ *
+ * The first nineteen arrived with the sidebar, which is why the type
+ * lives in `lib/nav/`. DS15 pass B added the rest for buttons, section
+ * headings and empty states, so the name is `IconName` now and the set
+ * is the app's, not the navigation's. `NavIcon` stays as an alias
+ * because `NavItem.icon` reads better with it.
  */
-export type NavIcon =
+export type IconName =
+  // the nineteen from DS6, drawn for the two sidebars
   | 'home'
   | 'book'
   | 'clipboard'
@@ -28,7 +36,36 @@ export type NavIcon =
   | 'banknote'
   | 'package'
   | 'folder'
-  | 'settings';
+  | 'settings'
+  // DS15 pass B: buttons, section headings, empty states
+  | 'save'
+  | 'trash'
+  | 'pencil'
+  | 'refresh'
+  | 'flag'
+  | 'alert'
+  | 'inbox'
+  | 'timer'
+  | 'book-open'
+  | 'link'
+  | 'square'
+  | 'graduation'
+  | 'user'
+  | 'zap'
+  | 'hourglass'
+  | 'search'
+  | 'ticket'
+  | 'key'
+  | 'ban'
+  | 'lock'
+  | 'eye'
+  | 'check-circle'
+  | 'grid'
+  | 'pointer'
+  | 'play';
+
+/** The nav row's icon. Every icon name is allowed; see IconName. */
+export type NavIcon = IconName;
 
 export type NavItem = {
   /** Stable key — used for dropdown state, badges and the active test. */
