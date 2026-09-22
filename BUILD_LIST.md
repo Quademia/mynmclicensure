@@ -268,6 +268,12 @@ storage.
 - ⬜ DS6 The icon set — 16px outline; the nav's emoji leave the labels, NavItem gains an icon field (data, not CSS)
 - ⬜ DS7 One name circle — one component for the four treatments; how a message shows student vs Quademia is unruled
 - ⬜ DS8 One badge — status 6px not a pill (Sam), labels stay 4px; 173 colours in 28 files; neutral + info added
+- ⬜ DS9 The eight surfaces the shared button cannot reach — standalone .btn-start / .btn-send; markup, not CSS
+- ⬜ DS10 The button size scale — eight sizes survive DS3; small / medium / large, 44px for a student action
+- ⬜ DS11 A categorical palette — colour that means a kind, not a state: MCQ / TF / SATA, mock / fixed, the modes
+- ⬜ DS12 A scale palette — easy / moderate / hard borrows the signal ramp; no gradient vocabulary yet — later
+- ⬜ DS13 One badge class name — .badge / .chip / .pill / .status-chip are one thing under four; markup — later
+- ⬜ DS14 The price weight — Inter loads 400-700 and the price style is 800, so it falls back; add it or drop to 700
 - ⬜ Dark mode — not one prefers-color-scheme rule in the app and one theme in the token file; after the above
 - ⬜ A content max-width above 1440px, where A3's closed sidebar leaves cards and tables past a comfortable measure
 

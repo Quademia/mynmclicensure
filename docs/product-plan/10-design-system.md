@@ -391,6 +391,56 @@ One component replacing the four treatments, sized by prop. Needs Sam's
 answer on how a message shows student versus Quademia once the circle
 stops carrying it in its colour.
 
+### DS9 — The surfaces the shared button cannot reach (added 2026-09-22)
+
+About eight surfaces do not use the `.btn` convention at all. Admin
+Users and Messages, and the student quizzes, messages, learning
+history, offline packs and both builders use **standalone** classes —
+`.btn-action`, `.btn-send`, `.btn-start`, `.btn-resume`, `.btn-lite`,
+`.btn-back`, `.btn-ghost-sm`, `.btn-new-msg` — rather than `.btn` plus
+a variant. No CSS can fold those in: the markup has to change. Found
+by the DS3 sweep, which is where the sweep stopped.
+
+### DS10 — The button size scale (added 2026-09-22)
+
+Eight distinct button sizes survive DS3, because that slice shared the
+*skin* and left the size to each surface. A real scale is small /
+medium / large, with the design system's own rule that a student action
+is **44px** for touch while admin surfaces may be dense. Needs Sam, and
+is better drawn than argued.
+
+### DS11 — A categorical palette (added 2026-09-22)
+
+The token set has three signal colours and no vocabulary for a colour
+that means a **kind** rather than a **state**: MCQ / TF / SATA, mock /
+fixed / builder, BOTH / INSTANT_ONLY / TIMED_ONLY, instant / timed. The
+DS8 sweep left every one of them on its own hue rather than forcing it
+onto success / danger / warning, because a green `TF` would read as
+"passed" and a red `TIMED_ONLY` as a failure. Owed back to the design
+system.
+
+### DS12 — A scale palette (added 2026-09-22)
+
+`easy / moderate / hard` borrows the green-amber-red signal ramp to
+mean a **gradient**. It reads well and it is the one place the signal
+hues are used for something that is not a signal. The design system has
+no gradient vocabulary; until it does, this stays as it is.
+
+### DS13 — One badge class name (added 2026-09-22)
+
+`.badge`, `.chip`, `.pill` and `.status-chip` are one component under
+four names. DS8's shared rules cover all four precisely so no markup
+had to change; collapsing them to one name is the tidy that follows,
+and it is markup.
+
+### DS14 — The price weight (added 2026-09-22)
+
+The design system's `price` style is weight **800**; `app/layout.tsx`
+loads Inter at 400–700, so it falls back today. Either 800 joins that
+list — more font bytes for students on paid data, against the doc's own
+first principle — or the style drops to 700. Sam's call, and the
+smallest open question here.
+
 ### Later, under this doc
 
 - **Dark mode.** The product has not one `prefers-color-scheme` rule and
@@ -418,4 +468,10 @@ stops carrying it in its colour.
 | DS6 The icon set | ⬜ |
 | DS7 One name circle | ⬜ |
 | DS8 One badge | ⬜ |
+| DS9 The surfaces the shared button cannot reach | ⬜ |
+| DS10 The button size scale | ⬜ |
+| DS11 A categorical palette | ⬜ |
+| DS12 A scale palette | ⬜ later |
+| DS13 One badge class name | ⬜ later |
+| DS14 The price weight | ⬜ |
 | Dark mode · content max-width · the avatar's size | ⬜ later |
