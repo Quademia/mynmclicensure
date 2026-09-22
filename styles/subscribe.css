@@ -1,83 +1,221 @@
 /* styles/subscribe.css
  *
- * The public subscribe page — legacy/mynmclicensure/subscribe.html's
- * inline <style>, scoped under `.subp` so its own tokens never leak.
- * Gone: `.banner` (the shared toast) and `.paused-panel` (the switch
- * was lifted, Sam, 2026-09-11).
+ * The shop, rebuilt 2026-09-22 (Sam) on the design system. The file it
+ * replaces was the legacy page's inline <style> — a two-column form
+ * layout with its own token aliases, its own field and button rules and
+ * its own price box, none of which survive the form's removal.
  *
- * 2026-09-22, DS2 (Sam's B1 ruling): the marketing look is retired.
- * The `#0b7a75` teal, the page and hero gradients, the 18–24px radii,
- * the big soft shadow and the slate greys are gone; the page's own
- * names now point at the app's tokens. The names are kept because they
- * are scoped to this page; they go when DS3 reaches this surface.
- * Structure, spacing and copy are untouched.
+ * ⚠ NO LOCAL TOKEN BLOCK and NO RESTATED COMPONENT. The old file
+ * aliased the app's tokens behind private names (--brand, --card,
+ * --line, --ink …) and re-declared the button and the price box; DS2
+ * kept the aliases alive only until DS3 reached this surface, which is
+ * now. Every rule below names the app's token directly, the buttons are
+ * `.btn .btn-accent .btn-lg` and the duration is `.badge .badge-neutral`
+ * from components.css. So this surface leaves the DS9 list rather than
+ * joining it. The only button rule here is a layout one — full width
+ * inside a card — which ruling 9 allows a converted surface to keep.
+ *
+ * ⚠ EVERY TYPE SIZE IS A SCALE TOKEN. Checked before writing, not
+ * after: the price uses --type-price-* (DS1, its weight set by DS14),
+ * the headline --type-page-title-*, the band headings
+ * --type-section-title-*. On /premium-prep earlier today I invented a
+ * price size and had to correct it — the same mistake DS14 exists to
+ * stop.
+ *
+ * ⚠ THE CARD IS DUPLICATED. /premium-prep carries near-identical card
+ * rules under .prep-*. Two copies is the shape D23 punishes, and a
+ * shared product card belongs in components.css beside .btn and .badge.
+ * Not done here because it would convert a surface Sam has not asked
+ * about in a slice he asked to keep to this page; flagged instead.
  */
 
+.subp-page { display: flex; flex-direction: column; min-height: 100vh; }
+
 .subp {
-  --brand: var(--brand-teal);
-  --brand-dark: var(--brand-teal-hover);
-  --muted: var(--ink-muted);
-  --card: var(--surface);
-  --line: var(--border);
-  --soft: var(--surface-page);
-  --danger: var(--status-danger);
-  --danger-bg: var(--badge-danger-bg);
-  --ok: var(--badge-success-ink);
-  --ok-bg: var(--badge-success-bg);
-  --shadow: var(--shadow-sm);
-
-  min-height: 100vh;
-  font-family: var(--font-inter), Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: var(--ink);
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: var(--space-32) var(--space-16) var(--space-32);
   background: var(--surface-page);
+  color: var(--ink);
 }
-.subp * { box-sizing: border-box; }
 
-.subp .wrap { max-width: 980px; margin: 0 auto; padding: 28px 16px 32px; }
+/* ── The hero ───────────────────────────────────────────────────── */
 
-.subp .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
-
-.subp .hero {
-  padding: 24px 22px 18px;
-  background: var(--brand-teal-pale);
-  border-bottom: 1px solid var(--line);
+.subp-hero { max-width: 660px; margin-bottom: var(--space-24); }
+.subp-hero h1 {
+  font-size: var(--type-page-title-size);
+  line-height: var(--type-page-title-line);
+  font-weight: var(--type-page-title-weight);
+  letter-spacing: var(--type-page-title-track);
+  color: var(--brand-navy);
+  margin: 0 0 var(--space-12);
 }
-.subp .eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: var(--radius-pill); background: var(--badge-success-bg); color: var(--badge-success-ink); border: 1px solid var(--badge-success-border); font-size: .78rem; font-weight: 700; letter-spacing: .02em; }
-.subp h1 { margin: 14px 0 8px; font-size: clamp(1.6rem, 2.2vw, 2.2rem); line-height: 1.1; }
-.subp .sub { margin: 0; max-width: 760px; color: var(--muted); font-size: .98rem; line-height: 1.6; }
+.subp-lede {
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line);
+  color: var(--ink);
+  margin: 0;
+}
 
-.subp .grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 18px; padding: 20px; }
-@media (max-width: 860px) { .subp .grid { grid-template-columns: 1fr; } }
+/* ── The programme chooser ──────────────────────────────────────────
+   Links, not buttons: each is a real URL, so the choice survives a
+   reload, can be shared, and works with no JavaScript. `.is-on` is the
+   current one — carried by aria-current too, so it is not colour alone
+   that says which is chosen. */
 
-.subp .panel { border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); padding: 18px; }
-.subp .panel h2 { margin: 0 0 6px; font-size: 1.02rem; }
-.subp .panel p { margin: 0; color: var(--muted); line-height: 1.55; font-size: .92rem; }
+.subp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  margin-bottom: var(--space-24);
+}
+.subp-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: var(--space-6) var(--space-16);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--type-ui-size);
+  line-height: var(--type-ui-line);
+  font-weight: var(--type-ui-weight);
+  text-decoration: none;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.subp-chip:hover { background: var(--brand-teal-pale); border-color: var(--brand-teal); }
+/* One label shows at a time — see the note in page.tsx. */
+.subp-chip-short { display: none; }
+.subp-chip.is-on {
+  background: var(--brand-navy);
+  border-color: var(--brand-navy);
+  color: var(--surface);
+}
 
-.subp .signed-in { margin: 16px 20px 0; padding: 13px 14px; border-radius: var(--radius); background: #eff6ff; border: 1px solid rgba(37, 99, 235, .12); color: #1d4ed8; line-height: 1.45; font-size: .92rem; }
-.subp .signed-in a { font-weight: 700; color: inherit; }
+/* ── The band headings ──────────────────────────────────────────── */
 
-.subp .field { margin-top: 14px; }
-.subp .label { display: block; margin-bottom: 6px; font-size: .84rem; font-weight: 700; color: var(--ink-muted); }
-.subp .input, .subp .select { width: 100%; padding: 12px 13px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--card); font-size: .96rem; outline: none; font-family: inherit; color: inherit; }
-.subp .input:focus, .subp .select:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(45, 125, 114, .18); }
-.subp .hint { margin-top: 6px; color: var(--muted); font-size: .82rem; line-height: 1.4; }
+.subp-band {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-10);
+  flex-wrap: wrap;
+  font-size: var(--type-section-title-size);
+  line-height: var(--type-section-title-line);
+  font-weight: var(--type-section-title-weight);
+  color: var(--brand-navy);
+  margin: 0 0 var(--space-12);
+}
+.subp-band-other { margin-top: var(--space-32); padding-top: var(--space-24); border-top: 1px solid var(--border); }
+.subp-count { font-size: var(--type-meta-size); font-weight: var(--type-meta-weight); color: var(--ink-muted); }
+.subp-band-note { font-size: var(--type-meta-size); color: var(--ink-muted); margin: 0 0 var(--space-16); }
 
-.subp .priceBox { margin-top: 16px; padding: 14px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--soft); }
-.subp .priceLabel { color: var(--muted); font-size: .78rem; margin-bottom: 4px; }
-.subp .priceValue { font-size: 1.2rem; font-weight: var(--type-price-weight); color: var(--ink); }
-.subp .priceMeta { margin-top: 4px; color: var(--muted); font-size: .84rem; }
+/* ── The cards ──────────────────────────────────────────────────── */
 
-.subp .checks { display: grid; gap: 10px; margin-top: 16px; }
-.subp .check { display: flex; gap: 10px; align-items: flex-start; padding: 11px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); font-size: .9rem; line-height: 1.45; color: var(--ink); }
-.subp .dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; background: var(--brand); flex: 0 0 10px; }
+.subp-grid {
+  list-style: none;
+  margin: 0 0 var(--space-24);
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-16);
+}
 
-.subp .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
-.subp .btn { appearance: none; border: none; border-radius: var(--radius); padding: 13px 18px; font-size: .95rem; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 7px; font-family: inherit; }
-.subp .btn-primary { background: var(--brand); color: var(--surface); flex: 1 1 240px; }
-.subp .btn-primary:hover { background: var(--brand-dark); }
-.subp .btn-secondary { background: var(--card); color: var(--ink); border: 1px solid var(--line); flex: 1 1 180px; }
-.subp .btn:disabled { opacity: .72; cursor: not-allowed; }
+.subp-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-24);
+  box-shadow: var(--shadow-sm);
+}
+.subp-card-name {
+  font-size: var(--type-field-size);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--brand-navy);
+  margin: 0 0 var(--space-12);
+}
 
-.subp .footerLinks { margin-top: 12px; font-size: .88rem; color: var(--muted); }
-.subp .footerLinks a { color: var(--brand); font-weight: 700; text-decoration: none; }
-.subp .footerLinks a:hover { text-decoration: underline; }
+.subp-price { display: flex; align-items: baseline; gap: var(--space-10); margin: 0 0 var(--space-16); flex-wrap: wrap; }
+.subp-amount {
+  font-size: var(--type-price-size);
+  line-height: var(--type-price-line);
+  font-weight: var(--type-price-weight);
+  letter-spacing: var(--type-price-track);
+  color: var(--brand-teal-hover);
+}
+
+.subp-unlocks { font-size: var(--type-meta-size); font-weight: 600; color: var(--ink); margin: 0 0 var(--space-6); }
+.subp-courses { list-style: none; margin: 0 0 var(--space-24); padding: 0; flex: 1 1 auto; }
+.subp-courses li {
+  position: relative;
+  padding-left: var(--space-20);
+  font-size: var(--type-meta-size);
+  line-height: 1.7;
+  color: var(--ink-muted);
+}
+/* Drawn, not an emoji (DS15); a pseudo-element so it is not read out on
+   every line. */
+.subp-courses li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: .62em;
+  width: 9px;
+  height: 5px;
+  border-left: 2px solid var(--brand-teal);
+  border-bottom: 2px solid var(--brand-teal);
+  transform: rotate(-45deg);
+}
+
+/* Layout only — the skin is .btn .btn-accent .btn-lg (ruling 9). */
+.subp-cta { width: 100%; margin-top: auto; }
+
+/* ── The Premium Prep pointer, and the empty state ──────────────── */
+
+.subp-note {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-24);
+}
+.subp-note h2 {
+  font-size: var(--type-section-title-size);
+  line-height: var(--type-section-title-line);
+  font-weight: var(--type-section-title-weight);
+  color: var(--brand-navy);
+  margin: 0 0 var(--space-8);
+}
+.subp-note p { font-size: var(--type-meta-size); line-height: 1.7; color: var(--ink-muted); margin: 0; }
+.subp-note a, .subp-empty a { color: var(--brand-teal-hover); font-weight: 600; }
+
+.subp-empty {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-32) var(--space-24);
+  text-align: center;
+  color: var(--ink-muted);
+  font-size: var(--type-field-size);
+  margin: 0 0 var(--space-32);
+}
+
+/* ── The phone (AGENTS.md UI convention #3, 768px) ──────────────── */
+
+@media (max-width: 768px) {
+  .subp { padding: var(--space-24) var(--space-16) var(--space-32); }
+  /* One card per row: two 300px tracks plus the gap overflow 375px. */
+  .subp-grid { grid-template-columns: 1fr; gap: var(--space-12); }
+  .subp-card { padding: var(--space-16); }
+  /* The chooser WRAPS on a phone and shows programme codes. A
+     sideways-scrolling row left the chosen chip off-screen to the right
+     after the reload, which is worse than two rows of chips: the one
+     thing the row must show is which one is on. */
+  .subp-chip-full { display: none; }
+  .subp-chip-short { display: inline; }
+  .subp-chip { padding: var(--space-6) var(--space-12); }
+}
