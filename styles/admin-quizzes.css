@@ -61,14 +61,14 @@
    triples. The three MODE chips — BOTH, INSTANT_ONLY, TIMED_ONLY — are
    a category, not a state, and keep their hues: a red TIMED_ONLY must
    not read as a failure. */
-.qm .chip.active { background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink); }
-.qm .chip.draft { background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink); }
-.qm .chip.archived { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); color: var(--badge-neutral-ink); }
+.qm .badge.active { background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink); }
+.qm .badge.draft { background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink); }
+.qm .badge.archived { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); color: var(--badge-neutral-ink); }
 
-.qm .chip.BOTH { background: var(--brand-teal-pale); color: var(--brand-teal-hover); }
-.qm .chip.INSTANT_ONLY { background: #f0fdf4; color: #15803d; }
-.qm .chip.TIMED_ONLY { background: #fef2f2; color: #b91c1c; }
-.qm .chip.plain { background: var(--badge-neutral-bg); color: var(--ink); font-size: 10px; }
+.qm .badge.BOTH { background: var(--brand-teal-pale); color: var(--brand-teal-hover); }
+.qm .badge.INSTANT_ONLY { background: #f0fdf4; color: #15803d; }
+.qm .badge.TIMED_ONLY { background: #fef2f2; color: #b91c1c; }
+.qm .badge.plain { background: var(--badge-neutral-bg); color: var(--ink); font-size: 10px; }
 
 /* ── Publish toggle ── */
 .qm .toggle { position: relative; width: 36px; height: 20px; cursor: pointer; display: inline-block; }
@@ -150,7 +150,7 @@
 .qm .review-item-num { color: var(--text-muted); min-width: 24px; font-size: 12px; }
 .qm .review-item-id { font-family: monospace; font-size: 11px; color: var(--text-muted); min-width: 100px; }
 .qm .review-item-stem { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
-.qm .review-item-row .chip { flex-shrink: 0; }
+.qm .review-item-row .badge { flex-shrink: 0; }
 .qm .review-item-remove { background: none; border: none; cursor: pointer; color: var(--danger); font-size: 15px; padding: 0; }
 
 /* ── Pane actions bar ── */

@@ -119,10 +119,10 @@
 .sdash .attempt-action:hover { text-decoration: underline; }
 /* Badges: shape from the shared family in styles/components.css (DS8
    sweep, 2026-09-22). All three are attempt states. */
-.sdash .status-chip { text-transform: capitalize; }
-.sdash .status-chip.completed { background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink); }
-.sdash .status-chip.in_progress { background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink); }
-.sdash .status-chip.abandoned { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); color: var(--badge-neutral-ink); }
+.sdash .badge { text-transform: capitalize; }
+.sdash .badge.completed { background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink); }
+.sdash .badge.in_progress { background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink); }
+.sdash .badge.abandoned { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); color: var(--badge-neutral-ink); }
 
 /* ── Floating Portal Guide bubble (legacy: inline styles) ── */
 .sdash .guide-bubble { position: fixed; bottom: 18px; right: 16px; z-index: 900; display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px; background: var(--primary); color: #fff; font-size: 13px; font-weight: 600; text-decoration: none; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2); transition: transform 0.15s, box-shadow 0.15s; }

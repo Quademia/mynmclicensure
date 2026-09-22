@@ -50,12 +50,12 @@
    2026-09-22). Only this surface's state→colour mapping stays, now on
    the token triples. `archived` was #9ca3af on grey, 2.3:1 and
    unreadable; it takes the neutral ink with the rest. */
-.ann .pill-active { background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink); }
-.ann .pill-draft,
-.ann .pill-archived { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); color: var(--badge-neutral-ink); }
-.ann .pill-scheduled { background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink); }
-.ann .pill-expired { background: var(--badge-danger-bg); border-color: var(--badge-danger-border); color: var(--badge-danger-ink); }
-.ann .pill-pinned { background: var(--badge-info-bg); border-color: var(--badge-info-border); color: var(--badge-info-ink); }
+.ann .badge-active { background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink); }
+.ann .badge-draft,
+.ann .badge-archived { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); color: var(--badge-neutral-ink); }
+.ann .badge-scheduled { background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink); }
+.ann .badge-expired { background: var(--badge-danger-bg); border-color: var(--badge-danger-border); color: var(--badge-danger-ink); }
+.ann .badge-pinned { background: var(--badge-info-bg); border-color: var(--badge-info-border); color: var(--badge-info-ink); }
 .ann .pinned-gap { margin-left: 4px; }
 
 .ann .engage-counts { display: flex; gap: 10px; font-size: 12px; color: var(--text-muted); white-space: nowrap; }

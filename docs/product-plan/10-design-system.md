@@ -544,10 +544,56 @@ no gradient vocabulary; until it does, this stays as it is.
 
 ### DS13 — One badge class name (added 2026-09-22)
 
-`.badge`, `.chip`, `.pill` and `.status-chip` are one component under
-four names. DS8's shared rules cover all four precisely so no markup
-had to change; collapsing them to one name is the tidy that follows,
-and it is markup.
+✅ **2026-09-22.** `.badge`, `.chip`, `.pill` and `.status-chip` were one
+component under four names. DS8's shared rule covered all four precisely
+so no markup had to change; this collapsed them to `.badge` — **153
+renames across 61 places**, 50 markup sites and 73 surface selectors, and
+nothing moved a pixel, because all four already drew the same thing.
+
+`.badge` won the name because it already owned the five variants
+(`badge-success`, `badge-danger`, `badge-warning`, `badge-neutral`,
+`badge-info`); the alternatives would have meant renaming those too
+(Sam, 2026-09-22).
+
+Token-exact throughout. The compounds that merely *contain* the word —
+`.context-chip`, `.topic-chip`, `.filter-chip-bar`, `.exam-chip-body`,
+`.hero-pill-dot`, `.selected-pill .pill-clear`, `.course-badge` — belong
+to other components and were left alone. Seventeen modifiers that
+genuinely hang off this base took the `badge-` prefix.
+
+**One collision, in `premium-prep.css`:** the surface defined both
+`.prep .badge` (the *"NMC 2026 Premium Prep"* line) and `.prep .chip`
+(the feature chips) with different looks, so renaming the second onto the
+first would have destroyed one. The first is a marketing eyebrow, not a
+badge at all, so it left the family as `.prep-eyebrow`.
+
+**Two breaks the rename itself caused, caught by a checker rather than by
+eye** — and this is the lesson worth keeping. A class assembled at
+runtime is invisible to a rename:
+
+- `` className={`pill pill-${ds}`} `` — the base was renamed, the prefix
+  was not, so the announcement status badges pointed at `.pill-draft`
+  while the CSS had become `.badge-draft`.
+- `TYPE_CHIP` / `DIFF_CHIP`, two `Record<string, string>` maps holding
+  `'chip-mcq'`, `'chip-easy'` and so on. The CSS was renamed; the map
+  values are strings in a `.ts` file and matched no className pattern.
+
+Neither would have thrown, and both would have shown only as a badge
+quietly losing its colour on an admin page. The check that found them
+is the one to repeat after any class rename: for every element carrying
+the base class, confirm each of its *other* classes still resolves to a
+rule, and separately list any modifier in the CSS that no markup uses —
+the second list is where a runtime-assembled name hides.
+
+**Not done here, and deliberately:** sorting the 50 into states and
+names. DS8 also built `.label-chip` for a name rather than a state — and
+it is used **zero times**, which is DS14's lesson one level up: *a class
+is not a change until markup uses it*. About 29 of the 50 are names
+rather than states (`mock`, `fixed`, `builder`, `instant`, `timed`, a
+topic, a course code), and moving them would change their shape on 29
+sites. That sort is the DS11 question — deciding a thing is a *kind* is
+deciding it needs a categorical colour — so it waits for the palette
+rather than being done twice.
 
 ### DS14 — The price weight (added 2026-09-22)
 
@@ -695,7 +741,7 @@ declarations in `landing.css` stay as they are.
 | DS10 The button size scale | ✅ 2026-09-22 — the scale; surfaces as touched |
 | DS11 A categorical palette | ⬜ |
 | DS12 A scale palette | ⬜ later |
-| DS13 One badge class name | ⬜ later |
+| DS13 One badge class name | ✅ 2026-09-22 — 153 renames onto `.badge`; the state/name sort waits for DS11 |
 | DS14 The price weight | ✅ 2026-09-22 |
 | DS15 The page emoji | ✅ 2026-09-22 — 52 deleted, 65 to icons, 5 kept |
 | DS16 The synthesised weights | ✅ 2026-09-22 — 40 to 700; landing's 12 kept at 800 |

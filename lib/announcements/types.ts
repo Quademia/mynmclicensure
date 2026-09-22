@@ -11,7 +11,7 @@
 export const ANNOUNCEMENT_STATUSES = ['draft', 'active', 'archived'] as const;
 export type AnnouncementStatus = (typeof ANNOUNCEMENT_STATUSES)[number];
 
-// legacy computeDisplayStatus: what the table's pill and the stats count.
+// legacy computeDisplayStatus: what the table's badge and the stats count.
 export type DisplayStatus = 'active' | 'scheduled' | 'expired' | 'draft' | 'archived';
 
 export const NOTICE_STATES = ['read', 'clicked', 'dismissed'] as const;

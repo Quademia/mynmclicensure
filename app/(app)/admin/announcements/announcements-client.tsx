@@ -404,8 +404,8 @@ export function AnnouncementsClient({
                         {(a.scope_programs || []).map((p) => <span key={p} className="prog-badge">{p}</span>)}
                       </td>
                       <td>
-                        <span className={`pill pill-${ds}`}>{ds}</span>
-                        {a.pinned ? <span className="pill pill-pinned pinned-gap">Pinned</span> : null}
+                        <span className={`badge badge-${ds}`}>{ds}</span>
+                        {a.pinned ? <span className="badge badge-pinned pinned-gap">Pinned</span> : null}
                       </td>
                       <td className="cell-13">{a.scope_audience === 'ALL' || !a.scope_audience ? 'Everyone' : a.scope_audience}</td>
                       <td className="cell-muted">{schedule}</td>

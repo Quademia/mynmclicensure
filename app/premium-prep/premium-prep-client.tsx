@@ -229,7 +229,7 @@ export function PremiumPrepClient({ programs, products }: { programs: Program[];
         </div>
 
         <section className="hero">
-          <div className="badge">NMC 2026 Premium Prep</div>
+          <div className="prep-eyebrow">NMC 2026 Premium Prep</div>
 
           <div className="hero-grid">
             <div>
@@ -316,7 +316,7 @@ export function PremiumPrepClient({ programs, products }: { programs: Program[];
                 </div>
                 <div className="chips">
                   {chips.map((c) => (
-                    <span key={c} className="chip">{c}</span>
+                    <span key={c} className="badge">{c}</span>
                   ))}
                 </div>
               </div>
@@ -362,7 +362,7 @@ export function PremiumPrepClient({ programs, products }: { programs: Program[];
                 </div>
                 <div className="chips">
                   {chips.map((c) => (
-                    <span key={c} className="chip">{c}</span>
+                    <span key={c} className="badge">{c}</span>
                   ))}
                 </div>
               </div>

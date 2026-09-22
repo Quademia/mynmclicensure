@@ -122,9 +122,13 @@
  * than a state — a course code, a programme tag, a payment source —
  * is a different thing and keeps --radius-sm; it is not covered here.
  *
- * The base covers the four class names the markup already uses, so a
- * surface converts with no change to its TSX: deleting its own shape
- * rules is enough. Standardising on one name is a later tidy.
+ * DS8 made the base cover the four names the markup used — `.badge`,
+ * `.chip`, `.pill`, `.status-chip` — so a surface could convert without
+ * touching its TSX. DS13 (2026-09-22) collapsed those four to this one:
+ * 153 renames, no shape change, because all four already drew this. The
+ * compounds that merely contain the word — `.context-chip`,
+ * `.topic-chip`, `.filter-chip-bar`, `.hero-pill`, `.course-badge` —
+ * are other components and were left alone.
  *
  * Each variant carries its whole triple — ground, border and ink. The
  * border is what keeps a badge readable as a badge in a greyscale
@@ -132,10 +136,7 @@
  * colour, which is too light for text.
  */
 
-.badge,
-.chip,
-.pill,
-.status-chip {
+.badge {
   display: inline-flex;
   align-items: center;
   gap: var(--space-4);

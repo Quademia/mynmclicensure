@@ -93,9 +93,9 @@
 .opb .use-all-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .opb .use-all-row label { font-size: 13px; color: var(--text); cursor: pointer; }
 .opb .chips-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; min-height: 0; }
-.opb .chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--primary-light); color: var(--primary); border: 1px solid rgba(30, 58, 95, 0.18); }
-.opb .chip-remove { cursor: pointer; font-size: 14px; line-height: 1; color: var(--primary); opacity: 0.7; background: none; border: none; padding: 0; }
-.opb .chip-remove:hover { opacity: 1; }
+.opb .badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--primary-light); color: var(--primary); border: 1px solid rgba(30, 58, 95, 0.18); }
+.opb .badge-remove { cursor: pointer; font-size: 14px; line-height: 1; color: var(--primary); opacity: 0.7; background: none; border: none; padding: 0; }
+.opb .badge-remove:hover { opacity: 1; }
 
 /* ── Concept mode ── */
 .opb .concept-search-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-bottom: 10px; }
@@ -169,7 +169,7 @@
 .opb-overlay .modal-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .opb-overlay .rule-box { border: 1px solid rgba(45, 125, 114, 0.14); background: var(--primary-light); border-radius: 14px; padding: 14px; margin-bottom: 14px; font-size: 13px; line-height: 1.65; color: var(--text); }
 .opb-overlay .kv-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-.opb-overlay .pill { display: inline-flex; align-items: center; gap: 8px; background: #f3f4f6; color: var(--text); border-radius: 999px; padding: 8px 12px; font-size: 12px; font-weight: 700; }
+.opb-overlay .badge { display: inline-flex; align-items: center; gap: 8px; background: #f3f4f6; color: var(--text); border-radius: 999px; padding: 8px 12px; font-size: 12px; font-weight: 700; }
 .opb-overlay .field { margin-bottom: 8px; }
 .opb-overlay .inline-error { font-size: 12px; color: var(--danger); min-height: 18px; margin-bottom: 12px; }
 .opb-overlay .btn-ghost { font-size: 14px; padding: 9px 18px; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--text); cursor: pointer; font-family: inherit; }

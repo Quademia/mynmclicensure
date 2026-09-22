@@ -89,9 +89,9 @@
 .qbld .use-all-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .qbld .use-all-row label { font-size: 13px; color: var(--text); cursor: pointer; }
 .qbld .chips-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; min-height: 0; }
-.qbld .chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--primary-light); color: var(--primary); border: 1px solid rgba(30, 58, 95, 0.18); }
-.qbld .chip-remove { cursor: pointer; font-size: 14px; line-height: 1; color: var(--primary); opacity: 0.7; background: none; border: none; padding: 0; }
-.qbld .chip-remove:hover { opacity: 1; }
+.qbld .badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--primary-light); color: var(--primary); border: 1px solid rgba(30, 58, 95, 0.18); }
+.qbld .badge-remove { cursor: pointer; font-size: 14px; line-height: 1; color: var(--primary); opacity: 0.7; background: none; border: none; padding: 0; }
+.qbld .badge-remove:hover { opacity: 1; }
 
 /* ── Concept mode ── */
 .qbld .concept-search-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-bottom: 10px; }

@@ -539,10 +539,10 @@ export function QuizBuilderClient({
               </div>
               <div className="chips-row">
                 {useAllTopics ? (
-                  <span className="chip">All topics</span>
+                  <span className="badge">All topics</span>
                 ) : (
                   selectedTopics.map((t) => (
-                    <span key={t} className="chip">{t} <button type="button" className="chip-remove" onClick={() => setSelectedTopics((s) => s.filter((x) => x !== t))}>×</button></span>
+                    <span key={t} className="badge">{t} <button type="button" className="badge-remove" onClick={() => setSelectedTopics((s) => s.filter((x) => x !== t))}>×</button></span>
                   ))
                 )}
               </div>
@@ -572,7 +572,7 @@ export function QuizBuilderClient({
               </div>
               <div className="chips-row">
                 {selectedConcepts.map((s) => (
-                  <span key={s} className="chip">{s} <button type="button" className="chip-remove" onClick={() => setSelectedConcepts((c) => c.filter((x) => x !== s))}>×</button></span>
+                  <span key={s} className="badge">{s} <button type="button" className="badge-remove" onClick={() => setSelectedConcepts((c) => c.filter((x) => x !== s))}>×</button></span>
                 ))}
               </div>
             </div>

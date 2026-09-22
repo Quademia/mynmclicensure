@@ -419,7 +419,7 @@ export function SubscriptionsClient({
                       )}
                       <td className={first ? 'cell-13' : 'cell-muted'}>{u?.program_id || '—'}</td>
                       <td className="cell-product">{s.products?.name || s.product_id || '—'}</td>
-                      <td>{expiring ? <span className="chip expiring">Expiring</span> : <span className={`chip ${shownStatus(s)}`}>{shownStatus(s)}</span>}</td>
+                      <td>{expiring ? <span className="badge expiring">Expiring</span> : <span className={`badge ${shownStatus(s)}`}>{shownStatus(s)}</span>}</td>
                       <td className="cell-13 cell-muted">{fmtDate(s.created_utc)}</td>
                       <td className="cell-13">{fmtDate(s.start_utc)}</td>
                       <td className={`cell-13${expiring ? ' cell-expiring' : ''}`}>{fmtDate(s.expires_utc)}</td>
@@ -455,7 +455,7 @@ export function SubscriptionsClient({
                   <div className="detail-section">
                     <h4>Subscription</h4>
                     <div className="detail-row"><span className="key">Product</span><span className="val">{panelSub.products?.name || panelSub.product_id}</span></div>
-                    <div className="detail-row"><span className="key">Status</span><span className="val"><span className={`chip ${shownStatus(panelSub)}`}>{shownStatus(panelSub)}</span></span></div>
+                    <div className="detail-row"><span className="key">Status</span><span className="val"><span className={`badge ${shownStatus(panelSub)}`}>{shownStatus(panelSub)}</span></span></div>
                     <div className="detail-row"><span className="key">Granted on</span><span className="val">{fmtDate(panelSub.created_utc)}</span></div>
                     <div className="detail-row"><span className="key">Start</span><span className="val">{fmtDate(panelSub.start_utc)}</span></div>
                     <div className="detail-row"><span className="key">Expires</span><span className="val">{fmtDate(panelSub.expires_utc)}</span></div>
@@ -483,7 +483,7 @@ export function SubscriptionsClient({
                           <div className="detail-row" key={r.access_id}>
                             <span className="key" title={r.course_id}>{r.courses?.title || r.course_id}</span>
                             <span className="val small">
-                              {fmtDate(r.start_utc)} → {fmtDate(r.expires_utc)} <span className={`chip ${state.cls}`}>{state.word}</span>
+                              {fmtDate(r.start_utc)} → {fmtDate(r.expires_utc)} <span className={`badge ${state.cls}`}>{state.word}</span>
                             </span>
                           </div>
                         );

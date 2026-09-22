@@ -476,11 +476,11 @@ export function AttemptsClient({ courses, quizTitles }: { courses: { course_id: 
                       <div className="st-name">{studentName(a.users, a.user_id)}</div>
                       <div className="st-email">{studentEmail(a.users)}</div>
                     </td>
-                    <td><span className={`chip ${a.source}`}>{typeLabel(a.source)}</span></td>
+                    <td><span className={`badge ${a.source}`}>{typeLabel(a.source)}</span></td>
                     <td>{quizTitle(a)}</td>
                     <td className="cell-muted">{courseMap[a.course_id] || a.course_id}</td>
                     <td className="cell-12">{a.mode === 'timed' ? 'Exam' : 'Practice'}</td>
-                    <td><span className={`chip ${a.status}`}>{statusLabel(a.status)}</span></td>
+                    <td><span className={`badge ${a.status}`}>{statusLabel(a.status)}</span></td>
                     <td className="cell-bold">{a.status === 'completed' && a.score_pct != null ? Math.round(a.score_pct) + '%' : '—'}</td>
                     <td>{a.n ?? '—'}</td>
                     <td className="cell-muted">{fmtDuration(a.time_taken_s)}</td>

@@ -63,11 +63,11 @@
    sweep, 2026-09-22). All five are payment states, so all take the
    token triples. ACTIVATED was #16a34a on #dcfce7 — 2.9:1, under the
    line — and now reads at 6.8:1 on the success ink. */
-.pay .status-chip.ACTIVATED, .pay-overlay .status-chip.ACTIVATED { background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink); }
-.pay .status-chip.PAID, .pay-overlay .status-chip.PAID,
-.pay .status-chip.SETUP_REQUIRED, .pay-overlay .status-chip.SETUP_REQUIRED { background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink); }
-.pay .status-chip.FAILED, .pay-overlay .status-chip.FAILED { background: var(--badge-danger-bg); border-color: var(--badge-danger-border); color: var(--badge-danger-ink); }
-.pay .status-chip.INIT, .pay-overlay .status-chip.INIT { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); color: var(--badge-neutral-ink); }
+.pay .badge.ACTIVATED, .pay-overlay .badge.ACTIVATED { background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink); }
+.pay .badge.PAID, .pay-overlay .badge.PAID,
+.pay .badge.SETUP_REQUIRED, .pay-overlay .badge.SETUP_REQUIRED { background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink); }
+.pay .badge.FAILED, .pay-overlay .badge.FAILED { background: var(--badge-danger-bg); border-color: var(--badge-danger-border); color: var(--badge-danger-ink); }
+.pay .badge.INIT, .pay-overlay .badge.INIT { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); color: var(--badge-neutral-ink); }
 
 /* ── Revenue card ── */
 .pay .revenue-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-top: 20px; }

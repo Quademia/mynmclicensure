@@ -299,7 +299,7 @@ export function CoursesClient({ courses, programs }: { courses: Course[]; progra
                           ? (c.program_scope || []).map((p) => <span key={p} className="prog-tag">{p}</span>)
                           : <span className="cell-muted">None</span>}
                       </td>
-                      <td><span className={`chip ${c.status}`}>{c.status}</span></td>
+                      <td><span className={`badge ${c.status}`}>{c.status}</span></td>
                       <td className="cell-mono">{c.page_slug || '—'}</td>
                     </tr>
                   ))}
@@ -333,7 +333,7 @@ export function CoursesClient({ courses, programs }: { courses: Course[]; progra
                       coursesOf(panelProg.program_id).map((c) => (
                         <div key={c.course_id} className="detail-course-line">
                           <span>{c.title}</span>
-                          <span className={`chip ${c.status}`}>{c.status}</span>
+                          <span className={`badge ${c.status}`}>{c.status}</span>
                         </div>
                       ))
                     ) : (
@@ -358,7 +358,7 @@ export function CoursesClient({ courses, programs }: { courses: Course[]; progra
                     <h4>Course Info</h4>
                     <div className="detail-row"><span className="key">Course ID</span><span className="val mono">{panelCourse.course_id}</span></div>
                     <div className="detail-row"><span className="key">Title</span><span className="val">{panelCourse.title}</span></div>
-                    <div className="detail-row"><span className="key">Status</span><span className="val"><span className={`chip ${panelCourse.status}`}>{panelCourse.status}</span></span></div>
+                    <div className="detail-row"><span className="key">Status</span><span className="val"><span className={`badge ${panelCourse.status}`}>{panelCourse.status}</span></span></div>
                     <div className="detail-row"><span className="key">Page Slug</span><span className="val mono">{panelCourse.page_slug || '—'}</span></div>
                   </div>
                   <div className="detail-section">

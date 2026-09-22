@@ -228,10 +228,10 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
           </div>
           <div className="attempt-title">{title}</div>
           <div className="chips-row">
-            {a.mode ? <span className={`chip mode-${a.mode}`}>{a.mode === 'timed' ? 'Timed' : 'Instant'}</span> : null}
-            {a.status ? <span className={`chip status-${a.status}`}>{formatStatus(a.status)}</span> : null}
-            {a.source ? <span className={`chip source-${a.source}`}>{formatSource(a.source)}</span> : null}
-            {a.n ? <span className="chip">{a.n} Q</span> : null}
+            {a.mode ? <span className={`badge mode-${a.mode}`}>{a.mode === 'timed' ? 'Timed' : 'Instant'}</span> : null}
+            {a.status ? <span className={`badge status-${a.status}`}>{formatStatus(a.status)}</span> : null}
+            {a.source ? <span className={`badge source-${a.source}`}>{formatSource(a.source)}</span> : null}
+            {a.n ? <span className="badge">{a.n} Q</span> : null}
           </div>
         </div>
 

@@ -339,8 +339,8 @@ export function ProductsClient({
                       <div className="row-title">{p.name}</div>
                       <div className="row-id">{p.product_id}</div>
                     </td>
-                    <td><span className={`chip ${p.kind}`}>{p.kind}</span></td>
-                    <td><span className={`chip ${p.status}`}>{p.status}</span></td>
+                    <td><span className={`badge ${p.kind}`}>{p.kind}</span></td>
+                    <td><span className={`badge ${p.status}`}>{p.status}</span></td>
                     <td className="cell-strong">{priceCell(p)}</td>
                     <td className="cell-13">{p.duration_days ? `${p.duration_days}d` : '—'}</td>
                     <td className="cell-courses">
@@ -377,8 +377,8 @@ export function ProductsClient({
                     <h4>Product Info</h4>
                     <div className="detail-row"><span className="key">Product ID</span><span className="val mono">{panelProduct.product_id}</span></div>
                     <div className="detail-row"><span className="key">Name</span><span className="val">{panelProduct.name}</span></div>
-                    <div className="detail-row"><span className="key">Kind</span><span className="val"><span className={`chip ${panelProduct.kind}`}>{panelProduct.kind}</span></span></div>
-                    <div className="detail-row"><span className="key">Status</span><span className="val"><span className={`chip ${panelProduct.status}`}>{panelProduct.status}</span></span></div>
+                    <div className="detail-row"><span className="key">Kind</span><span className="val"><span className={`badge ${panelProduct.kind}`}>{panelProduct.kind}</span></span></div>
+                    <div className="detail-row"><span className="key">Status</span><span className="val"><span className={`badge ${panelProduct.status}`}>{panelProduct.status}</span></span></div>
                   </div>
                   <div className="detail-section">
                     <h4>Pricing &amp; Access</h4>

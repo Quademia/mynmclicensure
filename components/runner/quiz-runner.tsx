@@ -711,9 +711,9 @@ export function QuizRunner({
                   <div className="opt-body">
                     <div className="opt-title">
                       <span className="opt-text"><strong>{displayLetter(j, opt.letter)}.</strong> {opt.text}</span>
-                      {canReveal && opt.isCorrect ? <span className="chip chip-correct">✓ Correct answer</span> : null}
-                      {canReveal && isChosen && !opt.isCorrect ? <span className="chip chip-wrong">✗ Your choice</span> : null}
-                      {canReveal && isChosen && opt.isCorrect ? <span className="chip chip-chosen">✓ Your choice</span> : null}
+                      {canReveal && opt.isCorrect ? <span className="badge badge-correct">✓ Correct answer</span> : null}
+                      {canReveal && isChosen && !opt.isCorrect ? <span className="badge badge-wrong">✗ Your choice</span> : null}
+                      {canReveal && isChosen && opt.isCorrect ? <span className="badge badge-chosen">✓ Your choice</span> : null}
                     </div>
                     {canReveal && feedbackMode === 'inline' && opt.fb ? <div className="opt-fb">{opt.fb}</div> : null}
                   </div>

@@ -66,13 +66,13 @@
    sweep, 2026-09-22). Every one of these is a state, so all take the
    token triples — and the ink tokens rather than the raw signal
    colours, which are too light to read at this size. */
-.subs .chip.ACTIVE, .subs-overlay .chip.ACTIVE { background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink); }
-.subs .chip.EXPIRED, .subs-overlay .chip.EXPIRED { background: var(--badge-danger-bg); border-color: var(--badge-danger-border); color: var(--badge-danger-ink); }
-.subs .chip.REVOKED, .subs-overlay .chip.REVOKED { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); color: var(--badge-neutral-ink); }
-.subs .chip.TRIAL, .subs-overlay .chip.TRIAL { background: var(--badge-info-bg); border-color: var(--badge-info-border); color: var(--badge-info-ink); }
-.subs .chip.expiring, .subs-overlay .chip.expiring { background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink); }
+.subs .badge.ACTIVE, .subs-overlay .badge.ACTIVE { background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink); }
+.subs .badge.EXPIRED, .subs-overlay .badge.EXPIRED { background: var(--badge-danger-bg); border-color: var(--badge-danger-border); color: var(--badge-danger-ink); }
+.subs .badge.REVOKED, .subs-overlay .badge.REVOKED { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); color: var(--badge-neutral-ink); }
+.subs .badge.TRIAL, .subs-overlay .badge.TRIAL { background: var(--badge-info-bg); border-color: var(--badge-info-border); color: var(--badge-info-ink); }
+.subs .badge.expiring, .subs-overlay .badge.expiring { background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink); }
 /* a course row that starts later (02 C3b) */
-.subs .chip.queued, .subs-overlay .chip.queued { background: var(--badge-info-bg); border-color: var(--badge-info-border); color: var(--badge-info-ink); }
+.subs .badge.queued, .subs-overlay .badge.queued { background: var(--badge-info-bg); border-color: var(--badge-info-border); color: var(--badge-info-ink); }
 .subs .detail-empty, .subs-overlay .detail-empty { color: var(--text-muted); font-size: 13px; }
 .subs .source-chip, .subs-overlay .source-chip { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
 .subs .ref-link { font-size: 12px; color: var(--primary); text-decoration: none; font-family: monospace; }

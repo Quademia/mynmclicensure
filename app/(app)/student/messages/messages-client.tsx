@@ -445,7 +445,7 @@ export function MessagesClient({
                         {hasUnread ? <span className="unread-dot" /> : null}
                         <span>{latest ? formatTime(latest.created_at, now) : ''}</span>
                         {t.context_type !== 'general' ? <span className="context-chip">{t.context_type}</span> : null}
-                        {t.status === 'closed' ? <span className="status-chip closed">Closed</span> : null}
+                        {t.status === 'closed' ? <span className="badge closed">Closed</span> : null}
                       </div>
                     </div>
                   );

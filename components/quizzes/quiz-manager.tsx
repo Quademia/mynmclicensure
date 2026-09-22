@@ -615,10 +615,10 @@ export function QuizManager({
                           <div className="row-id">{r.quiz_id}</div>
                         </td>
                         <td>{courseTitle(r.course_id)}</td>
-                        <td><span className={`chip ${r.allowed_modes}`}>{MODE_LABELS[r.allowed_modes] || r.allowed_modes}</span></td>
+                        <td><span className={`badge ${r.allowed_modes}`}>{MODE_LABELS[r.allowed_modes] || r.allowed_modes}</span></td>
                         <td className="row-n">{r.n}</td>
                         {kind === 'mock' ? <td className="row-schedule">{formatSchedule(r)}</td> : null}
-                        <td><span className={`chip ${r.status}`}>{r.status}</span></td>
+                        <td><span className={`badge ${r.status}`}>{r.status}</span></td>
                         <td onClick={(e) => e.stopPropagation()}>
                           <label className="toggle">
                             <input type="checkbox" checked={r.published} onChange={(e) => togglePublish(r.quiz_id, e.target.checked)} />
@@ -799,10 +799,10 @@ export function QuizManager({
                             <tr key={i.item_id} className={sel ? 'selected-row' : ''} onClick={() => toggleItem(i)}>
                               <td><input type="checkbox" checked={sel} onClick={(e) => e.stopPropagation()} onChange={() => toggleItem(i)} /></td>
                               <td className="mono">{i.item_id}</td>
-                              <td><span className="chip plain">{i.question_type}</span></td>
+                              <td><span className="badge plain">{i.question_type}</span></td>
                               <td><span className="item-stem-short" title={i.stem}>{i.stem}</span></td>
                               <td className="muted">{i.maintopic || '—'}</td>
-                              <td><span className="chip plain">{i.difficulty || '—'}</span></td>
+                              <td><span className="badge plain">{i.difficulty || '—'}</span></td>
                             </tr>
                           );
                         })
@@ -863,7 +863,7 @@ export function QuizManager({
             <div className="review-card">
               <h4>Settings</h4>
               <div className="detail-row"><span className="detail-label">Allowed Modes</span><span className="detail-value">{MODE_LABELS[form.modes]}</span></div>
-              <div className="detail-row"><span className="detail-label">Status</span><span className="detail-value"><span className={`chip ${form.status}`}>{form.status}</span></span></div>
+              <div className="detail-row"><span className="detail-label">Status</span><span className="detail-value"><span className={`badge ${form.status}`}>{form.status}</span></span></div>
               <div className="detail-row"><span className="detail-label">Published</span><span className="detail-value">{form.published ? 'Yes' : 'No'}</span></div>
               <div className="detail-row"><span className="detail-label">Shuffle</span><span className="detail-value">{form.shuffle ? 'Yes — randomised per attempt' : 'No — fixed order'}</span></div>
               <div className="detail-row"><span className="detail-label">Time Limit</span><span className="detail-value">{timeLimitText}</span></div>
@@ -881,7 +881,7 @@ export function QuizManager({
                   <span className="review-item-num">{idx + 1}.</span>
                   <span className="review-item-id">{item.item_id}</span>
                   <span className="review-item-stem">{item.stem}</span>
-                  <span className="chip plain">{item.question_type}</span>
+                  <span className="badge plain">{item.question_type}</span>
                   <button type="button" className="review-item-remove" title="Remove" onClick={() => removeFromReview(item.item_id)}>×</button>
                 </div>
               ))}

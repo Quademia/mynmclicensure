@@ -107,14 +107,14 @@
    category, not a state: they tell you where an attempt came from, so
    they keep their own hues. The design system has no categorical
    palette and that is a gap worth feeding back. */
-.att .chip.completed { background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink); }
-.att .chip.in_progress { background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink); }
-.att .chip.abandoned { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); color: var(--badge-neutral-ink); }
+.att .badge.completed { background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink); }
+.att .badge.in_progress { background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink); }
+.att .badge.abandoned { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); color: var(--badge-neutral-ink); }
 
-.att .chip.mock { background: #eef2ff; color: #4f46e5; }
-.att .chip.fixed { background: #e0f2fe; color: #0369a1; }
-.att .chip.builder { background: #dcfce7; color: #15803d; }
-.att .chip.retake { background: #fef3c7; color: #92400e; }
+.att .badge.mock { background: #eef2ff; color: #4f46e5; }
+.att .badge.fixed { background: #e0f2fe; color: #0369a1; }
+.att .badge.builder { background: #dcfce7; color: #15803d; }
+.att .badge.retake { background: #fef3c7; color: #92400e; }
 
 /* ── Pagination, empty, cap ── */
 .att .pager { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 14px; font-size: 13px; color: var(--text-muted); }

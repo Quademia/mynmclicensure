@@ -69,18 +69,18 @@
    2026-09-22). Only this surface's state→colour mapping stays, now on
    the token triples: a domain word like PAID or TRIAL is this page's
    vocabulary, not the design system's. */
-.cat .chip.active, .cat-overlay .chip.active,
-.cat .chip.PAID, .cat-overlay .chip.PAID {
+.cat .badge.active, .cat-overlay .badge.active,
+.cat .badge.PAID, .cat-overlay .badge.PAID {
   background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink);
 }
-.cat .chip.draft, .cat-overlay .chip.draft {
+.cat .badge.draft, .cat-overlay .badge.draft {
   background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink);
 }
-.cat .chip.archived, .cat-overlay .chip.archived,
-.cat .chip.FREE, .cat-overlay .chip.FREE {
+.cat .badge.archived, .cat-overlay .badge.archived,
+.cat .badge.FREE, .cat-overlay .badge.FREE {
   background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); color: var(--badge-neutral-ink);
 }
-.cat .chip.TRIAL, .cat-overlay .chip.TRIAL {
+.cat .badge.TRIAL, .cat-overlay .badge.TRIAL {
   background: var(--badge-info-bg); border-color: var(--badge-info-border); color: var(--badge-info-ink);
 }
 

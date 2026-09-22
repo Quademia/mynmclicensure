@@ -117,10 +117,10 @@
    correct, what they chose, wrong — which is the clearest state in the
    product, so all three take the token triples. `wrong` was #dc2626 on
    #fee2e2, 3.9:1, and now reads at 5.9:1. */
-.runner .chip { padding: 2px 8px; font-weight: 700; }
-.runner .chip-correct { background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink); }
-.runner .chip-chosen { background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink); }
-.runner .chip-wrong { background: var(--badge-danger-bg); border-color: var(--badge-danger-border); color: var(--badge-danger-ink); }
+.runner .badge { padding: 2px 8px; font-weight: 700; }
+.runner .badge-correct { background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink); }
+.runner .badge-chosen { background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink); }
+.runner .badge-wrong { background: var(--badge-danger-bg); border-color: var(--badge-danger-border); color: var(--badge-danger-ink); }
 .runner .opt-fb { margin-top: 8px; padding: 8px 10px; border-left: 3px solid var(--border); background: #f8fafc; border-radius: 0 6px 6px 0; font-size: 13px; color: #374151; line-height: 1.5; }
 
 /* ── Rationale block ── */

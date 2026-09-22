@@ -95,7 +95,7 @@ function AttemptsTable({ attempts }: { attempts: AttemptListRow[] }) {
               <td>{completed ? `${a.score_raw}/${a.score_total} (${Math.round(a.score_pct ?? 0)}%)` : '—'}</td>
               <td>{fmtAttemptDate(a.ts_iso)}</td>
               <td>
-                <span className={`status-chip ${a.status}`}>{a.status.replace('_', ' ')}</span>
+                <span className={`badge ${a.status}`}>{a.status.replace('_', ' ')}</span>
               </td>
               <td>
                 <a className="attempt-action" href={runnerHref(a.mode, a.attempt_id, completed)}>

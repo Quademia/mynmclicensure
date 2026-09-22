@@ -273,7 +273,7 @@ storage.
 - ✅ DS10 The button size scale — small / medium / large, large 44px; ten student forward buttons on it — 2026-09-22
 - ⬜ DS11 A categorical palette — colour that means a kind, not a state: MCQ / TF / SATA, mock / fixed, the modes
 - ⬜ DS12 A scale palette — easy / moderate / hard borrows the signal ramp; no gradient vocabulary yet — later
-- ⬜ DS13 One badge class name — .badge / .chip / .pill / .status-chip are one thing under four; markup — later
+- ✅ DS13 One badge class name — 153 renames onto .badge; the state/name sort left to DS11 — 2026-09-22
 - ✅ DS14 The price weight — the token to 700 and the three price rules onto it (they were literals) — 2026-09-22
 - ✅ DS15 The page emoji — 52 deleted, 65 to drawn icons, 88 working glyphs and 5 kept; 27 new shapes — 2026-09-22
 - ✅ DS16 The synthesised weights — 40 to 700; landing's 12 kept, its 800 is real (not Inter) — 2026-09-22

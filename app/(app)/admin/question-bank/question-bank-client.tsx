@@ -80,8 +80,8 @@ const EMPTY_FORM: Form = {
   shuffle: true,
 };
 
-const TYPE_CHIP: Record<string, string> = { MCQ: 'chip-mcq', TF: 'chip-tf', SATA: 'chip-sata' };
-const DIFF_CHIP: Record<string, string> = { Easy: 'chip-easy', Moderate: 'chip-moderate', Hard: 'chip-hard' };
+const TYPE_BADGE: Record<string, string> = { MCQ: 'badge-mcq', TF: 'badge-tf', SATA: 'badge-sata' };
+const DIFF_BADGE: Record<string, string> = { Easy: 'badge-easy', Moderate: 'badge-moderate', Hard: 'badge-hard' };
 
 function correctLetters(item: Item): string[] {
   return item.question_type === 'SATA'
@@ -479,9 +479,9 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
                     <div className="q-card-header">
                       <div className="q-card-meta">
                         <span className="q-id">{item.item_id}</span>
-                        <span className={`chip ${TYPE_CHIP[item.question_type] || 'chip-default'}`}>{item.question_type || '—'}</span>
-                        {item.difficulty ? <span className={`chip ${DIFF_CHIP[item.difficulty] || 'chip-default'}`}>{item.difficulty}</span> : null}
-                        {item.marks && Number(item.marks) !== 1 ? <span className="chip chip-default">{item.marks} marks</span> : null}
+                        <span className={`badge ${TYPE_BADGE[item.question_type] || 'badge-default'}`}>{item.question_type || '—'}</span>
+                        {item.difficulty ? <span className={`badge ${DIFF_BADGE[item.difficulty] || 'badge-default'}`}>{item.difficulty}</span> : null}
+                        {item.marks && Number(item.marks) !== 1 ? <span className="badge badge-default">{item.marks} marks</span> : null}
                       </div>
                       <button type="button" className="q-edit-btn" onClick={(e) => { e.stopPropagation(); openEdit(item); }}><Icon name="pencil" />Edit</button>
                     </div>

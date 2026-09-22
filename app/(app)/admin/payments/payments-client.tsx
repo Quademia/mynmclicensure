@@ -347,7 +347,7 @@ export function PaymentsClient({
                           ? `(${formatMinor(p.amount_minor_expected, p.currency)})`
                           : '—'}
                     </td>
-                    <td><span className={`status-chip ${p.status}`}>{formatStatus(p.status)}</span></td>
+                    <td><span className={`badge ${p.status}`}>{formatStatus(p.status)}</span></td>
                     <td className="cell-12 muted nowrap">{formatDay(p.paid_utc)}</td>
                   </tr>
                 ))}
@@ -397,7 +397,7 @@ export function PaymentsClient({
                   <div className="detail-section">
                     <div className="detail-section-title">Payment</div>
                     <div className="detail-row"><span className="key">Reference</span><span className="val mono small">{panel.reference}</span></div>
-                    <div className="detail-row"><span className="key">Status</span><span className="val"><span className={`status-chip ${panel.status}`}>{formatStatus(panel.status)}</span></span></div>
+                    <div className="detail-row"><span className="key">Status</span><span className="val"><span className={`badge ${panel.status}`}>{formatStatus(panel.status)}</span></span></div>
                     <div className="detail-row"><span className="key">Product</span><span className="val">{panel.products?.name || panel.product_name || '—'}</span></div>
                     <div className="detail-row"><span className="key">Expected</span><span className="val">{panel.amount_minor_expected ? formatMinor(panel.amount_minor_expected, panel.currency) : '—'}</span></div>
                     <div className="detail-row"><span className="key">Paid</span><span className={`val${panel.amount_minor_paid ? ' paid' : ''}`}>{panel.amount_minor_paid ? formatMinor(panel.amount_minor_paid, panel.currency) : '—'}</span></div>
