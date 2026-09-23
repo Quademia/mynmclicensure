@@ -442,11 +442,39 @@
    page's local --navy / --teal block held the SAME hex values as the
    global brand tokens, so nothing moved a pixel in the extraction. */
 
+/* ── The wordmark (DS21, 2026-09-23) ───────────────────────────────
+   Drawn by both top bars (components/shell/wordmark.tsx): the painted
+   Q, the product on top, "by Quademia" beneath — MyNclex's lockup. Here
+   rather than in shell.css because shell.css loads only behind the
+   sign-in and the public bar draws it too. */
+
+.wordmark { display: inline-flex; align-items: center; gap: var(--space-8); min-width: 0; }
+.wordmark-mark { display: block; flex: none; width: 28px; height: 28px; border-radius: var(--radius-pill); }
+.wordmark-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.15; }
+.wordmark-text b {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--brand-navy);
+  white-space: nowrap;
+}
+.wordmark-text span {
+  font-size: var(--type-micro-size);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .wordmark-text b { font-size: 15px; }
+}
+
 .pubbar {
   height: 64px;
   display: flex;
   align-items: center;
-  gap: var(--space-12);
+  gap: var(--space-24);
   padding: 0 var(--space-24);            /* the page gutter */
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -454,30 +482,102 @@
   top: 0;
   z-index: 100;
 }
-.pubbar-brand { display: flex; align-items: baseline; gap: 10px; min-width: 0; text-decoration: none; }
-.pubbar-brand span { font-size: 13px; font-weight: 600; line-height: 1.2; color: var(--ink-muted); }
-.pubbar-brand b { font-size: 16px; font-weight: 700; color: var(--brand-navy); white-space: nowrap; }
-.pubbar-spacer { flex: 1 1 auto; }
-.pubbar-actions { display: flex; align-items: center; gap: var(--space-10); }
+.pubbar-brand { display: flex; flex: none; min-width: 0; text-decoration: none; }
+.pubbar-brand:hover { text-decoration: none; }
+/* the links from lib/nav/public.ts — the same list as the phone menu —
+   pushed right to sit beside Sign in, so everything clickable is one
+   group (Sam, 2026-09-23; centred was offered and not taken) */
+.pubbar-links { display: flex; align-items: center; gap: var(--space-24); min-width: 0; margin-left: auto; }
 .pubbar-link {
-  font-size: var(--type-meta-size);
-  font-weight: 700;
-  color: var(--brand-teal);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-ui-weight);
+  color: var(--ink-muted);
   text-decoration: none;
-  padding: 4px 0;
-  border-bottom: 1.5px solid transparent;
-  transition: border-color .15s;
+  white-space: nowrap;
 }
-.pubbar-link:hover { border-bottom-color: var(--brand-teal); }
+.pubbar-link:hover { color: var(--ink); text-decoration: none; }
+.pubbar-actions { display: flex; align-items: center; gap: var(--space-8); }
 
-/* The phone keeps the brand and the one action that starts an account.
-   Sign In goes rather than Register Free: someone who already has an
-   account can reach /login from the page's own copy, and a visitor who
-   does not is the one the bar is for. Matches the landing page's old
-   680px rule, moved to the app's 768px breakpoint. */
+/* the hamburger — phone only, at the right beside Sign in (Sam) */
+.pubbar-burger {
+  display: none;
+  width: 44px;                           /* the touch-target minimum */
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+.pubbar-burger:hover { background: var(--surface-page); }
+.pubbar-burger svg { display: block; }
+
+/* The phone keeps the wordmark, Sign in and the hamburger; the links
+   move behind the hamburger. Sign in stays in the bar at every width —
+   it is the bar's one action (Sam, 2026-09-23). */
 @media (max-width: 768px) {
-  .pubbar { padding: 0 var(--space-16); }   /* the phone gutter */
-  .pubbar-link, .pubbar .btn-outline { display: none; }
+  .pubbar { padding: 0 var(--space-16); gap: var(--space-12); }   /* the phone gutter */
+  .pubbar-links { display: none; }
+  .pubbar-actions { margin-left: auto; }   /* the links' push, now they are hidden */
+  .pubbar-burger { display: inline-flex; }
+}
+
+/* ── The public phone menu (DS21, components/shell/public-menu.tsx) ─
+   From the RIGHT, under the 64px bar, over a dimmed page. The same
+   navy and link inks as the signed-in drawer (shell.css .sidebar), from
+   tokens; it closes the same four ways. Portalled to <body>, so it sits
+   just beneath the sticky bar (z-index 100) and the bar's close mark
+   stays in reach. */
+
+.pubmenu-backdrop {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--scrim);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 98;
+}
+.pubmenu.is-open .pubmenu-backdrop { opacity: 1; pointer-events: auto; }
+
+.pubmenu-panel {
+  position: fixed;
+  top: 64px;
+  right: 0;
+  bottom: 0;
+  width: 260px;
+  max-width: 86%;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-12) 0 var(--space-24);
+  overflow-y: auto;
+  background: var(--brand-navy-dark);
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  z-index: 99;
+}
+.pubmenu.is-open .pubmenu-panel { transform: translateX(0); box-shadow: var(--shadow-lg); }
+
+.pubmenu-link {
+  display: block;
+  padding: var(--space-10) var(--space-24);
+  font-size: 14px;                       /* the sidebar row's size */
+  font-weight: 500;
+  color: var(--ink-on-navy-soft);
+  text-decoration: none;
+}
+.pubmenu-link:hover { background: var(--surface-on-navy-hover); color: var(--surface); text-decoration: none; }
+.pubmenu-signin { margin: var(--space-16) var(--space-24) 0; justify-content: center; }
+
+/* never on a computer: the links are in the bar there */
+@media (min-width: 769px) {
+  .pubmenu { display: none; }
 }
 
 .pubfoot {

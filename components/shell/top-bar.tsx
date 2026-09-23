@@ -2,9 +2,10 @@
 //
 // The A3 top bar (10-design-system.md DS5, Sam 2026-09-22): a 56px
 // white bar on every authenticated page, at every width. Left to
-// right: the hamburger, the wordmark (Quademia, then the product line —
-// "MyNMCLicensure" on both sides since DS5; plain type, no logo,
-// AGENTS.md UI convention #5), then at the right the envelope
+// right: the hamburger, the wordmark (DS21, 2026-09-23: the one both
+// bars draw, `wordmark.tsx` — the painted Q, "MyNMCLicensure" on top and
+// "by Quademia" beneath; it replaced DS5's one-line "Quademia
+// MyNMCLicensure"), then at the right the envelope
 // carrying the unread messages count, the bell as a link to
 // Announcements (plain until announcements have an unread state, doc 05
 // A2), and the avatar, which opens the account menu: the person's name
@@ -24,6 +25,7 @@ import { usePathname } from 'next/navigation';
 import { useShell } from './shell-state';
 import { IconBell, IconClose, IconEnvelope, IconMenu } from './icons';
 import { NameCircle } from './name-circle';
+import { Wordmark } from './wordmark';
 
 export type TopBarLink = { label: string; href: string; accent?: boolean };
 
@@ -75,11 +77,8 @@ export function TopBar({ product, messagesHref, announcementsHref, unread, user,
         <IconClose className="topbar-ico-close" />
       </button>
 
-      {/* brand first, product bold: the order says whose product it is,
-          the weight says which one you are in (Sam, 2026-09-22) */}
       <div className="topbar-brand">
-        <span>Quademia</span>
-        <b>{product}</b>
+        <Wordmark product={product} />
       </div>
 
       <div className="topbar-spacer" />

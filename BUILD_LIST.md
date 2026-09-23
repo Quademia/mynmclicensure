@@ -161,7 +161,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - → The product card duplicated between `.prep-*` and `.subp-*` — built as 10-design-system.md DS20 (2026-09-23)
 - ✅ C4 The checkout — one route, MyNclex's layout, four required fields, isForSale() at both doors — 2026-09-23
 - ⬜ The checkout and confirmation-page wording — all new, not approved; Sam to revisit (2026-09-23)
-- ⬜ The public top bar offers Sign In / Register Free to a buyer already signed in (2026-09-23)
+- ✅ The public top bar offers Sign In / Register Free to a buyer already signed in (2026-09-23) — closed by DS21 without a check: the bar has Sign in and a Dashboard link, and the middleware lands either kind of visitor right (Sam) — 2026-09-23
 - ⬜ A signed-in buyer with no WhatsApp number on the profile pays without one (setup-form accounts)
 - ⬜ A premium-ticked product whose id matches no programme is dropped in silence on `/premium-prep` — the admin sees "updated successfully" and it never appears (2026-09-22, unruled)
 - ⬜ Desktop: a side rail of tickable filters (programme and similar) instead of the chip row (Sam, 2026-09-22)
@@ -302,6 +302,8 @@ storage.
 - ⬜ DS18 Product kind (PAID / FREE / TRIAL) borrows the state colours — a kind by DS11, unmapped; Sam to rule
 - ✅ DS20 One card — `.card` into components.css, one product card for both selling pages — 2026-09-23
 - ⬜ DS20 The ~20 stylesheets that draw their own white box under another name — onto `.card` as each is touched
+- ✅ DS21 The wordmark and the public menu — the painted Q with the product over "by Quademia" on both bars; the public bar's links (Home · Premium Prep · Packages · Dashboard), Sign in as its one action, a phone menu from the right — 2026-09-23
+- ⬜ DS21 The signed-in app's drawer to open from the right, like the public menu (Sam, later)
 - ⬜ One form field — `.dlg-input`, `.qa-input` and `.chk-input` are three copies of one field
 - ⬜ Dark mode — not one prefers-color-scheme rule in the app and one theme in the token file; after the above
 - ⬜ A content max-width above 1440px, where A3's closed sidebar leaves cards and tables past a comfortable measure

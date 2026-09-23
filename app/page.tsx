@@ -40,7 +40,7 @@ export default async function LandingPage() {
       {/* NAV — the shared public bar (2026-09-22). The tagline that used
           to sit under the brand here moves to the hero: a bar shown to
           someone halfway through paying should not carry marketing. */}
-      <PublicTopBar showSubscribe />
+      <PublicTopBar />
 
       {/* HERO */}
       <section className="hero">

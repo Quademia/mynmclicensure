@@ -135,9 +135,16 @@ above sit at the repo root; the audience grouping inside them is kept.
    A native box also cannot be answered from the desktop app's browser
    pane, so any flow behind one is unwalkable by an assistant.
 3. **Every surface works on a phone; student surfaces are the
-   priority.** Breakpoint **768px**. Navigation comes from the shared
-   drawer in `components/shell/mobile/`; do not hand-roll it. Content
-   reflows and stacks below 768px in the surface's own stylesheet.
+   priority.** Breakpoint **768px**. The signed-in app's navigation
+   comes from the shared drawer in `components/shell/mobile/` (from the
+   left). The public top bar has its own phone menu
+   (`components/shell/public-menu.tsx`), opening from the right beside
+   its hamburger, with the same look from the design system and the
+   same closing behaviour — backdrop, link tap, Escape, route change
+   (Sam, 2026-09-23). No other surface builds one. The two opening from
+   opposite sides is temporary: the app's drawer moves to the right
+   later (Sam). Content reflows and stacks below 768px in the surface's
+   own stylesheet.
 4. **One money voice: `GHS 350`, never `₵350`.** Amounts are stored as
    integer minor units and rendered through `formatMinor()`.
 5. **One brand name: `Quademia`. `QAcademy` never reaches a reader.**

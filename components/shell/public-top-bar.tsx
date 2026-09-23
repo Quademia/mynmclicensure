@@ -1,63 +1,57 @@
 // components/shell/public-top-bar.tsx
 //
 // The public top bar — the signed-out sibling of DS5's `top-bar.tsx`
-// (Sam, 2026-09-22). Extracted from the landing page's own `<nav>`,
-// which was the only real public bar in the app: `/premium-prep` had a
-// smaller one of its own ("Quademia" plus a sign-in link), and
-// `/subscribe` and `/payment-confirmation` had none at all. Four public
-// pages, three treatments, none shared.
+// (Sam, 2026-09-22), on every public page: the landing page, Premium
+// Prep, Packages (/subscribe), the checkout and the confirmation page.
 //
-// ⚠ IT IS A SERVER COMPONENT, deliberately. It reads nothing from the
-// browser and holds no state, so it ships no JavaScript to a phone on a
-// bad connection — and the pages that use it render it around their
-// client half rather than from inside it.
+// ⚠ IT IS A SERVER COMPONENT, deliberately. The wordmark, the links and
+// Sign in are plain markup, so on a phone on a bad connection the bar
+// costs no JavaScript — except the hamburger and its menu, which are the
+// one client piece (`public-menu.tsx`) and the only part that has to be.
 //
-// THE WORDMARK IS DS5's, not the landing page's. Brand first, product
-// bold — "Quademia" muted, the product name heavier — because Sam ruled
-// that the order says whose product it is and the weight says which one
-// you are in (2026-09-22). The landing page used to add a tagline
-// ("MyNMCLicensure · NMC Licensure Prep"); that is marketing copy, and
-// it belongs on the landing page's hero rather than in a bar that is
-// also shown to someone halfway through paying.
+// DS21 (Sam, 2026-09-23), on MyNclex's pattern:
+//   · the one wordmark both bars draw (`wordmark.tsx`) — the painted Q,
+//     the product on top, "by Quademia" beneath;
+//   · the links from `lib/nav/public.ts` in a row on a computer, the same
+//     list behind the hamburger on a phone;
+//   · ONE action, Sign in, on every page and every width. Subscribe and
+//     Register Free left the bar: each page's own copy carries them.
 //
-// `showSubscribe` exists because the landing page links to /subscribe
-// from its bar and a page that IS the subscribe page should not. It
-// defaults to off, so a new public page gets the two doors that always
-// make sense — sign in, or register.
+// Nothing here knows who is signed in, by design (Sam): Dashboard and
+// Sign in each land a visitor in the right place through the
+// middleware's redirects, so a check would cost a round trip for nothing.
 
 import Link from 'next/link';
+import { PUBLIC_LINKS } from '@/lib/nav/public';
+import { PublicMenu } from './public-menu';
+import { Wordmark } from './wordmark';
 
 export function PublicTopBar({
   product = 'MyNMCLicensure',
-  showSubscribe = false,
 }: {
-  /** The product line beside the brand. Matches DS5's `product` prop. */
+  /** The product line in the wordmark. Matches DS5's `product` prop. */
   product?: string;
-  /** The landing page's extra "Subscribe" link. Off everywhere else. */
-  showSubscribe?: boolean;
 }) {
   return (
     <header className="pubbar">
-      <Link href="/" className="pubbar-brand" aria-label="Quademia home">
-        <span>Quademia</span>
-        <b>{product}</b>
+      <Link href="/" className="pubbar-brand" aria-label={`${product} by Quademia — home`}>
+        <Wordmark product={product} />
       </Link>
 
-      <div className="pubbar-spacer" />
-
-      <nav className="pubbar-actions" aria-label="Account">
-        {showSubscribe ? (
-          <Link href="/subscribe" className="pubbar-link">
-            Subscribe
+      <nav className="pubbar-links" aria-label="Site">
+        {PUBLIC_LINKS.map((l) => (
+          <Link key={l.href} href={l.href} className="pubbar-link">
+            {l.label}
           </Link>
-        ) : null}
-        <Link href="/login" className="btn btn-outline btn-sm">
-          Sign In
-        </Link>
-        <Link href="/register" className="btn btn-accent btn-sm">
-          Register Free
-        </Link>
+        ))}
       </nav>
+
+      <div className="pubbar-actions">
+        <Link href="/login" className="btn btn-outline btn-sm">
+          Sign in
+        </Link>
+        <PublicMenu />
+      </div>
     </header>
   );
 }

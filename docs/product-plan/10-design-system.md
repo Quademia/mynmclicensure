@@ -796,6 +796,48 @@ each surface is touched (ruling 9's pattern). `/student/upgrade` keeps
 its own list of what is for sale and its own `.upg .card`; that is
 D23 item 3, a separate line.
 
+### DS21 — The wordmark and the public menu (added 2026-09-23)
+
+**What was there.** Both bars drew "Quademia **MyNMCLicensure**" on one
+line in plain type, brand first (DS5, Sam 2026-09-22: "the order says
+whose product it is, the weight says which one you are in"). The public
+bar's right side held Subscribe (landing page only), Sign In and
+Register Free — and below 768px only Register Free, so a returning
+student on a phone had no way in from the bar.
+
+**What was built (Sam, 2026-09-23, on MyNclex's pattern).**
+
+- **One wordmark** (`components/shell/wordmark.tsx`, `.wordmark` in
+  `components.css`), drawn by both bars: the painted Q, then
+  **MyNMCLicensure** on top and "by Quademia" beneath. It **replaces
+  DS5's order**: the product leads, the parent earns its line. The mark
+  is a 64px copy of `quademia-mark.png` (3.9 KB against 91 KB) — the same
+  picture, not a redraw.
+- **The two bars stay two components** (Sam: they do different jobs)
+  and share only the wordmark and the design system's look.
+- **The public bar:** the links Home · Premium Prep · Packages ·
+  Dashboard from `lib/nav/public.ts`, one list for both widths; **one
+  action, Sign in**, at every width. Subscribe and Register Free left
+  the bar; each page's own copy carries them. Nothing checks who is
+  signed in (Sam): Dashboard (`/router`) and Sign in (`/login`) each land
+  a visitor in the right place through the middleware's redirects — this
+  closes the "Sign In / Register Free offered to a signed-in buyer" line
+  without a round trip.
+- **The public phone menu** (`public-menu.tsx`, the bar's one client
+  piece): the hamburger at the right beside Sign in, the panel **from the
+  right** under the bar (Sam), in the signed-in drawer's navy and link
+  inks, closing the same four ways (backdrop, link tap, Escape, route
+  change) — and on a widening window, since the hamburger hides above
+  768px. Portalled to `<body>`. Three tokens lifted from `shell.css`'s
+  literals: `--ink-on-navy-soft`, `--surface-on-navy-hover`, `--scrim`.
+- **AGENTS.md UI convention #3 amended** (Sam): the app's menu is the
+  shared drawer, the public bar has its own; no third.
+
+**Not in this slice.** The signed-in drawer opening from the right too
+(Sam, later) — until then the two open from opposite sides, which is
+temporary, not a design. The landing page's hero still says "Sign In"
+and "Sign In to Portal" beside the bar's "Sign in" (legacy's words).
+
 ### Later, under this doc
 
 - **Dark mode.** The product has not one `prefers-color-scheme` rule and
@@ -835,4 +877,5 @@ D23 item 3, a separate line.
 | DS17 The ~15 name chips still on `.badge` | ⬜ most sit on DS9 surfaces |
 | DS18 Product kind borrows the state colours | ⬜ Sam to rule |
 | DS20 One card | ✅ 2026-09-23 — `.card` global, the product card shared by both selling pages; own-name boxes as touched |
+| DS21 The wordmark and the public menu | ✅ 2026-09-23 — the painted Q, product over "by Quademia" on both bars; public links, Sign in only, a phone menu from the right |
 | Dark mode · content max-width · the avatar's size | ⬜ later |
