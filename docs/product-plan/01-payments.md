@@ -97,7 +97,7 @@ already have been.
 
 | Finding | What it says | Status |
 |---|---|---|
-| D4 | There is no Paystack webhook; activation depends on the payer's browser coming back. A payer who approves the mobile-money prompt and loses signal has paid and received nothing until an admin intervenes — in a product built for unreliable connectivity | ⬜ **unruled, and queued nowhere until today** |
+| D4 | There is no Paystack webhook; activation depends on the payer's browser coming back. A payer who approves the mobile-money prompt and loses signal has paid and received nothing until an admin intervenes — in a product built for unreliable connectivity | ✅ built 2026-09-23 (Sam, in session) — `/api/paystack/webhook`, after §8 S15; proven on the dev site with Paystack's own call. A new buyer still needs D31 for an account |
 | D31 | Pay-first is the root of every carried payments question; alpha had it the other way | ⬜ ruled (Sam, 2026-09-18) — the account created at PAID, the setup token and its two columns gone |
 | D32 | The payment row stores Paystack's whole reply, forever, and shows it to admins | ✅ 2026-09-19 — channel, card_type, last4 kept; prod at the next release |
 | D33 | The reference alone unlocks the payer's personal data and the setup token | ⬜ ruled (Sam, 2026-09-18) — a same-browser cookie, else the emailed link |

@@ -197,12 +197,17 @@ this is.
 and runs the same activation path the confirmation page runs, so a
 completed payment activates whether or not the browser ever comes back.
 
-**Status.** Open. Not approved, not queued. The only finding here that
-costs money rather than tidiness. Two facts added 2026-09-18: alpha's
-Payments web app *was* webhook-driven (Sam); and D34's ruling — a
-nightly sweep that verifies every stale INIT row with Paystack — covers
-most of this finding within a day, leaving the webhook as the
-seconds-not-hours version of the same catch.
+**Status.** ✅ Ruled and built 2026-09-23 (Sam, in session), after §8
+S15 made activation safe for two callers at once:
+`app/api/paystack/webhook/route.ts`, the signature checked, only
+`charge.success`, the confirmation page's own verify path, a live setup
+token kept. Proven on the dev site with Paystack's own call and the tab
+closed. What it does NOT close: a **new** buyer's payment is recorded
+at once but no account exists until they reach the setup form — that is
+D31. The nightly sweep (D34) stays the backstop for a webhook Paystack
+gives up on. Earlier facts, 2026-09-18: alpha's Payments web app *was*
+webhook-driven (Sam); D34 covers most of this finding within a day, the
+webhook being the seconds-not-hours version of the same catch.
 
 ---
 
@@ -2971,6 +2976,6 @@ They are a different series from the *findings* here, and the ids
 collide: D4 there is "like-for-like", D4 here is the missing Paystack
 webhook. Read a "D" by the document it comes from.
 
-**Still unruled by Sam, anywhere:** D4 (no Paystack webhook), D28 (six
+**Still unruled by Sam, anywhere:** D28 (six
 trips before a protected page renders), D50 (schools unmanageable), D3
 (telegram keys free text).

@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-23 — the Paystack webhook (D4) on one subscription per payment (S15), proven on the dev site with Paystack's own call and the tab closed
+  - ↳ one Paystack business per product · account is the Blogger era's, at its ceiling · live after Quademia Limited · setup token kept · rule 9 on subscriptions · dev site broke till merge · D31 next, own session
+
 - 2026-09-23 — one shared card (DS20), the checkout on MyNclex's layout (C4), one payment limit per action (D35), the confirmation page server-first
   - ↳ no basket yet · WhatsApp + confirm email required · isForSale at both doors · 10/10/30 · retry restarts · rate_limits grants back · receipt · leak closed · 3 test payments · copy unapproved · D4 next
 

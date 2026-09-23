@@ -317,6 +317,19 @@ above sit at the repo root; the audience grouping inside them is kept.
   edited reader within seconds; a migration applied minutes later leaves
   every open page erroring in between. Run `npm run db:migrate` the
   moment the readers are written, or migrate first.
+- **A migration run from the session branch also reaches the deployed
+  dev site**, which shares the dev database but runs `main`'s code. A
+  migration that takes a table's writes back from the browser (rule 9)
+  breaks the old code's writes there until the merge — S15 left the dev
+  site's admin Grant / Edit / Revoke / Sync refused for the length of the
+  session (2026-09-23). Say so when proposing the migration; it reaches
+  only Sam, on dev.
+- **A webhook cannot reach `localhost`, but its handler can be walked
+  there**: sign a body the way the sender does (for Paystack, HMAC-SHA512
+  of the raw body under the test secret key) with a scratchpad script
+  that reads `.env.local` and never prints the key, and post it. With
+  Sam holding a real test payment at a chosen step, that walks the race
+  the webhook exists for (2026-09-23).
 - **Next memoises an identical fetch within one render.** A Server
   Component that reads a row, writes through a function, then reads the
   same row again with the same client gets the FIRST read back (03 Q5:
