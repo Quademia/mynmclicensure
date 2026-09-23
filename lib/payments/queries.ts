@@ -11,6 +11,7 @@
 // Server only.
 
 import type { createServiceRoleClient } from '@/lib/supabase/server';
+import type { ProductKind, ProductStatus } from '@/lib/catalogue/types';
 import type { Subscription } from '@/lib/subscriptions/types';
 import type { Payment, PaymentUser } from './types';
 
@@ -19,10 +20,12 @@ export type ServiceDb = ReturnType<typeof createServiceRoleClient>;
 export type PaymentProduct = {
   product_id: string;
   name: string;
+  /** Read for isForSale() at the two init doors (02 C4). */
+  kind: ProductKind;
   duration_days: number;
   price_minor: number;
   currency: string;
-  status: string;
+  status: ProductStatus;
 };
 
 const USER_COLUMNS = 'user_id, email, auth_id, forename, surname, name, active, program_id, phone_number';
@@ -34,7 +37,7 @@ export async function getPaymentByReference(db: ServiceDb, reference: string): P
 }
 
 export async function getProductForPayment(db: ServiceDb, productId: string, requireActive: boolean): Promise<PaymentProduct | null> {
-  let query = db.from('products').select('product_id, name, duration_days, price_minor, currency, status').eq('product_id', productId);
+  let query = db.from('products').select('product_id, name, kind, duration_days, price_minor, currency, status').eq('product_id', productId);
   if (requireActive) query = query.eq('status', 'active');
   const { data, error } = await query.maybeSingle();
   if (error) throw new Error(`Supabase select failed on products: ${error.message}`);

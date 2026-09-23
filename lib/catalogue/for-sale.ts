@@ -33,8 +33,13 @@
 
 import type { Course, Product } from './types';
 
-/** D23 item 3. The one definition of a product a visitor may buy. */
-export function isForSale(product: Product): boolean {
+/**
+ * D23 item 3. The one definition of a product a visitor may buy. Takes
+ * only the three fields it reads, so the payment actions' own product
+ * lookup can ask the same question (02 C4, 2026-09-23) — the server's
+ * init gate used to check `status` alone.
+ */
+export function isForSale(product: Pick<Product, 'kind' | 'status' | 'price_minor'>): boolean {
   return (
     product.kind === 'PAID' &&
     product.status === 'active' &&

@@ -444,6 +444,52 @@ nothing and is pushed by nothing; the panel shows each row with the
 right state word; the receipt's window equals its rows; a student with
 only a future row sees "starts …" on the dashboard, not Subscribe.
 
+### C4 — The checkout (added 2026-09-23)
+
+**Why.** Both selling pages were rebuilt as cards on 2026-09-22 with a
+Continue button pointing at `/checkout/<product_id>`, a page that did not
+exist. Sam's rulings of that day shaped it: **one checkout for every
+product** (every money shape here is "buy one product by id"), and
+**"upgrade" is who you are, not what you buy** — a signed-in buyer gets
+the same page.
+
+**What was built.** `app/checkout/[productId]/` — a Server Component
+page and one client form — on MyNclex's checkout layout (Sam, after
+reading `components/checkout/checkout-shell.tsx` there): the package
+(the shared product card, DS20) with "Change package", then the
+details, on the left; an order summary with the Pay button, then "What
+happens next", in a rail on the right; stacked in that order on a phone.
+
+- **A new buyer** gives email, the email again, a WhatsApp number and a
+  programme — **all four required** (Sam, 2026-09-23). The number
+  because it is how a payer is reached and Paystack does not hand back
+  the one it takes for mobile money; the confirm box because the server
+  only ever sees one email, and a typo sends the account and receipt
+  somewhere the buyer cannot reach. The programme is prefilled when the
+  product belongs to exactly one programme (D23 item 2's derivation) and
+  stays editable — it becomes the account's. Then init-public.
+- **A signed-in buyer** sees "Paying as" — the account's email and
+  programme — and pays through init-upgrade.
+- **The server refuses what is not for sale.** Both init doors checked
+  `status = 'active'` alone, so a zero-price trial could be sent to
+  Paystack by its id; both now call `isForSale()`, and init-public
+  repeats the form's checks (email shape, nine digits, a real
+  programme). On dev every priced product is PAID, so the upgrade page
+  loses nothing.
+- **Nothing is remembered in the browser**, and both forms are
+  `method="post"` so a page whose script never loaded cannot put the
+  email and number into the address bar — found in the walk.
+
+**Not carried from MyNclex:** the step wizard, the "this email already
+has an account — log in first" check (D31 rules that a paid email with
+an account gets the package added to it), and a Pay button held
+disabled until complete (this app reports on Pay, as toasts).
+
+**Not in this slice:** the account made at payment (D31), the
+same-browser cookie (D33), the confirmation page's own rate limit
+(D35 — Sam: a separate job, next), the nightly sweep (D34). "What
+happens next" describes today's pay-first flow and changes with D31.
+
 ### Later, under this doc
 
 - **The shop (D2, D19, D23):** one "for sale" helper on `kind` and
@@ -471,3 +517,4 @@ only a future row sees "starts …" on the dashboard, not Subscribe.
 | C2 The access rows | ✅ 2026-09-19 (`20260919230000_course_access.sql` + `…233000_course_access_grants.sql`; before S2 — Sam; proven on dev by SQL, walked by Sam on an RM Trial grant: the rows and the per-course ends, GP the later end not the sum) |
 | C3a The queued start | ✅ 2026-09-19 (code only; proven on dev by running the writer — RN_FULL queued behind the FREE receipt, RM_FULL's GP behind that, the RM courses starting today past the trial; walked by Sam: an RN_FULL grant, the dashboard's ends) |
 | C3b The panel shows the rows; the chain re-packed on every write; the receipt's window from its rows; created_utc and requested_start_utc | ✅ 2026-09-19 (`20260919235000_subscriptions_created_utc.sql`, `20260920003000_subscriptions_requested_start.sql`; three shapes in one day, the third proven on the five chain cases by running the writers; walked by Sam: the panel, Grant queued behind a live receipt, the live one revoked and the next pulled forward, both revoked and the dashboard back to Subscribe) |
+| C4 The checkout | ✅ 2026-09-23 (code only; walked in the pane both ways to Paystack's page — a student's INIT row through init-upgrade, a new buyer's through init-public with the mismatch and short-number refusals; the not-for-sale cases by address; phone at 375px) |

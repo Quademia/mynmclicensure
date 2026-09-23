@@ -14,9 +14,20 @@
 //
 // The Worker ignored the browser's callback_url on this route and built
 // its own from APP_BASE_URL; here it is appOrigin().
+//
+// Since the checkout (02 C4, Sam 2026-09-23) this door also refuses what
+// the checkout's form refuses, because a form's checks are advice to the
+// browser and this is the one that counts: a product not for sale by
+// isForSale() — the gate used to be `status = 'active'` alone, so a
+// zero-price trial could be sent to Paystack by its id — a WhatsApp
+// number under nine digits (the register page's own rule), and a
+// programme that is not one. The number and the programme are required:
+// the programme becomes the account's, and the number is how a payer is
+// reached; Paystack does not hand back the one it takes for mobile money.
 
 'use server';
 
+import { isForSale } from '@/lib/catalogue/for-sale';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { appOrigin } from '@/lib/site/app-origin';
 import { makePaymentReference } from './ids';
@@ -36,7 +47,16 @@ export async function initPublicPayment(input: InitPublicInput): Promise<InitRes
   const phoneNumber = String(input?.phone_number || '').trim();
 
   if (!email || !productId) {
-    return { ok: false, error: 'missing_required_fields', message: 'email and product_id are required' };
+    return { ok: false, error: 'missing_required_fields', message: 'Please enter your email address.' };
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { ok: false, error: 'invalid_email', message: 'Please enter a valid email address.' };
+  }
+  if (phoneNumber.replace(/\D/g, '').length < 9) {
+    return { ok: false, error: 'invalid_phone', message: 'Please enter a valid WhatsApp number.' };
+  }
+  if (!programId) {
+    return { ok: false, error: 'missing_program', message: 'Please select your programme.' };
   }
 
   const db = createServiceRoleClient();
@@ -44,13 +64,19 @@ export async function initPublicPayment(input: InitPublicInput): Promise<InitRes
   let product;
   try {
     product = await getProductForPayment(db, productId, true);
+    const { data: program, error: programError } = await db
+      .from('programs')
+      .select('program_id')
+      .eq('program_id', programId)
+      .maybeSingle();
+    if (programError) throw new Error(`Supabase select failed on programs: ${programError.message}`);
+    if (!program) return { ok: false, error: 'unknown_program', message: 'Please select your programme.' };
   } catch (err) {
     console.error('[payments] init-public product lookup failed:', err);
     return { ok: false, error: 'server_error', message: 'Could not start payment. Please try again.' };
   }
-  if (!product) {
-    // Legacy sent the code with no message; the page showed the code.
-    return { ok: false, error: 'product_not_found_or_inactive', message: 'product_not_found_or_inactive' };
+  if (!product || !isForSale(product)) {
+    return { ok: false, error: 'product_not_for_sale', message: 'This package is not available to buy.' };
   }
 
   const reference = makePaymentReference();
@@ -74,8 +100,8 @@ export async function initPublicPayment(input: InitPublicInput): Promise<InitRes
     setup_token: null,
     setup_created_utc: null,
     setup_completed_utc: null,
-    program_id: programId || null,
-    phone_number: phoneNumber || null,
+    program_id: programId,
+    phone_number: phoneNumber,
   });
   if (insertError) {
     console.error('[payments] init-public insert failed:', insertError.message);
@@ -92,8 +118,8 @@ export async function initPublicPayment(input: InitPublicInput): Promise<InitRes
       metadata: {
         product_id: product.product_id,
         product_name: product.name,
-        program_id: programId || null,
-        phone_number: phoneNumber || null,
+        program_id: programId,
+        phone_number: phoneNumber,
       },
     });
 

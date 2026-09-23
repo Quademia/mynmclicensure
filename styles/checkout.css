@@ -1,0 +1,215 @@
+/* styles/checkout.css — the checkout (02 C4, 2026-09-23)
+ *
+ * MyNclex's checkout shape (Sam, 2026-09-23): the package and the
+ * buyer's details on the left, a rail on the right with the order
+ * summary + Pay and "What happens next". On a phone it stacks in that
+ * order, so Pay comes after the details it sends.
+ *
+ * Built on the design system from the first line: every value is a
+ * token from tokens.css, every box is the shared `.card` (DS20) — the
+ * package is the shared product card itself — and the button is
+ * `.btn .btn-accent .btn-lg`. What is left here is layout and the
+ * form fields.
+ *
+ * ⚠ THE FIELDS ARE THIS PAGE'S OWN. The design system has no shared
+ * field yet — `.dlg-input` is the dialog's, `.qa-input` the auth
+ * pages'. These follow `.dlg-input`'s shape (the same padding, radius
+ * and teal focus) so the three do not drift further apart; a shared
+ * field is the design system's to add when a second page needs one.
+ * The focus ring is --brand-teal-pale, not the dialog's rgba literal,
+ * which the stylesheet guard would refuse.
+ */
+
+.chk-page { display: flex; flex-direction: column; min-height: 100vh; }
+
+.chk {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: var(--space-32) var(--space-16);
+  background: var(--surface-page);
+  color: var(--ink);
+}
+
+.chk h1 {
+  font-size: var(--type-page-title-size);
+  line-height: var(--type-page-title-line);
+  font-weight: var(--type-page-title-weight);
+  letter-spacing: var(--type-page-title-track);
+  color: var(--brand-navy);
+  margin: 0 0 var(--space-24);
+}
+
+/* ── The two columns ────────────────────────────────────────────── */
+
+.chk-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: var(--space-24);
+  align-items: start;
+}
+.chk-main { display: flex; flex-direction: column; gap: var(--space-24); min-width: 0; }
+
+/* The rail stays in view while the left column scrolls, so the total and
+   Pay are always beside the form. Below the public bar (64px). */
+.chk-rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  position: sticky;
+  top: calc(64px + var(--space-16));
+}
+
+.chk-title {
+  font-size: var(--type-section-title-size);
+  line-height: var(--type-section-title-line);
+  font-weight: var(--type-section-title-weight);
+  color: var(--brand-navy);
+  margin: 0;
+}
+
+/* ── Your package ───────────────────────────────────────────────── */
+
+.chk-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-12);
+  margin-bottom: var(--space-10);
+}
+.chk-change {
+  font-size: var(--type-meta-size);
+  font-weight: 600;
+  color: var(--brand-teal-hover);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.chk-change:hover { text-decoration: underline; }
+
+/* No Continue button on this card, so the list is its last line. */
+.chk .product-card-courses { margin-bottom: 0; }
+
+/* ── Your details ───────────────────────────────────────────────── */
+
+.chk-field {
+  display: block;
+  margin-top: var(--space-16);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-ui-weight);
+  color: var(--ink);
+}
+.chk-input {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-6);
+  padding: 9px 12px;
+  font: inherit;
+  font-weight: var(--type-field-weight);
+  font-size: var(--type-field-size);
+  line-height: var(--type-field-line);
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.chk-input:focus {
+  outline: none;
+  border-color: var(--brand-teal);
+  box-shadow: 0 0 0 3px var(--brand-teal-pale);
+}
+.chk-hint {
+  display: block;
+  margin-top: var(--space-4);
+  font-size: var(--type-meta-size);
+  font-weight: var(--type-meta-weight);
+  color: var(--ink-muted);
+  overflow-wrap: anywhere;
+}
+.chk-hint strong { color: var(--ink); }
+
+/* The signed-in buyer: who the payment goes to, instead of the fields. */
+.chk-who {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-6) var(--space-16);
+  margin: var(--space-12) 0 0;
+  font-size: var(--type-field-size);
+}
+.chk-who dt { color: var(--ink-muted); }
+.chk-who dd { margin: 0; color: var(--ink); font-weight: 600; overflow-wrap: anywhere; }
+
+/* ── The rail: order summary + Pay ──────────────────────────────── */
+
+.chk-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-12);
+  margin-top: var(--space-16);
+  padding-bottom: var(--space-12);
+  border-bottom: 1px solid var(--border);
+}
+.chk-line-name { font-size: var(--type-field-size); font-weight: 600; color: var(--ink); }
+.chk-line-meta { margin-top: var(--space-2); font-size: var(--type-meta-size); color: var(--ink-muted); }
+.chk-line-amount { font-size: var(--type-field-size); font-weight: 600; color: var(--ink); white-space: nowrap; }
+
+.chk-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-12);
+  margin-top: var(--space-12);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-ui-weight);
+  color: var(--ink-muted);
+}
+/* The one price that is the design system's price style on this page. */
+.chk-total-amount {
+  font-size: var(--type-price-size);
+  line-height: var(--type-price-line);
+  font-weight: var(--type-price-weight);
+  letter-spacing: var(--type-price-track);
+  color: var(--brand-teal-hover);
+  white-space: nowrap;
+}
+
+/* Layout only — the skin is .btn .btn-accent .btn-lg. */
+.chk-submit { width: 100%; margin-top: var(--space-16); }
+
+.chk-note {
+  margin: var(--space-10) 0 0;
+  font-size: var(--type-meta-size);
+  line-height: 1.6;
+  color: var(--ink-muted);
+  text-align: center;
+}
+
+/* ── The rail: what happens next ────────────────────────────────── */
+
+.chk-next ol {
+  margin: var(--space-12) 0 0;
+  padding-left: var(--space-20);
+  font-size: var(--type-meta-size);
+  line-height: 1.6;
+  color: var(--ink-muted);
+}
+.chk-next li + li { margin-top: var(--space-6); }
+
+/* ── Not for sale ───────────────────────────────────────────────── */
+
+.chk-empty { text-align: center; }
+.chk-empty p { margin: 0 0 var(--space-16); font-size: var(--type-field-size); color: var(--ink-muted); }
+
+/* ── The phone (AGENTS.md UI convention #3, 768px) ──────────────── */
+
+@media (max-width: 768px) {
+  .chk { padding: var(--space-24) var(--space-16) var(--space-32); }
+  .chk h1 { margin-bottom: var(--space-16); }
+  /* One column: package, details, then the summary with Pay, then what
+     happens next. The rail stops being sticky — it is below the form. */
+  .chk-grid { grid-template-columns: 1fr; gap: var(--space-16); }
+  .chk-main { gap: var(--space-16); }
+  .chk-rail { position: static; }
+  .chk-details, .chk-summary, .chk-next { padding: var(--space-16); }
+}

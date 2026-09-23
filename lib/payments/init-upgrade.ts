@@ -11,9 +11,15 @@
 // Paystack's initialize with the confirmation page as the callback; the
 // init reply kept in `raw`. A Paystack refusal marks the row FAILED and
 // answers generically (§7.1).
+//
+// Since the checkout (02 C4, 2026-09-23) the product must pass
+// isForSale(), not only be active — the same refusal as init-public. The
+// checkout's signed-in half and the upgrade page both come through here;
+// every priced product on dev is PAID, so the upgrade page loses nothing.
 
 'use server';
 
+import { isForSale } from '@/lib/catalogue/for-sale';
 import { requireStudent } from '@/lib/access';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { appOrigin } from '@/lib/site/app-origin';
@@ -44,7 +50,9 @@ export async function initUpgradePayment(productIdIn: string): Promise<InitResul
     console.error('[payments] init-upgrade product lookup failed:', err);
     return { ok: false, error: 'server_error', message: 'Could not start payment. Please try again.' };
   }
-  if (!product) return { ok: false, error: 'product_not_found_or_inactive', message: 'product_not_found_or_inactive' };
+  if (!product || !isForSale(product)) {
+    return { ok: false, error: 'product_not_for_sale', message: 'This package is not available to buy.' };
+  }
 
   const email = String(profile.email || user.email || '').trim().toLowerCase();
   if (!email) return { ok: false, error: 'user_email_missing', message: 'user_email_missing' };
