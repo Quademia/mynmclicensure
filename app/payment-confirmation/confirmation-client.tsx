@@ -417,8 +417,13 @@ export function ConfirmationClient() {
                 className="btn btn-secondary"
                 type="button"
                 onClick={() => {
+                  // Restarts the whole patient check, not one ask (Sam,
+                  // 2026-09-23): a buyer taps Retry the moment they have
+                  // approved on their phone, often seconds before Paystack
+                  // has settled, and one "not yet" would leave them to
+                  // guess that they must tap again. Legacy asked once.
                   pollCountRef.current = 0;
-                  verify(false);
+                  verify(true);
                 }}
               >
                 Retry Verification
