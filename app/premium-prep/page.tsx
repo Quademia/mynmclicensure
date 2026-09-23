@@ -45,6 +45,7 @@ import { getCourses, getProducts } from '@/lib/catalogue/queries';
 import { formatMinor } from '@/lib/money/format-minor';
 import { PublicTopBar } from '@/components/shell/public-top-bar';
 import { PublicFooter } from '@/components/shell/public-footer';
+import { ProductCard } from '@/components/catalogue/product-card';
 import '@/styles/premium-prep.css';
 
 export const metadata: Metadata = {
@@ -113,39 +114,14 @@ export default async function PremiumPrepPage() {
           </p>
         ) : (
           <ul className="prep-grid">
-            {premium.map((product) => {
-              const titles = product.courses
-                .map((id) => courseTitle.get(id) ?? id)
-                .sort((a, b) => a.localeCompare(b));
-              return (
-                <li key={product.product_id} className="prep-card">
-                  <h2 className="prep-card-name">{product.name}</h2>
-
-                  <p className="prep-price">
-                    <span className="prep-amount">
-                      {formatMinor(product.price_minor, product.currency)}
-                    </span>
-                    <span className="badge badge-neutral">{product.duration_days} days</span>
-                  </p>
-
-                  <p className="prep-unlocks">
-                    Unlocks {titles.length} course{titles.length === 1 ? '' : 's'}
-                  </p>
-                  <ul className="prep-courses">
-                    {titles.map((title) => (
-                      <li key={title}>{title}</li>
-                    ))}
-                  </ul>
-
-                  <Link
-                    href={`/checkout/${product.product_id}`}
-                    className="btn btn-accent btn-lg prep-cta"
-                  >
-                    Continue
-                  </Link>
-                </li>
-              );
-            })}
+            {premium.map((product) => (
+              <ProductCard
+                key={product.product_id}
+                product={product}
+                courseTitle={courseTitle}
+                headingLevel={2}
+              />
+            ))}
           </ul>
         )}
 

@@ -345,15 +345,10 @@
   margin-top: 4px;
 }
 
-/* --- Cards --- */
-.card {
-  background: var(--white);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 24px;
-  border: 1px solid var(--border);
-}
-
+/* --- Cards ---
+ * `.card` itself moved to components.css (DS20, 2026-09-23), so the
+ * public pages can use it too. The grid stays: the student dashboard's
+ * course cards are its one user. */
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));

@@ -35,7 +35,9 @@
 .pcf * { box-sizing: border-box; }
 
 .pcf .wrap { max-width: 860px; margin: 0 auto; padding: 28px 16px 32px; }
-.pcf .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
+/* padding: 0 since DS20 made the shared .card global — its 24px would
+   inset the tinted .hero band, which is meant to run edge to edge. */
+.pcf .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; padding: 0; }
 
 .pcf .hero {
   padding: 22px 22px 18px;

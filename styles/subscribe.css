@@ -10,10 +10,9 @@
  * --line, --ink …) and re-declared the button and the price box; DS2
  * kept the aliases alive only until DS3 reached this surface, which is
  * now. Every rule below names the app's token directly, the buttons are
- * `.btn .btn-accent .btn-lg` and the duration is `.badge .badge-neutral`
- * from components.css. So this surface leaves the DS9 list rather than
- * joining it. The only button rule here is a layout one — full width
- * inside a card — which ruling 9 allows a converted surface to keep.
+ * `.btn .btn-accent .btn-lg`, the duration is `.badge .badge-neutral`
+ * and the cards are the shared product card, all from components.css.
+ * So this surface leaves the DS9 list rather than joining it.
  *
  * ⚠ EVERY TYPE SIZE IS A SCALE TOKEN. Checked before writing, not
  * after: the price uses --type-price-* (DS1, its weight set by DS14),
@@ -22,11 +21,9 @@
  * price size and had to correct it — the same mistake DS14 exists to
  * stop.
  *
- * ⚠ THE CARD IS DUPLICATED. /premium-prep carries near-identical card
- * rules under .prep-*. Two copies is the shape D23 punishes, and a
- * shared product card belongs in components.css beside .btn and .badge.
- * Not done here because it would convert a surface Sam has not asked
- * about in a slice he asked to keep to this page; flagged instead.
+ * The card was duplicated with /premium-prep's `.prep-*` when this page
+ * was rebuilt; both now render components/catalogue/product-card.tsx
+ * (DS20, 2026-09-23).
  */
 
 .subp-page { display: flex; flex-direction: column; min-height: 100vh; }
@@ -123,57 +120,8 @@
   gap: var(--space-16);
 }
 
-.subp-card {
-  display: flex;
-  flex-direction: column;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: var(--space-24);
-  box-shadow: var(--shadow-sm);
-}
-.subp-card-name {
-  font-size: var(--type-field-size);
-  font-weight: 700;
-  line-height: 1.3;
-  color: var(--brand-navy);
-  margin: 0 0 var(--space-12);
-}
-
-.subp-price { display: flex; align-items: baseline; gap: var(--space-10); margin: 0 0 var(--space-16); flex-wrap: wrap; }
-.subp-amount {
-  font-size: var(--type-price-size);
-  line-height: var(--type-price-line);
-  font-weight: var(--type-price-weight);
-  letter-spacing: var(--type-price-track);
-  color: var(--brand-teal-hover);
-}
-
-.subp-unlocks { font-size: var(--type-meta-size); font-weight: 600; color: var(--ink); margin: 0 0 var(--space-6); }
-.subp-courses { list-style: none; margin: 0 0 var(--space-24); padding: 0; flex: 1 1 auto; }
-.subp-courses li {
-  position: relative;
-  padding-left: var(--space-20);
-  font-size: var(--type-meta-size);
-  line-height: 1.7;
-  color: var(--ink-muted);
-}
-/* Drawn, not an emoji (DS15); a pseudo-element so it is not read out on
-   every line. */
-.subp-courses li::before {
-  content: '';
-  position: absolute;
-  left: 2px;
-  top: .62em;
-  width: 9px;
-  height: 5px;
-  border-left: 2px solid var(--brand-teal);
-  border-bottom: 2px solid var(--brand-teal);
-  transform: rotate(-45deg);
-}
-
-/* Layout only — the skin is .btn .btn-accent .btn-lg (ruling 9). */
-.subp-cta { width: 100%; margin-top: auto; }
+/* The card itself is the shared product card (DS20, components.css);
+   only the grid it sits in is this page's. */
 
 /* ── The Premium Prep pointer, and the empty state ──────────────── */
 
@@ -210,7 +158,6 @@
   .subp { padding: var(--space-24) var(--space-16) var(--space-32); }
   /* One card per row: two 300px tracks plus the gap overflow 375px. */
   .subp-grid { grid-template-columns: 1fr; gap: var(--space-12); }
-  .subp-card { padding: var(--space-16); }
   /* The chooser WRAPS on a phone and shows programme codes. A
      sideways-scrolling row left the chosen chip off-screen to the right
      after the reload, which is worse than two rows of chips: the one

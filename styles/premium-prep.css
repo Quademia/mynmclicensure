@@ -15,11 +15,10 @@
  * aliases survive only until DS3 reaches the surface".
  *
  * ⚠ NOTHING HERE RESTATES A SHARED COMPONENT. The buttons are
- * `.btn .btn-accent .btn-lg` and the duration is `.badge
- * .badge-neutral`, both straight from components.css — so this surface
- * is NOT one of the eight DS9 still has to reach. The only button rule
- * below is a layout one (full width inside the card), which ruling 9
- * explicitly allows a converted surface to keep.
+ * `.btn .btn-accent .btn-lg`, the duration is `.badge .badge-neutral`
+ * and the cards are the shared product card (DS20, 2026-09-23), all
+ * straight from components.css — so this surface is NOT one of the
+ * eight DS9 still has to reach.
  *
  * Teal text on a pale teal ground uses --brand-teal-hover, not
  * --brand-teal: the design system measures the latter at 4.45:1 there,
@@ -79,64 +78,8 @@
   gap: var(--space-16);
 }
 
-.prep-card {
-  display: flex;
-  flex-direction: column;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: var(--space-24);
-  box-shadow: var(--shadow-sm);
-}
-
-.prep-card-name {
-  font-size: var(--type-field-size);
-  font-weight: 700;
-  line-height: 1.3;
-  color: var(--brand-navy);
-  margin: 0 0 var(--space-12);
-}
-
-/* Price and duration read as one line: the amount, then what it buys.
-   A price with no period beside it is the upgrade page's mistake. */
-.prep-price { display: flex; align-items: baseline; gap: var(--space-10); margin: 0 0 var(--space-16); flex-wrap: wrap; }
-/* The design system HAS a price style (DS1, its weight set by DS14). An
-   invented size here would have been the fourth price rule carrying a
-   literal — the exact thing DS14 was opened to fix. */
-.prep-amount {
-  font-size: var(--type-price-size);
-  line-height: var(--type-price-line);
-  font-weight: var(--type-price-weight);
-  letter-spacing: var(--type-price-track);
-  color: var(--brand-teal-hover);
-}
-
-.prep-unlocks { font-size: var(--type-meta-size); font-weight: 600; color: var(--ink); margin: 0 0 var(--space-6); }
-
-.prep-courses { list-style: none; margin: 0 0 var(--space-24); padding: 0; flex: 1 1 auto; }
-.prep-courses li {
-  position: relative;
-  padding-left: var(--space-20);
-  font-size: var(--type-meta-size);
-  line-height: 1.7;
-  color: var(--ink-muted);
-}
-/* The tick is drawn, not an emoji (DS15). A pseudo-element keeps it out
-   of the accessibility tree, where it would be read on every line. */
-.prep-courses li::before {
-  content: '';
-  position: absolute;
-  left: 2px;
-  top: .62em;
-  width: 9px;
-  height: 5px;
-  border-left: 2px solid var(--brand-teal);
-  border-bottom: 2px solid var(--brand-teal);
-  transform: rotate(-45deg);
-}
-
-/* Layout only — the skin is .btn .btn-accent .btn-lg (ruling 9). */
-.prep-cta { width: 100%; margin-top: auto; }
+/* The card itself is the shared product card (DS20, components.css);
+   only the grid it sits in is this page's. */
 
 /* ── The note under the cards ───────────────────────────────────── */
 
@@ -170,5 +113,4 @@
      track to fail — two 300px cards plus the gap overflow a 375px
      screen, and a card that is cut off reads as a broken page. */
   .prep-grid { grid-template-columns: 1fr; gap: var(--space-12); }
-  .prep-card { padding: var(--space-16); }
 }

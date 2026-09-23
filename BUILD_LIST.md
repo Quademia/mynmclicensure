@@ -154,7 +154,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ (unplanned) One Grant dialog for Subscriptions and the Users drawer, the preview by the chain — 2026-09-19
 - ✅ (unplanned) The selling pages become cards — `/premium-prep` five cards, `/subscribe` the shop with a programme chooser that reorders and does not filter; both Server Components with no client half (660 lines deleted); D23 items 1, 2 and 5 built, item 3 built as `lib/catalogue/for-sale.ts` — 2026-09-22
 - ⬜ D23 item 3 is not closed — only `/subscribe` calls the one "for sale" helper; `/student/upgrade` keeps its own copy and `/premium-prep` its own inline filter (2026-09-22)
-- ⬜ The product card is duplicated between `.prep-*` and `.subp-*` — a shared card belongs in `components.css` beside `.btn` and `.badge`, and a third copy arrives with the checkout (2026-09-22)
+- → The product card duplicated between `.prep-*` and `.subp-*` — built as 10-design-system.md DS20 (2026-09-23)
 - ⬜ The checkout — one route, `/checkout/<product_id>`, for every product; both selling pages already point at it. Email and phone move here; the programme is prefilled from the product but shown and editable, because it becomes the student's ACCOUNT programme and D23 item 1 lets anyone buy any product (Sam, 2026-09-22)
 - ⬜ A premium-ticked product whose id matches no programme is dropped in silence on `/premium-prep` — the admin sees "updated successfully" and it never appears (2026-09-22, unruled)
 - ⬜ Desktop: a side rail of tickable filters (programme and similar) instead of the chip row (Sam, 2026-09-22)
@@ -291,6 +291,8 @@ storage.
 - ✅ (unplanned) One public top bar and one footer — `public-top-bar.tsx` / `public-footer.tsx`, the signed-out siblings of DS5, on the landing page and `/premium-prep` in the same commit; `.btn-outline` promoted into the family; the footer's year computed, not typed — 2026-09-22
 - ⬜ DS17 The ~15 name chips still on .badge — both builders, premium-prep, upgrade; most sit on DS9 surfaces
 - ⬜ DS18 Product kind (PAID / FREE / TRIAL) borrows the state colours — a kind by DS11, unmapped; Sam to rule
+- ✅ DS20 One card — `.card` into components.css, one product card for both selling pages — 2026-09-23
+- ⬜ DS20 The ~20 stylesheets that draw their own white box under another name — onto `.card` as each is touched
 - ⬜ Dark mode — not one prefers-color-scheme rule in the app and one theme in the token file; after the above
 - ⬜ A content max-width above 1440px, where A3's closed sidebar leaves cards and tables past a comfortable measure
 

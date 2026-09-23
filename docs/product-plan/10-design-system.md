@@ -746,6 +746,54 @@ both and kept 800 — at 700 the headline also re-wraps from four lines
 to two, which is a layout change, not only a weight one. The twelve
 declarations in `landing.css` stay as they are.
 
+### DS20 — One card (added 2026-09-23)
+
+The number skips DS19: that id was used on the stylesheet guard's
+commit (2026-09-22), which Sam ruled is not a slice of this doc.
+
+**What was there.** The app had one shared card, `.card` — the white
+box, border, `--radius`, `--shadow`, 24px — carried from legacy's
+`style.css` and used by eight signed-in pages. It was never a design
+system piece: it sat in `shell.css`, which loads only behind the
+sign-in. So when `/premium-prep` and `/subscribe` were rebuilt as cards
+(2026-09-22) neither could reach it, and each drew its own box and its
+own product layout under `.prep-*` and `.subp-*` — line for line the
+same apart from the heading level. The checkout would have been a third
+copy. Beyond those, some twenty stylesheets draw a white box of their
+own under another name, the position buttons and badges were in before
+DS3 and DS8.
+
+**What was built (Sam, 2026-09-23).**
+
+- `.card` moved **unchanged** into `components.css`, so every page loads
+  it, signed in or not.
+- **The product card** — one package for sale: name, price and days,
+  "Unlocks N courses" with the drawn ticks, Continue — as
+  `components/catalogue/product-card.tsx` on `.card` + `.product-card-*`.
+  A Server Component, like both pages; the heading level is a prop (h2
+  under /premium-prep's title, h3 under /subscribe's band headings). The
+  grid each page lays the cards in stays the page's own.
+- `/premium-prep` and `/subscribe` render it; their ~100 lines of card
+  rules are deleted.
+- **One consequence of going global:** `/payment-confirmation` has its
+  own `.pcf .card`, which never set a padding because the shared rule
+  never loaded there. It now says `padding: 0`, so its tinted band still
+  runs edge to edge. Found before the change, not after.
+
+**Proven unchanged by measurement, not by eye.** Every element of every
+card — size, and the computed type, colour, spacing, border, shadow and
+tick — fingerprinted before and after: both selling pages and the
+confirmation box at 889px and 375px, and the dashboard, learning history
+and upgrade at 1200px. All nine identical. For the three signed-in pages
+the "before" was recreated by putting the old rule back in `shell.css`
+for one measurement, since they were out of reach until Sam signed the
+pane in.
+
+**Not in this slice.** The twenty own-name boxes move onto `.card` as
+each surface is touched (ruling 9's pattern). `/student/upgrade` keeps
+its own list of what is for sale and its own `.upg .card`; that is
+D23 item 3, a separate line.
+
 ### Later, under this doc
 
 - **Dark mode.** The product has not one `prefers-color-scheme` rule and
@@ -784,4 +832,5 @@ declarations in `landing.css` stay as they are.
 | The audience label loses "Panel" | ✅ 2026-09-22 (ruling 12) |
 | DS17 The ~15 name chips still on `.badge` | ⬜ most sit on DS9 surfaces |
 | DS18 Product kind borrows the state colours | ⬜ Sam to rule |
+| DS20 One card | ✅ 2026-09-23 — `.card` global, the product card shared by both selling pages; own-name boxes as touched |
 | Dark mode · content max-width · the avatar's size | ⬜ later |

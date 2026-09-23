@@ -50,6 +50,7 @@ import { courseScopeMap, isForSale, partitionByProgramme, programmesOf } from '@
 import { formatMinor } from '@/lib/money/format-minor';
 import { PublicTopBar } from '@/components/shell/public-top-bar';
 import { PublicFooter } from '@/components/shell/public-footer';
+import { ProductCard } from '@/components/catalogue/product-card';
 import type { Product } from '@/lib/catalogue/types';
 import '@/styles/subscribe.css';
 
@@ -59,42 +60,6 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = 'force-dynamic';
-
-function ProductCard({
-  product,
-  courseTitle,
-}: {
-  product: Product;
-  courseTitle: Map<string, string>;
-}) {
-  const titles = product.courses
-    .map((id) => courseTitle.get(id) ?? id)
-    .sort((a, b) => a.localeCompare(b));
-
-  return (
-    <li className="subp-card">
-      <h3 className="subp-card-name">{product.name}</h3>
-
-      <p className="subp-price">
-        <span className="subp-amount">{formatMinor(product.price_minor, product.currency)}</span>
-        <span className="badge badge-neutral">{product.duration_days} days</span>
-      </p>
-
-      <p className="subp-unlocks">
-        Unlocks {titles.length} course{titles.length === 1 ? '' : 's'}
-      </p>
-      <ul className="subp-courses">
-        {titles.map((title) => (
-          <li key={title}>{title}</li>
-        ))}
-      </ul>
-
-      <Link href={`/checkout/${product.product_id}`} className="btn btn-accent btn-lg subp-cta">
-        Continue
-      </Link>
-    </li>
-  );
-}
 
 export default async function SubscribePage({
   searchParams,
@@ -198,7 +163,12 @@ export default async function SubscribePage({
 
             <ul className="subp-grid">
               {mine.map((product) => (
-                <ProductCard key={product.product_id} product={product} courseTitle={courseTitle} />
+                <ProductCard
+                  key={product.product_id}
+                  product={product}
+                  courseTitle={courseTitle}
+                  headingLevel={3}
+                />
               ))}
             </ul>
 
@@ -222,6 +192,7 @@ export default async function SubscribePage({
                       key={product.product_id}
                       product={product}
                       courseTitle={courseTitle}
+                      headingLevel={3}
                     />
                   ))}
                 </ul>
