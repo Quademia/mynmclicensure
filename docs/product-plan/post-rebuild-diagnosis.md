@@ -1427,7 +1427,12 @@ the product name to any caller and nothing personal to anyone; the
 page still accepts the reference from the address and its stored copy,
 because the reference alone now yields status only. Emailed-link-only
 rejected: it sends every buyer to their inbox at the moment they are
-readiest to finish. Queued with D31 in BUILD_LIST.
+readiest to finish. Queued with D31 in BUILD_LIST. **One half closed
+2026-09-23** (Claude, with the confirmation page's redesign): the page
+keeps nothing in the browser and reads no remembered reference, so a
+shared computer no longer shows the last buyer. The other half — verify
+still hands the payer's email, phone, programme and setup token to
+anyone holding a SETUP_REQUIRED reference — waits for D31, as ruled.
 
 ---
 

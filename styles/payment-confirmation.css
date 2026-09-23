@@ -1,94 +1,206 @@
-/* styles/payment-confirmation.css
+/* styles/payment-confirmation.css — where Paystack sends the buyer back
  *
- * The public payment confirmation page —
- * legacy/mynmclicensure/payment-confirmation.html's inline <style>,
- * scoped under `.pcf` so its own tokens never leak.
+ * Rewritten 2026-09-23 (Sam) with the page, in MyNclex's result-screen
+ * shape: one card whose tone follows the outcome — an icon, a heading,
+ * one sentence and a small label, then the receipt or the form, then
+ * the one right next step. The file it replaces was legacy's inline
+ * <style> with its own palette (--card, --line, --muted …), its own
+ * buttons and a full-screen loader; none of it survives.
  *
- * 2026-09-22, DS2 (Sam's B1 ruling): the marketing look is retired.
- * The `#0b7a75` teal, the page and hero gradients, the 18–24px radii,
- * the big soft shadow and the slate greys are gone; the page's own
- * names now point at the app's tokens. The names are kept because they
- * are scoped to this page; they go when DS3 reaches this surface.
- * Structure, spacing and copy are untouched.
+ * Built on the design system: every value a token from tokens.css, the
+ * box the shared `.card` (DS20), the buttons `.btn`, the label `.badge`.
+ * The tone only colours the icon's circle and the card's top edge, from
+ * the badge tokens, so a state reads at a glance without a new colour.
+ *
+ * ⚠ THE FIELDS ARE THIS PAGE'S OWN, like the checkout's `.chk-input` —
+ * the design system has no shared field yet (BUILD_LIST, "One form
+ * field"). Same shape as `.chk-input`, so the two can merge into one.
  */
 
-.pcf {
-  --brand: var(--brand-teal);
-  --brand-dark: var(--brand-teal-hover);
-  --muted: var(--ink-muted);
-  --card: var(--surface);
-  --line: var(--border);
-  --soft: var(--surface-page);
-  --danger: var(--badge-danger-ink);
-  --danger-bg: var(--badge-danger-bg);
-  --ok: var(--badge-success-ink);
-  --ok-bg: var(--badge-success-bg);
-  --warn: var(--badge-warning-ink);
-  --warn-bg: var(--badge-warning-bg);
-  --shadow: var(--shadow-sm);
+.pcf-page { display: flex; flex-direction: column; min-height: 100vh; background: var(--surface-page); }
 
-  min-height: 100vh;
-  font-family: var(--font-inter), Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+.pcf {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: var(--space-32) var(--space-16);
   color: var(--ink);
+}
+
+/* ── The card and its tone ──────────────────────────────────────── */
+
+.pcf-card { border-top-width: 3px; }
+.pcf-tone-ok   { border-top-color: var(--badge-success-border); }
+.pcf-tone-step { border-top-color: var(--badge-info-border); }
+.pcf-tone-wait { border-top-color: var(--badge-warning-border); }
+.pcf-tone-bad  { border-top-color: var(--badge-danger-border); }
+
+.pcf-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-16);
+  align-items: start;
+}
+
+.pcf-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-pill);
+}
+.pcf-tone-ok   .pcf-icon { background: var(--badge-success-bg); color: var(--badge-success-ink); }
+.pcf-tone-step .pcf-icon { background: var(--badge-info-bg);    color: var(--badge-info-ink); }
+.pcf-tone-wait .pcf-icon { background: var(--badge-warning-bg); color: var(--badge-warning-ink); }
+.pcf-tone-bad  .pcf-icon { background: var(--badge-danger-bg);  color: var(--badge-danger-ink); }
+
+/* The waiting mark: a ring that turns, in place of the icon. */
+.pcf-spin {
+  border: 3px solid var(--badge-warning-border);
+  border-top-color: var(--badge-warning-ink);
+  background: none;
+  width: 36px;
+  height: 36px;
+  margin: 4px;
+  animation: pcfSpin 0.9s linear infinite;
+}
+@keyframes pcfSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .pcf-spin { animation-duration: 3s; }
+}
+
+.pcf-heading {
+  font-size: var(--type-page-title-size);
+  line-height: var(--type-page-title-line);
+  font-weight: var(--type-page-title-weight);
+  letter-spacing: var(--type-page-title-track);
+  color: var(--brand-navy);
+  margin: 0 0 var(--space-6);
+}
+.pcf-body {
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line);
+  color: var(--ink-muted);
+  margin: 0;
+}
+.pcf-body strong { color: var(--ink); }
+.pcf-pill { margin-top: var(--space-4); }
+
+.pcf-live {
+  margin: var(--space-16) 0 0;
+  font-size: var(--type-meta-size);
+  color: var(--ink-muted);
+}
+
+/* ── The receipt ────────────────────────────────────────────────── */
+
+.pcf-receipt {
+  margin-top: var(--space-24);
+  padding: var(--space-16);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   background: var(--surface-page);
 }
-.pcf * { box-sizing: border-box; }
-
-.pcf .wrap { max-width: 860px; margin: 0 auto; padding: 28px 16px 32px; }
-/* padding: 0 since DS20 made the shared .card global — its 24px would
-   inset the tinted .hero band, which is meant to run edge to edge. */
-.pcf .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; padding: 0; }
-
-.pcf .hero {
-  padding: 22px 22px 18px;
-  border-bottom: 1px solid var(--line);
-  background: var(--brand-teal-pale);
+.pcf-receipt-title {
+  font-size: var(--type-meta-size);
+  font-weight: var(--type-ui-weight);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+  margin-bottom: var(--space-10);
 }
-.pcf h1 { margin: 0 0 8px; font-size: clamp(1.4rem, 2vw, 2rem); line-height: 1.1; }
-.pcf .sub { margin: 0; color: var(--muted); line-height: 1.55; }
+.pcf-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-12);
+  padding-bottom: var(--space-10);
+  border-bottom: 1px solid var(--border);
+}
+.pcf-line-name { font-size: var(--type-field-size); font-weight: 600; color: var(--ink); }
+.pcf-line-amount { font-size: var(--type-field-size); font-weight: 700; color: var(--ink); white-space: nowrap; }
 
-.pcf .body { padding: 20px; }
-.pcf .kv { margin: 0 0 10px; font-size: .94rem; color: var(--ink-muted); }
-.pcf .kv b { color: var(--ink); }
+.pcf-ref {
+  margin-top: var(--space-10);
+  font-size: var(--type-meta-size);
+  color: var(--ink-muted);
+  overflow-wrap: anywhere;
+}
+.pcf-ref b { color: var(--ink); font-weight: 600; letter-spacing: 0.02em; }
+.pcf-ref-alone { margin-top: var(--space-16); }
 
-.pcf .status { display: none; margin: 14px 0 0; padding: 12px 14px; border-radius: var(--radius); line-height: 1.45; font-size: .93rem; white-space: pre-line; }
-.pcf .status.show { display: block; }
-.pcf .status.ok { background: var(--ok-bg); color: var(--ok); border: 1px solid var(--badge-success-border); }
-.pcf .status.error { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--badge-danger-border); }
-.pcf .status.warn { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--badge-warning-border); }
+.pcf-shot { margin: var(--space-8) 0 0; font-size: var(--type-meta-size); color: var(--ink-muted); }
 
-.pcf .actions { display: none; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
-.pcf .actions.show { display: flex; }
+/* ── The next step ──────────────────────────────────────────────── */
 
-.pcf .btn { appearance: none; border: none; border-radius: var(--radius); padding: 12px 16px; font-size: .94rem; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; }
-.pcf .btn-primary { background: var(--brand); color: var(--surface); flex: 1 1 190px; }
-.pcf .btn-primary:hover { background: var(--brand-dark); }
-.pcf .btn-secondary { background: var(--card); color: var(--ink); border: 1px solid var(--line); flex: 1 1 180px; }
-.pcf .btn:disabled { opacity: .72; cursor: not-allowed; }
+.pcf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-10);
+  margin-top: var(--space-24);
+}
 
-.pcf .setupBox { display: none; margin-top: 18px; padding: 16px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--soft); }
-.pcf .setupBox.show { display: block; }
-.pcf .setupTitle { margin: 0 0 6px; font-size: 1rem; font-weight: 700; }
-.pcf .setupSub { margin: 0; color: var(--muted); line-height: 1.5; font-size: .92rem; }
+.pcf-help {
+  margin: var(--space-16) 0 0;
+  text-align: center;
+  font-size: var(--type-meta-size);
+  color: var(--ink-muted);
+}
+.pcf-help a { color: var(--brand-teal-hover); font-weight: 600; }
 
-.pcf .field { margin-top: 14px; }
-.pcf .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-@media (max-width: 700px) { .pcf .row { grid-template-columns: 1fr; } }
+/* ── The setup form ─────────────────────────────────────────────── */
 
-.pcf .label { display: block; margin-bottom: 6px; font-size: .83rem; font-weight: 700; color: var(--ink-muted); }
-.pcf .input, .pcf .select { width: 100%; padding: 12px 13px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--card); font-size: .95rem; outline: none; font-family: inherit; color: inherit; }
-.pcf .input:focus, .pcf .select:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(45, 125, 114, .18); }
-.pcf .hint { margin-top: 6px; color: var(--muted); font-size: .82rem; line-height: 1.4; }
+.pcf-setup { margin-top: var(--space-24); }
+.pcf-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-12); }
 
-.pcf .support { display: none; margin-top: 18px; padding: 15px; border: 1px dashed var(--line); border-radius: var(--radius); background: var(--card); }
-.pcf .support.show { display: block; }
-.pcf .support h3 { margin: 0 0 8px; font-size: .95rem; }
-.pcf .support p { margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.5; }
-.pcf .supportLinks { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.pcf-field {
+  display: block;
+  margin-top: var(--space-16);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-ui-weight);
+  color: var(--ink);
+}
+.pcf-input {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-6);
+  padding: 9px 12px;
+  font: inherit;
+  font-weight: var(--type-field-weight);
+  font-size: var(--type-field-size);
+  line-height: var(--type-field-line);
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.pcf-input:focus {
+  outline: none;
+  border-color: var(--brand-teal);
+  box-shadow: 0 0 0 3px var(--brand-teal-pale);
+}
+.pcf-input[readonly] { background: var(--surface-page); color: var(--ink-muted); }
+.pcf-hint {
+  display: block;
+  margin-top: var(--space-4);
+  font-size: var(--type-meta-size);
+  font-weight: var(--type-meta-weight);
+  color: var(--ink-muted);
+}
 
-.pcf .meta { margin-top: 16px; font-size: .82rem; color: var(--muted); line-height: 1.45; }
+/* Layout only — the skin is .btn .btn-accent .btn-lg. */
+.pcf-setup-submit { width: 100%; margin-top: var(--space-24); }
 
-.pcf .loader { position: fixed; inset: 0; display: none; place-items: center; background: rgba(249, 250, 251, .82); backdrop-filter: blur(2px); z-index: 9999; }
-.pcf .loader.on { display: grid; }
-.pcf .spin { width: 40px; height: 40px; border-radius: 50%; border: 4px solid var(--brand-teal-pale); border-top-color: var(--brand); animation: pcf-spin 1s linear infinite; }
-@keyframes pcf-spin { to { transform: rotate(360deg); } }
+/* ── The phone (AGENTS.md UI convention #3, 768px) ──────────────── */
+
+@media (max-width: 768px) {
+  .pcf { padding: var(--space-24) var(--space-16) var(--space-32); }
+  .pcf-card { padding: var(--space-16); }
+  /* The label moves under the heading rather than squeezing it. */
+  .pcf-head { grid-template-columns: auto minmax(0, 1fr); gap: var(--space-12); }
+  .pcf-pill { grid-column: 2; justify-self: start; margin-top: 0; }
+  .pcf-row { grid-template-columns: 1fr; gap: 0; }
+  .pcf-actions .btn { flex: 1 1 100%; }
+}

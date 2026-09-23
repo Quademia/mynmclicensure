@@ -778,7 +778,9 @@ DS3 and DS8.
 - **One consequence of going global:** `/payment-confirmation` has its
   own `.pcf .card`, which never set a padding because the shared rule
   never loaded there. It now says `padding: 0`, so its tinted band still
-  runs edge to edge. Found before the change, not after.
+  runs edge to edge. Found before the change, not after. **Superseded
+  the same day:** the page was redesigned on the shared `.card` (Sam),
+  and `.pcf .card` went with its old stylesheet.
 
 **Proven unchanged by measurement, not by eye.** Every element of every
 card — size, and the computed type, colour, spacing, border, shadow and

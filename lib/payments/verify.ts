@@ -58,7 +58,14 @@ export async function verifyPayment(referenceIn: string): Promise<VerifyResult> 
 
   // Fast path: already activated.
   if (payment.status === 'ACTIVATED' && payment.subscription_id) {
-    return { ok: true, status: 'ACTIVATED', reference: payment.reference, subscription_id: payment.subscription_id, requires_setup: false };
+    return {
+      ok: true,
+      status: 'ACTIVATED',
+      reference: payment.reference,
+      subscription_id: payment.subscription_id,
+      requires_setup: false,
+      ...receiptOf(payment),
+    };
   }
 
   // Fast path: already paid / setup required → try local activation first.
@@ -157,6 +164,7 @@ async function activateOrRequireSetup(db: ServiceDb, payment: Payment): Promise<
       subscription_id: activation.subscription.subscription_id,
       activation_mode: activation.mode,
       requires_setup: false,
+      ...receiptOf(payment),
     };
   }
 
@@ -179,6 +187,16 @@ async function activateOrRequireSetup(db: ServiceDb, payment: Payment): Promise<
     currency: updated.currency || '',
     phone_number: updated.phone_number || '',
     program_id: updated.program_id || '',
+  };
+}
+
+// The receipt half of an ACTIVATED reply: what was bought and the price,
+// never who bought it.
+function receiptOf(payment: Payment) {
+  return {
+    product_name: payment.product_name || payment.product_id || '',
+    amount_minor_expected: payment.amount_minor_expected ?? null,
+    currency: payment.currency || '',
   };
 }
 

@@ -142,6 +142,8 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ Payments: Paystack's replies trimmed before saving — channel, card_type, last4 kept; the scrub migration on dev, prod at the next release; currency checked at verify (D32 + D36) — 2026-09-19
 - ⬜ Payments: a nightly sweep verifies stale INIT rows with Paystack — paid ones activated, the rest ABANDONED, never deleted; SETUP_REQUIRED goes (D34, Sam 2026-09-18)
 - ✅ D35 One limit per action — verify per payment, fail closed, a 3-minute poll, `rate_limits` grants back — 2026-09-23
+- ✅ (unplanned) Confirmation page redesigned — server-built (MyNclex's shape), five states, receipt, public bar — 2026-09-23
+- ✅ (unplanned) Shared-computer leak closed — the confirmation page stores and reads nothing in the browser — 2026-09-23
 - ✖ Payments: §9 #20 (token re-minted on verify) and §9 #21 (the reference as the only secret) — no token exists under D31 + D33 (Sam, 2026-09-18)
 - ✖ Payments: the setup step's login rollback (§9 #4) — the login is created by the server at PAID under D31, so the step and its rollback go (Sam, 2026-09-18)
 

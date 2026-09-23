@@ -93,6 +93,14 @@ export type VerifyResult =
       subscription_id: string;
       activation_mode?: ActivationMode;
       requires_setup: false;
+      /**
+       * For the confirmation page's receipt (2026-09-23): what was bought
+       * and for how much, from the payment row. Nothing personal — the
+       * reference alone must never yield the payer's details (D33).
+       */
+      product_name: string;
+      amount_minor_expected: number | null;
+      currency: string;
     }
   | {
       ok: true;
