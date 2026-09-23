@@ -1510,7 +1510,17 @@ table was introduced and whether he was asked: built in slice 9a
 session, as the plain replacement for gamma's Cloudflare rate-limit
 binding, which does not exist under OpenNext; not a §8 row because it
 changed no legacy data shape; not asked again at build. Queued in
-BUILD_LIST.
+BUILD_LIST. **Built 2026-09-23** (Claude): `lib/payments/rate-limit.ts`
+keys `payments:<action>:<subject>` — init and setup per address at 10 a
+minute, verify per reference at 30 (Sam's numbers) — through the
+existing function's limit and window arguments, so no schema change;
+the limiter fails closed with "Payments are briefly unavailable". The
+confirmation page treats a refused check as still pending and polls 3 s
+for a minute then 10 s to three minutes (Sam, for mobile money). Rule 9
+took `rate_limits`' `grant all` back from both browser roles
+(`20260923120000_rate_limits_grants.sql`). Proven on dev: 65 s of
+polling on one reference unrefused; the init refusal and the
+fail-closed path both shown in the pane.
 
 ---
 

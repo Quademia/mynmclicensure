@@ -102,7 +102,7 @@ already have been.
 | D32 | The payment row stores Paystack's whole reply, forever, and shows it to admins | ✅ 2026-09-19 — channel, card_type, last4 kept; prod at the next release |
 | D33 | The reference alone unlocks the payer's personal data and the setup token | ⬜ ruled (Sam, 2026-09-18) — a same-browser cookie, else the emailed link |
 | D34 | Abandoned INIT rows pile up forever, and anyone can make them | ⬜ ruled (Sam, 2026-09-18) — a nightly Paystack sweep; never deleted |
-| D35 | One rate-limit bucket per address for all four payment routes | ⬜ ruled (Sam, 2026-09-18) — one limit per action; closes §9 #22 |
+| D35 | One rate-limit bucket per address for all four payment routes | ✅ 2026-09-23 — init and setup 10 a minute per address, verify 30 a minute per payment, fail closed; the poll 3 s for a minute then 10 s to three minutes; `rate_limits` grants taken back (rule 9); closes §9 #22 |
 | D36 | Currency is never checked at verify | ✅ 2026-09-19 |
 
 Also relevant, owned elsewhere: **D2 / D19 / D23** (the three sales doors)

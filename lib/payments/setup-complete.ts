@@ -42,7 +42,7 @@ import { activatePaymentForUser } from './activate';
 import { makePaymentUserId } from './ids';
 import { findPaymentUser, getPaymentByReference, patchPayment, type ServiceDb } from './queries';
 import { checkPaymentRateLimit } from './rate-limit';
-import { RATE_LIMITED_MESSAGE, SETUP_TOKEN_LIFETIME_MS, type PaymentUser, type SetupCompleteResult } from './types';
+import { SETUP_TOKEN_LIFETIME_MS, type PaymentUser, type SetupCompleteResult } from './types';
 
 function fail(error: string, message?: string): SetupCompleteResult {
   return { ok: false, error, message: message || error };
@@ -54,8 +54,8 @@ function field(formData: FormData, name: string): string {
 }
 
 export async function completePaymentSetup(formData: FormData): Promise<SetupCompleteResult> {
-  const rl = await checkPaymentRateLimit();
-  if (!rl.ok) return fail('rate_limited', RATE_LIMITED_MESSAGE);
+  const rl = await checkPaymentRateLimit('setup');
+  if (!rl.ok) return fail(rl.error, rl.message);
 
   const reference = field(formData, 'reference');
   const setupToken = field(formData, 'setup_token');

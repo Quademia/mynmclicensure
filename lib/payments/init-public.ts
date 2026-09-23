@@ -35,11 +35,11 @@ import { paystackInitialize } from './paystack';
 import { getProductForPayment } from './queries';
 import { checkPaymentRateLimit } from './rate-limit';
 import { trimInitReply } from './trim';
-import { RATE_LIMITED_MESSAGE, type InitPublicInput, type InitResult } from './types';
+import type { InitPublicInput, InitResult } from './types';
 
 export async function initPublicPayment(input: InitPublicInput): Promise<InitResult> {
-  const rl = await checkPaymentRateLimit();
-  if (!rl.ok) return { ok: false, error: 'rate_limited', message: RATE_LIMITED_MESSAGE };
+  const rl = await checkPaymentRateLimit('init');
+  if (!rl.ok) return { ok: false, error: rl.error, message: rl.message };
 
   const email = String(input?.email || '').trim().toLowerCase();
   const productId = String(input?.product_id || '').trim();

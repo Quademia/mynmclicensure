@@ -2,8 +2,8 @@
 //
 // The script block of legacy payment-confirmation.html, transcribed: the
 // reference from the address (`reference`, Paystack's `trxref`, or
-// `ref`) or the browser's storage; verify on arrival and every 3 s up
-// to 20 times while Paystack has not said "success"; the four screens
+// `ref`) or the browser's storage; verify on arrival and on a schedule
+// while Paystack has not said "success" (D35, below); the four screens
 // (verifying, activated, finish setup, verification issue) with the
 // legacy titles and messages; Retry Verification; the setup form (first
 // name, surname, password twice, phone, programme) → the setup-complete
@@ -17,6 +17,17 @@
 // (Sam, 2026-09-15) and the WhatsApp button stays hidden because its
 // number was blank in legacy; "QAcademy" → "Quademia" (convention #5);
 // the "Go to Dashboard" and "Go to Login" links are this app's routes.
+//
+// D35 (Sam, 2026-09-23). The poll no longer stops at one minute: every
+// 3 s for the first minute, then every 10 s up to three — a mobile-money
+// buyer leaves the browser to approve the prompt on their phone, and the
+// test key's instant "success" had hidden how long that takes. A refused
+// check (the limiter's `rate_limited` or `limiter_unavailable`) is NOT a
+// verification issue: the page keeps saying it is still checking and
+// tries again on the slow beat. Verify is now counted per payment, so
+// the page's own polling should never be refused; this is the belt to
+// that brace. And "Buy another package" on success — Sam's answer to two
+// packages at once (no basket until the evidence asks for one).
 
 'use client';
 
@@ -25,7 +36,14 @@ import { Toast } from '@/lib/toast/toast';
 import { formatMinor } from '@/lib/money/format-minor';
 import { verifyPayment } from '@/lib/payments/verify';
 import { completePaymentSetup } from '@/lib/payments/setup-complete';
-import { VERIFY_MAX_POLLS, VERIFY_POLL_MS, type ActivationMode, type VerifyResult } from '@/lib/payments/types';
+import {
+  VERIFY_FAST_POLL_MS,
+  VERIFY_FAST_POLLS,
+  VERIFY_SLOW_POLL_MS,
+  VERIFY_SLOW_POLLS,
+  type ActivationMode,
+  type VerifyResult,
+} from '@/lib/payments/types';
 
 // Support config. Leave blank to hide the button automatically.
 const SUPPORT_WA_E164 = '';
@@ -49,6 +67,8 @@ type Screen = {
   err: string | null;
   showActions: boolean;
   showSetup: boolean;
+  /** Only on success: the way back to the shop for a second package. */
+  showBuyAnother: boolean;
   meta: string;
 };
 
@@ -60,6 +80,7 @@ const INITIAL: Screen = {
   err: null,
   showActions: false,
   showSetup: false,
+  showBuyAnother: false,
   meta: '',
 };
 
@@ -132,6 +153,7 @@ export function ConfirmationClient() {
       err: null,
       showActions: true,
       showSetup: false,
+      showBuyAnother: true,
       meta: payload?.amount_minor_expected && payload?.currency ? `Amount: ${formatMinor(payload.amount_minor_expected, payload.currency)}` : '',
     });
   }
@@ -145,6 +167,7 @@ export function ConfirmationClient() {
       err: null,
       showActions: true,
       showSetup: true,
+      showBuyAnother: false,
       meta: '',
     });
     const store = ls();
@@ -165,6 +188,7 @@ export function ConfirmationClient() {
       err: null,
       showActions: false,
       showSetup: false,
+      showBuyAnother: false,
       meta: '',
     });
   }
@@ -178,8 +202,24 @@ export function ConfirmationClient() {
       err: message || 'We could not confirm this payment yet.',
       showActions: true,
       showSetup: false,
+      showBuyAnother: false,
       meta: '',
     });
+  }
+
+  // The next poll, on the D35 schedule: the fast beat for the first
+  // minute, the slow one up to three, then the buyer is asked to retry.
+  // `slow` forces the slow beat — used after a refused check, so the
+  // page backs off instead of knocking again at once.
+  function scheduleNextPoll(slow = false) {
+    pollCountRef.current += 1;
+    const n = pollCountRef.current;
+    if (n > VERIFY_FAST_POLLS + VERIFY_SLOW_POLLS) {
+      renderError('Verification is taking longer than expected. Please tap Retry Verification in a few seconds.', 'TIMEOUT');
+      return;
+    }
+    const delay = !slow && n <= VERIFY_FAST_POLLS ? VERIFY_FAST_POLL_MS : VERIFY_SLOW_POLL_MS;
+    pollTimerRef.current = window.setTimeout(() => verify(true), delay);
   }
 
   async function verify(autoPoll: boolean) {
@@ -212,16 +252,15 @@ export function ConfirmationClient() {
       }
       if (!out.ok && out.error === 'not_ready') {
         renderPending(out.message || 'Still verifying…');
-        if (autoPoll) {
-          pollCountRef.current += 1;
-          if (pollCountRef.current <= VERIFY_MAX_POLLS) {
-            pollTimerRef.current = window.setTimeout(() => verify(true), VERIFY_POLL_MS);
-          } else {
-            renderError('Verification is taking longer than expected. Please tap Retry Verification in a few seconds.', 'TIMEOUT');
-          }
-        } else {
-          setScreen((s) => ({ ...s, showActions: true }));
-        }
+        if (autoPoll) scheduleNextPoll();
+        else setScreen((s) => ({ ...s, showActions: true }));
+        return;
+      }
+      // A refused check is not a failed payment (D35): keep waiting.
+      if (!out.ok && (out.error === 'rate_limited' || out.error === 'limiter_unavailable')) {
+        renderPending('Still checking your payment…');
+        if (autoPoll) scheduleNextPoll(true);
+        else setScreen((s) => ({ ...s, showActions: true }));
         return;
       }
       if (!out.ok && out.error === 'payment_not_found') {
@@ -370,6 +409,9 @@ export function ConfirmationClient() {
 
             <div className={`actions${screen.showActions ? ' show' : ''}`}>
               <a className="btn btn-primary" href="/student/dashboard">Go to Dashboard</a>
+              {screen.showBuyAnother && (
+                <a className="btn btn-secondary" href="/subscribe">Buy another package</a>
+              )}
               <a className="btn btn-secondary" href="/login">Go to Login</a>
               <button
                 className="btn btn-secondary"

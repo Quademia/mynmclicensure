@@ -141,7 +141,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⬜ Payments: verify answers status and product to anyone; a same-browser cookie set at init shows the password form, otherwise the emailed link (D33, Sam 2026-09-18)
 - ✅ Payments: Paystack's replies trimmed before saving — channel, card_type, last4 kept; the scrub migration on dev, prod at the next release; currency checked at verify (D32 + D36) — 2026-09-19
 - ⬜ Payments: a nightly sweep verifies stale INIT rows with Paystack — paid ones activated, the rest ABANDONED, never deleted; SETUP_REQUIRED goes (D34, Sam 2026-09-18)
-- ⬜ Payments: one limit per action, verify counted per reference, the confirmation poll uncounted, fail closed (D35, Sam 2026-09-18) — closes §9 #22
+- ✅ D35 One limit per action — verify per payment, fail closed, a 3-minute poll, `rate_limits` grants back — 2026-09-23
 - ✖ Payments: §9 #20 (token re-minted on verify) and §9 #21 (the reference as the only secret) — no token exists under D31 + D33 (Sam, 2026-09-18)
 - ✖ Payments: the setup step's login rollback (§9 #4) — the login is created by the server at PAID under D31, so the step and its rollback go (Sam, 2026-09-18)
 
@@ -169,6 +169,8 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⬜ Expiry reminders — a daily pg_cron doorbell to an app route, the email through Resend, a dashboard status line; no run-now button; written against S8's course expiry (Sam, 2026-09-18; auth item 9)
 - ⬜ Courses: the form suggests a code from programme + title, overwritable, the code stays the key; drop the dead page_slug column when the table is next touched; S2 (one items table) before S8 (Sam, 2026-09-19)
 - ⏸ Course-level pricing (a standalone price per course, products as bundles, a basket later) — the product stays the single unit of sale; revisit when the course count makes a product per course a chore (Sam, 2026-09-18)
+- ⏸ A basket — one package per payment until the Payments page shows buyers paying twice in a day (Sam, 2026-09-23)
+- ✅ (unplanned) "Buy another package" on the confirmation page's success screen, with D35 (Sam) — 2026-09-23
 - ⬜ A link to Premium Prep from the landing page — legacy never linked it; the page was shared by address only (slice 3, 2026-09-12)
 - ⬜ Profile: the Subscription panel shows one active subscription, the first returned, even when the student holds two — legacy did (slice 7e, 2026-09-14)
 - ⬜ Subscribe: a signed-in student only sees a note pointing to the upgrade page and can still pay here as a new buyer — consider redirecting them to /student/upgrade instead (Sam, slice 9a, 2026-09-15)

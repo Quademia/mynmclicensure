@@ -33,14 +33,17 @@ import { paystackVerify } from './paystack';
 import { findPaymentUser, getPaymentByReference, patchPayment, type ServiceDb } from './queries';
 import { checkPaymentRateLimit } from './rate-limit';
 import { trimVerifyReply } from './trim';
-import { RATE_LIMITED_MESSAGE, type Payment, type VerifyResult } from './types';
+import type { Payment, VerifyResult } from './types';
 
 export async function verifyPayment(referenceIn: string): Promise<VerifyResult> {
   const reference = String(referenceIn || '').trim();
   if (!reference) return { ok: false, error: 'missing_reference', reference, message: 'missing_reference' };
 
-  const rl = await checkPaymentRateLimit();
-  if (!rl.ok) return { ok: false, error: 'rate_limited', reference, message: RATE_LIMITED_MESSAGE };
+  // Counted per payment, not per address (D35): the confirmation page's
+  // own polling stays under the limit, and two buyers on one connection
+  // never share a tally.
+  const rl = await checkPaymentRateLimit('verify', reference);
+  if (!rl.ok) return { ok: false, error: rl.error, reference, message: rl.message };
 
   const db = createServiceRoleClient();
 

@@ -27,8 +27,9 @@ export async function listPaymentsAction(filters: PaymentFilters, page: number):
   return getPaymentsPaginated(supabase, filters, Math.max(0, Number(page) || 0));
 }
 
-// The same verify the confirmation page polls, so its rate limit and its
-// answers are unchanged; the page reads the result as before. On
+// The same verify the confirmation page polls, so its answers are
+// unchanged and it shares the page's limit — counted per payment since
+// D35 (30 a minute), which an admin's Retry never approaches. On
 // SETUP_REQUIRED with an email, the setup link on this site's own address
 // — the one Copy Setup Link builds, token included (§9 #20) — and the
 // token's 48 hours.

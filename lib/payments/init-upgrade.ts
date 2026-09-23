@@ -28,11 +28,11 @@ import { paystackInitialize } from './paystack';
 import { getProductForPayment } from './queries';
 import { checkPaymentRateLimit } from './rate-limit';
 import { trimInitReply } from './trim';
-import { RATE_LIMITED_MESSAGE, type InitResult } from './types';
+import type { InitResult } from './types';
 
 export async function initUpgradePayment(productIdIn: string): Promise<InitResult> {
-  const rl = await checkPaymentRateLimit();
-  if (!rl.ok) return { ok: false, error: 'rate_limited', message: RATE_LIMITED_MESSAGE };
+  const rl = await checkPaymentRateLimit('init');
+  if (!rl.ok) return { ok: false, error: rl.error, message: rl.message };
 
   const productId = String(productIdIn || '').trim().toUpperCase();
   if (!productId) return { ok: false, error: 'missing_product_id', message: 'missing_product_id' };

@@ -16,12 +16,22 @@ export type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
 /** 48 hours from setup_created_utc; expired or missing both refuse. */
 export const SETUP_TOKEN_LIFETIME_MS = 48 * 60 * 60 * 1000;
 
-/** The confirmation page's poll: every 3 s, at most 20 times. */
-export const VERIFY_POLL_MS = 3000;
-export const VERIFY_MAX_POLLS = 20;
+/**
+ * The confirmation page's poll (D35, Sam 2026-09-23): every 3 s for the
+ * first minute, then every 10 s up to three minutes in all. It used to
+ * stop at 20 polls — one minute — and a mobile-money buyer approving the
+ * prompt on their phone routinely takes longer than that.
+ */
+export const VERIFY_FAST_POLL_MS = 3000;
+export const VERIFY_FAST_POLLS = 20;
+export const VERIFY_SLOW_POLL_MS = 10000;
+export const VERIFY_SLOW_POLLS = 12;
 
 /** The Worker's own words for a refused call. */
 export const RATE_LIMITED_MESSAGE = 'Too many requests. Please wait a moment and try again.';
+
+/** The limiter could not be read, so the action is refused (fails closed, D35). */
+export const LIMITER_UNAVAILABLE_MESSAGE = 'Payments are briefly unavailable — please try again in a minute.';
 
 export type Payment = {
   reference: string;
@@ -105,7 +115,14 @@ export type VerifyResult =
   | { ok: false; error: 'payment_failed'; status: 'FAILED'; reference: string; failure_note: string }
   | {
       ok: false;
-      error: 'missing_reference' | 'rate_limited' | 'payment_not_found' | 'amount_mismatch' | 'currency_mismatch' | 'verify_failed';
+      error:
+        | 'missing_reference'
+        | 'rate_limited'
+        | 'limiter_unavailable'
+        | 'payment_not_found'
+        | 'amount_mismatch'
+        | 'currency_mismatch'
+        | 'verify_failed';
       reference: string;
       message: string;
     };
