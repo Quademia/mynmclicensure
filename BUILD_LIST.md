@@ -351,6 +351,7 @@ storage.
 - ⬜ DS21 The signed-in app's drawer to open from the right, like the public menu (Sam, later)
 - ⬜ The auth pages (login, register, forgot, reset) carry legacy's own lockup, Quademia large over the product small, not the shared wordmark — whether they take it (found 2026-09-26, unruled)
 - ⬜ One form field — `.dlg-input`, `.qa-input` and `.chk-input` are three copies of one field
+- ⬜ One link style — a link inside a sentence always underlined (phones have no hover; WCAG 1.4.1) (Sam, later)
 - ⬜ Dark mode — not one prefers-color-scheme rule in the app and one theme in the token file; after the above
 - ⬜ A content max-width above 1440px, where A3's closed sidebar leaves cards and tables past a comfortable measure
 
