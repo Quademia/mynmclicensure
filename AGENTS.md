@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-09-22 (fourth session). Rules for **any** assistant working in this
+Last updated: 2026-09-23. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What is built and
@@ -289,6 +289,24 @@ above sit at the repo root; the audience grouping inside them is kept.
 - **A desktop-app worktree has no `node_modules`** — `npm ci` in it —
   and gets a COPY of `.env.local` when created; a key added to the
   main checkout's file later must be copied across by hand.
+- **A reused worktree can carry a stale `.next`, and then every route
+  but `/` is a 404** — `/login` included, with no error in the log
+  (2026-09-23: a worktree with a `.next` from 2026-09-13). Stop the
+  server, delete `.next`, start it again. Check one inner page answers
+  200 before trusting the dev server.
+- **The dev server serves its scripts to `localhost` only.** Opened as
+  `127.0.0.1:3000` the page renders but nothing hydrates (Next's
+  `allowedDevOrigins` refusal, in the server log), so a second address
+  is no way to test a signed-out page while the pane is signed in —
+  Sam signs the pane out. It did show one real defect: **a form whose
+  submit a script handles still needs `method="post"`.** With no
+  method, a page whose JavaScript never loaded sends a GET, and every
+  field — an email, a phone number — lands in the address bar, the
+  history and the server's logs.
+- **Pin the pane's size before a before/after measurement.** The
+  pane's width follows the desktop app's window, which can change
+  between two measurements; set `resize_window` to a fixed size for
+  both, or a changed width reads as a changed layout (2026-09-23).
 - **A new table in `licensure_gh` starts with `grant all` to the browser
   roles** (the schema's default privileges): `revoke insert, update,
   delete` still leaves TRUNCATE, REFERENCES and TRIGGER with `anon` and

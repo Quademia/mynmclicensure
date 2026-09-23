@@ -158,6 +158,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⬜ D23 item 3 open — `/student/upgrade` and `/premium-prep` still skip `isForSale()` (2026-09-23)
 - → The product card duplicated between `.prep-*` and `.subp-*` — built as 10-design-system.md DS20 (2026-09-23)
 - ✅ C4 The checkout — one route, MyNclex's layout, four required fields, isForSale() at both doors — 2026-09-23
+- ⬜ The checkout and confirmation-page wording — all new, not approved; Sam to revisit (2026-09-23)
 - ⬜ The public top bar offers Sign In / Register Free to a buyer already signed in (2026-09-23)
 - ⬜ A signed-in buyer with no WhatsApp number on the profile pays without one (setup-form accounts)
 - ⬜ A premium-ticked product whose id matches no programme is dropped in silence on `/premium-prep` — the admin sees "updated successfully" and it never appears (2026-09-22, unruled)

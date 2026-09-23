@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-23 — one shared card (DS20), the checkout on MyNclex's layout (C4), one payment limit per action (D35), the confirmation page server-first
+  - ↳ no basket yet · WhatsApp + confirm email required · isForSale at both doors · 10/10/30 · retry restarts · rate_limits grants back · receipt · leak closed · 3 test payments · copy unapproved · D4 next
+
 - 2026-09-22 — the CSS guard, is_premium with products' grants back (S14), one public bar and footer, and the two selling pages rebuilt as cards
   - ↳ S14 option A · products SELECT-only, 2 policies dropped · premium ids renamed on dev · public bar + footer as Server Components · 660 client lines deleted · D23 1/2/5 · telegram keys leak closed · checkout next
 
