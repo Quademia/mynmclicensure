@@ -304,6 +304,7 @@ storage.
 - ⬜ DS20 The ~20 stylesheets that draw their own white box under another name — onto `.card` as each is touched
 - ✅ DS21 The wordmark and the public menu — the painted Q with the product over "by Quademia" on both bars; the public bar's links (Home · Premium Prep · Packages · Dashboard), Sign in as its one action, a phone menu from the right — 2026-09-23
 - ⬜ DS21 The signed-in app's drawer to open from the right, like the public menu (Sam, later)
+- ⬜ DS21 The signed-in phone bar is too full since the Q: the name runs 10px under the envelope at 360px (most Android phones) and is cut at 320px; fits at 375px. Offered: the bell off the phone bar (no unread state yet, Announcements is in the menu), the envelope kept for its count, spacing tightened — or both icons into the avatar menu, or a smaller wordmark. Sam thinking (2026-09-23). Not merged, so it reaches no one yet
 - ⬜ One form field — `.dlg-input`, `.qa-input` and `.chk-input` are three copies of one field
 - ⬜ Dark mode — not one prefers-color-scheme rule in the app and one theme in the token file; after the above
 - ⬜ A content max-width above 1440px, where A3's closed sidebar leaves cards and tables past a comfortable measure
