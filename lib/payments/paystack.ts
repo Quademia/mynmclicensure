@@ -2,7 +2,7 @@
 //
 // The two Paystack calls the Worker made, transcribed: initialize a
 // transaction (returns the hosted checkout address) and verify one by
-// reference. The secret key is read INSIDE each call, never at module
+// reference. Plus the webhook's signature check (D4, 2026-09-23). The secret key is read INSIDE each call, never at module
 // scope (AGENTS.md, Known Workarounds), and never leaves the server.
 // A non-OK reply or a `status: false` body throws with Paystack's own
 // message, as legacy — the caller records it on the row and answers the
@@ -48,6 +48,23 @@ export async function paystackInitialize(payload: PaystackInitPayload): Promise<
     throw new Error(data?.message || 'Paystack initialize failed');
   }
   return data;
+}
+
+// The webhook's proof of origin (D4): Paystack signs the raw request body
+// with HMAC-SHA512 under the account's secret key and sends the hex digest
+// as `x-paystack-signature`. Web Crypto rather than node:crypto so the one
+// code path runs under `next dev` and on the Worker alike; `verify` does
+// the comparison in constant time. A malformed header is a refusal, never
+// a throw.
+export async function isPaystackSignatureValid(rawBody: string, signatureHex: string): Promise<boolean> {
+  const sig = String(signatureHex || '').trim().toLowerCase();
+  if (!/^[0-9a-f]{128}$/.test(sig)) return false;
+  const sigBytes = new Uint8Array(64);
+  for (let i = 0; i < 64; i++) sigBytes[i] = parseInt(sig.slice(i * 2, i * 2 + 2), 16);
+
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey('raw', enc.encode(secretKey()), { name: 'HMAC', hash: 'SHA-512' }, false, ['verify']);
+  return crypto.subtle.verify('HMAC', key, sigBytes, enc.encode(rawBody));
 }
 
 export async function paystackVerify(reference: string): Promise<PaystackResponse> {

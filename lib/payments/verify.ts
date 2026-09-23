@@ -22,6 +22,13 @@
 //     IP fields never reach the row); then the same activate-or-setup step.
 // A thrown error writes failure_note and leaves the status alone
 // (retryable); the browser gets a generic message (§7.1).
+//
+// The Paystack webhook (D4, app/api/paystack/webhook/route.ts) runs the
+// same path with `keepLiveSetupToken`: it never replaces a setup token
+// that is still inside its lifetime. The buyer may already hold the
+// setup form with that token, and a new one would refuse their submit
+// as invalid_setup_token. The page and the admin's Retry still mint a
+// fresh one every call, as above.
 
 'use server';
 
@@ -33,9 +40,10 @@ import { paystackVerify } from './paystack';
 import { findPaymentUser, getPaymentByReference, patchPayment, type ServiceDb } from './queries';
 import { checkPaymentRateLimit } from './rate-limit';
 import { trimVerifyReply } from './trim';
-import type { Payment, VerifyResult } from './types';
+import { SETUP_TOKEN_LIFETIME_MS, type Payment, type VerifyResult } from './types';
 
-export async function verifyPayment(referenceIn: string): Promise<VerifyResult> {
+export async function verifyPayment(referenceIn: string, opts: { keepLiveSetupToken?: boolean } = {}): Promise<VerifyResult> {
+  const keepToken = opts.keepLiveSetupToken === true;
   const reference = String(referenceIn || '').trim();
   if (!reference) return { ok: false, error: 'missing_reference', reference, message: 'missing_reference' };
 
@@ -71,7 +79,7 @@ export async function verifyPayment(referenceIn: string): Promise<VerifyResult> 
   // Fast path: already paid / setup required → try local activation first.
   if (payment.status === 'PAID' || payment.status === 'SETUP_REQUIRED') {
     try {
-      return await activateOrRequireSetup(db, payment);
+      return await activateOrRequireSetup(db, payment, keepToken);
     } catch (err) {
       return await recordVerifyFailure(db, reference, err);
     }
@@ -145,14 +153,14 @@ export async function verifyPayment(referenceIn: string): Promise<VerifyResult> 
       raw: { ...(payment.raw || {}), verify: verifySaved },
     });
 
-    return await activateOrRequireSetup(db, payment);
+    return await activateOrRequireSetup(db, payment, keepToken);
   } catch (err) {
     return await recordVerifyFailure(db, reference, err);
   }
 }
 
 // A user for the row → activate; none → SETUP_REQUIRED with a fresh token.
-async function activateOrRequireSetup(db: ServiceDb, payment: Payment): Promise<VerifyResult> {
+async function activateOrRequireSetup(db: ServiceDb, payment: Payment, keepLiveToken: boolean): Promise<VerifyResult> {
   const existingUser = await findPaymentUser(db, payment);
 
   if (existingUser) {
@@ -168,12 +176,30 @@ async function activateOrRequireSetup(db: ServiceDb, payment: Payment): Promise<
     };
   }
 
+  // The webhook keeps a live token (see the header). `payment` is the row
+  // as just written or read, so a token the page minted a moment ago is
+  // on it. The status is re-stated because the webhook's own PAID patch
+  // can land after the page set SETUP_REQUIRED.
+  if (keepLiveToken && hasLiveSetupToken(payment)) {
+    const kept = payment.status === 'SETUP_REQUIRED' ? payment : await patchPayment(db, payment.reference, { status: 'SETUP_REQUIRED' });
+    return setupRequiredReply(kept);
+  }
+
   const updated = await patchPayment(db, payment.reference, {
     status: 'SETUP_REQUIRED',
     setup_token: makeSetupToken(),
     setup_created_utc: nowIso(),
   });
+  return setupRequiredReply(updated);
+}
 
+function hasLiveSetupToken(payment: Payment): boolean {
+  if (!String(payment.setup_token || '').trim()) return false;
+  const created = payment.setup_created_utc ? new Date(payment.setup_created_utc).getTime() : 0;
+  return created > 0 && Date.now() - created <= SETUP_TOKEN_LIFETIME_MS;
+}
+
+function setupRequiredReply(updated: Payment): VerifyResult {
   return {
     ok: true,
     status: 'SETUP_REQUIRED',

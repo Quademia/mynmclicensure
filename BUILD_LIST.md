@@ -137,7 +137,8 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 
 - ⬜ 10 Admin Payments: after Retry Activation the panel redraws — "Activated ✓" gone, and the panel can close itself
 - ⏸ Paystack LIVE key on prod — waits on the company / Paystack-account decision
-- ⬜ Payments: no Paystack webhook — a payer who loses signal has paid and got nothing until an admin acts (D4)
+- ✅ Payments: no Paystack webhook — a payer who loses signal has paid and got nothing until an admin acts (D4) — `/api/paystack/webhook`: signature checked, `charge.success` only, the confirmation page's verify path, a live setup token kept; walked on localhost with a signed event over a real test payment — 2026-09-23 (Sam, ruled in session)
+- ⬜ D4 on the dev site: the test webhook URL in the Paystack dashboard, then one test payment with the tab closed before it returns — Paystack's own call, which localhost cannot receive; the live URL at cutover, after the Registered Business upgrade (2026-09-23)
 - ⬜ Payments: the server creates the account at PAID and queues a set-password link; the setup token, its two columns and the rescue go; the form shrinks to a password (D31, Sam 2026-09-18)
 - ⬜ Payments: verify answers status and product to anyone; a same-browser cookie set at init shows the password form, otherwise the emailed link (D33, Sam 2026-09-18)
 - ✅ Payments: Paystack's replies trimmed before saving — channel, card_type, last4 kept; the scrub migration on dev, prod at the next release; currency checked at verify (D32 + D36) — 2026-09-19
