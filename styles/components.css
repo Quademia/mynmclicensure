@@ -515,12 +515,11 @@
 .pubbar-burger:hover { background: var(--surface-page); }
 .pubbar-burger svg { display: block; }
 
-/* The phone keeps the wordmark, Sign in and the hamburger; the links
-   move behind the hamburger. Sign in stays in the bar at every width —
-   it is the bar's one action (Sam, 2026-09-23). */
+/* The phone keeps the wordmark and the hamburger; the links and Sign in
+   move behind it — Sign in is the menu's foot (Sam, 2026-09-23). */
 @media (max-width: 768px) {
   .pubbar { padding: 0 var(--space-16); gap: var(--space-12); }   /* the phone gutter */
-  .pubbar-links { display: none; }
+  .pubbar-links, .pubbar-signin { display: none; }
   .pubbar-actions { margin-left: auto; }   /* the links' push, now they are hidden */
   .pubbar-burger { display: inline-flex; }
 }

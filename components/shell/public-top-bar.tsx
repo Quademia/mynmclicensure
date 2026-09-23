@@ -14,8 +14,10 @@
 //     the product on top, "by Quademia" beneath;
 //   · the links from `lib/nav/public.ts` in a row on a computer, the same
 //     list behind the hamburger on a phone;
-//   · ONE action, Sign in, on every page and every width. Subscribe and
-//     Register Free left the bar: each page's own copy carries them.
+//   · ONE action, Sign in, on every page. Subscribe and Register Free
+//     left the bar: each page's own copy carries them. On a phone Sign in
+//     is the menu's foot and the bar keeps only the hamburger (Sam,
+//     2026-09-23 — offered keeping a one-tap Sign in there, not taken).
 //
 // Nothing here knows who is signed in, by design (Sam): Dashboard and
 // Sign in each land a visitor in the right place through the
@@ -47,7 +49,7 @@ export function PublicTopBar({
       </nav>
 
       <div className="pubbar-actions">
-        <Link href="/login" className="btn btn-outline btn-sm">
+        <Link href="/login" className="btn btn-outline btn-sm pubbar-signin">
           Sign in
         </Link>
         <PublicMenu />

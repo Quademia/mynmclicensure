@@ -816,9 +816,12 @@ student on a phone had no way in from the bar.
 - **The two bars stay two components** (Sam: they do different jobs)
   and share only the wordmark and the design system's look.
 - **The public bar:** the links Home · Premium Prep · Packages ·
-  Dashboard from `lib/nav/public.ts`, one list for both widths; **one
-  action, Sign in**, at every width. Subscribe and Register Free left
-  the bar; each page's own copy carries them. Nothing checks who is
+  Dashboard from `lib/nav/public.ts`, one list for both widths, pushed
+  right beside the bar's **one action, Sign in** (centred was offered
+  and not taken). On a phone the bar keeps only the wordmark and the
+  hamburger; Sign in is the menu's foot (Sam — a one-tap Sign in in the
+  bar was offered and not taken). Subscribe and Register Free left the
+  bar; each page's own copy carries them. Nothing checks who is
   signed in (Sam): Dashboard (`/router`) and Sign in (`/login`) each land
   a visitor in the right place through the middleware's redirects — this
   closes the "Sign In / Register Free offered to a signed-in buyer" line
