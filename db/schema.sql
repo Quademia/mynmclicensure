@@ -275,6 +275,8 @@ create table if not exists subscriptions (
 create index if not exists subscriptions_user_id_idx on subscriptions (user_id);
 create index if not exists subscriptions_user_product_status_idx on subscriptions (user_id, product_id, status);
 create index if not exists subscriptions_status_expires_idx on subscriptions (status, expires_utc);
+-- §8 S15 (Sam, 2026-09-23): one subscription per Paystack payment
+create unique index if not exists subscriptions_paystack_ref_key on subscriptions (source_ref) where source = 'PAYSTACK';
 
 -- ── course_access (02 C2, §8 S8 the entitlement side) ──────────────────
 -- One row per course per receipt: what the gate reads. revoked_utc empty

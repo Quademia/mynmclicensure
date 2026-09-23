@@ -465,15 +465,17 @@ grant select (quiz_id, course_id, title, n, allowed_modes, shuffle, time_limit_s
 
 
 -- ── slice 8: subscriptions ─────────────────────────────────────────────
--- Own rows or ADMIN read; ADMIN inserts and updates; no DELETE. The
--- legacy student self-insert policy is not carried (§9 defect 2): the
--- trial grant is a Server Action with the service role.
+-- Own rows or ADMIN read; no browser write path since §8 S15 (the
+-- grants, not a policy — the migration revoked everything from anon and
+-- authenticated and granted authenticated SELECT back). The legacy
+-- student self-insert policy is not carried (§9 defect 2): the trial
+-- grant is a Server Action with the service role. The admin writes go
+-- through the service role behind requireAdmin() too, so
+-- subscriptions_insert and subscriptions_update were DROPPED with that
+-- migration; `requireAdmin()` in lib/subscriptions/actions.ts is the
+-- whole of the protection on that write path, as for products (S14).
 create policy subscriptions_select on subscriptions for select
 using (subscriptions.user_id = auth_user_id() or auth_user_role() = 'ADMIN');
-create policy subscriptions_insert on subscriptions for insert
-with check (auth_user_role() = 'ADMIN');
-create policy subscriptions_update on subscriptions for update
-using (auth_user_role() = 'ADMIN');
 
 -- course_access (02 C2): a student reads their own rows, an admin every
 -- row; no browser write path (the grants, not a policy — the migration

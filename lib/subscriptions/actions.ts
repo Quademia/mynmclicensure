@@ -2,10 +2,18 @@
 //
 // The four admin subscription writes, re-implemented from the payments
 // Worker to the contract in rebuild.md §7.1 (the Worker is what the
-// stack retires): grant, update, revoke, sync-expired. Each runs behind
-// requireAdmin() and writes as the signed-in admin — the ADMIN insert and
-// update policies are the floor. The Worker's own checks, in its order,
-// with its messages; the page's own checks stay in the page.
+// stack retires): grant, update, revoke, sync-expired. The Worker's own
+// checks, in its order, with its messages; the page's own checks stay in
+// the page.
+//
+// ⚠ THE SUBSCRIPTION WRITES GO THROUGH THE SERVICE ROLE (§8 S15,
+// 2026-09-23). They used to write as the signed-in admin, with the ADMIN
+// insert and update policies as the floor. S15 took `subscriptions`'
+// grants back from the browser roles — authenticated holds SELECT and
+// nothing else — so a cookie client can no longer write the table, and
+// the two policies were dropped with it. requireAdmin() is now the ONLY
+// thing deciding who may write, which is why it must stay the first line
+// of each action. The reads still go as the admin.
 //
 // Plus the Grant dialog's student search, which legacy ran from the
 // browser against `users`.
@@ -107,7 +115,8 @@ export async function grantSubscription(userIdIn: string, productIdIn: string, s
     expires_utc: addDaysIso(startIso, durationDays),
     status: 'ACTIVE',
   };
-  const { error } = await supabase.from('subscriptions').insert({
+  const db = createServiceRoleClient();
+  const { error } = await db.from('subscriptions').insert({
     ...receipt,
     // A chosen start date is the receipt's floor in the chain (C3b);
     // empty means the moment it was made.
@@ -120,7 +129,7 @@ export async function grantSubscription(userIdIn: string, productIdIn: string, s
   // One course row per course of the product, then the chain re-packed
   // (02 C2, C3a, C3b).
   try {
-    await writeAccessRows(createServiceRoleClient(), receipt);
+    await writeAccessRows(db, receipt);
   } catch (err) {
     return fail(`Subscription saved, but its course access rows failed: ${err instanceof Error ? err.message : String(err)}`);
   }
@@ -191,7 +200,8 @@ export async function updateSubscription(input: UpdateSubscriptionInput): Promis
 
   const finalSourceRef = source === 'ADMIN' ? sourceRefInput || 'admin_grant' : sourceRefInput || null;
 
-  const { error } = await supabase
+  const db = createServiceRoleClient();
+  const { error } = await db
     .from('subscriptions')
     .update({ product_id: productId, start_utc: startIso, expires_utc: expiresIso, status, source, source_ref: finalSourceRef })
     .eq('subscription_id', subscriptionId);
@@ -199,7 +209,7 @@ export async function updateSubscription(input: UpdateSubscriptionInput): Promis
   // The receipt's course rows move by the change made here — a queued
   // start is kept, other receipts' rows untouched (02 C2, C3b, ruling 4).
   try {
-    await rewriteAccessRows(createServiceRoleClient(), existing, {
+    await rewriteAccessRows(db, existing, {
       subscription_id: subscriptionId,
       user_id: existing.user_id,
       product_id: productId,
@@ -223,11 +233,12 @@ export async function revokeSubscription(subscriptionIdIn: string): Promise<Acti
   const existing = await getSubscriptionById(supabase, subscriptionId);
   if (!existing) return fail('Subscription not found');
 
-  const { error } = await supabase.from('subscriptions').update({ status: 'REVOKED' }).eq('subscription_id', subscriptionId);
+  const db = createServiceRoleClient();
+  const { error } = await db.from('subscriptions').update({ status: 'REVOKED' }).eq('subscription_id', subscriptionId);
   if (error) return fail(error.message);
   // The receipt's live course rows are stamped; the course closes at once (02 C2).
   try {
-    await revokeAccessRows(createServiceRoleClient(), subscriptionId);
+    await revokeAccessRows(db, subscriptionId);
   } catch (err) {
     return fail(`Subscription revoked, but its course access rows failed: ${err instanceof Error ? err.message : String(err)}`);
   }
@@ -312,9 +323,9 @@ export async function loadAccessRows(subscriptionIdIn: string): Promise<AccessRo
 // ── POST /admin/subscriptions/sync-expired ─────────────────────────────
 // One direction only: ACTIVE → EXPIRED where the expiry is past.
 export async function syncExpiredSubscriptions(): Promise<SyncResult> {
-  const { supabase } = await requireAdmin();
+  await requireAdmin();
 
-  const { data, error } = await supabase
+  const { data, error } = await createServiceRoleClient()
     .from('subscriptions')
     .update({ status: 'EXPIRED' })
     .eq('status', 'ACTIVE')

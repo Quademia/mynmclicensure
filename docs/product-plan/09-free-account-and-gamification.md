@@ -111,8 +111,9 @@ still reach the top ten in a good week.
   rows ("free", tagged by programme) and a second door on the read
   policy: a row marked free is readable by any signed-in student. That
   changes the SQL policy, the security floor, so it is a `rebuild.md` §8
-  row before it is built (**a candidate S15, under 08** — this said S14
-  until 2026-09-22, when S14 was taken by the premium marker). A separate pool
+  row before it is built (**a candidate S16, under 08** — this said S14
+  until 2026-09-22, when S14 was taken by the premium marker, and S15
+  until 2026-09-23, when S15 was taken by one subscription per payment). A separate pool
   table is the alternative; it keeps the bank's policy untouched at the
   cost of a second importer path.
 - **What the trial gives, which this doc depends on and does not set**

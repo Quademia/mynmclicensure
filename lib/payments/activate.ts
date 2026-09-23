@@ -4,7 +4,8 @@
 // Two modes, checked in this order:
 //   existing_by_ref — a subscription with source PAYSTACK and this
 //                     reference already exists (the replay guard): reuse
-//                     it, keep the row's original activated_utc;
+//                     it, keep the row's original activated_utc — also
+//                     reached when the insert below loses a race (§8 S15);
 //   created         — a fresh receipt from now; its course rows queue
 //                     behind whatever the student already holds
 //                     (02 C3a). The Worker's third mode — extending a
@@ -30,18 +31,7 @@ export async function activatePaymentForUser(db: ServiceDb, payment: Payment, us
 
   // Idempotency 1: this reference already produced a subscription.
   const existingByRef = await getSubscriptionByPaymentRef(db, payment.reference);
-  if (existingByRef) {
-    // The course rows (02 C2) — written here too, so a retry after a
-    // failure between the receipt and its rows heals itself.
-    await ensureAccessRows(db, existingByRef);
-    await patchPayment(db, payment.reference, {
-      user_id: user.user_id,
-      subscription_id: existingByRef.subscription_id,
-      status: 'ACTIVATED',
-      activated_utc: payment.activated_utc || nowIso(),
-    });
-    return { mode: 'existing_by_ref', subscription: existingByRef };
-  }
+  if (existingByRef) return adoptExisting(db, payment, user, existingByRef);
 
   const product = await getProductForPayment(db, payment.product_id, false);
   if (!product) throw new Error('Activation failed: product not found');
@@ -62,7 +52,17 @@ export async function activatePaymentForUser(db: ServiceDb, payment: Payment, us
     })
     .select('*')
     .single();
-  if (insertError) throw new Error(`Supabase insert failed on subscriptions: ${insertError.message}`);
+  if (insertError) {
+    // Idempotency 2 (§8 S15): the database holds one PAYSTACK receipt per
+    // reference, so a unique refusal here means another caller — the
+    // webhook, a second tab — inserted between our check and our insert.
+    // Its receipt is this payment's receipt; adopt it.
+    if (insertError.code === '23505') {
+      const winner = await getSubscriptionByPaymentRef(db, payment.reference);
+      if (winner) return adoptExisting(db, payment, user, winner);
+    }
+    throw new Error(`Supabase insert failed on subscriptions: ${insertError.message}`);
+  }
 
   const sub = newSub as Subscription;
   // One course row per course of the product, each queued behind the
@@ -76,4 +76,19 @@ export async function activatePaymentForUser(db: ServiceDb, payment: Payment, us
     activated_utc: nowIso(),
   });
   return { mode: 'created', subscription: sub };
+}
+
+// The receipt this reference already produced: reuse it, keep the row's
+// original activated_utc.
+async function adoptExisting(db: ServiceDb, payment: Payment, user: PaymentUser, existing: Subscription): Promise<Activation> {
+  // The course rows (02 C2) — written here too, so a retry after a
+  // failure between the receipt and its rows heals itself.
+  await ensureAccessRows(db, existing);
+  await patchPayment(db, payment.reference, {
+    user_id: user.user_id,
+    subscription_id: existing.subscription_id,
+    status: 'ACTIVATED',
+    activated_utc: payment.activated_utc || nowIso(),
+  });
+  return { mode: 'existing_by_ref', subscription: existing };
 }
