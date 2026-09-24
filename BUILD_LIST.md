@@ -123,6 +123,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⬜ `db/schema.sql` and `db/rls.sql` snapshots omit offline_packs, announcements and user_notice_state — the migrations are complete
 - ⏸ Student analytics, notifications, search, sequential runner mode — new features, after (analytics: 03 Q10–Q13)
 - ⬜ 16 Cutover — DNS, live keys, content re-copy, old logins deleted, `legacy/` removed (moved from the rebuild, Sam, 2026-09-16)
+- ⬜ Security headers: the app sends none (HSTS, framing, nosniff, referrer, CSP); before cutover (dev, 2026-09-24)
 - ⬜ Reference data: schools is a regulator's list with no way to change it (D50, unruled since 2026-09-18)
 - ⬜ Reference data: telegram_group_keys is free text and holds junk — no list, no validation (D3)
 - ⬜ Storage hygiene: ~14 columns, the `levels` table and one config row with no reader or writer (list in the 2026-09-18 session entry) — Sam: some have an unbuilt purpose; review one at a time (2026-09-18); the auth group's five settled by the trace and the read-back (S9, items 7 and 8)

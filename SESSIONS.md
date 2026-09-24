@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-24 — NMC Prep walked on Sam's account and taken apart from outside; attempt reports captured as 03 Q10–Q13; no code
+  - ↳ pane refused the site, Chrome instead · past papers = question books · challenge 3% of points · streak is points · weak-areas promise unkept · time_spent_s never written · no security headers · not a competitor · Clerk no
+
 - 2026-09-23 — the Paystack webhook (D4) on one subscription per payment (S15), proven on dev; one wordmark on both bars and a public phone menu (DS21)
   - ↳ a Paystack business per product · live after Quademia Limited · setup token kept · rule 9 on subscriptions · Dashboard with no check · menu from the right · phone bar full at 360px since the Q · D31 own session
 
