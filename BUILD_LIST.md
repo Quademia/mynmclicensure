@@ -121,7 +121,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⬜ About 40 minor or cosmetic differences (titles, wording, focus, scroll, spinners) — listed in the session entry; Sam's call whether to tidy
 - ⬜ Five legacy bugs the rebuild fixed without a record (history Retake, "%" in Send feedback, inbox unread, picker Subtopic filter, timed pre-Start save) — keep, Sam to confirm
 - ⬜ `db/schema.sql` and `db/rls.sql` snapshots omit offline_packs, announcements and user_notice_state — the migrations are complete
-- ⏸ Student analytics, notifications, search, sequential runner mode — new features, after
+- ⏸ Student analytics, notifications, search, sequential runner mode — new features, after (analytics: 03 Q10–Q13)
 - ⬜ 16 Cutover — DNS, live keys, content re-copy, old logins deleted, `legacy/` removed (moved from the rebuild, Sam, 2026-09-16)
 - ⬜ Reference data: schools is a regulator's list with no way to change it (D50, unruled since 2026-09-18)
 - ⬜ Reference data: telegram_group_keys is free text and holds junk — no list, no validation (D3)
@@ -191,6 +191,10 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⬜ Q7 SATA partial credit — the rule, then the three-state display (Sam, 2026-09-20) — after S7
 - ⬜ Q8 The runner as a player — one route, mode and exit from the header (captured 2026-09-20; ruled after 08 B2)
 - ⬜ Q9 The Check Answer pending state — the option shows it is being checked until the reply lands (2026-09-20)
+- ⬜ Q10 The attempt report — breakdown by subject / topic / difficulty / type, what to fix next (2026-09-24)
+- ⬜ Q11 Time per question — the runner fills `time_spent_s`; pace and slowest on the report (2026-09-24)
+- ⬜ Q12 Progress across attempts — accuracy by topic over history, a trend, true totals (2026-09-24)
+- ⬜ Q13 Readiness and the cohort — a band, how others did per question, standing; with Q3 (2026-09-24)
 
 *Not yet sliced — each gets an id when the doc is rewritten:*
 
@@ -268,7 +272,7 @@ Decided in principle in a cloud session on 2026-09-20; candidates, none sliced, 
 - ⬜ F1 The pool and its door — a free mark on the bank and a second door on the read policy; a §8 row first (renumbered S16 — S14 was taken 2026-09-22, S15 2026-09-23)
 - ⬜ F2 The free account — no course_access rows, the builder and runner on the pool, the dashboard's free-vs-trial line
 - ⬜ F3 Landing and copy — "free practice questions, forever"; the trial and the products as the route to the full bank
-- ⬜ G1 Streak, points, leaderboard — derived from the graded rows, no new tables; after the NMC Prep walk
+- ⬜ G1 Streak, points, leaderboard — derived from the graded rows, no new tables; NMC Prep walked 2026-09-24
 - ⬜ G2 The daily challenge — five a day per programme from the free pool, a new attempt source; after G1
 - ⬜ G3 Tiers — names on point bands; later
 

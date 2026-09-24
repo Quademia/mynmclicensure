@@ -63,7 +63,8 @@ doc's section.
   a five-question daily challenge, streaks, a leaderboard, a community
   area; six tracks (RGN, RM, RMN, RCN, NAC, NAP — NAC and NAP split,
   community health named RCN). The real competitor. Its moat is
-  engagement, not content.
+  engagement, not content. **Walked on Sam's account 2026-09-24**
+  (below).
 - **Where we are ahead:** offline packs (nothing they do works without
   data), the admin and messaging side (cohorts, grants, support at
   scale), a self-serve funnel a Passwell visitor cannot get.
@@ -71,6 +72,95 @@ doc's section.
   the AI tutor, and a price that makes ours look expensive if ours is
   much above GHS 6 a month — **ours is unchecked** (the prices live in
   `products`).
+
+### The NMC Prep walk (2026-09-24, on Sam's Premium account)
+
+Walked by Claude in Sam's own Chrome (the desktop app's browser pane
+refused the site's scripts), signed in by Sam, who allowed any test to
+be taken. A practice test (RGN Anatomy & Physiology, 20 questions), the
+day's Daily Challenge and one mock (three answered, submitted early)
+were sat on his account; notifications were left unopened. Other
+students' names are left out of this record.
+
+**The offer.** Free, no expiry: practice by programme and course, timed
+or untimed, explanations, the Daily Challenge, progress and the
+leaderboard, the community, "AI Study" with two uploads a month.
+Premium, GHS 6 for 30 days, paid once through Paystack, no renewal:
+mocks, the "past questions", shuffled mocks with a breakdown, the AI
+tutor, unlimited AI Study. **The mock page itself says "Mock exams are
+currently free"** — the pricing page and the product disagree.
+
+**The Daily Challenge.** Five questions a day, one graded attempt, a
+prompt on sign-in ("Answer now / Maybe later"). Each answer shows right
+or wrong and a one-line explanation at once; no going back; each
+question carries a topic label. **All five were midwifery questions on
+an account that practises RGN** — the set looks like one five for
+everyone, not one per track. +5 points for 5 correct: a point per
+correct answer. One question named a "Midwife Amo" absent from its own
+stem — lifted from elsewhere unchecked.
+
+**Streaks, points, the leaderboard.** Points for every correct answer
+plus points for daily sign-in streaks; the streak ("1 day · 2 streak
+pts") sits at the top of the side menu on every page. The leaderboard
+is **all-time** (no weekly reset), the **top 100** by **full real
+name**, no opt-out seen; columns rank, name, track, points, streak,
+attempts, best score; a track filter (its subtitle says "compare
+players within the same school", no school filter seen). Points are
+**per track** — one person appears twice under two tracks. The leader
+held 1,426 points over 32 attempts; the longest streak was 70 days.
+**A student outside the top 100 sees no rank of their own.** The
+challenge and the mock do not count in "My progress"; practice does.
+
+**"Past papers" — settled: not NMC papers.** Nothing is "by year".
+Five courses (General Paper, Medical, Surgical, Psychiatric Nursing,
+Nursing), 27 papers, each naming its source: 25 volumes of "Road to
+Licensure MCQs" (a question book) and two from "PerfectGhana", one
+titled "KNUST Nursing Past Questions" (a university's exam). Mostly
+RGN-shaped.
+
+**Practice and the runner.** Track → subject (twelve for RGN, each with
+a one-line description) → a choice of Practice or Mock → a settings
+card. Settings are saved per student: timer on or off, free or linear
+navigation, feedback per question or at the end, a default count (10
+to All). RGN Anatomy & Physiology holds **80 questions**. The question
+screen watermarks **the student's email** behind every question. The
+result: score, correct / wrong, time, each question with its answer
+and "Why", filters all / wrong / correct. **"Explain with AI"** (the
+paid tutor) sat under every question and **did nothing** in three
+tries. Content is uneven: heavy clinical cases filed under Anatomy &
+Physiology, and the right answer was B in 12 of 20.
+
+**The mock.** One per course across all six tracks. A pre-exam page:
+rules (a strict timer, no going back, randomised order, no feedback),
+"instructions from the instructor", an "I understand" tick and a
+"Start the timer?" confirm; refreshing or closing the tab ends the
+attempt. During: a countdown, a **difficulty label and a topic on each
+question**, and a "Mark for review" that cannot be used (no going
+back). Submitting takes two confirms and warns that skipped questions
+are marked wrong. **The results page is their best screen:** score
+against the pass mark, correct / wrong / skipped, total time and share
+of the allowance, average per question, the fastest and slowest
+questions, a breakdown by difficulty and by topic, and all 101
+questions for review. **The content is weak:** at least six repeated
+pairs (two word for word), pharmacology, surgery and obstetrics inside
+an "Anatomy & Physiology" paper, "101 questions" in the header against
+"100" in the instructions — machine-written and unchecked.
+
+**Also there.** A ten-step welcome tour on first sign-in; the side menu
+on the **right**, folding to an icon strip; a bell for community
+replies and team announcements; "Report a bug"; "Install app" (the
+home screen); dark mode. **AI Study**: a PDF becomes AI flashcards or a
+multiple-choice quiz; sets can be shared publicly, one titled like a
+real NMC exam review. **Community**: threads with votes and images,
+filtered by type and track — three threads, two of them the team's.
+
+**What it means for us** (Claude's reading; views, not decisions).
+Their strength is the habit — the daily five, the streak, a detailed
+mock results page; their weakness is the questions. Ours is a bank
+checked by hand and scoped by programme. Worth taking: the mock
+results breakdown (now `03-quiz-system.md` Q10–Q13); a student's own
+rank shown when outside the list (G1); a daily five **per programme**
+(G2, as already planned — theirs is not).
 
 ---
 
@@ -155,17 +245,20 @@ still reach the top ten in a good week.
   pool is per programme, and `users.program_id` picks it.
 - **The leaderboard:** per programme or platform-wide; weekly reset or
   all time; real names, first names, or a chosen display name with an
-  opt-out.
+  opt-out. NMC Prep's answer (walked 2026-09-24): all time, the top
+  100, full real names, per track with an all-tracks view, no rank
+  shown to anyone outside the hundred.
 - **Who plays:** trial and paid students too (the view: yes, all
   attempts count).
 - **Our prices beside GHS 6.** Unchecked; decides how the free floor
   and the trial are worded against each other.
 - **NAC and NAP as separate programmes; RPHN and RCN the same exam or
   not.** A programme question NMC Prep's track list raised.
-- **The past-papers claim** — to be checked when Sam hands over a
-  browser session on his NMC Prep account, alongside the walk of their
-  daily challenge and leaderboard that the gamification design waits
-  on.
+- ~~**The past-papers claim**~~ — **settled 2026-09-24** by the walk
+  (§2): question books and a university's papers, labelled "past
+  questions"; nothing by year, nothing from the NMC. The daily
+  challenge and the leaderboard were walked the same day; G1 no longer
+  waits on the walk.
 
 ---
 
@@ -198,7 +291,9 @@ one-off buttons and cards.
   correct answer, a bonus for timed); the leaderboard = the top ten in
   the student's programme this period plus their own rank. One SQL
   function, one dashboard card, one page. Since 03 Q5 every answer is a
-  graded row, so this is reads only.
+  graded row, so this is reads only. The own rank is the one thing NMC
+  Prep leaves out (walked 2026-09-24): a student below its hundred sees
+  nothing of their standing.
 - **G2 — The daily challenge.** Five questions per programme, the same
   five for everyone, chosen by a seed from the date, run through the
   instant runner; a new attempt source (every list that switches on
@@ -222,7 +317,7 @@ one-off buttons and cards.
 | F1 The pool and its door | candidate; a §8 row first |
 | F2 The free account | candidate |
 | F3 Landing and copy | candidate |
-| G1 Streak, points, leaderboard (derived) | candidate; after the NMC Prep walk |
+| G1 Streak, points, leaderboard (derived) | candidate; the NMC Prep walk done 2026-09-24 |
 | G2 The daily challenge | candidate; after G1 |
 | G3 Tiers | later |
 

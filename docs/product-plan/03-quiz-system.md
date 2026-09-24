@@ -442,7 +442,7 @@ one-line experiment, reverted).
 - **The analytics by SQL:** "which questions does everyone fail" and
   the by-topic figures as queries over `attempt_items`; the admin
   Attempts page's 5,000-row cap goes. Its own slice once Q5 has the
-  rows.
+  rows. The student's side of the same queries is Q10–Q13 below.
 - **`quiz_items`** replacing the `item_ids` array — decided with S2
   (one items table), not before.
 - **The legacy-check gap 7** (the builder's stuck status line) and the
@@ -519,6 +519,110 @@ most for the exam.
   mode (parked on BUILD_LIST as a new feature); the screen word for an
   exam sitting.
 
+### Attempt reports and progress (captured 2026-09-24; candidates, none ruled)
+
+Sam, 2026-09-24, after walking NMC Prep on his own account: plans made
+before MyNclex was built may not have been built here, and MyNclex
+"really breaks down attempts". Checked the same day against MyNclex's
+code, this repo's docs, `legacy/` and the code. Written into the plan on
+Sam's yes; nothing here is ruled or built.
+
+**What a student gets today.** After an attempt: the score, a
+percentage and a grade word (`lib/attempts/scoring.ts`, 80 / 70 / 50),
+and the review — each question right or wrong with its rationale and
+its topic › subtopic. Across attempts: Learning History's five figures
+(total, instant, timed, average, best — over the loaded pages only,
+BUILD_LIST), the per-quiz attempts and best on the quiz cards, the
+dashboard's last five attempts. **Nothing breaks an attempt down** by
+subject, topic, difficulty or question type, for the student or the
+admin, and nothing shows progress over time. The only line that
+mentions it is BUILD_LIST's parked "Student analytics", a gamma-era
+leftover with no design behind it.
+
+**A promise made and never kept.** The portal guide (`portal-guide-
+client.tsx`: "Identify topics you repeatedly miss", "Monitor
+improvement over time", "identify 1–2 weak topics") and the landing
+page ("Review weak areas… watch your scores climb") promise what
+neither this app nor legacy does. Legacy carries the same words, so
+the live site makes the promise today.
+
+**What the data already holds.** Every `attempt_items` row carries
+`subject`, `maintopic`, `subtopic`, `difficulty`, `question_type` and
+`marks`, copied from the bank at creation "for the analytics" (Q4), and
+since Q5 its `is_correct`, `score_awarded` and `chosen` (null =
+unanswered). On dev the bank's tagging is near-complete (one row in
+5,281 untagged; two maintopics misspelt). So a breakdown by any of
+those, for one attempt or across a student's history, is **queries
+only — no storage change.** The one gap: **`time_spent_s` exists and is
+never written** — the column and the save path (`AnswerPatch`,
+`saveAnswers`) accept it; the runner never measures it, and legacy
+never did either. `answered_utc` is the time of the last change of
+answer, not time on the question.
+
+**What MyNclex has, for reference** (read 2026-09-24; reference, not
+plan). A report after every sitting: the score, outcome counts
+(correct / partial / wrong / unanswered), **"Where you slipped"** —
+percentage fully correct per value, weakest first, on four switchable
+axes (its client-needs category, subject, difficulty, question type) —
+a **fix list** of up to three actions (the weakest areas with at least
+three questions, each a link to the builder pre-filtered to it; the
+unanswered; the bookmarked), time on task and pace, every question in a
+table with its time and a "changed your mind" count, filters by
+outcome. A readiness-pack report adds bands (Building / Approaching /
+Ready / Excelling), a trend line across sittings, pacing against a
+budget with "rushed" answers, a per-question map, and a percentile
+among everyone who sat the pack (hidden under 25 sittings). The review
+screen shows how everyone did on each question (hidden under 30
+students). Across sittings, a bank dashboard: a streak, accuracy by
+area over all history with a "weakest area" nudge, a readiness panel
+from three signals, and a "practise my weak spots" button. Per-question
+time is its own engine (engaged seconds, paused when the student looks
+away); answer changes are stored as a history on each answer. Its own
+student analytics page (trends, coverage) is planned there, not built.
+
+**What NMC Prep has** (walked 2026-09-24, `09-free-account-and-
+gamification.md` §2): a mock results page with the score against the
+pass mark, total time, time per question, the fastest and slowest
+questions, and a breakdown by difficulty and by topic; review filters
+all / wrong / correct / skipped. No breakdown after practice.
+
+**Candidate slices** (proposed 2026-09-24, in the order recommended;
+Sam orders them):
+
+- **Q10 — The attempt report.** After every finished attempt, one page
+  (or the review's head): the score and outcome counts; the breakdown
+  by subject, topic, difficulty and question type, weakest first, a
+  slice shown only above a minimum number of questions; **what to fix
+  next** — up to three weakest areas, each a link to the Quiz Builder
+  set to that course and topic; review filters (wrong / unanswered /
+  flagged). Queries over the attempt's own rows, gated like the review
+  (a live exam's report exists only once it is finished — the seal).
+  No storage change. Open when sliced: the minimum per slice; whether
+  it replaces the runner's score card or sits beside it; the grade
+  bands' words.
+- **Q11 — Time per question.** The runner measures the time on each
+  question and sends it with the answer it already saves; the report
+  gains time on task, average pace and the slowest questions. The
+  column and the write path exist. Open: whether the clock pauses when
+  the tab is hidden (MyNclex's engagement clock does); "rushed" against
+  a budget needs a budget, which only a timed quiz has.
+- **Q12 — Progress across attempts.** Learning History and the
+  dashboard: accuracy by subject and topic over the student's whole
+  history with a weakest-area nudge to the builder, a score trend, and
+  the history's true totals (closing BUILD_LIST's "counts the loaded
+  pages" lines). The slice that makes the portal guide's promise true.
+  Queries only; an index on `attempts (user_id, …)` is already queued
+  under *Speed and scale*.
+- **Q13 — Readiness and the cohort.** Later: a readiness band from a
+  student's own history; how everyone did on each question (a minimum
+  count before it shows); standing among those who sat the same fixed
+  quiz or mock. Belongs with Q3's mock design — the mock's own results
+  screen is where NMC Prep is strongest.
+
+Not proposed: an answer-change history ("you changed N answers") —
+it needs a change log on every answer, a storage change and its own
+§8 row; the attempt keeps only the final choice.
+
 ---
 
 ## 5. Ladder
@@ -534,3 +638,7 @@ most for the exam.
 | Q7 SATA partial credit | later, after S7 |
 | Q8 The runner as a player | candidate, captured 2026-09-20; ruled when it comes up, after 08 B2 |
 | Q9 The Check Answer pending state | candidate, captured 2026-09-20 |
+| Q10 The attempt report | candidate, captured 2026-09-24 |
+| Q11 Time per question | candidate, captured 2026-09-24 |
+| Q12 Progress across attempts | candidate, captured 2026-09-24 |
+| Q13 Readiness and the cohort | candidate, captured 2026-09-24; with Q3 |
