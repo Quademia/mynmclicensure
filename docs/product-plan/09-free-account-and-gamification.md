@@ -107,9 +107,36 @@ name**, no opt-out seen; columns rank, name, track, points, streak,
 attempts, best score; a track filter (its subtitle says "compare
 players within the same school", no school filter seen). Points are
 **per track** — one person appears twice under two tracks. The leader
-held 1,426 points over 32 attempts; the longest streak was 70 days.
-**A student outside the top 100 sees no rank of their own.** The
-challenge and the mock do not count in "My progress"; practice does.
+held 1,426 points over 32 attempts. The "Streak" column shows **streak
+points, not days** (the payload has no day count; Sam's 1-day streak
+is 2 points), so its highest value, 70, is not a 70-day streak — first
+written as days and corrected the same day. **A student outside the
+top 100 sees no rank of their own.** The challenge and the mock do not
+count in "My progress"; practice does.
+
+**How engaging the Daily Challenge has been** (measured 2026-09-24
+from the leaderboard payload the app sends a signed-in student, which
+splits each row's points into `examPoints`, `streakPoints` and
+`dailyPoints`; totals only, no names). The 100 rows are 96 people and
+are, by construction, the most active students — the whole base is
+less engaged, and its size is not visible.
+
+- **32 of the 100 have never scored a challenge point**; 68 have.
+- The median player has **7 challenge points** — about two days at up
+  to 5 a day (1 point per correct answer). Only 5 of the 100 have more
+  than 25 (six days or more); the highest is 80 (at least 16 days).
+- All 100 together hold 730 challenge points — roughly 180 completed
+  challenges over the site's life (its launch date unknown).
+- **Where the points come from:** practice and mocks 25,057 of 26,624
+  (**94%**), sign-in streaks 837 (3%), the challenge 730 (3%).
+- **Recency:** 14 active in the last day, 46 in 3 days, **73 in 7
+  days**, 93 in 30 days; the least recent 125 days ago. The 100th row
+  held 121 points.
+
+Reading (Claude's): their best students return to **practise**; the
+daily five is a light extra, not the engine. For this doc it supports
+G1 (points and a leaderboard from practice) before G2 (the daily
+challenge), the order already planned.
 
 **"Past papers" — settled: not NMC papers.** Nothing is "by year".
 Five courses (General Paper, Medical, Surgical, Psychiatric Nursing,
