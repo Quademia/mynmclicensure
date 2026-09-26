@@ -175,6 +175,18 @@ export type ListEntry = { id: number; name: string; retired: boolean };
  *  or be Not set (null) — the database's keys hold it to that. */
 export type CourseLists = { subjects: ListEntry[]; topics: ListEntry[] };
 
+/** Which of a course's two lists an action works on. */
+export type ListKind = 'subject' | 'topic';
+/** A list entry with the number of the course's questions carrying it. */
+export type PanelEntry = ListEntry & { count: number };
+/** The Subjects & topics panel's read: both lists with their counts, and
+ *  how many questions have each word Not set. */
+export type ListPanelResult =
+  | { ok: true; subjects: PanelEntry[]; topics: PanelEntry[]; notSet: { subject: number; topic: number }; questions: number }
+  | { ok: false; error: string };
+/** An add, rename, merge, retire, delete or split: questions moved. */
+export type ListChangeResult = { ok: true; changed: number } | { ok: false; error: string };
+
 // What loadCourseItems() returns: the whole course, as legacy loaded it
 // (the page filters in the browser), plus the two dropdowns it fills,
 // (08 B4) every tag in use across the bank, for the editor's

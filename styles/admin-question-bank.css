@@ -127,6 +127,16 @@
 .qb .pool-course { display: flex; justify-content: space-between; gap: var(--space-8); padding: 3px 0; font-size: 12px; color: var(--primary); }
 .qb .pool-course-count { white-space: nowrap; }
 
+/* ── 08 B5: the Subjects & topics panel — two lists side by side ── */
+.qb .lists-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-20); }
+.qb .lists-col { min-width: 0; }
+.qb .lists-col-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-8); margin-bottom: var(--space-8); }
+.qb .lists-col-head h4 { margin: 0; font-size: 13px; font-weight: 700; color: var(--primary); }
+.qb .lists-notset { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.qb .lists-add { display: flex; gap: var(--space-6); margin-bottom: var(--space-8); }
+.qb .lists-add input { flex: 1; min-width: 0; padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; font: inherit; font-size: 13px; color: var(--primary); }
+.qb .tag-row.is-retired .tag-chip { opacity: 0.6; }
+
 /* ── 08 B4: the import's two choices ── */
 .qb-modal .csv-choices { margin-top: var(--space-12); padding: var(--space-10) var(--space-12); border: 1px solid var(--border); border-radius: 8px; }
 .qb-modal .csv-choice { display: flex; align-items: center; gap: var(--space-8); font-size: 13px; font-weight: 600; color: var(--primary); margin-bottom: var(--space-6); cursor: pointer; }
@@ -210,6 +220,7 @@
   .qb .qb-card-panel { padding: var(--space-12) var(--space-16); }
   .qb .qb-card-panel-find { max-width: none; }
   .qb .tag-row-edit input, .qb .tag-row-edit select { flex: 1 1 100%; min-width: 0; }
+  .qb .lists-grid { grid-template-columns: 1fr; }
   .qb .form-row { grid-template-columns: 1fr; gap: 0; }
   .qb .option-pair { grid-template-columns: 1fr; }
   .qb .panel-actions .btn { flex: 1 1 auto; }

@@ -30,6 +30,7 @@ import { checkCourseWords, checkListColumns, findOnList, rowToPayload, type CsvR
 import { uploadRationaleImage } from './images';
 import {
   courseLists,
+  courseWordRows,
   existingItemIds,
   freeRowCounts,
   getItemFilterOptions,
@@ -38,6 +39,7 @@ import {
   mockReservedIds,
   taggedRows,
   tagSpellingsInUse,
+  type ServiceDb,
 } from './queries';
 import { courseExists } from './queries';
 import {
@@ -54,6 +56,10 @@ import {
   type FreePoolResult,
   type ImportChoices,
   type ImportResult,
+  type ListChangeResult,
+  type ListEntry,
+  type ListKind,
+  type ListPanelResult,
   type PublishResult,
   type QuestionType,
   type QuizUseResult,
@@ -536,4 +542,224 @@ export async function deleteQuestion(courseId: string, itemId: string): Promise<
   const { error } = await db.from('question_bank').delete().eq('item_id', itemId).eq('course_id', course);
   if (error) return fail('Delete failed: ' + error.message);
   return { ok: true };
+}
+
+// ── The Subjects & topics panel (08 B5) ────────────────────────────────
+// A course's two lists and the questions on them. The database's keys
+// carry a rename to every question (on update cascade) and refuse a
+// delete while a question uses the word; these actions say the same
+// things in words first, and stamp `updated_by` on the questions they
+// move. Every move is a label change: no history row, no new version.
+// Service role behind requireAdmin() — the lists hold no browser grant.
+
+const LIST_TABLE: Record<ListKind, 'bank_subjects' | 'bank_topics'> = { subject: 'bank_subjects', topic: 'bank_topics' };
+const LIST_COLUMN: Record<ListKind, 'subject' | 'maintopic'> = { subject: 'subject', topic: 'maintopic' };
+const LIST_NOUN: Record<ListKind, string> = { subject: 'subject', topic: 'topic' };
+
+/** A word as a list stores it: trimmed, runs of spaces made one. */
+function tidyWord(word: string): string {
+  return String(word ?? '').trim().replace(/\s+/g, ' ');
+}
+
+function listKindOk(kind: string): kind is ListKind {
+  return kind === 'subject' || kind === 'topic';
+}
+
+async function readEntry(db: ServiceDb, kind: ListKind, courseId: string, id: number) {
+  const { data, error } = await db.from(LIST_TABLE[kind]).select('id, name, retired').eq('course_id', courseId).eq('id', id).maybeSingle();
+  if (error) console.error('readEntry:', error);
+  return (data as ListEntry | null) ?? null;
+}
+
+/** Stamps who moved the questions now carrying `word` (a label change). */
+async function stampWord(db: ServiceDb, kind: ListKind, courseId: string, word: string, actor: string) {
+  const { error } = await db.from('question_bank').update({ updated_by: actor }).eq('course_id', courseId).eq(LIST_COLUMN[kind], word);
+  if (error) console.error('stampWord:', error);
+}
+
+export async function loadListPanel(courseIdIn: string): Promise<ListPanelResult> {
+  await requireAdmin();
+  const courseId = String(courseIdIn || '').trim().toUpperCase();
+  if (!courseId) return { ok: false, error: 'Please select a course first.' };
+  const db = createServiceRoleClient();
+  const [lists, rows] = await Promise.all([courseLists(db, courseId), courseWordRows(db, courseId)]);
+  if (!lists || !rows) return { ok: false, error: "Could not read this course's lists. Please try again." };
+
+  const tally = (col: 'subject' | 'maintopic') => {
+    const m = new Map<string, number>();
+    for (const r of rows) if (r[col]) m.set(r[col] as string, (m.get(r[col] as string) ?? 0) + 1);
+    return m;
+  };
+  const subjectCounts = tally('subject');
+  const topicCounts = tally('maintopic');
+  return {
+    ok: true,
+    subjects: lists.subjects.map((e) => ({ ...e, count: subjectCounts.get(e.name) ?? 0 })),
+    topics: lists.topics.map((e) => ({ ...e, count: topicCounts.get(e.name) ?? 0 })),
+    notSet: { subject: rows.filter((r) => !r.subject).length, topic: rows.filter((r) => !r.maintopic).length },
+    questions: rows.length,
+  };
+}
+
+export async function addListEntry(kind: ListKind, courseIdIn: string, nameIn: string): Promise<ListChangeResult> {
+  const { supabase } = await requireAdmin();
+  if (!listKindOk(kind)) return { ok: false, error: 'Unknown list.' };
+  const courseId = String(courseIdIn || '').trim().toUpperCase();
+  if (!(await courseExists(supabase, courseId))) return { ok: false, error: 'Unknown course.' };
+  const name = tidyWord(nameIn);
+  if (!name) return { ok: false, error: `Please enter the ${LIST_NOUN[kind]}.` };
+
+  const db = createServiceRoleClient();
+  const lists = await courseLists(db, courseId);
+  if (!lists) return { ok: false, error: "Could not read this course's lists. Please try again." };
+  const twin = findOnList(kind === 'subject' ? lists.subjects : lists.topics, name);
+  if (twin) return { ok: false, error: `“${twin.name}” is already on the list${twin.retired ? ' (retired — restore it instead)' : ''}.` };
+
+  const { error } = await db.from(LIST_TABLE[kind]).insert({ course_id: courseId, name });
+  if (error) return { ok: false, error: `Could not add it: ${error.message}` };
+  return { ok: true, changed: 0 };
+}
+
+// A rename changes the list row; the key carries the new word to every
+// question. Onto a word already on the list it would be a merge — the
+// panel asks and calls mergeListEntries instead, so here it is refused.
+export async function renameListEntry(kind: ListKind, courseIdIn: string, id: number, nameIn: string): Promise<ListChangeResult> {
+  const { profile } = await requireAdmin();
+  if (!listKindOk(kind)) return { ok: false, error: 'Unknown list.' };
+  const courseId = String(courseIdIn || '').trim().toUpperCase();
+  const name = tidyWord(nameIn);
+  if (!name) return { ok: false, error: 'Please enter the new name.' };
+
+  const db = createServiceRoleClient();
+  const entry = await readEntry(db, kind, courseId, id);
+  if (!entry) return { ok: false, error: 'That entry is no longer on the list.' };
+  if (entry.name === name) return { ok: true, changed: 0 };
+  const lists = await courseLists(db, courseId);
+  if (!lists) return { ok: false, error: "Could not read this course's lists. Please try again." };
+  const twin = findOnList(kind === 'subject' ? lists.subjects : lists.topics, name);
+  if (twin && twin.id !== entry.id) return { ok: false, error: `“${twin.name}” is already on the list — merge into it instead.` };
+
+  const { count } = await db
+    .from('question_bank')
+    .select('item_id', { count: 'exact', head: true })
+    .eq('course_id', courseId)
+    .eq(LIST_COLUMN[kind], entry.name);
+  const { error } = await db.from(LIST_TABLE[kind]).update({ name }).eq('id', entry.id);
+  if (error) return { ok: false, error: `Could not rename it: ${error.message}` };
+  await stampWord(db, kind, courseId, name, profile.user_id);
+  return { ok: true, changed: count ?? 0 };
+}
+
+// Every question on `from` moves to `into`; the emptied entry is deleted.
+export async function mergeListEntries(kind: ListKind, courseIdIn: string, fromId: number, intoId: number): Promise<ListChangeResult> {
+  const { profile } = await requireAdmin();
+  if (!listKindOk(kind)) return { ok: false, error: 'Unknown list.' };
+  const courseId = String(courseIdIn || '').trim().toUpperCase();
+  if (fromId === intoId) return { ok: false, error: 'Choose a different entry to merge into.' };
+
+  const db = createServiceRoleClient();
+  const [from, into] = await Promise.all([readEntry(db, kind, courseId, fromId), readEntry(db, kind, courseId, intoId)]);
+  if (!from || !into) return { ok: false, error: 'That entry is no longer on the list.' };
+
+  const { data, error } = await db
+    .from('question_bank')
+    .update({ [LIST_COLUMN[kind]]: into.name, updated_by: profile.user_id })
+    .eq('course_id', courseId)
+    .eq(LIST_COLUMN[kind], from.name)
+    .select('item_id');
+  if (error) return { ok: false, error: `Could not merge: ${error.message}` };
+  const { error: delError } = await db.from(LIST_TABLE[kind]).delete().eq('id', from.id);
+  if (delError) return { ok: false, error: `The questions moved, but “${from.name}” could not be removed: ${delError.message}` };
+  return { ok: true, changed: (data ?? []).length };
+}
+
+export async function setListEntryRetired(kind: ListKind, courseIdIn: string, id: number, retired: boolean): Promise<ListChangeResult> {
+  await requireAdmin();
+  if (!listKindOk(kind)) return { ok: false, error: 'Unknown list.' };
+  const courseId = String(courseIdIn || '').trim().toUpperCase();
+  const { error } = await createServiceRoleClient()
+    .from(LIST_TABLE[kind])
+    .update({ retired: Boolean(retired) })
+    .eq('course_id', courseId)
+    .eq('id', id);
+  if (error) return { ok: false, error: `Could not update it: ${error.message}` };
+  return { ok: true, changed: 0 };
+}
+
+// Refused while any question carries the word — the key refuses it too.
+export async function deleteListEntry(kind: ListKind, courseIdIn: string, id: number): Promise<ListChangeResult> {
+  await requireAdmin();
+  if (!listKindOk(kind)) return { ok: false, error: 'Unknown list.' };
+  const courseId = String(courseIdIn || '').trim().toUpperCase();
+  const db = createServiceRoleClient();
+  const entry = await readEntry(db, kind, courseId, id);
+  if (!entry) return { ok: false, error: 'That entry is no longer on the list.' };
+
+  const { count, error: countError } = await db
+    .from('question_bank')
+    .select('item_id', { count: 'exact', head: true })
+    .eq('course_id', courseId)
+    .eq(LIST_COLUMN[kind], entry.name);
+  if (countError) return { ok: false, error: 'Could not check the questions. Please try again.' };
+  if (count) {
+    return {
+      ok: false,
+      error: `${count} question${count === 1 ? ' still uses' : 's still use'} “${entry.name}” — merge it into another ${LIST_NOUN[kind]}, or retire it.`,
+    };
+  }
+  const { error } = await db.from(LIST_TABLE[kind]).delete().eq('id', entry.id);
+  if (error) return { ok: false, error: `Could not delete it: ${error.message}` };
+  return { ok: true, changed: 0 };
+}
+
+// A double such as "Cardiovascular/Emergency": its questions take one
+// part as their topic — added to the list if new — and the other parts
+// join their tags, snapped to the spellings in use; the emptied entry is
+// deleted. Only topics split (Sam, 2026-09-26: one topic per question).
+export async function splitTopic(courseIdIn: string, id: number, keepIn: string): Promise<ListChangeResult> {
+  const { profile } = await requireAdmin();
+  const courseId = String(courseIdIn || '').trim().toUpperCase();
+  const db = createServiceRoleClient();
+  const entry = await readEntry(db, 'topic', courseId, id);
+  if (!entry) return { ok: false, error: 'That topic is no longer on the list.' };
+
+  const parts = entry.name.split('/').map(tidyWord).filter(Boolean);
+  if (parts.length < 2) return { ok: false, error: `“${entry.name}” has no “/” to split on.` };
+  const keep = parts.find((p) => p.toLowerCase() === tidyWord(keepIn).toLowerCase());
+  if (!keep) return { ok: false, error: 'Choose which part becomes the topic.' };
+  const toTags = parts.filter((p) => p !== keep);
+
+  const [lists, inUse, rows] = await Promise.all([courseLists(db, courseId), tagSpellingsInUse(db), courseWordRows(db, courseId)]);
+  if (!lists || !rows) return { ok: false, error: "Could not read this course's lists. Please try again." };
+
+  // the kept part: the list's own spelling if it is there, else added
+  let topic = findOnList(lists.topics, keep);
+  if (!topic) {
+    const { data, error } = await db.from('bank_topics').insert({ course_id: courseId, name: keep }).select('id, name, retired').single();
+    if (error) return { ok: false, error: `Could not add “${keep}”: ${error.message}` };
+    topic = data as ListEntry;
+  }
+
+  const groups = new Map<string, string[]>();
+  for (const r of rows.filter((r) => r.maintopic === entry.name)) {
+    const key = JSON.stringify(snapTags([...r.tags, ...toTags], inUse));
+    groups.set(key, [...(groups.get(key) ?? []), r.item_id]);
+  }
+  let changed = 0;
+  for (const [key, ids] of groups) {
+    for (let i = 0; i < ids.length; i += PUBLISH_SLICE) {
+      const slice = ids.slice(i, i + PUBLISH_SLICE);
+      const { error } = await db
+        .from('question_bank')
+        .update({ maintopic: topic.name, tags: JSON.parse(key) as string[], updated_by: profile.user_id })
+        .in('item_id', slice);
+      if (error) {
+        return { ok: false, error: `Could not split: ${error.message}` + (changed ? ` (${changed} questions moved before the failure)` : '') };
+      }
+      changed += slice.length;
+    }
+  }
+  const { error: delError } = await db.from('bank_topics').delete().eq('id', entry.id);
+  if (delError) return { ok: false, error: `The questions moved, but “${entry.name}” could not be removed: ${delError.message}` };
+  return { ok: true, changed };
 }

@@ -33,6 +33,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Toast } from '@/lib/toast/toast';
 import { CsvImportModal } from './csv-import-modal';
 import { FreePoolPanel } from './free-pool-panel';
+import { SubjectsTopicsPanel } from './subjects-topics-panel';
 import { TagsPanel } from './tags-panel';
 import { countQuizzesNaming, deleteQuestion, loadCourseItems, saveQuestion, setPublished } from '@/lib/bank/actions';
 import {
@@ -148,6 +149,9 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
   const [batchIds, setBatchIds] = useState<string[]>([]);
   const [tagsInUse, setTagsInUse] = useState<string[]>([]);
   const [lists, setLists] = useState<CourseLists>(NO_LISTS);
+  // bumped on every course read, so the Subjects & topics panel re-reads
+  // its counts after an import, a save or a delete elsewhere on the page
+  const [courseReads, setCourseReads] = useState(0);
   const [loading, setLoading] = useState(false);
 
   // ── filters (applied in the browser, as legacy) ──
@@ -187,18 +191,20 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
   // DS4: the app's own dialog for every question the page asks.
   const [confirm, confirmDialog] = useConfirm();
 
-  // ── the two panels (08 B4): whole bank, so no course needed ──
-  const [sidePanel, setSidePanel] = useState<'tags' | 'free' | null>(null);
+  // ── the panels: Tags and Free pool (08 B4) cover the whole bank, so
+  // need no course; Subjects & topics (08 B5) is the picked course's ──
+  const [sidePanel, setSidePanel] = useState<'tags' | 'free' | 'lists' | null>(null);
   const notify = useCallback((text: string, tone: 'error' | 'success') => setMsg({ text, tone }), []);
 
-  // After a tag is renamed, merged or deleted: the course's cards and the
-  // open editor's tags read again, so neither shows the old word.
-  async function afterTagChange() {
+  // After a tag or a list word is renamed, merged, split or deleted: the
+  // course's cards and lists and the open editor's words read again, so
+  // none shows the old word.
+  async function afterWordChange() {
     if (!courseId) return;
     const fresh = await fetchCourse(courseId);
     if (currentId) {
       const row = fresh.find((i) => i.item_id === currentId);
-      if (row) setForm((f) => ({ ...f, tags: row.tags ?? [] }));
+      if (row) setForm((f) => ({ ...f, tags: row.tags ?? [], subject: row.subject || '', maintopic: row.maintopic || '' }));
     }
   }
 
@@ -226,6 +232,7 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
     setBatchIds(result.batchIds);
     setTagsInUse(result.tagsInUse);
     setLists(result.lists);
+    setCourseReads((n) => n + 1);
     return result.items;
   }
 
@@ -588,6 +595,8 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
     const result = await deleteQuestion(courseId, currentId);
     if (!result.ok) return setMsg({ text: result.error, tone: 'error' });
     setItems((rows) => rows.filter((i) => i.item_id !== currentId));
+    // the Subjects & topics panel's counts move with it (08 B5)
+    setCourseReads((n) => n + 1);
     closePanel();
     setMsg({ text: 'Question deleted.', tone: 'success' });
   }
@@ -706,6 +715,16 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
           >
             Free pool
           </button>
+          <button
+            type="button"
+            className={`btn btn-ghost${sidePanel === 'lists' && courseId ? ' is-on' : ''}`}
+            aria-pressed={sidePanel === 'lists' && Boolean(courseId)}
+            disabled={!courseId}
+            title={courseId ? undefined : 'Select a course first'}
+            onClick={() => setSidePanel((p) => (p === 'lists' ? null : 'lists'))}
+          >
+            Subjects &amp; topics
+          </button>
           {courseId && !loading && shownDrafts.length ? (
             <button type="button" className="btn btn-ghost" disabled={busyId !== null} onClick={publishAllShown}>
               <Icon name="check-circle" />Publish all shown ({shownDrafts.length})
@@ -716,11 +735,20 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
         </div>
       </div>
 
-      {/* The two whole-bank panels (08 B4) */}
+      {/* The panels (08 B4, B5) */}
       {sidePanel === 'tags' ? (
-        <TagsPanel onClose={() => setSidePanel(null)} onChanged={afterTagChange} notify={notify} />
+        <TagsPanel onClose={() => setSidePanel(null)} onChanged={afterWordChange} notify={notify} />
       ) : sidePanel === 'free' ? (
         <FreePoolPanel onClose={() => setSidePanel(null)} />
+      ) : sidePanel === 'lists' && courseId ? (
+        <SubjectsTopicsPanel
+          key={`${courseId}:${courseReads}`}
+          courseId={courseId}
+          courseTitle={courses.find((c) => c.course_id === courseId)?.title || courseId}
+          onClose={() => setSidePanel(null)}
+          onChanged={afterWordChange}
+          notify={notify}
+        />
       ) : null}
 
       {/* List + edit panel */}

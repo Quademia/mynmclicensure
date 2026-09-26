@@ -302,6 +302,33 @@ export async function courseLists(db: ServiceDb, courseId: string): Promise<Cour
 }
 
 /**
+ * A course's rows as the Subjects & topics panel counts and moves them:
+ * id, subject, topic and tags. Paged — RM_PED_OBS_HRN holds 1,080 rows
+ * and a read stops at 1,000. Null when the bank could not be read.
+ */
+export async function courseWordRows(
+  db: ServiceDb,
+  courseId: string,
+): Promise<{ item_id: string; subject: string | null; maintopic: string | null; tags: string[] }[] | null> {
+  const rows: { item_id: string; subject: string | null; maintopic: string | null; tags: string[] }[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await db
+      .from('question_bank')
+      .select('item_id, subject, maintopic, tags')
+      .eq('course_id', courseId)
+      .order('item_id')
+      .range(from, from + PAGE - 1);
+    if (error) {
+      console.error('courseWordRows:', error);
+      return null;
+    }
+    const page = (data ?? []) as { item_id: string; subject: string | null; maintopic: string | null; tags: string[] | null }[];
+    for (const r of page) rows.push({ ...r, tags: r.tags ?? [] });
+    if (page.length < PAGE) return rows;
+  }
+}
+
+/**
  * The free rows per course, published and draft, for the Free pool
  * panel. Null when the bank could not be read.
  */
