@@ -981,16 +981,35 @@ back at most 1,000 rows a request and says nothing when it stops.
 RM_PED_OBS_HRN holds 1,080 questions, so the admin bank page shows
 "1000 questions", and every read that takes a whole course is short
 by the same 80 (the last by id, or an arbitrary 80 where the read has
-no order): the two builders' pool (`getBuilderCourseItems`), their
-topic, difficulty and type options (`getItemFilterOptions`), the
-fixed-quiz and mock pickers and the admin page (`getItemsByFilters`).
-The fix pages each such read until a short page comes back — the
-shape `tagSpellingsInUse` already uses — or moves it server-side (the
-admin list is B3's, which pages it fifty at a time).
+no order). Four reads, D52's 1–4:
+
+- the admin page and the fixed-quiz and mock pickers
+  (`getItemsByFilters`);
+- the admin page's dropdowns (`getItemFilterOptions`);
+- the two builders' pool (`getBuilderCourseItems`) — since B6 their
+  topic, difficulty and type options are built from the same rows, so
+  it is one read, not two;
+- the builders' keyword (`search_question_bank_ids`) — a function
+  returning a set is cut too: "a" in RM_PED_OBS_HRN returns 1,000 of
+  the 1,080 it matches (probed on dev, 2026-09-26).
+
+**Widened (Sam, 2026-09-26).** Asked how far the cap reaches, the
+sweep of every database call found thirteen more outside the bank
+(D52 5–17: the announcement counts, the Attempts page, the inbox and
+its badge, a quiz's attempts box, Subscriptions, the revenue summary,
+Bulk Send, the pickers, the student's own quiz pages and messages).
+Offered as the grants were — a rule, fixed surface by surface — or a
+rule and one pass; **Sam took the one pass, before cutover.** B7
+builds the bank's four and the Speed and scale line the rest, in the
+same pass: one helper that reads in batches of 1,000 until a short
+batch comes back (the shape `taggedRows` already uses, which moves
+onto it), and AGENTS.md rule 10. The admin list's proper shape stays
+B3's, fifty at a time, which replaces B7's batching on that page.
 
 **Reach.** Dev only today — the new app is not live. At cutover,
 every student and admin of a course past 1,000 rows: RM_PED_OBS_HRN
-now, and any course that grows past it. Before cutover.
+now, and any course that grows past it (RN_MED and RN_SURG hold 900).
+Before cutover.
 
 ### Later, under this doc
 
@@ -1018,4 +1037,4 @@ now, and any course that grows past it. Before cutover.
 | B4 The columns, the version and the history | ✅ 2026-09-26 (`20260926150000_question_bank_columns_history.sql`, `20260926160000_copiers_refuse_any_draft.sql`; the code in two sittings the same day; walked on dev and by Sam — §4) |
 | B5 The lists and their panel | ✅ 2026-09-26 (`20260926170000_bank_subject_topic_lists.sql`; the code in two sittings the same day; walked on dev and by Sam — §4); the clean-up of the words is content work, in the panel |
 | B6 The draws, and the student's read (S19) | ✅ 2026-09-26 (`20260926180000_question_bank_student_read_narrowed.sql`; walked on dev as Sam's admin and as a GP student — §4) |
-| B7 Whole-course reads past the 1,000-row cap | ⬜ queued 2026-09-26 (Sam); found walking B4; before cutover |
+| B7 Whole-course reads past the 1,000-row cap | ⬜ queued 2026-09-26 (Sam); found walking B4; widened the same day into one pass with D52's other thirteen (Sam); before cutover |

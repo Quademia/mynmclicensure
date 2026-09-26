@@ -2489,6 +2489,89 @@ profile field a year input. Drafted with D49 as §8 **S13**. D50
 
 ---
 
+## D52 — A read of a whole growing table stops at 1,000 rows and says nothing (every surface)
+
+**What.** The API hands back at most 1,000 rows a request and gives no
+error when it stops — the list simply arrives short. Probed on dev
+(2026-09-26, read-only): a request with no limit, `limit=2000` and
+`limit=5000` each returned 1,000 rows of `question_bank`; a function
+returning a set is cut the same way (`search_question_bank_ids` for
+"a" in RM_PED_OBS_HRN returned 1,000 of the 1,080 it matches). So
+every read that asks for a whole table, a whole course, or every row
+of a kind across students is short once the table passes 1,000 — a
+list missing rows, a count too low, a dropdown missing a choice — and
+the page cannot tell. Found in the bank walking 08 B4 (queued as B7);
+then every database call in `app/`, `lib/` and `components/` swept
+(233: 139 bounded by design — one row, a count, a write, or already
+paged — and the rest read by hand). The Attempts page's "5,000-row
+cap" of the 2026-09-16 perf line is really 1,000.
+
+**Where.**
+
+| # | Read | Page | Past 1,000 |
+|---|---|---|---|
+| 1 | `getItemsByFilters` (`lib/bank/queries.ts:103`) | admin Question Bank; the fixed-quiz and mock pickers | the course's list short — RM_PED_OBS_HRN shows 1,000 of 1,080 today |
+| 2 | `getItemFilterOptions` (`lib/bank/queries.ts:139`) | admin Question Bank dropdowns | built from an arbitrary 1,000 (no order) |
+| 3 | `getBuilderCourseItems` (`lib/attempts/queries.ts:122`) | both builders' pool and chips (the options since 08 B6) | 80 questions never drawn, the counts short |
+| 4 | `searchConceptItemIds` → `search_question_bank_ids` (`lib/bank/queries.ts:88`) | both builders' keyword | a short or common word loses matches |
+| 5 | `getEngagementCounts` (`lib/announcements/queries.ts:34`) | admin Announcements | read / clicked / dismissed low — one row per student per announcement, so a few hundred students pass it |
+| 6 | `getAttemptsWindow` (`lib/attempts/admin-queries.ts:32`) | admin Attempts | asks for 5,000, gets 1,000; `capped` tests 5,000, so the page never says so |
+| 7 | `getAdminThreads` (`lib/messaging/admin-queries.ts:47`) | admin Messages inbox | every message of every thread, for the latest and the dot — wrong past 1,000 messages; threads vanish past 1,000 threads |
+| 8 | `getUnreadCountForAdmin` (`lib/messaging/admin-queries.ts:98`) | the admin badge, every admin page | undercounts |
+| 9 | `getQuizAttemptStats` (`lib/attempts/queries.ts:43`) | a quiz's or mock's attempts box | totals and the mean from an arbitrary 1,000 |
+| 10 | `getAllSubscriptions` (`lib/subscriptions/queries.ts:72`) | admin Subscriptions | the oldest gone; the totals, search and filters miss them |
+| 11 | `getRevenueRows` (`lib/payments/admin-queries.ts:124`) | admin Payments, the revenue summary | revenue low |
+| 12 | `resolveRecipients` (`lib/messaging/admin-queries.ts:156`) | Bulk Send and its preview | 1,000 recipients, the preview saying 1,000; its subscription and course reads cut too |
+| 13 | `getDistinctLevelsAndCohorts` (`lib/messaging/admin-queries.ts:143`), `getCohorts` (`lib/announcements/queries.ts:49`) | the Messages and Announcements pickers | a cohort or level missing |
+| 14 | the search pre-pass in `getAdminThreads` (`lib/messaging/admin-queries.ts:51`) | admin Messages search | a short term loses students |
+| 15 | `getStudentAttempts` (`lib/attempts/queries.ts:81`) | student Fixed Quizzes, Mock Exams | an old sitting drops off; a quiz taken shows as not taken |
+| 16 | its answered-count read (`lib/attempts/queries.ts:98`) | the same two pages | "N of M answered" low |
+| 17 | `getStudentThreads` (`lib/messaging/queries.ts:19`) | student Messages | the latest message or the dot wrong |
+
+Two more reach it only past 1,000 announcements or 1,000 quizzes:
+`getAllAnnouncements` (`lib/announcements/queries.ts:25`) and
+`getAllQuizzes` (`lib/quizzes/queries.ts:90`, the Attempts page's
+title map). Not tested, because it needs a write: whether the reply of
+a write is cut too — "Mark expired" (`syncExpiredSubscriptions`) and
+the panel's Merge change every matching row either way; only the
+number they report could be short.
+
+Checked and bounded: the reference tables (programmes, products,
+courses, config, schools — 141), a course's subject and topic lists
+(149 at most), one student's own access, subscriptions and packs
+(five packs of 100 by config), one attempt's, one pack's or one
+subscription's rows, today's revenue, and every list already paged
+(Users, Payments, the quiz lists, learning history, My Packs).
+
+**Who it reaches.** Only dev today — the new app is not live. After
+cutover: 1–4 at once, for every student and the admin of
+RM_PED_OBS_HRN, and any course that grows past 1,000 (RN_MED and
+RN_SURG hold 900). 5–11 grow with activity and come first — a few
+hundred students pass them; 12–14 at 1,000 active students (the live
+site's June welcome went to 628); 15–17 only for one very heavy
+student. Every one is the admin or a student trusting a number or a
+list that is silently short.
+
+**Proposed fix.** One helper that reads in batches of 1,000 until a
+short batch comes back, through every read above — the safety net,
+before cutover. The proper shape per surface as each is next worked
+on: a count for a number, a page of fifty with the database filtering
+for a list (08 B3; D39's paged inbox), distinct values or a list for
+a picker, the job inside the database for Bulk Send. A rule, so new
+code does not repeat it.
+
+**Status.** → ruled (Sam, 2026-09-26): the rule (AGENTS.md rule 10)
+and every read above fixed in one pass before cutover, rather than
+surface by surface as the grants were (D43) — the fix is the same few
+lines everywhere and needs no design, and "as we go" would leave pages
+nobody reopens before launch; the proper shapes still surface by
+surface. Queued as 08 B7 (1–4) and one Speed and scale line (the
+rest). Overlaps: D39 (the messaging half, its paged inbox queued under
+07), D47 (the notice counts' own defect, 05 A2), and the two Scale
+lines of 2026-09-16 (the `.in()` lists; the Attempts page's slice).
+
+---
+
 ## The inventory — everything that reads the bank
 
 Traced 2026-09-17. Every caller of `lib/bank/queries.ts` and every use of
@@ -2962,10 +3045,10 @@ home — that is the bug it exists to prevent.
 | Announcements | D46, D47, D48 | [05-announcements.md](05-announcements.md) |
 | Offline packs | D12, D17 (both closed elsewhere) | [06-offline-packs.md](06-offline-packs.md) |
 | Messaging | D10, D37–D42 | [07-messaging.md](07-messaging.md) |
-| Question bank | D8, D9, D11, D22 | [08-question-bank.md](08-question-bank.md) |
+| Question bank | D8, D9, D11, D22, D52 (its reads 1–4, as B7) | [08-question-bank.md](08-question-bank.md) |
 | Free account and gamification | none — the surface postdates this diagnosis | [09-free-account-and-gamification.md](09-free-account-and-gamification.md) |
 | Reference data (config, schools, levels, telegram keys) | D3, D49, D50, D51 | [00-overview.md](00-overview.md) |
-| **Belongs to every surface** | **D43** | [00-overview.md](00-overview.md) and AGENTS.md rule 9 |
+| **Belongs to every surface** | **D43, D52** | [00-overview.md](00-overview.md) and AGENTS.md rules 9 and 10 |
 
 A finding appears under two surfaces where it genuinely spans both: D12
 sits in 03 because the snapshot closed it and in 06 because packs are

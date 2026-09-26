@@ -194,6 +194,20 @@ above sit at the repo root; the audience grouping inside them is kept.
    avoid is the one the record shows: a slice fixes the table's *reads*
    and leaves its *writes* (02 C1 on `subscriptions`, 03 Q1 on
    `quizzes`, S10 leaving `users` with TRUNCATE).
+10. **A read that can grow past 1,000 rows reads in batches or is
+   paged.** The API hands back at most 1,000 rows a request and gives
+   no error when it stops: a `.limit()` above 1,000 is cut to 1,000,
+   and so is a database function that returns a set. A read of a whole
+   table, a whole course, or every row of a kind across students goes
+   through `readAll()` (`lib/supabase/read-all.ts`), 1,000 at a time
+   until a short batch comes back; a page that shows a list pages it
+   for the screen (`.range()`, the database doing the filtering); a
+   number is a count (`{ count: 'exact', head: true }`), never rows
+   counted in the app. Exempt: one row, one student's own rows, one
+   attempt's, pack's or subscription's rows, and the small reference
+   tables. This is diagnosis finding **D52**; unlike rule 9 its known
+   places were fixed in one pass rather than surface by surface (Sam,
+   2026-09-26), so a new read that breaks it is a new defect.
 
 ## Known Workarounds (stack-level, carried from MyNclex)
 
@@ -428,13 +442,6 @@ above sit at the repo root; the audience grouping inside them is kept.
   caught by a reviewer after B4's migration was written and before it
   was applied — and still applied first, so `main`'s dev-site pack
   page was down until the merge).
-- **A read stops at 1,000 rows and says nothing.** The API caps a
-  request at 1,000 rows and returns them with no error: a whole-course
-  read of RM_PED_OBS_HRN (1,080 questions) came back with 1,000
-  (2026-09-26, queued as 08 B7 for the older reads). A new read that can
-  pass 1,000 pages with `.range()` until a short page comes back —
-  `taggedRows` and `courseWordRows` in `lib/bank/queries.ts` are the
-  shape.
 - **A bulk insert or upsert writes the union of its rows' keys to every
   row.** supabase-js sends one column list for the batch; a row missing
   a key gets it as null or the default. A column only some rows should
