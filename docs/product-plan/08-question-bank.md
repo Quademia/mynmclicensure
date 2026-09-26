@@ -196,6 +196,61 @@ behind it. Ideas come across one at a time; a self-contained piece may
 be copied. Revisit only if the product's future is NGN-style items or
 adaptive testing, and then as a planned rebuild.
 
+**Sam, 2026-09-26 (B5 talked through, one decision at a time).** The
+shape of S18's lists, settled before B5 is scoped; they amend the S18
+row:
+
+1. **Two separate lists per course, subjects and topics** — no tree of
+   topics under subjects (most courses have one subject, so a tree
+   would make an author pick it first for nothing; MyNclex's only
+   two-level list is the fixed NCLEX blueprint). Subtopic stays free
+   text.
+2. **The migration seeds the lists from the words already in the bank
+   and changes no question's words** (the one exception is item 4).
+   The clean-up is done afterwards, in the panel, at Sam's pace, so
+   every step is visible — rather than a drafted mapping applied in one
+   move nobody can check line by line. For it the panel gains
+   **Merge** (a rename onto an entry already on the list, which moves
+   every question) and, for topics, **Split** (a double such as
+   "Cardiovascular/Emergency" becomes the topic plus a tag — item 6).
+3. **An empty subject or topic is "Not set"** — a null, not a word on
+   the list. It is the dropdowns' first choice, a blank CSV cell means
+   it, the panel counts "N questions not set" per course as the
+   clean-up's to-do, and such a question reaches a student only through
+   "All topics" in the builder (as the RMHN questions do today). There
+   is no built-in "Other" or "Unspecified": two ways of saying "none"
+   would drift, and "Other" becomes a place the list never grows from.
+   A course that wants "Other" adds it as an ordinary word, and it is
+   then on the list.
+4. **The course-name subjects are cleared to Not set at migration** —
+   the eight courses whose every subject is the course's own name
+   ("Medical Nursing", "NAC", "MHN" …), which S18 already counted as
+   unlabelled.
+5. **One combined panel, Subjects & topics, on the Question Bank page**
+   — a button beside Tags, working on the course picked, the two lists
+   side by side (stacked on a phone): add, rename, merge, retire
+   (hidden from the dropdowns, questions untouched), delete refused
+   while in use; Split on topics only. Not a Topics panel on the
+   Courses page as S18 said: the clean-up means reading the questions
+   while merging their words, and it sits where Tags sits. The subject
+   list needs its panel too — the importer never creates a word, so
+   without one the list could never grow (S18 named only topics).
+6. **One topic per question.** A question that spans two areas takes
+   its main one as the topic and the other as a tag. Reports and a
+   blueprint need each question counted once — so the NCLEX blueprint,
+   UWorld and MyNclex all do it this way (MyNclex's body systems carry
+   a "Multisystem" entry for the ones that span). Many topics per
+   question, and one main topic with "also" topics from the list, were
+   offered and not taken; the second can be added later without undoing
+   anything. The ~170 doubles are entries at migration and split during
+   the clean-up.
+7. **The importer refuses a subject or topic not on its course's list**
+   with the word named (S18), and **accepts a blank cell** as Not set —
+   without that the RMHN courses, which have no topics at all, could
+   import nothing until their lists were written.
+8. NAC_BASIC_PREV and RPHN_PPHN hold the same 180 questions on dev —
+   intended (sample questions). No action.
+
 ---
 
 ## 4. The plan
@@ -593,14 +648,33 @@ the admin.
 
 ### B5 — The lists and their panel (S18)
 
-One migration: `bank_subjects`, `bank_topics`, the keys, seeded from
-the words already in the bank per course — the seed is the first-draft
-list, and Sam corrects it in the panel. Code: the editor's dropdowns,
-the importer's refusal with the word named, the Topics panel on the
-Courses page. The clean-up per course — the two RMHN files relabelled,
-NACNAP regrouped, General Paper's subject sorted into perhaps eight —
-is content work in the CSVs, re-imported through the same door.
-Before 03 Q10's report, which groups by these words.
+Shaped by Sam's rulings of 2026-09-26 (§3, the B5 block); not yet
+scoped against the code — that comes before the build, as for B4. Two
+sessions.
+
+- **Storage, one migration.** `bank_subjects` and `bank_topics` (course,
+  name, retired), keys from the bank rows to them, seeded from the
+  words already in the bank per course; no question's words change
+  except the course-name subjects, cleared to Not set. An empty value
+  stays null ("Not set"). Rule 9 on the new tables.
+- **Code, first session.** The editor's Subject and Topic become
+  dropdowns from the course's lists, "— Not set —" first; the importer
+  refuses a word not on the list, naming it, and accepts a blank.
+- **Code, second session.** The **Subjects & topics** panel on the
+  Question Bank page, beside Tags, for the course picked: the two lists
+  side by side with add, rename, merge, retire and delete (refused
+  while in use), a count of questions not set, and Split on topics
+  (the main topic kept, the other half a tag).
+
+What the clean-up starts from (dev, 2026-09-26): RN_MED 78 topics,
+RN_SURG 32, GP 31 — about 170 of them doubles like
+"Cardiovascular/Emergency"; NACNAP Clinical 148 topics for 180
+questions; NACNAP Preventive and RPHN PPHN 68 each; the two RMHN
+courses no topic on any of 720 questions; the RM courses tidy (12 and
+20); General Paper's subject 149 values, mostly source codes ("FUND",
+"FUND – IPC"). The clean-up is content work for Sam and the writers,
+done in the panel after the build. Before 03 Q10's report, which groups
+by these words.
 
 ### B6 — The draws (no storage change)
 
@@ -651,6 +725,6 @@ now, and any course that grows past it. Before cutover.
 | B2 The answers server-only | ✅ 2026-09-21 (`20260921120000_question_bank_secret_half.sql`; the secret half and every write grant off the browser roles, the three write policies with them, the concept search a service-role function; proven on dev and walked both sides — §4) |
 | B3 The admin page paged | ⬜ later |
 | B4 The columns, the version and the history | ✅ 2026-09-26 (`20260926150000_question_bank_columns_history.sql`, `20260926160000_copiers_refuse_any_draft.sql`; the code in two sittings the same day; walked on dev and by Sam — §4) |
-| B5 The lists and their panel | ⬜ adopted 2026-09-26; §8 S18 ✅ 2026-09-26; the clean-up is content work |
+| B5 The lists and their panel | ⬜ adopted 2026-09-26; §8 S18 ✅ 2026-09-26, amended the same day (§3, the B5 block); scoping next; the clean-up is content work |
 | B6 The draws | ⬜ adopted 2026-09-26; no storage change |
 | B7 Whole-course reads past the 1,000-row cap | ⬜ queued 2026-09-26 (Sam); found walking B4; before cutover |

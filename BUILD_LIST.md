@@ -88,7 +88,7 @@ the gamma-era list it replaces is in git history and in `qacademy-gamma`.
 - ✅ §8 S15 one subscription per Paystack payment — a unique index on the reference, activation adopting the other door's receipt on a refusal; rule 9 took `subscriptions`' grants back to SELECT for signed-in users, the admin writes moved to the service role, two policies dropped (the D4 webhook's prerequisite) — 2026-09-23
 - ✅ §8 S16 the free pool's door — two doors, the read policy and attempt creation, opening rows marked free to any signed-in student; the mark is 08 B4's column, the doors 09 F1 — ticked 2026-09-26, not built
 - ✅ §8 S17 the bank's new columns, the version and the history — level, published, free mark, source, tags, dates, version; a history table on content changes to published rows; three columns copied into the sitting; CHECKs on type and difficulty — ticked 2026-09-26, built as 08 B4
-- ✅ §8 S18 the classification lists — subjects and topics per course as tables with keys, a Topics panel, the importer refusing unknown words — ticked 2026-09-26, built as 08 B5
+- ✅ §8 S18 the classification lists — subjects and topics per course as tables with keys, one Subjects & topics panel on the bank page, the importer refusing unknown words — ticked 2026-09-26, amended the same day, built as 08 B5
 - ⬜ §8 has no row for `courses_select` — the policy is `auth.uid() is not null`, so a signed-out visitor reads nothing from `courses`; `/premium-prep` and `/subscribe` both work around it with a service-role read, and D23 item 5 (a sales row lists its courses) cannot be met on any public page without it (2026-09-22)
 
 ## Improvements
@@ -261,7 +261,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ B2 Answers server-only — the secret half and write grants off the browser roles, search server-side — 2026-09-21
 - ⬜ B3 The admin bank page paged and filtered server-side, fifty at a time (D11) — later
 - ✅ B4 Columns, version, history — drafts, level, free mark, tags; import choices; two panels — 2026-09-26
-- ⬜ B5 The lists and their panel — subjects and topics per course as tables with a Topics panel on the Courses page, the importer refusing unknown words, keys on the bank rows; the clean-up per course is content work (§8 S18; Sam, 2026-09-26)
+- ⬜ B5 The lists — subjects and topics per course, Not set for empty, one panel on the bank page (S18, amended)
 - ⬜ B6 The draws — a question reserved while any mock names it (derived), free accounts see free rows only, every draw published rows only; the overlap list at migration (Sam, 2026-09-26)
 - ⬜ B7 Whole-course bank reads paged past the API's 1,000-row cap — RM_PED_OBS_HRN shows 1,000 of 1,080 (2026-09-26)
 
