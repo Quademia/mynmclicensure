@@ -266,7 +266,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ B4 Columns, version, history — drafts, level, free mark, tags; import choices; two panels — 2026-09-26
 - ✅ B5 The lists — subjects and topics per course, Not set for empty, the Subjects & topics panel — 2026-09-26
 - ✅ B6 The draws — a draft or active mock's questions held back from practice; S19 — 2026-09-26
-- ⬜ B7 The bank's four reads past the API's 1,000-row cap, the keyword too — one pass with D52's other 13 (2026-09-26)
+- ✅ B7 The bank's four reads past the API's 1,000-row cap, the keyword too — one pass with D52's other 13 — 2026-09-26
 
 *Not yet sliced — each gets an id when the doc is rewritten:*
 
@@ -345,8 +345,8 @@ every page.
 - ⬜ Speed: the student layout's three queries block every student page, including pages needing none of them (perf investigation, 2026-09-16)
 - → Speed: the item-bank policy re-runs user_has_course() per row — ~230 ms per Quiz Builder course pick now, ~2.2 s per read at a 10,000-row course; eleven ALTER POLICY lines, no data change (perf investigation, 2026-09-16)
 - ⬜ Scale: admin Bulk Send and the admin inbox collect every matching student id into one .in() list — exceeds the API limit around 2,000–5,000 students and returns nothing rather than erroring (perf investigation, 2026-09-16)
-- ⬜ Scale: the admin Attempts page computes its analytics from at most 1,000 loaded rows (it asks for 5,000; the API's cap is 1,000 — D52, 2026-09-26) — past that it silently reports numbers from an arbitrary slice; wrong, not late (perf investigation, 2026-09-16)
-- ⬜ Scale: D52's reads outside the bank (5–17, two more) read in batches past the cap — one pass with 08 B7 (2026-09-26)
+- ⬜ Scale: the admin Attempts page computes its analytics from at most 5,000 loaded rows — past that the numbers are the newest 5,000's; wrong, not late (perf investigation, 2026-09-16). Until D52's pass it read 1,000 with no note; it now reads up to 5,000 and its note shows (2026-09-26)
+- ✅ Scale: D52's reads outside the bank (5–17, two more) read in batches past the cap — one pass with 08 B7 — 2026-09-26
 - ⬜ Speed: fixed-quizzes and mock-exams select every attempt column, answer blob included, only to count answers — 400 KB–1 MB per load on a phone (perf investigation, 2026-09-16)
 - ⬜ Scale: no index on attempts(ts_iso); attempts(user_id, ts_iso desc) too — seconds on the admin window at 500k rows (perf investigation, 2026-09-16)
 - ⬜ Check before launch: whether sharing the gamma project with the legacy product and MyTeacher slows prod — false on dev (99.95% idle), untested on prod (perf investigation, 2026-09-16)

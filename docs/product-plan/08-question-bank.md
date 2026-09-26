@@ -1011,6 +1011,28 @@ every student and admin of a course past 1,000 rows: RM_PED_OBS_HRN
 now, and any course that grows past it (RN_MED and RN_SURG hold 900).
 Before cutover.
 
+**Built 2026-09-26**, ticked by Sam after the walk. `readAll()` and
+`slices()` in `lib/supabase/read-all.ts`; the four reads here and D52's
+5–17 and two more on it, each ordered on its table's key so no row
+slips between batches; the id lists the batching lengthens (Bulk
+Send's narrowing, the inbox's messages) sent in slices of 200, and the
+inbox's name search matched in the app rather than as an id list; the
+Attempts window reading to its 5,000 cap, so its note shows again;
+`taggedRows`, `courseWordRows` and `freeRowCounts` moved onto the
+helper. No storage change. **Proven:** every changed read run against
+dev outside the app (the repo's esbuild, the service role) —
+RM_PED_OBS_HRN 1,080 rows and 1,080 distinct in the admin list, the
+builders' pool and the keyword "a", 20 topics and 76 subtopics in the
+dropdowns; the Attempts window at a cap of 3 returning 3 and saying so;
+the threads, unread, subscriptions, cohorts, revenue and quiz counts
+each matching the database counted directly. As the RM student in the
+pane: the Quiz Builder on RM_PED_OBS_HRN — the topic counts summing to
+1,080 across 20 topics, "1080 available" (Easy 600, Moderate 382, Hard
+98), the keyword "a" giving "1080 available"; General Paper unchanged
+at 576 as the NACNAP account. The admin side (the bank page, the mock
+picker) was not walked in the pane — the same read, proven outside it.
+`tsc`, lint and `npm run build` clean.
+
 ### Later, under this doc
 
 - **The link table** replacing the quiz tables' `item_ids` arrays —
@@ -1037,4 +1059,4 @@ Before cutover.
 | B4 The columns, the version and the history | ✅ 2026-09-26 (`20260926150000_question_bank_columns_history.sql`, `20260926160000_copiers_refuse_any_draft.sql`; the code in two sittings the same day; walked on dev and by Sam — §4) |
 | B5 The lists and their panel | ✅ 2026-09-26 (`20260926170000_bank_subject_topic_lists.sql`; the code in two sittings the same day; walked on dev and by Sam — §4); the clean-up of the words is content work, in the panel |
 | B6 The draws, and the student's read (S19) | ✅ 2026-09-26 (`20260926180000_question_bank_student_read_narrowed.sql`; walked on dev as Sam's admin and as a GP student — §4) |
-| B7 Whole-course reads past the 1,000-row cap | ⬜ queued 2026-09-26 (Sam); found walking B4; widened the same day into one pass with D52's other thirteen (Sam); before cutover |
+| B7 Whole-course reads past the 1,000-row cap | ✅ 2026-09-26 (widened the same day into one pass with D52's other thirteen — Sam; `lib/supabase/read-all.ts`; proven against dev and walked as the RM student — §4) |

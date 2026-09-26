@@ -110,7 +110,7 @@ ticked by Sam 2026-09-18, not yet built.
 | Finding | What it says | How it is resolved |
 |---|---|---|
 | D43 | Every table grants the browser roles everything — SELECT, INSERT, UPDATE, DELETE, TRUNCATE — and RLS is the only gate. Schema-wide: the vanilla era needed it, because the browser *was* the application | **surface by surface**, not as one sweep (Sam, 2026-09-21): every table will be touched eventually, and the slice that touches a table takes its grants back to the one thing that table needs. The rule is in AGENTS.md |
-| D52 | A read of a whole growing table stops at 1,000 rows and says nothing — 17 reads across the app, four in the bank already short on dev | **one pass before cutover**, not surface by surface (Sam, 2026-09-26): the same few lines everywhere, no design; 08 B7 for the bank's four, a Speed and scale line for the rest. The proper shape of each page (counts, pages of fifty) still surface by surface. Rule 10 in AGENTS.md |
+| D52 | A read of a whole growing table stops at 1,000 rows and says nothing — 17 reads across the app, four in the bank already short on dev | **one pass before cutover**, not surface by surface (Sam, 2026-09-26): the same few lines everywhere, no design; 08 B7 for the bank's four, a Speed and scale line for the rest. The proper shape of each page (counts, pages of fifty) still surface by surface. Rule 10 in AGENTS.md. ✅ built 2026-09-26 |
 
 D43 cannot live in a feature doc because it belongs to all of them, and
 that is exactly how it went quiet: it was found on 2026-09-18, recorded

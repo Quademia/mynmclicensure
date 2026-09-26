@@ -2569,6 +2569,10 @@ surface. Queued as 08 B7 (1–4) and one Speed and scale line (the
 rest). Overlaps: D39 (the messaging half, its paged inbox queued under
 07), D47 (the notice counts' own defect, 05 A2), and the two Scale
 lines of 2026-09-16 (the `.in()` lists; the Attempts page's slice).
+**Built 2026-09-26** (08 B7 and the Speed and scale line, ticked by
+Sam): every read above on `readAll()`, the lengthened id lists in
+slices; the proof is in 08 B7. The better shapes remain, surface by
+surface.
 
 ---
 
