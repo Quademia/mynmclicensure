@@ -203,6 +203,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⬜ Q13 Readiness and the cohort — a band, how others did per question, standing; with Q3 (2026-09-24)
 - ⬜ Q14 The link table — quiz_items and mock_quiz_items replacing the id arrays; the reservation check becomes a join (decided with §8 S12; queued 2026-09-26)
 - ⬜ Q15 The student's own marks across attempts — a "Marked" pool for the builder, MyNclex's shape (captured 2026-09-26, unruled)
+- ⬜ Q16 The builders' keyword step offers only subtopic chips — GP: "patient" matches 182, one chip (2026-09-26)
 
 *Not yet sliced — each gets an id when the doc is rewritten:*
 
@@ -264,7 +265,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⬜ B3 The admin bank page paged and filtered server-side, fifty at a time (D11) — later
 - ✅ B4 Columns, version, history — drafts, level, free mark, tags; import choices; two panels — 2026-09-26
 - ✅ B5 The lists — subjects and topics per course, Not set for empty, the Subjects & topics panel — 2026-09-26
-- ⬜ B6 The draws — a draft or active mock's questions held back from practice; S19 (scoped 2026-09-26)
+- ✅ B6 The draws — a draft or active mock's questions held back from practice; S19 — 2026-09-26
 - ⬜ B7 Whole-course bank reads paged past the API's 1,000-row cap — RM_PED_OBS_HRN shows 1,000 of 1,080 (2026-09-26)
 
 *Not yet sliced — each gets an id when the doc is rewritten:*

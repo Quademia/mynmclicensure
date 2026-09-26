@@ -487,6 +487,17 @@ one-line experiment, reverted).
   flag lives on the attempt row and dies with the sitting. A
   student-facing feature that pairs with Q10–Q12 (practise what you
   marked, practise what you missed). Captured 2026-09-26; not ruled.
+- **Q16 — The keyword step offers only what has a subtopic.** Both
+  builders' keyword ("concept") step turns the matching questions into
+  subtopic chips, and a student picks chips — so a matching question
+  with no subtopic cannot be picked at all. Found walking 08 B6 on
+  2026-09-26 as a General Paper student: "patient" matches 182
+  questions and the step offers one chip, "Ethicsics/Patient Rights
+  (1)", because almost no GP question has a subtopic. Reaches every
+  student of a course whose subtopics are empty. Two ways out, unruled:
+  subtopics filled in during the B5 clean-up (content, in the Subjects
+  & topics panel's course), or the step also offering "all matching
+  questions" (code). Queued 2026-09-26 (Sam); before cutover.
 - **The legacy-check gap 7** (the builder's stuck status line) and the
   Learning History items on BUILD_LIST — runner and history work that
   belongs here when queued.
@@ -686,3 +697,4 @@ it needs a change log on every answer, a storage change and its own
 | Q13 Readiness and the cohort | candidate, captured 2026-09-24; with Q3 |
 | Q14 The link table | decided with §8 S12 (2026-09-18); queued 2026-09-26 |
 | Q15 The student's own marks across attempts | candidate, captured 2026-09-26 |
+| Q16 The keyword step offers only what has a subtopic | ⬜ queued 2026-09-26 (Sam); found walking 08 B6 |

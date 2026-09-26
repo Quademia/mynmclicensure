@@ -956,6 +956,24 @@ site's `main` code, which reads no question text through a student's
 client — nothing breaks there. A student sees fewer questions in the
 builders (a mock's own) and no other change.
 
+**Built 2026-09-26**, ticked on Sam's walk. As scoped, with the
+details as ruled; `mockReservedIds` became `heldBackIds` (draft or
+active mocks, optionally one course's). **Proven:** S19 in a
+rolled-back run as an RN_MED student (the question text refused, the
+builder's, the options' and the id check's reads passing, 10 columns
+left), then applied. As Sam's admin: RN_MED's fixed-quiz picker 880,
+its mock picker 900; a mock question put into a fixed quiz for the
+test shown "In a mock" with its line in the review and the save
+refused by name, the quiz restored; the mock archived for the test
+releasing its 20 (the fixed picker at 900) and letting the free tick
+through, then unticked and the mock restored to active, the tick
+refused again. As a General Paper student in the pane: the Quiz
+Builder's pool "576 available" of 601, the topic and difficulty counts
+each summing to 576; the pack builder's course load starting after the
+mock's 25 and its keyword search for "patient" returning 182 ids — the
+database's 190 less the mock's, none of them held back. The walk found
+03 Q16 (the keyword step's chips).
+
 ### B7 — Whole-course reads past the 1,000-row cap (no storage change)
 
 Found 2026-09-26 walking B4; queued the same day (Sam). The API hands
@@ -999,5 +1017,5 @@ now, and any course that grows past it. Before cutover.
 | B3 The admin page paged | ⬜ later |
 | B4 The columns, the version and the history | ✅ 2026-09-26 (`20260926150000_question_bank_columns_history.sql`, `20260926160000_copiers_refuse_any_draft.sql`; the code in two sittings the same day; walked on dev and by Sam — §4) |
 | B5 The lists and their panel | ✅ 2026-09-26 (`20260926170000_bank_subject_topic_lists.sql`; the code in two sittings the same day; walked on dev and by Sam — §4); the clean-up of the words is content work, in the panel |
-| B6 The draws, and the student's read (S19) | ⬜ adopted 2026-09-26; talked through, scoped and ruled the same day (§3, the B6 block); S19 ✅ 2026-09-26; building |
+| B6 The draws, and the student's read (S19) | ✅ 2026-09-26 (`20260926180000_question_bank_student_read_narrowed.sql`; walked on dev as Sam's admin and as a GP student — §4) |
 | B7 Whole-course reads past the 1,000-row cap | ⬜ queued 2026-09-26 (Sam); found walking B4; before cutover |
