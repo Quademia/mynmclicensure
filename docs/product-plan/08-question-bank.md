@@ -545,6 +545,52 @@ The refusal's course scope was corrected by a second file the same
 afternoon (`20260926160000_copiers_refuse_any_draft.sql`): a draft is
 refused whichever course it sits in, as the clause above says.
 
+**Built 2026-09-26** — the migration above, then the code in two
+sittings with Sam's walk after each; ticked on his walk. As the spec
+says, with these choices made at the build:
+
+- **The two panels are cards on the bank page**, opened by Tags and
+  Free pool buttons in the toolbar, above the list and needing no
+  course — not dialogs (the shared dialog is 420px). Sam kept them as
+  built (2026-09-26); tabs on the bank page (*Questions · Tags · Free
+  pool*, MyNclex's bank shape) were offered as the later home if they
+  grow.
+- **The Tags panel covers the whole bank** (Sam): the save and the
+  importer snap a tag to the spelling in use anywhere in the bank, a
+  file's rows to each other's too. Rename asks nothing (it can be
+  undone by another rename); a rename onto a tag in use is a merge and
+  asks first; delete asks with the tag typed. The rewrite runs in
+  TypeScript through the service role, grouping rows by their new list
+  — no database function, so no second migration.
+- **The importer's choices reach new rows only because new and
+  existing rows go in separate batches**: a batch's columns are the
+  union of its rows' keys, so one new row's switch in a mixed batch
+  would have reached every existing row in it.
+- **The level "Analyze"** lands as "Analyse" (above).
+- The start's refusal passes through to the card; the free tick and a
+  mock's save refuse from both sides; Publish / Unpublish per card and
+  "Publish all shown"; the quiz and mock editors mark a draft and the
+  review names them.
+
+**Proven on dev** (as Sam's admin, and as an RN_MED student's role in
+a rolled-back read): a new question saved as a draft, invisible to the
+student (900 of 901) and the concept search; a stem edit moved a
+published row to version 2 with a history row naming the admin; a
+topic edit wrote nothing; unpublish, edit, republish wrote nothing and
+kept version 2; delete wrote a row marked deleted, a draft's delete
+nothing; Unpublish on `RN_MED-S1-1` counted its two live quizzes and
+`create_attempt` then refused with the message; the free tick on a
+mock's question and a mock naming a free question both refused; a
+file imported as drafts, then re-imported with both choices on — the
+published row kept its switches and gained a version naming the
+importer, the draft stayed a draft, the new row landed published and
+free; the Free pool counted it under Registered Nursing; rename, merge
+and delete in the Tags panel, no history written; the CSV rules in
+the real dialog; 375px. Not walked: "import as free" refused for a new
+id a mock names (no such id on dev; the tick's check is the same one).
+The walks left five test rows in `question_bank_history`, each naming
+the admin.
+
 ### B5 — The lists and their panel (S18)
 
 One migration: `bank_subjects`, `bank_topics`, the keys, seeded from
@@ -604,7 +650,7 @@ now, and any course that grows past it. Before cutover.
 | B1 One table | ✅ 2026-09-19 (`20260920010000_question_bank.sql`; proven on dev — 5,281 rows, the eleven gone, 2,401 visible to the RN student and none of RM's, EXPLAIN a hashed SubPlan once per statement; walked by Sam: the builder, the runner, the admin bank page, packs, the picker) |
 | B2 The answers server-only | ✅ 2026-09-21 (`20260921120000_question_bank_secret_half.sql`; the secret half and every write grant off the browser roles, the three write policies with them, the concept search a service-role function; proven on dev and walked both sides — §4) |
 | B3 The admin page paged | ⬜ later |
-| B4 The columns, the version and the history | ⬜ adopted and scoped 2026-09-26; §8 S17 ✅ 2026-09-26; the migration applied on dev 2026-09-26 (`20260926150000_question_bank_columns_history.sql`, `20260926160000_copiers_refuse_any_draft.sql`; proven in rolled-back runs, reviewed by three, the pack renderer's read fixed with it); the code half next |
+| B4 The columns, the version and the history | ✅ 2026-09-26 (`20260926150000_question_bank_columns_history.sql`, `20260926160000_copiers_refuse_any_draft.sql`; the code in two sittings the same day; walked on dev and by Sam — §4) |
 | B5 The lists and their panel | ⬜ adopted 2026-09-26; §8 S18 ✅ 2026-09-26; the clean-up is content work |
 | B6 The draws | ⬜ adopted 2026-09-26; no storage change |
 | B7 Whole-course reads past the 1,000-row cap | ⬜ queued 2026-09-26 (Sam); found walking B4; before cutover |
