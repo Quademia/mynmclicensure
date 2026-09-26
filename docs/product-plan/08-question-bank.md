@@ -685,12 +685,17 @@ changes.
 - `bank_subjects` and `bank_topics`, the same shape: `id bigint
   generated always as identity primary key`, `course_id text not null
   references courses (course_id)`, `name text not null` with a CHECK
-  that it is trimmed, not empty and holds no `;` or `,` (the CSV's and
-  the tags' separators), `retired boolean not null default false`,
+  that it is trimmed and not empty (a rule against commas was drafted
+  and dropped at the build: nothing needs it, and a prod word holding
+  one would fail the release), `retired boolean not null default false`,
   `created_at timestamptz not null default now()`; `unique (course_id,
   name)` — the key the bank rows point at — and a unique index on
   `(course_id, lower(name))`, so "Pain" and "pain" cannot both be on a
   course's list.
+- **The words tidied so they can be keys** — spaces trimmed, an empty
+  string made Not set, two spellings of one word in a course made the
+  commoner. Nothing to do on dev; it guards the prod bank, whose words
+  were never read by the importer, so the release cannot fail on them.
 - **The eight course-name subjects cleared to Not set**, named pair by
   pair (course, word): NAC_BASIC_CLIN "NAC", NAC_BASIC_PREV "NAP",
   RM_MID "Midwifery", RMHN_PSYCH_NURS "RMHN", RMHN_PSYCH_PPHARM "MHN",
