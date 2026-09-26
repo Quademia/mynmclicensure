@@ -125,6 +125,77 @@ three admin write policies go with the privilege they policed: with no
 role holding the write, RLS refuses by default, and a policy that can
 never be reached reads like a live gate.
 
+**Sam, 2026-09-26 (MyNclex's bank compared column by column; nine
+things taken one at a time).** MyNclex's bank has 32 columns to this
+one's 26; the overlap is the question itself. Ruled, in order:
+
+1. **`bloom_level` adopted** — the taxonomy level. Six levels or three,
+   the spelling (Ghana writes "Analyse"), and whether students see it,
+   open until the slice is written.
+2. **`is_published` adopted, draft by default** for a new row; the
+   existing rows published at migration.
+3. **`is_free_sample` adopted, as a mark on the bank rows** — not a
+   separate pool table (09 §4's open question, answered: the same rows,
+   importer, editor and snapshot serve both, and a second table would
+   duplicate all of them and every column adopted here). Free rows stay
+   inside their paid course. The daily challenge draws from the free
+   rows, the same five per programme, rotating; five a day is about
+   1,800 a year per programme, so the pool's size and refresh are still
+   to be set. F1's "second door" is two doors, the read policy and
+   attempt creation — §8 S16.
+4. **Mock questions are never builder-visible — as a rule, not a
+   column.** A question is reserved while any mock names it, derived
+   from the mock lists (a join once the link table lands, 03 Q14); the
+   builder, the pack maker, the fixed-quiz picker and the daily
+   challenge skip it; a mock question can never be marked free. Fixed
+   quizzes stay from the course bank and visible everywhere. Existing
+   overlaps are listed at migration for Sam to decide. MyNclex's stored
+   switch (`is_builder_visible`, flipped when a question joins a pack
+   and never back) was offered and not taken: reserved rows would
+   accumulate silently as mocks are edited.
+5. **`created_at` / `updated_at` adopted.**
+6. **`question_ref` adopted, internal** — where the question came from,
+   free text with commas, never shown to a student, never copied.
+   **`tags` adopted (Sam, against the recommendation)** as the
+   student-facing label: free text with suggestions from tags in use,
+   matched without case, a Tags panel to rename, merge and delete;
+   shown in review, a builder filter, a report grouping. A canonical tag
+   list was offered and judged the hard way: tags gate nothing, so a
+   stray costs tidying, not a wrong report — which is also why the
+   subject and topic lists are canonical and tags are not.
+7. **The classification lists, in the database, per course** —
+   subjects and topics as tables with a management panel on the Courses
+   page, subtopic free text, the importer refusing unknown words, keys
+   on the bank rows, CHECKs on `question_type` and `difficulty`.
+   Subject means the academic module a question draws on (the paper is
+   the course); per course, no programme column. §8 S18.
+8. **Copied into the sitting: the level, the tags and the version.**
+   Not the source, the switches or a date. A version on every row and a
+   history table; versions cut only for content changes to published
+   rows; drafts and label changes unversioned; a delete goes to history
+   marked deleted; restore is a save. §8 S17.
+9. **A blueprint axis, adopted in principle, blocked** on the NMC
+   curricula. The council's site was checked 2026-09-26: eleven cadres,
+   four sitting windows, procedure manuals, the scope of practice, fees;
+   no syllabus, no paper breakdown, no format. A college library lists a
+   printed *Curriculum for the RGN Programme* (NMC, Accra, 2021), so the
+   documents exist in print; Sam is obtaining them. The topic lists
+   stand in.
+
+**Not taken:** MyNclex's two JSON columns holding twelve question
+shapes, the adaptive-testing columns, the case-study and trend links,
+`body_system`, the five-step difficulty, `instruction`, the
+type-prefixed ids (ours encode the course, the more useful fact here).
+**Adopting MyNclex's whole quiz system and cutting it down** was asked
+again (first answered as D4, 2026-09-10) and answered for the
+improvement era: 56,000 lines in 249 files over 24 tables against this
+product's 6,700 in 36, woven for twelve question types and an adaptive
+engine Ghana's paper does not use; the removal is the expensive part,
+with a reshaped bank, a rewritten importer and a re-hardening pass
+behind it. Ideas come across one at a time; a self-contained piece may
+be copied. Revisit only if the product's future is NGN-style items or
+adaptive testing, and then as a planned rebuild.
+
 ---
 
 ## 4. The plan
@@ -238,23 +309,52 @@ Fifty at a time with an exact count, the five filters in the query,
 as the mock admin list was done in 03 Q2. The importer's row report
 unchanged.
 
+### B4 — The columns, the version and the history (S17)
+
+One migration: the seven columns, the two CHECKs, the history table
+and its trigger, the three columns on `attempt_items` and
+`offline_pack_items`, the existing rows published and at version 1.
+Code: the editor gains the level dropdown, the published switch, the
+free tick (refused on a mock question), the source field and the tags
+field with suggestions; the importer gains the columns, the
+publish-now-or-drafts choice and "import as free"; every student-side
+read adds `is_published`; the two copy functions copy the three new
+fields; the bank page gains Published and Free filters, a Free pool
+view per programme with its count, and a Tags panel. The History
+panel on the editor (view, restore) can follow the capture, the order
+MyNclex took.
+
+### B5 — The lists and their panel (S18)
+
+One migration: `bank_subjects`, `bank_topics`, the keys, seeded from
+the words already in the bank per course — the seed is the first-draft
+list, and Sam corrects it in the panel. Code: the editor's dropdowns,
+the importer's refusal with the word named, the Topics panel on the
+Courses page. The clean-up per course — the two RMHN files relabelled,
+NACNAP regrouped, General Paper's subject sorted into perhaps eight —
+is content work in the CSVs, re-imported through the same door.
+Before 03 Q10's report, which groups by these words.
+
+### B6 — The draws (no storage change)
+
+The three student draws and the fixed-quiz picker skip any question a
+mock names; a free account's draws see free rows only; every draw sees
+published rows only. The migration's overlap list for Sam. Written
+into 03 Q3 as its first settled ingredient.
+
 ### Later, under this doc
 
-- **`quiz_items`** replacing the quiz tables' `item_ids` arrays — noted
-  in 03 and in §8 S12 as "decided with S2"; a slice under 03 when Sam
-  picks it, now that S2 is ticked.
+- **The link table** replacing the quiz tables' `item_ids` arrays —
+  decided with §8 S12, queued 2026-09-26 as 03 Q14; the reservation
+  check in B6 becomes a join when it lands.
 - Content items on BUILD_LIST (the empty disease-control course, the
   midwifery shortfall, the set-size targets).
 - A course *filter* on the admin bank page over every course at once
   (search the whole bank) — cheap once the table is one.
 - **The free pool's door** (`09-free-account-and-gamification.md`
-  F1): a free-forever account practises on a set-aside pool, per
-  programme, with no `course_access` rows. The cheapest shape is a
-  "free" mark on `question_bank` rows and a second door on the read
-  policy — a row marked free readable by any signed-in student. That
-  is a change to the gate, the security floor, so it is a `rebuild.md`
-  §8 row (a candidate S14) before it is built, and the importer learns
-  the mark. Captured 2026-09-20 from Sam's cloud session; not ruled.
+  F1): settled 2026-09-26 as the mark (B4's `is_free_sample`) and two
+  doors, the read policy and attempt creation — §8 S16. The mark is
+  built here; the doors are built under 09 F1 once S16 is ticked.
 
 ---
 
@@ -265,3 +365,6 @@ unchanged.
 | B1 One table | ✅ 2026-09-19 (`20260920010000_question_bank.sql`; proven on dev — 5,281 rows, the eleven gone, 2,401 visible to the RN student and none of RM's, EXPLAIN a hashed SubPlan once per statement; walked by Sam: the builder, the runner, the admin bank page, packs, the picker) |
 | B2 The answers server-only | ✅ 2026-09-21 (`20260921120000_question_bank_secret_half.sql`; the secret half and every write grant off the browser roles, the three write policies with them, the concept search a service-role function; proven on dev and walked both sides — §4) |
 | B3 The admin page paged | ⬜ later |
+| B4 The columns, the version and the history | ⬜ adopted 2026-09-26; §8 S17's tick first |
+| B5 The lists and their panel | ⬜ adopted 2026-09-26; §8 S18's tick first; the clean-up is content work |
+| B6 The draws | ⬜ adopted 2026-09-26; no storage change |

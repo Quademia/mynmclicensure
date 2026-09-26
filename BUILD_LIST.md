@@ -185,7 +185,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 
 - ✅ Q1 The floor — course-scoped reads of active published rows, item_ids and notes server-only, CHECKs (S12; D44, D48) — 2026-09-19
 - ✅ Q2 The lifecycle rules — one availability check on the server clock, archive one-way, saveQuiz validation, stats by table, the mock list paged (D45) — 2026-09-19
-- ⏸ Q3 Mock exams as a premium exam experience — a design item, ingredients noted, none decided (Sam, 2026-09-18)
+- ⏸ Q3 Mock exams as a premium exam experience — a design item, ingredients noted (Sam, 2026-09-18); one settled 2026-09-26: a mock's questions live nowhere else (08 B6)
 - ✅ Q4 The questions as rows — attempt_items and offline_pack_items copied at creation, two clocks (S7) — 2026-09-20
 - ✅ Q5 The answers as rows, the write door — grading in SQL, no browser writes, save per tap (S7; D6, D7) — 2026-09-20
 - ✅ Q6 The seal — the public half live, one key at Check Answer, review unsealed, console refused (S7; D5) — 2026-09-20
@@ -196,6 +196,8 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⬜ Q11 Time per question — the runner fills `time_spent_s`; pace and slowest on the report (2026-09-24)
 - ⬜ Q12 Progress across attempts — accuracy by topic over history, a trend, true totals (2026-09-24)
 - ⬜ Q13 Readiness and the cohort — a band, how others did per question, standing; with Q3 (2026-09-24)
+- ⬜ Q14 The link table — quiz_items and mock_quiz_items replacing the id arrays; the reservation check becomes a join (decided with §8 S12; queued 2026-09-26)
+- ⬜ Q15 The student's own marks across attempts — a "Marked" pool for the builder, MyNclex's shape (captured 2026-09-26, unruled)
 
 *Not yet sliced — each gets an id when the doc is rewritten:*
 
@@ -255,6 +257,9 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ B1 One table — question_bank with a course key, the eleven copied in and dropped, one gate a statement — 2026-09-19
 - ✅ B2 Answers server-only — the secret half and write grants off the browser roles, search server-side — 2026-09-21
 - ⬜ B3 The admin bank page paged and filtered server-side, fifty at a time (D11) — later
+- ⬜ B4 The columns, the version and the history — level, published (draft by default), free mark, source, tags, dates, version; history on content changes to published rows; level, tags and version copied into the sitting; CHECKs on type and difficulty (§8 S17; Sam, 2026-09-26)
+- ⬜ B5 The lists and their panel — subjects and topics per course as tables with a Topics panel on the Courses page, the importer refusing unknown words, keys on the bank rows; the clean-up per course is content work (§8 S18; Sam, 2026-09-26)
+- ⬜ B6 The draws — a question reserved while any mock names it (derived), free accounts see free rows only, every draw published rows only; the overlap list at migration (Sam, 2026-09-26)
 
 *Not yet sliced — each gets an id when the doc is rewritten:*
 
@@ -270,11 +275,11 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 Decided in principle in a cloud session on 2026-09-20; candidates, none sliced, the open questions in the doc's §4.
 
 - ⬜ What the trial gives, before F1 is sliced — a 7-day programme trial or `WELCOME_TRIAL`'s General Paper only. The 60 days are a stopgap from 2026-05-27, when the paid plans were paused and the trials bumped 7 → 60 the same day; the pause ends at cutover. Six active products are unreachable today: `WELCOME_TRIAL` and five `*_FULL_FREE` (30 days, the whole programme free), neither linked from a programme nor named in any code — Sam's view is the `*_FULL_FREE` stay admin-grant-only. Nothing needs deleting: `status` is one column (Sam, 2026-09-22)
-- ⬜ F1 The pool and its door — a free mark on the bank and a second door on the read policy; a §8 row first (renumbered S16 — S14 was taken 2026-09-22, S15 2026-09-23)
+- ⬜ F1 The pool and its door — the mark is 08 B4's column; this slice is the two doors, the read policy and attempt creation, plus the free-only draws for a student with no course (§8 S16 drafted 2026-09-26, tick pending; a mark, not a separate table — Sam)
 - ⬜ F2 The free account — no course_access rows, the builder and runner on the pool, the dashboard's free-vs-trial line
 - ⬜ F3 Landing and copy — "free practice questions, forever"; the trial and the products as the route to the full bank
 - ⬜ G1 Streak, points, leaderboard — derived from the graded rows, no new tables; NMC Prep walked 2026-09-24
-- ⬜ G2 The daily challenge — five a day per programme from the free pool, a new attempt source; after G1
+- ⬜ G2 The daily challenge — five a day per programme from the free pool (Sam's yes, 2026-09-26; the rotation and the pool's size open), a new attempt source; after G1
 - ⬜ G3 Tiers — names on point bands; later
 
 #### [10-design-system.md](docs/product-plan/10-design-system.md)

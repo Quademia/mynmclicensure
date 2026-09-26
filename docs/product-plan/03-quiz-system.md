@@ -289,6 +289,15 @@ when it opens and when results land (announcements, the outbox); a
 closed window submits whatever is in progress. Until it is designed,
 both tables get the same fixes.
 
+**One ingredient settled early (Sam, 2026-09-26, with the MyNclex bank
+comparison, 08 §3 item 4):** a mock's questions live nowhere else.
+A question is reserved while any mock names it — derived from the mock
+lists, no stored switch — and the builder, the pack maker, the
+fixed-quiz picker and the daily challenge skip it; a mock question can
+never be marked free. Fixed quizzes stay from the course bank and
+visible everywhere. Built as 08 B6; the check becomes a join when Q14
+lands. The rest of Q3 stays open.
+
 ### Q4 — The questions as rows (S7; D12)
 
 The read side. On screen nothing changes.
@@ -443,8 +452,22 @@ one-line experiment, reverted).
   the by-topic figures as queries over `attempt_items`; the admin
   Attempts page's 5,000-row cap goes. Its own slice once Q5 has the
   rows. The student's side of the same queries is Q10–Q13 below.
-- **`quiz_items`** replacing the `item_ids` array — decided with S2
-  (one items table), not before.
+- **Q14 — The link table.** `quiz_items` and `mock_quiz_items`
+  (quiz, item → the bank, position) replacing the two `item_ids`
+  arrays — decided with §8 S12 on 2026-09-18 ("after S2"), S2 ticked
+  2026-09-19, queued as a slice 2026-09-26 when Sam asked whether the
+  arrays would change. One migration copying the arrays into rows and
+  dropping them; the quiz editor and the two list pages on the table.
+  A quiz question then points at a real bank row, ordering is a
+  column, and "which mocks hold this question" is a join (08 B6). S7's
+  ruling stands: a quiz on offer follows the live bank; a sitting is
+  its own snapshot.
+- **Q15 — The student's own marks across attempts.** MyNclex keeps a
+  student's "mark for review" on a question in its own table, kept
+  across attempts, and offers a "Marked" pool in the builder; here a
+  flag lives on the attempt row and dies with the sitting. A
+  student-facing feature that pairs with Q10–Q12 (practise what you
+  marked, practise what you missed). Captured 2026-09-26; not ruled.
 - **The legacy-check gap 7** (the builder's stuck status line) and the
   Learning History items on BUILD_LIST — runner and history work that
   belongs here when queued.
@@ -642,3 +665,5 @@ it needs a change log on every answer, a storage change and its own
 | Q11 Time per question | candidate, captured 2026-09-24 |
 | Q12 Progress across attempts | candidate, captured 2026-09-24 |
 | Q13 Readiness and the cohort | candidate, captured 2026-09-24; with Q3 |
+| Q14 The link table | decided with §8 S12 (2026-09-18); queued 2026-09-26 |
+| Q15 The student's own marks across attempts | candidate, captured 2026-09-26 |

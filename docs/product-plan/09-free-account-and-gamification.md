@@ -224,15 +224,25 @@ still reach the top ten in a good week.
 
 ## 4. Open questions (Sam's, before slicing)
 
-- **Where the pool lives.** The cheapest is a mark on `question_bank`
-  rows ("free", tagged by programme) and a second door on the read
-  policy: a row marked free is readable by any signed-in student. That
-  changes the SQL policy, the security floor, so it is a `rebuild.md` §8
-  row before it is built (**a candidate S16, under 08** — this said S14
-  until 2026-09-22, when S14 was taken by the premium marker, and S15
-  until 2026-09-23, when S15 was taken by one subscription per payment). A separate pool
-  table is the alternative; it keeps the bank's policy untouched at the
-  cost of a second importer path.
+- **Where the pool lives — settled 2026-09-26: a mark on the bank
+  rows** (`is_free_sample`, 08 B4), not a separate table. Sam's case
+  for a separate table was the volume the challenge needs (about 1,800
+  a year per programme with no repeats) and that the runner checks
+  course access; the answer given was that volume decides authoring
+  and rotation, not storage — the same rows, importer, editor and
+  snapshot serve both, a second table duplicates all of them and every
+  column B4 adds, and the paid bank is protected the same way, because
+  the door opens marked rows only. The door is two doors: the read
+  policy lets any signed-in student read a marked row, and attempt
+  creation accepts a set of ids when every one is marked free. That is
+  the security floor, so it is `rebuild.md` **§8 S16** (drafted
+  2026-09-26, tick pending; this said S14 until 2026-09-22 and S15
+  until 2026-09-23). Free rows stay inside their paid course; a
+  question named by any mock can never be free. The pool gets a Free
+  pool view on the bank page, per programme with its count, and an
+  "import as free" choice on the importer, so it feels like its own
+  bank without being one. Still open: the pool's size per programme and
+  the challenge's rotation.
 - **What the trial gives, which this doc depends on and does not set**
   (opened 2026-09-22). The free-forever account is positioned here as
   retention, with the trial and the paid products as the only route to
@@ -298,9 +308,12 @@ one-off buttons and cards.
 
 ### F — the free account
 
-- **F1 — The pool and its door.** The mark (or table) and the policy's
-  second door; the importer learning the mark; a §8 row first. The one
-  storage change in this doc.
+- **F1 — The pool and its door.** The mark is 08 B4's column; this
+  slice is the two doors (§8 S16): the read policy's second condition
+  and `create_attempt` accepting an all-free set of ids, plus the
+  builder and the pack maker drawing free rows only for a student with
+  no live course. The one storage change in this doc. Settled
+  2026-09-26 (§4 above).
 - **F2 — The free account.** Registration without a trial row (or the
   trial kept and the floor beneath it — Sam's call), the builder and the
   runner drawing from the pool for a student with no live course, the
@@ -324,7 +337,14 @@ one-off buttons and cards.
 - **G2 — The daily challenge.** Five questions per programme, the same
   five for everyone, chosen by a seed from the date, run through the
   instant runner; a new attempt source (every list that switches on
-  source is touched). From the free pool (the view above).
+  source is touched). From the free pool — Sam's yes, 2026-09-26; the
+  same five for everyone in a programme, so a free and a paid student
+  compete on one set. Five a day is about 1,800 a year per programme
+  with no repeats, so the pool rotates: a question may return after
+  some months, and the pool's size per programme is the open number.
+  The seal (03 Q6) holds for the challenge as for any quiz — the NMC
+  Prep walk found theirs sends the answers to the browser before it is
+  opened.
 - **G3 — Tiers.** Names on point bands, Passwell's shape, once real
   numbers exist. Cosmetic.
 
@@ -341,11 +361,11 @@ one-off buttons and cards.
 
 | Slice | Date |
 |---|---|
-| F1 The pool and its door | candidate; a §8 row first |
+| F1 The pool and its door | candidate; settled as the mark + two doors 2026-09-26; §8 S16 drafted, tick pending; the column is 08 B4 |
 | F2 The free account | candidate |
 | F3 Landing and copy | candidate |
 | G1 Streak, points, leaderboard (derived) | candidate; the NMC Prep walk done 2026-09-24 |
-| G2 The daily challenge | candidate; after G1 |
+| G2 The daily challenge | candidate; after G1; from the free pool (Sam, 2026-09-26), rotation and pool size open |
 | G3 Tiers | later |
 
 ---
