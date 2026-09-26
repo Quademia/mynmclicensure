@@ -22,8 +22,8 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
-- 2026-09-26 — the lockup the right way up and the phone bar cut to three (DS21); MyNclex's bank compared column by column, nine rulings, §8 S16–S18
-  - ↳ MyNclex bar is text only · six lockups measured · dot follows the tap · whole quiz system not adopted (56k vs 6.7k lines) · free pool = a mark · mocks reserved by rule · lists in the DB · history on publish · NMC site has no syllabus
+- 2026-09-26 — the lockup brand-first and the phone bar cut to three (DS21); MyNclex's bank compared, nine rulings, S16–S18 ticked, B4's migration applied
+  - ↳ MyNclex bar text only · whole quiz system not adopted, 56k vs 6.7k lines · free pool = a mark · mocks reserved by rule · lists in the DB · history on publish · NMC site has no syllabus · select('*') refused under a column grant
 
 - 2026-09-24 — NMC Prep walked on Sam's account and taken apart from outside; attempt reports captured as 03 Q10–Q13; no code
   - ↳ pane refused the site, Chrome instead · past papers = question books · challenge 3% of points · streak is points · weak-areas promise unkept · time_spent_s never written · no security headers · not a competitor · Clerk no

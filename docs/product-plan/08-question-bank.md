@@ -582,6 +582,6 @@ into 03 Q3 as its first settled ingredient.
 | B1 One table | ✅ 2026-09-19 (`20260920010000_question_bank.sql`; proven on dev — 5,281 rows, the eleven gone, 2,401 visible to the RN student and none of RM's, EXPLAIN a hashed SubPlan once per statement; walked by Sam: the builder, the runner, the admin bank page, packs, the picker) |
 | B2 The answers server-only | ✅ 2026-09-21 (`20260921120000_question_bank_secret_half.sql`; the secret half and every write grant off the browser roles, the three write policies with them, the concept search a service-role function; proven on dev and walked both sides — §4) |
 | B3 The admin page paged | ⬜ later |
-| B4 The columns, the version and the history | ⬜ adopted and scoped 2026-09-26; §8 S17 ✅ 2026-09-26; two sessions |
+| B4 The columns, the version and the history | ⬜ adopted and scoped 2026-09-26; §8 S17 ✅ 2026-09-26; the migration applied on dev 2026-09-26 (`20260926150000_question_bank_columns_history.sql`, `20260926160000_copiers_refuse_any_draft.sql`; proven in rolled-back runs, reviewed by three, the pack renderer's read fixed with it); the code half next |
 | B5 The lists and their panel | ⬜ adopted 2026-09-26; §8 S18 ✅ 2026-09-26; the clean-up is content work |
 | B6 The draws | ⬜ adopted 2026-09-26; no storage change |

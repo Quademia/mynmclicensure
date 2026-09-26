@@ -363,8 +363,10 @@ above sit at the repo root; the audience grouping inside them is kept.
   list any modifier in the CSS that no markup uses. **The second list
   is where a runtime-assembled name hides.**
 - **Most surfaces cannot be verified by eye from here.** The desktop
-  app's browser pane signs in as a student, so `/admin` bounces and every
-  authenticated student page needs Sam to sign the pane in. For a change
+  app's browser pane is signed in as whoever Sam last signed in — a
+  student, or on 2026-09-26 his admin account, which also renders the
+  student pages — and signs itself out between sessions; every
+  authenticated page needs Sam to sign the pane in. For a change
   across many such pages, `npm run build` (webpack, all 50 routes) is
   the check that actually exercises them; for CSS, render a proof sheet
   from the repo's own stylesheets and screenshot it, rather than
@@ -404,6 +406,26 @@ above sit at the repo root; the audience grouping inside them is kept.
   `licensure_gh.migrations`. Never `supabase db push`, never the MCP
   `apply_migration` — both stamp the project's shared tracker, which
   this repo does not own.
+- **Prove a migration before applying it, without touching dev's
+  data:** a scratchpad script that reads `DB_URL` from `.env.local`
+  (never printing it) and runs `begin; <the file>; <tests>; rollback;`
+  through `postgres.js` (`sql.unsafe`, which returns every statement's
+  rows, so SELECTs placed before the rollback report back). First the
+  file alone with a summary SELECT, then a second run exercising the
+  rules on a scratch row — triggers, refusals, grants — with `do`
+  blocks catching `sqlerrm` into a temp table. Both runs leave nothing
+  behind. `set local role authenticated` inside a transaction proves
+  what the student's role can read (2026-09-26, 08 B4).
+- **A `select('*')` under a cookie client breaks the moment a table's
+  grant becomes a column list.** PostgREST hands `*` to Postgres as a
+  literal `*`, which needs SELECT on every column it expands to, so a
+  column added later, or a table-level grant narrowed to columns
+  (rule 9), turns the read into "permission denied" with no build
+  error. Every student-side read names its columns; `select('*')`
+  survives only under the service role (2026-09-26: the pack renderer,
+  caught by a reviewer after B4's migration was written and before it
+  was applied — and still applied first, so `main`'s dev-site pack
+  page was down until the merge).
 
 ## Branching workflow
 
