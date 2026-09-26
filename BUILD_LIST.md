@@ -89,7 +89,7 @@ the gamma-era list it replaces is in git history and in `qacademy-gamma`.
 - ✅ §8 S16 the free pool's door — two doors, the read policy and attempt creation, opening rows marked free to any signed-in student; the mark is 08 B4's column, the doors 09 F1 — ticked 2026-09-26, not built
 - ✅ §8 S17 the bank's new columns, the version and the history — level, published, free mark, source, tags, dates, version; a history table on content changes to published rows; three columns copied into the sitting; CHECKs on type and difficulty — ticked 2026-09-26, built as 08 B4
 - ✅ §8 S18 the classification lists — subjects and topics per course as tables with keys, one Subjects & topics panel on the bank page, the importer refusing unknown words — ticked 2026-09-26, amended the same day, built as 08 B5
-- ⬜ §8 S19 a student's read of the bank narrowed to the ten filter columns — no question text outside a sitting (08 B6) — drafted 2026-09-26, awaiting the tick
+- ⬜ §8 S19 a student's read of the bank cut to the ten filter columns (08 B6) — drafted 2026-09-26, awaiting the tick
 - ⬜ §8 has no row for `courses_select` — the policy is `auth.uid() is not null`, so a signed-out visitor reads nothing from `courses`; `/premium-prep` and `/subscribe` both work around it with a service-role read, and D23 item 5 (a sales row lists its courses) cannot be met on any public page without it (2026-09-22)
 
 ## Improvements
@@ -264,7 +264,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⬜ B3 The admin bank page paged and filtered server-side, fifty at a time (D11) — later
 - ✅ B4 Columns, version, history — drafts, level, free mark, tags; import choices; two panels — 2026-09-26
 - ✅ B5 The lists — subjects and topics per course, Not set for empty, the Subjects & topics panel — 2026-09-26
-- ⬜ B6 The draws — a draft or active mock's questions held back from practice; S19 the student's read (scoped 2026-09-26)
+- ⬜ B6 The draws — a draft or active mock's questions held back from practice; S19 (scoped 2026-09-26)
 - ⬜ B7 Whole-course bank reads paged past the API's 1,000-row cap — RM_PED_OBS_HRN shows 1,000 of 1,080 (2026-09-26)
 
 *Not yet sliced — each gets an id when the doc is rewritten:*
