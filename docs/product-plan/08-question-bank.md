@@ -311,18 +311,219 @@ unchanged.
 
 ### B4 — The columns, the version and the history (S17)
 
-One migration: the seven columns, the two CHECKs, the history table
-and its trigger, the three columns on `attempt_items` and
-`offline_pack_items`, the existing rows published and at version 1.
-Code: the editor gains the level dropdown, the published switch, the
-free tick (refused on a mock question), the source field and the tags
-field with suggestions; the importer gains the columns, the
-publish-now-or-drafts choice and "import as free"; every student-side
-read adds `is_published`; the two copy functions copy the three new
-fields; the bank page gains Published and Free filters, a Free pool
-view per programme with its count, and a Tags panel. The History
-panel on the editor (view, restore) can follow the capture, the order
-MyNclex took.
+Scoped 2026-09-26 against the code as it stands; the five open
+details ruled the same day (Sam: the recommendations on all five); the
+draft then checked against the code, the dev database and the rest of
+the record by three readers (36 findings, 18 distinct points taken —
+the session entry names them). Two sessions: the migration, the
+actions and the editor first; the importer's choices and the two
+panels second, with Sam's walk between.
+
+**Storage, one migration.**
+
+- `question_bank` gains nine columns: `bloom_level text` (null, or one
+  of the six: Remember, Understand, Apply, **Analyse**, Evaluate,
+  Create — the existing rows have none; Ghana's spelling on screen and
+  in the data, MyNclex's list in meaning), `is_published boolean not
+  null default false`, `is_free_sample boolean not null default
+  false`, `question_ref text`, `tags text[] not null default '{}'`,
+  `created_at` / `updated_at timestamptz not null default now()` with
+  a trigger stamping the update, `version integer not null default
+  1`, and `updated_by text` — the admin's `U_` id, written by every
+  admin write, because a plain PostgREST statement carries only the
+  row's columns and the trigger cannot see the actor under the service
+  role; the actor travels on the row. Backfill: every existing row
+  `is_published = true`, both dates the migration's time, version 1,
+  `updated_by` null.
+- Two CHECKs: `question_type in ('MCQ','TF','SATA')`; `difficulty in
+  ('Easy','Moderate','Hard')` or null. Today's 5,281 rows pass both
+  (counted on dev: 5,277 / 0 / 4; 2,437 / 2,125 / 719).
+- `question_bank_history`: `history_id bigint generated always as
+  identity primary key`, the bank's columns, `version`, `changed_by
+  text`, `changed_at timestamptz not null default now()`, `deleted
+  boolean not null default false`; an index on `(item_id, version)`,
+  not unique — a deleted id re-imported starts at version 1 again. One
+  trigger, before update and before delete: when `old.is_published`
+  and the content row (`stem`, the six options, `correct`,
+  `rationale`, `rationale_img`, the six feedbacks, `question_type`,
+  `marks`) `is distinct from` the new one, insert `old` with
+  `changed_by = new.updated_by` and set `new.version = old.version +
+  1`; on delete of a published row, insert `old` with `changed_by =
+  old.updated_by` and `deleted = true`. Label-only changes (subject,
+  topic, subtopic, level, tags, `question_ref`, batch, course,
+  difficulty, shuffle, the two switches) and any change to an
+  unpublished row write nothing. **A question unpublished for rework
+  is a draft again and its edits are unversioned; republishing is a
+  switch flip and writes nothing either, so the row keeps its version
+  number over the reworked content** (the literal reading of the rule,
+  ruled 2026-09-26; the alternative — the flip back cutting a version
+  when the content differs from the last history row — was not taken).
+  A new table in this schema is born with `grant all` to both browser
+  roles (the schema's default privileges), so the migration ends with
+  `revoke all on question_bank_history from anon, authenticated`, the
+  same on its sequence, and RLS enabled with no policy;
+  `role_table_grants` shows neither role after the apply. The admin
+  reads it through the service role behind `requireAdmin()`.
+- `question_bank_select` gains the published condition for
+  non-admins: `auth_user_role() = 'ADMIN' or (is_published and
+  course_id in (select course_id from my_course_access()))`. A draft
+  cannot be read by a browser that asks directly. (S16's second door,
+  the free rows, is a later change to the same policy — 09 F1.)
+- `search_question_bank_ids` is redefined with `and q.is_published`
+  in its WHERE: it is SECURITY INVOKER but called by the service role
+  (`searchConceptItemIds`), which RLS never filters, and its ids go to
+  the browser bare — a draft's id must never leave the database.
+- `attempt_items` and `offline_pack_items` gain `bloom_level text`,
+  `tags text[] not null default '{}'`, `version integer`;
+  `create_attempt` and `create_offline_pack` copy them beside the four
+  classification fields. Both copiers **refuse an unpublished id**
+  before the copy — `if exists (select 1 from unnest(p_item_ids) i
+  join question_bank q on q.item_id = i where not q.is_published) then
+  raise exception 'This quiz has a question that is not published'`
+  (the pack's message says pack) — rather than copying or dropping it;
+  a deleted id keeps today's rule and is dropped, since there is
+  nothing to republish. Existing rows show blanks, which is honest.
+- Rule 9 after the apply. `question_bank`: `authenticated`'s
+  column-level SELECT list (anon holds nothing since B2 and gets
+  nothing here) gains `is_published` and `is_free_sample` only — the
+  student-side reads filter on them and a cookie-client filter needs
+  SELECT on the column; `bloom_level`, `tags`, `version` and the dates
+  are not granted in B4, because no student read uses them yet and the
+  bank page reads them through the service role (the slice that puts a
+  level or tag filter before a student grants them); **`question_ref`
+  and `updated_by` are never granted** — internal, server-only.
+  `attempt_items`: its column-level list stays as it is, without the
+  three (the runner and the review read through the service role).
+  `offline_pack_items`: holds table-level SELECT today, which would
+  carry the three to `authenticated` by itself — narrowed to a column
+  list without them. `information_schema.role_column_grants` and
+  `role_table_grants` checked for all three tables.
+
+**Code.**
+
+- `lib/bank/types.ts`: `Item` gains the nine fields; `BLOOM_LEVELS`
+  beside `DIFFICULTIES` (a constant, so here and not in the `'use
+  server'` module); `CSV_COLUMNS` gains `bloom_level`, `question_ref`,
+  `tags` — **tags in a CSV cell separated by semicolons** (commas are
+  the file's own separator; ruled 2026-09-26). The two switches are not
+  CSV columns.
+- `lib/bank/csv.ts` (`parseCsv`, which builds the row report in the
+  browser when the file is picked): a row whose type, difficulty or
+  level is not on its list is refused with the word named — 'Row 7:
+  question type "T/F" is not MCQ, TF or SATA — skipped'; the match is
+  without case and the row lands in the list's spelling (`easy` →
+  Easy), so a spelling variant is corrected and an unknown word
+  refused. `importItems` repeats the check on what it receives, as it
+  repeats the other rules.
+- `lib/bank/actions.ts`: `saveQuestion` carries the new fields, stamps
+  `updated_by`, and **refuses the free tick on a question any
+  `mock_quizzes` row names** ("This question is in a mock exam and
+  cannot be free") — a TypeScript check through the service role
+  (`item_ids @> array[id]`; the column is off the browser roles),
+  enough here because the tick gates nothing until S16's door lands
+  with the policy; the SQL check comes with 03 Q14's link table. The
+  rule's other door is built with it: `lib/quizzes/actions.ts`
+  `saveQuiz` for a mock refuses an id marked free by name ("Question
+  RN_MED_… is a free question and cannot be in a mock exam"), so the
+  two writes hold the rule from both sides and B6's draws are only its
+  read side. New `setPublished(courseId, itemIds, published)` for one
+  row or the shown set, stamping `updated_by`; **Unpublish first counts,
+  through the service role, the active published fixed quizzes and
+  mocks whose lists name the rows, and when the count is not zero
+  confirms with the app's dialog** — "N quizzes will refuse to start
+  until this question is published again" (`useConfirm()`, never
+  `window.confirm`) — and returns the count for the toast.
+  `importItems` takes two choices per file — publish now or leave as
+  drafts, import as free or not — **applied to the rows the file
+  creates**: the action reads which of the file's ids exist first, and
+  an existing row keeps its own `is_published` and `is_free_sample`
+  (the upsert on `item_id` writes the file's content and label columns,
+  never the two switches, so a re-import cannot unpublish a live
+  question or free one; "Publish all shown" is the door for publishing
+  existing drafts); "import as free" is refused row by row for an id
+  any mock names, with the tick's message; the importer stamps
+  `updated_by` like the save, so a re-imported published row whose
+  content changed gets a history row that names the importer.
+  `deleteQuestion` is **not** unchanged: it stamps `updated_by` in one
+  statement (label-only, no history row) and deletes in the next, so
+  the deleted row's history names who deleted it.
+- Reads. `knownItemIds` and `getBuilderCourseItems` (student-only) add
+  `.eq('is_published', true)`, belt and braces with the policy.
+  `getItemFilterOptions` serves both audiences — the builder through
+  `loadBuilderCourse`, the admin page's dropdowns through
+  `loadCourseItems` — so it takes a `publishedOnly` flag: true from
+  the two builders, false from the admin, whose dropdowns must show a
+  draft's topic and batch. `getItemsByFilters` (admin, service role)
+  untouched. `createAttemptRows` **passes the function's message
+  through** as `rpcError()` does for the six write doors — today it
+  replaces every error with "Could not start this attempt. Please try
+  again.", which would swallow the refusal — so the Start button's
+  toast carries the words, **a retake included** (a retake is a start
+  that copies fresh from the live bank; an origin holding a question
+  since unpublished waits for the republish, builder retakes too); the
+  quiz editor lists the offending ids with a Draft badge.
+- The bank page (`question-bank-client.tsx`): the editor gains a Level
+  dropdown, a Published switch, a Free tick, a Source field
+  (`question_ref`), a Tags field with suggestions from tags in use
+  (matched without case, trimmed); the list gains Published, Free and
+  Level filters and a Draft badge; Publish / Unpublish per row and
+  "Publish all shown"; two panels — **Tags** (every tag with its
+  count; rename flows to every row; merge folds one into another;
+  delete removes it everywhere; merge and delete are irreversible bulk
+  writes behind the app's confirm dialog, type-to-confirm for delete;
+  results as toasts) and **Free pool** (the free count per programme
+  from the courses' `program_scope`: a course in several programmes
+  counts under each — General Paper is in all five, so its free rows
+  are in every programme's pool and the five figures overlap rather
+  than sum; the panel says so in one line and lists the per-course
+  counts beneath each programme). Both panels and the new filters
+  stack under 768px in `admin-question-bank.css` like the rest of the
+  page. Subject and topic stay free text until B5 swaps them for
+  dropdowns (**B4 before B5**, ruled).
+
+**Not in B4.** The History panel (view a version, restore — a save
+that writes the chosen version's content onto the row) follows the
+capture, the order MyNclex took. Nothing student-facing: the level's
+visibility to students is Sam's open call (§3 item 1), so no builder
+filter on it here; tags are ruled student-facing (§3 item 6 — the
+label in review, a builder filter, a report grouping) and are built
+before students with 03 Q10's report and the builder work, not here.
+The free rows' door is 09 F1 (S16).
+
+**Done when.** A new question saves as a draft and is absent from the
+builder, the pack builder, the concept search and a quiz start;
+published, it appears. Editing a published question's stem writes a
+history row naming the admin and moves the version to 2; editing its
+topic writes nothing; unpublishing, editing and republishing writes
+nothing and keeps the number; deleting it writes a row marked deleted
+that names who. A fixed quiz holding an unpublished question refuses
+to start with the message on the card, and Unpublish had first said
+how many quizzes would; the editor lists the id. A file imported as
+drafts lands as drafts; the same file with "publish now" lands live;
+a re-import of a live course file changes no switch; a row with "T/F"
+is refused by name; `easy` lands as Easy. The free tick on a question
+in a mock is refused, and a mock's save naming a free question is
+refused. A tag typed twice in different case is one tag; renaming it
+in the panel changes every row; merge and delete ask first.
+`role_column_grants` shows `authenticated` with `is_published` and
+`is_free_sample` added and nothing else new, `question_ref` and
+`updated_by` absent; `role_table_grants` shows no browser role on the
+history table and `offline_pack_items` narrowed to columns. Sam walks
+all of it at `localhost:3000`; `npm run build` green.
+
+**Reach.** Dev only. The migration reaches the deployed dev site
+before the merge, where `main`'s code keeps working: the existing rows
+are published, the new columns have defaults, `main`'s editor picks
+the type and the difficulty from its two lists, and its importer
+upper-cases the type. Three things change there until the merge, none
+reaching a student: a question saved or imported from `main`'s admin
+page lands as a draft, with no Publish control on that build, so it
+stays out of every draw until the merge; a CSV row whose difficulty is
+not exactly Easy, Moderate or Hard (`main` writes it as typed) fails
+its batch of 50 at the CHECK with Postgres's message, where before it
+landed; and any history row written meanwhile carries a null
+`changed_by`. Say so when proposing the apply; or the apply waits for
+the merge.
 
 ### B5 — The lists and their panel (S18)
 
@@ -365,6 +566,6 @@ into 03 Q3 as its first settled ingredient.
 | B1 One table | ✅ 2026-09-19 (`20260920010000_question_bank.sql`; proven on dev — 5,281 rows, the eleven gone, 2,401 visible to the RN student and none of RM's, EXPLAIN a hashed SubPlan once per statement; walked by Sam: the builder, the runner, the admin bank page, packs, the picker) |
 | B2 The answers server-only | ✅ 2026-09-21 (`20260921120000_question_bank_secret_half.sql`; the secret half and every write grant off the browser roles, the three write policies with them, the concept search a service-role function; proven on dev and walked both sides — §4) |
 | B3 The admin page paged | ⬜ later |
-| B4 The columns, the version and the history | ⬜ adopted 2026-09-26; §8 S17 ✅ 2026-09-26 |
+| B4 The columns, the version and the history | ⬜ adopted and scoped 2026-09-26; §8 S17 ✅ 2026-09-26; two sessions |
 | B5 The lists and their panel | ⬜ adopted 2026-09-26; §8 S18 ✅ 2026-09-26; the clean-up is content work |
 | B6 The draws | ⬜ adopted 2026-09-26; no storage change |

@@ -260,7 +260,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ B1 One table — question_bank with a course key, the eleven copied in and dropped, one gate a statement — 2026-09-19
 - ✅ B2 Answers server-only — the secret half and write grants off the browser roles, search server-side — 2026-09-21
 - ⬜ B3 The admin bank page paged and filtered server-side, fifty at a time (D11) — later
-- ⬜ B4 The columns, the version and the history — level, published (draft by default), free mark, source, tags, dates, version; history on content changes to published rows; level, tags and version copied into the sitting; CHECKs on type and difficulty (§8 S17; Sam, 2026-09-26)
+- ⬜ B4 The columns, the version and the history — level, published (draft by default), free mark, source, tags, dates, version; history on content changes to published rows; level, tags and version copied into the sitting; CHECKs on type and difficulty (§8 S17 ✅; scoped 2026-09-26: six levels with "Analyse", tags by semicolon in a CSV, an unpublished question refuses the start, drafts unversioned, B4 before B5)
 - ⬜ B5 The lists and their panel — subjects and topics per course as tables with a Topics panel on the Courses page, the importer refusing unknown words, keys on the bank rows; the clean-up per course is content work (§8 S18; Sam, 2026-09-26)
 - ⬜ B6 The draws — a question reserved while any mock names it (derived), free accounts see free rows only, every draw published rows only; the overlap list at migration (Sam, 2026-09-26)
 
