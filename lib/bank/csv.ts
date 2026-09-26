@@ -29,12 +29,17 @@
 // columns: bloom_level, question_ref, and tags split on semicolons. A
 // file that has no such column leaves the row's value as it is — every
 // file made before B4 lacks all three, and re-importing one must not
-// wipe a level or tags set in the editor since.
+// wipe a level or tags set in the editor since. One alias: the level
+// "Analyze", MyNclex's spelling, lands as "Analyse" (Sam, 2026-09-26) —
+// the same word, so a file carried over from MyNclex is not refused.
 
 import { BLOOM_LEVELS, CSV_COLUMNS, DIFFICULTIES, OPTION_LETTERS, QUESTION_TYPES, normaliseTags } from './types';
 
 // The three B4 columns a file may or may not carry.
 const B4_COLUMNS = ['bloom_level', 'question_ref', 'tags'] as const;
+
+// Spellings of a level that mean one of the six, keyed lower-case.
+const LEVEL_ALIASES: Record<string, string> = { analyze: 'Analyse' };
 
 /** "A, B or C" — the list as the refusal names it. */
 function spoken(list: readonly string[]): string {
@@ -74,7 +79,7 @@ export function checkListColumns(row: CsvRow): string | null {
 
   const level = (row.bloom_level || '').trim();
   if (level) {
-    const l = onList(BLOOM_LEVELS, level);
+    const l = onList(BLOOM_LEVELS, level) ?? LEVEL_ALIASES[level.toLowerCase()] ?? null;
     if (!l) return `level "${level}" is not ${spoken(BLOOM_LEVELS)}`;
     row.bloom_level = l;
   }
