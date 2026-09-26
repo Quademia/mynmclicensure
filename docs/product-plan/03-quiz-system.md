@@ -747,6 +747,6 @@ it needs a change log on every answer, a storage change and its own
 | Q11 Time per question | candidate, captured 2026-09-24 |
 | Q12 Progress across attempts | candidate, captured 2026-09-24 |
 | Q13 Readiness and the cohort | candidate, captured 2026-09-24; with Q3 |
-| Q14 The link tables | decided with §8 S12 (2026-09-18); queued 2026-09-26; scoped and ruled 2026-09-27 (Sam); §8 S20 awaiting the tick |
+| Q14 The link tables | decided with §8 S12 (2026-09-18); queued 2026-09-26; scoped and ruled 2026-09-27 (Sam); §8 S20 ✅ 2026-09-27; building |
 | Q15 The student's own marks across attempts | candidate, captured 2026-09-26 |
 | Q16 The keyword step offers only what has a subtopic | ⬜ queued 2026-09-26 (Sam); found walking 08 B6 |
