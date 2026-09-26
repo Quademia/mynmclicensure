@@ -77,6 +77,24 @@
 .qb .q-topics { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
 .qb .q-topic-pill { font-size: 11px; color: var(--text-muted); background: #f1f5f9; padding: 2px 8px; border-radius: 999px; }
 
+/* ── 08 B4: drafts, the card's two buttons, tags ── */
+/* A draft's card is dashed, so a list of mixed rows reads at a glance
+   without leaning on the badge's colour alone. */
+.qb .q-card.is-draft { border-style: dashed; }
+.qb .q-card-actions { display: flex; gap: var(--space-6); flex-shrink: 0; }
+.qb .q-edit-btn:disabled { opacity: 0.6; cursor: default; }
+.qb .q-tag-pill { font-size: 11px; color: var(--accent); background: var(--primary-light); padding: 2px 8px; border-radius: 999px; }
+.qb .panel-title { display: flex; align-items: center; gap: var(--space-8); }
+.qb .qb-switches .check-label { margin-bottom: var(--space-4); }
+.qb .qb-switches .form-hint { margin: 0 0 var(--space-8); }
+.qb .tag-editor { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-6); padding: var(--space-6); border: 1px solid var(--border); border-radius: 6px; background: var(--white); }
+.qb .form-group .tag-editor input { flex: 1 1 140px; width: auto; min-width: 120px; border: none; padding: var(--space-4); }
+.qb .form-group .tag-editor input:focus { outline: none; }
+.qb .tag-editor:focus-within { border-color: var(--accent); }
+.qb .tag-chip { display: inline-flex; align-items: center; gap: var(--space-2); padding: 2px var(--space-4) 2px var(--space-10); border-radius: 999px; background: var(--primary-light); color: var(--primary); font-size: 12px; }
+.qb .tag-chip button { border: none; background: none; cursor: pointer; color: var(--text-muted); font-size: 15px; line-height: 1; padding: 0 var(--space-4); }
+.qb .tag-chip button:hover { color: var(--danger); }
+
 .qb .empty-state { text-align: center; padding: 48px 24px; color: var(--text-muted); background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); }
 .qb .empty-state .icon { display: flex; justify-content: center; color: var(--text-muted); margin-bottom: 12px; }
 .qb .empty-state p { font-size: 14px; margin: 0; }
@@ -149,6 +167,7 @@
   .qb .toolbar-right { width: 100%; }
   .qb .toolbar-right .btn { flex: 1; }
   .qb .q-card { padding: 14px; }
+  .qb .q-card-header { flex-wrap: wrap; }
   .qb .form-row { grid-template-columns: 1fr; gap: 0; }
   .qb .option-pair { grid-template-columns: 1fr; }
   .qb .panel-actions .btn { flex: 1 1 auto; }

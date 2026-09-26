@@ -16,6 +16,13 @@
 // shuffle box follows the TYPE (unchecked for TF, checked otherwise), not
 // the stored value; and the message after a save is always "Question
 // saved." — the "created" branch is unreachable in the legacy script.
+//
+// 08 B4 (2026-09-26): a question is a draft until published. The editor
+// gains the Published switch, the Free tick, a Level, a Source and Tags
+// (suggested from the tags in use, snapped to their spelling); the list
+// gains Status, Free and Level filters, a Draft badge, Publish /
+// Unpublish per card and "Publish all shown". Unpublishing asks first
+// when live quizzes name the question, since each will refuse to start.
 
 'use client';
 import { useConfirm } from '@/lib/overlays/shared/confirm-dialog';
@@ -23,13 +30,15 @@ import { useConfirm } from '@/lib/overlays/shared/confirm-dialog';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Toast } from '@/lib/toast/toast';
 import { CsvImportModal } from './csv-import-modal';
-import { deleteQuestion, loadCourseItems, saveQuestion } from '@/lib/bank/actions';
+import { countQuizzesNaming, deleteQuestion, loadCourseItems, saveQuestion, setPublished } from '@/lib/bank/actions';
 import {
+  BLOOM_LEVELS,
   DIFFICULTIES,
   OPTION_LETTERS,
   QUESTION_TYPES,
   QUESTION_TYPE_LABELS,
   RATIONALE_IMAGE_MAX_BYTES,
+  normaliseTags,
   type Item,
   type OptionLetter,
   type QuestionType,
@@ -58,6 +67,12 @@ type Form = {
   marks: string;
   batchId: string;
   shuffle: boolean;
+  // ── 08 B4 ──
+  bloomLevel: string;
+  isPublished: boolean;
+  isFreeSample: boolean;
+  questionRef: string;
+  tags: string[];
 };
 
 const blankLetters = (): Record<OptionLetter, string> =>
@@ -79,6 +94,12 @@ const EMPTY_FORM: Form = {
   marks: '1',
   batchId: '',
   shuffle: true,
+  bloomLevel: '',
+  // a new question is a draft (08 B4, draft by default)
+  isPublished: false,
+  isFreeSample: false,
+  questionRef: '',
+  tags: [],
 };
 
 
@@ -86,6 +107,11 @@ function correctLetters(item: Item): string[] {
   return item.question_type === 'SATA'
     ? (item.correct || '').split(',').map((s) => s.trim().toLowerCase())
     : [(item.correct || '').trim().toLowerCase()];
+}
+
+/** "1 quiz will…" / "3 quizzes will…" — the unpublish warning's words. */
+function quizzesWillRefuse(n: number): string {
+  return `${n} ${n === 1 ? 'quiz' : 'quizzes'} will refuse to start until this question is published again.`;
 }
 
 export function QuestionBankClient({ courses }: { courses: Course[] }) {
@@ -97,6 +123,7 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
   const [items, setItems] = useState<Item[]>([]);
   const [maintopics, setMaintopics] = useState<string[]>([]);
   const [batchIds, setBatchIds] = useState<string[]>([]);
+  const [tagsInUse, setTagsInUse] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
   // ── filters (applied in the browser, as legacy) ──
@@ -104,6 +131,10 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
   const [fDifficulty, setFDifficulty] = useState('');
   const [fType, setFType] = useState('');
   const [fBatch, setFBatch] = useState('');
+  // 08 B4: '' | 'published' | 'draft'; '' | 'free' | 'not-free'; '' | a level | 'none'
+  const [fStatus, setFStatus] = useState('');
+  const [fFree, setFFree] = useState('');
+  const [fLevel, setFLevel] = useState('');
   const [keyword, setKeyword] = useState('');
   const [debouncedKeyword, setDebouncedKeyword] = useState('');
   const [limit, setLimit] = useState(PAGE_SIZE);
@@ -123,7 +154,14 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
   const [imgLocalPreview, setImgLocalPreview] = useState('');
   const [imgUrl, setImgUrl] = useState('');
   const [saving, setSaving] = useState(false);
+  const [tagDraft, setTagDraft] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // ── Publish / Unpublish: the card whose switch is in flight ──
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  // DS4: the app's own dialog for every question the page asks.
+  const [confirm, confirmDialog] = useConfirm();
 
   // ── the CSV modal (slice 4b) ──
   const [csvOpen, setCsvOpen] = useState(false);
@@ -146,6 +184,7 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
     setItems(result.items);
     setMaintopics(result.maintopics);
     setBatchIds(result.batchIds);
+    setTagsInUse(result.tagsInUse);
     return result.items;
   }
 
@@ -154,6 +193,9 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
     setFDifficulty('');
     setFType('');
     setFBatch('');
+    setFStatus('');
+    setFFree('');
+    setFLevel('');
     setKeyword('');
     setDebouncedKeyword('');
     setLimit(PAGE_SIZE);
@@ -189,17 +231,26 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
     if (fDifficulty && item.difficulty !== fDifficulty) return false;
     if (fType && item.question_type !== fType) return false;
     if (fBatch && item.batch_id !== fBatch) return false;
+    if (fStatus === 'published' && !item.is_published) return false;
+    if (fStatus === 'draft' && item.is_published) return false;
+    if (fFree === 'free' && !item.is_free_sample) return false;
+    if (fFree === 'not-free' && item.is_free_sample) return false;
+    if (fLevel === 'none' && item.bloom_level) return false;
+    if (fLevel && fLevel !== 'none' && item.bloom_level !== fLevel) return false;
     if (kw) {
       const searchable = [
         item.stem, item.option_a, item.option_b, item.option_c,
         item.option_d, item.option_e, item.option_f,
         item.rationale, item.maintopic, item.subtopic, item.subject,
+        item.question_ref, ...(item.tags ?? []),
       ].map((v) => (v || '').toLowerCase()).join(' ');
       if (!searchable.includes(kw)) return false;
     }
     return true;
   });
   const shown = filtered.slice(0, limit);
+  const shownDrafts = filtered.filter((i) => !i.is_published);
+  const currentItem = currentId ? items.find((i) => i.item_id === currentId) ?? null : null;
 
   // ── the panel: open for edit / new, type change, close ──
 
@@ -239,7 +290,13 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
       marks: String(item.marks || 1),
       batchId: item.batch_id || '',
       shuffle: item.shuffle_options !== false,
+      bloomLevel: item.bloom_level || '',
+      isPublished: item.is_published,
+      isFreeSample: item.is_free_sample,
+      questionRef: item.question_ref || '',
+      tags: item.tags ?? [],
     };
+    setTagDraft('');
     setForm(applyType(filled, filled.type));
     setPanelOpen(true);
   }
@@ -252,7 +309,8 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
     setImgLocalPreview('');
     setImgUrl('');
     const prefix = courseId.replace(/_/g, '') + '_';
-    setForm(applyType({ ...EMPTY_FORM, options: blankLetters(), feedback: blankLetters(), itemId: prefix + Date.now().toString().slice(-6) }, 'MCQ'));
+    setTagDraft('');
+    setForm(applyType({ ...EMPTY_FORM, options: blankLetters(), feedback: blankLetters(), tags: [], itemId: prefix + Date.now().toString().slice(-6) }, 'MCQ'));
     setPanelOpen(true);
   }
 
@@ -271,6 +329,37 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
       ...f,
       correctSata: f.correctSata.includes(letter) ? f.correctSata.filter((l) => l !== letter) : [...f.correctSata, letter],
     }));
+  }
+
+  // ── tags (08 B4) ──
+  // Typed text becomes tags at Enter, a comma or a semicolon, or at Save.
+  // Each is snapped to the spelling already in use, matched without case,
+  // so "Pain" where "pain" exists stays one tag; the save does the same.
+  function withTags(current: string[], raw: string): string[] {
+    const typed = raw.split(/[;,]/).map((s) => s.trim()).filter(Boolean);
+    const snapped = typed.map((t) => tagsInUse.find((u) => u.toLowerCase() === t.toLowerCase()) ?? t);
+    return normaliseTags([...current, ...snapped]);
+  }
+
+  function onTagInput(value: string) {
+    // a separator typed (or pasted) closes every tag before it
+    if (/[;,]/.test(value)) {
+      const cut = Math.max(value.lastIndexOf(','), value.lastIndexOf(';'));
+      setForm((f) => ({ ...f, tags: withTags(f.tags, value.slice(0, cut)) }));
+      setTagDraft(value.slice(cut + 1));
+    } else {
+      setTagDraft(value);
+    }
+  }
+
+  function commitTagDraft() {
+    if (!tagDraft.trim()) return;
+    setForm((f) => ({ ...f, tags: withTags(f.tags, tagDraft) }));
+    setTagDraft('');
+  }
+
+  function removeTag(tag: string) {
+    setForm((f) => ({ ...f, tags: f.tags.filter((t) => t !== tag) }));
   }
 
   // ── image ──
@@ -302,6 +391,25 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
       return setMsg({ text: 'Select at least one correct option for SATA.', tone: 'error' });
     }
 
+    // 08 B4: a published question switched off here is an unpublish, and
+    // asks first when live quizzes name it — as the card's button does.
+    let blocked = 0;
+    if (currentItem?.is_published && !form.isPublished) {
+      const use = await countQuizzesNaming(courseId, [currentItem.item_id]);
+      if (!use.ok) return setMsg({ text: use.error, tone: 'error' });
+      if (use.count > 0) {
+        const ok = await confirm({
+          title: 'Unpublish this question?',
+          body: quizzesWillRefuse(use.count),
+          confirmLabel: 'Save and unpublish',
+        });
+        if (!ok) return;
+        blocked = use.count;
+      }
+    }
+    // text still in the Tags box is a tag the admin meant
+    const tags = withTags(form.tags, tagDraft);
+
     let image: FormData | null = null;
     if (imgFile) {
       image = new FormData();
@@ -328,6 +436,11 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
         marks: form.marks,
         batchId: form.batchId,
         shuffleOptions: form.shuffle,
+        bloomLevel: form.bloomLevel,
+        isPublished: form.isPublished,
+        isFreeSample: form.isFreeSample,
+        questionRef: form.questionRef,
+        tags,
       },
       image,
     );
@@ -335,19 +448,90 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
     if (!result.ok) return setMsg({ text: result.error, tone: 'error' });
 
     // legacy: re-fetch the course, keep the panel open on this question;
-    // the preview shows the stored URL again.
+    // the preview shows the stored URL again. The tags as the server
+    // stored them (snapped to the bank's spellings).
     const fresh = await fetchCourse(courseId);
+    const stored = fresh.find((i) => i.item_id === form.itemId);
     if (isNew) setIsNew(false);
     setCurrentId(form.itemId);
     setImgFile(null);
     setImgLocalPreview('');
-    setImgUrl(fresh.find((i) => i.item_id === form.itemId)?.rationale_img || '');
-    setMsg({ text: 'Question saved.', tone: 'success' });
+    setImgUrl(stored?.rationale_img || '');
+    setTagDraft('');
+    setForm((f) => ({ ...f, tags: stored?.tags ?? tags }));
+    setMsg({
+      text: blocked ? `Question saved and unpublished. ${quizzesWillRefuse(blocked)}` : 'Question saved.',
+      tone: 'success',
+    });
+  }
+
+  // ── Publish / Unpublish (08 B4) ──
+  function markPublished(ids: string[], published: boolean) {
+    const set = new Set(ids);
+    setItems((rows) => rows.map((i) => (set.has(i.item_id) ? { ...i, is_published: published } : i)));
+    if (currentId && set.has(currentId)) setForm((f) => ({ ...f, isPublished: published }));
+  }
+
+  async function publishOne(item: Item, published: boolean) {
+    if (busyId) return;
+    setBusyId(item.item_id);
+    try {
+      if (!published) {
+        const use = await countQuizzesNaming(courseId, [item.item_id]);
+        if (!use.ok) return setMsg({ text: use.error, tone: 'error' });
+        if (use.count > 0) {
+          const ok = await confirm({
+            title: `Unpublish question ${item.item_id}?`,
+            body: quizzesWillRefuse(use.count),
+            confirmLabel: 'Unpublish',
+          });
+          if (!ok) return;
+        }
+      }
+      const result = await setPublished(courseId, [item.item_id], published);
+      if (!result.ok) return setMsg({ text: result.error, tone: 'error' });
+      markPublished([item.item_id], published);
+      setMsg({
+        text: published
+          ? 'Question published.'
+          : result.blockedQuizzes
+            ? `Question unpublished. ${quizzesWillRefuse(result.blockedQuizzes)}`
+            : 'Question unpublished.',
+        tone: 'success',
+      });
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  // Every draft the filters are showing — not only the cards drawn so far.
+  async function publishAllShown() {
+    const ids = shownDrafts.map((i) => i.item_id);
+    if (!ids.length || busyId) return;
+    const noun = ids.length === 1 ? 'draft question' : 'draft questions';
+    const ok = await confirm({
+      title: `Publish ${ids.length} ${noun}?`,
+      body: 'Published questions reach students at once — in the Quiz Builder, offline packs and any quiz that names them.',
+      confirmLabel: `Publish ${ids.length}`,
+    });
+    if (!ok) return;
+    setBusyId('*');
+    try {
+      const result = await setPublished(courseId, ids, true);
+      if (!result.ok) {
+        // part of the set may have gone through before a failure
+        await fetchCourse(courseId);
+        return setMsg({ text: result.error, tone: 'error' });
+      }
+      markPublished(ids, true);
+      setMsg({ text: `${result.changed} question${result.changed === 1 ? '' : 's'} published.`, tone: 'success' });
+    } finally {
+      setBusyId(null);
+    }
   }
 
   // DS4: legacy's words in the app's dialog; the id is typed back before
   // Delete enables (a delete cannot be undone).
-  const [confirm, confirmDialog] = useConfirm();
   async function confirmDelete() {
     if (!currentId) return;
     const ok = await confirm({
@@ -422,6 +606,30 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
           </select>
         </div>
         <div className="filter-group">
+          <label htmlFor="filterStatus">Status</label>
+          <select id="filterStatus" value={fStatus} onChange={(e) => { setFStatus(e.target.value); setLimit(PAGE_SIZE); }}>
+            <option value="">All</option>
+            <option value="published">Published</option>
+            <option value="draft">Drafts</option>
+          </select>
+        </div>
+        <div className="filter-group">
+          <label htmlFor="filterFree">Free</label>
+          <select id="filterFree" value={fFree} onChange={(e) => { setFFree(e.target.value); setLimit(PAGE_SIZE); }}>
+            <option value="">All</option>
+            <option value="free">Free only</option>
+            <option value="not-free">Not free</option>
+          </select>
+        </div>
+        <div className="filter-group">
+          <label htmlFor="filterLevel">Level</label>
+          <select id="filterLevel" value={fLevel} onChange={(e) => { setFLevel(e.target.value); setLimit(PAGE_SIZE); }}>
+            <option value="">All levels</option>
+            {BLOOM_LEVELS.map((l) => <option key={l} value={l}>{l}</option>)}
+            <option value="none">Not set</option>
+          </select>
+        </div>
+        <div className="filter-group">
           <label htmlFor="filterKeyword">Search</label>
           <input id="filterKeyword" type="text" placeholder="Keyword in stem…" value={keyword} onChange={(e) => { setKeyword(e.target.value); setLimit(PAGE_SIZE); }} />
         </div>
@@ -438,6 +646,11 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
           </span>
         </div>
         <div className="toolbar-right">
+          {courseId && !loading && shownDrafts.length ? (
+            <button type="button" className="btn btn-ghost" disabled={busyId !== null} onClick={publishAllShown}>
+              <Icon name="check-circle" />Publish all shown ({shownDrafts.length})
+            </button>
+          ) : null}
           <button type="button" className="btn btn-ghost" disabled={!courseId} onClick={openCsvModal}><Icon name="upload" />Import CSV</button>
           <button type="button" className="btn btn-primary" disabled={!courseId} onClick={openNew}>+ New Question</button>
         </div>
@@ -472,19 +685,32 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
                   <div
                     key={item.item_id}
                     id={`card-${item.item_id}`}
-                    className={`q-card${currentId === item.item_id ? ' active' : ''}`}
+                    className={`q-card${currentId === item.item_id ? ' active' : ''}${item.is_published ? '' : ' is-draft'}`}
                     onClick={() => openEdit(item)}
                   >
                     <div className="q-card-header">
                       <div className="q-card-meta">
                         <span className="q-id">{item.item_id}</span>
+                        {!item.is_published ? <span className="badge badge-warning">Draft</span> : null}
                         <KindChip hue={QUESTION_TYPE_HUE[item.question_type]}>{item.question_type || '—'}</KindChip>
                         {item.difficulty && DIFFICULTY_STEP[item.difficulty]
                           ? <ScaleChip step={DIFFICULTY_STEP[item.difficulty]}>{item.difficulty}</ScaleChip>
                           : item.difficulty ? <KindChip>{item.difficulty}</KindChip> : null}
+                        {item.bloom_level ? <KindChip>{item.bloom_level}</KindChip> : null}
+                        {item.is_free_sample ? <KindChip>Free</KindChip> : null}
                         {item.marks && Number(item.marks) !== 1 ? <KindChip>{item.marks} marks</KindChip> : null}
                       </div>
-                      <button type="button" className="q-edit-btn" onClick={(e) => { e.stopPropagation(); openEdit(item); }}><Icon name="pencil" />Edit</button>
+                      <div className="q-card-actions">
+                        <button
+                          type="button"
+                          className="q-edit-btn"
+                          disabled={busyId !== null}
+                          onClick={(e) => { e.stopPropagation(); publishOne(item, !item.is_published); }}
+                        >
+                          {busyId === item.item_id ? '…' : item.is_published ? 'Unpublish' : <><Icon name="check-circle" />Publish</>}
+                        </button>
+                        <button type="button" className="q-edit-btn" onClick={(e) => { e.stopPropagation(); openEdit(item); }}><Icon name="pencil" />Edit</button>
+                      </div>
                     </div>
                     <div className="q-stem">{item.stem}</div>
                     <div className="q-options">
@@ -508,6 +734,7 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
                       {item.subject ? <span className="q-topic-pill">{item.subject}</span> : null}
                       {item.maintopic ? <span className="q-topic-pill">{item.maintopic}</span> : null}
                       {item.subtopic ? <span className="q-topic-pill">• {item.subtopic}</span> : null}
+                      {(item.tags ?? []).map((t) => <span key={t} className="q-tag-pill">#{t}</span>)}
                     </div>
                   </div>
                 );
@@ -524,7 +751,10 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
         {/* Edit panel */}
         <div className={`edit-panel${panelOpen ? ' open' : ''}`} aria-hidden={!panelOpen}>
           <div className="panel-header">
-            <h3>{isNew ? 'New Question' : 'Edit Question'}</h3>
+            <h3 className="panel-title">
+              {isNew ? 'New Question' : 'Edit Question'}
+              {!isNew && currentItem && !currentItem.is_published ? <span className="badge badge-warning">Draft</span> : null}
+            </h3>
             <button type="button" className="panel-close" onClick={closePanel} title="Close">✕</button>
           </div>
 
@@ -532,7 +762,23 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
             <div className="form-group">
               <label htmlFor="fieldItemId">Question ID</label>
               <input id="fieldItemId" type="text" className="field-id" readOnly value={form.itemId} />
-              <p className="form-hint">Auto-generated. Cannot be changed.</p>
+              <p className="form-hint">
+                Auto-generated. Cannot be changed.
+                {!isNew && currentItem ? ` · Version ${currentItem.version}` : ''}
+              </p>
+            </div>
+
+            <div className="form-group qb-switches">
+              <label className="check-label">
+                <input type="checkbox" checked={form.isPublished} onChange={(e) => setField('isPublished', e.target.checked)} />
+                Published — students can see this question
+              </label>
+              {isNew ? <p className="form-hint">A new question is saved as a draft unless this is ticked.</p> : null}
+              <label className="check-label">
+                <input type="checkbox" checked={form.isFreeSample} onChange={(e) => setField('isFreeSample', e.target.checked)} />
+                Free question
+              </label>
+              <p className="form-hint">Marks it for the free pool, which is not open to students yet. A question in a mock exam cannot be free.</p>
             </div>
 
             <div className="form-group">
@@ -665,6 +911,48 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
                 <label htmlFor="fieldBatchId">Batch ID</label>
                 <input id="fieldBatchId" type="text" placeholder="e.g. GP_BATCH_001" value={form.batchId} onChange={(e) => setField('batchId', e.target.value)} />
               </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="fieldLevel">Level</label>
+                <select id="fieldLevel" value={form.bloomLevel} onChange={(e) => setField('bloomLevel', e.target.value)}>
+                  <option value="">— Not set —</option>
+                  {BLOOM_LEVELS.map((l) => <option key={l} value={l}>{l}</option>)}
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="fieldQuestionRef">Source</label>
+                <input id="fieldQuestionRef" type="text" placeholder="e.g. NMC 2019 paper, Q14" value={form.questionRef} onChange={(e) => setField('questionRef', e.target.value)} />
+              </div>
+            </div>
+            <p className="form-hint form-hint-block">The source is for admins only — students never see it.</p>
+            <div className="form-group">
+              <label htmlFor="fieldTags">Tags</label>
+              <div className="tag-editor">
+                {form.tags.map((t) => (
+                  <span key={t} className="tag-chip">
+                    {t}
+                    <button type="button" aria-label={`Remove tag ${t}`} onClick={() => removeTag(t)}>×</button>
+                  </span>
+                ))}
+                <input
+                  id="fieldTags"
+                  type="text"
+                  list="qbTagsInUse"
+                  placeholder={form.tags.length ? 'Add another…' : 'Type a tag, then Enter'}
+                  value={tagDraft}
+                  onChange={(e) => onTagInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') { e.preventDefault(); commitTagDraft(); }
+                    else if (e.key === 'Backspace' && !tagDraft && form.tags.length) removeTag(form.tags[form.tags.length - 1]);
+                  }}
+                  onBlur={commitTagDraft}
+                />
+                <datalist id="qbTagsInUse">
+                  {tagsInUse.filter((t) => !form.tags.some((x) => x.toLowerCase() === t.toLowerCase())).map((t) => <option key={t} value={t} />)}
+                </datalist>
+              </div>
+              <p className="form-hint">Shown to students with the question. Enter, a comma or a semicolon ends a tag; one already in use keeps its spelling.</p>
             </div>
             <div className="form-group">
               <label className="check-label">

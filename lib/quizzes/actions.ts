@@ -116,6 +116,23 @@ export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
   if (!(QUIZ_STATUSES as readonly string[]).includes(input.status)) return fail('Please choose a valid status.');
   if (!(ALLOWED_MODES as readonly string[]).includes(input.allowedModes)) return fail('Please choose a valid mode.');
 
+  // 08 B4: a mock's questions are never free (08 §3 item 4). The bank's
+  // save refuses the free tick on a question a mock names; this is the
+  // same rule from the other side. Service role: the free mark is
+  // readable by the admin's client, but the rule should not rest on it.
+  if (input.kind === 'mock') {
+    const { data: free, error: freeError } = await createServiceRoleClient()
+      .from('question_bank')
+      .select('item_id')
+      .in('item_id', itemIds)
+      .eq('is_free_sample', true)
+      .order('item_id');
+    if (freeError) return fail('Could not check the questions. Please try again.');
+    const freeIds = (free ?? []).map((r) => (r as { item_id: string }).item_id);
+    if (freeIds.length === 1) return fail(`Question ${freeIds[0]} is a free question and cannot be in a mock exam.`);
+    if (freeIds.length > 1) return fail(`Questions ${freeIds.join(', ')} are free questions and cannot be in a mock exam.`);
+  }
+
   const timeLimitRaw = input.timeLimitSec.trim();
   const timeLimit = timeLimitRaw ? parseInt(timeLimitRaw, 10) : null;
 

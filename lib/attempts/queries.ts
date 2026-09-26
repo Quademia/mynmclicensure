@@ -116,11 +116,15 @@ export async function getStudentAttempts(
 // The keyword is now searchConceptItemIds() on the server and the
 // browser keeps the criteria columns alone. The rationale is not
 // readable by this client any more in any case.
+//
+// Published rows only (08 B4): the policy already hides a draft from
+// this client; the filter names the scope in the query as well.
 export async function getBuilderCourseItems(db: ServerSupabaseClient, courseId: string): Promise<BuilderItem[]> {
   const { data, error } = await db
     .from('question_bank')
     .select('item_id, subject, maintopic, subtopic, difficulty, question_type')
     .eq('course_id', courseId)
+    .eq('is_published', true)
     .order('item_id');
   if (error) {
     console.error('getBuilderCourseItems:', error);

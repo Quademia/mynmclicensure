@@ -20,8 +20,66 @@
 //   7. marks parsed as a number, default 1;
 //   8. shuffle_options is false only when the cell says "false";
 //   9. rows are upserted on item_id, 50 at a time (the action).
+//
+// 08 B4 (2026-09-26) adds three columns and one rule. The rule: a row
+// whose question type, difficulty or level is not on its list is skipped
+// with the word named; the match ignores case and the row takes the
+// list's spelling, so `easy` lands as Easy and "T/F" is refused. The
+// table's CHECKs are the floor; this is the words before it. The
+// columns: bloom_level, question_ref, and tags split on semicolons. A
+// file that has no such column leaves the row's value as it is — every
+// file made before B4 lacks all three, and re-importing one must not
+// wipe a level or tags set in the editor since.
 
-import { CSV_COLUMNS, OPTION_LETTERS } from './types';
+import { BLOOM_LEVELS, CSV_COLUMNS, DIFFICULTIES, OPTION_LETTERS, QUESTION_TYPES, normaliseTags } from './types';
+
+// The three B4 columns a file may or may not carry.
+const B4_COLUMNS = ['bloom_level', 'question_ref', 'tags'] as const;
+
+/** "A, B or C" — the list as the refusal names it. */
+function spoken(list: readonly string[]): string {
+  return list.length < 2 ? list.join('') : `${list.slice(0, -1).join(', ')} or ${list[list.length - 1]}`;
+}
+
+/** The list's own spelling of `value`, matched without case; null when it is not on the list. */
+function onList(list: readonly string[], value: string): string | null {
+  const v = value.trim().toLowerCase();
+  return list.find((w) => w.toLowerCase() === v) ?? null;
+}
+
+/**
+ * The three list columns of one row, checked and spelled the list's way.
+ * Returns the reason when a word is not on its list ("question type
+ * "T/F" is not MCQ, TF or SATA"); otherwise fixes the row in place and
+ * returns null. A blank type is MCQ (legacy's default); a blank
+ * difficulty or level stays blank. Run by the browser for the report and
+ * again by the import action on what it receives.
+ */
+export function checkListColumns(row: CsvRow): string | null {
+  const type = (row.question_type || '').trim();
+  if (type) {
+    const t = onList(QUESTION_TYPES, type);
+    if (!t) return `question type "${type}" is not ${spoken(QUESTION_TYPES)}`;
+    row.question_type = t;
+  } else {
+    row.question_type = 'MCQ';
+  }
+
+  const difficulty = (row.difficulty || '').trim();
+  if (difficulty) {
+    const d = onList(DIFFICULTIES, difficulty);
+    if (!d) return `difficulty "${difficulty}" is not ${spoken(DIFFICULTIES)}`;
+    row.difficulty = d;
+  }
+
+  const level = (row.bloom_level || '').trim();
+  if (level) {
+    const l = onList(BLOOM_LEVELS, level);
+    if (!l) return `level "${level}" is not ${spoken(BLOOM_LEVELS)}`;
+    row.bloom_level = l;
+  }
+  return null;
+}
 
 export type CsvRow = Record<string, string>;
 
@@ -107,6 +165,11 @@ export function parseCsv(text: string, courseId: string): CsvParseResult {
       report.push({ ok: false, msg: `Row ${rowNum}: must have at least 2 options — skipped.` });
       continue;
     }
+    const offList = checkListColumns(row);
+    if (offList) {
+      report.push({ ok: false, msg: `Row ${rowNum}: ${offList} — skipped.` });
+      continue;
+    }
 
     if (!row.item_id) {
       row.item_id = courseId.replace(/_/g, '') + '_' + now + '_' + i;
@@ -119,7 +182,14 @@ export function parseCsv(text: string, courseId: string): CsvParseResult {
   return { rows, validCount: rows.length, report };
 }
 
-/** Legacy runCsvImport's payload for one row (rationale_img is never set). */
+/**
+ * Legacy runCsvImport's payload for one row (rationale_img is never set).
+ * The row has been through checkListColumns(), so the three list words
+ * are already the lists' spellings. The B4 columns go in only when the
+ * file has them (see the header); the two switches never do — a new row
+ * takes the table's defaults (a draft, not free) and an existing row
+ * keeps its own.
+ */
 export function rowToPayload(row: CsvRow): Record<string, unknown> {
   const payload: Record<string, unknown> = {
     item_id: row.item_id,
@@ -138,6 +208,10 @@ export function rowToPayload(row: CsvRow): Record<string, unknown> {
   for (const l of OPTION_LETTERS) {
     payload[`option_${l}`] = row[`option_${l}`] || null;
     payload[`fb_${l}`] = row[`fb_${l}`] || null;
+  }
+  for (const col of B4_COLUMNS) {
+    if (!(col in row)) continue;
+    payload[col] = col === 'tags' ? normaliseTags((row.tags || '').split(';')) : row[col] || null;
   }
   return payload;
 }
@@ -158,6 +232,7 @@ export function csvTemplate(courseId: string): string {
     'The normal resting heart rate for adults is 60-100 bpm.',
     'Anatomy', 'Cardiovascular', 'Heart rate',
     'Easy', '1', 'GP_BATCH_001', 'true',
+    'Remember', 'Example source', 'vital signs;adult',
   ].join(',');
   return header + '\n' + example;
 }

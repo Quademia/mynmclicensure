@@ -63,6 +63,13 @@ function fail(error: string): { ok: false; error: string } {
 // (requireStudent, the course access, the quiz's availability). An id
 // the bank no longer has is dropped by the function, as getItemsByIds
 // dropped it before; none resolving is a refusal, and no header is left.
+//
+// Since 08 B4 the function refuses an id that is a draft — a fixed quiz,
+// a mock or a retake naming a question unpublished since — with "This
+// quiz has a question that is not published". That sentence is for the
+// student, so it passes through as the six write doors' messages do
+// (rpcError); a function's own diagnostic, prefixed with its name, still
+// becomes the general words.
 type CreateAttemptArgs = {
   attemptId: string;
   userId: string;
@@ -91,7 +98,7 @@ async function createAttemptRows(args: CreateAttemptArgs): Promise<SpawnResult> 
   });
   if (error) {
     console.error('create_attempt:', error);
-    return fail('Could not start this attempt. Please try again.');
+    return fail(rpcError(error, 'Could not start this attempt. Please try again.'));
   }
   return { ok: true, attemptId: args.attemptId };
 }
@@ -108,7 +115,7 @@ export async function loadBuilderCourse(courseId: string): Promise<BuilderCourse
   if (!access[courseId]) return fail('You do not have an active subscription for this course.');
 
   const [options, items] = await Promise.all([
-    getItemFilterOptions(supabase, courseId),
+    getItemFilterOptions(supabase, courseId, { publishedOnly: true }),
     getBuilderCourseItems(supabase, courseId),
   ]);
   return { ok: true, items, options };

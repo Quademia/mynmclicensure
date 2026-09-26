@@ -20,8 +20,17 @@
 //     ids" check.
 // A read that needs the key cannot be handed a student's client by
 // accident; the compiler refuses it.
+//
+// 08 B4 (2026-09-26): a new row is a draft. The read policy already hides
+// drafts from a student's client; the student-side reads here say
+// `is_published` as well (belt and braces, and it names the scope in the
+// query as AGENTS.md asks). The filter options serve both audiences, so
+// they take the choice. Three service-role reads serve the admin's
+// writes: the ids any mock names, the live quizzes naming some ids, and
+// the tag spellings already in use.
 
 import type { createClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { QUIZ_TABLES } from '@/lib/quizzes/types';
 import type { Item, ItemFilterOptions, ItemFilters } from './types';
 
 type Db = Awaited<ReturnType<typeof createClient>>;
@@ -50,11 +59,17 @@ export async function courseExists(db: Db, courseId: string): Promise<boolean> {
 // this course's? Ids only — before B2 this was getItemsByIds returning
 // whole rows, of which both callers used nothing but item_id. RLS is the
 // gate: a course the student cannot reach returns the empty set, and the
-// caller refuses the build.
+// caller refuses the build. Published rows only (08 B4): a draft id is
+// dropped here, as the pool never offered it.
 export async function knownItemIds(db: Db, courseId: string, itemIds: string[]): Promise<Set<string>> {
   if (!itemIds || itemIds.length === 0) return new Set();
 
-  const { data, error } = await db.from('question_bank').select('item_id').eq('course_id', courseId).in('item_id', itemIds);
+  const { data, error } = await db
+    .from('question_bank')
+    .select('item_id')
+    .eq('course_id', courseId)
+    .eq('is_published', true)
+    .in('item_id', itemIds);
   if (error) {
     console.error('knownItemIds:', error);
     return new Set();
@@ -117,12 +132,21 @@ export async function getItemsByFilters(db: ServiceDb, courseId: string, filters
 
 // Distinct real values for the dropdowns and chips, from the course's
 // rows. Criteria columns only, so either client may ask: the student's
-// own (the builders, RLS the gate) and the admin's.
-export async function getItemFilterOptions(db: Db, courseId: string): Promise<ItemFilterOptions> {
-  const { data, error } = await db
+// own (the builders, RLS the gate) and the admin's. The builders ask for
+// published rows only, so a draft's new topic is not offered as a chip
+// with nothing behind it; the admin page asks for every row, so its
+// dropdowns show a draft's topic and batch (08 B4).
+export async function getItemFilterOptions(
+  db: Db,
+  courseId: string,
+  { publishedOnly }: { publishedOnly: boolean },
+): Promise<ItemFilterOptions> {
+  let query = db
     .from('question_bank')
     .select('subject, maintopic, subtopic, difficulty, question_type, batch_id')
     .eq('course_id', courseId);
+  if (publishedOnly) query = query.eq('is_published', true);
+  const { data, error } = await query;
   if (error) {
     console.error('getItemFilterOptions:', error);
     return EMPTY_OPTIONS;
@@ -141,4 +165,84 @@ export async function getItemFilterOptions(db: Db, courseId: string): Promise<It
     question_types: unique(rows.map((r) => r.question_type)),
     batch_ids: unique(rows.map((r) => r.batch_id)),
   };
+}
+
+// ── the admin writes' three helpers (08 B4), service role ──────────────
+// item_ids on the two quiz tables is off the browser roles since 03 Q1,
+// so these read through the service role, behind requireAdmin().
+
+/**
+ * Every question id any mock exam names, whatever its status: a mock's
+ * questions are never free (08 §3 item 4). The mocks are few (two on dev),
+ * so the lists are read whole and the check is made here. Null when the
+ * lists could not be read — the caller refuses rather than guess.
+ */
+export async function mockReservedIds(db: ServiceDb): Promise<Set<string> | null> {
+  const { data, error } = await db.from(QUIZ_TABLES.mock).select('item_ids');
+  if (error) {
+    console.error('mockReservedIds:', error);
+    return null;
+  }
+  const ids = new Set<string>();
+  for (const row of (data ?? []) as { item_ids: string[] | null }[]) {
+    for (const id of row.item_ids ?? []) ids.add(id);
+  }
+  return ids;
+}
+
+/**
+ * How many live quizzes — fixed or mock, status active and published —
+ * name any of `itemIds` in this course. Each will refuse to start while
+ * one of them is a draft. Null when the lists could not be read.
+ */
+export async function liveQuizzesNaming(db: ServiceDb, courseId: string, itemIds: string[]): Promise<number | null> {
+  const wanted = new Set(itemIds);
+  let count = 0;
+  for (const table of [QUIZ_TABLES.fixed, QUIZ_TABLES.mock]) {
+    const { data, error } = await db
+      .from(table)
+      .select('item_ids')
+      .eq('course_id', courseId)
+      .eq('status', 'active')
+      .eq('published', true);
+    if (error) {
+      console.error('liveQuizzesNaming:', error);
+      return null;
+    }
+    for (const row of (data ?? []) as { item_ids: string[] | null }[]) {
+      if ((row.item_ids ?? []).some((id) => wanted.has(id))) count++;
+    }
+  }
+  return count;
+}
+
+/**
+ * Every tag in use across the bank, keyed by its lower-case form: the
+ * spelling a new tag is snapped to, so "Pain" typed where "pain" is in
+ * use becomes "pain" and stays one tag (08 B4). Paged, because a table
+ * read stops at the API's row cap.
+ */
+export async function tagSpellingsInUse(db: ServiceDb): Promise<Map<string, string>> {
+  const spellings = new Map<string, string>();
+  const PAGE = 1000;
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await db
+      .from('question_bank')
+      .select('tags')
+      .neq('tags', '{}')
+      .order('item_id')
+      .range(from, from + PAGE - 1);
+    if (error) {
+      console.error('tagSpellingsInUse:', error);
+      return spellings;
+    }
+    const rows = (data ?? []) as { tags: string[] | null }[];
+    for (const row of rows) {
+      for (const tag of row.tags ?? []) {
+        const key = tag.toLowerCase();
+        if (!spellings.has(key)) spellings.set(key, tag);
+      }
+    }
+    if (rows.length < PAGE) return spellings;
+  }
 }

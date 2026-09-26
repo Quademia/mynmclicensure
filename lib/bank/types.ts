@@ -18,6 +18,11 @@ export const QUESTION_TYPE_LABELS: Record<QuestionType, string> = {
 
 export const DIFFICULTIES = ['Easy', 'Moderate', 'Hard'] as const;
 
+// The taxonomy level (08 B4, §8 S17): Bloom's six, MyNclex's list in
+// meaning, Ghana's spelling on screen and in the data ("Analyse"). The
+// table's CHECK holds the same six; null means not yet classified.
+export const BLOOM_LEVELS = ['Remember', 'Understand', 'Apply', 'Analyse', 'Evaluate', 'Create'] as const;
+
 export const OPTION_LETTERS = ['a', 'b', 'c', 'd', 'e', 'f'] as const;
 export type OptionLetter = (typeof OPTION_LETTERS)[number];
 
@@ -50,6 +55,22 @@ export type Item = {
   marks: number;
   batch_id: string | null;
   shuffle_options: boolean;
+  // ── 08 B4 (§8 S17) ──
+  /** One of BLOOM_LEVELS, or null. */
+  bloom_level: string | null;
+  /** A new row is a draft; only a published row reaches a student. */
+  is_published: boolean;
+  /** The free-pool mark. It gates nothing until 09 F1 builds its doors. */
+  is_free_sample: boolean;
+  /** Where the question came from — internal, never shown to a student. */
+  question_ref: string | null;
+  tags: string[];
+  created_at: string;
+  updated_at: string;
+  /** Moves by one each time a published row's content changes. */
+  version: number;
+  /** The U_ id of the admin who last wrote the row — the history's "who". */
+  updated_by: string | null;
 };
 
 // The filters getItemsByFilters() understands — legacy's exact set.
@@ -75,16 +96,51 @@ export type ItemFilterOptions = {
 
 // The CSV template's columns (legacy CSV_COLUMNS), in their order. Note
 // rationale_img is not among them — legacy's importer never set it.
+// B4 added the last three: the level, the source and the tags — the tags
+// in one cell separated by semicolons, since commas are the file's own
+// separator (ruled 2026-09-26). The two switches are not columns: they
+// are choices made per file (08 B4).
 export const CSV_COLUMNS = [
   'item_id', 'question_type', 'stem',
   'option_a', 'fb_a', 'option_b', 'fb_b', 'option_c', 'fb_c',
   'option_d', 'fb_d', 'option_e', 'fb_e', 'option_f', 'fb_f',
   'correct', 'rationale', 'subject', 'maintopic', 'subtopic',
   'difficulty', 'marks', 'batch_id', 'shuffle_options',
+  'bloom_level', 'question_ref', 'tags',
 ] as const;
+
+/**
+ * One way to write a tag list, wherever tags arrive — the editor's field,
+ * a CSV cell, a panel rename: trimmed, empties dropped, and two spellings
+ * that differ only in case kept once (the first spelling wins). A tag
+ * typed twice in different case is one tag (08 B4).
+ */
+export function normaliseTags(tags: readonly string[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const raw of tags) {
+    const tag = String(raw ?? '').trim().replace(/\s+/g, ' ');
+    const key = tag.toLowerCase();
+    if (!tag || seen.has(key)) continue;
+    seen.add(key);
+    out.push(tag);
+  }
+  return out;
+}
 
 // What the bank Server Actions return.
 export type ActionResult = { ok: true } | { ok: false; error: string };
+
+// What setPublished() returns: how many rows changed, and — for an
+// unpublish — how many live quizzes now name a draft and will refuse to
+// start until it is published again.
+export type PublishResult =
+  | { ok: true; changed: number; blockedQuizzes: number }
+  | { ok: false; error: string };
+
+// countQuizzesNaming(): the live fixed quizzes and mocks whose question
+// lists name any of the given ids — what Unpublish asks about first.
+export type QuizUseResult = { ok: true; count: number } | { ok: false; error: string };
 
 // What importItems() returns (slice 4b): legacy's two counts, plus the
 // batch errors legacy sent to the browser console.
@@ -93,7 +149,8 @@ export type ImportResult =
   | { ok: false; error: string };
 
 // What loadCourseItems() returns: the whole course, as legacy loaded it
-// (the page filters in the browser), plus the two dropdowns it fills.
+// (the page filters in the browser), plus the two dropdowns it fills and
+// (08 B4) every tag in use across the bank, for the editor's suggestions.
 export type CourseItemsResult =
-  | { ok: true; items: Item[]; maintopics: string[]; batchIds: string[] }
+  | { ok: true; items: Item[]; maintopics: string[]; batchIds: string[]; tagsInUse: string[] }
   | { ok: false; error: string };
