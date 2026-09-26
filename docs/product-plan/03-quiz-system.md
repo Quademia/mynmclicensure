@@ -460,6 +460,65 @@ reload; a console query for `correct` on the student's own rows is
 refused; tsc fails when a review list is passed to the live runner (a
 one-line experiment, reverted).
 
+### Q14 — The link tables (§8 S20; S12)
+
+Decided with §8 S12 on 2026-09-18 ("after S2"); S2 built 2026-09-19;
+queued 2026-09-26 when Sam asked whether the arrays would change;
+talked through and scoped 2026-09-27. **Sam's rulings (2026-09-27,
+"recommendation accepted"):** a question a quiz or mock names cannot be
+deleted — the delete is refused and names the quizzes (MyNclex's
+readiness packs; its tutor quizzes drop the question instead, not
+taken); the course enforced by the database; a question once per quiz;
+the storage as a row of its own, **§8 S20**.
+
+**Why.** The id arrays carry no key, so today: a deleted question is
+skipped at start and the quiz serves fewer than its `n` with no
+warning; nothing refuses a repeat or another course's id; an existing
+quiz's course can be changed in the editor while it holds the old
+course's questions (`onCourseChange` clears the picks only for a new
+quiz), which saves and leaves a quiz no student can start; and "which
+mocks hold this question" reads every mock's list in the app. Dev is
+clean (7 quizzes and mocks, 105 ids); this is protection, not repair.
+
+**Storage (one migration, S20).** `quiz_items` and `mock_quiz_items`
+(`quiz_id`, `course_id`, `item_id`, `position`), the keys and the
+restrict as S20 sets out; the lists copied in, tidied first (missing,
+other-course and repeated ids left out with a counted notice, positions
+from 1), then `item_ids` dropped; no browser grant on either table. A
+save function writes the quiz row and replaces its rows in one step.
+
+**Code.**
+
+- The save (`lib/quizzes/actions.ts` `saveQuiz`) through the function;
+  a refusal worded for the admin (another course's question, a repeat).
+- The full-row read (`getQuizById`, `lib/quizzes/queries.ts`) and the
+  `Quiz` type take the list from the rows in position order; the start
+  (`spawnQuizAttempt`) and the editor's load (`quiz-manager.tsx`) read
+  it unchanged in shape.
+- `heldBackIds` and `liveQuizzesNaming` (`lib/bank/queries.ts`) become
+  lookups on the rows; the fixed picker's "In a mock" and the unpublish
+  count follow.
+- The bank's delete (`deleteQuestion`) refused while a row names the
+  question, the message naming the quizzes and mocks.
+
+**Reach while building.** A migration run from the session branch
+reaches the dev site, which runs `main`'s code (AGENTS.md): from the
+apply until the merge, starting a quiz or mock and saving one fail
+there, because `main` still reads `item_ids`. Only Sam, on dev; the
+local server runs the new code.
+
+**Done when:** the migration proven in a rolled-back run — the copy's
+count equal to the arrays' (105 on dev), and refused inside it: a
+delete of a named question, another course's question, a repeat, a
+second question at one position, any browser-role read — then applied,
+`role_table_grants` checked; as the admin, every quiz and mock opens in
+the editor with its questions in order, a change saves, a named
+question's delete is refused naming the quiz, a course change with the
+old questions is refused, the fixed picker still marks a mock's
+question "In a mock"; as a student, a fixed quiz and a mock start with
+their questions in order; `npm run build` clean. Cutover's re-copy
+writes rows (the line under 00).
+
 ### Later, under this doc
 
 - **Q7 — SATA partial credit** (Sam, 2026-09-20): the rule first (a
@@ -471,16 +530,9 @@ one-line experiment, reverted).
   the by-topic figures as queries over `attempt_items`; the admin
   Attempts page's 5,000-row cap goes. Its own slice once Q5 has the
   rows. The student's side of the same queries is Q10–Q13 below.
-- **Q14 — The link table.** `quiz_items` and `mock_quiz_items`
-  (quiz, item → the bank, position) replacing the two `item_ids`
-  arrays — decided with §8 S12 on 2026-09-18 ("after S2"), S2 ticked
-  2026-09-19, queued as a slice 2026-09-26 when Sam asked whether the
-  arrays would change. One migration copying the arrays into rows and
-  dropping them; the quiz editor and the two list pages on the table.
-  A quiz question then points at a real bank row, ordering is a
-  column, and "which mocks hold this question" is a join (08 B6). S7's
-  ruling stands: a quiz on offer follows the live bank; a sitting is
-  its own snapshot.
+- **Q14 — The link tables** — scoped 2026-09-27, its own section
+  above (§8 S20). S7's ruling stands: a quiz on offer follows the live
+  bank; a sitting is its own snapshot.
 - **Q15 — The student's own marks across attempts.** MyNclex keeps a
   student's "mark for review" on a question in its own table, kept
   across attempts, and offers a "Marked" pool in the builder; here a
@@ -695,6 +747,6 @@ it needs a change log on every answer, a storage change and its own
 | Q11 Time per question | candidate, captured 2026-09-24 |
 | Q12 Progress across attempts | candidate, captured 2026-09-24 |
 | Q13 Readiness and the cohort | candidate, captured 2026-09-24; with Q3 |
-| Q14 The link table | decided with §8 S12 (2026-09-18); queued 2026-09-26 |
+| Q14 The link tables | decided with §8 S12 (2026-09-18); queued 2026-09-26; scoped and ruled 2026-09-27 (Sam); §8 S20 awaiting the tick |
 | Q15 The student's own marks across attempts | candidate, captured 2026-09-26 |
 | Q16 The keyword step offers only what has a subtopic | ⬜ queued 2026-09-26 (Sam); found walking 08 B6 |

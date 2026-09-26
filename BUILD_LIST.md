@@ -90,6 +90,7 @@ the gamma-era list it replaces is in git history and in `qacademy-gamma`.
 - ✅ §8 S17 the bank's new columns, the version and the history — level, published, free mark, source, tags, dates, version; a history table on content changes to published rows; three columns copied into the sitting; CHECKs on type and difficulty — ticked 2026-09-26, built as 08 B4
 - ✅ §8 S18 the classification lists — subjects and topics per course as tables with keys, one Subjects & topics panel on the bank page, the importer refusing unknown words — ticked 2026-09-26, amended the same day, built as 08 B5
 - ✅ §8 S19 a student's read of the bank cut to the ten filter columns — ticked 2026-09-26, built as 08 B6
+- ⬜ §8 S20 the quiz and mock question lists as rows, keyed to the bank — drafted 2026-09-27, awaiting the tick (03 Q14)
 - ⬜ §8 has no row for `courses_select` — the policy is `auth.uid() is not null`, so a signed-out visitor reads nothing from `courses`; `/premium-prep` and `/subscribe` both work around it with a service-role read, and D23 item 5 (a sales row lists its courses) cannot be met on any public page without it (2026-09-22)
 
 ## Improvements
@@ -128,6 +129,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⏸ Student analytics, notifications, search, sequential runner mode — new features, after (analytics: 03 Q10–Q13)
 - ⬜ 16 Cutover — DNS, live keys, content re-copy, old logins deleted, `legacy/` removed (moved from the rebuild, Sam, 2026-09-16)
 - ⬜ Cutover: the bank's re-copy seeds bank_subjects / bank_topics before the rows, or the keys refuse it (08 B5)
+- ⬜ Cutover: the quizzes' re-copy writes quiz_items / mock_quiz_items after the bank, not item_ids (03 Q14)
 - ⬜ Security headers: the app sends none (HSTS, framing, nosniff, referrer, CSP); before cutover (dev, 2026-09-24)
 - ⬜ Reference data: schools is a regulator's list with no way to change it (D50, unruled since 2026-09-18)
 - ⬜ Reference data: telegram_group_keys is free text and holds junk — no list, no validation (D3)
@@ -201,7 +203,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⬜ Q11 Time per question — the runner fills `time_spent_s`; pace and slowest on the report (2026-09-24)
 - ⬜ Q12 Progress across attempts — accuracy by topic over history, a trend, true totals (2026-09-24)
 - ⬜ Q13 Readiness and the cohort — a band, how others did per question, standing; with Q3 (2026-09-24)
-- ⬜ Q14 The link table — quiz_items and mock_quiz_items replacing the id arrays; the reservation check becomes a join (decided with §8 S12; queued 2026-09-26)
+- ⬜ Q14 The link tables — quiz_items and mock_quiz_items replacing the id arrays; delete refused (§8 S20, 2026-09-27)
 - ⬜ Q15 The student's own marks across attempts — a "Marked" pool for the builder, MyNclex's shape (captured 2026-09-26, unruled)
 - ⬜ Q16 The builders' keyword step offers only subtopic chips — GP: "patient" matches 182, one chip (2026-09-26)
 
