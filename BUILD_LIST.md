@@ -203,7 +203,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⬜ Q11 Time per question — the runner fills `time_spent_s`; pace and slowest on the report (2026-09-24)
 - ⬜ Q12 Progress across attempts — accuracy by topic over history, a trend, true totals (2026-09-24)
 - ⬜ Q13 Readiness and the cohort — a band, how others did per question, standing; with Q3 (2026-09-24)
-- ⬜ Q14 The link tables — quiz_items and mock_quiz_items replacing the id arrays; delete refused (§8 S20, 2026-09-27)
+- ✅ Q14 The link tables — quiz_items and mock_quiz_items replacing the id arrays; delete refused (§8 S20) — 2026-09-27
 - ⬜ Q15 The student's own marks across attempts — a "Marked" pool for the builder, MyNclex's shape (captured 2026-09-26, unruled)
 - ⬜ Q16 The builders' keyword step offers only subtopic chips — GP: "patient" matches 182, one chip (2026-09-26)
 
