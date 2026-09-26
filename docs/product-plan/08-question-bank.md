@@ -1029,9 +1029,12 @@ each matching the database counted directly. As the RM student in the
 pane: the Quiz Builder on RM_PED_OBS_HRN — the topic counts summing to
 1,080 across 20 topics, "1080 available" (Easy 600, Moderate 382, Hard
 98), the keyword "a" giving "1080 available"; General Paper unchanged
-at 576 as the NACNAP account. The admin side (the bank page, the mock
-picker) was not walked in the pane — the same read, proven outside it.
-`tsc`, lint and `npm run build` clean.
+at 576 as the NACNAP account. Then as Sam's admin: the bank page
+"1080 questions" with all 20 topics in its dropdown; a new mock's
+picker "Showing 1080 questions"; a new fixed quiz's picker 1,080 rows,
+1,080 distinct, ending on `RM_PED_OBS_HRN-S1-99` — one of the 80 that
+were cut (no mock holds this course's questions, so none held back);
+neither form saved. `tsc`, lint and `npm run build` clean.
 
 ### Later, under this doc
 
