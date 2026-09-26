@@ -17,11 +17,25 @@
 //     read the two columns.
 // RLS is the floor, not the filter (AGENTS.md): the student reads still
 // name "published + active" here.
+//
+// 03 Q14 (§8 S20, 2026-09-27): a quiz's questions are rows of their own
+// (quiz_items / mock_quiz_items), keyed to the quiz and to the bank; the
+// item_ids column is gone. The rows carry no browser grant, so only the
+// service-role reads below see them.
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import { readAll } from '@/lib/supabase/read-all';
 import type { createServiceRoleClient } from '@/lib/supabase/server';
-import { QUIZ_TABLES, type Quiz, type QuizCard, type QuizKind, type QuizListRow, type QuizPage } from './types';
+import {
+  QUIZ_ITEM_TABLES,
+  QUIZ_TABLES,
+  type Quiz,
+  type QuizCard,
+  type QuizKind,
+  type QuizListRow,
+  type QuizPage,
+  type QuizRow,
+} from './types';
 
 export type ServiceDb = ReturnType<typeof createServiceRoleClient>;
 
@@ -87,12 +101,12 @@ export async function getAllQuizzesPaginated(
 // getAllQuizzes / getAllMockQuizzes: every row, every course, every
 // status — by course then title. The attempts analytics page's title
 // map (slice 14); the mock admin list left it for the paged read in Q2.
-// Full rows: service role, behind requireAdmin().
+// Full rows without the questions: service role, behind requireAdmin().
 // A whole table, so readAll() (D52, AGENTS.md rule 10) — it passes the
 // API's 1,000-row cap only at 1,000 quizzes of a kind, and is read in
 // batches all the same so the rule carries no exception to remember.
-export async function getAllQuizzes(db: ServiceDb, kind: QuizKind): Promise<Quiz[]> {
-  const { data, error } = await readAll<Quiz>((from, to) =>
+export async function getAllQuizzes(db: ServiceDb, kind: QuizKind): Promise<QuizRow[]> {
+  const { data, error } = await readAll<QuizRow>((from, to) =>
     db.from(QUIZ_TABLES[kind]).select('*').order('course_id').order('title').order('quiz_id').range(from, to),
   );
   if (error) {
@@ -104,12 +118,19 @@ export async function getAllQuizzes(db: ServiceDb, kind: QuizKind): Promise<Quiz
 
 // getQuizById / getMockQuizById: the full row — the attempt spawn's read
 // before launch (slice 6, behind requireStudent() and the access check),
-// the admin edit step (behind requireAdmin()). Service role.
+// the admin edit step (behind requireAdmin()). Service role. Since 03 Q14
+// the question list is the quiz's rows in position order; a quiz holds a
+// few hundred at most, so one read.
 export async function getQuizById(db: ServiceDb, kind: QuizKind, quizId: string): Promise<Quiz | null> {
-  const { data, error } = await db.from(QUIZ_TABLES[kind]).select('*').eq('quiz_id', quizId).maybeSingle();
-  if (error) {
-    console.error('getQuizById:', error);
+  const [quiz, items] = await Promise.all([
+    db.from(QUIZ_TABLES[kind]).select('*').eq('quiz_id', quizId).maybeSingle(),
+    db.from(QUIZ_ITEM_TABLES[kind]).select('item_id').eq('quiz_id', quizId).order('position'),
+  ]);
+  if (quiz.error || items.error) {
+    console.error('getQuizById:', quiz.error ?? items.error);
     return null;
   }
-  return (data as Quiz | null) ?? null;
+  if (!quiz.data) return null;
+  const itemIds = ((items.data ?? []) as { item_id: string }[]).map((r) => r.item_id);
+  return { ...(quiz.data as QuizRow), item_ids: itemIds };
 }

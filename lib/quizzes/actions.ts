@@ -4,10 +4,15 @@
 // writes as Server Actions behind the admin gate — legacy
 // admin/fixed-quizzes.html and admin/mock-exams.html did all of this from
 // the browser with direct `db.from(...)` calls. Each write repeats the
-// page's own validation, in its order, with its words, then writes as
-// the signed-in admin (the RLS admin policies are the floor). A Supabase
-// error comes back as its own message, as the legacy pages showed it.
-// The row types and constants live in ./types.
+// page's own validation, in its order, with its words. A Supabase error
+// comes back as its own message, as the legacy pages showed it. The row
+// types and constants live in ./types.
+//
+// 03 Q14 (§8 S20, 2026-09-27): the writes go through the service role
+// behind requireAdmin() — rule 9 took INSERT / UPDATE / DELETE on both
+// quiz tables back from the browser roles with the two admin write
+// policies — and the save is one database function, save_quiz(), which
+// writes the quiz row and replaces its question rows in one step.
 
 'use server';
 
@@ -76,8 +81,8 @@ export async function loadPickerItems(courseId: string): Promise<PickerLoad> {
 
 // ── togglePublish ───────────────────────────────────────────────────────
 export async function setQuizPublished(kind: QuizKind, quizId: string, published: boolean): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
-  const { error } = await supabase
+  await requireAdmin();
+  const { error } = await createServiceRoleClient()
     .from(QUIZ_TABLES[kind])
     .update({ published, updated_at: new Date().toISOString() })
     .eq('quiz_id', quizId);
@@ -91,9 +96,9 @@ export async function setQuizPublished(kind: QuizKind, quizId: string, published
 // accepts two words only: 'archived' from any status, 'draft' as the
 // only way back; active is a choice made on the details form.
 export async function setQuizStatus(kind: QuizKind, quizId: string, status: QuizStatus): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
+  await requireAdmin();
   if (status !== 'archived' && status !== 'draft') return fail('A quiz is archived, or restored as a draft.');
-  const { error } = await supabase
+  const { error } = await createServiceRoleClient()
     .from(QUIZ_TABLES[kind])
     .update({ status, updated_at: new Date().toISOString() })
     .eq('quiz_id', quizId);
@@ -102,10 +107,12 @@ export async function setQuizStatus(kind: QuizKind, quizId: string, status: Quiz
 }
 
 // ── saveQuiz ────────────────────────────────────────────────────────────
-// The page's checks, in legacy's order, then the insert or update with
-// legacy's payload. The two datetime strings go in as they are.
+// The page's checks, in legacy's order, then legacy's payload and the
+// picked ids to save_quiz() (03 Q14), which writes both in one step and
+// refuses a repeat or a question not in the quiz's course by name. The
+// two datetime strings go in as they are.
 export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
+  await requireAdmin();
   const noun = NOUN[input.kind];
 
   const courseId = input.courseId;
@@ -157,11 +164,11 @@ export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
   const timeLimitRaw = input.timeLimitSec.trim();
   const timeLimit = timeLimitRaw ? parseInt(timeLimitRaw, 10) : null;
 
+  const now = new Date().toISOString();
   const payload: Record<string, unknown> = {
+    quiz_id: quizId,
     course_id: courseId,
     title,
-    item_ids: itemIds,
-    n,
     allowed_modes: input.allowedModes,
     shuffle: input.shuffle,
     time_limit_sec: Number.isFinite(timeLimit) ? timeLimit : null,
@@ -170,18 +177,17 @@ export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
     unpublish_at: input.unpublishAt || null,
     status: input.status,
     notes: input.notes.trim() || null,
-    updated_at: new Date().toISOString(),
+    updated_at: now,
   };
+  if (!input.isEdit) payload.created_at = now;
 
-  const table = QUIZ_TABLES[input.kind];
-  let error: { message: string } | null;
-  if (input.isEdit) {
-    ({ error } = await supabase.from(table).update(payload).eq('quiz_id', quizId));
-  } else {
-    payload.quiz_id = quizId;
-    payload.created_at = new Date().toISOString();
-    ({ error } = await supabase.from(table).insert(payload));
-  }
+  // `n` is the rows written, set by the function.
+  const { error } = await createServiceRoleClient().rpc('save_quiz', {
+    p_kind: input.kind,
+    p_is_edit: input.isEdit,
+    p_quiz: payload,
+    p_item_ids: itemIds,
+  });
   if (error) return fail(`Error saving ${noun}: ` + error.message);
 
   return { ok: true };

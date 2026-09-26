@@ -36,8 +36,8 @@
 // holds 1,080 and every such read came back 80 short.
 
 import type { createClient, createServiceRoleClient } from '@/lib/supabase/server';
-import { readAll } from '@/lib/supabase/read-all';
-import { QUIZ_TABLES } from '@/lib/quizzes/types';
+import { readAll, slices } from '@/lib/supabase/read-all';
+import { QUIZ_ITEM_TABLES, QUIZ_KINDS, QUIZ_TABLES, type QuizKind } from '@/lib/quizzes/types';
 import type { CourseLists, Item, ItemFilterOptions, ItemFilters, ListEntry } from './types';
 
 type Db = Awaited<ReturnType<typeof createClient>>;
@@ -183,31 +183,43 @@ export async function getItemFilterOptions(
   };
 }
 
-// ── the admin writes' three helpers (08 B4), service role ──────────────
-// item_ids on the two quiz tables is off the browser roles since 03 Q1,
-// so these read through the service role, behind requireAdmin().
+// ── the admin writes' helpers (08 B4), service role ────────────────────
+// A quiz's questions are rows since 03 Q14 (quiz_items, mock_quiz_items),
+// which hold no browser grant, so these read through the service role,
+// behind requireAdmin() — or, for the draws, after requireStudent() and
+// the access check.
 
 /**
  * The questions held back from practice (08 B6): every id named by a
  * mock whose status is draft or active. An archived mock releases its
- * questions; restoring it holds them back again — derived from the mock
- * lists, never stored (Sam, 2026-09-26). One definition serves the
- * draws, the fixed-quiz picker and the free tick's refusal. The mocks
- * are few, so their lists are read whole; `courseId` narrows to one
- * course's mocks. Null when the lists could not be read — every caller
- * then refuses rather than guesses.
+ * questions; restoring it holds them back again — derived from the mocks'
+ * rows, never stored (Sam, 2026-09-26). One definition serves the
+ * draws, the fixed-quiz picker and the free tick's refusal. `courseId`
+ * narrows to one course's mocks. Null when the rows could not be read —
+ * every caller then refuses rather than guesses.
  */
 export async function heldBackIds(db: ServiceDb, courseId?: string): Promise<Set<string> | null> {
-  let query = db.from(QUIZ_TABLES.mock).select('item_ids').in('status', ['draft', 'active']);
-  if (courseId) query = query.eq('course_id', courseId);
-  const { data, error } = await query;
-  if (error) {
-    console.error('heldBackIds:', error);
+  const build = () => {
+    let query = db.from(QUIZ_TABLES.mock).select('quiz_id').in('status', ['draft', 'active']);
+    if (courseId) query = query.eq('course_id', courseId);
+    return query.order('quiz_id');
+  };
+  const mocks = await readAll<{ quiz_id: string }>((from, to) => build().range(from, to));
+  if (mocks.error) {
+    console.error('heldBackIds:', mocks.error);
     return null;
   }
+
   const ids = new Set<string>();
-  for (const row of (data ?? []) as { item_ids: string[] | null }[]) {
-    for (const id of row.item_ids ?? []) ids.add(id);
+  for (const quizIds of slices(mocks.data.map((m) => m.quiz_id))) {
+    const { data, error } = await readAll<{ item_id: string }>((from, to) =>
+      db.from(QUIZ_ITEM_TABLES.mock).select('item_id').in('quiz_id', quizIds).order('quiz_id').order('item_id').range(from, to),
+    );
+    if (error) {
+      console.error('heldBackIds rows:', error);
+      return null;
+    }
+    for (const r of data) ids.add(r.item_id);
   }
   return ids;
 }
@@ -215,27 +227,77 @@ export async function heldBackIds(db: ServiceDb, courseId?: string): Promise<Set
 /**
  * How many live quizzes — fixed or mock, status active and published —
  * name any of `itemIds` in this course. Each will refuse to start while
- * one of them is a draft. Null when the lists could not be read.
+ * one of them is a draft. Null when the rows could not be read.
  */
 export async function liveQuizzesNaming(db: ServiceDb, courseId: string, itemIds: string[]): Promise<number | null> {
-  const wanted = new Set(itemIds);
+  const wanted = [...new Set(itemIds)];
   let count = 0;
-  for (const table of [QUIZ_TABLES.fixed, QUIZ_TABLES.mock]) {
-    const { data, error } = await db
-      .from(table)
-      .select('item_ids')
-      .eq('course_id', courseId)
-      .eq('status', 'active')
-      .eq('published', true);
-    if (error) {
-      console.error('liveQuizzesNaming:', error);
-      return null;
+  for (const kind of QUIZ_KINDS) {
+    const naming = new Set<string>();
+    for (const ids of slices(wanted)) {
+      const { data, error } = await readAll<{ quiz_id: string }>((from, to) =>
+        db
+          .from(QUIZ_ITEM_TABLES[kind])
+          .select('quiz_id')
+          .eq('course_id', courseId)
+          .in('item_id', ids)
+          .order('quiz_id')
+          .order('item_id')
+          .range(from, to),
+      );
+      if (error) {
+        console.error('liveQuizzesNaming:', error);
+        return null;
+      }
+      for (const r of data) naming.add(r.quiz_id);
     }
-    for (const row of (data ?? []) as { item_ids: string[] | null }[]) {
-      if ((row.item_ids ?? []).some((id) => wanted.has(id))) count++;
+    for (const quizIds of slices([...naming])) {
+      const { count: live, error } = await db
+        .from(QUIZ_TABLES[kind])
+        .select('quiz_id', { count: 'exact', head: true })
+        .in('quiz_id', quizIds)
+        .eq('status', 'active')
+        .eq('published', true);
+      if (error) {
+        console.error('liveQuizzesNaming:', error);
+        return null;
+      }
+      count += live ?? 0;
     }
   }
   return count;
+}
+
+/**
+ * Every quiz and mock — any status — that names this question: the bank's
+ * delete is refused while one does (03 Q14, Sam: the key restricts), and
+ * the refusal names them. Null when the rows could not be read.
+ */
+export async function quizzesNaming(
+  db: ServiceDb,
+  itemId: string,
+): Promise<{ kind: QuizKind; quizId: string; title: string }[] | null> {
+  const found: { kind: QuizKind; quizId: string; title: string }[] = [];
+  for (const kind of QUIZ_KINDS) {
+    const { data, error } = await db.from(QUIZ_ITEM_TABLES[kind]).select('quiz_id').eq('item_id', itemId);
+    if (error) {
+      console.error('quizzesNaming:', error);
+      return null;
+    }
+    const quizIds = ((data ?? []) as { quiz_id: string }[]).map((r) => r.quiz_id);
+    if (!quizIds.length) continue;
+    const { data: quizzes, error: quizError } = await db
+      .from(QUIZ_TABLES[kind])
+      .select('quiz_id, title')
+      .in('quiz_id', quizIds)
+      .order('title');
+    if (quizError) {
+      console.error('quizzesNaming:', quizError);
+      return null;
+    }
+    for (const q of (quizzes ?? []) as { quiz_id: string; title: string }[]) found.push({ kind, quizId: q.quiz_id, title: q.title });
+  }
+  return found;
 }
 
 // The panels' reads below take the whole bank or a whole course, so each

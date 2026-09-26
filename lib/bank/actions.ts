@@ -37,6 +37,7 @@ import {
   getItemsByFilters,
   liveQuizzesNaming,
   heldBackIds,
+  quizzesNaming,
   taggedRows,
   tagSpellingsInUse,
   type ServiceDb,
@@ -532,6 +533,17 @@ export async function deleteQuestion(courseId: string, itemId: string): Promise<
   if (!course) return fail('Unknown course.');
 
   const db = createServiceRoleClient();
+
+  // 03 Q14 (Sam, 2026-09-27): a question a quiz or mock names cannot be
+  // deleted — the bank key restricts; this says which ones, before the
+  // key refuses in Postgres's words. Unpublish is the way to retire it.
+  const naming = await quizzesNaming(db, itemId);
+  if (!naming) return fail('Could not check which quizzes use this question. Please try again.');
+  if (naming.length) {
+    const names = naming.map((q) => `${q.kind === 'mock' ? 'mock exam' : 'quiz'} “${q.title}”`).join(', ');
+    return fail(`This question is in ${names}. Remove it there first, or unpublish it instead.`);
+  }
+
   const { error: stampError } = await db
     .from('question_bank')
     .update({ updated_by: profile.user_id })

@@ -478,7 +478,7 @@ quiz's course can be changed in the editor while it holds the old
 course's questions (`onCourseChange` clears the picks only for a new
 quiz), which saves and leaves a quiz no student can start; and "which
 mocks hold this question" reads every mock's list in the app. Dev is
-clean (7 quizzes and mocks, 105 ids); this is protection, not repair.
+clean (7 quizzes and mocks, 95 ids); this is protection, not repair.
 
 **Storage (one migration, S20).** `quiz_items` and `mock_quiz_items`
 (`quiz_id`, `course_id`, `item_id`, `position`), the keys and the
@@ -508,7 +508,7 @@ there, because `main` still reads `item_ids`. Only Sam, on dev; the
 local server runs the new code.
 
 **Done when:** the migration proven in a rolled-back run — the copy's
-count equal to the arrays' (105 on dev), and refused inside it: a
+count equal to the arrays' (95 on dev), and refused inside it: a
 delete of a named question, another course's question, a repeat, a
 second question at one position, any browser-role read — then applied,
 `role_table_grants` checked; as the admin, every quiz and mock opens in

@@ -19,6 +19,13 @@ export const QUIZ_TABLES: Record<QuizKind, string> = {
   mock: 'mock_quizzes',
 };
 
+/** A quiz's questions, one row each (03 Q14, §8 S20): quiz, course,
+ *  question, position — keyed to the quiz and to the bank. */
+export const QUIZ_ITEM_TABLES: Record<QuizKind, string> = {
+  fixed: 'quiz_items',
+  mock: 'mock_quiz_items',
+};
+
 export const ALLOWED_MODES = ['BOTH', 'INSTANT_ONLY', 'TIMED_ONLY'] as const;
 export type AllowedModes = (typeof ALLOWED_MODES)[number];
 
@@ -46,6 +53,8 @@ export type Quiz = {
   quiz_id: string;
   course_id: string;
   title: string;
+  /** In position order. Not a column since 03 Q14: getQuizById reads
+   *  it from the quiz's rows in QUIZ_ITEM_TABLES. */
   item_ids: string[];
   n: number;
   allowed_modes: AllowedModes;
@@ -69,6 +78,10 @@ export type Quiz = {
 // course page work on this shape; a page that needs the question list
 // asks the server (lib/quizzes/queries getQuizById, service role).
 export type QuizCard = Omit<Quiz, 'item_ids' | 'notes'>;
+
+/** A quiz table's own row — every column; the questions are rows of
+ *  their own (03 Q14). */
+export type QuizRow = Omit<Quiz, 'item_ids'>;
 
 // The columns the paginated admin list selects (getAllQuizzesPaginated)
 // — the row shape of both admin tables until the quiz is opened. Legacy
