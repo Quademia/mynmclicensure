@@ -98,6 +98,22 @@
   border: 1.5px solid var(--surface);
 }
 
+/* the unread dot on the hamburger — a phone-only sign that something
+   unread sits behind the menu (Sam, 2026-09-26); above 768px the
+   envelope carries the count and the dot stays hidden. The same teal
+   as .topbar-count, on the icon's top-right corner. */
+.topbar-dot {
+  display: none;
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 9px;
+  height: 9px;
+  border-radius: var(--radius-pill);
+  background: var(--brand-teal);
+  border: 1.5px solid var(--surface);
+}
+
 .topbar-account { position: relative; }
 .topbar-avatar-btn { border-radius: var(--radius-pill); }
 /* the circle itself is the shared name circle (DS7, components.css);
@@ -367,6 +383,17 @@
   /* the hamburger becomes the close mark while the drawer is out */
   .nav-phone-open .topbar-toggle .topbar-ico-menu { display: none; }
   .nav-phone-open .topbar-toggle .topbar-ico-close { display: block; }
+
+  /* the phone bar keeps the hamburger, the wordmark and the avatar (Sam,
+     2026-09-26, from three options measured at 360px): the envelope and
+     the bell go behind the menu, where the Messages row carries the
+     count and Announcements is a row. The dot on the hamburger says
+     there is something unread behind it; it rests while the drawer is
+     out, because the row's number is then on screen. */
+  .topbar-messages,
+  .topbar-announcements { display: none; }
+  .topbar-dot { display: block; }
+  .nav-phone-open .topbar-toggle .topbar-dot { display: none; }
 
   .topbar { padding: 0 6px; }
 }
