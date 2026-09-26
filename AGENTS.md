@@ -366,7 +366,9 @@ above sit at the repo root; the audience grouping inside them is kept.
   app's browser pane is signed in as whoever Sam last signed in — a
   student, or on 2026-09-26 his admin account, which also renders the
   student pages — and signs itself out between sessions; every
-  authenticated page needs Sam to sign the pane in. For a change
+  authenticated page needs Sam to sign the pane in. The admin holds no
+  course access, so the Quiz Builder and the pack builder need a
+  student's sign-in (2026-09-26). For a change
   across many such pages, `npm run build` (webpack, all 50 routes) is
   the check that actually exercises them; for CSS, render a proof sheet
   from the repo's own stylesheets and screenshot it, rather than
@@ -426,6 +428,34 @@ above sit at the repo root; the audience grouping inside them is kept.
   caught by a reviewer after B4's migration was written and before it
   was applied — and still applied first, so `main`'s dev-site pack
   page was down until the merge).
+- **A read stops at 1,000 rows and says nothing.** The API caps a
+  request at 1,000 rows and returns them with no error: a whole-course
+  read of RM_PED_OBS_HRN (1,080 questions) came back with 1,000
+  (2026-09-26, queued as 08 B7 for the older reads). A new read that can
+  pass 1,000 pages with `.range()` until a short page comes back —
+  `taggedRows` and `courseWordRows` in `lib/bank/queries.ts` are the
+  shape.
+- **A bulk insert or upsert writes the union of its rows' keys to every
+  row.** supabase-js sends one column list for the batch; a row missing
+  a key gets it as null or the default. A column only some rows should
+  write — the importer's publish and free choices, for the rows a file
+  creates — goes in a batch of its own, or it reaches the other rows too
+  (2026-09-26, 08 B4: caught before a re-import could unpublish a live
+  question).
+- **A column that must come from a list is keyed on the word** (08 B5):
+  `foreign key (course_id, maintopic) references bank_topics
+  (course_id, name) on update cascade`. The row keeps its word, so no
+  reader changes; renaming the list entry reaches every row inside the
+  database; a delete of an entry in use is refused; a null is not
+  checked (Not set). A cascade fires the table's row triggers, so they
+  must treat it as the label change it is.
+- **A migration that adds a rule to prod's data tidies that data
+  first.** Prod cannot be read from here, and a constraint prod's rows
+  fail stops the release's migrate job and so the deploy. Normalise what
+  the rule depends on — spaces, empty strings, case twins — in the same
+  file even when dev needs none, and leave out a rule nothing needs
+  (2026-09-26, 08 B5: the tidy step found nothing on dev; a comma rule
+  was dropped).
 
 ## Branching workflow
 
