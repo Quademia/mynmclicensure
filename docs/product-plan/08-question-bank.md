@@ -263,6 +263,33 @@ row:
    word on old attempts — 03 Q12's concern, not B5's. No readers' check
    before the build (Sam).
 
+**Sam, 2026-09-26 (B6 talked through).**
+
+1. **A question is held back from practice while a draft or active
+   mock names it; an archived mock releases its questions** (restoring
+   it holds them back again, since the rule is derived from the mock
+   lists, not stored). A draft mock must hide its questions before it
+   goes live; once a mock is archived everyone who sat it has seen
+   them, and locking them for ever would shrink the practice pool as
+   mocks pile up — the accumulation that ruled out MyNclex's stored
+   switch (§3 item 4). "Any mock, whatever its status" was offered and
+   not taken.
+2. **No overlap handling.** The overlap B6's first draft planned to list
+   — a question in both a mock and a fixed quiz — existed on dev only
+   because the seven dev quizzes were re-pointed by hand at "the first
+   N questions of the course" on 2026-09-14, so each GP and RN_MED fixed
+   quiz was a subset of its mock. Sam: test data, not a problem to
+   build for. The two fixed quizzes were re-pointed the same day through
+   the admin editor to the first 10 questions no mock names; no dev
+   quiz shares a question with a mock. The clean way to author a mock
+   is the one B4 made possible: write its questions as drafts (no
+   student sees a draft), add them to the mock, publish them when the
+   mock goes live — from then on B6 holds them back. The "In a mock"
+   badge, the overlap list and a refusal in the mock's save were offered
+   and not taken.
+3. **S19 adopted:** a student's own login no longer reads a question's
+   wording or options (`rebuild.md` §8 S19).
+
 ---
 
 ## 4. The plan
@@ -832,12 +859,93 @@ courses no topic on any of 720 questions; the RM courses tidy (12 and
 done in the panel after the build. Before 03 Q10's report, which groups
 by these words.
 
-### B6 — The draws (no storage change)
+### B6 — The draws, and the student's read (S19)
 
-The three student draws and the fixed-quiz picker skip any question a
-mock names; a free account's draws see free rows only; every draw sees
-published rows only. The migration's overlap list for Sam. Written
-into 03 Q3 as its first settled ingredient.
+Talked through and ruled 2026-09-26 (§3, the B6 block); scoped against
+the code the same day. One session.
+
+**What is already done, and what waits.** Every draw sees published
+rows only — built in B4 (the builders' reads, the id check, the concept
+search, both copiers refusing a draft). A mock's question can never be
+free — built in B4, both doors. A free account's draws seeing free rows
+only waits for free accounts: 09 F1 / F2. What B6 builds is the
+hold-back, and S19.
+
+**What the scoping found.** The two builders share their course load and
+concept search (`loadBuilderCourse`, `searchBuilderConcepts` in
+`lib/attempts/actions.ts`), so one filter covers both. A mock's
+question list is readable only by the service role (03 Q1), so the
+hold-back is worked out on the server and the browser is never told
+which questions a mock holds — it simply never receives them. The
+admin quiz editor is one component for both kinds (`quiz-manager.tsx`,
+`loadPickerItems`). The builders do not use the batch option. The four
+database functions that read the bank are definer or run by the
+service role, and no browser-client read uses the nine columns S19
+revokes.
+
+**Storage.** No change for the hold-back — it is derived from
+`mock_quizzes.item_ids` for mocks whose status is draft or active (a
+join once 03 Q14's link table lands). One migration for S19:
+`revoke select (stem, option_a … option_f, marks, shuffle_options) on
+question_bank from authenticated`, proven in a rolled-back run under
+`set role authenticated` (the nine refused, the ten filter columns and
+the builders' reads passing) and checked in `role_column_grants` after
+the apply.
+
+**Code.**
+
+- `lib/bank/queries.ts`: `heldBackIds(db, courseId?)` — the ids named
+  by draft or active mocks, through the service role; null when the
+  mocks cannot be read, and every caller then refuses rather than
+  guesses.
+- `lib/attempts/actions.ts`: `loadBuilderCourse` drops held-back rows
+  from the pool and builds the topic, subtopic, difficulty and type
+  options from what is left — a topic whose only questions are in a
+  mock is not offered — instead of a second read of the table;
+  `searchBuilderConcepts` drops held-back ids from its answer;
+  `spawnBuilderAttempt` drops a held-back id sent by a stale or
+  tampered browser, as it drops an unknown one.
+- `lib/offline-packs/actions.ts`: `createOfflinePack` does the same.
+- `lib/quizzes/actions.ts`: `loadPickerItems` takes the quiz's kind and
+  returns the held-back ids with the rows; `saveQuiz` for a fixed quiz
+  refuses a held-back id by name ("Question X is in a mock exam and
+  cannot be in a fixed quiz"). The mock picker is unchanged — it shows
+  every published question of the course, mock questions included.
+- `components/quizzes/quiz-manager.tsx`: the fixed-quiz picker does not
+  offer a held-back question (detail 3 for one it already holds).
+- The daily challenge (09 G2) inherits the rule when it is built.
+
+**Three details to rule** (recommendations):
+
+1. **A builder attempt's retake** copies its questions afresh from the
+   bank; one that has since gone into a mock is **dropped from the
+   retake** — the retake is practice. A mock's retake keeps its
+   questions, and a fixed quiz holds none.
+2. **The free rule uses the same definition**: a question is "in a
+   mock" for the free tick while a draft or active mock names it, so an
+   archived mock's question — back in practice — may be marked free.
+   One definition of "in a mock", not two.
+3. **A fixed quiz that comes to hold a held-back question** (a question
+   in a fixed quiz later added to a mock): its editor keeps showing the
+   question, marked "In a mock", rather than dropping it silently at the
+   next save, and the save refuses it until it is removed; the fixed
+   quiz's start still serves it meanwhile. None exists on dev.
+
+**Done when.** As a student holding RN_MED: the Quiz Builder's pool is
+880, not 900 (the RN_MED mock's 20 held back), and a topic with only
+mock questions is not offered; the keyword search leaves them out; a
+build sent with a mock question drops it; the offline-pack builder the
+same. The admin fixed-quiz picker for RN_MED shows 880; the mock picker
+900. Archiving the mock returns its 20 to the pool, restoring it holds
+them back. The free tick on an archived mock's question is accepted,
+on an active one's refused. Under the student's role, `stem` refused
+and the ten filter columns read. `npm run build` green; Sam walks it
+on a student account (the builders need course access).
+
+**Reach.** Dev only until the merge. The S19 migration reaches the dev
+site's `main` code, which reads no question text through a student's
+client — nothing breaks there. A student sees fewer questions in the
+builders (a mock's own) and no other change.
 
 ### B7 — Whole-course reads past the 1,000-row cap (no storage change)
 
@@ -882,5 +990,5 @@ now, and any course that grows past it. Before cutover.
 | B3 The admin page paged | ⬜ later |
 | B4 The columns, the version and the history | ✅ 2026-09-26 (`20260926150000_question_bank_columns_history.sql`, `20260926160000_copiers_refuse_any_draft.sql`; the code in two sittings the same day; walked on dev and by Sam — §4) |
 | B5 The lists and their panel | ✅ 2026-09-26 (`20260926170000_bank_subject_topic_lists.sql`; the code in two sittings the same day; walked on dev and by Sam — §4); the clean-up of the words is content work, in the panel |
-| B6 The draws | ⬜ adopted 2026-09-26; no storage change |
+| B6 The draws, and the student's read (S19) | ⬜ adopted 2026-09-26; talked through and scoped the same day (§3, the B6 block); S19 awaiting the tick; three details to rule |
 | B7 Whole-course reads past the 1,000-row cap | ⬜ queued 2026-09-26 (Sam); found walking B4; before cutover |
