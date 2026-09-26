@@ -291,12 +291,31 @@ both tables get the same fixes.
 
 **One ingredient settled early (Sam, 2026-09-26, with the MyNclex bank
 comparison, 08 §3 item 4):** a mock's questions live nowhere else.
-A question is reserved while any mock names it — derived from the mock
-lists, no stored switch — and the builder, the pack maker, the
-fixed-quiz picker and the daily challenge skip it; a mock question can
-never be marked free. Fixed quizzes stay from the course bank and
-visible everywhere. Built as 08 B6; the check becomes a join when Q14
-lands. The rest of Q3 stays open.
+A question is held back from practice while a **draft or active** mock
+names it (refined when B6 was talked through the same day: an archived
+mock releases its questions, and restoring it holds them back) —
+derived from the mock lists, no stored switch — and the builder, the
+pack maker, the fixed-quiz picker and the daily challenge skip it; a
+question held back can never be marked free. A question may sit in
+several mocks. Fixed quizzes stay from the course bank and visible
+everywhere. Built as 08 B6; the check becomes a join when Q14 lands.
+The rest of Q3 stays open.
+
+**Who mocks are for (Sam, 2026-09-26, noted for the design).** Mocks
+are planned for premium members, who are transient: they buy near the
+exam, sit the mocks, finish and are gone. What a mock gives them is an
+honest reading of readiness, which holds only if its questions are new
+to them — the reason for the hold-back above, since the same members
+practise in the builder on the same course. It suggests how mocks are
+run: **a mock stays active across cohorts**, each new wave sitting it
+fresh, and is **archived only to retire it**, its questions then
+returning to practice and new ones written for the next. **Mock
+questions are authored as drafts**, added to the mock, and published
+when it goes live, so no student ever meets them in practice first.
+Sam's sense is that the mock feature reaches well beyond the
+hold-back; the rest — timing like the paper, a readiness band, the
+cohort comparison (Q13), how many mocks per programme — is this design
+item's, when Sam picks it.
 
 ### Q4 — The questions as rows (S7; D12)
 

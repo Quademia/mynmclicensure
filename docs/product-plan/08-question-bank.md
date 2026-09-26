@@ -288,7 +288,24 @@ row:
    badge, the overlap list and a refusal in the mock's save were offered
    and not taken.
 3. **S19 adopted:** a student's own login no longer reads a question's
-   wording or options (`rebuild.md` §8 S19).
+   wording or options (`rebuild.md` §8 S19) — ticked 2026-09-26.
+4. **No retake rule.** A retake takes its question list from the
+   student's original attempt, not the quiz as it is now, so an old
+   attempt could carry a question that has since joined a mock. With
+   mock questions authored fresh as drafts no practice attempt ever
+   holds one; the only such attempts are dev test data made before the
+   rule, left as they are (Sam: the same shape as the overlap). A
+   question may sit in several mocks.
+5. **One meaning of "in a mock"**: the free tick's refusal uses the
+   hold-back's definition, so an archived mock's question, back in
+   practice, may be marked free.
+6. **A fixed quiz that later comes to hold a held-back question** keeps
+   showing it in its editor, marked "In a mock", rather than dropping it
+   silently; the save refuses it until it is removed; the quiz's start
+   serves it meanwhile.
+7. Sam's framing of mocks — premium members, transient, a mock kept
+   active across cohorts and archived only to retire it — is noted in
+   03 Q3.
 
 ---
 
@@ -915,21 +932,13 @@ the apply.
   offer a held-back question (detail 3 for one it already holds).
 - The daily challenge (09 G2) inherits the rule when it is built.
 
-**Three details to rule** (recommendations):
-
-1. **A builder attempt's retake** copies its questions afresh from the
-   bank; one that has since gone into a mock is **dropped from the
-   retake** — the retake is practice. A mock's retake keeps its
-   questions, and a fixed quiz holds none.
-2. **The free rule uses the same definition**: a question is "in a
-   mock" for the free tick while a draft or active mock names it, so an
-   archived mock's question — back in practice — may be marked free.
-   One definition of "in a mock", not two.
-3. **A fixed quiz that comes to hold a held-back question** (a question
-   in a fixed quiz later added to a mock): its editor keeps showing the
-   question, marked "In a mock", rather than dropping it silently at the
-   next save, and the save refuses it until it is removed; the fixed
-   quiz's start still serves it meanwhile. None exists on dev.
+**The details, ruled** (§3, the B6 block, items 4–6): no retake rule
+(a drafted "drop a now-held-back question from a practice retake" was
+set aside — with mocks authored as drafts no practice attempt holds
+one); the free tick's refusal moves from "any mock" to the hold-back's
+draft-or-active; a fixed quiz that comes to hold a held-back question
+shows it marked "In a mock" and refuses to save it, its start
+unchanged. `mockReservedIds` becomes `heldBackIds` for both uses.
 
 **Done when.** As a student holding RN_MED: the Quiz Builder's pool is
 880, not 900 (the RN_MED mock's 20 held back), and a topic with only
@@ -990,5 +999,5 @@ now, and any course that grows past it. Before cutover.
 | B3 The admin page paged | ⬜ later |
 | B4 The columns, the version and the history | ✅ 2026-09-26 (`20260926150000_question_bank_columns_history.sql`, `20260926160000_copiers_refuse_any_draft.sql`; the code in two sittings the same day; walked on dev and by Sam — §4) |
 | B5 The lists and their panel | ✅ 2026-09-26 (`20260926170000_bank_subject_topic_lists.sql`; the code in two sittings the same day; walked on dev and by Sam — §4); the clean-up of the words is content work, in the panel |
-| B6 The draws, and the student's read (S19) | ⬜ adopted 2026-09-26; talked through and scoped the same day (§3, the B6 block); S19 awaiting the tick; three details to rule |
+| B6 The draws, and the student's read (S19) | ⬜ adopted 2026-09-26; talked through, scoped and ruled the same day (§3, the B6 block); S19 ✅ 2026-09-26; building |
 | B7 Whole-course reads past the 1,000-row cap | ⬜ queued 2026-09-26 (Sam); found walking B4; before cutover |
