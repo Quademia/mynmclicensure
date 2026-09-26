@@ -417,7 +417,11 @@ panels second, with Sam's walk between.
   without case and the row lands in the list's spelling (`easy` →
   Easy), so a spelling variant is corrected and an unknown word
   refused. `importItems` repeats the check on what it receives, as it
-  repeats the other rules.
+  repeats the other rules. **One alias: the level "Analyze"**,
+  MyNclex's spelling, lands as "Analyse" rather than being refused
+  (Sam, 2026-09-26, after the walk) — the same word, so a file carried
+  over from MyNclex's bank imports; "Analysis" and the like are still
+  refused by name.
 - `lib/bank/actions.ts`: `saveQuestion` carries the new fields, stamps
   `updated_by`, and **refuses the free tick on a question any
   `mock_quizzes` row names** ("This question is in a mock exam and
@@ -559,6 +563,24 @@ mock names; a free account's draws see free rows only; every draw sees
 published rows only. The migration's overlap list for Sam. Written
 into 03 Q3 as its first settled ingredient.
 
+### B7 — Whole-course reads past the 1,000-row cap (no storage change)
+
+Found 2026-09-26 walking B4; queued the same day (Sam). The API hands
+back at most 1,000 rows a request and says nothing when it stops.
+RM_PED_OBS_HRN holds 1,080 questions, so the admin bank page shows
+"1000 questions", and every read that takes a whole course is short
+by the same 80 (the last by id, or an arbitrary 80 where the read has
+no order): the two builders' pool (`getBuilderCourseItems`), their
+topic, difficulty and type options (`getItemFilterOptions`), the
+fixed-quiz and mock pickers and the admin page (`getItemsByFilters`).
+The fix pages each such read until a short page comes back — the
+shape `tagSpellingsInUse` already uses — or moves it server-side (the
+admin list is B3's, which pages it fifty at a time).
+
+**Reach.** Dev only today — the new app is not live. At cutover,
+every student and admin of a course past 1,000 rows: RM_PED_OBS_HRN
+now, and any course that grows past it. Before cutover.
+
 ### Later, under this doc
 
 - **The link table** replacing the quiz tables' `item_ids` arrays —
@@ -585,3 +607,4 @@ into 03 Q3 as its first settled ingredient.
 | B4 The columns, the version and the history | ⬜ adopted and scoped 2026-09-26; §8 S17 ✅ 2026-09-26; the migration applied on dev 2026-09-26 (`20260926150000_question_bank_columns_history.sql`, `20260926160000_copiers_refuse_any_draft.sql`; proven in rolled-back runs, reviewed by three, the pack renderer's read fixed with it); the code half next |
 | B5 The lists and their panel | ⬜ adopted 2026-09-26; §8 S18 ✅ 2026-09-26; the clean-up is content work |
 | B6 The draws | ⬜ adopted 2026-09-26; no storage change |
+| B7 Whole-course reads past the 1,000-row cap | ⬜ queued 2026-09-26 (Sam); found walking B4; before cutover |
