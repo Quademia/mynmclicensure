@@ -155,6 +155,8 @@
 .qm .draft-mark { margin-left: var(--space-6); padding: 1px 6px; font-size: 10px; flex-shrink: 0; }
 .qm .draft-warning { margin: 0; padding: var(--space-10) var(--space-20); background: var(--badge-warning-bg); border-bottom: 1px solid var(--badge-warning-border); color: var(--badge-warning-ink); font-size: 12px; line-height: 1.5; }
 .qm .draft-warning .mono { font-family: monospace; }
+/* 08 B6: a fixed quiz holding a question a mock holds back */
+.qm .in-mock-warning { background: var(--badge-danger-bg); border-bottom-color: var(--badge-danger-border); color: var(--badge-danger-ink); }
 
 /* ── Pane actions bar ── */
 .qm .pane { min-width: 0; }

@@ -267,6 +267,8 @@ export function QuizManager({
 
   // ── pane 3: the picker ──
   const [pickerAll, setPickerAll] = useState<Item[]>([]);
+  // 08 B6: the ids a draft or active mock holds back from practice
+  const [heldBack, setHeldBack] = useState<Set<string>>(new Set());
   const [pickerCourse, setPickerCourse] = useState('');
   const [pickerLoading, setPickerLoading] = useState(false);
   const [selected, setSelected] = useState<Item[]>([]);
@@ -281,8 +283,11 @@ export function QuizManager({
 
   async function fetchPicker(courseId: string): Promise<Item[]> {
     setPickerLoading(true);
-    const items = await loadPickerItems(courseId);
+    const result = await loadPickerItems(courseId);
+    const items = result.ok ? result.items : [];
+    if (!result.ok) err(result.error);
     setPickerAll(items);
+    setHeldBack(new Set(result.ok ? result.heldBack : []));
     setPickerCourse(courseId);
     setPickerLoading(false);
     return items;
@@ -418,8 +423,15 @@ export function QuizManager({
     ...new Set(pickerAll.filter((i) => !pMaintopic || i.maintopic === pMaintopic).map((i) => i.subtopic).filter(Boolean) as string[]),
   ].sort();
 
+  // 08 B6: a fixed quiz is practice, so its picker does not offer a
+  // question a draft or active mock holds back — except one the quiz
+  // already holds, shown so the admin can see and remove it (the save
+  // refuses it). The mock picker offers every question.
+  const isHeldBack = (i: Item) => kind === 'fixed' && heldBack.has(i.item_id);
+
   const pkw = pKeyword.toLowerCase().trim();
   const pickerFiltered = pickerAll.filter((i) => {
+    if (isHeldBack(i) && !selectedIds.has(i.item_id)) return false;
     if (pMaintopic && i.maintopic !== pMaintopic) return false;
     if (pSubtopic && i.subtopic !== pSubtopic) return false;
     if (pDifficulty && i.difficulty !== pDifficulty) return false;
@@ -495,7 +507,13 @@ export function QuizManager({
   // has a question that is not published"). The picker, the selected
   // list and the review mark each one, and the review names them all.
   const selectedDrafts = selected.filter((i) => !i.is_published);
-  const draftBadge = (i: Item) => (i.is_published ? null : <span className="badge badge-warning draft-mark">Draft</span>);
+  const selectedInMock = selected.filter(isHeldBack);
+  const draftBadge = (i: Item) => (
+    <>
+      {i.is_published ? null : <span className="badge badge-warning draft-mark">Draft</span>}
+      {isHeldBack(i) ? <span className="badge badge-danger draft-mark">In a mock</span> : null}
+    </>
+  );
 
   const courseTitle = (id: string) => courses.find((c) => c.course_id === id)?.title || id;
   const timeLimitText = form.timeLimit
@@ -888,6 +906,13 @@ export function QuizManager({
                 {selectedDrafts.length === 1 ? '1 question here is a draft' : `${selectedDrafts.length} questions here are drafts`}:{' '}
                 <span className="mono">{selectedDrafts.map((i) => i.item_id).join(', ')}</span>. This {W.noun} will refuse to start until{' '}
                 {selectedDrafts.length === 1 ? 'it is' : 'they are'} published in the Question Bank, or removed here.
+              </div>
+            ) : null}
+            {selectedInMock.length ? (
+              <div className="draft-warning in-mock-warning" role="note">
+                {selectedInMock.length === 1 ? '1 question here is' : `${selectedInMock.length} questions here are`} in a mock exam:{' '}
+                <span className="mono">{selectedInMock.map((i) => i.item_id).join(', ')}</span>. A fixed quiz is practice, so{' '}
+                {selectedInMock.length === 1 ? 'it has' : 'they have'} to be removed before this quiz can be saved.
               </div>
             ) : null}
             <div>

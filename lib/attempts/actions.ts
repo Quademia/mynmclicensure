@@ -23,7 +23,7 @@
 
 import { requireStudent } from '@/lib/access';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { getItemFilterOptions, knownItemIds, searchConceptItemIds } from '@/lib/bank/queries';
+import { heldBackIds, knownItemIds, searchConceptItemIds } from '@/lib/bank/queries';
 import type { ItemFilterOptions } from '@/lib/bank/types';
 import { getConfig } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
@@ -104,9 +104,33 @@ async function createAttemptRows(args: CreateAttemptArgs): Promise<SpawnResult> 
 }
 
 // ── the builder's course load (legacy handleCourseChange's two reads) ──
+// Shared by the quiz builder and the offline-pack builder.
+//
+// 08 B6 (2026-09-26): a question a draft or active mock names is held
+// back from practice. The mocks' lists are readable by the service role
+// only (03 Q1), so the pool is filtered here and the browser is never
+// told which questions a mock holds — it simply never receives them.
+// The options (topics, subtopics, difficulties, types) are built from
+// the pool that is left, so a topic whose only questions are in a mock
+// is not offered; that replaced legacy's second read of the table.
 export type BuilderCourseLoad =
   | { ok: true; items: BuilderItem[]; options: ItemFilterOptions }
   | { ok: false; error: string };
+
+const HELD_BACK_UNREADABLE = 'Could not load the questions for this course. Please try again.';
+
+function optionsFrom(items: BuilderItem[]): ItemFilterOptions {
+  const unique = (values: (string | null)[]) => [...new Set(values.map((v) => String(v || '').trim()).filter(Boolean))].sort();
+  return {
+    subjects: unique(items.map((i) => i.subject)),
+    maintopics: unique(items.map((i) => i.maintopic)),
+    subtopics: unique(items.map((i) => i.subtopic)),
+    difficulties: unique(items.map((i) => i.difficulty)),
+    question_types: unique(items.map((i) => i.question_type)),
+    // the builders filter by none of the batches
+    batch_ids: [],
+  };
+}
 
 export async function loadBuilderCourse(courseId: string): Promise<BuilderCourseLoad> {
   const { supabase, profile } = await requireStudent();
@@ -114,11 +138,13 @@ export async function loadBuilderCourse(courseId: string): Promise<BuilderCourse
   const access = await getStudentCourseAccess(supabase, profile.user_id);
   if (!access[courseId]) return fail('You do not have an active subscription for this course.');
 
-  const [options, items] = await Promise.all([
-    getItemFilterOptions(supabase, courseId, { publishedOnly: true }),
+  const [all, held] = await Promise.all([
     getBuilderCourseItems(supabase, courseId),
+    heldBackIds(createServiceRoleClient(), courseId),
   ]);
-  return { ok: true, items, options };
+  if (!held) return fail(HELD_BACK_UNREADABLE);
+  const items = all.filter((i) => !held.has(i.item_id));
+  return { ok: true, items, options: optionsFrom(items) };
 }
 
 // ── the builders' concept keyword (08 B2; D9) ──────────────────────────
@@ -143,7 +169,11 @@ export async function searchBuilderConcepts(courseId: string, query: string): Pr
   const q = String(query || '').trim();
   if (!q) return { ok: true, itemIds: [] };
 
-  return { ok: true, itemIds: await searchConceptItemIds(createServiceRoleClient(), courseId, q) };
+  // 08 B6: a held-back question's id never leaves the server either
+  const svc = createServiceRoleClient();
+  const [ids, held] = await Promise.all([searchConceptItemIds(svc, courseId, q), heldBackIds(svc, courseId)]);
+  if (!held) return fail(HELD_BACK_UNREADABLE);
+  return { ok: true, itemIds: ids.filter((id) => !held.has(id)) };
 }
 
 // ── spawnBuilderAttempt ────────────────────────────────────────────────
@@ -171,9 +201,15 @@ export async function spawnBuilderAttempt(
   if (!safeIds.length) return fail('No questions were selected.');
 
   // The ids must be this course's: a wrong id is dropped, as
-  // create_attempt would drop it later.
-  const known = await knownItemIds(supabase, courseId, safeIds);
-  const orderedIds = safeIds.filter((id) => known.has(id));
+  // create_attempt would drop it later. So is one a mock holds back (08
+  // B6) — the wizard never offered it; only a stale or tampered browser
+  // sends one.
+  const [known, held] = await Promise.all([
+    knownItemIds(supabase, courseId, safeIds),
+    heldBackIds(createServiceRoleClient(), courseId),
+  ]);
+  if (!held) return fail(HELD_BACK_UNREADABLE);
+  const orderedIds = safeIds.filter((id) => known.has(id) && !held.has(id));
   if (!orderedIds.length) return fail('No questions were selected.');
 
   // legacy: 1 minute per question unless the wizard passed an override

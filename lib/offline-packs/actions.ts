@@ -14,7 +14,7 @@
 'use server';
 
 import { requireStudent } from '@/lib/access';
-import { knownItemIds } from '@/lib/bank/queries';
+import { heldBackIds, knownItemIds } from '@/lib/bank/queries';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getConfig } from '@/lib/catalogue/queries';
 import { buildOfflineOwnerLabel, buildOfflinePackDefaultName, buildOfflinePackDisplayLabel, maskEmailForOffline, ownerNameOf, safeArray } from './labels';
@@ -95,9 +95,16 @@ export async function createOfflinePack(input: CreatePackInput): Promise<CreateP
 
   // Server-side: every id must be one of the course's items, kept in the
   // order the pick gave (a wrong id is dropped, as create_offline_pack
-  // would drop it later).
-  const known = await knownItemIds(supabase, safeCourseId, safeIds);
-  const orderedIds = safeIds.filter((id) => known.has(id));
+  // would drop it later) — and not one a mock holds back (08 B6), which
+  // the builder never offered.
+  const [known, held] = await Promise.all([
+    knownItemIds(supabase, safeCourseId, safeIds),
+    heldBackIds(createServiceRoleClient(), safeCourseId),
+  ]);
+  if (!held) {
+    return { ok: false, reason: 'insert_failed', message: 'Could not check the questions. Please try again.', allowance };
+  }
+  const orderedIds = safeIds.filter((id) => known.has(id) && !held.has(id));
   if (!orderedIds.length) {
     return { ok: false, reason: 'no_items_match', message: 'No questions were selected.', allowance };
   }

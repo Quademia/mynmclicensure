@@ -172,15 +172,21 @@ export async function getItemFilterOptions(
 // so these read through the service role, behind requireAdmin().
 
 /**
- * Every question id any mock exam names, whatever its status: a mock's
- * questions are never free (08 §3 item 4). The mocks are few (two on dev),
- * so the lists are read whole and the check is made here. Null when the
- * lists could not be read — the caller refuses rather than guess.
+ * The questions held back from practice (08 B6): every id named by a
+ * mock whose status is draft or active. An archived mock releases its
+ * questions; restoring it holds them back again — derived from the mock
+ * lists, never stored (Sam, 2026-09-26). One definition serves the
+ * draws, the fixed-quiz picker and the free tick's refusal. The mocks
+ * are few, so their lists are read whole; `courseId` narrows to one
+ * course's mocks. Null when the lists could not be read — every caller
+ * then refuses rather than guesses.
  */
-export async function mockReservedIds(db: ServiceDb): Promise<Set<string> | null> {
-  const { data, error } = await db.from(QUIZ_TABLES.mock).select('item_ids');
+export async function heldBackIds(db: ServiceDb, courseId?: string): Promise<Set<string> | null> {
+  let query = db.from(QUIZ_TABLES.mock).select('item_ids').in('status', ['draft', 'active']);
+  if (courseId) query = query.eq('course_id', courseId);
+  const { data, error } = await query;
   if (error) {
-    console.error('mockReservedIds:', error);
+    console.error('heldBackIds:', error);
     return null;
   }
   const ids = new Set<string>();
