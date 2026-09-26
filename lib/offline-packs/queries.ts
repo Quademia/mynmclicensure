@@ -214,9 +214,17 @@ export async function getOfflinePackAllowance(db: ServerSupabaseClient, userId: 
 
 // ── the renderer's read (legacy getOfflinePackForRender) ──────────────
 // Since 03 Q4 the questions are the pack's own rows, in position order,
-// read as the owner (the student holds SELECT on the whole row — a pack
-// carries its key by design). A pack can no longer lose a question, so
-// the "missing count" of the pointer-list days is gone.
+// read as the owner (the student holds SELECT on the row's 27 columns —
+// a pack carries its key by design). A pack can no longer lose a
+// question, so the "missing count" of the pointer-list days is gone.
+//
+// The columns are NAMED, not `*`: since 08 B4 (2026-09-26) the student's
+// SELECT on offline_pack_items is a column list (the three snapshot
+// columns B4 added — bloom_level, tags, version — are not in it until a
+// student surface reads them), and PostgREST passes `*` to Postgres as
+// a literal `*`, which needs SELECT on every column it expands to. The
+// migration's reviewer caught this before the apply; with `*` the page
+// failed with "permission denied" from the apply until this change.
 export type RenderLoad =
   | { ok: true; pack: OfflinePack; items: OfflinePackItem[] }
   | { ok: false; code: 'pack_lookup_failed' | 'pack_not_found' | 'pack_inactive'; message: string };
@@ -235,14 +243,21 @@ export async function getOfflinePackForRender(db: ServerSupabaseClient, userId: 
 
   const { data: rows, error: rowsError } = await db
     .from('offline_pack_items')
-    .select('*')
+    .select(
+      'pack_item_id, pack_id, position, item_id, question_type, stem, ' +
+        'option_a, option_b, option_c, option_d, option_e, option_f, marks, shuffle_options, ' +
+        'correct, rationale, rationale_img, fb_a, fb_b, fb_c, fb_d, fb_e, fb_f, ' +
+        'subject, maintopic, subtopic, difficulty',
+    )
     .eq('pack_id', pack.pack_id)
     .order('position', { ascending: true });
   if (rowsError) {
     console.error('getOfflinePackForRender rows:', rowsError);
     return { ok: false, code: 'pack_lookup_failed', message: rowsError.message };
   }
-  const items = ((rows ?? []) as Omit<OfflinePackItem, 'course_id' | 'batch_id'>[]).map((row) => ({
+  // the column list is a built string, so the client's type parser gives
+  // up on it; the shape is the 27 columns above, cast through unknown
+  const items = ((rows ?? []) as unknown as Omit<OfflinePackItem, 'course_id' | 'batch_id'>[]).map((row) => ({
     ...row,
     course_id: pack.course_id,
     batch_id: null,
