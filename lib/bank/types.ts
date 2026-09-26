@@ -167,9 +167,18 @@ export type FreePoolResult =
   | { ok: true; programmes: FreePoolProgramme[]; totalFree: number }
   | { ok: false; error: string };
 
+// ── the subject and topic lists (08 B5, §8 S18) ──
+/** One word on a course's subject or topic list. A retired word stays on
+ *  the questions that carry it but is offered to no new one. */
+export type ListEntry = { id: number; name: string; retired: boolean };
+/** A course's two lists; a question's subject and topic must be on them,
+ *  or be Not set (null) — the database's keys hold it to that. */
+export type CourseLists = { subjects: ListEntry[]; topics: ListEntry[] };
+
 // What loadCourseItems() returns: the whole course, as legacy loaded it
-// (the page filters in the browser), plus the two dropdowns it fills and
-// (08 B4) every tag in use across the bank, for the editor's suggestions.
+// (the page filters in the browser), plus the two dropdowns it fills,
+// (08 B4) every tag in use across the bank, for the editor's
+// suggestions, and (08 B5) the course's subject and topic lists.
 export type CourseItemsResult =
-  | { ok: true; items: Item[]; maintopics: string[]; batchIds: string[]; tagsInUse: string[] }
+  | { ok: true; items: Item[]; maintopics: string[]; batchIds: string[]; tagsInUse: string[]; lists: CourseLists }
   | { ok: false; error: string };

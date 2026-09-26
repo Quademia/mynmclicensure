@@ -43,7 +43,9 @@ import {
   QUESTION_TYPE_LABELS,
   RATIONALE_IMAGE_MAX_BYTES,
   normaliseTags,
+  type CourseLists,
   type Item,
+  type ListEntry,
   type OptionLetter,
   type QuestionType,
 } from '@/lib/bank/types';
@@ -113,6 +115,23 @@ function correctLetters(item: Item): string[] {
     : [(item.correct || '').trim().toLowerCase()];
 }
 
+const NO_LISTS: CourseLists = { subjects: [], topics: [] };
+
+/**
+ * A list's words for the editor's dropdown (08 B5): the active ones, plus
+ * the question's own word when it is retired, so an edit never clears a
+ * word by accident.
+ */
+function listOptions(list: ListEntry[], current: string): { value: string; label: string }[] {
+  const options = list.filter((e) => !e.retired).map((e) => ({ value: e.name, label: e.name }));
+  const own = current ? list.find((e) => e.name === current) : null;
+  if (own?.retired) options.push({ value: own.name, label: `${own.name} (retired)` });
+  // a word no longer on the list at all cannot be on a question (the
+  // key); shown as it stands if a stale page somehow holds one
+  else if (current && !own) options.push({ value: current, label: `${current} (not on the list)` });
+  return options;
+}
+
 /** "1 quiz will…" / "3 quizzes will…" — the unpublish warning's words. */
 function quizzesWillRefuse(n: number): string {
   return `${n} ${n === 1 ? 'quiz' : 'quizzes'} will refuse to start until this question is published again.`;
@@ -128,6 +147,7 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
   const [maintopics, setMaintopics] = useState<string[]>([]);
   const [batchIds, setBatchIds] = useState<string[]>([]);
   const [tagsInUse, setTagsInUse] = useState<string[]>([]);
+  const [lists, setLists] = useState<CourseLists>(NO_LISTS);
   const [loading, setLoading] = useState(false);
 
   // ── filters (applied in the browser, as legacy) ──
@@ -197,6 +217,7 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
       setItems([]);
       setMaintopics([]);
       setBatchIds([]);
+      setLists(NO_LISTS);
       setMsg({ text: result.error, tone: 'error' });
       return [];
     }
@@ -204,6 +225,7 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
     setMaintopics(result.maintopics);
     setBatchIds(result.batchIds);
     setTagsInUse(result.tagsInUse);
+    setLists(result.lists);
     return result.items;
   }
 
@@ -230,6 +252,7 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
       setItems([]);
       setMaintopics([]);
       setBatchIds([]);
+      setLists(NO_LISTS);
       return;
     }
     await fetchCourse(id);
@@ -241,6 +264,7 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
     setItems([]);
     setMaintopics([]);
     setBatchIds([]);
+    setLists(NO_LISTS);
     resetFilters();
   }
 
@@ -578,6 +602,7 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
       {csvOpen ? (
         <CsvImportModal
           courseId={courseId}
+          lists={lists}
           onClose={() => setCsvOpen(false)}
           onImported={async () => { await fetchCourse(courseId); }}
         />
@@ -921,16 +946,32 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
               <p className="form-hint img-url">{imgLocalPreview ? 'New image selected — will upload on save.' : imgUrl}</p>
             </div>
 
+            {/* 08 B5: both from the course's lists, Not set first */}
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="fieldSubject">Subject</label>
-                <input id="fieldSubject" type="text" placeholder="e.g. Anatomy" value={form.subject} onChange={(e) => setField('subject', e.target.value)} />
+                <select id="fieldSubject" value={form.subject} onChange={(e) => setField('subject', e.target.value)}>
+                  <option value="">— Not set —</option>
+                  {listOptions(lists.subjects, form.subject).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                </select>
               </div>
               <div className="form-group">
                 <label htmlFor="fieldMaintopic">Main Topic</label>
-                <input id="fieldMaintopic" type="text" placeholder="e.g. Cardiovascular" value={form.maintopic} onChange={(e) => setField('maintopic', e.target.value)} />
+                <select id="fieldMaintopic" value={form.maintopic} onChange={(e) => setField('maintopic', e.target.value)}>
+                  <option value="">— Not set —</option>
+                  {listOptions(lists.topics, form.maintopic).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                </select>
               </div>
             </div>
+            {!lists.subjects.length || !lists.topics.length ? (
+              <p className="form-hint form-hint-block">
+                {!lists.subjects.length && !lists.topics.length
+                  ? 'This course has no subjects or topics on its lists yet.'
+                  : !lists.topics.length
+                    ? 'This course has no topics on its list yet.'
+                    : 'This course has no subjects on its list yet.'}
+              </p>
+            ) : null}
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="fieldSubtopic">Subtopic / Concept</label>

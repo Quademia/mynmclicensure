@@ -26,9 +26,10 @@
 import { requireAdmin } from '@/lib/access';
 import { getAllCourses, getPrograms } from '@/lib/catalogue/queries';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { checkListColumns, rowToPayload, type CsvRow } from './csv';
+import { checkCourseWords, checkListColumns, findOnList, rowToPayload, type CsvRow } from './csv';
 import { uploadRationaleImage } from './images';
 import {
+  courseLists,
   existingItemIds,
   freeRowCounts,
   getItemFilterOptions,
@@ -82,17 +83,20 @@ export async function loadCourseItems(courseId: string): Promise<CourseItemsResu
   if (!courseId.trim()) return { ok: false, error: 'Unknown course.' };
 
   const svc = createServiceRoleClient();
-  const [items, options, tags] = await Promise.all([
+  const [items, options, tags, lists] = await Promise.all([
     getItemsByFilters(svc, courseId, {}),
     getItemFilterOptions(supabase, courseId, { publishedOnly: false }),
     tagSpellingsInUse(svc),
+    courseLists(svc, courseId),
   ]);
+  if (!lists) return { ok: false, error: "Could not read this course's subject and topic lists." };
   return {
     ok: true,
     items,
     maintopics: options.maintopics,
     batchIds: options.batch_ids,
     tagsInUse: [...tags.values()].sort((a, b) => a.localeCompare(b)),
+    lists,
   };
 }
 
@@ -155,6 +159,29 @@ export async function saveQuestion(input: SaveQuestionInput, image: FormData | n
 
   const db = createServiceRoleClient();
 
+  // 08 B5: the subject and topic must be on the course's lists, or Not
+  // set. A retired word is kept only on a question that already carries
+  // it. The database's keys hold the same rule; this says it in words.
+  const lists = await courseLists(db, courseId);
+  if (!lists) return fail("Could not read this course's subject and topic lists. Please try again.");
+  let stored: { subject: string | null; maintopic: string | null } | null = null;
+  if (!input.isNew) {
+    const { data } = await db.from('question_bank').select('subject, maintopic').eq('item_id', itemId).maybeSingle();
+    stored = (data as typeof stored) ?? null;
+  }
+  const words: Record<'subject' | 'maintopic', string | null> = { subject: null, maintopic: null };
+  for (const [col, list, noun] of [
+    ['subject', lists.subjects, 'Subject'],
+    ['maintopic', lists.topics, 'Topic'],
+  ] as const) {
+    const typed = String(input[col] || '').trim();
+    if (!typed) continue;
+    const entry = findOnList(list, typed);
+    if (!entry) return fail(`${noun} "${typed}" is not on this course's list.`);
+    if (entry.retired && stored?.[col] !== entry.name) return fail(`${noun} "${entry.name}" is retired on this course's list.`);
+    words[col] = entry.name;
+  }
+
   // A mock's questions are never free (08 §3 item 4). A TypeScript check
   // here and in saveQuiz holds the rule from both sides until 03 Q14's
   // link table lets SQL hold it.
@@ -181,8 +208,8 @@ export async function saveQuestion(input: SaveQuestionInput, image: FormData | n
     correct,
     rationale: input.rationale.trim() || null,
     rationale_img: imgUrl,
-    subject: input.subject.trim() || null,
-    maintopic: input.maintopic.trim() || null,
+    subject: words.subject,
+    maintopic: words.maintopic,
     subtopic: input.subtopic.trim() || null,
     difficulty: difficulty || null,
     marks: parseFloat(input.marks) || 1,
@@ -294,11 +321,13 @@ export async function importItems(
   const freeNew = Boolean(choices?.freeNew);
 
   const db = createServiceRoleClient();
-  const [inUse, reserved] = await Promise.all([
+  const [inUse, reserved, lists] = await Promise.all([
     tagSpellingsInUse(db),
     freeNew ? mockReservedIds(db) : Promise.resolve(new Set<string>()),
+    courseLists(db, courseId),
   ]);
   if (!reserved) return { ok: false, error: 'Could not check the mock exams. Please try again.' };
+  if (!lists) return { ok: false, error: "Could not read this course's subject and topic lists. Please try again." };
 
   // Every row lands in the one table under the page's course (08 B1).
   let failCount = 0;
@@ -307,7 +336,7 @@ export async function importItems(
   for (const r of rows) {
     if (!(r.stem && r.correct && (r.option_a || r.option_b))) continue;
     const row: CsvRow = { ...r, item_id: r.item_id || `${courseId.replace(/_/g, '')}_${Date.now()}` };
-    const offList = checkListColumns(row);
+    const offList = checkListColumns(row) ?? checkCourseWords(row, courseId, lists);
     if (offList) {
       failCount++;
       errors.push(`${row.item_id}: ${offList}`);

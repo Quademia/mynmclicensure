@@ -31,7 +31,7 @@
 
 import type { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { QUIZ_TABLES } from '@/lib/quizzes/types';
-import type { Item, ItemFilterOptions, ItemFilters } from './types';
+import type { CourseLists, Item, ItemFilterOptions, ItemFilters, ListEntry } from './types';
 
 type Db = Awaited<ReturnType<typeof createClient>>;
 export type ServiceDb = ReturnType<typeof createServiceRoleClient>;
@@ -279,6 +279,26 @@ export async function existingItemIds(db: ServiceDb, itemIds: string[]): Promise
     for (const r of (data ?? []) as { item_id: string }[]) found.add(r.item_id);
   }
   return found;
+}
+
+/**
+ * A course's subject and topic lists (08 B5), sorted as a person reads
+ * them. Service role: the lists hold no browser grant (rule 9) — the
+ * admin reads them behind requireAdmin(), and no student read uses them.
+ * A list is short (GP's subjects are the longest, 149), so no paging.
+ * Null when they could not be read.
+ */
+export async function courseLists(db: ServiceDb, courseId: string): Promise<CourseLists | null> {
+  const read = async (table: 'bank_subjects' | 'bank_topics') => {
+    const { data, error } = await db.from(table).select('id, name, retired').eq('course_id', courseId);
+    if (error) {
+      console.error(`courseLists ${table}:`, error);
+      return null;
+    }
+    return ((data ?? []) as ListEntry[]).sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+  };
+  const [subjects, topics] = await Promise.all([read('bank_subjects'), read('bank_topics')]);
+  return subjects && topics ? { subjects, topics } : null;
 }
 
 /**

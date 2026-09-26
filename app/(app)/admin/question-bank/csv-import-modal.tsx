@@ -22,16 +22,20 @@ import { useRef, useState } from 'react';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { importItems } from '@/lib/bank/actions';
 import { csvTemplate, parseCsv, type CsvParseResult } from '@/lib/bank/csv';
+import type { CourseLists } from '@/lib/bank/types';
 import { Icon } from '@/components/shell/icons';
 
 type Outcome = { successCount: number; failCount: number; errors: string[]; created: number; updated: number };
 
 export function CsvImportModal({
   courseId,
+  lists,
   onClose,
   onImported,
 }: {
   courseId: string;
+  /** The course's subject and topic lists (08 B5): the report checks each row against them. */
+  lists: CourseLists;
   onClose: () => void;
   /** Called after an import ran, before the modal closes itself. */
   onImported: () => Promise<void> | void;
@@ -59,7 +63,7 @@ export function CsvImportModal({
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
-      setParsed(parseCsv(String(ev.target?.result || ''), courseId));
+      setParsed(parseCsv(String(ev.target?.result || ''), courseId, lists));
       setOutcome(null);
       setError(null);
     };

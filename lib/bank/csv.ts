@@ -32,8 +32,24 @@
 // wipe a level or tags set in the editor since. One alias: the level
 // "Analyze", MyNclex's spelling, lands as "Analyse" (Sam, 2026-09-26) —
 // the same word, so a file carried over from MyNclex is not refused.
+//
+// 08 B5 (2026-09-26) adds the course's lists: a row whose subject or
+// topic is not on its course's list is skipped with the word named, and
+// one on the list but retired is skipped as retired; the match ignores
+// case and runs of spaces, and the row takes the list's spelling; a
+// blank is Not set. The database's keys are the floor; this is the words
+// before them.
 
-import { BLOOM_LEVELS, CSV_COLUMNS, DIFFICULTIES, OPTION_LETTERS, QUESTION_TYPES, normaliseTags } from './types';
+import {
+  BLOOM_LEVELS,
+  CSV_COLUMNS,
+  DIFFICULTIES,
+  OPTION_LETTERS,
+  QUESTION_TYPES,
+  normaliseTags,
+  type CourseLists,
+  type ListEntry,
+} from './types';
 
 // The three B4 columns a file may or may not carry.
 const B4_COLUMNS = ['bloom_level', 'question_ref', 'tags'] as const;
@@ -86,6 +102,40 @@ export function checkListColumns(row: CsvRow): string | null {
   return null;
 }
 
+/** A word as a list compares it: case and runs of spaces ignored. */
+export function listKey(word: string): string {
+  return String(word ?? '').trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+/** The list's entry for `word`, matched without case or spacing; null when it has none. */
+export function findOnList(list: readonly ListEntry[], word: string): ListEntry | null {
+  const k = listKey(word);
+  return list.find((e) => listKey(e.name) === k) ?? null;
+}
+
+/**
+ * The subject and topic of one row against its course's lists (08 B5).
+ * Returns the reason when a word is not on the list or is retired;
+ * otherwise writes the list's spelling into the row (a blank stays
+ * blank, which is Not set) and returns null. Run by the browser for the
+ * report and again by the import action on what it receives.
+ */
+export function checkCourseWords(row: CsvRow, courseId: string, lists: CourseLists): string | null {
+  const columns = [
+    ['subject', lists.subjects, 'subject'],
+    ['maintopic', lists.topics, 'topic'],
+  ] as const;
+  for (const [col, list, noun] of columns) {
+    const word = (row[col] || '').trim();
+    if (!word) continue;
+    const entry = findOnList(list, word);
+    if (!entry) return `${noun} "${word}" is not on ${courseId}'s list`;
+    if (entry.retired) return `${noun} "${word}" is retired on ${courseId}'s list`;
+    row[col] = entry.name;
+  }
+  return null;
+}
+
 export type CsvRow = Record<string, string>;
 
 export type CsvReportLine = { ok: boolean; msg: string };
@@ -134,8 +184,12 @@ export function readCsv(text: string): string[][] {
   return records;
 }
 
-/** Legacy parseCsv: header → keys, then the row rules with legacy's words. */
-export function parseCsv(text: string, courseId: string): CsvParseResult {
+/**
+ * Legacy parseCsv: header → keys, then the row rules with legacy's words.
+ * With the course's lists (08 B5) it also checks each row's subject and
+ * topic against them.
+ */
+export function parseCsv(text: string, courseId: string, lists?: CourseLists): CsvParseResult {
   const records = readCsv(text);
   if (records.length < 2) {
     return { rows: [], validCount: 0, report: [{ ok: false, msg: 'CSV is empty or has no data rows.' }] };
@@ -170,7 +224,7 @@ export function parseCsv(text: string, courseId: string): CsvParseResult {
       report.push({ ok: false, msg: `Row ${rowNum}: must have at least 2 options — skipped.` });
       continue;
     }
-    const offList = checkListColumns(row);
+    const offList = checkListColumns(row) ?? (lists ? checkCourseWords(row, courseId, lists) : null);
     if (offList) {
       report.push({ ok: false, msg: `Row ${rowNum}: ${offList} — skipped.` });
       continue;
@@ -235,7 +289,9 @@ export function csvTemplate(courseId: string): string {
     '', '', '', '',
     'b',
     'The normal resting heart rate for adults is 60-100 bpm.',
-    'Anatomy', 'Cardiovascular', 'Heart rate',
+    // subject and topic blank (Not set): a word must be on the course's
+    // list (08 B5), and no one example word is on every course's
+    '', '', 'Heart rate',
     'Easy', '1', 'GP_BATCH_001', 'true',
     'Remember', 'Example source', 'vital signs;adult',
   ].join(',');
