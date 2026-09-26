@@ -216,33 +216,95 @@ export async function liveQuizzesNaming(db: ServiceDb, courseId: string, itemIds
   return count;
 }
 
+// A read that may pass 1,000 rows is paged: the API stops at its row
+// cap and says nothing (08 B7 is the same fix for the older reads).
+const PAGE = 1000;
+
 /**
- * Every tag in use across the bank, keyed by its lower-case form: the
- * spelling a new tag is snapped to, so "Pain" typed where "pain" is in
- * use becomes "pain" and stays one tag (08 B4). Paged, because a table
- * read stops at the API's row cap.
+ * Every row that carries a tag, whole bank: the Tags panel counts and
+ * rewrites these, and the save snaps a new tag to their spellings. Null
+ * when the bank could not be read.
  */
-export async function tagSpellingsInUse(db: ServiceDb): Promise<Map<string, string>> {
-  const spellings = new Map<string, string>();
-  const PAGE = 1000;
+export async function taggedRows(db: ServiceDb): Promise<{ item_id: string; tags: string[] }[] | null> {
+  const rows: { item_id: string; tags: string[] }[] = [];
   for (let from = 0; ; from += PAGE) {
     const { data, error } = await db
       .from('question_bank')
-      .select('tags')
+      .select('item_id, tags')
       .neq('tags', '{}')
       .order('item_id')
       .range(from, from + PAGE - 1);
     if (error) {
-      console.error('tagSpellingsInUse:', error);
-      return spellings;
+      console.error('taggedRows:', error);
+      return null;
     }
-    const rows = (data ?? []) as { tags: string[] | null }[];
-    for (const row of rows) {
-      for (const tag of row.tags ?? []) {
-        const key = tag.toLowerCase();
-        if (!spellings.has(key)) spellings.set(key, tag);
-      }
+    const page = (data ?? []) as { item_id: string; tags: string[] | null }[];
+    for (const r of page) rows.push({ item_id: r.item_id, tags: r.tags ?? [] });
+    if (page.length < PAGE) return rows;
+  }
+}
+
+/**
+ * Every tag in use across the bank, keyed by its lower-case form: the
+ * spelling a new tag is snapped to, so "Pain" typed where "pain" is in
+ * use becomes "pain" and stays one tag (08 B4). An unreadable bank
+ * snaps nothing.
+ */
+export async function tagSpellingsInUse(db: ServiceDb): Promise<Map<string, string>> {
+  const spellings = new Map<string, string>();
+  for (const row of (await taggedRows(db)) ?? []) {
+    for (const tag of row.tags) {
+      const key = tag.toLowerCase();
+      if (!spellings.has(key)) spellings.set(key, tag);
     }
-    if (rows.length < PAGE) return spellings;
+  }
+  return spellings;
+}
+
+/**
+ * Which of these ids the bank already holds, in any course — the
+ * importer's two choices apply only to the rows a file creates. In
+ * slices of 200, because the ids ride in the request's address. Null
+ * when the bank could not be read.
+ */
+export async function existingItemIds(db: ServiceDb, itemIds: string[]): Promise<Set<string> | null> {
+  const found = new Set<string>();
+  const ids = [...new Set(itemIds)];
+  for (let i = 0; i < ids.length; i += 200) {
+    const { data, error } = await db.from('question_bank').select('item_id').in('item_id', ids.slice(i, i + 200));
+    if (error) {
+      console.error('existingItemIds:', error);
+      return null;
+    }
+    for (const r of (data ?? []) as { item_id: string }[]) found.add(r.item_id);
+  }
+  return found;
+}
+
+/**
+ * The free rows per course, published and draft, for the Free pool
+ * panel. Null when the bank could not be read.
+ */
+export async function freeRowCounts(db: ServiceDb): Promise<Map<string, { free: number; freeDrafts: number }> | null> {
+  const counts = new Map<string, { free: number; freeDrafts: number }>();
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await db
+      .from('question_bank')
+      .select('course_id, is_published')
+      .eq('is_free_sample', true)
+      .order('item_id')
+      .range(from, from + PAGE - 1);
+    if (error) {
+      console.error('freeRowCounts:', error);
+      return null;
+    }
+    const page = (data ?? []) as { course_id: string; is_published: boolean }[];
+    for (const r of page) {
+      const c = counts.get(r.course_id) ?? { free: 0, freeDrafts: 0 };
+      if (r.is_published) c.free++;
+      else c.freeDrafts++;
+      counts.set(r.course_id, c);
+    }
+    if (page.length < PAGE) return counts;
   }
 }

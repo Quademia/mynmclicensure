@@ -149,6 +149,13 @@
 .qm .review-item-row .badge { flex-shrink: 0; }
 .qm .review-item-remove { background: none; border: none; cursor: pointer; color: var(--danger); font-size: 15px; padding: 0; }
 
+/* 08 B4: a draft question in a quiz — its mark beside the id, and the
+   review's one line naming them all (the start refuses until they are
+   published). The warning triple is the shared badge's. */
+.qm .draft-mark { margin-left: var(--space-6); padding: 1px 6px; font-size: 10px; flex-shrink: 0; }
+.qm .draft-warning { margin: 0; padding: var(--space-10) var(--space-20); background: var(--badge-warning-bg); border-bottom: 1px solid var(--badge-warning-border); color: var(--badge-warning-ink); font-size: 12px; line-height: 1.5; }
+.qm .draft-warning .mono { font-family: monospace; }
+
 /* ── Pane actions bar ── */
 .qm .pane { min-width: 0; }
 .qm .pane-actions { display: flex; align-items: center; gap: 10px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); flex-wrap: wrap; }

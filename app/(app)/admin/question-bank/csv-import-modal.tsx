@@ -9,6 +9,12 @@
 // course. Single use, so it sits beside its caller (folder convention #3).
 // Portalled to <body> (AGENTS.md workaround) with the `qb-modal` scope
 // class for its styles.
+//
+// 08 B4: two choices per file — publish the new questions now or keep
+// them as drafts (the default, as for a question saved by hand), and
+// mark them free or not. Both apply to the questions the file creates;
+// a question already in the bank keeps its own settings, and the result
+// line says how many were new and how many updated.
 
 'use client';
 
@@ -17,6 +23,8 @@ import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { importItems } from '@/lib/bank/actions';
 import { csvTemplate, parseCsv, type CsvParseResult } from '@/lib/bank/csv';
 import { Icon } from '@/components/shell/icons';
+
+type Outcome = { successCount: number; failCount: number; errors: string[]; created: number; updated: number };
 
 export function CsvImportModal({
   courseId,
@@ -30,8 +38,10 @@ export function CsvImportModal({
 }) {
   const [parsed, setParsed] = useState<CsvParseResult | null>(null);
   const [phase, setPhase] = useState<'pick' | 'importing' | 'done'>('pick');
-  const [outcome, setOutcome] = useState<{ successCount: number; failCount: number; errors: string[] } | null>(null);
+  const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [publishNew, setPublishNew] = useState(false);
+  const [freeNew, setFreeNew] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   function downloadTemplate() {
@@ -59,13 +69,19 @@ export function CsvImportModal({
   async function runImport() {
     if (!parsed || !parsed.rows.length) return;
     setPhase('importing');
-    const result = await importItems(courseId, parsed.rows);
+    const result = await importItems(courseId, parsed.rows, { publishNew, freeNew });
     if (!result.ok) {
       setError(result.error);
       setPhase('pick');
       return;
     }
-    setOutcome({ successCount: result.successCount, failCount: result.failCount, errors: result.errors });
+    setOutcome({
+      successCount: result.successCount,
+      failCount: result.failCount,
+      errors: result.errors,
+      created: result.created,
+      updated: result.updated,
+    });
     setPhase('done');
     await onImported();
     window.setTimeout(onClose, 2000);
@@ -96,6 +112,11 @@ export function CsvImportModal({
               {outcome ? (
                 <>
                   <div className="csv-report-row ok">{outcome.successCount} question{outcome.successCount !== 1 ? 's' : ''} imported successfully.</div>
+                  {outcome.successCount ? (
+                    <div className="csv-report-row ok">
+                      {outcome.created} new ({publishNew ? 'published' : 'drafts'}{freeNew ? ', free' : ''}) · {outcome.updated} already in the bank, updated with their own settings kept.
+                    </div>
+                  ) : null}
                   {outcome.failCount ? (
                     <div className="csv-report-row err">{outcome.failCount} row(s) failed — {outcome.errors.join('; ') || 'see the server log for details.'}</div>
                   ) : null}
@@ -112,6 +133,22 @@ export function CsvImportModal({
                 </>
               ) : null}
             </div>
+
+            {parsed && parsed.validCount > 0 && !outcome ? (
+              <div className="csv-choices">
+                <label className="csv-choice">
+                  <input type="checkbox" checked={publishNew} disabled={phase !== 'pick'} onChange={(e) => setPublishNew(e.target.checked)} />
+                  Publish the new questions now
+                </label>
+                <label className="csv-choice">
+                  <input type="checkbox" checked={freeNew} disabled={phase !== 'pick'} onChange={(e) => setFreeNew(e.target.checked)} />
+                  Mark the new questions as free
+                </label>
+                <p className="csv-choice-hint">
+                  Unticked, new questions are saved as drafts. Both choices apply only to questions this file adds — a question already in the bank keeps its own settings. A question in a mock exam cannot be free.
+                </p>
+              </div>
+            ) : null}
 
             <div className="modal-actions">
               <button type="button" className="btn btn-primary" disabled={!canImport} onClick={runImport}>

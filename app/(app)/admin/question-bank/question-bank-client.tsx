@@ -23,6 +23,8 @@
 // gains Status, Free and Level filters, a Draft badge, Publish /
 // Unpublish per card and "Publish all shown". Unpublishing asks first
 // when live quizzes name the question, since each will refuse to start.
+// Two whole-bank panels open as cards above the list, needing no course:
+// Tags (tags-panel.tsx) and Free pool (free-pool-panel.tsx).
 
 'use client';
 import { useConfirm } from '@/lib/overlays/shared/confirm-dialog';
@@ -30,6 +32,8 @@ import { useConfirm } from '@/lib/overlays/shared/confirm-dialog';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Toast } from '@/lib/toast/toast';
 import { CsvImportModal } from './csv-import-modal';
+import { FreePoolPanel } from './free-pool-panel';
+import { TagsPanel } from './tags-panel';
 import { countQuizzesNaming, deleteQuestion, loadCourseItems, saveQuestion, setPublished } from '@/lib/bank/actions';
 import {
   BLOOM_LEVELS,
@@ -162,6 +166,21 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
 
   // DS4: the app's own dialog for every question the page asks.
   const [confirm, confirmDialog] = useConfirm();
+
+  // ── the two panels (08 B4): whole bank, so no course needed ──
+  const [sidePanel, setSidePanel] = useState<'tags' | 'free' | null>(null);
+  const notify = useCallback((text: string, tone: 'error' | 'success') => setMsg({ text, tone }), []);
+
+  // After a tag is renamed, merged or deleted: the course's cards and the
+  // open editor's tags read again, so neither shows the old word.
+  async function afterTagChange() {
+    if (!courseId) return;
+    const fresh = await fetchCourse(courseId);
+    if (currentId) {
+      const row = fresh.find((i) => i.item_id === currentId);
+      if (row) setForm((f) => ({ ...f, tags: row.tags ?? [] }));
+    }
+  }
 
   // ── the CSV modal (slice 4b) ──
   const [csvOpen, setCsvOpen] = useState(false);
@@ -646,6 +665,22 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
           </span>
         </div>
         <div className="toolbar-right">
+          <button
+            type="button"
+            className={`btn btn-ghost${sidePanel === 'tags' ? ' is-on' : ''}`}
+            aria-pressed={sidePanel === 'tags'}
+            onClick={() => setSidePanel((p) => (p === 'tags' ? null : 'tags'))}
+          >
+            Tags
+          </button>
+          <button
+            type="button"
+            className={`btn btn-ghost${sidePanel === 'free' ? ' is-on' : ''}`}
+            aria-pressed={sidePanel === 'free'}
+            onClick={() => setSidePanel((p) => (p === 'free' ? null : 'free'))}
+          >
+            Free pool
+          </button>
           {courseId && !loading && shownDrafts.length ? (
             <button type="button" className="btn btn-ghost" disabled={busyId !== null} onClick={publishAllShown}>
               <Icon name="check-circle" />Publish all shown ({shownDrafts.length})
@@ -655,6 +690,13 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
           <button type="button" className="btn btn-primary" disabled={!courseId} onClick={openNew}>+ New Question</button>
         </div>
       </div>
+
+      {/* The two whole-bank panels (08 B4) */}
+      {sidePanel === 'tags' ? (
+        <TagsPanel onClose={() => setSidePanel(null)} onChanged={afterTagChange} notify={notify} />
+      ) : sidePanel === 'free' ? (
+        <FreePoolPanel onClose={() => setSidePanel(null)} />
+      ) : null}
 
       {/* List + edit panel */}
       <div className="qb-layout">

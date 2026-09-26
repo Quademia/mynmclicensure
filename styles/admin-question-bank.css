@@ -95,6 +95,43 @@
 .qb .tag-chip button { border: none; background: none; cursor: pointer; color: var(--text-muted); font-size: 15px; line-height: 1; padding: 0 var(--space-4); }
 .qb .tag-chip button:hover { color: var(--danger); }
 
+/* ── 08 B4: the Tags and Free pool panels — cards above the list ── */
+.qb .toolbar .btn.is-on { border-color: var(--accent); color: var(--accent); background: var(--primary-light); }
+.qb .qb-card-panel { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-16) var(--space-20); margin-bottom: var(--space-16); }
+.qb .qb-card-panel-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-12); }
+.qb .qb-card-panel-head h3 { margin: 0; font-size: 15px; color: var(--primary); }
+.qb .qb-card-panel-head-actions { display: flex; align-items: center; gap: var(--space-8); }
+.qb .qb-card-panel-note { margin: var(--space-6) 0 var(--space-12); font-size: 12px; line-height: 1.5; color: var(--text-muted); }
+.qb .qb-card-panel-empty { margin: var(--space-8) 0; font-size: 13px; color: var(--text-muted); list-style: none; }
+.qb .qb-card-panel-find { width: 100%; max-width: 320px; box-sizing: border-box; padding: 7px 10px; margin-bottom: var(--space-8); border: 1px solid var(--border); border-radius: 6px; font: inherit; font-size: 13px; color: var(--primary); }
+.qb .muted { color: var(--text-muted); }
+
+.qb .tag-list { list-style: none; margin: 0; padding: 0; max-height: 420px; overflow-y: auto; }
+.qb .tag-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-12); padding: var(--space-8) 0; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.qb .tag-row:first-child { border-top: 0; }
+.qb .tag-row-main { display: flex; align-items: center; gap: var(--space-8); min-width: 0; }
+.qb .tag-row .tag-chip { padding: 2px var(--space-10); }
+.qb .tag-count { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.qb .tag-row-actions, .qb .tag-row-edit { display: flex; align-items: center; gap: var(--space-6); flex-wrap: wrap; }
+.qb .tag-row-edit input, .qb .tag-row-edit select { padding: 5px 8px; border: 1px solid var(--border); border-radius: 6px; font: inherit; font-size: 13px; color: var(--primary); min-width: 160px; }
+.qb .tag-delete { color: var(--danger); }
+
+.qb .pool-total { margin: 0 0 var(--space-12); font-size: 13px; color: var(--text-muted); }
+.qb .pool-total strong { color: var(--primary); }
+.qb .pool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-12); }
+.qb .pool-prog { border: 1px solid var(--border); border-radius: 8px; padding: var(--space-10) var(--space-12); }
+.qb .pool-prog-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-8); margin-bottom: var(--space-6); }
+.qb .pool-prog-name { font-size: 13px; font-weight: 700; color: var(--primary); }
+.qb .pool-prog-count { font-size: 13px; font-weight: 700; color: var(--accent); white-space: nowrap; }
+.qb .pool-prog ul { list-style: none; margin: 0; padding: 0; }
+.qb .pool-course { display: flex; justify-content: space-between; gap: var(--space-8); padding: 3px 0; font-size: 12px; color: var(--primary); }
+.qb .pool-course-count { white-space: nowrap; }
+
+/* ── 08 B4: the import's two choices ── */
+.qb-modal .csv-choices { margin-top: var(--space-12); padding: var(--space-10) var(--space-12); border: 1px solid var(--border); border-radius: 8px; }
+.qb-modal .csv-choice { display: flex; align-items: center; gap: var(--space-8); font-size: 13px; font-weight: 600; color: var(--primary); margin-bottom: var(--space-6); cursor: pointer; }
+.qb-modal .csv-choice-hint { margin: var(--space-4) 0 0; font-size: 12px; line-height: 1.5; color: var(--text-muted); }
+
 .qb .empty-state { text-align: center; padding: 48px 24px; color: var(--text-muted); background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); }
 .qb .empty-state .icon { display: flex; justify-content: center; color: var(--text-muted); margin-bottom: 12px; }
 .qb .empty-state p { font-size: 14px; margin: 0; }
@@ -168,6 +205,11 @@
   .qb .toolbar-right .btn { flex: 1; }
   .qb .q-card { padding: 14px; }
   .qb .q-card-header { flex-wrap: wrap; }
+  /* B4 made the toolbar four or five buttons: two to a row, so no label breaks */
+  .qb .toolbar-right .btn { flex: 1 1 calc(50% - var(--space-8)); }
+  .qb .qb-card-panel { padding: var(--space-12) var(--space-16); }
+  .qb .qb-card-panel-find { max-width: none; }
+  .qb .tag-row-edit input, .qb .tag-row-edit select { flex: 1 1 100%; min-width: 0; }
   .qb .form-row { grid-template-columns: 1fr; gap: 0; }
   .qb .option-pair { grid-template-columns: 1fr; }
   .qb .panel-actions .btn { flex: 1 1 auto; }

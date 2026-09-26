@@ -491,6 +491,12 @@ export function QuizManager({
     window.setTimeout(() => goToPane(1), 1400);
   }
 
+  // 08 B4: a draft question in a quiz makes its start refuse ("This quiz
+  // has a question that is not published"). The picker, the selected
+  // list and the review mark each one, and the review names them all.
+  const selectedDrafts = selected.filter((i) => !i.is_published);
+  const draftBadge = (i: Item) => (i.is_published ? null : <span className="badge badge-warning draft-mark">Draft</span>);
+
   const courseTitle = (id: string) => courses.find((c) => c.course_id === id)?.title || id;
   const timeLimitText = form.timeLimit
     ? `${form.timeLimit} seconds (${Math.round(Number(form.timeLimit) / 60)} min)`
@@ -799,7 +805,7 @@ export function QuizManager({
                           return (
                             <tr key={i.item_id} className={sel ? 'selected-row' : ''} onClick={() => toggleItem(i)}>
                               <td><input type="checkbox" checked={sel} onClick={(e) => e.stopPropagation()} onChange={() => toggleItem(i)} /></td>
-                              <td className="mono">{i.item_id}</td>
+                              <td className="mono">{i.item_id}{draftBadge(i)}</td>
                               <td><KindChip hue={QUESTION_TYPE_HUE[i.question_type]}>{i.question_type}</KindChip></td>
                               <td><span className="item-stem-short" title={i.stem}>{i.stem}</span></td>
                               <td className="muted">{i.maintopic || '—'}</td>
@@ -830,6 +836,7 @@ export function QuizManager({
                   selected.map((i) => (
                     <div key={i.item_id} className="sel-item">
                       <span className="sel-item-id">{i.item_id}</span>
+                      {draftBadge(i)}
                       <span className="sel-item-stem" title={i.stem}>{i.stem}</span>
                       <button type="button" className="sel-item-remove" title="Remove" onClick={() => removeSelected(i.item_id)}>×</button>
                     </div>
@@ -876,11 +883,19 @@ export function QuizManager({
               <h4>{W.reviewItems}</h4>
               <span className="result-count">{selected.length} questions</span>
             </div>
+            {selectedDrafts.length ? (
+              <div className="draft-warning" role="note">
+                {selectedDrafts.length === 1 ? '1 question here is a draft' : `${selectedDrafts.length} questions here are drafts`}:{' '}
+                <span className="mono">{selectedDrafts.map((i) => i.item_id).join(', ')}</span>. This {W.noun} will refuse to start until{' '}
+                {selectedDrafts.length === 1 ? 'it is' : 'they are'} published in the Question Bank, or removed here.
+              </div>
+            ) : null}
             <div>
               {selected.map((item, idx) => (
                 <div key={item.item_id} className="review-item-row">
                   <span className="review-item-num">{idx + 1}.</span>
                   <span className="review-item-id">{item.item_id}</span>
+                  {draftBadge(item)}
                   <span className="review-item-stem">{item.stem}</span>
                   <KindChip hue={QUESTION_TYPE_HUE[item.question_type]}>{item.question_type}</KindChip>
                   <button type="button" className="review-item-remove" title="Remove" onClick={() => removeFromReview(item.item_id)}>×</button>

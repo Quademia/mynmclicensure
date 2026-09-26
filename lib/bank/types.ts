@@ -142,10 +142,29 @@ export type PublishResult =
 // lists name any of the given ids — what Unpublish asks about first.
 export type QuizUseResult = { ok: true; count: number } | { ok: false; error: string };
 
+// The import's two choices per file (08 B4), applied to the rows the
+// file CREATES; a row already in the bank keeps its own switches.
+export type ImportChoices = { publishNew: boolean; freeNew: boolean };
+
 // What importItems() returns (slice 4b): legacy's two counts, plus the
-// batch errors legacy sent to the browser console.
+// batch errors legacy sent to the browser console; since 08 B4 the
+// successes split into rows created and rows updated.
 export type ImportResult =
-  | { ok: true; successCount: number; failCount: number; errors: string[] }
+  | { ok: true; successCount: number; failCount: number; errors: string[]; created: number; updated: number }
+  | { ok: false; error: string };
+
+// ── the two panels (08 B4) ──
+/** One tag in use, as the Tags panel lists it: whole bank, every course. */
+export type TagCount = { tag: string; count: number };
+export type TagListResult = { ok: true; tags: TagCount[] } | { ok: false; error: string };
+/** A rename, merge or delete: how many questions it changed. */
+export type TagChangeResult = { ok: true; changed: number } | { ok: false; error: string };
+
+/** A course's free rows: published (in the pool) and drafts marked free (not yet). */
+export type FreePoolCourse = { courseId: string; title: string; archived: boolean; free: number; freeDrafts: number };
+export type FreePoolProgramme = { programId: string; name: string; free: number; courses: FreePoolCourse[] };
+export type FreePoolResult =
+  | { ok: true; programmes: FreePoolProgramme[]; totalFree: number }
   | { ok: false; error: string };
 
 // What loadCourseItems() returns: the whole course, as legacy loaded it
