@@ -788,7 +788,39 @@ the release the migration seeds prod's lists from prod's own words (a
 course-name subject spelled differently there is seeded, not cleared,
 and tidied in the panel). **At cutover the bank's re-copy (§11) must
 seed the lists before the rows**, or the keys refuse the copy — a line
-for the cutover script.
+for the cutover script (queued on BUILD_LIST under 00).
+
+**Built 2026-09-26**, ticked on Sam's walk, with no readers' check
+(Sam). As the spec says, with these made at the build:
+
+- The tidy step (spaces, empty strings, two spellings of one word)
+  was added to the migration so the prod release cannot fail on the
+  prod bank's words; it found nothing on dev. The comma rule was
+  dropped from the name CHECK.
+- A rename onto a word already on the list is refused by the action;
+  the panel sees it first and asks as a merge, as the Tags panel does.
+- The panel re-reads with every course read — after a save, an
+  import, a question delete, or a change of its own — so its counts
+  never lag the page.
+
+**Proven on dev.** The migration in a rolled-back run, then applied:
+151 subjects and 457 topics seeded, 3,600 course-name subjects cleared
+and only those rows' `updated_at` moved, no version or history; a
+rename cascading to 62 questions with no history row; delete in use,
+an unknown word, a case twin and a padded name refused; `authenticated`
+refused on both lists. Session 1: RN_MED's editor (no subjects, with
+the hint; 78 topics); a retired topic kept and saved on its question
+and not offered to another; the CSV report refusing "Cardio", a retired
+"hematology" and a subject "Anatomy" by name; "cardiovascular" stored
+as "Cardiovascular" and a blank as Not set. Session 2, on throwaway
+words and questions since removed: add; a case twin refused; a rename
+with no dialog reaching its question; a rename onto an existing word
+turned into a merge that asked; a split keeping one part and tagging
+the other, an existing tag kept; retire and restore; a delete in use
+refused with its count, unused deletes accepted; 375px. The dev bank
+was left as found (151 / 457, no drafts, nothing retired); one real
+question, `GP_360697`, carries the tag "Prioritization" from Sam's own
+walk of B4.
 
 What the clean-up starts from (dev, 2026-09-26): RN_MED 78 topics,
 RN_SURG 32, GP 31 — about 170 of them doubles like
@@ -849,6 +881,6 @@ now, and any course that grows past it. Before cutover.
 | B2 The answers server-only | ✅ 2026-09-21 (`20260921120000_question_bank_secret_half.sql`; the secret half and every write grant off the browser roles, the three write policies with them, the concept search a service-role function; proven on dev and walked both sides — §4) |
 | B3 The admin page paged | ⬜ later |
 | B4 The columns, the version and the history | ✅ 2026-09-26 (`20260926150000_question_bank_columns_history.sql`, `20260926160000_copiers_refuse_any_draft.sql`; the code in two sittings the same day; walked on dev and by Sam — §4) |
-| B5 The lists and their panel | ⬜ adopted 2026-09-26; §8 S18 ✅ 2026-09-26, amended the same day (§3, the B5 block); scoped 2026-09-26, the five details ruled; the clean-up is content work |
+| B5 The lists and their panel | ✅ 2026-09-26 (`20260926170000_bank_subject_topic_lists.sql`; the code in two sittings the same day; walked on dev and by Sam — §4); the clean-up of the words is content work, in the panel |
 | B6 The draws | ⬜ adopted 2026-09-26; no storage change |
 | B7 Whole-course reads past the 1,000-row cap | ⬜ queued 2026-09-26 (Sam); found walking B4; before cutover |
