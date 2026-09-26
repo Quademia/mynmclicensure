@@ -11,7 +11,8 @@
 //
 // DS21 (Sam, 2026-09-23), on MyNclex's pattern:
 //   · the one wordmark both bars draw (`wordmark.tsx`) — the painted Q,
-//     the product on top, "by Quademia" beneath;
+//     QUADEMIA small on top, the product bold beneath (the order settled
+//     2026-09-26; DS21's first cut had the product on top);
 //   · the links from `lib/nav/public.ts` in a row on a computer, the same
 //     list behind the hamburger on a phone;
 //   · ONE action, Sign in, on every page. Subscribe and Register Free
