@@ -354,7 +354,7 @@ into 03 Q3 as its first settled ingredient.
 - **The free pool's door** (`09-free-account-and-gamification.md`
   F1): settled 2026-09-26 as the mark (B4's `is_free_sample`) and two
   doors, the read policy and attempt creation — §8 S16. The mark is
-  built here; the doors are built under 09 F1 once S16 is ticked.
+  built here; the doors are built under 09 F1 (S16 ticked 2026-09-26).
 
 ---
 
@@ -365,6 +365,6 @@ into 03 Q3 as its first settled ingredient.
 | B1 One table | ✅ 2026-09-19 (`20260920010000_question_bank.sql`; proven on dev — 5,281 rows, the eleven gone, 2,401 visible to the RN student and none of RM's, EXPLAIN a hashed SubPlan once per statement; walked by Sam: the builder, the runner, the admin bank page, packs, the picker) |
 | B2 The answers server-only | ✅ 2026-09-21 (`20260921120000_question_bank_secret_half.sql`; the secret half and every write grant off the browser roles, the three write policies with them, the concept search a service-role function; proven on dev and walked both sides — §4) |
 | B3 The admin page paged | ⬜ later |
-| B4 The columns, the version and the history | ⬜ adopted 2026-09-26; §8 S17's tick first |
-| B5 The lists and their panel | ⬜ adopted 2026-09-26; §8 S18's tick first; the clean-up is content work |
+| B4 The columns, the version and the history | ⬜ adopted 2026-09-26; §8 S17 ✅ 2026-09-26 |
+| B5 The lists and their panel | ⬜ adopted 2026-09-26; §8 S18 ✅ 2026-09-26; the clean-up is content work |
 | B6 The draws | ⬜ adopted 2026-09-26; no storage change |

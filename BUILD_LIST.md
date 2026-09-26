@@ -86,6 +86,9 @@ the gamma-era list it replaces is in git history and in `qacademy-gamma`.
 - ✅ §8 S13 config, levels and cohort — config admin-only with a registry read by the service role, users.level keyed to levels, cohort a year (D49, D51) — 2026-09-18
 - ✅ §8 S14 the premium marker — `products.is_premium` replaces the `_2026_PREP` id suffix (it carried a year and had no price gate); rule 9 took `products`' grants back to SELECT, the admin writes moved to the service role, two dead policies dropped (D23 item 4) — 2026-09-22
 - ✅ §8 S15 one subscription per Paystack payment — a unique index on the reference, activation adopting the other door's receipt on a refusal; rule 9 took `subscriptions`' grants back to SELECT for signed-in users, the admin writes moved to the service role, two policies dropped (the D4 webhook's prerequisite) — 2026-09-23
+- ✅ §8 S16 the free pool's door — two doors, the read policy and attempt creation, opening rows marked free to any signed-in student; the mark is 08 B4's column, the doors 09 F1 — ticked 2026-09-26, not built
+- ✅ §8 S17 the bank's new columns, the version and the history — level, published, free mark, source, tags, dates, version; a history table on content changes to published rows; three columns copied into the sitting; CHECKs on type and difficulty — ticked 2026-09-26, built as 08 B4
+- ✅ §8 S18 the classification lists — subjects and topics per course as tables with keys, a Topics panel, the importer refusing unknown words — ticked 2026-09-26, built as 08 B5
 - ⬜ §8 has no row for `courses_select` — the policy is `auth.uid() is not null`, so a signed-out visitor reads nothing from `courses`; `/premium-prep` and `/subscribe` both work around it with a service-role read, and D23 item 5 (a sales row lists its courses) cannot be met on any public page without it (2026-09-22)
 
 ## Improvements
@@ -275,7 +278,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 Decided in principle in a cloud session on 2026-09-20; candidates, none sliced, the open questions in the doc's §4.
 
 - ⬜ What the trial gives, before F1 is sliced — a 7-day programme trial or `WELCOME_TRIAL`'s General Paper only. The 60 days are a stopgap from 2026-05-27, when the paid plans were paused and the trials bumped 7 → 60 the same day; the pause ends at cutover. Six active products are unreachable today: `WELCOME_TRIAL` and five `*_FULL_FREE` (30 days, the whole programme free), neither linked from a programme nor named in any code — Sam's view is the `*_FULL_FREE` stay admin-grant-only. Nothing needs deleting: `status` is one column (Sam, 2026-09-22)
-- ⬜ F1 The pool and its door — the mark is 08 B4's column; this slice is the two doors, the read policy and attempt creation, plus the free-only draws for a student with no course (§8 S16 drafted 2026-09-26, tick pending; a mark, not a separate table — Sam)
+- ⬜ F1 The pool and its door — the mark is 08 B4's column; this slice is the two doors, the read policy and attempt creation, plus the free-only draws for a student with no course (§8 S16 ✅ 2026-09-26; a mark, not a separate table — Sam)
 - ⬜ F2 The free account — no course_access rows, the builder and runner on the pool, the dashboard's free-vs-trial line
 - ⬜ F3 Landing and copy — "free practice questions, forever"; the trial and the products as the route to the full bank
 - ⬜ G1 Streak, points, leaderboard — derived from the graded rows, no new tables; NMC Prep walked 2026-09-24

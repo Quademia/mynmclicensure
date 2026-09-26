@@ -236,7 +236,7 @@ still reach the top ten in a good week.
   policy lets any signed-in student read a marked row, and attempt
   creation accepts a set of ids when every one is marked free. That is
   the security floor, so it is `rebuild.md` **§8 S16** (drafted
-  2026-09-26, tick pending; this said S14 until 2026-09-22 and S15
+  and ticked 2026-09-26; this said S14 until 2026-09-22 and S15
   until 2026-09-23). Free rows stay inside their paid course; a
   question named by any mock can never be free. The pool gets a Free
   pool view on the bank page, per programme with its count, and an
@@ -361,7 +361,7 @@ one-off buttons and cards.
 
 | Slice | Date |
 |---|---|
-| F1 The pool and its door | candidate; settled as the mark + two doors 2026-09-26; §8 S16 drafted, tick pending; the column is 08 B4 |
+| F1 The pool and its door | candidate; settled as the mark + two doors 2026-09-26; §8 S16 ✅ 2026-09-26; the column is 08 B4 |
 | F2 The free account | candidate |
 | F3 Landing and copy | candidate |
 | G1 Streak, points, leaderboard (derived) | candidate; the NMC Prep walk done 2026-09-24 |
