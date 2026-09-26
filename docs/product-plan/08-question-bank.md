@@ -250,6 +250,18 @@ row:
    import nothing until their lists were written.
 8. NAC_BASIC_PREV and RPHN_PPHN hold the same 180 questions on dev —
    intended (sample questions). No action.
+9. **At the scoping (the five details, all as recommended):** a
+   question keeps its words, and the database checks each against its
+   course's list (a key made of the course and the word), so a rename
+   reaches every question inside the database and no screen that shows
+   a topic changes; a retired word is refused by the importer, named as
+   retired, and kept on a question that already carries it; Split lets
+   the admin pick which half is the topic (the first by default) and is
+   offered only on topics with a "/"; the CSV template's example row
+   leaves subject and topic blank; and a sitting keeps the word it was
+   given (S17's "names, not keys"), so a later rename shows the old
+   word on old attempts — 03 Q12's concern, not B5's. No readers' check
+   before the build (Sam).
 
 ---
 
@@ -648,23 +660,130 @@ the admin.
 
 ### B5 — The lists and their panel (S18)
 
-Shaped by Sam's rulings of 2026-09-26 (§3, the B5 block); not yet
-scoped against the code — that comes before the build, as for B4. Two
-sessions.
+Shaped by Sam's rulings of 2026-09-26 (§3, the B5 block, items 1–8)
+and scoped against the code and the dev database the same day, the
+five details ruled as recommended (item 9). Two sessions: the
+migration, the editor and the importer; then the panel.
 
-- **Storage, one migration.** `bank_subjects` and `bank_topics` (course,
-  name, retired), keys from the bank rows to them, seeded from the
-  words already in the bank per course; no question's words change
-  except the course-name subjects, cleared to Not set. An empty value
-  stays null ("Not set"). Rule 9 on the new tables.
-- **Code, first session.** The editor's Subject and Topic become
-  dropdowns from the course's lists, "— Not set —" first; the importer
-  refuses a word not on the list, naming it, and accepts a blank.
-- **Code, second session.** The **Subjects & topics** panel on the
-  Question Bank page, beside Tags, for the course picked: the two lists
-  side by side with add, rename, merge, retire and delete (refused
-  while in use), a count of questions not set, and Split on topics
-  (the main topic kept, the other half a tag).
+**What the scoping found.** The words are clean on dev: no leading or
+trailing spaces, no empty strings, no two spellings of one word in a
+course; 721 questions have no topic (the 720 RMHN and one in GP) and
+one has no subject. **Subject reaches no student screen** — it is
+copied into a sitting and a pack row and never shown — so clearing the
+course-name subjects changes nothing a student sees. Topic and subtopic
+reach students through the builders' chips, the runner's topic line and
+the pack; every one reads the word stored on the question, so keeping
+the word there leaves all of them untouched. The bank already has
+indexes on `(course_id, subject)` and `(course_id, maintopic)`, which
+the key below needs on the referencing side. Four database functions
+read the words (`create_attempt`, `create_offline_pack`,
+`search_question_bank_ids`, the history trigger) — all by name, none
+changes.
+
+**Storage, one migration.**
+
+- `bank_subjects` and `bank_topics`, the same shape: `id bigint
+  generated always as identity primary key`, `course_id text not null
+  references courses (course_id)`, `name text not null` with a CHECK
+  that it is trimmed, not empty and holds no `;` or `,` (the CSV's and
+  the tags' separators), `retired boolean not null default false`,
+  `created_at timestamptz not null default now()`; `unique (course_id,
+  name)` — the key the bank rows point at — and a unique index on
+  `(course_id, lower(name))`, so "Pain" and "pain" cannot both be on a
+  course's list.
+- **The eight course-name subjects cleared to Not set**, named pair by
+  pair (course, word): NAC_BASIC_CLIN "NAC", NAC_BASIC_PREV "NAP",
+  RM_MID "Midwifery", RMHN_PSYCH_NURS "RMHN", RMHN_PSYCH_PPHARM "MHN",
+  RN_MED "Medical Nursing", RN_SURG "Surgical Nursing", RPHN_PPHN
+  "Principles of Public Health Nursing". A label change: no history
+  row, no new version; `updated_at` moves, since the subject did.
+- **Seeded** from the distinct non-null words per course, as they stand
+  (§3 item 2).
+- **The keys:** `question_bank (course_id, subject) references
+  bank_subjects (course_id, name) on update cascade`, and the same for
+  `(course_id, maintopic)` to `bank_topics`. A null word is not
+  checked, which is Not set. A rename of a list entry reaches every
+  question carrying it inside the database — a label change, so the
+  history trigger writes nothing; a delete of an entry still in use is
+  refused by the database (the default `no action`). Subtopic stays
+  free text.
+- **Rule 9:** both tables are born with `grant all` to the browser
+  roles (the schema's default privileges), so `revoke all` from `anon`
+  and `authenticated` on the tables and their sequences, RLS on, no
+  policy; the admin reads and writes them through the service role
+  behind `requireAdmin()`. No student read uses them — the builders
+  read the word on the question. `question_bank`'s own grants are
+  unchanged (no new column). `role_table_grants` checked after the
+  apply.
+- Proven in rolled-back runs before the apply (AGENTS.md): the counts
+  seeded per course, the eight cleared, every row passing both keys; a
+  rename cascading with no history row; a delete in use refused; a word
+  not on the list refused; a case twin refused; no browser grant.
+
+**Code, first session.**
+
+- `lib/bank/types.ts`: `ListEntry` (`id`, `name`, `retired`) and
+  `CourseLists` (`subjects`, `topics`); `CourseItemsResult` carries the
+  course's lists.
+- `lib/bank/queries.ts`: `courseLists(db, courseId)` through the service
+  role.
+- `lib/bank/csv.ts`: `parseCsv` takes the course's lists and refuses a
+  row whose subject or topic is not on them, naming the word — 'Row 7:
+  topic "Cardio" is not on RN_MED's list — skipped' — or names it
+  retired; the match is without case and the row takes the list's
+  spelling; a blank is Not set. The template's example row leaves
+  subject and topic blank.
+- `lib/bank/actions.ts`: `loadCourseItems` returns the lists with the
+  rows. `saveQuestion` checks the subject and topic against the course's
+  list the same way — a retired word only when the question already
+  carries it — before the key refuses it in Postgres's words.
+  `importItems` repeats the list check on what it receives.
+- The bank page (`question-bank-client.tsx`): Subject and Main Topic
+  become dropdowns from the lists, "— Not set —" first, retired words
+  left out unless the question carries one (shown "(retired)"). The CSV
+  dialog is handed the lists for its report.
+
+**Code, second session — the Subjects & topics panel.** A button
+beside Tags, enabled once a course is picked, opening a card above the
+list as Tags does (`subjects-topics-panel.tsx`, beside its caller). The
+two lists side by side, stacked under 768px, each entry with its
+question count and a line for the questions not set; the counts read
+in pages (RM_PED_OBS_HRN holds 1,080). Per entry: **rename** (the list
+row's name changes and the key carries it to every question; onto an
+entry already there it is a **merge** and asks first), **merge** (the
+questions move to the chosen entry, then the emptied entry is
+deleted; asks first), **retire / restore**, **delete** (refused while
+any question uses it, with the count). On a topic holding a "/",
+**Split**: the admin picks which part is the topic (the first by
+default), the questions move to it — added to the list if new — and the
+other parts join their tags, snapped to the spellings in use; the
+emptied entry is then deleted; asks first. Every move stamps
+`updated_by`. Actions in `lib/bank/actions.ts` through the service
+role.
+
+**Done when.** The migration applied on dev: both tables seeded, the
+eight subjects cleared, every row passing both keys, neither browser
+role holding a grant on the new tables. The editor offers the course's
+words and Not set; a save with a word not on the list is refused by
+name; a CSV row naming an unknown or retired word is refused by name
+in the report and by the action, `cardiology` lands as the list's
+"Cardiology", a blank lands as Not set. In the panel: add a word and
+use it; rename one and see every question carry it with no history row;
+merge two; retire one and see it leave the dropdown; delete one in use
+refused, unused accepted; split a double into its topic and a tag. The
+builders, the runner and a pack unchanged. `npm run build` green; Sam
+walks it.
+
+**Reach.** Dev until the merge; from the apply, the dev site runs
+`main`'s code against the new keys, where the admin page's free-text
+Subject and Topic are refused by Postgres when the word is not on the
+course's list — a save or an import batch of 50 fails with the
+database's message. That reaches only Sam; no student read changes. At
+the release the migration seeds prod's lists from prod's own words (a
+course-name subject spelled differently there is seeded, not cleared,
+and tidied in the panel). **At cutover the bank's re-copy (§11) must
+seed the lists before the rows**, or the keys refuse the copy — a line
+for the cutover script.
 
 What the clean-up starts from (dev, 2026-09-26): RN_MED 78 topics,
 RN_SURG 32, GP 31 — about 170 of them doubles like
@@ -725,6 +844,6 @@ now, and any course that grows past it. Before cutover.
 | B2 The answers server-only | ✅ 2026-09-21 (`20260921120000_question_bank_secret_half.sql`; the secret half and every write grant off the browser roles, the three write policies with them, the concept search a service-role function; proven on dev and walked both sides — §4) |
 | B3 The admin page paged | ⬜ later |
 | B4 The columns, the version and the history | ✅ 2026-09-26 (`20260926150000_question_bank_columns_history.sql`, `20260926160000_copiers_refuse_any_draft.sql`; the code in two sittings the same day; walked on dev and by Sam — §4) |
-| B5 The lists and their panel | ⬜ adopted 2026-09-26; §8 S18 ✅ 2026-09-26, amended the same day (§3, the B5 block); scoping next; the clean-up is content work |
+| B5 The lists and their panel | ⬜ adopted 2026-09-26; §8 S18 ✅ 2026-09-26, amended the same day (§3, the B5 block); scoped 2026-09-26, the five details ruled; the clean-up is content work |
 | B6 The draws | ⬜ adopted 2026-09-26; no storage change |
 | B7 Whole-course reads past the 1,000-row cap | ⬜ queued 2026-09-26 (Sam); found walking B4; before cutover |
