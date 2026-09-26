@@ -335,9 +335,12 @@ panels second, with Sam's walk between.
   role; the actor travels on the row. Backfill: every existing row
   `is_published = true`, both dates the migration's time, version 1,
   `updated_by` null.
-- Two CHECKs: `question_type in ('MCQ','TF','SATA')`; `difficulty in
-  ('Easy','Moderate','Hard')` or null. Today's 5,281 rows pass both
-  (counted on dev: 5,277 / 0 / 4; 2,437 / 2,125 / 719).
+- Three CHECKs: `question_type in ('MCQ','TF','SATA')`; `difficulty in
+  ('Easy','Moderate','Hard')` or null; `bloom_level` in the six or null
+  (the same refuse-a-stray-word method as the other two — the file's
+  reviewer counted the spec's "two" against the file's three, and the
+  third stays). Today's 5,281 rows pass all three (counted on dev:
+  5,277 / 0 / 4; 2,437 / 2,125 / 719; no level yet).
 - `question_bank_history`: `history_id bigint generated always as
   identity primary key`, the bank's columns, `version`, `changed_by
   text`, `changed_at timestamptz not null default now()`, `deleted
@@ -447,6 +450,13 @@ panels second, with Sam's walk between.
   `deleteQuestion` is **not** unchanged: it stamps `updated_by` in one
   statement (label-only, no history row) and deletes in the next, so
   the deleted row's history names who deleted it.
+- `lib/offline-packs/queries.ts`: the renderer's read of
+  `offline_pack_items` names its 27 columns instead of `*` — the
+  student's SELECT is a column list now, and PostgREST hands `*` to
+  Postgres as a literal `*`, which needs SELECT on every column it
+  expands to, the three new ones included. Found by the migration's
+  reviewer; with `*` the pack page failed with "permission denied" from
+  the apply until the change (built the same hour on the branch).
 - Reads. `knownItemIds` and `getBuilderCourseItems` (student-only) add
   `.eq('is_published', true)`, belt and braces with the policy.
   `getItemFilterOptions` serves both audiences — the builder through
@@ -522,8 +532,14 @@ stays out of every draw until the merge; a CSV row whose difficulty is
 not exactly Easy, Moderate or Hard (`main` writes it as typed) fails
 its batch of 50 at the CHECK with Postgres's message, where before it
 landed; and any history row written meanwhile carries a null
-`changed_by`. Say so when proposing the apply; or the apply waits for
-the merge.
+`changed_by`. **And one thing that does break there until the merge:
+the student's offline-pack page**, whose renderer on `main` reads the
+pack rows with `*` — refused once the grant is a column list (above).
+Applied 2026-09-26 with Sam's "apply it now", the renderer fixed on the
+branch the same hour; the dev site's pack page waits for the merge.
+The refusal's course scope was corrected by a second file the same
+afternoon (`20260926160000_copiers_refuse_any_draft.sql`): a draft is
+refused whichever course it sits in, as the clause above says.
 
 ### B5 — The lists and their panel (S18)
 
