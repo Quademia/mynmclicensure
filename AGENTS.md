@@ -200,14 +200,18 @@ above sit at the repo root; the audience grouping inside them is kept.
    and so is a database function that returns a set. A read of a whole
    table, a whole course, or every row of a kind across students goes
    through `readAll()` (`lib/supabase/read-all.ts`), 1,000 at a time
-   until a short batch comes back; a page that shows a list pages it
-   for the screen (`.range()`, the database doing the filtering); a
-   number is a count (`{ count: 'exact', head: true }`), never rows
-   counted in the app. Exempt: one row, one student's own rows, one
-   attempt's, pack's or subscription's rows, and the small reference
-   tables. This is diagnosis finding **D52**; unlike rule 9 its known
-   places were fixed in one pass rather than surface by surface (Sam,
-   2026-09-26), so a new read that breaks it is a new defect.
+   until a short batch comes back, ordered on a unique column; an id
+   list it lengthens goes to `.in()` in `slices()`. That is the floor.
+   New code does better where it can: a page that shows a list pages
+   it for the screen (`.range()`, the database doing the filtering),
+   and a number is a count (`{ count: 'exact', head: true }`) rather
+   than rows counted in the app. Exempt: one row, one student's own
+   rows, one attempt's, pack's or subscription's rows, and the small
+   reference tables. This is diagnosis finding **D52**; unlike rule 9
+   its known places were put on the floor in one pass rather than
+   surface by surface (Sam, 2026-09-26) — each takes the better shape
+   when its surface is next worked on — so a new read that breaks it
+   is a new defect.
 
 ## Known Workarounds (stack-level, carried from MyNclex)
 

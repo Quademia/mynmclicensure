@@ -12,8 +12,13 @@
 // One shape change under the standing S4 tick: the student joins on
 // `attempts.user_id` in the same select; legacy fetched the window's
 // users in a second call by id.
+//
+// D52 (2026-09-26): the API cuts any request at 1,000 rows, `.limit(5000)`
+// included, so the window read 1,000 and `capped` (which tests 5,000)
+// never said so. It reads in batches up to the cap now (rule 10).
 
 import type { ServerSupabaseClient } from '@/lib/access';
+import { readAll } from '@/lib/supabase/read-all';
 import type { AttemptListRow } from './types';
 
 export const ATTEMPTS_WINDOW_CAP = 5000;
@@ -35,16 +40,19 @@ export async function getAttemptsWindow(
   toIso: string | null,
   cap = ATTEMPTS_WINDOW_CAP,
 ): Promise<AttemptsWindow> {
-  let query = db.from('attempts').select(WINDOW_COLUMNS).order('ts_iso', { ascending: false }).limit(cap);
-  if (fromIso) query = query.gte('ts_iso', fromIso);
-  if (toIso) query = query.lt('ts_iso', toIso);
+  const build = () => {
+    let query = db.from('attempts').select(WINDOW_COLUMNS);
+    if (fromIso) query = query.gte('ts_iso', fromIso);
+    if (toIso) query = query.lt('ts_iso', toIso);
+    return query.order('ts_iso', { ascending: false }).order('attempt_id');
+  };
 
-  const { data, error } = await query;
+  const { data, error } = await readAll<unknown>((from, to) => build().range(from, to), { max: cap });
   if (error) {
     console.error('getAttemptsWindow:', error);
     return { attempts: [], capped: false };
   }
-  const attempts = (data ?? []) as unknown as WindowAttemptRow[];
+  const attempts = data as WindowAttemptRow[];
   return { attempts, capped: attempts.length >= cap };
 }
 

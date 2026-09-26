@@ -8,8 +8,13 @@
 //
 // RLS is the floor, not the filter (AGENTS.md): the student reads name
 // their user; the runner's ownership check is in lib/attempts/runner-load.
+//
+// D52 (2026-09-26; AGENTS.md rule 10): the reads that can pass the API's
+// 1,000-row cap — a quiz's sittings across students, a student's whole
+// attempt list, a whole course for the builders — go through readAll().
 
 import type { ServerSupabaseClient } from '@/lib/access';
+import { readAll, slices } from '@/lib/supabase/read-all';
 import type { createServiceRoleClient } from '@/lib/supabase/server';
 import { HISTORY_PAGE_SIZE, RECENT_ATTEMPTS_LIMIT, type Attempt, type AttemptItem, type AttemptListRow, type AttemptWithProgress, type BuilderItem, type HistoryFilters, type HistoryPage, type QuizAttemptStats } from './types';
 
@@ -42,16 +47,19 @@ export async function readAttemptItems(db: ServiceDb, attemptId: string): Promis
 // counted apart. The mean score is over the completed rows, rounded.
 export async function getQuizAttemptStats(db: ServerSupabaseClient, kind: 'fixed' | 'mock', quizId: string): Promise<QuizAttemptStats> {
   const empty: QuizAttemptStats = { total: 0, firstSittings: 0, retakes: 0, abandoned: 0, completed: 0, avgScore: 0 };
-  const { data, error } = await db
-    .from('attempts')
-    .select('attempt_id, source, status, score_pct')
-    .eq('quiz_id', quizId)
-    .in('source', [kind, 'retake']);
+  const { data: rows, error } = await readAll<{ source: string; status: string; score_pct: number | null }>((from, to) =>
+    db
+      .from('attempts')
+      .select('attempt_id, source, status, score_pct')
+      .eq('quiz_id', quizId)
+      .in('source', [kind, 'retake'])
+      .order('attempt_id')
+      .range(from, to),
+  );
   if (error) {
     console.error('getQuizAttemptStats:', error);
     return empty;
   }
-  const rows = (data ?? []) as { source: string; status: string; score_pct: number | null }[];
   const completedRows = rows.filter((a) => a.status === 'completed');
   const completed = completedRows.length;
   const avgScore = completed > 0 ? Math.round(completedRows.reduce((s, a) => s + (a.score_pct || 0), 0) / completed) : 0;
@@ -83,25 +91,31 @@ export async function getStudentAttempts(
   userId: string,
   courseId: string | null = null,
 ): Promise<AttemptWithProgress[]> {
-  let query = db.from('attempts').select('*').eq('user_id', userId).order('ts_iso', { ascending: false });
-  if (courseId) query = query.eq('course_id', courseId);
-  const { data, error } = await query;
+  const build = () => {
+    let query = db.from('attempts').select('*').eq('user_id', userId);
+    if (courseId) query = query.eq('course_id', courseId);
+    return query.order('ts_iso', { ascending: false }).order('attempt_id');
+  };
+  const { data: attempts, error } = await readAll<Attempt>((from, to) => build().range(from, to));
   if (error) {
     console.error('getStudentAttempts:', error);
     return [];
   }
-  const attempts = (data ?? []) as Attempt[];
 
   const open = attempts.filter((a) => a.status === 'in_progress').map((a) => a.attempt_id);
   const counts: Record<string, number> = {};
-  if (open.length) {
-    const { data: rows, error: rowsError } = await db
-      .from('attempt_items')
-      .select('attempt_id')
-      .in('attempt_id', open)
-      .not('chosen', 'is', null);
+  for (const ids of slices(open)) {
+    const { data: rows, error: rowsError } = await readAll<{ attempt_id: string }>((from, to) =>
+      db
+        .from('attempt_items')
+        .select('attempt_id')
+        .in('attempt_id', ids)
+        .not('chosen', 'is', null)
+        .order('attempt_item_id')
+        .range(from, to),
+    );
     if (rowsError) console.error('getStudentAttempts rows:', rowsError);
-    for (const r of (rows ?? []) as { attempt_id: string }[]) counts[r.attempt_id] = (counts[r.attempt_id] ?? 0) + 1;
+    for (const r of rows ?? []) counts[r.attempt_id] = (counts[r.attempt_id] ?? 0) + 1;
   }
   return attempts.map((a) => ({ ...a, answered_count: counts[a.attempt_id] ?? 0 }));
 }
@@ -119,18 +133,24 @@ export async function getStudentAttempts(
 //
 // Published rows only (08 B4): the policy already hides a draft from
 // this client; the filter names the scope in the query as well.
+//
+// 08 B7: a whole course, so readAll() — RM_PED_OBS_HRN's 1,080 came back
+// as 1,000, and since B6 the chips are built from these same rows.
 export async function getBuilderCourseItems(db: ServerSupabaseClient, courseId: string): Promise<BuilderItem[]> {
-  const { data, error } = await db
-    .from('question_bank')
-    .select('item_id, subject, maintopic, subtopic, difficulty, question_type')
-    .eq('course_id', courseId)
-    .eq('is_published', true)
-    .order('item_id');
+  const { data, error } = await readAll<BuilderItem>((from, to) =>
+    db
+      .from('question_bank')
+      .select('item_id, subject, maintopic, subtopic, difficulty, question_type')
+      .eq('course_id', courseId)
+      .eq('is_published', true)
+      .order('item_id')
+      .range(from, to),
+  );
   if (error) {
     console.error('getBuilderCourseItems:', error);
     return [];
   }
-  return (data ?? []) as BuilderItem[];
+  return data;
 }
 
 // getStudentAttemptsPaginated: the learning history page's read (7a) —

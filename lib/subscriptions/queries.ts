@@ -11,9 +11,14 @@
 //
 // RLS is the floor, not the filter (AGENTS.md): every student read names
 // its user; the admin list is admin by the gate that made the client.
+//
+// D52 (2026-09-26; AGENTS.md rule 10): the admin list takes the whole
+// table, and its totals, search and filters run over what it read — so
+// it goes through readAll(). Paging it for the screen is its proper shape.
 
 import { cache } from 'react';
 import type { ServerSupabaseClient } from '@/lib/access';
+import { readAll } from '@/lib/supabase/read-all';
 import { nowIso } from './dates';
 import type { ActiveSubscriptionWithProduct, CourseAccessMap, StudentHit, Subscription, SubscriptionListRow } from './types';
 
@@ -70,19 +75,23 @@ export async function getUpcomingAccess(db: ServerSupabaseClient, userId: string
 
 // ── the admin list (legacy loadData) ───────────────────────────────────
 export async function getAllSubscriptions(db: ServerSupabaseClient): Promise<SubscriptionListRow[]> {
-  const { data, error } = await db
-    .from('subscriptions')
-    .select(
-      'subscription_id, user_id, product_id, start_utc, expires_utc, status, source, source_ref, created_utc, ' +
-        'users ( user_id, name, forename, surname, email, program_id ), ' +
-        'products ( name, kind, duration_days )',
-    )
-    .order('start_utc', { ascending: false });
+  const { data, error } = await readAll<unknown>((from, to) =>
+    db
+      .from('subscriptions')
+      .select(
+        'subscription_id, user_id, product_id, start_utc, expires_utc, status, source, source_ref, created_utc, ' +
+          'users ( user_id, name, forename, surname, email, program_id ), ' +
+          'products ( name, kind, duration_days )',
+      )
+      .order('start_utc', { ascending: false })
+      .order('subscription_id')
+      .range(from, to),
+  );
   if (error) {
     console.error('getAllSubscriptions:', error);
     return [];
   }
-  return (data ?? []) as unknown as SubscriptionListRow[];
+  return data as SubscriptionListRow[];
 }
 
 // ── the Grant dialog's student search (legacy searchGrantUser) ─────────

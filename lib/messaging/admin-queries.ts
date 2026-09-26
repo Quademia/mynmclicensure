@@ -21,8 +21,16 @@
 // One shape change under the standing S4 tick: the student joins on
 // `messages_threads.user_id` in the same select; legacy fetched the
 // threads' users in a second call by id.
+//
+// D52 (2026-09-26; AGENTS.md rule 10): every read here but the dialog's
+// search takes a whole table — all threads, all their messages, every
+// unread message, every active student — so each goes through
+// readAll(), and an id list it lengthens is sent in slices. The safety
+// net only: the proper shapes (the inbox paged on the server, the badge
+// one count) are D39's, queued under 07.
 
 import type { ServerSupabaseClient } from '@/lib/access';
+import { readAll, slices } from '@/lib/supabase/read-all';
 import { nowIso } from '@/lib/subscriptions/dates';
 import type { LatestMessage, Thread } from './types';
 
@@ -45,63 +53,74 @@ export type RecipientScope = {
 
 // ── getAdminThreads ────────────────────────────────────────────────────
 export async function getAdminThreads(db: ServerSupabaseClient, filters: AdminThreadFilters): Promise<AdminThread[]> {
-  let searchUserIds: string[] | null = null;
+  let searchUserIds: Set<string> | null = null;
   const term = String(filters.search || '').trim();
   if (term) {
     const like = `%${term}%`;
-    const { data: matched, error } = await db
-      .from('users')
-      .select('user_id')
-      .or(`name.ilike.${like},forename.ilike.${like},surname.ilike.${like},email.ilike.${like}`);
+    const { data: matched, error } = await readAll<{ user_id: string }>((from, to) =>
+      db
+        .from('users')
+        .select('user_id')
+        .or(`name.ilike.${like},forename.ilike.${like},surname.ilike.${like},email.ilike.${like}`)
+        .order('user_id')
+        .range(from, to),
+    );
     if (error) {
       console.error('getAdminThreads - search:', error);
       return [];
     }
-    searchUserIds = (matched ?? []).map((u) => u.user_id as string);
-    if (!searchUserIds.length) return [];
+    searchUserIds = new Set(matched.map((u) => u.user_id));
+    if (!searchUserIds.size) return [];
   }
 
-  let query = db
-    .from('messages_threads')
-    .select('*, users ( user_id, name, forename, surname, email, program_id, avatar_url )')
-    .order('last_message_at', { ascending: false });
-  if (filters.status) query = query.eq('status', filters.status);
-  if (filters.contextType) query = query.eq('context_type', filters.contextType);
-  if (searchUserIds) query = query.in('user_id', searchUserIds);
+  const build = () => {
+    let query = db.from('messages_threads').select('*, users ( user_id, name, forename, surname, email, program_id, avatar_url )');
+    if (filters.status) query = query.eq('status', filters.status);
+    if (filters.contextType) query = query.eq('context_type', filters.contextType);
+    return query.order('last_message_at', { ascending: false }).order('thread_id');
+  };
 
-  const { data, error } = await query;
+  const { data, error } = await readAll<Thread & { users: ThreadUser | null }>((from, to) => build().range(from, to));
   if (error) {
     console.error('getAdminThreads:', error);
     return [];
   }
-  const threads = (data ?? []) as unknown as (Thread & { users: ThreadUser | null })[];
+  // The search's students are matched here, not sent as an .in() list:
+  // a short term can match more ids than the request's address can hold.
+  const threads = searchUserIds ? data.filter((t) => searchUserIds.has(t.user_id)) : data;
   if (!threads.length) return [];
-
-  const ids = threads.map((t) => t.thread_id);
-  const { data: msgs, error: msgError } = await db
-    .from('messages')
-    .select('thread_id, body_text, sender_role, created_at, read_by_user, read_by_admin')
-    .in('thread_id', ids)
-    .order('created_at', { ascending: false });
-  if (msgError) console.error('getAdminThreads - latest:', msgError);
 
   const latest: Record<string, LatestMessage> = {};
   const unread: Record<string, boolean> = {};
-  for (const m of (msgs ?? []) as LatestMessage[]) {
-    if (!latest[m.thread_id]) latest[m.thread_id] = m;
-    if (!m.read_by_admin) unread[m.thread_id] = true;
+  for (const ids of slices(threads.map((t) => t.thread_id))) {
+    const { data: msgs, error: msgError } = await readAll<LatestMessage>((from, to) =>
+      db
+        .from('messages')
+        .select('thread_id, body_text, sender_role, created_at, read_by_user, read_by_admin')
+        .in('thread_id', ids)
+        .order('created_at', { ascending: false })
+        .order('message_id')
+        .range(from, to),
+    );
+    if (msgError) console.error('getAdminThreads - latest:', msgError);
+    for (const m of msgs ?? []) {
+      if (!latest[m.thread_id]) latest[m.thread_id] = m;
+      if (!m.read_by_admin) unread[m.thread_id] = true;
+    }
   }
   return threads.map((t) => ({ ...t, latest: latest[t.thread_id] ?? null, unread: Boolean(unread[t.thread_id]) }));
 }
 
 // ── getUnreadCountForAdmin (the admin sidebar's badge) ─────────────────
 export async function getUnreadCountForAdmin(db: ServerSupabaseClient): Promise<number> {
-  const { data, error } = await db.from('messages').select('thread_id').eq('read_by_admin', false);
+  const { data, error } = await readAll<{ thread_id: string }>((from, to) =>
+    db.from('messages').select('thread_id').eq('read_by_admin', false).order('message_id').range(from, to),
+  );
   if (error) {
     console.error('getUnreadCountForAdmin:', error);
     return 0;
   }
-  return new Set((data ?? []).map((m) => m.thread_id as string)).size;
+  return new Set(data.map((m) => m.thread_id)).size;
 }
 
 // ── searchStudentsForMessaging (the New Thread dialog) ─────────────────
@@ -141,12 +160,13 @@ export async function getStudentCourseIds(db: ServerSupabaseClient, userId: stri
 
 // ── the distinct levels and cohorts (legacy fetchDistinctFilters) ──────
 export async function getDistinctLevelsAndCohorts(db: ServerSupabaseClient): Promise<{ levels: string[]; cohorts: string[] }> {
-  const { data, error } = await db.from('users').select('level, cohort').eq('active', true);
+  const { data: rows, error } = await readAll<{ level: string | null; cohort: string | null }>((from, to) =>
+    db.from('users').select('level, cohort').eq('active', true).order('user_id').range(from, to),
+  );
   if (error) {
     console.error('getDistinctLevelsAndCohorts:', error);
     return { levels: [], cohorts: [] };
   }
-  const rows = (data ?? []) as { level: string | null; cohort: string | null }[];
   const levels = [...new Set(rows.map((u) => u.level).filter((v): v is string => Boolean(v)))].sort();
   const cohorts = [...new Set(rows.map((u) => String(u.cohort || '')).filter(Boolean))].sort();
   return { levels, cohorts };
@@ -154,27 +174,43 @@ export async function getDistinctLevelsAndCohorts(db: ServerSupabaseClient): Pro
 
 // ── resolveRecipients (the Bulk Send scope) ────────────────────────────
 export async function resolveRecipients(db: ServerSupabaseClient, scope: RecipientScope): Promise<string[]> {
-  let query = db.from('users').select('user_id').eq('active', true).eq('role', 'STUDENT');
-  if (scope.program_ids?.length) query = query.in('program_id', scope.program_ids);
-  if (scope.cohort_ids?.length) query = query.in('cohort', scope.cohort_ids);
-  if (scope.level_ids?.length) query = query.in('level', scope.level_ids);
+  const build = () => {
+    let query = db.from('users').select('user_id').eq('active', true).eq('role', 'STUDENT');
+    if (scope.program_ids?.length) query = query.in('program_id', scope.program_ids);
+    if (scope.cohort_ids?.length) query = query.in('cohort', scope.cohort_ids);
+    if (scope.level_ids?.length) query = query.in('level', scope.level_ids);
+    return query.order('user_id');
+  };
 
-  const { data, error } = await query;
+  const { data, error } = await readAll<{ user_id: string }>((from, to) => build().range(from, to));
   if (error) {
     console.error('resolveRecipients:', error);
     return [];
   }
-  let userIds = (data ?? []).map((u) => u.user_id as string);
+  let userIds = data.map((u) => u.user_id);
   if (!userIds.length) return [];
 
   type SubRow = { user_id: string; products: { kind: string | null } | null };
 
+  // The two narrowing reads below take the students in slices (D52):
+  // past a few hundred ids the list is too long for the request's address.
+  // As before, a failed read narrows to nobody (D39).
   if (scope.subscription_kinds?.length) {
-    const { data: subs } = await db.from('subscriptions').select('user_id, products ( kind )').eq('status', 'ACTIVE').in('user_id', userIds);
     const want = new Set(scope.subscription_kinds.map((k) => k.toUpperCase()));
     const matched = new Set<string>();
-    for (const s of (subs ?? []) as unknown as SubRow[]) {
-      if (want.has(String(s.products?.kind || '').toUpperCase())) matched.add(s.user_id);
+    for (const ids of slices(userIds)) {
+      const { data: subs } = await readAll<unknown>((from, to) =>
+        db
+          .from('subscriptions')
+          .select('user_id, products ( kind )')
+          .eq('status', 'ACTIVE')
+          .in('user_id', ids)
+          .order('subscription_id')
+          .range(from, to),
+      );
+      for (const s of (subs ?? []) as SubRow[]) {
+        if (want.has(String(s.products?.kind || '').toUpperCase())) matched.add(s.user_id);
+      }
     }
     userIds = userIds.filter((id) => matched.has(id));
     if (!userIds.length) return [];
@@ -183,15 +219,23 @@ export async function resolveRecipients(db: ServerSupabaseClient, scope: Recipie
   if (scope.course_ids?.length) {
     // Live course_access rows on any of the wanted courses (02 C2).
     const now = nowIso();
-    const { data: rows } = await db
-      .from('course_access')
-      .select('user_id')
-      .in('user_id', userIds)
-      .in('course_id', scope.course_ids)
-      .is('revoked_utc', null)
-      .lte('start_utc', now)
-      .gt('expires_utc', now);
-    const matched = new Set((rows ?? []).map((r) => r.user_id as string));
+    const courseIds = scope.course_ids;
+    const matched = new Set<string>();
+    for (const ids of slices(userIds)) {
+      const { data: rows } = await readAll<{ user_id: string }>((from, to) =>
+        db
+          .from('course_access')
+          .select('user_id')
+          .in('user_id', ids)
+          .in('course_id', courseIds)
+          .is('revoked_utc', null)
+          .lte('start_utc', now)
+          .gt('expires_utc', now)
+          .order('access_id')
+          .range(from, to),
+      );
+      for (const r of rows ?? []) matched.add(r.user_id);
+    }
     userIds = userIds.filter((id) => matched.has(id));
   }
 

@@ -19,6 +19,7 @@
 // name "published + active" here.
 
 import type { ServerSupabaseClient } from '@/lib/access';
+import { readAll } from '@/lib/supabase/read-all';
 import type { createServiceRoleClient } from '@/lib/supabase/server';
 import { QUIZ_TABLES, type Quiz, type QuizCard, type QuizKind, type QuizListRow, type QuizPage } from './types';
 
@@ -87,13 +88,18 @@ export async function getAllQuizzesPaginated(
 // status — by course then title. The attempts analytics page's title
 // map (slice 14); the mock admin list left it for the paged read in Q2.
 // Full rows: service role, behind requireAdmin().
+// A whole table, so readAll() (D52, AGENTS.md rule 10) — it passes the
+// API's 1,000-row cap only at 1,000 quizzes of a kind, and is read in
+// batches all the same so the rule carries no exception to remember.
 export async function getAllQuizzes(db: ServiceDb, kind: QuizKind): Promise<Quiz[]> {
-  const { data, error } = await db.from(QUIZ_TABLES[kind]).select('*').order('course_id').order('title');
+  const { data, error } = await readAll<Quiz>((from, to) =>
+    db.from(QUIZ_TABLES[kind]).select('*').order('course_id').order('title').order('quiz_id').range(from, to),
+  );
   if (error) {
     console.error('getAllQuizzes:', error);
     return [];
   }
-  return (data ?? []) as Quiz[];
+  return data;
 }
 
 // getQuizById / getMockQuizById: the full row — the attempt spawn's read

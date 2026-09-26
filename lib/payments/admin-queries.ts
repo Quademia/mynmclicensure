@@ -11,8 +11,14 @@
 // `product_id` are keys now, so the student and the product join in
 // the same select; legacy fetched the page's users in a second call
 // because no key existed. Same columns, same rows.
+//
+// D52 (2026-09-26; AGENTS.md rule 10): the revenue summary sums every
+// activated payment ever made, so it goes through readAll(); past 1,000
+// payments it came back short and the revenue low. A sum in the database
+// is its proper shape.
 
 import type { ServerSupabaseClient } from '@/lib/access';
+import { readAll } from '@/lib/supabase/read-all';
 import type { Payment, PaymentStatus } from './types';
 
 export type PaymentFilters = {
@@ -122,14 +128,18 @@ export async function getTodayRevenue(db: ServerSupabaseClient): Promise<{ minor
 // ── the revenue summary's rows (legacy renderRevenue) ──────────────────
 // Every ACTIVATED row with an amount; grouped by product in the page.
 export async function getRevenueRows(db: ServerSupabaseClient): Promise<RevenueRow[]> {
-  const { data, error } = await db
-    .from('payments')
-    .select('product_id, amount_minor_paid, currency')
-    .eq('status', 'ACTIVATED')
-    .gt('amount_minor_paid', 0);
+  const { data, error } = await readAll<RevenueRow>((from, to) =>
+    db
+      .from('payments')
+      .select('product_id, amount_minor_paid, currency')
+      .eq('status', 'ACTIVATED')
+      .gt('amount_minor_paid', 0)
+      .order('reference')
+      .range(from, to),
+  );
   if (error) {
     console.error('getRevenueRows:', error);
     return [];
   }
-  return (data ?? []) as RevenueRow[];
+  return data;
 }

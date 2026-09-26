@@ -11,8 +11,13 @@
 //
 // RLS is the floor, not the filter (AGENTS.md): every read names the
 // student.
+//
+// D52 (2026-09-26; AGENTS.md rule 10): the list's preview read takes
+// every message of every thread the student holds, which a long-standing
+// student can take past the API's 1,000-row cap — readAll().
 
 import type { ServerSupabaseClient } from '@/lib/access';
+import { readAll } from '@/lib/supabase/read-all';
 import type { LatestMessage, Message, StudentThread, Thread } from './types';
 
 // ── getStudentThreads ──────────────────────────────────────────────────
@@ -30,15 +35,19 @@ export async function getStudentThreads(db: ServerSupabaseClient, userId: string
   if (!threads.length) return [];
 
   const ids = threads.map((t) => t.thread_id);
-  const { data: msgs, error: msgError } = await db
-    .from('messages')
-    .select('thread_id, body_text, sender_role, created_at, read_by_user, read_by_admin')
-    .in('thread_id', ids)
-    .order('created_at', { ascending: false });
+  const { data: msgs, error: msgError } = await readAll<LatestMessage>((from, to) =>
+    db
+      .from('messages')
+      .select('thread_id, body_text, sender_role, created_at, read_by_user, read_by_admin')
+      .in('thread_id', ids)
+      .order('created_at', { ascending: false })
+      .order('message_id')
+      .range(from, to),
+  );
   if (msgError) console.error('getStudentThreads - latest:', msgError);
 
   const latest: Record<string, LatestMessage> = {};
-  for (const m of (msgs ?? []) as LatestMessage[]) {
+  for (const m of msgs ?? []) {
     if (!latest[m.thread_id]) latest[m.thread_id] = m;
   }
   return threads.map((t) => ({ ...t, latest: latest[t.thread_id] ?? null }));

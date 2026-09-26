@@ -14,31 +14,41 @@
 // open: an error is logged and an empty result returned. RLS is the
 // floor, not the filter (AGENTS.md): every student read names the
 // student.
+//
+// D52 (2026-09-26; AGENTS.md rule 10): the admin page's three reads take
+// whole tables, so each goes through readAll() — the engagement counts
+// are one row per student per announcement and pass the API's 1,000-row
+// cap with a few hundred students.
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import type { Profile } from '@/lib/auth/profile';
+import { readAll } from '@/lib/supabase/read-all';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import { filterAnnouncementsForStudent, mergeNoticeStates } from './scoping';
 import type { Announcement, EngageMap, StudentNoticeMap, StudentScope } from './types';
 
 // ── admin ──────────────────────────────────────────────────────────────
 export async function getAllAnnouncements(db: ServerSupabaseClient): Promise<Announcement[]> {
-  const { data, error } = await db.from('announcements').select('*').order('created_at', { ascending: false });
+  const { data, error } = await readAll<Announcement>((from, to) =>
+    db.from('announcements').select('*').order('created_at', { ascending: false }).order('announcement_id').range(from, to),
+  );
   if (error) {
     console.error('getAllAnnouncements:', error);
     return [];
   }
-  return (data ?? []) as Announcement[];
+  return data;
 }
 
 export async function getEngagementCounts(db: ServerSupabaseClient): Promise<EngageMap> {
-  const { data, error } = await db.from('user_notice_state').select('item_id, state').eq('item_type', 'ANNOUNCEMENT');
+  const { data, error } = await readAll<{ item_id: string; state: string }>((from, to) =>
+    db.from('user_notice_state').select('item_id, state').eq('item_type', 'ANNOUNCEMENT').order('id').range(from, to),
+  );
   if (error) {
     console.error('getEngagementCounts:', error);
     return {};
   }
   const map: EngageMap = {};
-  for (const row of (data ?? []) as { item_id: string; state: string }[]) {
+  for (const row of data) {
     if (!map[row.item_id]) map[row.item_id] = { read: 0, clicked: 0, dismissed: 0 };
     if (row.state === 'read' || row.state === 'clicked' || row.state === 'dismissed') map[row.item_id][row.state]++;
   }
@@ -47,12 +57,14 @@ export async function getEngagementCounts(db: ServerSupabaseClient): Promise<Eng
 
 // legacy: `select cohort from users where cohort is not null`, deduped and sorted
 export async function getCohorts(db: ServerSupabaseClient): Promise<string[]> {
-  const { data, error } = await db.from('users').select('cohort').not('cohort', 'is', null);
+  const { data, error } = await readAll<{ cohort: string | null }>((from, to) =>
+    db.from('users').select('cohort').not('cohort', 'is', null).order('user_id').range(from, to),
+  );
   if (error) {
     console.error('getCohorts:', error);
     return [];
   }
-  return [...new Set((data ?? []).map((u: { cohort: string | null }) => u.cohort).filter((c): c is string => Boolean(c)))].sort();
+  return [...new Set(data.map((u) => u.cohort).filter((c): c is string => Boolean(c)))].sort();
 }
 
 export async function getAnnouncementById(db: ServerSupabaseClient, id: string): Promise<Announcement | null> {

@@ -29,7 +29,14 @@
 // writes: the ids any mock names, the live quizzes naming some ids, and
 // the tag spellings already in use.
 
+//
+// 08 B7 (2026-09-26; D52, AGENTS.md rule 10): a read that takes a whole
+// course — or, for the panels, the whole bank — goes through readAll(),
+// because the API stops at 1,000 rows and says nothing: RM_PED_OBS_HRN
+// holds 1,080 and every such read came back 80 short.
+
 import type { createClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { readAll } from '@/lib/supabase/read-all';
 import { QUIZ_TABLES } from '@/lib/quizzes/types';
 import type { CourseLists, Item, ItemFilterOptions, ItemFilters, ListEntry } from './types';
 
@@ -89,45 +96,52 @@ export async function searchConceptItemIds(db: ServiceDb, courseId: string, quer
   const q = String(query || '').trim();
   if (!q) return [];
 
-  const { data, error } = await db.rpc('search_question_bank_ids', { p_course_id: courseId, p_query: q });
+  // a set-returning function is cut at 1,000 too: "a" matches all 1,080
+  // of RM_PED_OBS_HRN (B7)
+  const { data, error } = await readAll<{ item_id: string }>((from, to) =>
+    db.rpc('search_question_bank_ids', { p_course_id: courseId, p_query: q }).order('item_id').range(from, to),
+  );
   if (error) {
     console.error('searchConceptItemIds:', error);
     return [];
   }
-  return (data ?? []).map((r: { item_id: string }) => r.item_id);
+  return data.map((r) => r.item_id);
 }
 
 // The admin picker's read (and the bank page's "load the course"): every
 // filter is an equality; the keyword is an ilike across every text field.
 // Whole rows, the key included — service role, behind requireAdmin().
 export async function getItemsByFilters(db: ServiceDb, courseId: string, filters: ItemFilters = {}): Promise<Item[]> {
-  let query = db.from('question_bank').select('*').eq('course_id', courseId);
-  if (filters.subject) query = query.eq('subject', filters.subject);
-  if (filters.maintopic) query = query.eq('maintopic', filters.maintopic);
-  if (filters.subtopic) query = query.eq('subtopic', filters.subtopic);
-  if (filters.difficulty) query = query.eq('difficulty', filters.difficulty);
-  if (filters.question_type) query = query.eq('question_type', filters.question_type);
-  if (filters.batch_id) query = query.eq('batch_id', filters.batch_id);
+  const build = () => {
+    let query = db.from('question_bank').select('*').eq('course_id', courseId);
+    if (filters.subject) query = query.eq('subject', filters.subject);
+    if (filters.maintopic) query = query.eq('maintopic', filters.maintopic);
+    if (filters.subtopic) query = query.eq('subtopic', filters.subtopic);
+    if (filters.difficulty) query = query.eq('difficulty', filters.difficulty);
+    if (filters.question_type) query = query.eq('question_type', filters.question_type);
+    if (filters.batch_id) query = query.eq('batch_id', filters.batch_id);
 
-  if (filters.keyword) {
-    const kw = filters.keyword.trim();
-    query = query.or(
-      `stem.ilike.%${kw}%,` +
-        `option_a.ilike.%${kw}%,option_b.ilike.%${kw}%,` +
-        `option_c.ilike.%${kw}%,option_d.ilike.%${kw}%,` +
-        `option_e.ilike.%${kw}%,option_f.ilike.%${kw}%,` +
-        `rationale.ilike.%${kw}%,` +
-        `maintopic.ilike.%${kw}%,subtopic.ilike.%${kw}%,` +
-        `subject.ilike.%${kw}%`,
-    );
-  }
+    if (filters.keyword) {
+      const kw = filters.keyword.trim();
+      query = query.or(
+        `stem.ilike.%${kw}%,` +
+          `option_a.ilike.%${kw}%,option_b.ilike.%${kw}%,` +
+          `option_c.ilike.%${kw}%,option_d.ilike.%${kw}%,` +
+          `option_e.ilike.%${kw}%,option_f.ilike.%${kw}%,` +
+          `rationale.ilike.%${kw}%,` +
+          `maintopic.ilike.%${kw}%,subtopic.ilike.%${kw}%,` +
+          `subject.ilike.%${kw}%`,
+      );
+    }
+    return query.order('item_id');
+  };
 
-  const { data, error } = await query.order('item_id');
+  const { data, error } = await readAll<Item>((from, to) => build().range(from, to));
   if (error) {
     console.error('getItemsByFilters:', error);
     return [];
   }
-  return (data ?? []) as Item[];
+  return data;
 }
 
 // Distinct real values for the dropdowns and chips, from the course's
@@ -141,19 +155,21 @@ export async function getItemFilterOptions(
   courseId: string,
   { publishedOnly }: { publishedOnly: boolean },
 ): Promise<ItemFilterOptions> {
-  let query = db
-    .from('question_bank')
-    .select('subject, maintopic, subtopic, difficulty, question_type, batch_id')
-    .eq('course_id', courseId);
-  if (publishedOnly) query = query.eq('is_published', true);
-  const { data, error } = await query;
+  type Row = Pick<Item, 'subject' | 'maintopic' | 'subtopic' | 'difficulty' | 'question_type' | 'batch_id'>;
+  const build = () => {
+    let query = db
+      .from('question_bank')
+      .select('subject, maintopic, subtopic, difficulty, question_type, batch_id')
+      .eq('course_id', courseId);
+    if (publishedOnly) query = query.eq('is_published', true);
+    return query.order('item_id');
+  };
+  const { data: rows, error } = await readAll<Row>((from, to) => build().range(from, to));
   if (error) {
     console.error('getItemFilterOptions:', error);
     return EMPTY_OPTIONS;
   }
 
-  type Row = Pick<Item, 'subject' | 'maintopic' | 'subtopic' | 'difficulty' | 'question_type' | 'batch_id'>;
-  const rows = (data ?? []) as Row[];
   const unique = (values: (string | null)[]) =>
     [...new Set(values.map((v) => String(v || '').trim()).filter(Boolean))].sort();
 
@@ -222,9 +238,8 @@ export async function liveQuizzesNaming(db: ServiceDb, courseId: string, itemIds
   return count;
 }
 
-// A read that may pass 1,000 rows is paged: the API stops at its row
-// cap and says nothing (08 B7 is the same fix for the older reads).
-const PAGE = 1000;
+// The panels' reads below take the whole bank or a whole course, so each
+// goes through readAll() (rule 10); they were the first written that way.
 
 /**
  * Every row that carries a tag, whole bank: the Tags panel counts and
@@ -232,22 +247,14 @@ const PAGE = 1000;
  * when the bank could not be read.
  */
 export async function taggedRows(db: ServiceDb): Promise<{ item_id: string; tags: string[] }[] | null> {
-  const rows: { item_id: string; tags: string[] }[] = [];
-  for (let from = 0; ; from += PAGE) {
-    const { data, error } = await db
-      .from('question_bank')
-      .select('item_id, tags')
-      .neq('tags', '{}')
-      .order('item_id')
-      .range(from, from + PAGE - 1);
-    if (error) {
-      console.error('taggedRows:', error);
-      return null;
-    }
-    const page = (data ?? []) as { item_id: string; tags: string[] | null }[];
-    for (const r of page) rows.push({ item_id: r.item_id, tags: r.tags ?? [] });
-    if (page.length < PAGE) return rows;
+  const { data, error } = await readAll<{ item_id: string; tags: string[] | null }>((from, to) =>
+    db.from('question_bank').select('item_id, tags').neq('tags', '{}').order('item_id').range(from, to),
+  );
+  if (error) {
+    console.error('taggedRows:', error);
+    return null;
   }
+  return data.map((r) => ({ item_id: r.item_id, tags: r.tags ?? [] }));
 }
 
 /**
@@ -316,22 +323,15 @@ export async function courseWordRows(
   db: ServiceDb,
   courseId: string,
 ): Promise<{ item_id: string; subject: string | null; maintopic: string | null; tags: string[] }[] | null> {
-  const rows: { item_id: string; subject: string | null; maintopic: string | null; tags: string[] }[] = [];
-  for (let from = 0; ; from += PAGE) {
-    const { data, error } = await db
-      .from('question_bank')
-      .select('item_id, subject, maintopic, tags')
-      .eq('course_id', courseId)
-      .order('item_id')
-      .range(from, from + PAGE - 1);
-    if (error) {
-      console.error('courseWordRows:', error);
-      return null;
-    }
-    const page = (data ?? []) as { item_id: string; subject: string | null; maintopic: string | null; tags: string[] | null }[];
-    for (const r of page) rows.push({ ...r, tags: r.tags ?? [] });
-    if (page.length < PAGE) return rows;
+  const { data, error } = await readAll<{ item_id: string; subject: string | null; maintopic: string | null; tags: string[] | null }>(
+    (from, to) =>
+      db.from('question_bank').select('item_id, subject, maintopic, tags').eq('course_id', courseId).order('item_id').range(from, to),
+  );
+  if (error) {
+    console.error('courseWordRows:', error);
+    return null;
   }
+  return data.map((r) => ({ ...r, tags: r.tags ?? [] }));
 }
 
 /**
@@ -339,25 +339,19 @@ export async function courseWordRows(
  * panel. Null when the bank could not be read.
  */
 export async function freeRowCounts(db: ServiceDb): Promise<Map<string, { free: number; freeDrafts: number }> | null> {
-  const counts = new Map<string, { free: number; freeDrafts: number }>();
-  for (let from = 0; ; from += PAGE) {
-    const { data, error } = await db
-      .from('question_bank')
-      .select('course_id, is_published')
-      .eq('is_free_sample', true)
-      .order('item_id')
-      .range(from, from + PAGE - 1);
-    if (error) {
-      console.error('freeRowCounts:', error);
-      return null;
-    }
-    const page = (data ?? []) as { course_id: string; is_published: boolean }[];
-    for (const r of page) {
-      const c = counts.get(r.course_id) ?? { free: 0, freeDrafts: 0 };
-      if (r.is_published) c.free++;
-      else c.freeDrafts++;
-      counts.set(r.course_id, c);
-    }
-    if (page.length < PAGE) return counts;
+  const { data, error } = await readAll<{ course_id: string; is_published: boolean }>((from, to) =>
+    db.from('question_bank').select('course_id, is_published').eq('is_free_sample', true).order('item_id').range(from, to),
+  );
+  if (error) {
+    console.error('freeRowCounts:', error);
+    return null;
   }
+  const counts = new Map<string, { free: number; freeDrafts: number }>();
+  for (const r of data) {
+    const c = counts.get(r.course_id) ?? { free: 0, freeDrafts: 0 };
+    if (r.is_published) c.free++;
+    else c.freeDrafts++;
+    counts.set(r.course_id, c);
+  }
+  return counts;
 }
