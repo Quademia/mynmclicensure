@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-09-23. Rules for **any** assistant working in this
+Last updated: 2026-09-26. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What is built and
@@ -369,6 +369,11 @@ above sit at the repo root; the audience grouping inside them is kept.
   the check that actually exercises them; for CSS, render a proof sheet
   from the repo's own stylesheets and screenshot it, rather than
   trusting the markup to be right. Never a temp file left in `public/`.
+  The pane cannot open a `file://` page, so serve the sheet from the
+  scratchpad with a throwaway static server on another port (a dozen
+  lines of Node on `localhost:8766`, 2026-09-26) — never from `public/`.
+  Measure a lockup's **natural** width with `scrollWidth`, not the box:
+  a flex box with `min-width: 0` shrinks to fit and the box lies.
 - **A new hardcoded colour in a stylesheet is refused by a pre-commit
   guard** (`scripts/css-baseline.mjs`, `.css-baseline.json`, 2026-09-22).
   It is `lint-baseline.mjs`'s shape for CSS: the literals already there

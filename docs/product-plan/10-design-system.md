@@ -247,7 +247,10 @@ both sides:**
    it as built; settled as ruling 12 below.
 7. **The wordmark's weight is on the product.** Order stays brand first
    (the lockup says whose product it is); Quademia is the small muted
-   word, MyNMCLicensure the bold navy one.
+   word, MyNMCLicensure the bold navy one. DS21 inverted the order for
+   three days on a misread of MyNclex (2026-09-23); Sam restored it on
+   2026-09-26, the small word now teal capitals — DS21, *The order and
+   the phone bar*.
 8. **The full-width bar stays.** Sam asked to see the open sidebar run
    to the top with the bar starting at its edge and the wordmark in the
    navy. Built, looked at in both states, reverted the same hour: the
@@ -810,7 +813,8 @@ student on a phone had no way in from the bar.
 - **One wordmark** (`components/shell/wordmark.tsx`, `.wordmark` in
   `components.css`), drawn by both bars: the painted Q, then
   **MyNMCLicensure** on top and "by Quademia" beneath. It **replaces
-  DS5's order**: the product leads, the parent earns its line. The mark
+  DS5's order**: the product leads, the parent earns its line.
+  **Reversed 2026-09-26** — *The order and the phone bar* below. The mark
   is a 64px copy of `quademia-mark.png` (3.9 KB against 91 KB) — the same
   picture, not a redraw.
 - **The two bars stay two components** (Sam: they do different jobs)
@@ -840,6 +844,61 @@ student on a phone had no way in from the bar.
 (Sam, later) — until then the two open from opposite sides, which is
 temporary, not a design. The landing page's hero still says "Sign In"
 and "Sign In to Portal" beside the bar's "Sign in" (legacy's words).
+
+**The order and the phone bar (Sam, 2026-09-26).** Two rulings from one
+question — whether the bar's icons belong on a phone at all, and then
+how the brand should be presented, with UWorld's "UWORLD | Nursing" as
+the example. Sam's frame: the mark is accepted; its presentation had
+not been explored.
+
+- **The lockup is the right way up again: QUADEMIA small on top, the
+  product bold beneath.** Brand first, weight on the product — ruling 7,
+  which DS21's first cut had inverted. The 2026-09-23 reason, "MyNclex's
+  lockup", was checked against MyNclex's code and is half true: its
+  bars are text only ("MyNclex-RN"), the Q lives in its tab and
+  home-screen icons, and it was ruled there on 2026-08-22 that MyNclex
+  gets no mark of its own. Ours was the first bar in either product to
+  carry the Q. Chosen from six lockups rendered on the real bar chrome
+  with the real mark and measured by the browser (a scratchpad sheet
+  served on `localhost:8766`; nothing in the repo):
+
+  | | Phone width | Room at 360 |
+  |---|---|---|
+  | A · MyNMCLicensure over "by Quademia" (as built) | 166px | 76px |
+  | B · QUADEMIA small over MyNMCLicensure bold — **chosen** | 166px | 76px |
+  | C · QUADEMIA \| MyNMCLicensure, UWorld's line | 266px | −24px |
+  | D · QUADEMIA alone | 126px | 116px |
+  | E · MyNMCLicensure alone, no mark (MyNclex's bar) | 130px | 112px |
+  | F · QUADEMIA \| NMC Licensure (a rename) | 249px | −7px |
+
+  UWorld's divider works because "Nursing" is a category word; with a
+  coined product name it reads as two brands side by side, and it does
+  not fit a 360px bar. F is a naming decision, not a bar decision; the
+  subdomains settled in August (`licensure.quademia.com`) already lean
+  that way. B is UWorld's parent-first family idea in the shape a phone
+  holds. The small line is typed "Quademia" and set in capitals by the
+  style (10px, 700, tracked, `--brand-teal`), so a screen reader says
+  the word. MyNclex's bar should take the same lockup for the family to
+  read as one brand — a line for its own repo.
+- **On a phone the signed-in bar keeps the hamburger, the wordmark and
+  the avatar.** The envelope and the bell are hidden below 768px: the
+  drawer's Messages row carries the count and Announcements is a row,
+  so both were duplicates, and since the Q the name ran under the
+  envelope at 360px. Offered: this (MyNclex's phone bar, and the common
+  three-slot bar), the hamburger alone with the account moved into the
+  drawer (legacy's sidebar ended with a My Account block), or the bell
+  off only. A **teal dot on the hamburger** when anything is unread —
+  the dot goes on the control whose tap leads to the new thing; the
+  avatar's menu holds nothing new, and a dot on an avatar reads
+  elsewhere as an account alert. It rests while the drawer is out; the
+  toggle's label speaks the count ("Menu, 1 unread message"). Measured
+  signed in: 86px of room at 360, 46 at 320 with no spill; above 768px
+  the envelope, its count and the bell are unchanged.
+
+**Found on the way, not done.** The login, register, forgot and reset
+pages carry legacy's own lockup (`auth.css` `.auth-logo`: Quademia
+large, the product small beneath) — the same order as B, different
+weights, not the shared wordmark. Unruled.
 
 ### Later, under this doc
 
@@ -880,5 +939,5 @@ and "Sign In to Portal" beside the bar's "Sign in" (legacy's words).
 | DS17 The ~15 name chips still on `.badge` | ⬜ most sit on DS9 surfaces |
 | DS18 Product kind borrows the state colours | ⬜ Sam to rule |
 | DS20 One card | ✅ 2026-09-23 — `.card` global, the product card shared by both selling pages; own-name boxes as touched |
-| DS21 The wordmark and the public menu | ✅ 2026-09-23 — the painted Q, product over "by Quademia" on both bars; public links, Sign in only, a phone menu from the right |
+| DS21 The wordmark and the public menu | ✅ 2026-09-23 — the painted Q on both bars; public links, Sign in only, a phone menu from the right · 2026-09-26 the order turned brand-first (QUADEMIA small over the product) and the phone bar cut to hamburger · wordmark · avatar with an unread dot |
 | Dark mode · content max-width · the avatar's size | ⬜ later |
