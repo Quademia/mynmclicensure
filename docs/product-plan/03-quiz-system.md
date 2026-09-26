@@ -519,6 +519,39 @@ question "In a mock"; as a student, a fixed quiz and a mock start with
 their questions in order; `npm run build` clean. Cutover's re-copy
 writes rows (the line under 00).
 
+**Built 2026-09-27** (`20260927100000_quiz_item_rows.sql`). As scoped,
+with one addition the rules require: **rule 9 on both quiz tables** —
+`anon` and `authenticated` still held INSERT, UPDATE, DELETE, TRUNCATE,
+REFERENCES and TRIGGER on `quizzes` and `mock_quizzes` (Q1 fixed the
+reads and left the writes), now revoked with the two admin write
+policies each; the admin's publish and archive / restore writes moved
+to the service role beside the save. `n` is set to the rows copied where
+it differed (nothing on dev). **Proven:** two rolled-back runs on dev —
+95 ids copied (50 fixed, 45 mock), none left out, order kept, `n` equal;
+refused: a named question's delete, another course's question (by
+either key), a repeat, a second question at one position, a bad mode
+through the save, every browser-role touch of the four tables and of
+`save_quiz`; the save's edit, reorder and new mock writing every
+setting; a quiz's delete taking its rows. Applied; `role_table_grants`
+empty for the browser roles on all four. Every changed read run against
+dev outside the app (getQuizById in order for a fixed quiz and a mock,
+the hold-back 25 / 20 / 45, the live counts, the naming lookup). **As
+Sam's admin in the pane:** General Paper Quiz 1 opens with its ten in
+order; its picker offers 576 of 601 (the mock's 25 held back); an
+unchanged re-save "Quiz updated successfully", the rows the same; the
+course switched to RN_MED refused "Not a question of course RN_MED:
+GP-S0-30 … GP-S0-39", the quiz left untouched; GP-S0-30's delete refused
+"This question is in quiz 'General Paper Quiz 1'. Remove it there
+first, or unpublish it instead." **As the RM student:** Midwifery's
+fixed quiz started in practice — the sitting holds exactly the quiz's
+ten, shuffled as set. **As the RN student:** the Medicine mock started
+— the sitting holds exactly the mock's twenty, shuffled as set (the GP
+mock is closed by its own March dates). `tsc`, lint and `npm run
+build` clean. **Found, not changed:** the CSV importer can move an
+existing question into the page's course when a file names its id;
+under the new key a question a quiz names cannot move, so that batch
+fails with Postgres's words.
+
 ### Later, under this doc
 
 - **Q7 — SATA partial credit** (Sam, 2026-09-20): the rule first (a
