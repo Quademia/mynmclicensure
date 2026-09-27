@@ -199,8 +199,9 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ Q6 The seal — the public half live, one key at Check Answer, review unsealed, console refused (S7; D5) — 2026-09-20
 - ⬜ Q7 SATA partial credit — the rule, then the three-state display (Sam, 2026-09-20) — after S7
 - ✅ Q8.1 The runner as a player — /session/<id>, exit to the sitting's home, the mode table — 2026-09-27
-- ⬜ Q8.2 Four modes (§8 S21) — MyNclex's codes, the quiz's ticked modes, the builder's choice, Untimed practice
-- ⬜ Q8.3 Sequential — one question at a time, an answer required, the lock in the database (§8 S21)
+- ⬜ Q8.2 Four modes (§8 S21) — MyNclex's codes, the quiz's ticked modes, the builder's choice (built, to tick)
+- ⬜ Q8.3 Sequential — one question at a time, an answer required, the lock in the database (built, to tick)
+- ⬜ An exam's answers are taken after its deadline — save_answers and finish_attempt check no clock (found 09-27)
 - ✅ Q9 The Check Answer pending state — "Checking…" on the option until the reply lands, with Q8.1 — 2026-09-27
 - ⬜ Q10 The attempt report — breakdown by subject / topic / difficulty / type, what to fix next (2026-09-24)
 - ⬜ Q11 Time per question — the runner fills `time_spent_s`; pace and slowest on the report (2026-09-24)

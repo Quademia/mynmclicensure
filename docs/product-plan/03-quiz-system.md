@@ -739,6 +739,54 @@ retake's and a mock's exits resolved against dev by script (the
 Midwifery student has neither): retake → Fixed Quizzes via its origin,
 mock → Mock Exams. `tsc`, lint, the CSS guard and `npm run build` clean.
 
+**Q8 steps 2 and 3 — built 2026-09-27** on §8 S21 (ticked the same
+day), as one migration and one commit, since the migration carries both:
+
+- `20260927140000_four_modes.sql`: `attempts.mode` on MyNclex's four
+  codes, dev's rows converted (17 Learning, 4 Free Navigation);
+  `allowed_modes` a `text[]` on both quiz tables (at least one, only the
+  four; BOTH → Learning + Free Navigation, the default); Sequential's
+  lock — `attempt_items.passed_utc`, `advance_attempt()` (refuses without
+  an answer and after the deadline), `save_answers` taking only the
+  current row in a Sequential sitting; `check_answer` Learning only, the
+  clock's two and `finish_attempt` on the two `TIMED_` codes. The browser
+  roles' grants unchanged (SELECT only; the new column and function
+  withheld). **Proven** in two rolled-back runs: the conversion counted
+  and the column grants kept; then thirty steps on scratch sittings —
+  every refusal in its words, `save_quiz` storing a ticked list. Applied
+  on dev.
+- The app: the mode table's four rows (`nav: 'free' | 'forward'`,
+  `normaliseMode` reading legacy's two words, `orderModes`,
+  `modesLabel`); the admin form's ticks under Study and Exam, a chip per
+  allowed mode in the list, the filter "Allows …"; the student lists a
+  section per allowed mode (two to a row); the builder's four cards;
+  **Untimed practice** — no clock, no Check Answer, results at the end;
+  **Sequential** — one question on screen, "Next question" enabled once
+  answered (the answer saved, then `advance_attempt`), no Previous, the
+  map showing progress without moving, no flags, the last question's
+  Submit enabled once answered; the review moves freely. The portal
+  guide's "Instant vs Timed" is "Study and Exam modes", its cards from
+  the table — **new wording, not yet approved by Sam.**
+
+**Walked** as the RM student: the builder's four cards under Study and
+Exam; a 3-question Sequential sitting — the brief with "about 3
+minutes", one question with "Next question" off until answered, the
+database stamping question 1 passed on the move, question 3's "Submit
+Exam" off until answered, 2 / 3 with "Back to Quiz Builder", the review
+free again with its map and rationales; an Untimed practice sitting — no
+clock, a pick shown as selected with nothing revealed and no "Checking…";
+Fixed Quizzes with each quiz's converted two modes and a four-mode
+filter; the converted Learning sitting resuming with its answer. **Not
+walked:** the admin's ticks (the pane was the student; Sam's admin
+sign-in needed), and so a quiz offering Untimed practice or Sequential
+on the student lists.
+
+**Found, not built:** in Free Navigation nothing in the database
+refuses a late answer — `save_answers` and `finish_attempt` accept
+writes after the deadline, so a student who blocks the browser's
+auto-submit can keep answering (the page closes the exam only when it
+is reopened). Since Q5; Sequential's move refuses it. Offered to Sam.
+
 ### Attempt reports and progress (captured 2026-09-24; candidates, none ruled)
 
 Sam, 2026-09-24, after walking NMC Prep on his own account: plans made
@@ -856,7 +904,7 @@ it needs a change log on every answer, a storage change and its own
 | Q5 The answers as rows and the write door | ✅ 2026-09-20 (`20260920150000_attempt_answers.sql`; walked as student4: per-tap saves and a flag read back, a reload restoring them, finish at 4 / 10, an exam closed at its deadline on the next open, a failed Submit's toast with the runner unlocked) |
 | Q6 The seal | ✅ 2026-09-20 (code only; walked as student4: a live exam's page with 0 keys, the closed exam's with 10, a practice quiz reloaded with exactly the 2 checked, the review filled from the finish reply) |
 | Q7 SATA partial credit | later, after S7 |
-| Q8 The runner as a player | ruled 2026-09-27 (Sam: `/session`, MyNclex's modes, four now, A); step 1 ✅ 2026-09-27 (code only; walked as the RM student — §4; ticked by Sam); steps 2 and 3 on §8 S21 (✅ ticked 2026-09-27), building |
+| Q8 The runner as a player | ruled 2026-09-27 (Sam: `/session`, MyNclex's modes, four now, A); step 1 ✅ 2026-09-27 (code only; walked as the RM student — §4; ticked by Sam); steps 2 and 3 on §8 S21 (✅ ticked 2026-09-27) built 2026-09-27 (`20260927140000_four_modes.sql`; walked as the RM student, the admin's ticks not yet — §4), to tick |
 | Q9 The Check Answer pending state | ✅ 2026-09-27 (with Q8's step 1; walked as the RM student — §4; ticked by Sam) |
 | Q10 The attempt report | candidate, captured 2026-09-24 |
 | Q11 Time per question | candidate, captured 2026-09-24 |
