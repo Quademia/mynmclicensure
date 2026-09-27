@@ -205,7 +205,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⬜ Q13 Readiness and the cohort — a band, how others did per question, standing; with Q3 (2026-09-24)
 - ✅ Q14 The link tables — quiz_items and mock_quiz_items replacing the id arrays; delete refused (§8 S20) — 2026-09-27
 - ⬜ Q15 The student's own marks across attempts — a "Marked" pool for the builder, MyNclex's shape (captured 2026-09-26, unruled)
-- ⬜ Q16 The builders' keyword step offers only subtopic chips — GP: "patient" matches 182, one chip (2026-09-26)
+- ⬜ Q16 The keyword step never says what matched — chips a name filter; "No matching concepts" in 5 courses (09-26)
 
 *Not yet sliced — each gets an id when the doc is rewritten:*
 
@@ -277,6 +277,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⬜ Content: `items_rm_mid` short of its target set count (540 of 900)
 - ⬜ Content: set-size targets for RMHN / NACNAP / RPHN
 - ⬜ Remove MANUAL_TEST rows before cutover (moot if cutover deletes old data)
+- ⬜ The importer moves a question into the page's course; a quiz's question refuses, its batch fails raw (2026-09-27)
 - ⬜ Question reports — a new feature replacing "Send feedback" threads: reason list, the student's answer, status new/reviewed/fixed/dismissed, admin page grouped by question with Mark fixed (Sam, 2026-09-18)
 
 #### [09-free-account-and-gamification.md](docs/product-plan/09-free-account-and-gamification.md)

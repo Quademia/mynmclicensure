@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-09-26. Rules for **any** assistant working in this
+Last updated: 2026-09-27. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What is built and
@@ -435,7 +435,12 @@ above sit at the repo root; the audience grouping inside them is kept.
   rules on a scratch row — triggers, refusals, grants — with `do`
   blocks catching `sqlerrm` into a temp table. Both runs leave nothing
   behind. `set local role authenticated` inside a transaction proves
-  what the student's role can read (2026-09-26, 08 B4).
+  what the student's role can read (2026-09-26, 08 B4). **The runner
+  prints no notices** (`onnotice` is silenced in `db-migrate.mjs`), so a
+  count a migration raises — what a tidy step left out — is seen only in
+  the proof run, never in the release job's log; a number that matters
+  on prod goes into the data itself (03 Q14 set `n` to the rows copied,
+  2026-09-27).
 - **A `select('*')` under a cookie client breaks the moment a table's
   grant becomes a column list.** PostgREST hands `*` to Postgres as a
   literal `*`, which needs SELECT on every column it expands to, so a

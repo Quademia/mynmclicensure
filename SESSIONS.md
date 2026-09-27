@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-27 — 08 B7 widened into D52 (the 1,000-row cap swept, rule 10, every such read batched); §8 S20 built as 03 Q14, quiz lists as rows; both merged
+  - ↳ limit=5000 still 1000 · rpc cut too · one pass, not surface by surface · B3 later · Q16 record was wrong · storage inventory · delete restricted · course by keys · editor course-change gap · rule 9 on quizzes · 105 was 95
+
 - 2026-09-26 — 08 B4's code, B5 (subject and topic lists, a Subjects & topics panel) and B6 (mock questions held back, S19) built and ticked
   - ↳ Analyze → Analyse · 1,000-row cap = B7 · tags whole bank · Not set, no Other · one topic a question · keyed by word, rename cascades · overlap a dev artifact · no retake rule · premium mocks transient · Q16 chips
 

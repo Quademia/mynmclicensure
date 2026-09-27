@@ -572,17 +572,27 @@ fails with Postgres's words.
   flag lives on the attempt row and dies with the sitting. A
   student-facing feature that pairs with Q10–Q12 (practise what you
   marked, practise what you missed). Captured 2026-09-26; not ruled.
-- **Q16 — The keyword step offers only what has a subtopic.** Both
-  builders' keyword ("concept") step turns the matching questions into
-  subtopic chips, and a student picks chips — so a matching question
-  with no subtopic cannot be picked at all. Found walking 08 B6 on
-  2026-09-26 as a General Paper student: "patient" matches 182
-  questions and the step offers one chip, "Ethicsics/Patient Rights
-  (1)", because almost no GP question has a subtopic. Reaches every
-  student of a course whose subtopics are empty. Two ways out, unruled:
-  subtopics filled in during the B5 clean-up (content, in the Subjects
-  & topics panel's course), or the step also offering "all matching
-  questions" (code). Queued 2026-09-26 (Sam); before cutover.
+- **Q16 — The keyword step never says what the keyword found.** Found
+  walking 08 B6 on 2026-09-26 as a General Paper student ("patient":
+  182 matches, one chip). **Re-read against the code 2026-09-27; the
+  first description here was wrong** — it said a question with no
+  subtopic "cannot be picked at all", and that subtopics could be
+  filled in the Subjects & topics panel. Neither holds: with a keyword
+  typed and no chip picked, Next draws from every match (all 182); and
+  the panel manages subjects and main topics only — a subtopic is free
+  text per question. What the step really does (both builders, as
+  legacy's `renderConcepts` / `getStep2FilteredPool` did): the database
+  finds the matches, while the chip list is a **name filter** — the
+  subtopic names containing the typed text, each with its whole-course
+  count, not a count among the matches — and a picked chip replaces the
+  keyword. So the step shows one "(1)" chip for 182 matches, and in the
+  five courses with no subtopics at all (both NACNAP, both RMHN,
+  RPHN_PPHN — 1,260 questions) any keyword shows "No matching
+  concepts." while Next would work; the number matched appears only on
+  the next step. Offered 2026-09-27: A, the step saying "N questions
+  match — Next uses them all, or pick subtopics to narrow" with the
+  chips built from the matches (recommended, code only); B, subtopics
+  filled as content; C, both. **Sam: not now** (2026-09-27).
 - **The legacy-check gap 7** (the builder's stuck status line) and the
   Learning History items on BUILD_LIST — runner and history work that
   belongs here when queued.
@@ -782,4 +792,4 @@ it needs a change log on every answer, a storage change and its own
 | Q13 Readiness and the cohort | candidate, captured 2026-09-24; with Q3 |
 | Q14 The link tables | ✅ 2026-09-27 (`20260927100000_quiz_item_rows.sql`; §8 S20; walked as Sam's admin, the RM student and the RN student — §4) |
 | Q15 The student's own marks across attempts | candidate, captured 2026-09-26 |
-| Q16 The keyword step offers only what has a subtopic | ⬜ queued 2026-09-26 (Sam); found walking 08 B6 |
+| Q16 The keyword step never says what the keyword found | ⬜ queued 2026-09-26 (Sam); found walking 08 B6; re-read and offered 2026-09-27, not now (Sam) |
