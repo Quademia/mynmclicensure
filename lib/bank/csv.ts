@@ -39,7 +39,15 @@
 // case and runs of spaces, and the row takes the list's spelling; a
 // blank is Not set. The database's keys are the floor; this is the words
 // before them.
+//
+// 08 B8 (2026-09-27) adds the answer rule (answer-rule.ts): a row whose
+// correct answer names an empty option, is not a letter, gives a
+// one-answer question two, or makes a True / False question with text in
+// C–F is skipped with the reason; the answer lands lower case with no
+// spaces. The import action adds one rule it alone can check, since it
+// needs the bank: a row may not change an existing question's type.
 
+import { checkAnswer } from './answer-rule';
 import {
   BLOOM_LEVELS,
   CSV_COLUMNS,
@@ -99,6 +107,21 @@ export function checkListColumns(row: CsvRow): string | null {
     if (!l) return `level "${level}" is not ${spoken(BLOOM_LEVELS)}`;
     row.bloom_level = l;
   }
+  return null;
+}
+
+/**
+ * One row's correct answer against its type and options (08 B8). Returns
+ * the reason when the answer cannot be right; otherwise writes the answer
+ * as stored into the row and returns null. Run after checkListColumns(),
+ * which settles the type — by the browser for the report and again by
+ * the import action on what it receives.
+ */
+export function checkRowAnswer(row: CsvRow): string | null {
+  const options = Object.fromEntries(OPTION_LETTERS.map((l) => [l, row[`option_${l}`]]));
+  const check = checkAnswer(row.question_type || 'MCQ', row.correct || '', options);
+  if (!check.ok) return check.reason;
+  row.correct = check.correct;
   return null;
 }
 
@@ -224,7 +247,7 @@ export function parseCsv(text: string, courseId: string, lists?: CourseLists): C
       report.push({ ok: false, msg: `Row ${rowNum}: must have at least 2 options — skipped.` });
       continue;
     }
-    const offList = checkListColumns(row) ?? (lists ? checkCourseWords(row, courseId, lists) : null);
+    const offList = checkListColumns(row) ?? checkRowAnswer(row) ?? (lists ? checkCourseWords(row, courseId, lists) : null);
     if (offList) {
       report.push({ ok: false, msg: `Row ${rowNum}: ${offList} — skipped.` });
       continue;

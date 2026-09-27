@@ -50,7 +50,7 @@ export async function readAll<T>(
  * A long id list in slices. An `.in()` filter rides in the request's
  * address, which has a length limit of its own; a list that `readAll`
  * made longer than 1,000 must be sent in slices (200 ids, as
- * `existingItemIds` in lib/bank/queries.ts always has).
+ * `existingItemTypes` in lib/bank/queries.ts always has).
  */
 export function slices<T>(list: T[], size = 200): T[][] {
   const out: T[][] = [];

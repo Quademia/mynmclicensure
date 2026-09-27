@@ -337,21 +337,22 @@ export async function tagSpellingsInUse(db: ServiceDb): Promise<Map<string, stri
 }
 
 /**
- * Which of these ids the bank already holds, in any course — the
- * importer's two choices apply only to the rows a file creates. In
+ * Which of these ids the bank already holds, in any course, with each
+ * one's question type — the importer's two choices apply only to the rows
+ * a file creates, and a file may not change a question's type (08 B8). In
  * slices of 200, because the ids ride in the request's address. Null
  * when the bank could not be read.
  */
-export async function existingItemIds(db: ServiceDb, itemIds: string[]): Promise<Set<string> | null> {
-  const found = new Set<string>();
+export async function existingItemTypes(db: ServiceDb, itemIds: string[]): Promise<Map<string, string> | null> {
+  const found = new Map<string, string>();
   const ids = [...new Set(itemIds)];
   for (let i = 0; i < ids.length; i += 200) {
-    const { data, error } = await db.from('question_bank').select('item_id').in('item_id', ids.slice(i, i + 200));
+    const { data, error } = await db.from('question_bank').select('item_id, question_type').in('item_id', ids.slice(i, i + 200));
     if (error) {
-      console.error('existingItemIds:', error);
+      console.error('existingItemTypes:', error);
       return null;
     }
-    for (const r of (data ?? []) as { item_id: string }[]) found.add(r.item_id);
+    for (const r of (data ?? []) as { item_id: string; question_type: string }[]) found.set(r.item_id, r.question_type);
   }
   return found;
 }

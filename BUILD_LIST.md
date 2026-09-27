@@ -269,10 +269,12 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ B5 The lists — subjects and topics per course, Not set for empty, the Subjects & topics panel — 2026-09-26
 - ✅ B6 The draws — a draft or active mock's questions held back from practice; S19 — 2026-09-26
 - ✅ B7 The bank's four reads past the API's 1,000-row cap, the keyword too — one pass with D52's other 13 — 2026-09-26
+- ⬜ B8 A question's type fixed once saved; an answer a student can give, at the editor and the importer (gap 3)
 
 *Not yet sliced — each gets an id when the doc is rewritten:*
 
-- ⬜ 3 Question Bank: an MCQ with answer C–F switched to TF shows "A (True)" but saves the old letter — every student marked wrong on it
+- → 3 Question Bank: MCQ → TF kept the hidden options and the old letter (students got the old question) — B8 above
+- ⬜ Content: `RM_MID_PHILLI-S1-42`'s answer is "a & c" on an MCQ — no one can get it right; likely live; Sam (09-27)
 - ⬜ Content: `items_rphn_disease_ctrl` is empty while its course is active
 - ⬜ Content: `items_rm_mid` short of its target set count (540 of 900)
 - ⬜ Content: set-size targets for RMHN / NACNAP / RPHN

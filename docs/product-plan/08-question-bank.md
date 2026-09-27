@@ -1036,6 +1036,71 @@ picker "Showing 1080 questions"; a new fixed quiz's picker 1,080 rows,
 were cut (no mock holds this course's questions, so none held back);
 neither form saved. `tsc`, lint and `npm run build` clean.
 
+### B8 — A question's type fixed once saved, and an answer a student can give (no storage change)
+
+The legacy check's gap 3 (2026-09-16), re-read against the code on
+2026-09-27. **The build list's line described it wrongly** ("every
+student marked wrong on it"). What the editor did: switching a saved MCQ
+to TF hid options C–F but kept their text, and kept an answer of C–F
+while the answer box showed "A (True)", because a box shows its first
+choice when its value is not among them; the save sent all six options
+and the old letter. The runner shows every option that has text,
+whatever the type, and grades by letter — so students got the old
+six-option question with its old answer, and the admin believed they had
+made a True / False with answer A. Legacy reset the answer to A on the
+switch but saved the hidden options too.
+
+Behind it, a wider gap: **nothing checked that an answer is one a
+student can give.** The editor offered A–F whatever had text, the
+importer wrote `correct` as the file had it, and the database has no
+rule. An answer naming an empty option, or not a letter, is a question
+nobody can get right.
+
+**Asked whether the switch is needed at all (Sam, 2026-09-27).** No
+reader uses it — the dev bank, copied from prod's exports, holds 5,577
+MCQ, 4 SATA and no TF; questions arrive by the importer far more than
+the editor — and MyNclex has no switch: the type is picked once, at
+"New question", and Edit opens that type's editor. Offered A (the type
+fixed once saved, MyNclex's way), B (keep the switch and make it
+correct) or C (switching on drafts only); **Sam: A**, with the answer
+check at both doors either way. A departure from legacy, which allowed
+the switch.
+
+**Scope.**
+
+- The editor: a saved question shows its type as a label ("Fixed once
+  saved. To change the type, create a new question."); a new question
+  keeps the dropdown, and switched to TF takes answer A unless it was A
+  or B. A TF saves options A and B only — what is hidden is not saved.
+  An answer the box does not offer shows as itself (`"a & c" — not a
+  valid answer`), not as "A".
+- `lib/bank/answer-rule.ts`, one pure check run by the save, the CSV
+  report and the import: the answer is letters A–F; one of them on an
+  MCQ or TF; A or B on a TF, whose options are A and B only and both
+  filled; every letter named has text. The answer lands lower case with
+  no spaces, each letter once.
+- The save refuses a type change on a saved question (the server's
+  check, since it cannot trust the page); the import refuses a row that
+  would change an existing question's type, naming it in the result —
+  the one check the browser's report cannot make, since it needs the
+  bank (`existingItemTypes`, which `existingItemIds` became).
+
+**Reach.** Dev only today. At cutover, the students on any question an
+admin converted or saved with an answer they cannot give. Only admins
+see the change.
+
+**Done when** a saved question's type cannot be changed from the editor
+or a file; a new question switched to TF saves A and B and an answer of
+A or B; a save or a CSV row whose answer names an empty option, or is not
+a letter, is refused with the reason; and a re-import of the bank's own
+files refuses nothing but a question already broken.
+
+**Found building it:** `RM_MID_PHILLI-S1-42` (Midwifery, published)
+holds the answer `"a & c"` on an MCQ — nobody can get it right, and
+since dev's bank came from prod's exports it is very likely live on the
+legacy site. Content, Sam's to answer; the rule refuses a save of it
+until then.
+
 ### Later, under this doc
 
 - **The link table** replacing the quiz tables' `item_ids` arrays —
@@ -1063,3 +1128,4 @@ neither form saved. `tsc`, lint and `npm run build` clean.
 | B5 The lists and their panel | ✅ 2026-09-26 (`20260926170000_bank_subject_topic_lists.sql`; the code in two sittings the same day; walked on dev and by Sam — §4); the clean-up of the words is content work, in the panel |
 | B6 The draws, and the student's read (S19) | ✅ 2026-09-26 (`20260926180000_question_bank_student_read_narrowed.sql`; walked on dev as Sam's admin and as a GP student — §4) |
 | B7 Whole-course reads past the 1,000-row cap | ✅ 2026-09-26 (widened the same day into one pass with D52's other thirteen — Sam; `lib/supabase/read-all.ts`; proven against dev and walked as the RM student — §4) |
+| B8 A question's type fixed once saved, an answer a student can give | ⬜ building (Sam: option A, 2026-09-27) |

@@ -25,6 +25,16 @@
 // when live quizzes name the question, since each will refuse to start.
 // Two whole-bank panels open as cards above the list, needing no course:
 // Tags (tags-panel.tsx) and Free pool (free-pool-panel.tsx).
+//
+// 08 B8 (Sam, 2026-09-27): a question's type is chosen when it is created
+// and fixed once saved — MyNclex's way — so a saved question shows its
+// type as a label, not a dropdown. Before, switching an MCQ to TF hid
+// options C–F but still saved them, and kept an answer of C–F while the
+// box showed "A (True)": students got the old question. What the form
+// shows is now what it saves: a new question switched to TF takes answer
+// A unless it was A or B, a TF saves options A and B only, and an answer
+// that is not one of the box's choices shows as itself, not as "A". The
+// server checks the answer (lib/bank/answer-rule.ts) and the type again.
 
 'use client';
 import { useConfirm } from '@/lib/overlays/shared/confirm-dialog';
@@ -84,6 +94,10 @@ type Form = {
 
 const blankLetters = (): Record<OptionLetter, string> =>
   ({ a: '', b: '', c: '', d: '', e: '', f: '' });
+
+/** A True / False question's option texts: A and B, the hidden four empty (08 B8). */
+const abOnly = (m: Record<OptionLetter, string>): Record<OptionLetter, string> =>
+  ({ ...blankLetters(), a: m.a, b: m.b });
 
 const EMPTY_FORM: Form = {
   itemId: '',
@@ -310,6 +324,13 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
     return { ...f, type, shuffle: type !== 'TF' };
   }
 
+  // 08 B8: the dropdown shows on a new question only. Switched to TF, the
+  // answer is A unless it was already A or B — the box offers no other.
+  function changeType(f: Form, type: QuestionType): Form {
+    const keep = type !== 'TF' || f.correctMcq === 'a' || f.correctMcq === 'b';
+    return applyType({ ...f, correctMcq: keep ? f.correctMcq : 'a' }, type);
+  }
+
   function openEdit(item: Item) {
     setIsNew(false);
     setCurrentId(item.item_id);
@@ -474,8 +495,9 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
         itemId: form.itemId,
         questionType: form.type,
         stem: form.stem,
-        options: form.options,
-        feedback: form.feedback,
+        // 08 B8: what is hidden is not saved — a TF keeps A and B only
+        options: form.type === 'TF' ? abOnly(form.options) : form.options,
+        feedback: form.type === 'TF' ? abOnly(form.feedback) : form.feedback,
         correct: form.type === 'SATA' ? form.correctSata : [form.correctMcq],
         rationale: form.rationale,
         rationaleImg: imgUrl,
@@ -508,7 +530,11 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
     setImgLocalPreview('');
     setImgUrl(stored?.rationale_img || '');
     setTagDraft('');
-    setForm((f) => ({ ...f, tags: stored?.tags ?? tags }));
+    setForm((f) => ({
+      ...f,
+      ...(f.type === 'TF' ? { options: abOnly(f.options), feedback: abOnly(f.feedback) } : {}),
+      tags: stored?.tags ?? tags,
+    }));
     setMsg({
       text: blocked ? `Question saved and unpublished. ${quizzesWillRefuse(blocked)}` : 'Question saved.',
       tone: 'success',
@@ -602,6 +628,10 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
   }
 
   const visibleLetters = form.type === 'TF' ? (['a', 'b'] as OptionLetter[]) : OPTION_LETTERS;
+  // 08 B8: a stored answer the box does not offer ("a & c", or C on a TF)
+  // is shown as itself, so the box never claims an answer the row lacks;
+  // the save refuses it with the reason until one of the choices is picked.
+  const strayAnswer = form.type !== 'SATA' && !(visibleLetters as readonly string[]).includes(form.correctMcq) ? form.correctMcq : null;
   const previewSrc = imgLocalPreview || imgUrl;
 
   return (
@@ -878,9 +908,16 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
 
             <div className="form-group">
               <label htmlFor="fieldType">Question Type *</label>
-              <select id="fieldType" value={form.type} onChange={(e) => setForm((f) => applyType(f, e.target.value as QuestionType))}>
-                {QUESTION_TYPES.map((t) => <option key={t} value={t}>{QUESTION_TYPE_LABELS[t]}</option>)}
-              </select>
+              {isNew ? (
+                <select id="fieldType" value={form.type} onChange={(e) => setForm((f) => changeType(f, e.target.value as QuestionType))}>
+                  {QUESTION_TYPES.map((t) => <option key={t} value={t}>{QUESTION_TYPE_LABELS[t]}</option>)}
+                </select>
+              ) : (
+                <>
+                  <input id="fieldType" type="text" className="field-id" readOnly value={QUESTION_TYPE_LABELS[form.type]} />
+                  <p className="form-hint">Fixed once saved. To change the type, create a new question.</p>
+                </>
+              )}
             </div>
 
             <div className="form-group">
@@ -933,6 +970,7 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
               <div className="form-group">
                 <label htmlFor="fieldCorrectMcq">Correct Option *</label>
                 <select id="fieldCorrectMcq" className="correct-select" value={form.correctMcq} onChange={(e) => setField('correctMcq', e.target.value)}>
+                  {strayAnswer !== null ? <option value={strayAnswer}>“{strayAnswer}” — not a valid answer</option> : null}
                   {form.type === 'TF' ? (
                     <>
                       <option value="a">A (True)</option>

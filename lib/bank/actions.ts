@@ -20,18 +20,23 @@
 // service role, so the actor travels on the row. The save carries the
 // level, the two switches, the source and the tags; Publish / Unpublish
 // is its own action; the free mark is refused on a question a mock names.
+//
+// Since 08 B8 (Sam, 2026-09-27) a question's type is fixed once saved —
+// the save and the import both refuse a change — and its answer must be
+// one a student can give (answer-rule.ts), at both doors.
 
 'use server';
 
 import { requireAdmin } from '@/lib/access';
 import { getAllCourses, getPrograms } from '@/lib/catalogue/queries';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { checkCourseWords, checkListColumns, findOnList, rowToPayload, type CsvRow } from './csv';
+import { asSentence, checkAnswer } from './answer-rule';
+import { checkCourseWords, checkListColumns, checkRowAnswer, findOnList, rowToPayload, type CsvRow } from './csv';
 import { uploadRationaleImage } from './images';
 import {
   courseLists,
   courseWordRows,
-  existingItemIds,
+  existingItemTypes,
   freeRowCounts,
   getItemFilterOptions,
   getItemsByFilters,
@@ -75,6 +80,10 @@ function fail(error: string): ActionResult {
 // The free mark's refusal, in one place: the tick and (08 B4's second
 // session) the importer's "import as free" say the same thing.
 const FREE_IN_MOCK = 'This question is in a mock exam and cannot be free.';
+
+// 08 B8: the editor offers no type change on a saved question; this is
+// the server saying so when one arrives anyway.
+const TYPE_FIXED = "A question's type is fixed once saved. To change it, create a new question.";
 
 /** Tags as typed, trimmed and de-duplicated, each in the spelling the bank already uses. */
 function snapTags(tags: readonly string[], inUse: Map<string, string>): string[] {
@@ -163,6 +172,10 @@ export async function saveQuestion(input: SaveQuestionInput, image: FormData | n
   } else {
     correct = (input.correct[0] || 'a').trim().toLowerCase();
   }
+  // 08 B8: an answer a student can give, for this type and these options
+  const answer = checkAnswer(input.questionType, correct, input.options);
+  if (!answer.ok) return fail(asSentence(answer.reason));
+  correct = answer.correct;
 
   const db = createServiceRoleClient();
 
@@ -171,10 +184,12 @@ export async function saveQuestion(input: SaveQuestionInput, image: FormData | n
   // it. The database's keys hold the same rule; this says it in words.
   const lists = await courseLists(db, courseId);
   if (!lists) return fail("Could not read this course's subject and topic lists. Please try again.");
-  let stored: { subject: string | null; maintopic: string | null } | null = null;
+  type Stored = { subject: string | null; maintopic: string | null; question_type: string };
+  let stored: Stored | null = null;
   if (!input.isNew) {
-    const { data } = await db.from('question_bank').select('subject, maintopic').eq('item_id', itemId).maybeSingle();
-    stored = (data as typeof stored) ?? null;
+    const { data } = await db.from('question_bank').select('subject, maintopic, question_type').eq('item_id', itemId).maybeSingle();
+    stored = (data as Stored | null) ?? null;
+    if (stored && stored.question_type !== input.questionType) return fail(TYPE_FIXED);
   }
   const words: Record<'subject' | 'maintopic', string | null> = { subject: null, maintopic: null };
   for (const [col, list, noun] of [
@@ -314,6 +329,10 @@ export async function setPublished(courseId: string, itemIds: string[], publishe
 // New and existing rows go in separate batches: a batch's columns are
 // the union of its rows' keys, so one new row's switches in a batch
 // would hand every existing row in it a switch too.
+//
+// 08 B8: the answer rule runs again here on what was sent, and a row may
+// not change an existing question's type — the one check the browser's
+// report cannot make, since it needs the bank; it is named in the result.
 const IMPORT_BATCH = 50;
 
 export async function importItems(
@@ -343,7 +362,7 @@ export async function importItems(
   for (const r of rows) {
     if (!(r.stem && r.correct && (r.option_a || r.option_b))) continue;
     const row: CsvRow = { ...r, item_id: r.item_id || `${courseId.replace(/_/g, '')}_${Date.now()}` };
-    const offList = checkListColumns(row) ?? checkCourseWords(row, courseId, lists);
+    const offList = checkListColumns(row) ?? checkRowAnswer(row) ?? checkCourseWords(row, courseId, lists);
     if (offList) {
       failCount++;
       errors.push(`${row.item_id}: ${offList}`);
@@ -360,14 +379,18 @@ export async function importItems(
   }
   if (!payloads.length) return { ok: true, successCount: 0, failCount, errors, created: 0, updated: 0 };
 
-  const existing = await existingItemIds(db, payloads.map((p) => String(p.item_id)));
+  const existing = await existingItemTypes(db, payloads.map((p) => String(p.item_id)));
   if (!existing) return { ok: false, error: 'Could not read the question bank. Please try again.' };
 
   const creates: Record<string, unknown>[] = [];
   const updates: Record<string, unknown>[] = [];
   for (const p of payloads) {
     const id = String(p.item_id);
-    if (existing.has(id)) {
+    const storedType = existing.get(id);
+    if (storedType !== undefined && storedType !== p.question_type) {
+      failCount++;
+      errors.push(`${id}: the bank holds it as ${storedType} and the file says ${String(p.question_type)} — a question's type is fixed once saved`);
+    } else if (storedType !== undefined) {
       updates.push(p);
     } else if (freeNew && reserved.has(id)) {
       failCount++;
