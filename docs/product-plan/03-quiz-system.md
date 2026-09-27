@@ -804,6 +804,72 @@ Applied on dev. **Walked:** a 1-question Free Navigation sitting as the
 RM student, answered and left to run out — the auto-submit at zero,
 "Time is up!", 1 / 1, closed at the deadline with 60 s.
 
+### Q17 — The start screen on its own (captured and ruled 2026-09-27)
+
+**Found (Sam, 2026-09-27):** the start card sits inside the runner, so
+the runner's header shows behind it — Question Grid, Exit, the progress
+bar and, on an exam, the clock bar at "10:00 remaining". And every
+question's public half is already in the page while only the card
+shows, so on an exam a student can read the paper in the page source
+and press Start after.
+
+**MyNclex, read 2026-09-27** (`session/[attempt_id]/preflight.tsx`,
+`page.tsx`, `runner.tsx`): the start screen replaces the whole runner —
+no top bar, clock, map or Exit, one card ("Ready when you are", the
+mode, the group, the count, the source, the mode's brief, Back / Start
+session). One gate: a live sitting with no `started_at` shows it; Start
+stamps `started_at` for every mode and reloads; a started sitting
+reopens straight into its questions. Its readiness packs get a heavier
+one-shot card (a Q3 idea). No "Don't show this again" (deferred there).
+**But its page loads the sealed questions for every live sitting and
+passes them to the runner under the start card too** — MyNclex has the
+same leak.
+
+**Ruled (Sam, 2026-09-27):**
+
+- The card on a screen of its own, the runner's chrome not behind it.
+- **The questions are not sent until Start or Resume is pressed** —
+  better than MyNclex here. For an exam the clock is started first, so
+  the paper is never visible before the clock runs.
+- **The card shows on every open (Option 2):** "Start" the first time,
+  "Resume" after — over MyNclex's straight-in resume (Option 1), which
+  Sam may take later ("I can change my mind"). So no start stamp is
+  needed for the Study modes and **no storage changes**: the button's
+  word keeps today's rule (an exam's clock started; a Study sitting with
+  anything answered or flagged).
+- **"Don't show this again" on every mode, remembered per mode** (B) —
+  its purpose is "I understand this now"; ticked on an exam, the list's
+  Start starts the clock at once, which is what the student asked for.
+  A way to undo it waits for a settings page, if one is ever built.
+
+**Scope.**
+
+- `lib/attempts/runner-load.ts`: a live sitting returns a third outcome,
+  the start card's data only — title, mode, count, minutes, whether it
+  is a resume, the way back; no questions, no secrets. A finished
+  sitting still opens as its review; the error cards as now.
+- `lib/attempts/actions.ts`: `enterSession(attemptId)` — the loader's
+  checks again (own sitting, course access, in progress, an exam past
+  its deadline closed and sent to the review), the exam's clock started
+  once, then the sealed questions and the secrets the seal allows.
+  Admin preview stamps nothing.
+- `components/runner/session-start.tsx` (new): the card, from the mode
+  table (the chips, the brief, Start / Resume, Cancel to the sitting's
+  home, the tick box, which presses Start by itself when set); on the
+  reply it mounts the runner.
+- `components/runner/quiz-runner.tsx`: its own start phase, the skip
+  keys and the clock start go — it opens on the questions, the clock
+  from the attempt's stamped start.
+- `app/(app)/session/[attempt_id]/page.tsx`: the card or the review.
+- `styles/runner.css`: the card on a plain page.
+
+**Done when** a live sitting's page carries no question until Start or
+Resume is pressed (read from the page's own data); the card shows with
+nothing of the runner behind it; an exam's clock starts at the press and
+its questions arrive after; Resume on a started exam shows the time left
+running; the tick box skips the card for that mode only; a finished
+sitting opens its review; the admin preview stamps nothing.
+
 ### Attempt reports and progress (captured 2026-09-24; candidates, none ruled)
 
 Sam, 2026-09-24, after walking NMC Prep on his own account: plans made
@@ -929,4 +995,5 @@ it needs a change log on every answer, a storage change and its own
 | Q13 Readiness and the cohort | candidate, captured 2026-09-24; with Q3 |
 | Q14 The link tables | ✅ 2026-09-27 (`20260927100000_quiz_item_rows.sql`; §8 S20; walked as Sam's admin, the RM student and the RN student — §4) |
 | Q15 The student's own marks across attempts | candidate, captured 2026-09-26 |
+| Q17 The start screen on its own | ⬜ ruled 2026-09-27 (Sam: its own screen, no questions before Start, the card on every open, the tick box on every mode); no storage change — §4 |
 | Q16 The keyword step never says what the keyword found | ⬜ queued 2026-09-26 (Sam); found walking 08 B6; re-read and offered 2026-09-27, not now (Sam) |
