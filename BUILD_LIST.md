@@ -211,7 +211,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ Q14 The link tables — quiz_items and mock_quiz_items replacing the id arrays; delete refused (§8 S20) — 2026-09-27
 - ⬜ Q15 The student's own marks across attempts — a "Marked" pool for the builder, MyNclex's shape (captured 2026-09-26, unruled)
 - ⬜ Q16 The keyword step never says what matched — chips a name filter; "No matching concepts" in 5 courses (09-26)
-- ⬜ Q17 The start screen on its own — no runner behind it, no questions sent before Start or Resume (Sam, 09-27)
+- ⬜ Q17 The start screen on its own — no runner behind it, no questions sent before Start or Resume (built)
 - ⏸ Undo "Don't show this again" — in a settings page, if one is ever built (Sam, 2026-09-27)
 
 *Not yet sliced — each gets an id when the doc is rewritten:*

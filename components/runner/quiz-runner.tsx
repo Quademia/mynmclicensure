@@ -12,8 +12,8 @@
 // sitting's home, which the page resolves (lib/attempts/links). Since Q9
 // the option being checked shows it until the server's reply lands.
 //
-// What it does, in legacy's order: the preflight card (or straight in,
-// when the student ticked "Don't show this again"); pages of N questions
+// What it does, in legacy's order (the preflight card is its own screen
+// since 03 Q17, session-start.tsx, and the runner mounts after it): pages of N questions
 // from config; the per-attempt seeded option order; MCQ / TF feedback on
 // answer and the SATA "Check Answer" gate (instant); flags; the question
 // grid as a desktop column or a phone overlay, with All / Flagged views;
@@ -56,8 +56,7 @@ import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } fro
 import { useRouter } from 'next/navigation';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { Toast } from '@/lib/toast/toast';
-import { advanceAttempt, checkAnswer, expireAttempt, finishAttempt, saveAnswers, startTimedAttempt } from '@/lib/attempts/actions';
-import { RunnerError } from './runner-error';
+import { advanceAttempt, checkAnswer, expireAttempt, finishAttempt, saveAnswers } from '@/lib/attempts/actions';
 import { Icon } from '@/components/shell/icons';
 import { KindChip, QUESTION_TYPE_HUE } from '@/components/shell/chips';
 import {
@@ -73,7 +72,7 @@ import {
   type OptionView,
 } from '@/lib/attempts/scoring';
 import type { SessionExit } from '@/lib/attempts/links';
-import { modeOf, preflightBrief } from '@/lib/attempts/modes';
+import { modeOf } from '@/lib/attempts/modes';
 import type { AnswerPatch, Attempt, ChosenMap, FlagMap, Score, SealedItem, SecretsMap } from '@/lib/attempts/types';
 
 type FeedbackMode = 'inline' | 'standalone' | 'hide';
@@ -103,6 +102,7 @@ export function QuizRunner({
   reviewMode,
   previewMode,
   exit,
+  resumed = false,
 }: {
   attempt: Attempt;
   items: SealedItem[];
@@ -112,6 +112,8 @@ export function QuizRunner({
   previewMode: boolean;
   /** Where Exit and the buttons after submitting go: the sitting's home. */
   exit: SessionExit;
+  /** The start card said Resume (03 Q17): the status line says so. */
+  resumed?: boolean;
 }) {
   const router = useRouter();
   // The mode's row (03 Q8): the runner asks it, never the code.
@@ -135,7 +137,9 @@ export function QuizRunner({
   const [locked, setLocked] = useState(reviewMode);
   const [finishSent, setFinishSent] = useState(false);
   const [booted, setBooted] = useState(false);
-  const [phase, setPhase] = useState<'init' | 'preflight' | 'quiz'>('init');
+  // Since 03 Q17 the start card is its own screen (session-start.tsx):
+  // the runner mounts on a started sitting and goes straight to the quiz.
+  const [phase, setPhase] = useState<'init' | 'quiz'>('init');
   const [page, setPage] = useState(0);
   const [viewMode, setViewMode] = useState<ViewMode>('ALL');
   const [feedbackMode, setFeedbackMode] = useState<FeedbackMode>('inline');
@@ -145,7 +149,6 @@ export function QuizRunner({
   const [desktopGridHidden, setDesktopGridHidden] = useState(false);
   const [exitOpen, setExitOpen] = useState(false);
   const [imgOverlay, setImgOverlay] = useState('');
-  const [skipNextTime, setSkipNextTime] = useState(false);
   const [status, setStatus] = useState('Initialising…');
   const [saving, setSaving] = useState<string>('');
   const [toast, setToast] = useState<string | null>(null);
@@ -159,7 +162,6 @@ export function QuizRunner({
   const [advancing, setAdvancing] = useState(false);
   const dismissToast = useCallback(() => setToast(null), []);
   const startedAtRef = useRef<number | null>(null);
-  const startingRef = useRef(false);
   const finishingRef = useRef(false);
   const lastAutoSubmitRef = useRef(0);
   // The save queue (03 Q5): one pending patch per question, flushed half
@@ -169,7 +171,6 @@ export function QuizRunner({
   const totalSeconds = (attempt.duration_min || items.length) * 60;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
   const [timeUp, setTimeUp] = useState(false);
-  const [startError, setStartError] = useState('');
   const headerRef = useRef<HTMLDivElement>(null);
 
   // legacy buildShufCache: the option order per item, once per attempt.
@@ -201,81 +202,30 @@ export function QuizRunner({
         return;
       }
 
-      let skip = false;
-      try {
-        skip = window.localStorage.getItem(M.skipKey) === '1';
-      } catch {
-        /* no storage — show the card */
-      }
-      if (skip) {
-        startQuiz(true);
-      } else {
-        setPhase('preflight');
-        setStatus(isResuming() ? W.preflightResume : W.preflightNew);
-      }
+      startQuiz();
     }, 0);
     return () => window.clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once, on mount
   }, []);
-
-  function hasProgress(): boolean {
-    return Object.keys(answers).length > 0 || Object.keys(flags).length > 0 || Object.keys(sataChecked).length > 0;
-  }
 
   function hasAnswerFor(item: SealedItem): boolean {
     const c = answers[item.item_id];
     return item.question_type === 'SATA' ? Array.isArray(c) && c.length > 0 : Boolean(c);
   }
 
-  // A clocked sitting is resumed once its clock has started; any other
-  // once something has been answered or flagged (legacy's two tests).
-  function isResuming(): boolean {
-    return hasClock ? attempt.started_utc !== null : hasProgress();
-  }
-
-  async function startQuiz(skipped = false) {
-    if (booted || startingRef.current) return;
-    startingRef.current = true;
-    if (hasClock) {
-      setSaving(W.starting);
-      try {
-        // Admin preview runs only in memory and never stamps an attempt.
-        const result = previewMode
-          ? { ok: true as const, startedIso: attempt.started_utc ?? new Date().toISOString() }
-          : await startTimedAttempt(attempt.attempt_id);
-        if (!result.ok) {
-          setStartError(result.error);
-          return;
-        }
-        startedAtRef.current = new Date(result.startedIso).getTime();
-        setSecondsLeft(Math.max(0, totalSeconds - Math.max(0, Math.floor((Date.now() - startedAtRef.current) / 1000))));
-      } catch {
-        setStartError(W.startFailed);
-        return;
-      } finally {
-        setSaving('');
-        startingRef.current = false;
-      }
-    }
+  // Since 03 Q17 the sitting arrives started: the start card's press
+  // stamped an exam's clock on the server before the questions came, so
+  // the countdown runs from that stamp (the admin's preview, which stamps
+  // nothing, from now).
+  function startQuiz() {
+    if (booted) return;
+    startedAtRef.current = hasClock && attempt.started_utc ? new Date(attempt.started_utc).getTime() : Date.now();
+    if (hasClock) setSecondsLeft(Math.max(0, totalSeconds - Math.max(0, Math.floor((Date.now() - startedAtRef.current) / 1000))));
     setBooted(true);
     setPhase('quiz');
-    if (!startedAtRef.current) startedAtRef.current = Date.now();
     setPage(0);
     setViewMode('ALL');
-    if (hasClock) {
-      setStatus(attempt.started_utc !== null ? W.resumed : '');
-    } else if (skipped && hasProgress()) setStatus(W.resumed);
-  }
-
-  function onPreflightStart() {
-    if (skipNextTime) {
-      try {
-        window.localStorage.setItem(M.skipKey, '1');
-      } catch {
-        /* ignore */
-      }
-    }
-    startQuiz(false);
+    setStatus(resumed ? W.resumed : '');
   }
 
   // ── derived (legacy getCurrentSource / getGridStats / paging) ──
@@ -902,7 +852,6 @@ export function QuizRunner({
   const timerColor = timerPercent <= 10 ? 'red' : timerPercent <= 20 ? 'amber' : '';
   const timerText = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
 
-  if (startError) return <RunnerError title="Could Not Start Exam" message={startError} exit={exit} />;
 
   return (
     <div className="runner">
@@ -954,34 +903,7 @@ export function QuizRunner({
 
       <div className="desktop-flex-wrap">
         <div className="runner-wrap">
-          {/* Preflight card */}
-          {phase === 'preflight' ? (
-            <div className="preflight-card">
-              <div className="preflight-logo">Quademia Nurses Hub</div>
-              <div className="preflight-title">{label}</div>
-              <div className="preflight-meta">
-                <span className="pre-chip">{items.length} questions</span>
-                <span className={`pre-chip${hasClock ? ' warning' : ''}`}>{attempt.duration_min || Math.ceil(items.length)} {hasClock ? 'minutes' : 'min suggested'}</span>
-                {feedbackEach ? <span className="pre-chip">{feedbackModeLabel(feedbackMode)}</span> : null}
-                <span className="pre-chip">{M.fullName}</span>
-              </div>
-              {hasClock ? (
-                <div className="preflight-warning"><strong>{M.fullName}:</strong> {preflightBrief(M, attempt.duration_min)}</div>
-              ) : <p className="preflight-text">{preflightBrief(M, attempt.duration_min)}</p>}
-              <div className="preflight-actions">
-                <button type="button" className="btn btn-primary btn-lg" onClick={onPreflightStart}>
-                  <Icon name={hasClock ? 'target' : 'play'} />
-                  {isResuming() ? W.resume : W.start}
-                </button>
-                <button type="button" className="btn btn-ghost" onClick={() => window.history.back()}>Cancel</button>
-                <label className="preflight-skip">
-                  <input type="checkbox" checked={skipNextTime} onChange={(e) => setSkipNextTime(e.target.checked)} /> Don&apos;t show this again
-                </label>
-              </div>
-            </div>
-          ) : null}
-
-          {reviewMode ? <div className="review-banner">{W.reviewBanner}</div> : null}
+          {reviewMode ?<div className="review-banner">{W.reviewBanner}</div> : null}
           {timeUp ? <div className="timeup-banner">Time is up! Your exam has been automatically submitted.</div> : null}
 
           {phase === 'quiz' && desktopGridHidden ? (

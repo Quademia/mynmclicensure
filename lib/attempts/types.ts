@@ -183,8 +183,6 @@ export type SpawnResult = { ok: true; attemptId: string } | { ok: false; error: 
 /** Finish and expire return the score and, the sitting being over, every question's secret half (Q6). */
 export type FinishResult = { ok: true; score: Score; secrets: SecretsMap } | { ok: false; error: string };
 
-export type TimedStartResult = { ok: true; startedIso: string } | { ok: false; error: string };
-
 /** Sequential's move (§8 S21): the position now current, or null when every question is passed. */
 export type AdvanceResult = { ok: true; nextPosition: number | null } | { ok: false; error: string };
 

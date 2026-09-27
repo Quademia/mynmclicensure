@@ -870,6 +870,32 @@ its questions arrive after; Resume on a started exam shows the time left
 running; the tick box skips the card for that mode only; a finished
 sitting opens its review; the admin preview stamps nothing.
 
+**Built 2026-09-27.** `runner-load.ts`: the checks as `checkSession`,
+shared by the page (`loadRunner`: the error card, a finished sitting's
+review, or the card's data — the count and the progress read as two
+columns of the attempt's rows, no stem, no option) and by Start
+(`openSession`: the checks again, an exam's clock started once, then
+the sealed questions); `enterSession` in `actions.ts` (the old
+`startTimedAttempt` action gone with the runner's start phase);
+`components/runner/session-start.tsx`, the card from the mode table —
+on Resume of a clocked sitting its chip reads the minutes left and its
+brief adds "The clock is still running"; the Learning card no longer
+shows the feedback-style chip (a runner setting, in the runner's
+header). No storage change. **Walked** as the RM student: the
+unstarted Peadiatrics exam's page with the card alone (no header, clock
+or map) and neither of two questions checked in the page's own HTML;
+Start Exam → the runner at 09:58; reopened → the card with "Resume
+Exam", "10 min left" and no question in the page; Resume → the clock
+at 09:16 and "Resuming your in-progress exam"; the finished Sequential
+sitting straight into its review; the tick box on a Learning sitting —
+the next open went straight in, the exam's card still shown (the key
+cleared after). The press takes 1–2 s on dev (the checks again, the
+rows read). **Not walked:** the admin preview (the pane was the
+student). `tsc`, lint, the CSS guard and `npm run build` clean.
+**Wording note:** a resumed exam's brief keeps the mode's first line
+("The clock starts when you begin…") before "The clock is still
+running" — Sam may want a resume line of its own.
+
 ### Attempt reports and progress (captured 2026-09-24; candidates, none ruled)
 
 Sam, 2026-09-24, after walking NMC Prep on his own account: plans made
@@ -995,5 +1021,5 @@ it needs a change log on every answer, a storage change and its own
 | Q13 Readiness and the cohort | candidate, captured 2026-09-24; with Q3 |
 | Q14 The link tables | ✅ 2026-09-27 (`20260927100000_quiz_item_rows.sql`; §8 S20; walked as Sam's admin, the RM student and the RN student — §4) |
 | Q15 The student's own marks across attempts | candidate, captured 2026-09-26 |
-| Q17 The start screen on its own | ⬜ ruled 2026-09-27 (Sam: its own screen, no questions before Start, the card on every open, the tick box on every mode); no storage change — §4 |
+| Q17 The start screen on its own | ruled 2026-09-27 (Sam: its own screen, no questions before Start, the card on every open, the tick box on every mode); built 2026-09-27, code only; walked as the RM student — §4; to tick |
 | Q16 The keyword step never says what the keyword found | ⬜ queued 2026-09-26 (Sam); found walking 08 B6; re-read and offered 2026-09-27, not now (Sam) |

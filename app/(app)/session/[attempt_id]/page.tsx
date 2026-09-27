@@ -4,12 +4,13 @@
 // (runner/instant.html and runner/timed.html, ported as /runner/instant
 // and /runner/timed). The server half runs the preflight
 // (lib/attempts/runner-load: the checks, in order, with their words)
-// before anything reaches the browser: the error card for a refusal,
-// otherwise the attempt, its items in order, the config value and the
-// sitting's Exit handed to the runner, which reads the mode from the
-// attempt and the mode's behaviour from lib/attempts/modes. A finished
-// sitting opens as its review. `?preview=1` is the admin's read-only
-// view of any attempt.
+// before anything reaches the browser: the error card for a refusal; a
+// finished sitting's review, questions and all; or, for a live sitting,
+// the start card (03 Q17) — its data only, no question. Start or Resume
+// on the card asks the server for the questions and mounts the runner,
+// which reads the mode from the attempt and the mode's behaviour from
+// lib/attempts/modes. `?preview=1` is the admin's read-only view of any
+// attempt.
 //
 // No sidebar, as legacy: the runner sits under the (app) auth boundary
 // with its own header (rebuild.md §12 slice 6).
@@ -19,6 +20,7 @@ import { requireStudent } from '@/lib/access';
 import { loadRunner } from '@/lib/attempts/runner-load';
 import { QuizRunner } from '@/components/runner/quiz-runner';
 import { RunnerError } from '@/components/runner/runner-error';
+import { SessionStart } from '@/components/runner/session-start';
 import '@/styles/runner.css';
 
 export const metadata: Metadata = {
@@ -44,6 +46,7 @@ export default async function SessionPage({
   });
 
   if (load.kind === 'error') return <RunnerError title={load.title} message={load.message} exit={load.exit} />;
+  if (load.kind === 'start') return <SessionStart card={load.card} exit={load.exit} previewMode={load.previewMode} />;
 
   return (
     <QuizRunner
@@ -51,7 +54,7 @@ export default async function SessionPage({
       items={load.items}
       secrets={load.secrets}
       questionsPerPage={load.questionsPerPage}
-      reviewMode={load.reviewMode}
+      reviewMode
       previewMode={load.previewMode}
       exit={load.exit}
     />

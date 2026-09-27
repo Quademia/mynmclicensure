@@ -32,6 +32,7 @@ import { getQuizById } from '@/lib/quizzes/queries';
 import type { QuizKind } from '@/lib/quizzes/types';
 import { makeAttemptId } from './ids';
 import { getAttemptById, getBuilderCourseItems, getStudentAttemptsPaginated, originSource, readAttemptItems } from './queries';
+import { openSession, type SessionOpen } from './runner-load';
 import { chosenToStored } from './scoring';
 import { secretsOf } from './seal';
 import {
@@ -49,7 +50,6 @@ import {
   type HistoryFilters,
   type HistoryPage,
   type SpawnResult,
-  type TimedStartResult,
   type Attempt,
 } from './types';
 
@@ -245,17 +245,14 @@ function rpcError(error: { message?: string } | null, fallback: string): string 
   return msg && !/^[a-z_]+:/.test(msg) ? msg : fallback;
 }
 
-// The timed clock's anchor: set once, then the stored value comes back
-// (another tab may have won).
-export async function startTimedAttempt(attemptId: string): Promise<TimedStartResult> {
-  const { profile } = await requireStudent();
-  const { data, error } = await createServiceRoleClient().rpc('start_timed_attempt', {
-    p_attempt_id: attemptId,
-    p_user_id: profile.user_id,
-  });
-  if (error) return fail(rpcError(error, 'We could not start your exam properly. Please try again.'));
-  if (!data) return fail('We could not start your exam properly. Please try again.');
-  return { ok: true, startedIso: String(data) };
+// Start or Resume on the start card (03 Q17): the session page's checks
+// again, an exam's clock started once (the function returns the stored
+// start when another tab won), then the questions — the first moment
+// they reach the browser. Admin preview reads any sitting and starts no
+// clock.
+export async function enterSession(attemptId: string, preview = false): Promise<SessionOpen> {
+  const gate = await requireStudent();
+  return openSession(gate, { attemptId: String(attemptId || ''), preview: Boolean(preview) });
 }
 
 // Sequential's move (§8 S21): the server stamps the current question as
