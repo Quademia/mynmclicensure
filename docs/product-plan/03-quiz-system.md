@@ -856,8 +856,8 @@ it needs a change log on every answer, a storage change and its own
 | Q5 The answers as rows and the write door | ✅ 2026-09-20 (`20260920150000_attempt_answers.sql`; walked as student4: per-tap saves and a flag read back, a reload restoring them, finish at 4 / 10, an exam closed at its deadline on the next open, a failed Submit's toast with the runner unlocked) |
 | Q6 The seal | ✅ 2026-09-20 (code only; walked as student4: a live exam's page with 0 keys, the closed exam's with 10, a practice quiz reloaded with exactly the 2 checked, the review filled from the finish reply) |
 | Q7 SATA partial credit | later, after S7 |
-| Q8 The runner as a player | ruled 2026-09-27 (Sam: `/session`, MyNclex's modes, four now, A); step 1 built 2026-09-27 and walked, to tick; steps 2 (§8 S21) and 3 (Sequential) to build |
-| Q9 The Check Answer pending state | built 2026-09-27 with Q8's step 1 and walked, to tick |
+| Q8 The runner as a player | ruled 2026-09-27 (Sam: `/session`, MyNclex's modes, four now, A); step 1 ✅ 2026-09-27 (code only; walked as the RM student — §4; ticked by Sam); steps 2 and 3 on §8 S21 (✅ ticked 2026-09-27), building |
+| Q9 The Check Answer pending state | ✅ 2026-09-27 (with Q8's step 1; walked as the RM student — §4; ticked by Sam) |
 | Q10 The attempt report | candidate, captured 2026-09-24 |
 | Q11 Time per question | candidate, captured 2026-09-24 |
 | Q12 Progress across attempts | candidate, captured 2026-09-24 |
