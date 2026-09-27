@@ -667,6 +667,78 @@ most for the exam.
   mode (parked on BUILD_LIST as a new feature); the screen word for an
   exam sitting.
 
+**Ruled 2026-09-27 (Sam), in one conversation:** Q8 and Q9 together.
+The address is **`/session/<id>`**, MyNclex's, and the two runner pages
+go with no redirects ("this is dev and it's only me"). **MyNclex's
+nature for modes** — modes grouped under **Study** and **Exam**, one
+table naming them and saying how each behaves, the runner asking the
+table — and **four of MyNclex's five modes now, not later**: Learning
+and Untimed practice under Study, Free Navigation and Sequential under
+Exam (adaptive testing out: it needs a calibrated engine; MyNclex's
+"Timed practice" out: its engagement clock is unbuilt there, and with a
+wall clock it is Free Navigation renamed). Asked whether choosing the
+modes means adopting MyNclex's runner outright: offered with the
+numbers (~10,800 lines in 48 files against ours ~2,600 in 14, built on
+MyNclex's own tables and nine question types; the 2026-09-26 ruling on
+the whole quiz system) — **Sam: extend ours**, copying MyNclex's shape
+and pieces. A quiz's modes: **A — the admin ticks which of the four a
+quiz or mock allows** and the student picks among them (over MyNclex's
+one mode per quiz, which ticking one reaches). Sequential: **an answer
+required to move on.** Built in three steps: **1** (this) no storage —
+the address, the exit, Q9 and the table on today's two codes; **2**
+§8 S21 — the four codes, the ticks, the builder's choice, Untimed
+practice; **3** Sequential and its lock.
+
+**Q8 + Q9 step 1 — built 2026-09-27** (no storage change):
+
+- `/session/[attempt_id]` — one page; `/runner/instant` and
+  `/runner/timed` deleted. The attempt's status decides: in progress
+  plays, completed opens as its review, abandoned is legacy's card —
+  so CHECK 6 and the `?review=1` flag's two bounces are gone.
+  `?preview=1` stays the admin's read-only view.
+- `lib/attempts/links.ts` — `sessionHref()`, used by the builder, the
+  quiz lists, Learning History and the dashboard (four copies of the
+  address deleted); `SESSION_EXITS`. The loader resolves the sitting's
+  home from `originSource()` (queries.ts; a retake followed back to
+  its origin, the retake's quiz check now on it too): the builder → the
+  Quiz Builder, a fixed quiz → Fixed Quizzes, a mock → Mock Exams. Exit,
+  Save & Resume Later, Submit & Exit, the button after submitting
+  ("Back to Mock Exams" …) and the error card go there.
+- `lib/attempts/modes.ts` — the table: group, name, full name, clock
+  (`none` / `wall`), feedback (`each` / `end`), navigation, the start
+  screen's brief, the builder's card, the runner's words, the "Don't
+  show this again" key (legacy's two, kept). `instant` is Study ·
+  Learning, `timed` Exam · Free Navigation. The runner asks the table
+  (is there a clock, does feedback show after each question) where it
+  asked "instant or timed?" in about two dozen places; the loader's
+  expiry and seal do the same. Every page names a mode from it: the
+  builder's cards under Study and Exam headings, the quiz lists'
+  sections and buttons ("Start Learning", "Start Exam"), Learning
+  History's chips, pills and filter, the dashboard's Mode column (it
+  printed the raw code), the admin Attempts page, the quiz form's
+  setting ("Study only").
+- **Q9:** the picked option shows "Checking…" on a dashed edge until
+  the server's reply lands, the question takes no second pick meanwhile
+  (the flag still works), SATA's button reads "Checking…"; a thrown
+  failure (a dropped connection) now toasts, where before only a
+  returned one did.
+
+**Walked** as the RM student (`…student4`) on dev: Fixed Quizzes named
+"Study · Learning" / "Exam · Free Navigation" with "Resume Learning" and
+"Start Exam"; Resume opening `/session/<id>` with the Learning brief;
+a tap showing "Checking…" (caught by an observer and a screenshot) then
+the rationale; Exit → Save & Resume Later back on Fixed Quizzes; a
+finished exam opening as its review with "Review Answers & Feedback" /
+"Back to Fixed Quizzes"; a builder sitting's Exit on the Quiz Builder;
+an abandoned sitting's card; Learning History's "Learning: 8 · Free
+Navigation: 2"; the dashboard's links all `/session/…`; `/runner/instant`
+a 404; another student's sitting refused; "Start Exam" on Peadiatrics
+paper 1 opening the Free Navigation brief with "about 10 minutes" (the
+clock not started); the builder's mode step under its two headings. A
+retake's and a mock's exits resolved against dev by script (the
+Midwifery student has neither): retake → Fixed Quizzes via its origin,
+mock → Mock Exams. `tsc`, lint, the CSS guard and `npm run build` clean.
+
 ### Attempt reports and progress (captured 2026-09-24; candidates, none ruled)
 
 Sam, 2026-09-24, after walking NMC Prep on his own account: plans made
@@ -784,8 +856,8 @@ it needs a change log on every answer, a storage change and its own
 | Q5 The answers as rows and the write door | ✅ 2026-09-20 (`20260920150000_attempt_answers.sql`; walked as student4: per-tap saves and a flag read back, a reload restoring them, finish at 4 / 10, an exam closed at its deadline on the next open, a failed Submit's toast with the runner unlocked) |
 | Q6 The seal | ✅ 2026-09-20 (code only; walked as student4: a live exam's page with 0 keys, the closed exam's with 10, a practice quiz reloaded with exactly the 2 checked, the review filled from the finish reply) |
 | Q7 SATA partial credit | later, after S7 |
-| Q8 The runner as a player | candidate, captured 2026-09-20; ruled when it comes up, after 08 B2 |
-| Q9 The Check Answer pending state | candidate, captured 2026-09-20 |
+| Q8 The runner as a player | ruled 2026-09-27 (Sam: `/session`, MyNclex's modes, four now, A); step 1 built 2026-09-27 and walked, to tick; steps 2 (§8 S21) and 3 (Sequential) to build |
+| Q9 The Check Answer pending state | built 2026-09-27 with Q8's step 1 and walked, to tick |
 | Q10 The attempt report | candidate, captured 2026-09-24 |
 | Q11 Time per question | candidate, captured 2026-09-24 |
 | Q12 Progress across attempts | candidate, captured 2026-09-24 |
