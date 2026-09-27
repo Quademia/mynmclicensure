@@ -1099,7 +1099,31 @@ files refuses nothing but a question already broken.
 holds the answer `"a & c"` on an MCQ — nobody can get it right, and
 since dev's bank came from prod's exports it is very likely live on the
 legacy site. Content, Sam's to answer; the rule refuses a save of it
-until then.
+until then. Its feedback marks both A and C "Correct", so it reads as a
+SATA of `a,c` saved as an MCQ.
+
+**Built 2026-09-27.** `lib/bank/answer-rule.ts`; the editor, the save,
+the CSV report and the import as scoped; `existingItemTypes` in
+`lib/bank/queries.ts`. No storage change. **Proven** outside the app
+(the repo's esbuild): thirteen cases through the rule, each refusal in
+its words and `" B "` / `"a, c ,a"` tidied to `b` / `a,c`; a six-row
+file through the report; the rule over every question on dev — 5,581
+rows, one refused (`RM_MID_PHILLI-S1-42`), none tidied. **Walked** as
+Sam's admin on RM_MID: the broken question opening with its type as a
+label and its answer shown as `"a & c" — not a valid answer`, its save
+refused with the reason and the row untouched; a new MCQ with answer D
+switched to TF showing "A (True)" with the value `a` and options A and
+B only, saved as TF, `a`, C and D null, a draft, then shown as a label;
+a new MCQ with answer E and only A and B refused ("The correct answer is
+E, but option E is empty.") and nothing written; a four-row file — the
+report skipping the empty-option row and the TF with C text by reason,
+the import creating the good row (answer `B ` stored `b`) and refusing
+the type change by name ("RMMID_040321: the bank holds it as TF and the
+file says MCQ — a question's type is fixed once saved"), the stored TF
+unchanged. The save's own type refusal is not reachable from the page
+by design and was not walked. `tsc`, lint and `npm run build` clean.
+The walk's two test questions deleted afterwards (Sam's yes); the dev
+bank back at 5,581. **Ticked by Sam, 2026-09-27.**
 
 ### Later, under this doc
 
@@ -1128,4 +1152,4 @@ until then.
 | B5 The lists and their panel | ✅ 2026-09-26 (`20260926170000_bank_subject_topic_lists.sql`; the code in two sittings the same day; walked on dev and by Sam — §4); the clean-up of the words is content work, in the panel |
 | B6 The draws, and the student's read (S19) | ✅ 2026-09-26 (`20260926180000_question_bank_student_read_narrowed.sql`; walked on dev as Sam's admin and as a GP student — §4) |
 | B7 Whole-course reads past the 1,000-row cap | ✅ 2026-09-26 (widened the same day into one pass with D52's other thirteen — Sam; `lib/supabase/read-all.ts`; proven against dev and walked as the RM student — §4) |
-| B8 A question's type fixed once saved, an answer a student can give | ⬜ building (Sam: option A, 2026-09-27) |
+| B8 A question's type fixed once saved, an answer a student can give | ✅ 2026-09-27 (Sam: option A; `lib/bank/answer-rule.ts`, no storage change; proven over the dev bank and walked as Sam's admin — §4; ticked by Sam after the walk) |

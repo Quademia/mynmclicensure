@@ -269,7 +269,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ B5 The lists — subjects and topics per course, Not set for empty, the Subjects & topics panel — 2026-09-26
 - ✅ B6 The draws — a draft or active mock's questions held back from practice; S19 — 2026-09-26
 - ✅ B7 The bank's four reads past the API's 1,000-row cap, the keyword too — one pass with D52's other 13 — 2026-09-26
-- ⬜ B8 A question's type fixed once saved; an answer a student can give, at the editor and the importer (gap 3)
+- ✅ B8 Type fixed once saved; an answer a student can give, checked at the editor and the importer — 2026-09-27
 
 *Not yet sliced — each gets an id when the doc is rewritten:*
 
