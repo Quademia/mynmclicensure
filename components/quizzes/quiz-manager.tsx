@@ -591,7 +591,7 @@ export function QuizManager({
               <select id="qFilterMode" value={fMode} onChange={(e) => setFMode(e.target.value)}>
                 <option value="">All modes</option>
                 <option value="BOTH">Both</option>
-                <option value="INSTANT_ONLY">Practice only</option>
+                <option value="INSTANT_ONLY">Study only</option>
                 <option value="TIMED_ONLY">Exam only</option>
               </select>
             </div>

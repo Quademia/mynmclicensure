@@ -10,7 +10,8 @@
 // did (carried as is, Sam 2026-09-14; listed under "After the rebuild").
 // Any filter or sort change reloads from page 0, as legacy's
 // applyFilters did. Retake goes through 5b's action; Resume and Review
-// open the runner for the attempt's mode.
+// open the sitting at /session/<id>, and the mode names come from the
+// mode table (03 Q8, 2026-09-27).
 //
 // The legacy alert() on a failed retake is a toast (UI convention #1).
 // The list renders after hydration behind legacy's "Loading your
@@ -23,7 +24,9 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from '
 import { useRouter } from 'next/navigation';
 import { Toast } from '@/lib/toast/toast';
 import { loadHistoryPage, retakeAttempt } from '@/lib/attempts/actions';
-import type { AttemptListRow, AttemptMode, HistoryFilters, HistoryPage } from '@/lib/attempts/types';
+import { sessionHref } from '@/lib/attempts/links';
+import { MODES, MODE_ORDER, modeOf } from '@/lib/attempts/modes';
+import type { AttemptListRow, HistoryFilters, HistoryPage } from '@/lib/attempts/types';
 import { Icon } from '@/components/shell/icons';
 import { KindChip, ATTEMPT_SOURCE_HUE, MODE_ICON } from '@/components/shell/chips';
 
@@ -43,10 +46,6 @@ const HISTORY_PATH = '/student/learning-history';
 
 function subscribeNever(): () => void {
   return () => {};
-}
-
-function runnerHref(mode: AttemptMode, attemptId: string, review = false): string {
-  return `/runner/${mode === 'timed' ? 'timed' : 'instant'}?attempt_id=${encodeURIComponent(attemptId)}${review ? '&review=1' : ''}`;
 }
 
 // legacy formatStatus / formatSource — an unknown value shows as it is
@@ -160,14 +159,14 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
       setMsg({ text: `Could not start retake. Please try again. ${result.error || ''}`.trim(), tone: 'error' });
       return;
     }
-    router.push(runnerHref(a.mode, result.attemptId));
+    router.push(sessionHref(result.attemptId));
   }
 
   // ── legacy renderStats (over the loaded pages) ──
   const completedRows = attempts.filter((a) => a.status === 'completed' && (a.score_total || 0) > 0);
   const statTotal = total || attempts.length;
-  const statInstant = attempts.filter((a) => a.mode === 'instant').length;
-  const statTimed = attempts.filter((a) => a.mode === 'timed').length;
+  // one pill per mode, named from the mode table (legacy's Instant / Timed)
+  const statByMode = MODE_ORDER.map((code) => ({ code, name: MODES[code].name, n: attempts.filter((a) => a.mode === code).length }));
   let avgPct = '—';
   let bestPct = '—';
   if (completedRows.length) {
@@ -229,7 +228,7 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
           </div>
           <div className="attempt-title">{title}</div>
           <div className="chips-row">
-            {a.mode ? <KindChip icon={MODE_ICON[a.mode]}>{a.mode === 'timed' ? 'Timed' : 'Instant'}</KindChip> : null}
+            {a.mode ? <KindChip icon={MODE_ICON[a.mode]}>{modeOf(a.mode).name}</KindChip> : null}
             {a.status ? <span className={`badge status-${a.status}`}>{formatStatus(a.status)}</span> : null}
             {a.source ? <KindChip hue={ATTEMPT_SOURCE_HUE[a.source]}>{formatSource(a.source)}</KindChip> : null}
             {a.n ? <KindChip>{a.n} Q</KindChip> : null}
@@ -247,7 +246,7 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
               className="act-btn btn-resume"
               disabled={!isInProgress}
               title={isInProgress ? 'Continue this attempt' : 'Only available for in-progress attempts'}
-              onClick={() => router.push(runnerHref(a.mode, a.attempt_id))}
+              onClick={() => router.push(sessionHref(a.attempt_id))}
             >
               <Icon name="play" />Resume
             </button>
@@ -256,7 +255,7 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
               className="act-btn btn-review"
               disabled={!isCompleted}
               title={isCompleted ? 'Review your answers' : 'Complete this attempt first'}
-              onClick={() => router.push(runnerHref(a.mode, a.attempt_id, true))}
+              onClick={() => router.push(sessionHref(a.attempt_id))}
             >
               <Icon name="eye" />Review
             </button>
@@ -284,8 +283,9 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
         <div className="stat-pill">Total attempts: <strong>{mounted ? statTotal : '—'}</strong></div>
         <div className="stat-pill">Avg score: <strong>{mounted ? avgPct : '—'}</strong></div>
         <div className="stat-pill">Best score: <strong>{mounted ? bestPct : '—'}</strong></div>
-        <div className="stat-pill">Instant: <strong>{mounted ? statInstant : '—'}</strong></div>
-        <div className="stat-pill">Timed: <strong>{mounted ? statTimed : '—'}</strong></div>
+        {statByMode.map((s) => (
+          <div key={s.code} className="stat-pill">{s.name}: <strong>{mounted ? s.n : '—'}</strong></div>
+        ))}
       </div>
 
       {/* Course filter chip (shows when ?course= is active) */}
@@ -310,8 +310,7 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
           <label htmlFor="modeFilter">Mode</label>
           <select id="modeFilter" className="filter-select" value={mode} onChange={(e) => { setMode(e.target.value); applyFilters({ mode: e.target.value }); }}>
             <option value="">All Modes</option>
-            <option value="instant">Instant</option>
-            <option value="timed">Timed</option>
+            {MODE_ORDER.map((code) => <option key={code} value={code}>{MODES[code].fullName}</option>)}
           </select>
         </div>
         <div className="toolbar-field">

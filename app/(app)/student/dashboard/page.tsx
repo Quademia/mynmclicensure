@@ -22,7 +22,9 @@
 //     attempt, timed ones included, so a timed mock resumed in the wrong
 //     runner. Learning history (7a) routes on the attempt's own mode;
 //     the dashboard now does the same (Sam, 2026-09-16). Not a §9 entry
-//     — ruled on in session.
+//     — ruled on in session. Since 03 Q8 there is one address per
+//     sitting, /session/<id>, so the mode no longer picks a page, and
+//     the Mode column names the mode from the mode table.
 //   · "Expires in N days" comes from the access map's stacked day count
 //     rather than a second clock read, as the course page's days box
 //     does; the map's expiry is today plus that count, so the two agree.
@@ -33,7 +35,9 @@ import { requireStudent } from '@/lib/access';
 import { getCourses } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess, getUpcomingAccess } from '@/lib/subscriptions/queries';
 import { getRecentAttempts } from '@/lib/attempts/queries';
-import type { AttemptListRow, AttemptMode } from '@/lib/attempts/types';
+import { sessionHref } from '@/lib/attempts/links';
+import { modeOf } from '@/lib/attempts/modes';
+import type { AttemptListRow } from '@/lib/attempts/types';
 import { getAnnouncementsForStudent, getStudentNoticeStates } from '@/lib/announcements/queries';
 import { AnnouncementsStrip } from '@/components/announcements/announcements-strip';
 import { PageHeader } from '@/components/shell/page-header';
@@ -65,11 +69,6 @@ function expiryLabel(days: number, expiresIso: string): string {
   return days <= 7 ? `Expires in ${days} day${days === 1 ? '' : 's'}` : `Expires ${fmtExpiry(expiresIso)}`;
 }
 
-// 7a's runnerHref, on the attempt's own mode (Sam, 2026-09-16)
-function runnerHref(mode: AttemptMode, attemptId: string, review = false): string {
-  return `/runner/${mode === 'timed' ? 'timed' : 'instant'}?attempt_id=${encodeURIComponent(attemptId)}${review ? '&review=1' : ''}`;
-}
-
 function AttemptsTable({ attempts }: { attempts: AttemptListRow[] }) {
   return (
     <table className="attempts-table">
@@ -90,7 +89,7 @@ function AttemptsTable({ attempts }: { attempts: AttemptListRow[] }) {
           return (
             <tr key={a.attempt_id}>
               <td>{a.display_label || a.quiz_id || 'Quiz'}</td>
-              <td>{a.mode}</td>
+              <td>{modeOf(a.mode).name}</td>
               <td>{a.n} questions</td>
               <td>{completed ? `${a.score_raw}/${a.score_total} (${Math.round(a.score_pct ?? 0)}%)` : '—'}</td>
               <td>{fmtAttemptDate(a.ts_iso)}</td>
@@ -98,7 +97,7 @@ function AttemptsTable({ attempts }: { attempts: AttemptListRow[] }) {
                 <span className={`badge ${a.status}`}>{a.status.replace('_', ' ')}</span>
               </td>
               <td>
-                <a className="attempt-action" href={runnerHref(a.mode, a.attempt_id, completed)}>
+                <a className="attempt-action" href={sessionHref(a.attempt_id)}>
                   {completed ? 'Review' : 'Resume'}
                 </a>
               </td>

@@ -129,6 +129,9 @@
 .qbld .count-hint { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; }
 .qbld .mode-label { font-size: 13px; font-weight: 600; color: var(--text); display: block; margin-bottom: 10px; }
 .qbld .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 4px; }
+/* 03 Q8: the modes under their group, Study or Exam */
+.qbld .mode-group { display: grid; gap: 10px; align-content: start; }
+.qbld .mode-group-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
 .qbld .mode-card { border: 1.5px solid var(--border); border-radius: 10px; padding: 16px; cursor: pointer; background: var(--bg); transition: all 0.15s; }
 .qbld .mode-card:hover { border-color: var(--accent); }
 .qbld .mode-card.picked { border-color: var(--primary); background: var(--primary-light); }

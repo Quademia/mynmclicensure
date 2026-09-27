@@ -11,8 +11,11 @@
 // line on an active exam.
 //
 // Start / Resume, Retake and Abandon go through Server Actions
-// (lib/attempts/actions); legacy wrote from the browser. Review opens
-// the runner with ?review=1. The legacy alert() messages are toasts (UI
+// (lib/attempts/actions); legacy wrote from the browser. Every sitting
+// opens at /session/<id>, a finished one as its review, and the mode
+// sections take their names from the mode table (03 Q8, 2026-09-27;
+// legacy's ?review=1 and the two runner pages are gone). The legacy
+// alert() messages are toasts (UI
 // convention #1); the Abandon confirm box stays the browser's, with
 // legacy's words (Sam, 2026-09-11: dialogs stay as legacy has them).
 //
@@ -29,6 +32,8 @@ import { useCallback, useState, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { Toast } from '@/lib/toast/toast';
 import { abandonAttempt, retakeAttempt, spawnQuizAttempt } from '@/lib/attempts/actions';
+import { sessionHref } from '@/lib/attempts/links';
+import { modeOf } from '@/lib/attempts/modes';
 import type { AttemptWithProgress, AttemptMode } from '@/lib/attempts/types';
 import { getQuizAvailability } from '@/lib/quizzes/availability';
 import type { AllowedModes, Availability, QuizCard, QuizKind } from '@/lib/quizzes/types';
@@ -81,10 +86,6 @@ const BADGE: Record<Exclude<Availability, 'HIDDEN'>, string> = {
 
 function subscribeNever(): () => void {
   return () => {};
-}
-
-function runnerHref(mode: AttemptMode, attemptId: string, review = false): string {
-  return `/runner/${mode}?attempt_id=${encodeURIComponent(attemptId)}${review ? '&review=1' : ''}`;
 }
 
 // legacy getOverallAttemptState — across both modes, for the filter
@@ -180,7 +181,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
         setBusy(null);
         return err(result.error || 'Could not create retake. Please try again.');
       }
-      router.push(runnerHref(mode, result.attemptId));
+      router.push(sessionHref(result.attemptId));
       return;
     }
 
@@ -190,12 +191,12 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
       setBusy(null);
       return err(result.error || 'Could not start quiz. Please try again.');
     }
-    router.push(runnerHref(mode, result.attemptId));
+    router.push(sessionHref(result.attemptId));
   }
 
-  // ── review (legacy reviewAttempt) ──
-  function reviewAttempt(attemptId: string, mode: AttemptMode) {
-    router.push(runnerHref(mode, attemptId, true));
+  // ── review (legacy reviewAttempt): a finished sitting opens as its review ──
+  function reviewAttempt(attemptId: string) {
+    router.push(sessionHref(attemptId));
   }
 
   // ── abandon (legacy abandonAttempt) ──
@@ -220,7 +221,10 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
   }
 
   // ── a mode section (legacy renderModeSection) ──
-  function renderModeSection(quiz: QuizCard, mode: AttemptMode, label: string, avail: Availability, attempts: AttemptWithProgress[]) {
+  function renderModeSection(quiz: QuizCard, mode: AttemptMode, avail: Availability, attempts: AttemptWithProgress[]) {
+    const M = modeOf(mode);
+    // the button colours stay the stylesheet's two: practice (Study), exam
+    const tone = M.group === 'study' ? 'practice' : 'exam';
     const modeAttempts = attempts.filter((a) => a.quiz_id === quiz.quiz_id && a.mode === mode);
     const completed = modeAttempts.filter((a) => a.status === 'completed');
     const inProgress = modeAttempts.find((a) => a.status === 'in_progress');
@@ -239,7 +243,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
         <>
           <button type="button" className="btn-start" disabled>Closed</button>
           {completed.length > 0 ? (
-            <button type="button" className="btn-link" onClick={() => reviewAttempt(completed[0].attempt_id, mode)}>Review last</button>
+            <button type="button" className="btn-link" onClick={() => reviewAttempt(completed[0].attempt_id)}>Review last</button>
           ) : null}
         </>
       );
@@ -252,7 +256,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
           </div>
           <div className="mode-actions">
             <button type="button" className="btn-start resume" disabled={isBusy} onClick={() => launchQuiz(quiz, mode, 'resume')}>
-              ▶ Resume {label.split(' ')[0]}
+              ▶ {M.words.listResume}
             </button>
             <button type="button" className="btn-link danger" disabled={busy === inProgress.attempt_id} onClick={() => abandon(inProgress.attempt_id)}>Abandon</button>
           </div>
@@ -261,17 +265,17 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
     } else if (completed.length > 0) {
       actions = (
         <div className="mode-actions">
-          <button type="button" className={`btn-start ${mode === 'instant' ? 'practice' : 'exam'}`} disabled={isBusy} onClick={() => launchQuiz(quiz, mode, 'retake')}>
+          <button type="button" className={`btn-start ${tone}`} disabled={isBusy} onClick={() => launchQuiz(quiz, mode, 'retake')}>
             <Icon name="refresh" />Retake
           </button>
-          <button type="button" className="btn-link" onClick={() => reviewAttempt(completed[0].attempt_id, mode)}>Review last</button>
+          <button type="button" className="btn-link" onClick={() => reviewAttempt(completed[0].attempt_id)}>Review last</button>
         </div>
       );
     } else {
       actions = (
         <div className="mode-actions">
-          <button type="button" className={`btn-start ${mode === 'instant' ? 'practice' : 'exam'}`} disabled={isBusy} onClick={() => launchQuiz(quiz, mode, 'start')}>
-            <Icon name={mode === 'instant' ? 'play' : 'target'} />{mode === 'instant' ? 'Start Practice' : 'Start Exam'}
+          <button type="button" className={`btn-start ${tone}`} disabled={isBusy} onClick={() => launchQuiz(quiz, mode, 'start')}>
+            <Icon name={M.clock === 'none' ? 'play' : 'target'} />{M.words.listStart}
           </button>
         </div>
       );
@@ -279,7 +283,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
 
     return (
       <div className="mode-section">
-        <div className="mode-section-title">{label}</div>
+        <div className="mode-section-title">{M.fullName}</div>
         <div className="mode-stats">
           <span className="mode-stat">Attempts: <strong>{attemptCount}</strong></span>
           {bestScore !== null ? <span className="mode-stat">Best: <strong>{Math.round(bestScore)}%</strong></span> : null}
@@ -327,8 +331,8 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
         </div>
         {scheduleInfo}
         <div className={`mode-sections ${isSingle ? 'single' : ''}`}>
-          {showPractice ? renderModeSection(quiz, 'instant', 'Practice Mode', avail, attempts) : null}
-          {showExam ? renderModeSection(quiz, 'timed', 'Exam Mode', avail, attempts) : null}
+          {showPractice ? renderModeSection(quiz, 'instant', avail, attempts) : null}
+          {showExam ? renderModeSection(quiz, 'timed', avail, attempts) : null}
         </div>
       </div>
     );
@@ -425,7 +429,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
           <label htmlFor="filterMode">Mode</label>
           <select id="filterMode" value={modeFilter} onChange={(e) => setModeFilter(e.target.value as ModeFilter)}>
             <option value="">All modes</option>
-            <option value="INSTANT_ONLY">Practice only</option>
+            <option value="INSTANT_ONLY">Study only</option>
             <option value="TIMED_ONLY">Exam only</option>
             <option value="BOTH">Both</option>
           </select>

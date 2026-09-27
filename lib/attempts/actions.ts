@@ -31,7 +31,7 @@ import { startRefusal } from '@/lib/quizzes/availability';
 import { getQuizById } from '@/lib/quizzes/queries';
 import type { QuizKind } from '@/lib/quizzes/types';
 import { makeAttemptId } from './ids';
-import { getAttemptById, getBuilderCourseItems, getStudentAttemptsPaginated, readAttemptItems } from './queries';
+import { getAttemptById, getBuilderCourseItems, getStudentAttemptsPaginated, originSource, readAttemptItems } from './queries';
 import { chosenToStored } from './scoring';
 import { secretsOf } from './seal';
 import {
@@ -464,18 +464,12 @@ export async function retakeAttempt(originAttemptId: string): Promise<SpawnResul
   });
 }
 
-// Which quiz table an attempt's quiz lives in: its own source, or — for
-// a retake, whose source is 'retake' — the source of the attempt it was
-// taken from, followed back through origin_attempt_id. A builder
-// attempt has no quiz: null.
+// Which quiz table an attempt's quiz lives in: where the sitting came
+// from (a retake followed back to its origin — queries.ts, since 03 Q8
+// the runner's Exit reads it too). A builder attempt has no quiz: null.
 async function quizKindOfAttempt(db: Parameters<typeof getAttemptById>[0], attempt: Attempt): Promise<QuizKind | null> {
-  let current: Attempt | null = attempt;
-  for (let hops = 0; current && hops < 20; hops++) {
-    if (current.source === 'fixed' || current.source === 'mock') return current.source;
-    if (current.source !== 'retake' || !current.origin_attempt_id) return null;
-    current = await getAttemptById(db, current.origin_attempt_id);
-  }
-  return null;
+  const source = await originSource(db, attempt);
+  return source === 'fixed' || source === 'mock' ? source : null;
 }
 
 // abandonAttempt: the list pages' Abandon — status to abandoned on the

@@ -29,17 +29,19 @@ export const QUIZ_ITEM_TABLES: Record<QuizKind, string> = {
 export const ALLOWED_MODES = ['BOTH', 'INSTANT_ONLY', 'TIMED_ONLY'] as const;
 export type AllowedModes = (typeof ALLOWED_MODES)[number];
 
-// legacy formatMode() — the admin table chip and the review pane.
+// legacy formatMode() — the admin table chip and the review pane. In the
+// mode table's words since 03 Q8 (Study / Exam, lib/attempts/modes); the
+// setting becomes a list of ticked modes with §8 S21.
 export const MODE_LABELS: Record<AllowedModes, string> = {
-  BOTH: 'Both Practice & Exam',
-  INSTANT_ONLY: 'Practice only',
+  BOTH: 'Both Study & Exam',
+  INSTANT_ONLY: 'Study only',
   TIMED_ONLY: 'Exam only',
 };
 
 // The details form's <select> labels, in legacy's order.
 export const MODE_OPTIONS: { value: AllowedModes; label: string }[] = [
-  { value: 'BOTH', label: 'Both Practice and Exam' },
-  { value: 'INSTANT_ONLY', label: 'Practice only' },
+  { value: 'BOTH', label: 'Both Study and Exam' },
+  { value: 'INSTANT_ONLY', label: 'Study only' },
   { value: 'TIMED_ONLY', label: 'Exam only' },
 ];
 

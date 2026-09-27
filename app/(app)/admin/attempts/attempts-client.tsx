@@ -24,6 +24,7 @@ import { useEffect, useRef, useState } from 'react';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { attemptDetailAction, attemptsWindowAction, headlineCountsAction, type HeadlineCounts } from '@/lib/attempts/admin-actions';
 import type { WindowAttemptRow } from '@/lib/attempts/admin-queries';
+import { MODES, MODE_ORDER, modeOf } from '@/lib/attempts/modes';
 import type { AttemptDetail } from '@/lib/attempts/types';
 import { KindChip, ATTEMPT_SOURCE_HUE } from '@/components/shell/chips';
 
@@ -432,8 +433,7 @@ export function AttemptsClient({ courses, quizTitles }: { courses: { course_id: 
           <label htmlFor="fMode">Mode</label>
           <select id="fMode" value={filters.mode} onChange={(e) => applyFilter({ mode: e.target.value })}>
             <option value="">All modes</option>
-            <option value="instant">Practice (instant)</option>
-            <option value="timed">Exam (timed)</option>
+            {MODE_ORDER.map((code) => <option key={code} value={code}>{MODES[code].fullName}</option>)}
           </select>
         </div>
         <div className="filter-group">
@@ -480,7 +480,7 @@ export function AttemptsClient({ courses, quizTitles }: { courses: { course_id: 
                     <td><KindChip hue={ATTEMPT_SOURCE_HUE[a.source]}>{typeLabel(a.source)}</KindChip></td>
                     <td>{quizTitle(a)}</td>
                     <td className="cell-muted">{courseMap[a.course_id] || a.course_id}</td>
-                    <td className="cell-12">{a.mode === 'timed' ? 'Exam' : 'Practice'}</td>
+                    <td className="cell-12">{modeOf(a.mode).name}</td>
                     <td><span className={`badge ${a.status}`}>{statusLabel(a.status)}</span></td>
                     <td className="cell-bold">{a.status === 'completed' && a.score_pct != null ? Math.round(a.score_pct) + '%' : '—'}</td>
                     <td>{a.n ?? '—'}</td>
@@ -526,7 +526,7 @@ export function AttemptsClient({ courses, quizTitles }: { courses: { course_id: 
                     <div className="detail-row"><span className="detail-label">Type</span><span className="detail-value">{typeLabel(detail.source)}</span></div>
                     <div className="detail-row"><span className="detail-label">Quiz / exam</span><span className="detail-value">{quizTitle(detail)}</span></div>
                     <div className="detail-row"><span className="detail-label">Course</span><span className="detail-value">{courseMap[detail.course_id] || detail.course_id}</span></div>
-                    <div className="detail-row"><span className="detail-label">Mode</span><span className="detail-value">{detail.mode === 'timed' ? 'Exam (timed)' : 'Practice (instant)'}</span></div>
+                    <div className="detail-row"><span className="detail-label">Mode</span><span className="detail-value">{modeOf(detail.mode).fullName}</span></div>
                     <div className="detail-row"><span className="detail-label">Status</span><span className="detail-value">{statusLabel(detail.status)}</span></div>
                     <div className="detail-row"><span className="detail-label">Score</span><span className="detail-value">{detailScore}</span></div>
                     <div className="detail-row"><span className="detail-label">Questions</span><span className="detail-value">{detail.n ?? '—'}</span></div>

@@ -106,6 +106,10 @@
 .runner .opt.correct { border-color: #16a34a; background: #f0fdf4; }
 .runner .opt.wrong { border-color: var(--danger); background: #fef2f2; }
 .runner .opt.disabled { cursor: default; }
+/* 03 Q9: the picked option while the server checks it — a dashed accent
+   edge and a "Checking…" badge until the reply lands. */
+.runner .opt.checking { border-color: var(--accent); border-style: dashed; cursor: progress; }
+.runner .badge-checking { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); color: var(--badge-neutral-ink); }
 .runner .opt-row { display: flex; align-items: flex-start; gap: 10px; }
 .runner .opt-input { margin-top: 2px; flex-shrink: 0; }
 .runner .opt-body { flex: 1; min-width: 0; }

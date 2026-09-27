@@ -1,14 +1,19 @@
 // lib/attempts/runner-load.ts
 //
 // The runner's preflight, transcribed from legacy runner/instant.html
-// and runner/timed.html runPreflightAndLoad() — the ten checks in their
+// and runner/timed.html runPreflightAndLoad() — the checks in their
 // order, with their titles and messages — but run on the server by the
-// runner's page before anything is sent to the browser (legacy ran them
+// session page before anything is sent to the browser (legacy ran them
 // in the browser behind a "Checking your access…" loader). The outcome is
-// one of three: an error screen, a redirect (the wrong runner for the
-// attempt's mode, a completed attempt opened without ?review=1, an
-// in-progress one opened with it), or the loaded attempt with its items
-// and the two config values.
+// an error screen or the loaded attempt with its items, the config value
+// and where the sitting's Exit goes.
+//
+// 03 Q8 (Sam, 2026-09-27): one address per sitting, `/session/<id>`. The
+// attempt says its own mode and its own state, so two of legacy's checks
+// went with the two pages: CHECK 6 (the other runner for the other mode)
+// and the review flag's two bounces — a finished sitting opens as its
+// review, an unfinished one as the sitting. The Exit is resolved here,
+// from where the sitting came from (links.ts).
 //
 // Server-only (it reads config and the bank); not a Server Action.
 
@@ -16,23 +21,23 @@ import { getConfig } from '@/lib/catalogue/queries';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import type { AuthGateResult } from '@/lib/access';
-import { getAttemptById, readAttemptItems } from './queries';
+import { SESSION_EXITS, type SessionExit } from './links';
+import { modeOf } from './modes';
+import { getAttemptById, originSource, readAttemptItems } from './queries';
 import { sealItem, secretOf } from './seal';
 import {
   RUNNER_QUESTIONS_PER_PAGE_DEFAULT,
   type Attempt,
-  type AttemptMode,
   type SealedItem,
   type SecretsMap,
 } from './types';
 
 // The seal (Q6; D5): the runner receives the rows cut to their public
 // half, and a secrets map — empty for a live exam; the questions already
-// graded for a live instant attempt (so Check Answer's feedback survives
+// graded for a live Learning sitting (so Check Answer's feedback survives
 // a reload); every question in review and admin preview.
 export type RunnerLoad =
-  | { kind: 'error'; title: string; message: string }
-  | { kind: 'redirect'; to: string }
+  | { kind: 'error'; title: string; message: string; exit: SessionExit }
   | {
       kind: 'ok';
       attempt: Attempt;
@@ -41,65 +46,56 @@ export type RunnerLoad =
       questionsPerPage: number;
       reviewMode: boolean;
       previewMode: boolean;
+      exit: SessionExit;
     };
-
-export function runnerPath(mode: AttemptMode, attemptId: string, review = false): string {
-  return `/runner/${mode}?attempt_id=${encodeURIComponent(attemptId)}${review ? '&review=1' : ''}`;
-}
 
 export async function loadRunner(
   gate: AuthGateResult,
-  mode: AttemptMode,
-  params: { attemptId: string; review: boolean; preview: boolean },
+  params: { attemptId: string; preview: boolean },
 ): Promise<RunnerLoad> {
   const { supabase, profile } = gate;
-  const words = mode === 'instant'
-    ? { back: 'Please start a quiz from the Fixed Quizzes page.', reviewMsg: 'This attempt cannot be reviewed yet as it has not been completed.' }
-    : { back: 'Please start a quiz from the Fixed Quizzes page.', reviewMsg: 'This attempt cannot be reviewed yet.' };
+  // Until the attempt is read, legacy's destination.
+  const fallback = SESSION_EXITS.fixed;
 
-  // CHECK 2 — URL params
+  // CHECK 2 — the attempt id
   const attemptId = params.attemptId.trim();
   if (!attemptId) {
-    return { kind: 'error', title: 'Missing Quiz', message: `No attempt ID was provided. ${words.back}` };
+    return { kind: 'error', title: 'Missing Quiz', message: 'No attempt ID was provided. Please start a quiz from the Fixed Quizzes page.', exit: fallback };
   }
 
   // CHECK 9 — Preview mode (admin only)
   const previewMode = params.preview;
   if (previewMode && (profile.role ?? '').toUpperCase() !== 'ADMIN') {
-    return { kind: 'error', title: 'Access Denied', message: 'Preview mode is for administrators only.' };
+    return { kind: 'error', title: 'Access Denied', message: 'Preview mode is for administrators only.', exit: fallback };
   }
-
-  // CHECK 8 — Review mode
-  const reviewMode = params.review;
 
   // CHECK 3 — Attempt exists
   let attempt = await getAttemptById(supabase, attemptId);
   if (!attempt) {
-    return {
-      kind: 'error',
-      title: 'Quiz Not Found',
-      message: mode === 'instant' ? 'This quiz attempt could not be found. It may have been deleted.' : 'This quiz attempt could not be found.',
-    };
+    return { kind: 'error', title: 'Quiz Not Found', message: 'This quiz attempt could not be found. It may have been deleted.', exit: fallback };
   }
 
   // CHECK 4 — Ownership (skipped in preview: an admin viewing any attempt)
   if (!previewMode && attempt.user_id !== profile.user_id) {
-    return { kind: 'error', title: 'Access Denied', message: 'This quiz attempt does not belong to your account.' };
+    return { kind: 'error', title: 'Access Denied', message: 'This quiz attempt does not belong to your account.', exit: fallback };
   }
+
+  // The sitting's home, now that it is known to be theirs (03 Q8).
+  const exit = SESSION_EXITS[(await originSource(supabase, attempt)) ?? 'fixed'];
 
   // CHECK 5 — Course access
   if (!previewMode) {
     const access = await getStudentCourseAccess(supabase, profile.user_id);
     if (!access[attempt.course_id]) {
-      return { kind: 'error', title: 'No Course Access', message: 'You do not have an active subscription for this course.' };
+      return { kind: 'error', title: 'No Course Access', message: 'You do not have an active subscription for this course.', exit };
     }
   }
 
   // 03 Q5 — an exam left open past its deadline is closed on this open,
   // by the server's clock (the function refuses while time is left), so
   // a closed tab is finished the next time the student comes back; the
-  // status checks below then send them to the review.
-  if (attempt.mode === 'timed' && attempt.status === 'in_progress' && attempt.started_utc && attempt.duration_min) {
+  // status then opens the review.
+  if (modeOf(attempt.mode).clock !== 'none' && attempt.status === 'in_progress' && attempt.started_utc && attempt.duration_min) {
     const deadline = new Date(attempt.started_utc).getTime() + attempt.duration_min * 60_000;
     if (Date.now() >= deadline) {
       const svc = createServiceRoleClient();
@@ -116,26 +112,11 @@ export async function loadRunner(
     }
   }
 
-  // CHECK 6 — Mode match: the other runner
-  if (attempt.mode !== mode) {
-    return { kind: 'redirect', to: runnerPath(attempt.mode === 'timed' ? 'timed' : 'instant', attemptId, reviewMode) };
-  }
-
-  // CHECK 7 — Attempt status
+  // CHECK 7 — Attempt status: abandoned is the card; finished is the review.
   if (attempt.status === 'abandoned') {
-    return {
-      kind: 'error',
-      title: 'Attempt Abandoned',
-      message: mode === 'instant'
-        ? 'This quiz attempt was abandoned. Please start a new attempt from the Fixed Quizzes page.'
-        : 'This quiz attempt was abandoned. Please start a new attempt.',
-    };
+    return { kind: 'error', title: 'Attempt Abandoned', message: 'This quiz attempt was abandoned. Please start a new attempt.', exit };
   }
-  if (attempt.status === 'completed' && !reviewMode) return { kind: 'redirect', to: runnerPath(mode, attemptId, true) };
-  if (attempt.status === 'in_progress' && reviewMode) return { kind: 'redirect', to: runnerPath(mode, attemptId, false) };
-  if (reviewMode && attempt.status !== 'completed') {
-    return { kind: 'error', title: 'Not Available', message: words.reviewMsg };
-  }
+  const reviewMode = attempt.status === 'completed';
 
   // Config. Since 03 Q5 the runner saves per tap, so
   // runner_autosave_interval_sec is no longer read (the key stays until
@@ -149,23 +130,18 @@ export async function loadRunner(
   // caller is an admin in preview).
   const rows = await readAttemptItems(createServiceRoleClient(), attempt.attempt_id);
   if (!rows.length) {
-    return {
-      kind: 'error',
-      title: 'No Questions',
-      message: mode === 'instant'
-        ? 'The questions for this quiz could not be loaded. Please contact support.'
-        : 'The questions for this quiz could not be loaded.',
-    };
+    return { kind: 'error', title: 'No Questions', message: 'The questions for this quiz could not be loaded. Please contact support.', exit };
   }
 
   // The cut. A live sitting gets the public half; the secret half goes
   // only where the rule allows it.
   const unsealAll = reviewMode || previewMode || attempt.status !== 'in_progress';
+  const feedbackEach = modeOf(attempt.mode).feedback === 'each';
   const items = rows.map(sealItem);
   const secrets: SecretsMap = {};
   for (const row of rows) {
-    if (unsealAll || (attempt.mode === 'instant' && row.graded_utc !== null)) secrets[row.item_id] = secretOf(row);
+    if (unsealAll || (feedbackEach && row.graded_utc !== null)) secrets[row.item_id] = secretOf(row);
   }
 
-  return { kind: 'ok', attempt, items, secrets, questionsPerPage, reviewMode, previewMode };
+  return { kind: 'ok', attempt, items, secrets, questionsPerPage, reviewMode, previewMode, exit };
 }

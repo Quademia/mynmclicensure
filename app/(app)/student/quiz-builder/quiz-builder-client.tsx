@@ -13,8 +13,9 @@
 // available" dialog can only appear when a remembered setup names a
 // course the student no longer has; it is kept for that case.
 //
-// The runner for a timed build is slice 6b: until then, picking Timed
-// opens a page that does not exist yet (rebuild.md §12).
+// 03 Q8 (2026-09-27): the mode cards, their words and the summary come
+// from the mode table (lib/attempts/modes), under the Study and Exam
+// headings; the build opens the sitting at /session/<id>.
 
 'use client';
 
@@ -22,12 +23,17 @@ import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { loadBuilderCourse, searchBuilderConcepts, spawnBuilderAttempt } from '@/lib/attempts/actions';
-import { CONCEPT_SEARCH_DELAY_MS, type BuilderItem } from '@/lib/attempts/types';
+import { sessionHref } from '@/lib/attempts/links';
+import { MODES, MODE_GROUPS, MODE_ORDER, modeOf } from '@/lib/attempts/modes';
+import { CONCEPT_SEARCH_DELAY_MS, type AttemptMode, type BuilderItem } from '@/lib/attempts/types';
 import type { ItemFilterOptions } from '@/lib/bank/types';
 
 type Course = { course_id: string; title: string };
-type Mode = 'instant' | 'timed';
+type Mode = AttemptMode;
 type SelectionMode = 'topics' | 'concept';
+
+// The card's badge colour per mode (student-quiz-builder.css).
+const MODE_BADGE: Record<AttemptMode, string> = { instant: 'badge-instant', timed: 'badge-timed' };
 
 const STEP_LABELS = [
   'Step 1 of 5 — Course & selection mode',
@@ -397,7 +403,7 @@ export function QuizBuilderClient({
 
     saveRecentSetup();
     setStatusOverride('Quiz ready. Opening runner…');
-    router.push(`/runner/${mode}?attempt_id=${encodeURIComponent(result.attemptId)}`);
+    router.push(sessionHref(result.attemptId));
   }
 
   // legacy: no accessible course → the empty card
@@ -413,9 +419,9 @@ export function QuizBuilderClient({
     );
   }
 
-  const modeHint = mode === 'timed'
-    ? `Timed mode will give you ${Math.ceil(questionCount * minutesPerQuestion)} minute(s).`
-    : 'Instant mode shows feedback after each answer.';
+  const modeHint = modeOf(mode).clock !== 'none'
+    ? `${modeOf(mode).fullName} will give you ${Math.ceil(questionCount * minutesPerQuestion)} minute(s).`
+    : `${modeOf(mode).fullName} has no clock.`;
 
   const summarySelection = selectionMode === 'topics'
     ? useAllTopics ? 'All topics' : selectedTopics.length ? selectedTopics.join(', ') : '—'
@@ -460,7 +466,7 @@ export function QuizBuilderClient({
                   const dt = item.savedAt
                     ? new Date(item.savedAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
                     : 'Saved';
-                  const sub = `${item.selectionMode === 'concept' ? 'Concept' : 'Topics'} · ${item.questionCount || '—'}Q · ${item.mode === 'timed' ? 'Timed' : 'Instant'} · ${dt}`;
+                  const sub = `${item.selectionMode === 'concept' ? 'Concept' : 'Topics'} · ${item.questionCount || '—'}Q · ${modeOf(item.mode).name} · ${dt}`;
                   return (
                     <div key={idx} className="recent-item">
                       <div className="recent-main">
@@ -663,16 +669,18 @@ export function QuizBuilderClient({
           <div className="count-hint">Max {maxQuestions} questions · Pool: {poolSize} available · Estimated {Math.ceil(questionCount * minutesPerQuestion)} min</div>
           <label className="mode-label">Mode</label>
           <div className="mode-grid">
-            <div className={`mode-card${mode === 'instant' ? ' picked' : ''}`} onClick={() => setMode('instant')}>
-              <div className="mode-card-title">Instant feedback</div>
-              <div className="mode-card-desc">See whether each answer is correct as you go. Best for learning and revision.</div>
-              <span className="mode-badge badge-instant">Practice</span>
-            </div>
-            <div className={`mode-card${mode === 'timed' ? ' picked' : ''}`} onClick={() => setMode('timed')}>
-              <div className="mode-card-title">Timed exam</div>
-              <div className="mode-card-desc">No feedback during the quiz. Review everything at the end. Simulates the real exam.</div>
-              <span className="mode-badge badge-timed">Exam-style</span>
-            </div>
+            {MODE_GROUPS.map((g) => (
+              <div key={g.group} className="mode-group">
+                <div className="mode-group-label">{g.label}</div>
+                {MODE_ORDER.filter((code) => MODES[code].group === g.group).map((code) => (
+                  <div key={code} className={`mode-card${mode === code ? ' picked' : ''}`} onClick={() => setMode(code)}>
+                    <div className="mode-card-title">{MODES[code].name}</div>
+                    <div className="mode-card-desc">{MODES[code].card}</div>
+                    <span className={`mode-badge ${MODE_BADGE[code]}`}>{MODES[code].fullName}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
           <div className="mode-hint">{modeHint}</div>
           <div className="nav-bar">
@@ -699,7 +707,7 @@ export function QuizBuilderClient({
               ['Topics / concept', summarySelection, 1],
               ['Difficulty', selectedDifficulties.length ? selectedDifficulties.join(', ') : 'All', 2],
               ['Question type', selectedQuestionTypes.length ? selectedQuestionTypes.join(', ') : 'All types', 2],
-              ['Mode', mode === 'timed' ? 'Timed exam' : 'Instant feedback', 3],
+              ['Mode', modeOf(mode).fullName, 3],
             ].map(([label, value, target]) => (
               <div key={String(label)} className="summary-item">
                 <div className="summary-head">

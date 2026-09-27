@@ -2,9 +2,15 @@
 //
 // The runner core — the script block of legacy runner/instant.html and
 // runner/timed.html, which were one script with two modes (slice 6a
-// builds the core and the instant mode; 6b adds the timed pieces where
-// `mode === 'timed'`). One component, two pages, each page's own words
-// (rebuild.md §12 slice 6, Sam 2026-09-13).
+// built the core and the instant mode; 6b the timed pieces).
+//
+// Since 03 Q8 (Sam, 2026-09-27) it is a player: one page,
+// `/session/<id>`, and the attempt says its mode. The runner reads the
+// mode's row in lib/attempts/modes — is there a clock, does feedback show
+// after each question or at the end — and its words from there, instead
+// of asking "instant or timed?" in two dozen places; Exit goes to the
+// sitting's home, which the page resolves (lib/attempts/links). Since Q9
+// the option being checked shows it until the server's reply lands.
 //
 // What it does, in legacy's order: the preflight card (or straight in,
 // when the student ticked "Don't show this again"); pages of N questions
@@ -66,7 +72,9 @@ import {
   optionFeedback,
   type OptionView,
 } from '@/lib/attempts/scoring';
-import type { AnswerPatch, Attempt, AttemptMode, ChosenMap, FlagMap, Score, SealedItem, SecretsMap } from '@/lib/attempts/types';
+import type { SessionExit } from '@/lib/attempts/links';
+import { modeOf, preflightBrief } from '@/lib/attempts/modes';
+import type { AnswerPatch, Attempt, ChosenMap, FlagMap, Score, SealedItem, SecretsMap } from '@/lib/attempts/types';
 
 type FeedbackMode = 'inline' | 'standalone' | 'hide';
 type ViewMode = 'ALL' | 'FLAGGED';
@@ -76,41 +84,6 @@ const FEEDBACK_KEY = 'qa_feedback_mode';
 const SAVE_DEBOUNCE_MS = 500;
 /** The timed auto-submit, when it fails, tries again after this long. */
 const AUTO_SUBMIT_RETRY_MS = 10_000;
-const SKIP_KEY: Record<AttemptMode, string> = { instant: 'qa_skip_preflight', timed: 'qa_skip_preflight_timed' };
-const QUIZZES_PAGE = '/student/fixed-quizzes';
-
-const WORDS = {
-  instant: {
-    title: 'Practice Quiz',
-    modeWord: 'Practice',
-    start: 'Start Quiz',
-    resume: 'Resume Attempt',
-    preflightText: 'Practice mode gives you immediate feedback after each answer. You can flag questions, navigate freely and review your answers at the end.',
-    reviewBanner: 'Review Mode — Answers are read-only. You are reviewing a completed attempt.',
-    submit: 'Submit Quiz',
-    flaggedEmptySub: 'Flag questions during the quiz, then switch back here to review only those questions.',
-    exitTitle: 'Leave this quiz?',
-    exitText: 'Your progress will be saved and you can resume later from your learning history.',
-    reviewingLog: 'Reviewing your completed attempt. All answers and feedback are shown read-only.',
-    submittedLog: 'Quiz submitted. Review your answers below.',
-    savedLog: 'Progress saved. You can resume from your learning history.',
-  },
-  timed: {
-    title: 'Exam Quiz',
-    modeWord: 'Exam',
-    start: 'Start Exam',
-    resume: 'Resume Exam',
-    preflightText: '',
-    reviewBanner: 'Review Mode — Answers are read-only. You are reviewing a completed exam attempt.',
-    submit: 'Submit Exam',
-    flaggedEmptySub: 'Flag questions during the exam, then switch back here to review only those questions.',
-    exitTitle: 'Leave this exam?',
-    exitText: 'The timer will keep running. Your progress will be saved and you can resume from your learning history — but the clock does not stop.',
-    reviewingLog: 'Reviewing your completed exam. All answers and feedback are shown read-only.',
-    submittedLog: 'Exam submitted. Review your answers below.',
-    savedLog: 'Progress saved.',
-  },
-} as const;
 
 function feedbackModeLabel(m: FeedbackMode): string {
   if (m === 'standalone') return 'Standalone feedback';
@@ -123,24 +96,29 @@ function isDesktop(): boolean {
 }
 
 export function QuizRunner({
-  mode,
   attempt,
   items,
   secrets: initialSecrets,
   questionsPerPage,
   reviewMode,
   previewMode,
+  exit,
 }: {
-  mode: AttemptMode;
   attempt: Attempt;
   items: SealedItem[];
   secrets: SecretsMap;
   questionsPerPage: number;
   reviewMode: boolean;
   previewMode: boolean;
+  /** Where Exit and the buttons after submitting go: the sitting's home. */
+  exit: SessionExit;
 }) {
   const router = useRouter();
-  const W = WORDS[mode];
+  // The mode's row (03 Q8): the runner asks it, never the code.
+  const M = modeOf(attempt.mode);
+  const W = M.words;
+  const hasClock = M.clock !== 'none';
+  const feedbackEach = M.feedback === 'each';
   const label = attempt.display_label || W.title;
 
   // ── state (legacy ANSW / FLAGS / SATA_EVAL / LOCKED / …) ──
@@ -166,6 +144,8 @@ export function QuizRunner({
   const [status, setStatus] = useState('Initialising…');
   const [saving, setSaving] = useState<string>('');
   const [toast, setToast] = useState<string | null>(null);
+  // 03 Q9: the questions whose Check Answer is on its way to the server.
+  const [checking, setChecking] = useState<FlagMap>({});
   const dismissToast = useCallback(() => setToast(null), []);
   const startedAtRef = useRef<number | null>(null);
   const startingRef = useRef(false);
@@ -212,7 +192,7 @@ export function QuizRunner({
 
       let skip = false;
       try {
-        skip = window.localStorage.getItem(SKIP_KEY[mode]) === '1';
+        skip = window.localStorage.getItem(M.skipKey) === '1';
       } catch {
         /* no storage — show the card */
       }
@@ -220,15 +200,7 @@ export function QuizRunner({
         startQuiz(true);
       } else {
         setPhase('preflight');
-        setStatus(
-          mode === 'timed'
-            ? attempt.started_utc !== null
-              ? 'You have an in-progress exam. Click Resume Exam when ready.'
-              : 'Read the exam details carefully then click Start Exam when ready.'
-            : hasProgress()
-            ? 'You have an in-progress attempt. Click Resume Attempt when ready.'
-            : 'Review the quiz details then click Start Quiz when ready.',
-        );
+        setStatus(isResuming() ? W.preflightResume : W.preflightNew);
       }
     }, 0);
     return () => window.clearTimeout(id);
@@ -239,11 +211,17 @@ export function QuizRunner({
     return Object.keys(answers).length > 0 || Object.keys(flags).length > 0 || Object.keys(sataChecked).length > 0;
   }
 
+  // A clocked sitting is resumed once its clock has started; any other
+  // once something has been answered or flagged (legacy's two tests).
+  function isResuming(): boolean {
+    return hasClock ? attempt.started_utc !== null : hasProgress();
+  }
+
   async function startQuiz(skipped = false) {
     if (booted || startingRef.current) return;
     startingRef.current = true;
-    if (mode === 'timed') {
-      setSaving('Starting your exam…');
+    if (hasClock) {
+      setSaving(W.starting);
       try {
         // Admin preview runs only in memory and never stamps an attempt.
         const result = previewMode
@@ -256,7 +234,7 @@ export function QuizRunner({
         startedAtRef.current = new Date(result.startedIso).getTime();
         setSecondsLeft(Math.max(0, totalSeconds - Math.max(0, Math.floor((Date.now() - startedAtRef.current) / 1000))));
       } catch {
-        setStartError('We could not start your exam properly. Please try again.');
+        setStartError(W.startFailed);
         return;
       } finally {
         setSaving('');
@@ -268,17 +246,15 @@ export function QuizRunner({
     if (!startedAtRef.current) startedAtRef.current = Date.now();
     setPage(0);
     setViewMode('ALL');
-    if (mode === 'timed') {
-      setStatus(attempt.started_utc !== null
-        ? 'Resuming your in-progress exam. Your saved answers have been restored.'
-        : '');
-    } else if (skipped && hasProgress()) setStatus('Resuming your in-progress attempt. Your saved answers have been restored.');
+    if (hasClock) {
+      setStatus(attempt.started_utc !== null ? W.resumed : '');
+    } else if (skipped && hasProgress()) setStatus(W.resumed);
   }
 
   function onPreflightStart() {
     if (skipNextTime) {
       try {
-        window.localStorage.setItem(SKIP_KEY[mode], '1');
+        window.localStorage.setItem(M.skipKey, '1');
       } catch {
         /* ignore */
       }
@@ -361,7 +337,7 @@ export function QuizRunner({
   });
 
   useEffect(() => {
-    if (mode !== 'timed' || !booted || locked || reviewMode) return;
+    if (!hasClock || !booted || locked || reviewMode) return;
     const first = window.setTimeout(() => onTimerTick(), 0);
     const id = window.setInterval(() => onTimerTick(), 1000);
     const wake = () => onTimerTick();
@@ -373,7 +349,7 @@ export function QuizRunner({
       window.removeEventListener('focus', wake);
       document.removeEventListener('visibilitychange', wake);
     };
-  }, [mode, booted, locked, reviewMode]);
+  }, [hasClock, booted, locked, reviewMode]);
 
   // legacy beforeunload guard — for a closed tab or a typed address, not
   // for our own exit. Save & Resume Later and Submit & Exit leave by a
@@ -422,8 +398,17 @@ export function QuizRunner({
   }
 
   // ── answering ──
+  function setCheckingFor(itemId: string, on: boolean) {
+    setChecking((c) => {
+      const copy = { ...c };
+      if (on) copy[itemId] = true;
+      else delete copy[itemId];
+      return copy;
+    });
+  }
+
   function choose(item: SealedItem, letter: string, checked: boolean) {
-    if (locked || reviewMode) return;
+    if (locked || reviewMode || checking[item.item_id]) return;
     if (item.question_type === 'SATA') {
       const current = Array.isArray(answers[item.item_id]) ? [...(answers[item.item_id] as string[])] : [];
       const next = checked ? (current.includes(letter) ? current : [...current, letter]) : current.filter((l) => l !== letter);
@@ -439,18 +424,27 @@ export function QuizRunner({
       return;
     }
     setAnswers((a) => ({ ...a, [item.item_id]: letter }));
-    if (mode === 'instant' && !previewMode) {
+    if (feedbackEach && !previewMode) {
       // The pick is the check for an MCQ / TF (legacy revealed on answer):
       // the server writes and grades the row and returns its secret half,
       // which is what reveals the feedback (Q6). A failure falls back to
-      // the plain save so the answer still lands, and says so.
-      void checkAnswer(item.attempt_item_id, letter).then((r) => {
-        if (r.ok) setSecrets((s) => ({ ...s, [item.item_id]: r.secret }));
-        else {
+      // the plain save so the answer still lands, and says so. Until the
+      // reply lands the option says it is being checked, and the question
+      // takes no second pick (Q9).
+      setCheckingFor(item.item_id, true);
+      void checkAnswer(item.attempt_item_id, letter)
+        .then((r) => {
+          if (r.ok) setSecrets((s) => ({ ...s, [item.item_id]: r.secret }));
+          else {
+            queueSave({ item_id: item.item_id, chosen: letter });
+            setToast(`Could not check this answer: ${r.error}`);
+          }
+        })
+        .catch(() => {
           queueSave({ item_id: item.item_id, chosen: letter });
-          setToast(`Could not check this answer: ${r.error}`);
-        }
-      });
+          setToast('Could not check this answer. Please check your connection.');
+        })
+        .finally(() => setCheckingFor(item.item_id, false));
     } else {
       queueSave({ item_id: item.item_id, chosen: letter });
     }
@@ -458,19 +452,26 @@ export function QuizRunner({
 
   function checkSata(item: SealedItem) {
     const chosen = answers[item.item_id];
-    if (!Array.isArray(chosen) || chosen.length === 0) return;
+    if (!Array.isArray(chosen) || chosen.length === 0 || checking[item.item_id]) return;
     setSataChecked((s) => ({ ...s, [item.item_id]: true }));
     if (previewMode) return;
     // The check writes the answer itself; a pending save for this row
     // would only overwrite sata_checked with false.
     pendingRef.current.delete(item.item_id);
-    void checkAnswer(item.attempt_item_id, chosen, true).then((r) => {
-      if (r.ok) setSecrets((s) => ({ ...s, [item.item_id]: r.secret }));
-      else {
+    setCheckingFor(item.item_id, true);
+    void checkAnswer(item.attempt_item_id, chosen, true)
+      .then((r) => {
+        if (r.ok) setSecrets((s) => ({ ...s, [item.item_id]: r.secret }));
+        else {
+          queueSave({ item_id: item.item_id, chosen: chosenToStored(chosen), sata_checked: true });
+          setToast(`Could not check this answer: ${r.error}`);
+        }
+      })
+      .catch(() => {
         queueSave({ item_id: item.item_id, chosen: chosenToStored(chosen), sata_checked: true });
-        setToast(`Could not check this answer: ${r.error}`);
-      }
-    });
+        setToast('Could not check this answer. Please check your connection.');
+      })
+      .finally(() => setCheckingFor(item.item_id, false));
   }
 
   function toggleFlag(item: SealedItem) {
@@ -552,9 +553,10 @@ export function QuizRunner({
   }
 
   // ── exit (legacy handleExit / saveAndExit / submitAndExit) ──
+  // To the sitting's home (03 Q8), where legacy always went to Fixed Quizzes.
   function handleExit() {
     if (locked || reviewMode) {
-      router.push(QUIZZES_PAGE);
+      router.push(exit.href);
       return;
     }
     setExitOpen(true);
@@ -565,7 +567,7 @@ export function QuizRunner({
     await saveProgress(false);
     setSaving('');
     leavingRef.current = true;
-    window.location.href = QUIZZES_PAGE;
+    window.location.href = exit.href;
   }
 
   async function submitAndExit() {
@@ -574,7 +576,7 @@ export function QuizRunner({
     if (!done) return;
     window.setTimeout(() => {
       leavingRef.current = true;
-      window.location.href = QUIZZES_PAGE;
+      window.location.href = exit.href;
     }, 1500);
   }
 
@@ -656,14 +658,18 @@ export function QuizRunner({
     const hasAnswer = isSATA ? Array.isArray(chosenRaw) && chosenRaw.length > 0 : Boolean(chosenRaw);
     // The secret half, if the server has sent it for this question (Q6).
     const secret = secrets[item.item_id] ?? null;
-    // legacy canReveal: instant reveals on answer (SATA after Check Answer);
-    // timed only when locked / review — and, since Q6, only once the
-    // secret half is here: without it there is nothing to reveal.
-    const wantsReveal = mode === 'instant'
+    // legacy canReveal: feedback after each question reveals on answer
+    // (SATA after Check Answer); feedback at the end only when locked /
+    // review — and, since Q6, only once the secret half is here: without
+    // it there is nothing to reveal.
+    const wantsReveal = feedbackEach
       ? isSATA ? showAlways || (hasAnswer && Boolean(sataChecked[item.item_id])) : showAlways || hasAnswer
       : locked || reviewMode;
     const canReveal = wantsReveal && secret !== null;
+    const isChecking = Boolean(checking[item.item_id]);
     const disabled = locked || reviewMode;
+    // the options, not the flag, wait for a check in flight (Q9)
+    const optionsOff = disabled || isChecking;
 
     const opts = shown.map((o) => ({
       ...o,
@@ -693,10 +699,12 @@ export function QuizRunner({
             if (canReveal) {
               if (opt.isCorrect) classes.push('correct');
               else if (isChosen) classes.push('wrong');
-            } else if (mode === 'timed' && isChosen) {
+            } else if (isChecking && isChosen) {
+              classes.push('checking');
+            } else if (!feedbackEach && isChosen) {
               classes.push('selected');
             }
-            if (disabled) classes.push('disabled');
+            if (optionsOff) classes.push('disabled');
             return (
               <label key={opt.letter} className={classes.join(' ')}>
                 <div className="opt-row">
@@ -705,13 +713,14 @@ export function QuizRunner({
                     type={isSATA ? 'checkbox' : 'radio'}
                     name={`opt_${item.item_id}`}
                     value={opt.letter}
-                    disabled={disabled}
+                    disabled={optionsOff}
                     checked={isChosen}
                     onChange={(e) => choose(item, opt.letter, e.target.checked)}
                   />
                   <div className="opt-body">
                     <div className="opt-title">
                       <span className="opt-text"><strong>{displayLetter(j, opt.letter)}.</strong> {opt.text}</span>
+                      {!canReveal && isChecking && isChosen ? <span className="badge badge-checking" role="status">Checking…</span> : null}
                       {canReveal && opt.isCorrect ? <span className="badge badge-correct">✓ Correct answer</span> : null}
                       {canReveal && isChosen && !opt.isCorrect ? <span className="badge badge-wrong">✗ Your choice</span> : null}
                       {canReveal && isChosen && opt.isCorrect ? <span className="badge badge-chosen">✓ Your choice</span> : null}
@@ -724,10 +733,10 @@ export function QuizRunner({
           })}
         </div>
 
-        {mode === 'instant' && isSATA && !locked && !reviewMode ? (
+        {feedbackEach && isSATA && !locked && !reviewMode ? (
           <div className="sata-check-row">
-            <button type="button" className="btn btn-primary" disabled={!hasAnswer || Boolean(sataChecked[item.item_id])} onClick={() => checkSata(item)}>
-              {sataChecked[item.item_id] ? '✓ Answer checked' : 'Check Answer'}
+            <button type="button" className="btn btn-primary" disabled={!hasAnswer || Boolean(sataChecked[item.item_id]) || isChecking} onClick={() => checkSata(item)}>
+              {isChecking ? 'Checking…' : sataChecked[item.item_id] ? '✓ Answer checked' : 'Check Answer'}
             </button>
             <div className="sata-check-note">Select all answers first, then click Check Answer.</div>
           </div>
@@ -774,7 +783,7 @@ export function QuizRunner({
   // ── Send feedback (legacy buildFriendlyRefText + the button) ──
   function buildFeedbackRef(item: SealedItem, globalIdx: number, opts: OptionView[], chosenRaw: ChosenMap[string] | undefined): string {
     const lines: string[] = [];
-    lines.push(`Quademia — Question feedback (${mode === 'timed' ? 'Timed' : 'Instant'} quiz)`);
+    lines.push(`Quademia — Question feedback (${M.fullName})`);
     lines.push(`Course: ${attempt.display_label || attempt.course_id || ''}`);
     lines.push(`Question: ${globalIdx + 1} of ${items.length}`);
     const topic = [item.maintopic, item.subtopic].filter(Boolean).join(' › ');
@@ -826,12 +835,12 @@ export function QuizRunner({
   const pageStart = safePage * questionsPerPage;
   const pageItems = source.slice(pageStart, pageStart + questionsPerPage);
   const grade = gradeFor(score.pct);
-  const showControls = mode === 'instant' || locked || reviewMode;
+  const showControls = feedbackEach || locked || reviewMode;
   const timerPercent = totalSeconds > 0 ? secondsLeft / totalSeconds * 100 : 0;
   const timerColor = timerPercent <= 10 ? 'red' : timerPercent <= 20 ? 'amber' : '';
   const timerText = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
 
-  if (startError) return <RunnerError title="Could Not Start Exam" message={startError} />;
+  if (startError) return <RunnerError title="Could Not Start Exam" message={startError} exit={exit} />;
 
   return (
     <div className="runner">
@@ -856,7 +865,7 @@ export function QuizRunner({
           <div className="progress-bar"><div className={barClass} style={{ width: `${locked ? 100 : pct}%` }} /></div>
           <div className="count-pill">{answered} / {items.length} answered • {unanswered} unanswered • {flaggedCount} flagged</div>
         </div>
-        {mode === 'timed' && !locked && !reviewMode ? (
+        {hasClock && !locked && !reviewMode ? (
           <div className="timer-bar">
             <div className="timer-display" role="timer" aria-label={`${timerText} remaining`}>
               <span className="timer-icon"><Icon name="timer" /></span>
@@ -876,7 +885,7 @@ export function QuizRunner({
             ))}
           </div>
           <div className="control-group">
-            <span className="mode-pill">{W.modeWord} | {feedbackModeLabel(feedbackMode)}</span>
+            <span className="mode-pill">{M.fullName} | {feedbackModeLabel(feedbackMode)}</span>
           </div>
         </div>
       </div>
@@ -890,17 +899,17 @@ export function QuizRunner({
               <div className="preflight-title">{label}</div>
               <div className="preflight-meta">
                 <span className="pre-chip">{items.length} questions</span>
-                <span className={`pre-chip${mode === 'timed' ? ' warning' : ''}`}>{attempt.duration_min || Math.ceil(items.length)} {mode === 'timed' ? 'minutes' : 'min suggested'}</span>
-                {mode === 'instant' ? <span className="pre-chip">{feedbackModeLabel(feedbackMode)}</span> : null}
-                <span className="pre-chip">{W.modeWord} Mode</span>
+                <span className={`pre-chip${hasClock ? ' warning' : ''}`}>{attempt.duration_min || Math.ceil(items.length)} {hasClock ? 'minutes' : 'min suggested'}</span>
+                {feedbackEach ? <span className="pre-chip">{feedbackModeLabel(feedbackMode)}</span> : null}
+                <span className="pre-chip">{M.fullName}</span>
               </div>
-              {mode === 'timed' ? (
-                <div className="preflight-warning"><strong>Exam mode:</strong> The timer starts when you click Start. No feedback is shown during the exam — you will see your results and explanations after submission. You cannot pause the timer.</div>
-              ) : <p className="preflight-text">{W.preflightText}</p>}
+              {hasClock ? (
+                <div className="preflight-warning"><strong>{M.fullName}:</strong> {preflightBrief(M, attempt.duration_min)}</div>
+              ) : <p className="preflight-text">{preflightBrief(M, attempt.duration_min)}</p>}
               <div className="preflight-actions">
                 <button type="button" className="btn btn-primary btn-lg" onClick={onPreflightStart}>
-                  <Icon name={mode === 'timed' ? 'target' : 'play'} />
-                  {(mode === 'timed' ? attempt.started_utc !== null : hasProgress()) ? W.resume : W.start}
+                  <Icon name={hasClock ? 'target' : 'play'} />
+                  {isResuming() ? W.resume : W.start}
                 </button>
                 <button type="button" className="btn btn-ghost" onClick={() => window.history.back()}>Cancel</button>
                 <label className="preflight-skip">
@@ -925,11 +934,12 @@ export function QuizRunner({
               <div className="score-pct">{score.pct}%</div>
               <div className="score-label">{grade.label}</div>
               <div className="score-actions">
-                <button type="button" className={`btn ${mode === 'timed' ? 'btn-primary' : 'btn-ghost'}`} onClick={reviewAnswers}>
+                {/* the review is the first thing a sitting that held its feedback back offers */}
+                <button type="button" className={`btn ${feedbackEach ? 'btn-ghost' : 'btn-primary'}`} onClick={reviewAnswers}>
                   <Icon name="book-open" />
-                  {mode === 'timed' ? 'Review Answers & Feedback' : 'Review Answers'}
+                  {W.reviewButton}
                 </button>
-                <button type="button" className={`btn ${mode === 'timed' ? 'btn-ghost' : 'btn-primary'}`} onClick={() => router.push(QUIZZES_PAGE)}>Back to Quizzes</button>
+                <button type="button" className={`btn ${feedbackEach ? 'btn-primary' : 'btn-ghost'}`} onClick={() => router.push(exit.href)}>{exit.label}</button>
               </div>
             </div>
           ) : null}

@@ -82,6 +82,22 @@ export async function getAttemptById(db: ServerSupabaseClient, attemptId: string
   return (data as Attempt | null) ?? null;
 }
 
+/**
+ * Where a sitting came from: its own source, or — for a retake, whose
+ * source is 'retake' — the source of the sitting it retakes, followed back
+ * through origin_attempt_id. Null when the chain breaks. The runner's Exit
+ * (03 Q8) and the retake's check on its quiz both read it.
+ */
+export async function originSource(db: ServerSupabaseClient, attempt: Attempt): Promise<'builder' | 'fixed' | 'mock' | null> {
+  let current: Attempt | null = attempt;
+  for (let hops = 0; current && hops < 20; hops++) {
+    if (current.source === 'builder' || current.source === 'fixed' || current.source === 'mock') return current.source;
+    if (current.source !== 'retake' || !current.origin_attempt_id) return null;
+    current = await getAttemptById(db, current.origin_attempt_id);
+  }
+  return null;
+}
+
 /** A student's attempts, newest first; one course when asked (the list
  * pages, 5b). Since 03 Q5 each in-progress attempt carries the count of
  * its answered rows for the card's "N of M answered" (legacy counted the
