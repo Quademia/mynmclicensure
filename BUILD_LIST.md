@@ -200,9 +200,9 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ Q6 The seal — the public half live, one key at Check Answer, review unsealed, console refused (S7; D5) — 2026-09-20
 - ⬜ Q7 SATA partial credit — the rule, then the three-state display (Sam, 2026-09-20) — after S7
 - ✅ Q8.1 The runner as a player — /session/<id>, exit to the sitting's home, the mode table — 2026-09-27
-- ⬜ Q8.2 Four modes (§8 S21) — MyNclex's codes, the quiz's ticked modes, the builder's choice (built, to tick)
-- ⬜ Q8.3 Sequential — one question at a time, an answer required, the lock in the database (built, to tick)
-- ⬜ Q8.4 An exam's deadline in the database — no answer after time is up, a late Submit closes at it (§8 S22; built)
+- ✅ Q8.2 Four modes (§8 S21) — MyNclex's codes, the quiz's ticked modes, the builder's choice — 2026-09-27
+- ✅ Q8.3 Sequential — one question at a time, an answer required, the lock in the database — 2026-09-27
+- ✅ Q8.4 An exam's deadline in the database — no answer after time is up (§8 S22) — 2026-09-27
 - ✅ Q9 The Check Answer pending state — "Checking…" on the option until the reply lands, with Q8.1 — 2026-09-27
 - ⬜ Q10 The attempt report — breakdown by subject / topic / difficulty / type, what to fix next (2026-09-24)
 - ⬜ Q11 Time per question — the runner fills `time_spent_s`; pace and slowest on the report (2026-09-24)
@@ -211,7 +211,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ Q14 The link tables — quiz_items and mock_quiz_items replacing the id arrays; delete refused (§8 S20) — 2026-09-27
 - ⬜ Q15 The student's own marks across attempts — a "Marked" pool for the builder, MyNclex's shape (captured 2026-09-26, unruled)
 - ⬜ Q16 The keyword step never says what matched — chips a name filter; "No matching concepts" in 5 courses (09-26)
-- ⬜ Q17 The start screen on its own — no runner behind it, no questions sent before Start or Resume (built)
+- ✅ Q17 The start screen on its own — no runner behind it, no questions sent before Start or Resume — 2026-09-27
 - ⏸ Undo "Don't show this again" — in a settings page, if one is ever built (Sam, 2026-09-27)
 
 *Not yet sliced — each gets an id when the doc is rewritten:*

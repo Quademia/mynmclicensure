@@ -1013,7 +1013,7 @@ it needs a change log on every answer, a storage change and its own
 | Q5 The answers as rows and the write door | ✅ 2026-09-20 (`20260920150000_attempt_answers.sql`; walked as student4: per-tap saves and a flag read back, a reload restoring them, finish at 4 / 10, an exam closed at its deadline on the next open, a failed Submit's toast with the runner unlocked) |
 | Q6 The seal | ✅ 2026-09-20 (code only; walked as student4: a live exam's page with 0 keys, the closed exam's with 10, a practice quiz reloaded with exactly the 2 checked, the review filled from the finish reply) |
 | Q7 SATA partial credit | later, after S7 |
-| Q8 The runner as a player | ruled 2026-09-27 (Sam: `/session`, MyNclex's modes, four now, A); step 1 ✅ 2026-09-27 (code only; walked as the RM student — §4; ticked by Sam); steps 2 and 3 on §8 S21 (✅ ticked 2026-09-27) built 2026-09-27 (`20260927140000_four_modes.sql`; walked as the RM student, the admin's ticks not yet — §4), to tick |
+| Q8 The runner as a player | ruled 2026-09-27 (Sam: `/session`, MyNclex's modes, four now, A); step 1 ✅ 2026-09-27 (code only; walked as the RM student — §4; ticked by Sam); steps 2 and 3 ✅ 2026-09-27 on §8 S21 (`20260927140000_four_modes.sql`; walked as the RM student, the admin's ticks not walked — §4; ticked by Sam); step 4, the exam's deadline, ✅ 2026-09-27 on §8 S22 (`20260927160000_exam_deadline.sql`; proven rolled back, the time-up walked — §4; ticked by Sam) |
 | Q9 The Check Answer pending state | ✅ 2026-09-27 (with Q8's step 1; walked as the RM student — §4; ticked by Sam) |
 | Q10 The attempt report | candidate, captured 2026-09-24 |
 | Q11 Time per question | candidate, captured 2026-09-24 |
@@ -1021,5 +1021,5 @@ it needs a change log on every answer, a storage change and its own
 | Q13 Readiness and the cohort | candidate, captured 2026-09-24; with Q3 |
 | Q14 The link tables | ✅ 2026-09-27 (`20260927100000_quiz_item_rows.sql`; §8 S20; walked as Sam's admin, the RM student and the RN student — §4) |
 | Q15 The student's own marks across attempts | candidate, captured 2026-09-26 |
-| Q17 The start screen on its own | ruled 2026-09-27 (Sam: its own screen, no questions before Start, the card on every open, the tick box on every mode); built 2026-09-27, code only; walked as the RM student — §4; to tick |
+| Q17 The start screen on its own | ✅ 2026-09-27 (Sam: its own screen, no questions before Start, the card on every open, the tick box on every mode; code only; walked as the RM student — §4; ticked by Sam) |
 | Q16 The keyword step never says what the keyword found | ⬜ queued 2026-09-26 (Sam); found walking 08 B6; re-read and offered 2026-09-27, not now (Sam) |
