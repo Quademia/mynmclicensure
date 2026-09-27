@@ -49,14 +49,12 @@ export const DIFFICULTY_STEP: Record<string, 1 | 2 | 3> = {
   Hard: 3,
 };
 
-/** The mode a quiz is run in. Grey, with the icon carrying the meaning. */
+/** The mode a quiz is run in (§8 S21's four codes). Grey, with the icon carrying the meaning. */
 export const MODE_ICON: Record<string, IconName | null> = {
-  instant: 'zap',
-  timed: 'timer',
-  INSTANT_ONLY: 'zap',
-  TIMED_ONLY: 'timer',
-  // "both" is the absence of a restriction, so it draws nothing
-  BOTH: null,
+  UNTIMED_LEARNING: 'zap',
+  UNTIMED_TEST: 'clipboard',
+  TIMED_FREE_NAV: 'timer',
+  TIMED_SEQUENTIAL: 'hourglass',
 };
 
 /**

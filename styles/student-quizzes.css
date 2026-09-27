@@ -62,6 +62,10 @@
 .sqz .mode-sections.single { grid-template-columns: 1fr; }
 .sqz .mode-section { padding: 14px 20px; border-right: 1px solid var(--border); }
 .sqz .mode-section:last-child { border-right: none; }
+/* §8 S21: up to four sections, two to a row — the right one of a row
+   drops its edge, and a second row opens with a rule */
+.sqz .mode-sections:not(.single) .mode-section:nth-child(2n) { border-right: none; }
+.sqz .mode-sections:not(.single) .mode-section:nth-child(n+3) { border-top: 1px solid var(--border); }
 .sqz .mode-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 10px; }
 .sqz .mode-stats { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
 .sqz .mode-stat { font-size: 12px; color: var(--text-muted); }
@@ -108,4 +112,5 @@
   .sqz .mode-sections { grid-template-columns: 1fr; }
   .sqz .mode-section { border-right: none; border-bottom: 1px solid var(--border); padding: 12px 16px; }
   .sqz .mode-section:last-child { border-bottom: none; }
+  .sqz .mode-sections:not(.single) .mode-section:nth-child(n+3) { border-top: none; }
 }

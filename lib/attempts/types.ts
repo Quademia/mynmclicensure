@@ -9,7 +9,12 @@
 
 import type { QuestionType } from '@/lib/bank/types';
 
-export type AttemptMode = 'instant' | 'timed';
+// The four modes (§8 S21, 03 Q8; Sam 2026-09-27), MyNclex's stored codes:
+// Study — Learning, Untimed practice; Exam — Free Navigation, Sequential.
+// Their names and behaviour live in ./modes. Legacy's `instant` is
+// UNTIMED_LEARNING and `timed` TIMED_FREE_NAV.
+export const ATTEMPT_MODES = ['UNTIMED_LEARNING', 'UNTIMED_TEST', 'TIMED_FREE_NAV', 'TIMED_SEQUENTIAL'] as const;
+export type AttemptMode = (typeof ATTEMPT_MODES)[number];
 export type AttemptSource = 'fixed' | 'builder' | 'retake' | 'mock';
 export type AttemptStatus = 'in_progress' | 'completed' | 'abandoned';
 
@@ -92,6 +97,8 @@ export type SealedItem = {
   score_awarded: number | null;
   answered_utc: string | null;
   graded_utc: string | null;
+  /** Sequential only (§8 S21): when the student moved past it; null = not yet */
+  passed_utc: string | null;
 };
 
 export type AttemptItem = SealedItem & SecretHalf;
@@ -177,6 +184,9 @@ export type SpawnResult = { ok: true; attemptId: string } | { ok: false; error: 
 export type FinishResult = { ok: true; score: Score; secrets: SecretsMap } | { ok: false; error: string };
 
 export type TimedStartResult = { ok: true; startedIso: string } | { ok: false; error: string };
+
+/** Sequential's move (§8 S21): the position now current, or null when every question is passed. */
+export type AdvanceResult = { ok: true; nextPosition: number | null } | { ok: false; error: string };
 
 // The admin details step's attempt-stats box — read by
 // lib/attempts/queries getQuizAttemptStats. Legacy showed Total,

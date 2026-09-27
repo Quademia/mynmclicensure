@@ -37,6 +37,8 @@ export function sealItem(row: AttemptItem): SealedItem {
     score_awarded: row.score_awarded,
     answered_utc: row.answered_utc,
     graded_utc: row.graded_utc,
+    // Sequential's lock (§8 S21): which questions are behind the student
+    passed_utc: row.passed_utc,
   };
 }
 

@@ -9,6 +9,7 @@
 // (AGENTS.md).
 
 import type { Item } from '@/lib/bank/types';
+import type { AttemptMode } from '@/lib/attempts/types';
 
 export const QUIZ_KINDS = ['fixed', 'mock'] as const;
 /** Which table: 'fixed' → quizzes, 'mock' → mock_quizzes. */
@@ -26,24 +27,11 @@ export const QUIZ_ITEM_TABLES: Record<QuizKind, string> = {
   mock: 'mock_quiz_items',
 };
 
-export const ALLOWED_MODES = ['BOTH', 'INSTANT_ONLY', 'TIMED_ONLY'] as const;
-export type AllowedModes = (typeof ALLOWED_MODES)[number];
-
-// legacy formatMode() — the admin table chip and the review pane. In the
-// mode table's words since 03 Q8 (Study / Exam, lib/attempts/modes); the
-// setting becomes a list of ticked modes with §8 S21.
-export const MODE_LABELS: Record<AllowedModes, string> = {
-  BOTH: 'Both Study & Exam',
-  INSTANT_ONLY: 'Study only',
-  TIMED_ONLY: 'Exam only',
-};
-
-// The details form's <select> labels, in legacy's order.
-export const MODE_OPTIONS: { value: AllowedModes; label: string }[] = [
-  { value: 'BOTH', label: 'Both Study and Exam' },
-  { value: 'INSTANT_ONLY', label: 'Study only' },
-  { value: 'TIMED_ONLY', label: 'Exam only' },
-];
+// The modes a quiz or mock allows, a list the admin ticks (§8 S21, Sam
+// 2026-09-27: A) — legacy's BOTH / INSTANT_ONLY / TIMED_ONLY became lists
+// of the four codes in 20260927140000_four_modes.sql. Named from the mode
+// table (lib/attempts/modes: modesLabel, orderModes).
+export type AllowedModes = AttemptMode[];
 
 export const QUIZ_STATUSES = ['draft', 'active', 'archived'] as const;
 export type QuizStatus = (typeof QUIZ_STATUSES)[number];

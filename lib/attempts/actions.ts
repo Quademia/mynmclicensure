@@ -35,9 +35,11 @@ import { getAttemptById, getBuilderCourseItems, getStudentAttemptsPaginated, ori
 import { chosenToStored } from './scoring';
 import { secretsOf } from './seal';
 import {
+  ATTEMPT_MODES,
   BUILDER_MAX_QUESTIONS_DEFAULT,
   BUILDER_MINUTES_PER_QUESTION_DEFAULT,
   type ActionResult,
+  type AdvanceResult,
   type AnswerPatch,
   type AttemptMode,
   type CheckResult,
@@ -187,7 +189,7 @@ export async function spawnBuilderAttempt(
   meta: BuilderMeta,
 ): Promise<SpawnResult> {
   const { supabase, profile } = await requireStudent();
-  if (mode !== 'instant' && mode !== 'timed') return fail('Unknown mode.');
+  if (!(ATTEMPT_MODES as readonly string[]).includes(mode)) return fail('Unknown mode.');
 
   const access = await getStudentCourseAccess(supabase, profile.user_id);
   if (!access[courseId]) return fail('You do not have an active subscription for this course.');
@@ -254,6 +256,21 @@ export async function startTimedAttempt(attemptId: string): Promise<TimedStartRe
   if (error) return fail(rpcError(error, 'We could not start your exam properly. Please try again.'));
   if (!data) return fail('We could not start your exam properly. Please try again.');
   return { ok: true, startedIso: String(data) };
+}
+
+// Sequential's move (§8 S21): the server stamps the current question as
+// passed — only when it has an answer, and not after the deadline — and
+// says which position is now current (null: every question passed). The
+// runner flushes the current answer first; save_answers then refuses any
+// row but the new current one.
+export async function advanceAttempt(attemptId: string): Promise<AdvanceResult> {
+  const { profile } = await requireStudent();
+  const { data, error } = await createServiceRoleClient().rpc('advance_attempt', {
+    p_attempt_id: attemptId,
+    p_user_id: profile.user_id,
+  });
+  if (error) return fail(rpcError(error, 'Could not move to the next question.'));
+  return { ok: true, nextPosition: data === null || data === undefined ? null : Number(data) };
 }
 
 // The runner's save-per-tap: one patch per question, each key optional.
@@ -372,7 +389,7 @@ function secureShuffle<T>(array: T[]): T[] {
 export async function spawnQuizAttempt(kind: QuizKind, quizId: string, mode: AttemptMode): Promise<SpawnResult> {
   const { supabase, profile } = await requireStudent();
   if (kind !== 'fixed' && kind !== 'mock') return fail('Unknown quiz kind.');
-  if (mode !== 'instant' && mode !== 'timed') return fail('Unknown mode.');
+  if (!(ATTEMPT_MODES as readonly string[]).includes(mode)) return fail('Unknown mode.');
 
   // The full row (item_ids) through the service role — Q1 took the
   // question list out of the browser roles' reach; the availability and

@@ -56,7 +56,7 @@ import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } fro
 import { useRouter } from 'next/navigation';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { Toast } from '@/lib/toast/toast';
-import { checkAnswer, expireAttempt, finishAttempt, saveAnswers, startTimedAttempt } from '@/lib/attempts/actions';
+import { advanceAttempt, checkAnswer, expireAttempt, finishAttempt, saveAnswers, startTimedAttempt } from '@/lib/attempts/actions';
 import { RunnerError } from './runner-error';
 import { Icon } from '@/components/shell/icons';
 import { KindChip, QUESTION_TYPE_HUE } from '@/components/shell/chips';
@@ -119,6 +119,11 @@ export function QuizRunner({
   const W = M.words;
   const hasClock = M.clock !== 'none';
   const feedbackEach = M.feedback === 'each';
+  // Sequential (§8 S21, Q8 step 3): while the sitting is live, one
+  // question at a time, forward only — the database holds the order
+  // (advance_attempt, and save_answers taking only the current row).
+  // A finished sitting's review moves freely, as every other review.
+  const forwardOnly = M.nav === 'forward';
   const label = attempt.display_label || W.title;
 
   // ── state (legacy ANSW / FLAGS / SATA_EVAL / LOCKED / …) ──
@@ -146,6 +151,12 @@ export function QuizRunner({
   const [toast, setToast] = useState<string | null>(null);
   // 03 Q9: the questions whose Check Answer is on its way to the server.
   const [checking, setChecking] = useState<FlagMap>({});
+  // Sequential: the questions the student has moved past (the rows'
+  // passed_utc, then each move), and a move on its way to the server.
+  const [passed, setPassed] = useState<FlagMap>(() =>
+    Object.fromEntries(items.filter((i) => i.passed_utc).map((i) => [i.item_id, true])),
+  );
+  const [advancing, setAdvancing] = useState(false);
   const dismissToast = useCallback(() => setToast(null), []);
   const startedAtRef = useRef<number | null>(null);
   const startingRef = useRef(false);
@@ -211,6 +222,11 @@ export function QuizRunner({
     return Object.keys(answers).length > 0 || Object.keys(flags).length > 0 || Object.keys(sataChecked).length > 0;
   }
 
+  function hasAnswerFor(item: SealedItem): boolean {
+    const c = answers[item.item_id];
+    return item.question_type === 'SATA' ? Array.isArray(c) && c.length > 0 : Boolean(c);
+  }
+
   // A clocked sitting is resumed once its clock has started; any other
   // once something has been answered or flagged (legacy's two tests).
   function isResuming(): boolean {
@@ -263,15 +279,25 @@ export function QuizRunner({
   }
 
   // ── derived (legacy getCurrentSource / getGridStats / paging) ──
+  // Sequential while live: one question a page, and the page is the first
+  // question not yet passed — the student cannot choose another.
+  const liveForward = forwardOnly && !locked && !reviewMode;
+  const perPage = liveForward ? 1 : questionsPerPage;
+  const firstOpen = items.findIndex((i) => !passed[i.item_id]);
+  const currentIdx = firstOpen < 0 ? Math.max(0, items.length - 1) : firstOpen;
   const source = viewMode === 'FLAGGED' ? items.filter((i) => flags[i.item_id]) : items;
-  const totalPages = Math.max(1, Math.ceil(Math.max(source.length, 1) / questionsPerPage));
-  const safePage = Math.max(0, Math.min(page, totalPages - 1));
-  const allPageCount = Math.max(1, Math.ceil(items.length / questionsPerPage));
+  const totalPages = Math.max(1, Math.ceil(Math.max(source.length, 1) / perPage));
+  const safePage = liveForward ? currentIdx : Math.max(0, Math.min(page, totalPages - 1));
+  const allPageCount = Math.max(1, Math.ceil(items.length / perPage));
   const answered = countAnswered(items, answers);
   const flaggedCount = items.filter((i) => flags[i.item_id]).length;
   const unanswered = Math.max(0, items.length - answered);
   const pct = items.length > 0 ? Math.round((answered / items.length) * 100) : 0;
   const showSubmit = !locked && !reviewMode && viewMode === 'ALL' && safePage >= allPageCount - 1;
+  // Sequential: the question on screen, and whether it has an answer — a
+  // move (and the last question's Submit) needs one (Sam, 2026-09-27).
+  const currentItem = items[currentIdx];
+  const currentAnswered = currentItem ? hasAnswerFor(currentItem) : false;
   // The score is the database's: the finish reply, or the header's stored
   // figures in review. No browser-side arithmetic (Q6 — it has no key).
   const storedScore: Score | null =
@@ -395,6 +421,34 @@ export function QuizRunner({
   function changeViewMode(m: ViewMode) {
     setViewMode(m);
     setPage(0);
+  }
+
+  // Sequential's move (§8 S21): the answer saved first — the server
+  // moves on only from a question with an answer — then the server stamps
+  // the question passed and the next one comes up. A refusal (no answer,
+  // time up, a dropped connection) is a toast and the question stays.
+  async function advanceSequential() {
+    if (!currentItem || !currentAnswered || advancing) return;
+    setAdvancing(true);
+    try {
+      if (!previewMode) {
+        if (!(await flushSaves())) {
+          setToast('Could not save your answer. Please check your connection and try again.');
+          return;
+        }
+        const r = await advanceAttempt(attempt.attempt_id);
+        if (!r.ok) {
+          setToast(r.error);
+          return;
+        }
+      }
+      setPassed((p) => ({ ...p, [currentItem.item_id]: true }));
+      scrollToTop();
+    } catch {
+      setToast('Could not move to the next question. Please check your connection and try again.');
+    } finally {
+      setAdvancing(false);
+    }
   }
 
   // ── answering ──
@@ -619,14 +673,17 @@ export function QuizRunner({
         if (has) classes.push('answered');
         if (flags[item.item_id]) classes.push('flagged');
       }
-      if (Math.floor(srcIdx / questionsPerPage) === safePage) classes.push('current');
+      if (Math.floor(srcIdx / perPage) === safePage) classes.push('current');
       return (
         <button
           key={item.item_id}
           type="button"
           className={classes.join(' ')}
+          // Sequential while live: the map shows progress, it does not move
+          disabled={liveForward}
           onClick={() => {
-            gotoPage(Math.floor(srcIdx / questionsPerPage));
+            if (liveForward) return;
+            gotoPage(Math.floor(srcIdx / perPage));
             if (!isDesktop()) setGridOverlayOpen(false);
           }}
         >
@@ -639,14 +696,17 @@ export function QuizRunner({
   const gridScoreText = locked ? `${score.raw}/${score.total} (${score.pct}%)` : '';
   const gridToolbar = (
     <div className="grid-toolbar">
-      <div className="grid-toggles">
-        <button type="button" className={`grid-toggle${viewMode === 'ALL' ? ' active' : ''}`} onClick={() => changeViewMode('ALL')}>All</button>
-        <button type="button" className={`grid-toggle${viewMode === 'FLAGGED' ? ' active' : ''}`} onClick={() => changeViewMode('FLAGGED')}>Flagged ({flaggedCount})</button>
-      </div>
+      {/* Sequential while live has nothing to come back to, so no flags */}
+      {liveForward ? null : (
+        <div className="grid-toggles">
+          <button type="button" className={`grid-toggle${viewMode === 'ALL' ? ' active' : ''}`} onClick={() => changeViewMode('ALL')}>All</button>
+          <button type="button" className={`grid-toggle${viewMode === 'FLAGGED' ? ' active' : ''}`} onClick={() => changeViewMode('FLAGGED')}>Flagged ({flaggedCount})</button>
+        </div>
+      )}
       <div className="grid-stats">
         <span className="grid-stat">{answered} answered</span>
         <span className="grid-stat">{unanswered} unanswered</span>
-        <span className="grid-stat">{flaggedCount} flagged</span>
+        {liveForward ? null : <span className="grid-stat">{flaggedCount} flagged</span>}
       </div>
     </div>
   );
@@ -767,9 +827,11 @@ export function QuizRunner({
 
         <div className="q-footer">
           <div className="q-footer-left">
-            <button type="button" className={`btn btn-flag${flags[item.item_id] ? ' flagged' : ''}`} disabled={disabled} onClick={() => toggleFlag(item)}>
-              <Icon name="flag" />{flags[item.item_id] ? 'Unflag' : 'Flag'}
-            </button>
+            {liveForward ? null : (
+              <button type="button" className={`btn btn-flag${flags[item.item_id] ? ' flagged' : ''}`} disabled={disabled} onClick={() => toggleFlag(item)}>
+                <Icon name="flag" />{flags[item.item_id] ? 'Unflag' : 'Flag'}
+              </button>
+            )}
             <button type="button" className="btn-sm-link" onClick={() => sendFeedback(item, globalIdx, opts, chosenRaw)}>
               Send feedback
             </button>
@@ -832,8 +894,8 @@ export function QuizRunner({
     }
   }
 
-  const pageStart = safePage * questionsPerPage;
-  const pageItems = source.slice(pageStart, pageStart + questionsPerPage);
+  const pageStart = safePage * perPage;
+  const pageItems = source.slice(pageStart, pageStart + perPage);
   const grade = gradeFor(score.pct);
   const showControls = feedbackEach || locked || reviewMode;
   const timerPercent = totalSeconds > 0 ? secondsLeft / totalSeconds * 100 : 0;
@@ -863,7 +925,7 @@ export function QuizRunner({
         </div>
         <div className="progress-wrap">
           <div className="progress-bar"><div className={barClass} style={{ width: `${locked ? 100 : pct}%` }} /></div>
-          <div className="count-pill">{answered} / {items.length} answered • {unanswered} unanswered • {flaggedCount} flagged</div>
+          <div className="count-pill">{answered} / {items.length} answered • {unanswered} unanswered{liveForward ? '' : ` • ${flaggedCount} flagged`}</div>
         </div>
         {hasClock && !locked && !reviewMode ? (
           <div className="timer-bar">
@@ -957,14 +1019,31 @@ export function QuizRunner({
                   pageItems.map((item) => renderQuestion(item, items.indexOf(item)))
                 )}
               </div>
-              <div className="page-nav">
-                <button type="button" className="btn btn-ghost" disabled={safePage === 0 || source.length === 0} onClick={prevPage}>← Previous</button>
-                <span className="page-pill">{viewMode === 'FLAGGED' ? 'Flagged • ' : ''}Page {safePage + 1} / {totalPages}</span>
-                <div className="page-nav-right">
-                  <button type="button" className="btn btn-ghost" disabled={safePage >= totalPages - 1 || source.length === 0} onClick={nextPage}>Next →</button>
-                  {showSubmit ? <button type="button" className="btn btn-primary btn-lg" onClick={confirmSubmit}>{W.submit}</button> : null}
+              {liveForward ? (
+                // Sequential: no way back; the move and the last Submit need an answer
+                <div className="page-nav">
+                  <span className="page-pill">Question {currentIdx + 1} / {items.length}</span>
+                  <div className="page-nav-right">
+                    {showSubmit ? (
+                      <button type="button" className="btn btn-primary btn-lg" disabled={!currentAnswered} onClick={confirmSubmit}>{W.submit}</button>
+                    ) : (
+                      <button type="button" className="btn btn-primary" disabled={!currentAnswered || advancing} onClick={advanceSequential}>
+                        {advancing ? 'Saving…' : 'Next question →'}
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="page-nav">
+                  <button type="button" className="btn btn-ghost" disabled={safePage === 0 || source.length === 0} onClick={prevPage}>← Previous</button>
+                  <span className="page-pill">{viewMode === 'FLAGGED' ? 'Flagged • ' : ''}Page {safePage + 1} / {totalPages}</span>
+                  <div className="page-nav-right">
+                    <button type="button" className="btn btn-ghost" disabled={safePage >= totalPages - 1 || source.length === 0} onClick={nextPage}>Next →</button>
+                    {showSubmit ? <button type="button" className="btn btn-primary btn-lg" onClick={confirmSubmit}>{W.submit}</button> : null}
+                  </div>
+                </div>
+              )}
+              {liveForward && !currentAnswered ? <div className="sata-check-note">Answer this question to move on. You cannot come back to it.</div> : null}
             </div>
           ) : null}
 

@@ -39,10 +39,9 @@ import {
   setQuizPublished,
   setQuizStatus,
 } from '@/lib/quizzes/actions';
-import type { QuizAttemptStats } from '@/lib/attempts/types';
+import { MODES, MODE_GROUPS, MODE_ORDER, modesLabel, orderModes } from '@/lib/attempts/modes';
+import type { AttemptMode, QuizAttemptStats } from '@/lib/attempts/types';
 import {
-  MODE_LABELS,
-  MODE_OPTIONS,
   QUIZ_STATUSES,
   type AllowedModes,
   type QuizKind,
@@ -77,7 +76,8 @@ type Form = {
 const EMPTY_FORM: Form = {
   courseId: '',
   title: '',
-  modes: 'BOTH',
+  // legacy's BOTH, as the table's default (§8 S21)
+  modes: ['UNTIMED_LEARNING', 'TIMED_FREE_NAV'],
   status: 'draft',
   timeLimit: '',
   shuffle: false,
@@ -218,7 +218,8 @@ export function QuizManager({
   const displayed = rows.filter((r) => {
     if (fCourse && r.course_id !== fCourse) return false;
     if (fStatus && r.status !== fStatus) return false;
-    if (fMode && r.allowed_modes !== fMode) return false;
+    // §8 S21: a quiz shows under a mode it allows
+    if (fMode && !(r.allowed_modes ?? []).includes(fMode as AttemptMode)) return false;
     if (fPublished !== '' && String(r.published) !== fPublished) return false;
     return true;
   });
@@ -263,6 +264,11 @@ export function QuizManager({
 
   function setField<K extends keyof Form>(key: K, value: Form[K]) {
     setForm((f) => ({ ...f, [key]: value }));
+  }
+
+  // §8 S21: a mode ticked or unticked, the list kept in the table's order
+  function toggleMode(code: AttemptMode, on: boolean) {
+    setForm((f) => ({ ...f, modes: orderModes(on ? [...f.modes, code] : f.modes.filter((m) => m !== code)) }));
   }
 
   // ── pane 3: the picker ──
@@ -347,7 +353,7 @@ export function QuizManager({
     setForm({
       courseId: quiz.course_id,
       title: quiz.title,
-      modes: quiz.allowed_modes,
+      modes: orderModes(quiz.allowed_modes),
       status: quiz.status,
       timeLimit: quiz.time_limit_sec ? String(quiz.time_limit_sec) : '',
       shuffle: quiz.shuffle,
@@ -590,9 +596,7 @@ export function QuizManager({
               <label htmlFor="qFilterMode">Mode</label>
               <select id="qFilterMode" value={fMode} onChange={(e) => setFMode(e.target.value)}>
                 <option value="">All modes</option>
-                <option value="BOTH">Both</option>
-                <option value="INSTANT_ONLY">Study only</option>
-                <option value="TIMED_ONLY">Exam only</option>
+                {MODE_ORDER.map((code) => <option key={code} value={code}>Allows {MODES[code].fullName}</option>)}
               </select>
             </div>
             <div className="filter-group">
@@ -640,7 +644,12 @@ export function QuizManager({
                           <div className="row-id">{r.quiz_id}</div>
                         </td>
                         <td>{courseTitle(r.course_id)}</td>
-                        <td><KindChip icon={MODE_ICON[r.allowed_modes]}>{MODE_LABELS[r.allowed_modes] || r.allowed_modes}</KindChip></td>
+                        <td>
+                          {/* §8 S21: one chip per allowed mode, by its short name */}
+                          {orderModes(r.allowed_modes).map((code) => (
+                            <KindChip key={code} icon={MODE_ICON[code]}>{MODES[code].name}</KindChip>
+                          ))}
+                        </td>
                         <td className="row-n">{r.n}</td>
                         {kind === 'mock' ? <td className="row-schedule">{formatSchedule(r)}</td> : null}
                         <td><span className={`badge ${r.status}`}>{r.status}</span></td>
@@ -694,13 +703,26 @@ export function QuizManager({
             {kind === 'mock' ? scheduling : null}
 
             <div className="form-section-title">Quiz Settings</div>
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="fieldModes">Allowed Modes</label>
-                <select id="fieldModes" value={form.modes} onChange={(e) => setField('modes', e.target.value as AllowedModes)}>
-                  {MODE_OPTIONS.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
-                </select>
+            {/* §8 S21 (Sam: A): the admin ticks which modes this quiz allows;
+                the student picks one of them at Start */}
+            <div className="form-group" role="group" aria-labelledby="fieldModesLabel">
+              <div id="fieldModesLabel" className="mode-ticks-label">Allowed Modes</div>
+              <div className="mode-ticks">
+                {MODE_GROUPS.map((g) => (
+                  <div key={g.group}>
+                    <div className="mode-tick-heading">{g.label}</div>
+                    {MODE_ORDER.filter((code) => MODES[code].group === g.group).map((code) => (
+                      <label key={code} className="check-label">
+                        <input type="checkbox" checked={form.modes.includes(code)} onChange={(e) => toggleMode(code, e.target.checked)} />
+                        {MODES[code].name}
+                      </label>
+                    ))}
+                  </div>
+                ))}
               </div>
+              <p className="form-hint">Students choose one of the ticked modes when they start.</p>
+            </div>
+            <div className="form-row">
               <div className="form-group">
                 <label htmlFor="fieldStatus">Status</label>
                 <select id="fieldStatus" value={form.status} onChange={(e) => setField('status', e.target.value as QuizStatus)}>
@@ -888,7 +910,7 @@ export function QuizManager({
             </div>
             <div className="review-card">
               <h4>Settings</h4>
-              <div className="detail-row"><span className="detail-label">Allowed Modes</span><span className="detail-value">{MODE_LABELS[form.modes]}</span></div>
+              <div className="detail-row"><span className="detail-label">Allowed Modes</span><span className="detail-value">{modesLabel(form.modes)}</span></div>
               <div className="detail-row"><span className="detail-label">Status</span><span className="detail-value"><span className={`badge ${form.status}`}>{form.status}</span></span></div>
               <div className="detail-row"><span className="detail-label">Published</span><span className="detail-value">{form.published ? 'Yes' : 'No'}</span></div>
               <div className="detail-row"><span className="detail-label">Shuffle</span><span className="detail-value">{form.shuffle ? 'Yes — randomised per attempt' : 'No — fixed order'}</span></div>

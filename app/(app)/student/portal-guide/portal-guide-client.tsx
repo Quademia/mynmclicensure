@@ -11,11 +11,17 @@
 // convention #5); nothing else changed. The two footer links land on
 // the upgrade page (7c) and the messages page (slice 12) and 404 until
 // those exist, as the sidebar's own links do.
+//
+// 03 Q8 (2026-09-27): legacy's "Instant vs Timed" section became "Study
+// and Exam modes", its four cards read from the mode table; the builder's
+// recommendations and two FAQs name the modes the same way. New wording,
+// not yet approved by Sam.
 
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { MODES, MODE_ORDER } from '@/lib/attempts/modes';
 
 type Section = { id: string; label: string };
 
@@ -23,7 +29,7 @@ const SECTIONS: Section[] = [
   { id: 'sec-dashboard', label: 'Dashboard' },
   { id: 'sec-fixed-quizzes', label: 'Fixed Quizzes' },
   { id: 'sec-quiz-builder', label: 'Quiz Builder' },
-  { id: 'sec-modes', label: 'Instant vs Timed' },
+  { id: 'sec-modes', label: 'Study and Exam modes' },
   { id: 'sec-after-quiz', label: 'After Your Quiz' },
   { id: 'sec-learning-history', label: 'Learning History' },
   { id: 'sec-downloads', label: 'Offline Packs' },
@@ -44,7 +50,7 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "Quiz won't load — what should I do?",
-    a: 'Refresh the page, confirm your internet connection, and sign in again if needed. If the issue persists, try a different browser tab and then message support with the course and mode (Instant/Timed).',
+    a: 'Refresh the page, confirm your internet connection, and sign in again if needed. If the issue persists, try a different browser tab and then message support with the course and mode (for example Study · Learning).',
   },
   {
     q: "What's the difference between Fixed Quizzes and Quiz Builder?",
@@ -63,8 +69,8 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
     ),
   },
   {
-    q: 'Why did my timed quiz submit automatically?',
-    a: 'Timed Mode auto-submits when the timer ends. This is normal and matches exam-style practice. Review your results and explanations after submission.',
+    q: 'Why did my exam submit automatically?',
+    a: 'Both Exam modes submit automatically when the clock runs out. This is normal and matches the real exam. Review your results and explanations after submission.',
   },
   {
     q: 'Telegram linking or join issues — what should I check?',
@@ -182,33 +188,32 @@ export function PortalGuide() {
                   <li>Topics</li>
                   <li>Difficulty</li>
                   <li>Number of questions</li>
-                  <li>Mode (Instant or Timed)</li>
+                  <li>Mode (Study or Exam, then how it runs)</li>
                 </ul>
               </div>
               <div className="guide-inner-card">
                 <h3>Recommended settings</h3>
                 <ul>
-                  <li><strong>New topic:</strong> 10–20 questions, Instant</li>
-                  <li><strong>Revision:</strong> 25–50 questions, mixed difficulty</li>
-                  <li><strong>Mock exam:</strong> 50–100 questions, Timed</li>
+                  <li><strong>New topic:</strong> 10–20 questions, {MODES.UNTIMED_LEARNING.fullName}</li>
+                  <li><strong>Revision:</strong> 25–50 questions, mixed difficulty, {MODES.UNTIMED_TEST.fullName}</li>
+                  <li><strong>Mock exam:</strong> 50–100 questions, {MODES.TIMED_SEQUENTIAL.fullName}</li>
                 </ul>
               </div>
             </div>
           </div>
 
-          {/* Instant vs Timed */}
-          <div className="guide-section" id="sec-modes" data-section="Instant vs Timed">
-            <h2>Instant vs Timed (Choose the right mode)</h2>
-            <p className="lead">Both modes are valuable. Use Instant for learning and Timed for exam readiness.</p>
+          {/* The modes (03 Q8, §8 S21): the four from the mode table, so the
+              guide names and describes them as the app does */}
+          <div className="guide-section" id="sec-modes" data-section="Study and Exam modes">
+            <h2>Study and Exam modes (Choose the right mode)</h2>
+            <p className="lead">Study modes are for learning at your own pace; Exam modes are for exam readiness, against the clock.</p>
             <div className="guide-grid">
-              <div className="guide-inner-card">
-                <h3>Instant Mode</h3>
-                <p>Feedback shows as you answer. Best for learning, understanding concepts, and improving quickly.</p>
-              </div>
-              <div className="guide-inner-card">
-                <h3>Timed Mode</h3>
-                <p>Exam-style practice. Best for speed, accuracy, and confidence under pressure.</p>
-              </div>
+              {MODE_ORDER.map((code) => (
+                <div key={code} className="guide-inner-card">
+                  <h3>{MODES[code].fullName}</h3>
+                  <p>{MODES[code].card}</p>
+                </div>
+              ))}
             </div>
           </div>
 

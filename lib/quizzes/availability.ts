@@ -13,6 +13,7 @@
 //   4. now > unpublish_at   → CLOSED
 //   5. all clear            → ACTIVE
 
+import type { AttemptMode } from '@/lib/attempts/types';
 import type { Availability, Quiz } from './types';
 
 type Scheduled = Pick<Quiz, 'status' | 'published' | 'publish_at' | 'unpublish_at'>;
@@ -32,11 +33,11 @@ export function getQuizAvailability(quiz: Scheduled, now: Date = new Date()): Av
 // words are the spawn's own; Retake refuses with the same ones.
 export function startRefusal(
   quiz: Scheduled & Pick<Quiz, 'allowed_modes'>,
-  mode: 'instant' | 'timed',
+  mode: AttemptMode,
   now: Date = new Date(),
 ): string | null {
   if (getQuizAvailability(quiz, now) !== 'ACTIVE') return 'This quiz is not open right now.';
-  const modeAllowed = mode === 'instant' ? quiz.allowed_modes !== 'TIMED_ONLY' : quiz.allowed_modes !== 'INSTANT_ONLY';
-  if (!modeAllowed) return 'This mode is not available for this quiz.';
+  // §8 S21: the quiz's ticked list
+  if (!(quiz.allowed_modes ?? []).includes(mode)) return 'This mode is not available for this quiz.';
   return null;
 }

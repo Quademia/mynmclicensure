@@ -21,9 +21,9 @@ import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getQuizAttemptStats } from '@/lib/attempts/queries';
 import type { QuizAttemptStats } from '@/lib/attempts/types';
 import { getItemsByFilters, heldBackIds } from '@/lib/bank/queries';
+import { orderModes } from '@/lib/attempts/modes';
 import { getAllQuizzesPaginated, getQuizById } from './queries';
 import {
-  ALLOWED_MODES,
   QUIZ_STATUSES,
   QUIZ_TABLES,
   type ActionResult,
@@ -129,7 +129,11 @@ export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
   // Q2 (D45 d): the two words checked against their lists before the
   // write, as saveAnnouncement checks its own; Q1's CHECKs are the floor.
   if (!(QUIZ_STATUSES as readonly string[]).includes(input.status)) return fail('Please choose a valid status.');
-  if (!(ALLOWED_MODES as readonly string[]).includes(input.allowedModes)) return fail('Please choose a valid mode.');
+  // §8 S21: the ticked modes, in the table's order, each once; at least one
+  const sent = Array.isArray(input.allowedModes) ? input.allowedModes.map((m) => String(m)) : [];
+  const allowedModes = orderModes(sent);
+  if (allowedModes.length !== new Set(sent).size) return fail('Please choose a valid mode.');
+  if (!allowedModes.length) return fail(`Tick at least one mode students can take this ${noun} in.`);
 
   // 08 B6: a fixed quiz is practice, so it cannot hold a question a
   // draft or active mock holds back. The picker does not offer one; this
@@ -169,7 +173,7 @@ export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
     quiz_id: quizId,
     course_id: courseId,
     title,
-    allowed_modes: input.allowedModes,
+    allowed_modes: allowedModes,
     shuffle: input.shuffle,
     time_limit_sec: Number.isFinite(timeLimit) ? timeLimit : null,
     published: input.published,

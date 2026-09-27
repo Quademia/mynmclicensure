@@ -28,15 +28,15 @@
 'use client';
 import { useConfirm } from '@/lib/overlays/shared/confirm-dialog';
 
-import { useCallback, useState, useSyncExternalStore } from 'react';
+import { Fragment, useCallback, useState, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { Toast } from '@/lib/toast/toast';
 import { abandonAttempt, retakeAttempt, spawnQuizAttempt } from '@/lib/attempts/actions';
 import { sessionHref } from '@/lib/attempts/links';
-import { modeOf } from '@/lib/attempts/modes';
+import { MODES, MODE_ORDER, modeOf, orderModes } from '@/lib/attempts/modes';
 import type { AttemptWithProgress, AttemptMode } from '@/lib/attempts/types';
 import { getQuizAvailability } from '@/lib/quizzes/availability';
-import type { AllowedModes, Availability, QuizCard, QuizKind } from '@/lib/quizzes/types';
+import type { Availability, QuizCard, QuizKind } from '@/lib/quizzes/types';
 import { Icon } from '@/components/shell/icons';
 import type { IconName } from '@/lib/nav/types';
 
@@ -57,7 +57,8 @@ type Props = {
 type Msg = { text: string; tone: 'error' | 'success' } | null;
 type AttemptFilter = '' | 'not_started' | 'in_progress' | 'completed';
 type StatusFilter = '' | Exclude<Availability, 'HIDDEN'>;
-type ModeFilter = '' | AllowedModes;
+// §8 S21: the quizzes that allow this mode
+type ModeFilter = '' | AttemptMode;
 type LaunchAction = 'start' | 'resume' | 'retake';
 
 const WORDS: Record<
@@ -312,9 +313,10 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
     const timeLimitSec = quiz.time_limit_sec || quiz.n * 60;
     const timeLimitMin = Math.round(timeLimitSec / 60);
 
-    const showPractice = quiz.allowed_modes === 'BOTH' || quiz.allowed_modes === 'INSTANT_ONLY';
-    const showExam = quiz.allowed_modes === 'BOTH' || quiz.allowed_modes === 'TIMED_ONLY';
-    const isSingle = !showPractice || !showExam;
+    // §8 S21: a section per mode the quiz allows, in the table's order
+    // (Study's, then Exam's); each has its own Start, Resume and Retake
+    const modes = orderModes(quiz.allowed_modes);
+    const isSingle = modes.length === 1;
 
     return (
       <div key={quiz.quiz_id} className={`quiz-card ${avail.toLowerCase()}`}>
@@ -331,8 +333,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
         </div>
         {scheduleInfo}
         <div className={`mode-sections ${isSingle ? 'single' : ''}`}>
-          {showPractice ? renderModeSection(quiz, 'instant', avail, attempts) : null}
-          {showExam ? renderModeSection(quiz, 'timed', avail, attempts) : null}
+          {modes.map((mode) => <Fragment key={mode}>{renderModeSection(quiz, mode, avail, attempts)}</Fragment>)}
         </div>
       </div>
     );
@@ -373,7 +374,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
         .filter((x): x is { quiz: QuizCard; avail: Exclude<Availability, 'HIDDEN'> } => x.avail !== 'HIDDEN');
 
       if (statusFilter) filtered = filtered.filter(({ avail }) => avail === statusFilter);
-      if (modeFilter) filtered = filtered.filter(({ quiz }) => quiz.allowed_modes === modeFilter);
+      if (modeFilter) filtered = filtered.filter(({ quiz }) => (quiz.allowed_modes ?? []).includes(modeFilter));
       if (attemptFilter) filtered = filtered.filter(({ quiz }) => getOverallAttemptState(quiz.quiz_id, attempts) === attemptFilter);
 
       return (
@@ -429,9 +430,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
           <label htmlFor="filterMode">Mode</label>
           <select id="filterMode" value={modeFilter} onChange={(e) => setModeFilter(e.target.value as ModeFilter)}>
             <option value="">All modes</option>
-            <option value="INSTANT_ONLY">Study only</option>
-            <option value="TIMED_ONLY">Exam only</option>
-            <option value="BOTH">Both</option>
+            {MODE_ORDER.map((code) => <option key={code} value={code}>{MODES[code].fullName}</option>)}
           </select>
         </div>
         <div className="filter-group">

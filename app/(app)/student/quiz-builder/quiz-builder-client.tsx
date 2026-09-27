@@ -33,7 +33,13 @@ type Mode = AttemptMode;
 type SelectionMode = 'topics' | 'concept';
 
 // The card's badge colour per mode (student-quiz-builder.css).
-const MODE_BADGE: Record<AttemptMode, string> = { instant: 'badge-instant', timed: 'badge-timed' };
+// Study's two take the old instant colour, Exam's the timed one.
+const MODE_BADGE: Record<AttemptMode, string> = {
+  UNTIMED_LEARNING: 'badge-instant',
+  UNTIMED_TEST: 'badge-instant',
+  TIMED_FREE_NAV: 'badge-timed',
+  TIMED_SEQUENTIAL: 'badge-timed',
+};
 
 const STEP_LABELS = [
   'Step 1 of 5 — Course & selection mode',
@@ -131,7 +137,7 @@ export function QuizBuilderClient({
   const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>([]);
   const [selectedQuestionTypes, setSelectedQuestionTypes] = useState<string[]>([]);
   const [questionCount, setQuestionCount] = useState(0);
-  const [mode, setMode] = useState<Mode>('instant');
+  const [mode, setMode] = useState<Mode>('UNTIMED_LEARNING');
 
   // ── the course's rows (legacy CURRENT_ITEMS / CURRENT_FILTER_OPTIONS) ──
   const [items, setItems] = useState<BuilderItem[]>([]);
