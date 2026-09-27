@@ -345,7 +345,16 @@ export async function finishAttempt(attemptId: string, timeTakenS: number | null
   if (error) return fail(rpcError(error, 'Could not submit this attempt.'));
   const score = scoreOf(data);
   if (!score) return fail('Could not submit this attempt.');
-  return { ok: true, score, secrets: secretsOf(await readAttemptItems(svc, attemptId)) };
+  const [rows, stored] = await Promise.all([readAttemptItems(svc, attemptId), storedTimeTaken(svc, attemptId)]);
+  return { ok: true, score, secrets: secretsOf(rows), timeTakenS: stored };
+}
+
+// The time the close wrote (03 Q18: the results pop-up shows it) — the
+// server clock's for an exam, the stopwatch's otherwise.
+async function storedTimeTaken(svc: ReturnType<typeof createServiceRoleClient>, attemptId: string): Promise<number | null> {
+  const { data } = await svc.from('attempts').select('time_taken_s').eq('attempt_id', attemptId).maybeSingle();
+  const t = (data as { time_taken_s: number | null } | null)?.time_taken_s;
+  return t === null || t === undefined ? null : Number(t);
 }
 
 // The exam's clock ran out: closed at the true deadline. The function
@@ -360,7 +369,8 @@ export async function expireAttempt(attemptId: string): Promise<FinishResult> {
   if (error) return fail(rpcError(error, 'Could not submit this exam.'));
   const score = scoreOf(data);
   if (!score) return fail('Could not submit this exam.');
-  return { ok: true, score, secrets: secretsOf(await readAttemptItems(svc, attemptId)) };
+  const [rows, timeTakenS] = await Promise.all([readAttemptItems(svc, attemptId), storedTimeTaken(svc, attemptId)]);
+  return { ok: true, score, secrets: secretsOf(rows), timeTakenS };
 }
 
 // ── the list pages (5b) ────────────────────────────────────────────────

@@ -181,7 +181,9 @@ export type ActionResult = { ok: true } | { ok: false; error: string };
 export type SpawnResult = { ok: true; attemptId: string } | { ok: false; error: string };
 
 /** Finish and expire return the score and, the sitting being over, every question's secret half (Q6). */
-export type FinishResult = { ok: true; score: Score; secrets: SecretsMap } | { ok: false; error: string };
+export type FinishResult =
+  | { ok: true; score: Score; secrets: SecretsMap; /** the stored time taken (03 Q18's pop-up) */ timeTakenS: number | null }
+  | { ok: false; error: string };
 
 /** Sequential's move (§8 S21): the position now current, or null when every question is passed. */
 export type AdvanceResult = { ok: true; nextPosition: number | null } | { ok: false; error: string };

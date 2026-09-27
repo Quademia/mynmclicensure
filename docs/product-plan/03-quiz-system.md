@@ -804,6 +804,47 @@ Applied on dev. **Walked:** a 1-question Free Navigation sitting as the
 RM student, answered and left to run out — the auto-submit at zero,
 "Time is up!", 1 / 1, closed at the deadline with 60 s.
 
+### Q18 — The results pop-up (captured, ruled and built 2026-09-27)
+
+**Found (Sam asked, 2026-09-27):** legacy's score card sat inline above
+the finished questions (answers already revealed beneath it; "Review
+Answers" only hid it), came back on every open of a finished sitting (on
+a phone with the question map popped over it), and said little — an
+emoji and a word at 80 / 70 / 50, the score and the percentage; no
+counts, no time, no pass mark, no Retake, the same for every mode.
+MyNclex (`lib/practice/runner/results-popup.tsx`, read the same day): a
+pop-up over the review, once, at the finish; a score pill reopens it;
+the percentage with "X of N correct", Passed / Didn't pass where a pass
+mark is set, a report page as the main button, Review attempt, Take
+again / Build another, Exit.
+
+**Ruled (Sam):** the pop-up and the pill now, with Review answers,
+Retake (where allowed) and the way back; the report page (Q10), a pass
+mark and per-mode grade words later. The emoji and words stay (Sam,
+2026-09-22).
+
+**Built 2026-09-27** (no storage change): `components/runner/results-
+popup.tsx` on the app's dialog — "Quiz complete" (Study) / "Exam
+complete" (Exam) / "Time is up", the emoji and word, the percentage,
+"N of M correct", Correct / Wrong / Unanswered (the grid's own test),
+the mode and the time (the finish reply now carries the stored
+`time_taken_s`); opened by Submit and the time-up (not by Submit &
+Exit, which leaves), by the header's score pill ("7 / 10 · 70%") on any
+finished sitting, never by reopening one; on a phone the question map no
+longer pops over a reopened review. Retake shown where `retakeAttempt`
+would take it (`retakeOpen` in the loader: a builder sitting, or the
+quiz open and still offering the mode) and landing on the new sitting's
+start card. Legacy's inline card and its styles removed (the CSS
+guard's count down one, banked). **Walked** as the RM student: the
+finished Sequential sitting reopened with no pop-up and the pill
+"2 / 3 · 67%"; the pill → "Exam complete", 📖, 67%, 2 of 3, 2 / 1 / 0,
+Exam · Sequential, 1 min 27 s, the three buttons; Retake → the new
+sitting's start card; that sitting finished → the pop-up by itself
+(0 / 3, 28 s from the server); Review answers → question 1 at the top
+(a scroll that left it under the header, fixed); at 375 px the pop-up
+fits and no map pops. New wording ("Quiz complete", "Exam complete",
+"N of M correct", the three counts) for Sam's review.
+
 ### Q17 — The start screen on its own (captured and ruled 2026-09-27)
 
 **Found (Sam, 2026-09-27):** the start card sits inside the runner, so
@@ -1021,5 +1062,6 @@ it needs a change log on every answer, a storage change and its own
 | Q13 Readiness and the cohort | candidate, captured 2026-09-24; with Q3 |
 | Q14 The link tables | ✅ 2026-09-27 (`20260927100000_quiz_item_rows.sql`; §8 S20; walked as Sam's admin, the RM student and the RN student — §4) |
 | Q15 The student's own marks across attempts | candidate, captured 2026-09-26 |
+| Q18 The results pop-up | ruled and built 2026-09-27 (Sam: the pop-up and the score pill now, the report page later; code only; walked as the RM student — §4); to tick |
 | Q17 The start screen on its own | ✅ 2026-09-27 (Sam: its own screen, no questions before Start, the card on every open, the tick box on every mode; code only; walked as the RM student — §4; ticked by Sam) |
 | Q16 The keyword step never says what the keyword found | ⬜ queued 2026-09-26 (Sam); found walking 08 B6; re-read and offered 2026-09-27, not now (Sam) |

@@ -113,6 +113,7 @@ export function SessionStart({ card, exit, previewMode }: { card: StartCard; exi
         previewMode={previewMode}
         exit={exit}
         resumed={card.resuming}
+        retakeAllowed={play.retakeAllowed}
       />
     );
   }

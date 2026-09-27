@@ -23,6 +23,8 @@
 // Server-only (it reads config and the bank); not a Server Action.
 
 import { getConfig } from '@/lib/catalogue/queries';
+import { startRefusal } from '@/lib/quizzes/availability';
+import { getQuizById } from '@/lib/quizzes/queries';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import type { AuthGateResult } from '@/lib/access';
@@ -57,6 +59,8 @@ export type SessionPlay = {
   items: SealedItem[];
   secrets: SecretsMap;
   questionsPerPage: number;
+  /** 03 Q18: the results pop-up offers Retake — the rule retakeAttempt holds (the quiz open, the mode allowed). */
+  retakeAllowed: boolean;
 };
 
 type SessionError = { kind: 'error'; title: string; message: string; exit: SessionExit };
@@ -183,7 +187,21 @@ async function sessionPlay(gate: AuthGateResult, attempt: Attempt, previewMode: 
   for (const row of rows) {
     if (unsealAll || (feedbackEach && row.graded_utc !== null)) secrets[row.item_id] = secretOf(row);
   }
-  return { attempt, items, secrets, questionsPerPage };
+  const retakeAllowed = previewMode ? false : await retakeOpen(gate, attempt);
+  return { attempt, items, secrets, questionsPerPage, retakeAllowed };
+}
+
+// 03 Q18: would retakeAttempt take this sitting once it is finished? A
+// builder sitting always (it has no quiz); a fixed quiz's or a mock's
+// while the quiz is open and still offers the mode — startRefusal, the
+// check Start and Retake share. The server checks again on the press.
+async function retakeOpen(gate: AuthGateResult, attempt: Attempt): Promise<boolean> {
+  const source = await originSource(gate.supabase, attempt);
+  if (source === 'builder') return true;
+  if ((source !== 'fixed' && source !== 'mock') || !attempt.quiz_id) return false;
+  const quiz = await getQuizById(createServiceRoleClient(), source, attempt.quiz_id);
+  if (!quiz) return false;
+  return startRefusal(quiz, attempt.mode) === null;
 }
 
 /**

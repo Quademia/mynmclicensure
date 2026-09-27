@@ -56,7 +56,9 @@ import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } fro
 import { useRouter } from 'next/navigation';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { Toast } from '@/lib/toast/toast';
-import { advanceAttempt, checkAnswer, expireAttempt, finishAttempt, saveAnswers } from '@/lib/attempts/actions';
+import { advanceAttempt, checkAnswer, expireAttempt, finishAttempt, retakeAttempt, saveAnswers } from '@/lib/attempts/actions';
+import { sessionHref } from '@/lib/attempts/links';
+import { ResultsPopup, type ResultsSummary } from './results-popup';
 import { Icon } from '@/components/shell/icons';
 import { KindChip, QUESTION_TYPE_HUE } from '@/components/shell/chips';
 import {
@@ -103,6 +105,7 @@ export function QuizRunner({
   previewMode,
   exit,
   resumed = false,
+  retakeAllowed = false,
 }: {
   attempt: Attempt;
   items: SealedItem[];
@@ -114,6 +117,8 @@ export function QuizRunner({
   exit: SessionExit;
   /** The start card said Resume (03 Q17): the status line says so. */
   resumed?: boolean;
+  /** 03 Q18: the results pop-up offers Retake (the server checks again on the press). */
+  retakeAllowed?: boolean;
 }) {
   const router = useRouter();
   // The mode's row (03 Q8): the runner asks it, never the code.
@@ -143,7 +148,11 @@ export function QuizRunner({
   const [page, setPage] = useState(0);
   const [viewMode, setViewMode] = useState<ViewMode>('ALL');
   const [feedbackMode, setFeedbackMode] = useState<FeedbackMode>('inline');
-  const [scoreCardOpen, setScoreCardOpen] = useState(false);
+  // 03 Q18: the results pop-up — opened by the finish, and by the
+  // header's score pill; not on reopening a finished sitting.
+  const [resultsOpen, setResultsOpen] = useState(false);
+  const [serverTime, setServerTime] = useState<number | null>(null);
+  const [retaking, setRetaking] = useState(false);
   const [serverScore, setServerScore] = useState<Score | null>(null);
   const [gridOverlayOpen, setGridOverlayOpen] = useState(false);
   const [desktopGridHidden, setDesktopGridHidden] = useState(false);
@@ -193,11 +202,11 @@ export function QuizRunner({
       }
       setFeedbackMode(fb);
 
+      // A finished sitting reopened: the review, with no pop-up (the pill
+      // opens it) and, since Q18, no question map over it on a phone.
       if (reviewMode) {
         setPhase('quiz');
         setBooted(true);
-        setScoreCardOpen(true);
-        if (!isDesktop()) setGridOverlayOpen(true);
         setStatus(W.reviewingLog);
         return;
       }
@@ -516,7 +525,7 @@ export function QuizRunner({
   // at its deadline. A failure unlocks the runner and shows a toast; the
   // answers are saved, so trying again loses nothing (gap 2). The
   // auto-submit retries on its own every AUTO_SUBMIT_RETRY_MS.
-  async function submitQuiz(autoSubmit = false): Promise<boolean> {
+  async function submitQuiz(autoSubmit = false, openResults = true): Promise<boolean> {
     if (finishSent || locked || finishingRef.current) return false;
     if (autoSubmit && Date.now() - lastAutoSubmitRef.current < AUTO_SUBMIT_RETRY_MS) return false;
     lastAutoSubmitRef.current = Date.now();
@@ -538,22 +547,51 @@ export function QuizRunner({
         return false;
       }
       setServerScore(result.score);
+      setServerTime(result.timeTakenS);
       // The sitting is over: every question's secret half arrives with
       // the score, so the review renders without a reload (Q6).
       setSecrets((s) => ({ ...s, ...result.secrets }));
+    } else {
+      setServerTime(timeTakenS);
     }
     if (autoSubmit) setTimeUp(true);
     setFinishSent(true);
     setLocked(true);
     setSaving('');
-    setScoreCardOpen(true);
+    // Q18: the results pop-up opens over the review — not on Submit &
+    // Exit, which leaves the page a moment later.
+    if (openResults) setResultsOpen(true);
     setStatus(autoSubmit ? 'Time is up. Your exam has been submitted automatically.' : W.submittedLog);
     return true;
   }
 
   function reviewAnswers() {
-    setScoreCardOpen(false);
+    setResultsOpen(false);
+    setViewMode('ALL');
     setPage(0);
+    // the top of the page, so question 1 opens below the header, not under it
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Q18's Retake: the same action the quiz lists and Learning History
+  // use (the origin's quiz open, the mode allowed — checked again there),
+  // then the new sitting's start card.
+  async function retakeNow() {
+    if (retaking) return;
+    setRetaking(true);
+    try {
+      const r = await retakeAttempt(attempt.attempt_id);
+      if (!r.ok) {
+        setToast(r.error || 'Could not start the retake. Please try again.');
+        return;
+      }
+      leavingRef.current = true;
+      router.push(sessionHref(r.attemptId));
+    } catch {
+      setToast('Could not start the retake. Please check your connection and try again.');
+    } finally {
+      setRetaking(false);
+    }
   }
 
   // ── exit (legacy handleExit / saveAndExit / submitAndExit) ──
@@ -576,7 +614,7 @@ export function QuizRunner({
 
   async function submitAndExit() {
     setExitOpen(false);
-    const done = await submitQuiz();
+    const done = await submitQuiz(false, false);
     if (!done) return;
     window.setTimeout(() => {
       leavingRef.current = true;
@@ -848,6 +886,32 @@ export function QuizRunner({
   const pageItems = source.slice(pageStart, pageStart + perPage);
   const grade = gradeFor(score.pct);
   const showControls = feedbackEach || locked || reviewMode;
+  // Q18's summary: the questions right, wrong and not answered, by the
+  // grid's own test (the server's grade, or the key once it is here).
+  const finished = locked || reviewMode;
+  const tally = { correct: 0, wrong: 0, unanswered: 0 };
+  if (finished) {
+    for (const item of items) {
+      if (!hasAnswerFor(item)) {
+        tally.unanswered++;
+        continue;
+      }
+      const secret = secrets[item.item_id];
+      const right = secret ? isCorrectAnswer(item.question_type, secret.correct, answers[item.item_id]) : item.is_correct === true;
+      if (right) tally.correct++;
+      else tally.wrong++;
+    }
+  }
+  const results: ResultsSummary = {
+    heading: timeUp ? 'Time is up' : M.group === 'study' ? 'Quiz complete' : 'Exam complete',
+    emoji: grade.emoji,
+    gradeLabel: grade.label,
+    pct: score.pct,
+    ...tally,
+    total: items.length,
+    timeTakenS: serverTime ?? attempt.time_taken_s,
+    modeName: M.fullName,
+  };
   const timerPercent = totalSeconds > 0 ? secondsLeft / totalSeconds * 100 : 0;
   const timerColor = timerPercent <= 10 ? 'red' : timerPercent <= 20 ? 'amber' : '';
   const timerText = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
@@ -868,6 +932,12 @@ export function QuizRunner({
           <div className="header-brand">Quademia</div>
           <div className="header-title">{label}</div>
           <div className="header-actions">
+            {/* Q18: a finished sitting's score, opening the results pop-up again */}
+            {finished && phase === 'quiz' ? (
+              <button type="button" className="hbtn hbtn-ghost hbtn-score" onClick={() => setResultsOpen(true)} aria-label={`Your results: ${score.raw} of ${score.total}, ${score.pct} percent`}>
+                {score.raw} / {score.total} · {score.pct}%
+              </button>
+            ) : null}
             <button type="button" className="hbtn hbtn-ghost" onClick={openGrid}><Icon name="grid" />Question Grid</button>
             <button type="button" className="hbtn hbtn-danger" onClick={handleExit}>Exit</button>
           </div>
@@ -910,25 +980,7 @@ export function QuizRunner({
             <button type="button" className="show-grid-btn" onClick={() => setDesktopGridHidden(false)}><Icon name="grid" />Show Grid</button>
           ) : null}
 
-          {/* Score card */}
-          {phase === 'quiz' && scoreCardOpen ? (
-            <div className="score-card">
-              <div className="score-grade">{grade.emoji}</div>
-              <div className="score-text">{score.raw} / {score.total}</div>
-              <div className="score-pct">{score.pct}%</div>
-              <div className="score-label">{grade.label}</div>
-              <div className="score-actions">
-                {/* the review is the first thing a sitting that held its feedback back offers */}
-                <button type="button" className={`btn ${feedbackEach ? 'btn-ghost' : 'btn-primary'}`} onClick={reviewAnswers}>
-                  <Icon name="book-open" />
-                  {W.reviewButton}
-                </button>
-                <button type="button" className={`btn ${feedbackEach ? 'btn-primary' : 'btn-ghost'}`} onClick={() => router.push(exit.href)}>{exit.label}</button>
-              </div>
-            </div>
-          ) : null}
-
-          {/* Quiz card */}
+          {/* Quiz card (Q18: legacy's inline score card is the results pop-up now) */}
           {phase === 'quiz' ? (
             <div className="quiz-card">
               <div className="q-list">
@@ -1006,6 +1058,16 @@ export function QuizRunner({
               </div>
             </div>
           ) : null}
+
+          {/* Q18: the results, once the sitting is finished */}
+          <ResultsPopup
+            open={resultsOpen && finished}
+            summary={results}
+            onReview={reviewAnswers}
+            onClose={() => setResultsOpen(false)}
+            retake={retakeAllowed && !previewMode ? { onClick: () => void retakeNow(), pending: retaking } : null}
+            exit={{ label: exit.label, onClick: () => { leavingRef.current = true; router.push(exit.href); } }}
+          />
 
           {/* the exit choice (slice 6a), on the shared dialog since DS4; a
               choice of three stacks full-width */}

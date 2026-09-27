@@ -57,6 +57,7 @@ export default async function SessionPage({
       reviewMode
       previewMode={load.previewMode}
       exit={load.exit}
+      retakeAllowed={load.retakeAllowed}
     />
   );
 }

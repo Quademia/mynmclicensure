@@ -213,6 +213,8 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⬜ Q16 The keyword step never says what matched — chips a name filter; "No matching concepts" in 5 courses (09-26)
 - ✅ Q17 The start screen on its own — no runner behind it, no questions sent before Start or Resume — 2026-09-27
 - ⏸ Undo "Don't show this again" — in a settings page, if one is ever built (Sam, 2026-09-27)
+- ⬜ Q18 The results pop-up — once at the finish, the score pill, counts and time, Retake (built)
+- ⬜ A pass mark and Passed / Didn't pass on the results — none per quiz today; Sam: later (2026-09-27)
 
 *Not yet sliced — each gets an id when the doc is rewritten:*
 

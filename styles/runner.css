@@ -86,6 +86,31 @@
 .runner .preflight-warning { background: #fef3c7; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #92400e; margin-bottom: 16px; line-height: 1.5; }
 .runner .preflight-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 20px; }
 .runner .preflight-skip { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; cursor: pointer; margin-left: auto; }
+/* 03 Q18: the results pop-up — on the app's dialog, portalled to <body>,
+   so its rules are not under .runner. The three counts take the state
+   triples (correct / wrong / neutral), as the review's own badges do. */
+.results-pop { text-align: center; }
+.results-pop-grade { font-size: 15px; font-weight: 600; color: var(--ink); }
+.results-pop-emoji { font-size: 22px; margin-right: 6px; vertical-align: -3px; }
+.results-pop-score { display: flex; align-items: baseline; justify-content: center; gap: 2px; color: var(--primary); margin: 10px 0 2px; }
+.results-pop-score .num { font-size: 44px; font-weight: 700; line-height: 1; }
+.results-pop-score .unit { font-size: 20px; font-weight: 700; }
+.results-pop-frac { font-size: 14px; color: var(--text-muted); margin-bottom: 16px; }
+.results-pop-counts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+.results-pop-counts .c { display: flex; flex-direction: column; gap: 2px; padding: 10px 6px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 12px; color: var(--text-muted); }
+.results-pop-counts .n { font-size: 20px; font-weight: 700; color: var(--ink); }
+.results-pop-counts .correct { background: var(--badge-success-bg); border-color: var(--badge-success-border); }
+.results-pop-counts .correct .n { color: var(--badge-success-ink); }
+.results-pop-counts .wrong { background: var(--badge-danger-bg); border-color: var(--badge-danger-border); }
+.results-pop-counts .wrong .n { color: var(--badge-danger-ink); }
+.results-pop-counts .unanswered { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); }
+.results-pop-counts .unanswered .n { color: var(--badge-neutral-ink); }
+.results-pop-facts { display: grid; grid-template-columns: auto auto; justify-content: center; gap: 4px 12px; font-size: 13px; margin: 0 0 8px; }
+.results-pop-facts dt { color: var(--text-muted); text-align: right; }
+.results-pop-facts dd { margin: 0; color: var(--ink); font-weight: 600; text-align: left; }
+/* the header's score pill: opens the pop-up again on a finished sitting */
+.runner .hbtn-score { font-variant-numeric: tabular-nums; }
+
 /* 03 Q17: the start card on a page of its own — no runner header above it */
 .runner.session-start .runner-wrap { max-width: 640px; margin-top: 48px; }
 @media (max-width: 768px) { .runner.session-start .runner-wrap { margin-top: 24px; } }
@@ -166,12 +191,7 @@
 .runner .page-nav-right { display: flex; gap: 8px; }
 
 /* ── Score card ── */
-.runner .score-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 28px; text-align: center; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07); margin-bottom: 16px; }
-.runner .score-grade { font-size: 32px; margin-bottom: 8px; }
-.runner .score-text { font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
-.runner .score-pct { font-size: 18px; color: var(--accent); font-weight: 700; margin-bottom: 16px; }
-.runner .score-label { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
-.runner .score-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+/* legacy's inline score card went with 03 Q18 — the results pop-up's rules are above */
 
 /* ── Status log ── */
 .runner .status-log { font-family: monospace; font-size: 12px; color: var(--text-muted); background: #f8fafc; border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; margin-top: 16px; min-height: 32px; }
