@@ -112,7 +112,6 @@ export function SessionStart({ card, exit, previewMode }: { card: StartCard; exi
         reviewMode={false}
         previewMode={previewMode}
         exit={exit}
-        resumed={card.resuming}
         retakeAllowed={play.retakeAllowed}
       />
     );
@@ -159,7 +158,6 @@ export function SessionStart({ card, exit, previewMode }: { card: StartCard; exi
             </label>
           </div>
         </div>
-        <div className="status-log">{card.resuming ? W.preflightResume : W.preflightNew}</div>
       </div>
     </div>
   );

@@ -215,6 +215,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⏸ Undo "Don't show this again" — in a settings page, if one is ever built (Sam, 2026-09-27)
 - ✅ Q18 The results pop-up — once at the finish, the score pill, counts and time, Retake — 2026-09-27
 - ⬜ A pass mark and Passed / Didn't pass on the results — none per quiz today; Sam: later (2026-09-27)
+- ✅ (unplanned) Legacy's status log out of the runner and the start card — its lines said elsewhere (Sam) — 2026-09-27
 
 *Not yet sliced — each gets an id when the doc is rewritten:*
 

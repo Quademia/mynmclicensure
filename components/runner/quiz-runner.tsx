@@ -104,7 +104,6 @@ export function QuizRunner({
   reviewMode,
   previewMode,
   exit,
-  resumed = false,
   retakeAllowed = false,
 }: {
   attempt: Attempt;
@@ -115,8 +114,6 @@ export function QuizRunner({
   previewMode: boolean;
   /** Where Exit and the buttons after submitting go: the sitting's home. */
   exit: SessionExit;
-  /** The start card said Resume (03 Q17): the status line says so. */
-  resumed?: boolean;
   /** 03 Q18: the results pop-up offers Retake (the server checks again on the press). */
   retakeAllowed?: boolean;
 }) {
@@ -158,7 +155,6 @@ export function QuizRunner({
   const [desktopGridHidden, setDesktopGridHidden] = useState(false);
   const [exitOpen, setExitOpen] = useState(false);
   const [imgOverlay, setImgOverlay] = useState('');
-  const [status, setStatus] = useState('Initialising…');
   const [saving, setSaving] = useState<string>('');
   const [toast, setToast] = useState<string | null>(null);
   // 03 Q9: the questions whose Check Answer is on its way to the server.
@@ -207,7 +203,6 @@ export function QuizRunner({
       if (reviewMode) {
         setPhase('quiz');
         setBooted(true);
-        setStatus(W.reviewingLog);
         return;
       }
 
@@ -234,7 +229,6 @@ export function QuizRunner({
     setPhase('quiz');
     setPage(0);
     setViewMode('ALL');
-    setStatus(resumed ? W.resumed : '');
   }
 
   // ── derived (legacy getCurrentSource / getGridStats / paging) ──
@@ -302,14 +296,10 @@ export function QuizRunner({
     }, SAVE_DEBOUNCE_MS);
   }
 
-  const saveProgress = useCallback(
-    async (showMsg: boolean) => {
-      const ok = await flushSaves();
-      if (showMsg) setStatus(ok ? W.savedLog : 'Save failed. Please check your connection and try again.');
-      return ok;
-    },
-    [flushSaves, W.savedLog],
-  );
+  // The pending saves, flushed now (a page turn, Save & Resume Later,
+  // Send feedback). Legacy's status line said "Progress saved" when asked;
+  // that line went with legacy's status log (Sam, 2026-09-27).
+  const saveProgress = useCallback(() => flushSaves(), [flushSaves]);
 
   // Read the latest answers on expiry without restarting the interval
   // on every answer. Recalculate from the saved start, never tick down
@@ -365,14 +355,14 @@ export function QuizRunner({
 
   function prevPage() {
     if (safePage > 0) {
-      void saveProgress(false);
+      void saveProgress();
       gotoPage(safePage - 1);
     }
   }
 
   function nextPage() {
     if (safePage < totalPages - 1) {
-      void saveProgress(false);
+      void saveProgress();
       gotoPage(safePage + 1);
     }
   }
@@ -543,7 +533,6 @@ export function QuizRunner({
         finishingRef.current = false;
         setSaving('');
         setToast(`Could not submit: ${result.error} Your answers are saved — please try again.`);
-        setStatus('Submit failed. Your answers are saved; please try again.');
         return false;
       }
       setServerScore(result.score);
@@ -561,7 +550,6 @@ export function QuizRunner({
     // Q18: the results pop-up opens over the review — not on Submit &
     // Exit, which leaves the page a moment later.
     if (openResults) setResultsOpen(true);
-    setStatus(autoSubmit ? 'Time is up. Your exam has been submitted automatically.' : W.submittedLog);
     return true;
   }
 
@@ -606,7 +594,7 @@ export function QuizRunner({
 
   async function saveAndExit() {
     setSaving('Saving your progress…');
-    await saveProgress(false);
+    await saveProgress();
     setSaving('');
     leavingRef.current = true;
     window.location.href = exit.href;
@@ -878,7 +866,7 @@ export function QuizRunner({
     if (locked || reviewMode) {
       window.open(url, '_blank');
     } else {
-      void saveProgress(false).then(() => window.open(url, '_blank'));
+      void saveProgress().then(() => window.open(url, '_blank'));
     }
   }
 
@@ -1020,8 +1008,6 @@ export function QuizRunner({
               {liveForward && !currentAnswered ? <div className="sata-check-note">Answer this question to move on. You cannot come back to it.</div> : null}
             </div>
           ) : null}
-
-          <div className="status-log">{status}</div>
         </div>
 
         {/* Desktop grid column */}

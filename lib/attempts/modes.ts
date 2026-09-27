@@ -52,42 +52,31 @@ export type ModeDef = {
     start: string;
     resume: string;
     starting: string;
-    startFailed: string;
     submit: string;
-    reviewButton: string;
     reviewBanner: string;
     flaggedEmptySub: string;
     exitTitle: string;
     exitText: string;
-    preflightNew: string;
-    preflightResume: string;
-    resumed: string;
-    reviewingLog: string;
-    submittedLog: string;
-    savedLog: string;
   };
   /** The "Don't show this again" key; legacy's two for the modes it had, so a student's choice survives. */
   skipKey: string;
 };
 
 // The words the two quiz-like modes share, and the two exam-like ones.
+// Legacy's status-log lines ("Review the quiz details then click Start
+// Quiz when ready.", "Quiz submitted…", "Progress saved…") went with its
+// status log (Sam, 2026-09-27): the start card, the review banner, the
+// results pop-up and the toasts say each of them already.
 const QUIZ_WORDS = {
   title: 'Study Quiz',
   start: 'Start Quiz',
   resume: 'Resume Attempt',
   starting: '',
-  startFailed: '',
   submit: 'Submit Quiz',
   reviewBanner: 'Review Mode — Answers are read-only. You are reviewing a completed attempt.',
   flaggedEmptySub: 'Flag questions during the quiz, then switch back here to review only those questions.',
   exitTitle: 'Leave this quiz?',
   exitText: 'Your progress will be saved and you can resume later from your learning history.',
-  preflightNew: 'Review the quiz details then click Start Quiz when ready.',
-  preflightResume: 'You have an in-progress attempt. Click Resume Attempt when ready.',
-  resumed: 'Resuming your in-progress attempt. Your saved answers have been restored.',
-  reviewingLog: 'Reviewing your completed attempt. All answers and feedback are shown read-only.',
-  submittedLog: 'Quiz submitted. Review your answers below.',
-  savedLog: 'Progress saved. You can resume from your learning history.',
 };
 
 const EXAM_WORDS = {
@@ -95,19 +84,11 @@ const EXAM_WORDS = {
   start: 'Start Exam',
   resume: 'Resume Exam',
   starting: 'Starting your exam…',
-  startFailed: 'We could not start your exam properly. Please try again.',
   submit: 'Submit Exam',
-  reviewButton: 'Review Answers & Feedback',
   reviewBanner: 'Review Mode — Answers are read-only. You are reviewing a completed exam attempt.',
   flaggedEmptySub: 'Flag questions during the exam, then switch back here to review only those questions.',
   exitTitle: 'Leave this exam?',
   exitText: 'The timer will keep running. Your progress will be saved and you can resume from your learning history — but the clock does not stop.',
-  preflightNew: 'Read the exam details carefully then click Start Exam when ready.',
-  preflightResume: 'You have an in-progress exam. Click Resume Exam when ready.',
-  resumed: 'Resuming your in-progress exam. Your saved answers have been restored.',
-  reviewingLog: 'Reviewing your completed exam. All answers and feedback are shown read-only.',
-  submittedLog: 'Exam submitted. Review your answers below.',
-  savedLog: 'Progress saved.',
 };
 
 export const MODES: Record<AttemptMode, ModeDef> = {
@@ -122,7 +103,7 @@ export const MODES: Record<AttemptMode, ModeDef> = {
     nav: 'free',
     brief: "You'll see the correct answer and its rationale straight after each question, and you can move between questions freely. There's no clock.",
     card: 'See the correct answer and its rationale after each question. No clock. Best for learning and revision.',
-    words: { ...QUIZ_WORDS, listStart: 'Start Learning', listResume: 'Resume Learning', reviewButton: 'Review Answers' },
+    words: { ...QUIZ_WORDS, listStart: 'Start Learning', listResume: 'Resume Learning' },
     skipKey: 'qa_skip_preflight',
   },
   UNTIMED_TEST: {
@@ -136,7 +117,7 @@ export const MODES: Record<AttemptMode, ModeDef> = {
     nav: 'free',
     brief: "Answer in any order and change your answers until you submit. There's no clock; your results and the rationales arrive when you finish.",
     card: 'Answer everything first, then see your results and rationales. No clock. Tests what you know without the pressure of time.',
-    words: { ...QUIZ_WORDS, listStart: 'Start Practice', listResume: 'Resume Practice', reviewButton: 'Review Answers & Feedback' },
+    words: { ...QUIZ_WORDS, listStart: 'Start Practice', listResume: 'Resume Practice' },
     skipKey: 'qa_skip_preflight_untimed',
   },
   TIMED_FREE_NAV: {
