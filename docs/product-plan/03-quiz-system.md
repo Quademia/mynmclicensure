@@ -787,6 +787,23 @@ writes after the deadline, so a student who blocks the browser's
 auto-submit can keep answering (the page closes the exam only when it
 is reopened). Since Q5; Sequential's move refuses it. Offered to Sam.
 
+**Q8.4 — the exam's deadline in the database, built 2026-09-27** (§8
+S22; Sam: "do the deadline fix now"). `20260927160000_exam_deadline.sql`:
+one helper, `_exam_time_up()` — a `TIMED_` sitting whose clock started
+more than its length plus **10 seconds** ago (the grace a last-second
+tap needs to arrive); `save_answers` refuses past it ("This exam has run
+out of time."), `finish_attempt` past it closes the sitting at the
+deadline with the full length, as `expire_attempt` does, and
+`advance_attempt` uses it too. **Proven** rolled back: past the time a
+save refused and a late Submit closed at the deadline with the answers
+as they stood (0 kept, 600 s); 5 s past the deadline a save taken; a
+running exam, Learning, Untimed practice and an unstarted exam
+untouched; Sequential past the time refusing the save and the move,
+`expire_attempt` still closing it; the helper withheld from the browser.
+Applied on dev. **Walked:** a 1-question Free Navigation sitting as the
+RM student, answered and left to run out — the auto-submit at zero,
+"Time is up!", 1 / 1, closed at the deadline with 60 s.
+
 ### Attempt reports and progress (captured 2026-09-24; candidates, none ruled)
 
 Sam, 2026-09-24, after walking NMC Prep on his own account: plans made

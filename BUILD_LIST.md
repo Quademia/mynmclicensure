@@ -92,6 +92,7 @@ the gamma-era list it replaces is in git history and in `qacademy-gamma`.
 - ✅ §8 S19 a student's read of the bank cut to the ten filter columns — ticked 2026-09-26, built as 08 B6
 - ✅ §8 S20 the quiz and mock question lists as rows, keyed to the bank — ticked 2026-09-27, the build is 03 Q14
 - ✅ §8 S21 four modes of a sitting, MyNclex's codes; a quiz's modes a ticked list; Sequential's lock — ticked 09-27
+- ✅ §8 S22 an exam's deadline held by the database, 10 s of grace — ticked 2026-09-27, the build is 03 Q8.4
 - ⬜ §8 has no row for `courses_select` — the policy is `auth.uid() is not null`, so a signed-out visitor reads nothing from `courses`; `/premium-prep` and `/subscribe` both work around it with a service-role read, and D23 item 5 (a sales row lists its courses) cannot be met on any public page without it (2026-09-22)
 
 ## Improvements
@@ -201,7 +202,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ Q8.1 The runner as a player — /session/<id>, exit to the sitting's home, the mode table — 2026-09-27
 - ⬜ Q8.2 Four modes (§8 S21) — MyNclex's codes, the quiz's ticked modes, the builder's choice (built, to tick)
 - ⬜ Q8.3 Sequential — one question at a time, an answer required, the lock in the database (built, to tick)
-- ⬜ An exam's answers are taken after its deadline — save_answers and finish_attempt check no clock (found 09-27)
+- ⬜ Q8.4 An exam's deadline in the database — no answer after time is up, a late Submit closes at it (§8 S22; built)
 - ✅ Q9 The Check Answer pending state — "Checking…" on the option until the reply lands, with Q8.1 — 2026-09-27
 - ⬜ Q10 The attempt report — breakdown by subject / topic / difficulty / type, what to fix next (2026-09-24)
 - ⬜ Q11 Time per question — the runner fills `time_spent_s`; pace and slowest on the report (2026-09-24)
