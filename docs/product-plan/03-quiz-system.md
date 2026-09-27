@@ -1062,6 +1062,6 @@ it needs a change log on every answer, a storage change and its own
 | Q13 Readiness and the cohort | candidate, captured 2026-09-24; with Q3 |
 | Q14 The link tables | ✅ 2026-09-27 (`20260927100000_quiz_item_rows.sql`; §8 S20; walked as Sam's admin, the RM student and the RN student — §4) |
 | Q15 The student's own marks across attempts | candidate, captured 2026-09-26 |
-| Q18 The results pop-up | ruled and built 2026-09-27 (Sam: the pop-up and the score pill now, the report page later; code only; walked as the RM student — §4); to tick |
+| Q18 The results pop-up | ✅ 2026-09-27 (Sam: the pop-up and the score pill now, the report page later; code only; walked as the RM student — §4; ticked by Sam) |
 | Q17 The start screen on its own | ✅ 2026-09-27 (Sam: its own screen, no questions before Start, the card on every open, the tick box on every mode; code only; walked as the RM student — §4; ticked by Sam) |
 | Q16 The keyword step never says what the keyword found | ⬜ queued 2026-09-26 (Sam); found walking 08 B6; re-read and offered 2026-09-27, not now (Sam) |
