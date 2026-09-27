@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-27, second — 08 B8 type fixed and the answer rule; 03 Q8 the runner as a player, four MyNclex modes (S21, S22); Q9, Q17 start screen, Q18 pop-up
+  - ↳ B8 record wrong · switch not needed · a & c question · extend ours not MyNclex · A ticks · answer to move on · deadline gap · MyNclex sends paper early · card every open · tick per mode · status log out · 16 not 15
+
 - 2026-09-27 — 08 B7 widened into D52 (the 1,000-row cap swept, rule 10, every such read batched); §8 S20 built as 03 Q14, quiz lists as rows; both merged
   - ↳ limit=5000 still 1000 · rpc cut too · one pass, not surface by surface · B3 later · Q16 record was wrong · storage inventory · delete restricted · course by keys · editor course-change gap · rule 9 on quizzes · 105 was 95
 

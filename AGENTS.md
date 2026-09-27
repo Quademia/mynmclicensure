@@ -246,7 +246,18 @@ above sit at the repo root; the audience grouping inside them is kept.
   config.** A stray named export fails the prod build; dev misses it.
 - **Every overlay is portalled to `<body>`.** A `container-type` or
   transformed ancestor becomes the containing block for `position:
-  fixed` with no error.
+  fixed` with no error. The flip side: a portalled dialog sits outside
+  the surface's wrapper, so the surface's scoped rules (`.runner …`) do
+  not reach it — its own rules are written unscoped (03 Q18's results
+  pop-up, 2026-09-27).
+- **What a Server Component hands a client component is in the page**,
+  rendered or not: the props are serialised into the HTML the browser
+  receives. A screen that must not show something — a sitting's
+  questions before Start — does not receive it; hiding it in the client
+  is not enough. MyNclex's start screen gets this wrong (its session
+  page passes the sealed questions under the card); ours sends the
+  card's data only and the questions after Start (03 Q17, 2026-09-27).
+  Check by searching the page's own HTML for the text.
 - **Deep-clone any rich-text doc before a Server Action boundary**
   (`JSON.parse(JSON.stringify(doc))`) — attrs with a null prototype are
   dropped by the serialiser.
