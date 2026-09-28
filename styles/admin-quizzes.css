@@ -143,6 +143,7 @@
 .qm .detail-label { font-weight: 600; color: var(--text-muted); min-width: 120px; flex-shrink: 0; }
 .qm .detail-value { color: var(--primary); word-break: break-word; }
 .qm .detail-value.mono { font-family: monospace; color: var(--accent); }
+.qm .detail-value.mode-chips { display: flex; flex-wrap: wrap; gap: var(--space-4); }
 .qm .review-items-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
 .qm .review-items-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
 .qm .review-items-header h4 { font-size: 14px; font-weight: 700; color: var(--primary); margin: 0; }

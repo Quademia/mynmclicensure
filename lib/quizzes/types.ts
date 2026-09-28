@@ -30,7 +30,7 @@ export const QUIZ_ITEM_TABLES: Record<QuizKind, string> = {
 // The modes a quiz or mock allows, a list the admin ticks (§8 S21, Sam
 // 2026-09-27: A) — legacy's BOTH / INSTANT_ONLY / TIMED_ONLY became lists
 // of the four codes in 20260927140000_four_modes.sql. Named from the mode
-// table (lib/attempts/modes: modesLabel, orderModes).
+// table (lib/attempts/modes: orderModes).
 export type AllowedModes = AttemptMode[];
 
 export const QUIZ_STATUSES = ['draft', 'active', 'archived'] as const;

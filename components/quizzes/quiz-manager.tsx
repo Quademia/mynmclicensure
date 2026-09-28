@@ -39,7 +39,7 @@ import {
   setQuizPublished,
   setQuizStatus,
 } from '@/lib/quizzes/actions';
-import { MODES, MODE_GROUPS, MODE_ORDER, modesLabel, orderModes } from '@/lib/attempts/modes';
+import { MODES, MODE_GROUPS, MODE_ORDER, orderModes } from '@/lib/attempts/modes';
 import type { AttemptMode, QuizAttemptStats } from '@/lib/attempts/types';
 import {
   QUIZ_STATUSES,
@@ -394,6 +394,9 @@ export function QuizManager({
     const title = form.title.trim();
     if (!courseId) return err('Please select a course.');
     if (!title) return err(`Please enter a ${W.noun} title.`);
+    // saveQuiz's own words, asked here too so an empty list is not found
+    // only at Save, two panes on (walked 2026-09-28)
+    if (!form.modes.length) return err(`Tick at least one mode students can take this ${W.noun} in.`);
     if (!generatedId) return err(`${W.idLabel} could not be generated. Please re-select the course.`);
 
     if (pickerCourse !== courseId) await fetchPicker(courseId);
@@ -910,7 +913,17 @@ export function QuizManager({
             </div>
             <div className="review-card">
               <h4>Settings</h4>
-              <div className="detail-row"><span className="detail-label">Allowed Modes</span><span className="detail-value">{modesLabel(form.modes)}</span></div>
+              {/* the list's chips, which never break inside a mode's name */}
+              <div className="detail-row">
+                <span className="detail-label">Allowed Modes</span>
+                <span className="detail-value mode-chips">
+                  {form.modes.length
+                    ? orderModes(form.modes).map((code) => (
+                        <KindChip key={code} icon={MODE_ICON[code]}>{MODES[code].name}</KindChip>
+                      ))
+                    : '—'}
+                </span>
+              </div>
               <div className="detail-row"><span className="detail-label">Status</span><span className="detail-value"><span className={`badge ${form.status}`}>{form.status}</span></span></div>
               <div className="detail-row"><span className="detail-label">Published</span><span className="detail-value">{form.published ? 'Yes' : 'No'}</span></div>
               <div className="detail-row"><span className="detail-label">Shuffle</span><span className="detail-value">{form.shuffle ? 'Yes — randomised per attempt' : 'No — fixed order'}</span></div>

@@ -186,12 +186,6 @@ export function orderModes(codes: readonly string[] | null | undefined): Attempt
   return MODE_ORDER.filter((m) => set.has(m));
 }
 
-/** A quiz's allowed modes in words: "Study · Learning, Exam · Free Navigation". */
-export function modesLabel(codes: readonly string[] | null | undefined): string {
-  const list = orderModes(codes);
-  return list.length ? list.map((m) => MODES[m].fullName).join(', ') : '—';
-}
-
 /** The start screen's line for a sitting: the brief, and the minutes when the mode has a clock. */
 export function preflightBrief(mode: ModeDef, durationMin: number | null): string {
   if (mode.clock === 'none' || !durationMin || durationMin <= 0) return mode.brief;
