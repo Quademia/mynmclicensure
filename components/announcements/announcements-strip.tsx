@@ -18,6 +18,7 @@ import { AnnouncementBody } from './announcement-body';
 import { recordNoticeState } from '@/lib/announcements/actions';
 import type { Announcement, StudentNoticeMap } from '@/lib/announcements/types';
 import { Icon } from '@/components/shell/icons';
+import { AppLink } from '@/components/shell/link-pending';
 
 export function AnnouncementsStrip({ announcements, states }: { announcements: Announcement[]; states: StudentNoticeMap }) {
   const [cleared, setCleared] = useState<Record<string, 'fading' | 'gone'>>({});
@@ -50,7 +51,7 @@ export function AnnouncementsStrip({ announcements, states }: { announcements: A
         ) : unread.length === 0 ? (
           <>
             <div className="announcements-empty">You&apos;re all caught up!</div>
-            <a href="/student/announcements" className="announcements-footer">View all announcements →</a>
+            <AppLink href="/student/announcements" className="announcements-footer">View all announcements →</AppLink>
           </>
         ) : (
           <>
@@ -71,13 +72,13 @@ export function AnnouncementsStrip({ announcements, states }: { announcements: A
                   ) : (
                     <p className="no-content">No content.</p>
                   )}
-                  <a href="/student/announcements" className="announcement-read-more">View on announcements page →</a>
+                  <AppLink href="/student/announcements" className="announcement-read-more">View on announcements page →</AppLink>
                 </div>
               </div>
             ))}
-            <a href="/student/announcements" className="announcements-footer">
+            <AppLink href="/student/announcements" className="announcements-footer">
               {totalUnread > 2 ? `View all announcements (${totalUnread} unread) →` : 'View all announcements →'}
-            </a>
+            </AppLink>
           </>
         )}
       </div>

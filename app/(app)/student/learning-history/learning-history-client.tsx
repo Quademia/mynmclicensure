@@ -29,6 +29,7 @@ import { MODES, MODE_ORDER, modeOf } from '@/lib/attempts/modes';
 import type { AttemptListRow, HistoryFilters, HistoryPage } from '@/lib/attempts/types';
 import { Icon } from '@/components/shell/icons';
 import { KindChip, ATTEMPT_SOURCE_HUE, MODE_ICON } from '@/components/shell/chips';
+import { AppLink } from '@/components/shell/link-pending';
 
 type CourseLite = { course_id: string; title: string };
 
@@ -241,24 +242,27 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
             <div className="score-sub">{scoreSub}</div>
           </div>
           <div className="attempt-actions">
-            <button
-              type="button"
-              className="act-btn btn-resume"
-              disabled={!isInProgress}
-              title={isInProgress ? 'Continue this attempt' : 'Only available for in-progress attempts'}
-              onClick={() => router.push(sessionHref(a.attempt_id))}
-            >
-              <Icon name="play" />Resume
-            </button>
-            <button
-              type="button"
-              className="act-btn btn-review"
-              disabled={!isCompleted}
-              title={isCompleted ? 'Review your answers' : 'Complete this attempt first'}
-              onClick={() => router.push(sessionHref(a.attempt_id))}
-            >
-              <Icon name="eye" />Review
-            </button>
+            {/* Resume and Review only open the sitting, so they are links
+                (the loading placeholder and the pressed mark, 2026-09-28);
+                the one that does not apply stays a disabled button */}
+            {isInProgress ? (
+              <AppLink className="act-btn btn-resume" href={sessionHref(a.attempt_id)} title="Continue this attempt">
+                <Icon name="play" />Resume
+              </AppLink>
+            ) : (
+              <button type="button" className="act-btn btn-resume" disabled title="Only available for in-progress attempts">
+                <Icon name="play" />Resume
+              </button>
+            )}
+            {isCompleted ? (
+              <AppLink className="act-btn btn-review" href={sessionHref(a.attempt_id)} title="Review your answers">
+                <Icon name="eye" />Review
+              </AppLink>
+            ) : (
+              <button type="button" className="act-btn btn-review" disabled title="Complete this attempt first">
+                <Icon name="eye" />Review
+              </button>
+            )}
             <button
               type="button"
               className="act-btn btn-retake"

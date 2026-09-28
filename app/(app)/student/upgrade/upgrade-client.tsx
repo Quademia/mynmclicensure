@@ -22,6 +22,7 @@ import { formatMinor } from '@/lib/money/format-minor';
 import { initUpgradePayment } from '@/lib/payments/init-upgrade';
 import type { Product, Program } from '@/lib/catalogue/types';
 import type { ActiveSubscriptionWithProduct } from '@/lib/subscriptions/types';
+import { AppLink } from '@/components/shell/link-pending';
 
 type Msg = { text: string; tone: 'error' | 'success' | 'info' } | null;
 
@@ -189,7 +190,7 @@ export function UpgradeClient({
                 <button className="btn btn-primary btn-lg" id="payBtn" type="button" disabled={busy || !productId} onClick={startUpgradePayment}>
                   {busy ? 'Starting payment…' : 'Proceed to Payment'}
                 </button>
-                <a className="btn btn-secondary" href="/student/dashboard">Back to Dashboard</a>
+                <AppLink className="btn btn-secondary" href="/student/dashboard">Back to Dashboard</AppLink>
               </div>
             </div>
           </div>

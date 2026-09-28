@@ -34,6 +34,7 @@ import { getAnnouncementsForStudent } from '@/lib/announcements/queries';
 import { AnnouncementBody } from '@/components/announcements/announcement-body';
 import '@/styles/student-course.css';
 import { Icon } from '@/components/shell/icons';
+import { AppLink } from '@/components/shell/link-pending';
 
 export const dynamic = 'force-dynamic';
 
@@ -71,13 +72,13 @@ function visibleOf(rows: QuizCard[]): QuizCard[] {
 function PreviewCard({ quiz, href, meta }: { quiz: QuizCard; href: string; meta: string }) {
   const avail = getQuizAvailability(quiz);
   return (
-    <a className="preview-card" href={href}>
+    <AppLink className="preview-card" href={href}>
       <div>
         <div className="preview-card-title">{quiz.title}</div>
         <div className="preview-card-meta">{meta}</div>
       </div>
       <span className={`preview-badge ${avail}`}>{avail === 'ACTIVE' ? 'Active' : 'Upcoming'}</span>
-    </a>
+    </AppLink>
   );
 }
 
@@ -100,7 +101,7 @@ export default async function CoursePage({ params }: { params: Params }) {
           <div className="icon"><Icon name="lock" size={36} /></div>
           <h2>No Access</h2>
           <p>You do not have an active subscription for this course.</p>
-          <a href="/student/dashboard" className="btn btn-primary">Back to Dashboard</a>
+          <AppLink href="/student/dashboard" className="btn btn-primary">Back to Dashboard</AppLink>
         </div>
       </div>
     );
@@ -151,9 +152,9 @@ export default async function CoursePage({ params }: { params: Params }) {
 
       {/* Message us button (slice 12's page) */}
       <div className="message-row">
-        <a className="btn-message-course" href={`/student/messages?course_id=${encodeURIComponent(courseId)}`}>
+        <AppLink className="btn-message-course" href={`/student/messages?course_id=${encodeURIComponent(courseId)}`}>
           <Icon name="message" />Message us about this course
-        </a>
+        </AppLink>
       </div>
 
       {/* 2. Fixed Quizzes */}
@@ -174,7 +175,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                 meta={`${q.n} questions${q.time_limit_sec ? ' · ' + Math.round(q.time_limit_sec / 60) + ' min' : ''}`}
               />
             ))}
-            <a className="view-all-link" href={fixedHref}>View all fixed quizzes →</a>
+            <AppLink className="view-all-link" href={fixedHref}>View all fixed quizzes →</AppLink>
           </>
         )}
       </div>
@@ -196,7 +197,7 @@ export default async function CoursePage({ params }: { params: Params }) {
               if (avail === 'ACTIVE' && q.unpublish_at) schedule = 'Closes ' + fmtDate(q.unpublish_at);
               return <PreviewCard key={q.quiz_id} quiz={q} href={mockHref} meta={`${q.n} questions${schedule ? ' · ' + schedule : ''}`} />;
             })}
-            <a className="view-all-link" href={mockHref}>View all mock exams →</a>
+            <AppLink className="view-all-link" href={mockHref}>View all mock exams →</AppLink>
           </>
         )}
       </div>
@@ -206,13 +207,13 @@ export default async function CoursePage({ params }: { params: Params }) {
         <div className="section-card-header">
           <span className="section-card-title"><Icon name="wrench" />Quiz Builder</span>
         </div>
-        <a href={`/student/quiz-builder?course=${encodeURIComponent(courseId)}`} className="builder-shortcut">
+        <AppLink href={`/student/quiz-builder?course=${encodeURIComponent(courseId)}`} className="builder-shortcut">
           <div className="builder-shortcut-icon"><Icon name="wrench" size={22} /></div>
           <div className="builder-shortcut-text">
             <div className="title">Build a Custom Quiz</div>
             <div className="sub">Create a practice quiz filtered to this course</div>
           </div>
-        </a>
+        </AppLink>
       </div>
 
       {/* 4. Course Announcements */}
@@ -245,7 +246,7 @@ export default async function CoursePage({ params }: { params: Params }) {
             </div>
           </div>
           <div>
-            <a href="/student/procedures" className="btn btn-primary skills-btn">Open Procedures Page &rarr;</a>
+            <AppLink href="/student/procedures" className="btn btn-primary skills-btn">Open Procedures Page &rarr;</AppLink>
           </div>
         </div>
       </div>

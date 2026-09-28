@@ -23,6 +23,7 @@
 'use client';
 
 import { useSyncExternalStore } from 'react';
+import { AppLink } from '@/components/shell/link-pending';
 
 const HIDDEN_KEY = 'qa_profile_nudge_hidden';
 
@@ -64,10 +65,10 @@ export function ProfileNudge() {
 
   return (
     <div className="profile-nudge">
-      <a className="pn-main" href="/student/profile?complete=1">
+      <AppLink className="pn-main" href="/student/profile?complete=1">
         <span className="pn-text">Finish setting up your profile — add your phone &amp; school.</span>
         <span className="pn-cta">Complete &rarr;</span>
-      </a>
+      </AppLink>
       <button type="button" className="pn-close" aria-label="Hide for now" onClick={hide}>
         &times;
       </button>

@@ -68,6 +68,8 @@
 .slh .attempt-actions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
 .slh .act-btn { display: inline-flex; align-items: center; gap: 5px; border: none; border-radius: 999px; padding: 5px 12px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
 .slh .act-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+/* Resume and Review are links when they apply (2026-09-28): no underline */
+.slh a.act-btn:hover { text-decoration: none; }
 .slh .btn-resume { background: var(--primary); color: #fff; }
 .slh .btn-resume:not(:disabled):hover { opacity: 0.85; }
 .slh .btn-review { background: #eef3f2; color: #25413d; }

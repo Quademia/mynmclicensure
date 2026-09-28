@@ -1,0 +1,108 @@
+/* styles/loading.css — the loading placeholder and the pressed link
+ * (Sam, 2026-09-28). One look for every page: components/shell/
+ * page-loading.tsx draws the shapes, components/shell/link-pending.tsx
+ * marks the tapped link. Tokens only, no pictures, so it arrives on a
+ * weak signal. Every animation rests under prefers-reduced-motion. */
+
+/* ── The placeholder ─────────────────────────────────────────────── */
+
+.page-loading { width: 100%; }
+
+/* heard, not seen */
+.page-loading-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* the page title and subtitle, spaced as .page-header (shell.css) */
+.pl-head { margin-bottom: 28px; }
+.pl-title { width: 40%; max-width: 260px; height: 22px; }
+.pl-subtitle { width: 60%; max-width: 380px; height: 12px; margin-top: var(--space-10); }
+
+.pl-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-24);
+  margin-bottom: var(--space-16);
+}
+
+.pl-bone {
+  background: var(--border);
+  border-radius: var(--radius-sm);
+  animation: pl-pulse 1.4s ease-in-out infinite;
+}
+.pl-line-short { width: 30%; height: 12px; }
+.pl-line-title { width: 70%; height: 20px; margin-top: var(--space-12); }
+.pl-line { width: 90%; height: 10px; margin-top: var(--space-12); }
+.pl-line-mid { width: 65%; }
+.pl-button { width: 140px; height: 40px; margin-top: var(--space-24); border-radius: var(--radius); }
+
+/* the quiz screen and the printable pack have no shell: one card on its own */
+.page-loading-bare {
+  max-width: 560px;
+  margin: 48px auto;
+  padding: 0 var(--space-16);
+}
+
+@keyframes pl-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@media (max-width: 768px) {
+  .pl-card { padding: var(--space-16); margin-bottom: var(--space-12); }
+  .page-loading-bare { margin-top: var(--space-24); }
+}
+
+/* ── The pressed link ────────────────────────────────────────────── */
+
+/* The mark is in every converted link and the menu's rows; it shows
+   only while that link's page is on its way and the placeholder is
+   not ready yet (Next skips it once the route is prefetched). */
+.link-pending { display: none; }
+
+/* In a page: the tapped link breathes, so no layout moves — a link may
+   be pinned (the dashboard's help bubble is position: fixed). */
+a:has(> .link-pending.is-pending) {
+  cursor: progress;
+  animation: link-pending-pulse 1s ease-in-out infinite;
+}
+
+@keyframes link-pending-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+/* In the menu: a small spinner in the row's right-hand end instead */
+.sidebar-nav a { position: relative; }
+.sidebar-nav a:has(> .link-pending.is-pending) { animation: none; }
+.sidebar-nav .link-pending {
+  display: block;
+  position: absolute;
+  right: var(--space-16);
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  opacity: 0;
+}
+.sidebar-nav .link-pending.is-pending {
+  opacity: 1;
+  animation: link-pending-spin 0.7s linear infinite;
+}
+
+@keyframes link-pending-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pl-bone { animation: none; }
+  a:has(> .link-pending.is-pending) { animation: none; opacity: 0.6; }
+  .sidebar-nav .link-pending.is-pending { animation: none; }
+}

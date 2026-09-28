@@ -6,7 +6,10 @@
 // across and the choice is remembered in the nmc_nav cookie, so the
 // server renders the right state first time. On a phone the drawer
 // slides over the page, starts closed on every page, and closes on a
-// link tap, the backdrop, Escape or a route change. The top bar's
+// route change, the backdrop, Escape, or a tap that leaves the page as it
+// is (the current page's link, an outside link). A tap that changes the
+// page keeps it open, its row spinning, until the address changes (Sam,
+// 2026-09-28: the menu is where the finger is). The top bar's
 // hamburger toggles whichever applies at the current width; the width
 // is read in the handler, never during render (AGENTS.md, the React
 // compiler's purity rule).
@@ -30,7 +33,7 @@ type ShellState = {
   toggle: () => void;
   /** The backdrop and Escape. */
   closePhone: () => void;
-  /** A link tap in the menu — closes the drawer on a phone, nothing on desktop. */
+  /** A menu tap that leaves the page as it is — closes the drawer on a phone, nothing on desktop. */
   closeOnPhone: () => void;
 };
 

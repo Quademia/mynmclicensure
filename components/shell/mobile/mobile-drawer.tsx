@@ -5,7 +5,9 @@
 // above 768px it is pinned open and pushes the content across, or is
 // closed and off-canvas when the student closed it; below 768px it is
 // the phone drawer, slid in over a dimmed backdrop and closed by the
-// backdrop, a link tap, Escape or a route change. The open-or-closed
+// backdrop, Escape or a route change — a tap that changes the page keeps
+// it open, its row spinning, until the address changes (2026-09-28;
+// shell-state.tsx). The open-or-closed
 // state and the hamburger live in the shell frame (../shell-state.tsx)
 // and the top bar; the classes shell.css keys on sit on the wrapper.
 // This is the shared drawer AGENTS.md UI convention #3 names; no

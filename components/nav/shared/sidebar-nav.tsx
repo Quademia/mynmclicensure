@@ -20,6 +20,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import type { NavItem } from '@/lib/nav/types';
 import { NavIcon } from '@/components/shell/icons';
+import { LinkPending } from '@/components/shell/link-pending';
 
 export type SidebarCourse = { course_id: string; title: string };
 
@@ -42,7 +43,8 @@ export function SidebarNav({
   items: NavItem[];
   courses?: SidebarCourse[];
   badges?: Record<string, number>;
-  /** Called when a link is tapped — the drawer closes itself on a phone. */
+  /** Called when a tap leaves the page as it is — the current page's own
+   *  link, or an outside one — so the drawer closes itself on a phone. */
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
@@ -50,6 +52,17 @@ export function SidebarNav({
 
   function isActive(href?: string): boolean {
     return !!href && pathname === href;
+  }
+
+  // Sam, 2026-09-28 (b): a tap that changes the page leaves the phone
+  // drawer open, the row's spinner turning, until the address changes —
+  // the shell closes the drawer then (shell-state.tsx), which is when
+  // the loading placeholder takes the page. Closing on the tap itself
+  // showed the old page with no sign of the tap on a slow connection.
+  function closeIfStaying(href?: string) {
+    return () => {
+      if (!href || href === pathname) onNavigate?.();
+    };
   }
 
   function childActive(item: NavItem): boolean {
@@ -90,10 +103,11 @@ export function SidebarNav({
         key={item.key}
         href={item.href ?? '#'}
         className={[className, isActive(item.href) ? 'active' : ''].filter(Boolean).join(' ') || undefined}
-        onClick={onNavigate}
+        onClick={closeIfStaying(item.href)}
       >
         <RowIcon item={item} />
         {item.label} {badge}
+        <LinkPending />
       </Link>
     );
   }
@@ -115,9 +129,10 @@ export function SidebarNav({
                 key={c.course_id}
                 href={href}
                 className={pathname === href ? 'active' : undefined}
-                onClick={onNavigate}
+                onClick={closeIfStaying(href)}
               >
                 {c.title}
+                <LinkPending />
               </Link>
             );
           })

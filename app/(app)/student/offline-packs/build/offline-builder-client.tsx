@@ -26,6 +26,7 @@ import type { ItemFilterOptions } from '@/lib/bank/types';
 import { createOfflinePack, prepareOfflinePack } from '@/lib/offline-packs/actions';
 import { allowanceMessageForReason, buildOfflinePackDefaultName, buildOfflinePackDisplayLabel } from '@/lib/offline-packs/labels';
 import type { Allowance, PickResult, SelectionMode } from '@/lib/offline-packs/types';
+import { AppLink } from '@/components/shell/link-pending';
 
 type Course = { course_id: string; title: string };
 
@@ -458,7 +459,7 @@ export function OfflineBuilderClient({
         <div className="empty-card">
           <h2>No builder access</h2>
           <p>You do not currently have access to any course that can be used in the offline pack builder.</p>
-          <a href="/student/dashboard" className="btn-primary">Back to dashboard</a>
+          <AppLink href="/student/dashboard" className="btn-primary">Back to dashboard</AppLink>
         </div>
       </div>
     );
@@ -779,7 +780,7 @@ export function OfflineBuilderClient({
               <p>You do not have an active subscription for {courseTitle(accessDenied)}.</p>
               <div className="modal-actions">
                 <button type="button" className="btn-ghost" onClick={() => { setAccessDenied(''); setCourseId(''); }}>Close</button>
-                <a className="btn-primary" href={`/student/course/${encodeURIComponent(accessDenied)}`}>View course</a>
+                <AppLink className="btn-primary" href={`/student/course/${encodeURIComponent(accessDenied)}`}>View course</AppLink>
               </div>
             </div>
           </div>

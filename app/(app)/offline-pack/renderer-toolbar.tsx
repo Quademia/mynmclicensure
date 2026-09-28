@@ -9,6 +9,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { AppLink } from '@/components/shell/link-pending';
 
 export function RendererToolbar() {
   const router = useRouter();
@@ -19,7 +20,7 @@ export function RendererToolbar() {
         <p className="topbar-sub">Open a saved pack, print it, or save it as PDF from your browser.</p>
       </div>
       <div className="btnrow">
-        <a className="btn" href="/student/offline-packs">Back</a>
+        <AppLink className="btn" href="/student/offline-packs">Back</AppLink>
         <button className="btn" type="button" onClick={() => window.print()}>Print</button>
         <button className="btn primary" type="button" onClick={() => window.print()}>Download / Save PDF</button>
         <button className="btn primary" type="button" onClick={() => router.refresh()}>Reload</button>

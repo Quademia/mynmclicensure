@@ -39,6 +39,7 @@ import { getQuizAvailability } from '@/lib/quizzes/availability';
 import type { Availability, QuizCard, QuizKind } from '@/lib/quizzes/types';
 import { Icon } from '@/components/shell/icons';
 import type { IconName } from '@/lib/nav/types';
+import { AppLink } from '@/components/shell/link-pending';
 
 type CourseLite = { course_id: string; title: string };
 
@@ -195,11 +196,6 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
     router.push(sessionHref(result.attemptId));
   }
 
-  // ── review (legacy reviewAttempt): a finished sitting opens as its review ──
-  function reviewAttempt(attemptId: string) {
-    router.push(sessionHref(attemptId));
-  }
-
   // ── abandon (legacy abandonAttempt) ──
   const [confirm, confirmDialog] = useConfirm();
   async function abandon(attemptId: string) {
@@ -244,7 +240,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
         <>
           <button type="button" className="btn-start" disabled>Closed</button>
           {completed.length > 0 ? (
-            <button type="button" className="btn-link" onClick={() => reviewAttempt(completed[0].attempt_id)}>Review last</button>
+            <AppLink className="btn-link" href={sessionHref(completed[0].attempt_id)}>Review last</AppLink>
           ) : null}
         </>
       );
@@ -269,7 +265,7 @@ export function StudentQuizList({ kind, courses, quizzesByCourse, attemptsByCour
           <button type="button" className={`btn-start ${tone}`} disabled={isBusy} onClick={() => launchQuiz(quiz, mode, 'retake')}>
             <Icon name="refresh" />Retake
           </button>
-          <button type="button" className="btn-link" onClick={() => reviewAttempt(completed[0].attempt_id)}>Review last</button>
+          <AppLink className="btn-link" href={sessionHref(completed[0].attempt_id)}>Review last</AppLink>
         </div>
       );
     } else {

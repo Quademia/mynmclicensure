@@ -327,11 +327,13 @@ export function QuizRunner({
   }, [hasClock, booted, locked, reviewMode]);
 
   // legacy beforeunload guard — for a closed tab or a typed address, not
-  // for our own exit. Save & Resume Later and Submit & Exit leave by a
-  // full load, which used to trip this guard too, so a student who had
-  // just saved was told their changes may not be saved (legacy did the
-  // same; fixed with DS4, Sam 2026-09-22). The ref is set in the exit
-  // handlers before they navigate.
+  // for our own exit. Save & Resume Later and Submit & Exit left by a
+  // full load until 2026-09-28, which used to trip this guard too, so a
+  // student who had just saved was told their changes may not be saved
+  // (legacy did the same; fixed with DS4, Sam 2026-09-22). They move
+  // inside the app now, so the loading placeholder shows on the way out
+  // (Sam, 2026-09-28); the ref is still set in the exit handlers before
+  // they navigate.
   const leavingRef = useRef(false);
   useEffect(() => {
     if (!booted || locked || reviewMode) return;
@@ -585,6 +587,9 @@ export function QuizRunner({
   // ── exit (legacy handleExit / saveAndExit / submitAndExit) ──
   // To the sitting's home (03 Q8), where legacy always went to Fixed Quizzes.
   function handleExit() {
+    // the way out's placeholder fetched while the student chooses, so it
+    // shows at once on a production build (2026-09-28)
+    router.prefetch(exit.href);
     if (locked || reviewMode) {
       router.push(exit.href);
       return;
@@ -595,19 +600,23 @@ export function QuizRunner({
   async function saveAndExit() {
     setSaving('Saving your progress…');
     await saveProgress();
-    setSaving('');
+    // the loader stays up until the next page takes over — cleared here,
+    // the quiz sat on screen with no sign of the move (walked 2026-09-28)
     leavingRef.current = true;
-    window.location.href = exit.href;
+    router.push(exit.href);
   }
 
   async function submitAndExit() {
     setExitOpen(false);
     const done = await submitQuiz(false, false);
     if (!done) return;
-    window.setTimeout(() => {
-      leavingRef.current = true;
-      window.location.href = exit.href;
-    }, 1500);
+    // Legacy paused 1.5 s here to show its score card; since Q18 that card
+    // is the pop-up, which Submit & Exit does not open, so the pause
+    // showed nothing. The way out is at once, the loader up with legacy's
+    // "Quiz submitted." until the next page takes over (2026-09-28).
+    setSaving('Quiz submitted.');
+    leavingRef.current = true;
+    router.push(exit.href);
   }
 
   // ── grid (legacy openGridOverlay / hideDesktopGrid / showDesktopGrid) ──

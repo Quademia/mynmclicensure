@@ -22,6 +22,7 @@ import { useRouter } from 'next/navigation';
 import { loadOfflinePacksPage } from '@/lib/offline-packs/actions';
 import { formatPackDate } from '@/lib/offline-packs/labels';
 import type { OfflinePackListRow, OfflinePackPage } from '@/lib/offline-packs/types';
+import { AppLink } from '@/components/shell/link-pending';
 
 type SortValue = 'newest' | 'oldest' | 'name_asc' | 'name_desc';
 
@@ -122,8 +123,8 @@ export function MyPacksClient({ initialPage }: { initialPage: OfflinePackPage })
           <h2>No Offline Packs Yet</h2>
           <p>You have not created any offline packs yet. Build one from a course, then it will appear here for future re-download.</p>
           <div className="footer-actions">
-            <a className="btn-primary" href="/student/offline-packs/build">Create Your First Pack</a>
-            <a className="btn-ghost" href="/student/dashboard">Back to Dashboard</a>
+            <AppLink className="btn-primary" href="/student/offline-packs/build">Create Your First Pack</AppLink>
+            <AppLink className="btn-ghost" href="/student/dashboard">Back to Dashboard</AppLink>
           </div>
         </div>
       </div>
@@ -140,8 +141,8 @@ export function MyPacksClient({ initialPage }: { initialPage: OfflinePackPage })
           <p>Every offline pack here is a stored snapshot. Open any active pack to print it again or save it as PDF from the renderer page.</p>
         </div>
         <div className="hero-actions">
-          <a className="btn-ghost" href="/student/dashboard">Back to Dashboard</a>
-          <a className="btn-primary" href="/student/offline-packs/build">Create New Pack</a>
+          <AppLink className="btn-ghost" href="/student/dashboard">Back to Dashboard</AppLink>
+          <AppLink className="btn-primary" href="/student/offline-packs/build">Create New Pack</AppLink>
         </div>
       </section>
 
@@ -240,7 +241,7 @@ export function MyPacksClient({ initialPage }: { initialPage: OfflinePackPage })
                 </div>
                 <div className="pack-actions">
                   <button className="btn-primary" type="button" disabled={!active} onClick={() => openPack(item.pack_id)}>Open / Download</button>
-                  <a className="btn-ghost" href={`/student/offline-packs/build?course=${encodeURIComponent(item.course_id || '')}`}>Build Similar</a>
+                  <AppLink className="btn-ghost" href={`/student/offline-packs/build?course=${encodeURIComponent(item.course_id || '')}`}>Build Similar</AppLink>
                 </div>
               </article>
             );

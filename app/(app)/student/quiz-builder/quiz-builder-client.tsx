@@ -27,6 +27,7 @@ import { sessionHref } from '@/lib/attempts/links';
 import { MODES, MODE_GROUPS, MODE_ORDER, modeOf } from '@/lib/attempts/modes';
 import { CONCEPT_SEARCH_DELAY_MS, type AttemptMode, type BuilderItem } from '@/lib/attempts/types';
 import type { ItemFilterOptions } from '@/lib/bank/types';
+import { AppLink } from '@/components/shell/link-pending';
 
 type Course = { course_id: string; title: string };
 type Mode = AttemptMode;
@@ -419,7 +420,7 @@ export function QuizBuilderClient({
         <div className="empty-card">
           <h2>No builder access</h2>
           <p>You do not currently have access to any course that can be used in the quiz builder.</p>
-          <a href="/student/dashboard" className="btn-primary">Back to dashboard</a>
+          <AppLink href="/student/dashboard" className="btn-primary">Back to dashboard</AppLink>
         </div>
       </div>
     );
@@ -741,7 +742,7 @@ export function QuizBuilderClient({
               <p>You do not have an active subscription for {courseTitle(accessDenied)}.</p>
               <div className="modal-actions">
                 <button type="button" className="btn-ghost" onClick={() => { setAccessDenied(''); setCourseId(''); }}>Close</button>
-                <a className="btn-primary" href={`/student/course/${encodeURIComponent(accessDenied)}`}>View course</a>
+                <AppLink className="btn-primary" href={`/student/course/${encodeURIComponent(accessDenied)}`}>View course</AppLink>
               </div>
             </div>
           </div>

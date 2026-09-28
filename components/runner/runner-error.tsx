@@ -8,6 +8,7 @@
 
 import { Icon } from '@/components/shell/icons';
 import { SESSION_EXITS, type SessionExit } from '@/lib/attempts/links';
+import { AppLink } from '@/components/shell/link-pending';
 
 export function RunnerError({ title, message, exit = SESSION_EXITS.fixed }: { title: string; message: string; exit?: SessionExit }) {
   return (
@@ -17,7 +18,7 @@ export function RunnerError({ title, message, exit = SESSION_EXITS.fixed }: { ti
           <div className="error-icon"><Icon name="alert" size={36} /></div>
           <div className="error-title">{title}</div>
           <div className="error-msg">{message}</div>
-          <a className="btn btn-primary" href={exit.href}>{exit.label}</a>
+          <AppLink className="btn btn-primary" href={exit.href}>{exit.label}</AppLink>
         </div>
       </div>
     </div>

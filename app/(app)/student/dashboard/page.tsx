@@ -30,7 +30,7 @@
 //     does; the map's expiry is today plus that count, so the two agree.
 
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { AppLink } from '@/components/shell/link-pending';
 import { requireStudent } from '@/lib/access';
 import { getCourses } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess, getUpcomingAccess } from '@/lib/subscriptions/queries';
@@ -97,9 +97,9 @@ function AttemptsTable({ attempts }: { attempts: AttemptListRow[] }) {
                 <span className={`badge ${a.status}`}>{a.status.replace('_', ' ')}</span>
               </td>
               <td>
-                <a className="attempt-action" href={sessionHref(a.attempt_id)}>
+                <AppLink className="attempt-action" href={sessionHref(a.attempt_id)}>
                   {completed ? 'Review' : 'Resume'}
-                </a>
+                </AppLink>
               </td>
             </tr>
           );
@@ -163,9 +163,9 @@ export default async function StudentDashboardPage() {
               <div className="sub-label">Subscription</div>
               <div className="sub-name">No active subscription</div>
             </div>
-            <a href="/student/upgrade" className="btn btn-primary btn-lg sub-cta">
+            <AppLink href="/student/upgrade" className="btn btn-primary btn-lg sub-cta">
               Subscribe Now
-            </a>
+            </AppLink>
           </div>
         ) : (
           // The active state carries its own Upgrade / Extend (Sam,
@@ -182,9 +182,9 @@ export default async function StudentDashboardPage() {
               <div className={`sub-expiry${subWarning ? ' warning' : ''}`}>
                 {expiryLabel(longest.totalDays, longest.expires)}
               </div>
-              <Link href="/student/upgrade" className="btn btn-primary btn-lg sub-cta">
+              <AppLink href="/student/upgrade" className="btn btn-primary btn-lg sub-cta">
                 Upgrade / Extend
-              </Link>
+              </AppLink>
             </div>
           </div>
         )}
@@ -237,14 +237,14 @@ export default async function StudentDashboardPage() {
               const access = accessMap[course.course_id];
               const warning = access.totalDays <= 7;
               return (
-                <a key={course.course_id} className="course-card" href={`/student/course/${encodeURIComponent(course.course_id)}`}>
+                <AppLink key={course.course_id} className="course-card" href={`/student/course/${encodeURIComponent(course.course_id)}`}>
                   <div className="course-badge">{(course.program_scope || []).join(', ')}</div>
                   <h3>{course.title}</h3>
                   <p>Click to view quizzes and study materials</p>
                   <div className={`course-expiry ${warning ? 'warning' : 'normal'}`}>
                     {expiryLabel(access.totalDays, access.expires)}
                   </div>
-                </a>
+                </AppLink>
               );
             })
           )}
@@ -257,9 +257,9 @@ export default async function StudentDashboardPage() {
             Build your own practice session by selecting topics, difficulty levels, and number of questions from your
             enrolled courses. Ideal for targeted revision, weak-area focus, or quick daily drills.
           </p>
-          <a href="/student/quiz-builder" className="btn btn-primary btn-lg promo-btn">
+          <AppLink href="/student/quiz-builder" className="btn btn-primary btn-lg promo-btn">
             Launch Quiz Builder &rarr;
-          </a>
+          </AppLink>
         </div>
 
         {/* 7. NMC Procedures */}
@@ -269,17 +269,17 @@ export default async function StudentDashboardPage() {
             View the official NMC Ghana procedure manuals (component tasks) for your programme and other programmes. Use
             this page to support your practical skills and OSCE preparation.
           </p>
-          <a href="/student/procedures" className="btn btn-primary btn-lg promo-btn">
+          <AppLink href="/student/procedures" className="btn btn-primary btn-lg promo-btn">
             Open NMC Procedures Page &rarr;
-          </a>
+          </AppLink>
         </div>
 
         {/* 8. Recent attempts */}
         <div className="attempts-head">
           <p className="section-title">Recent Quiz Attempts</p>
-          <a href="/student/learning-history" className="attempts-head-link">
+          <AppLink href="/student/learning-history" className="attempts-head-link">
             View full history &rarr;
-          </a>
+          </AppLink>
         </div>
         <div className="card attempts-area">
           {attempts.length === 0 ? (
@@ -288,12 +288,12 @@ export default async function StudentDashboardPage() {
                 No quiz attempts yet. Start a quiz to see your history here.
               </p>
               <div className="attempts-empty-btns">
-                <a href="/student/quiz-builder" className="btn btn-primary">
+                <AppLink href="/student/quiz-builder" className="btn btn-primary">
                   Custom Quiz
-                </a>
-                <a href="/student/fixed-quizzes" className="btn btn-primary">
+                </AppLink>
+                <AppLink href="/student/fixed-quizzes" className="btn btn-primary">
                   Fixed Quizzes
-                </a>
+                </AppLink>
               </div>
             </>
           ) : (
@@ -307,10 +307,10 @@ export default async function StudentDashboardPage() {
             main column; it is fixed to the viewport either way, and
             nothing above it is a transformed or container-type ancestor
             that would become its containing block. */}
-        <a href="/student/portal-guide" className="guide-bubble">
+        <AppLink href="/student/portal-guide" className="guide-bubble">
           <span className="guide-bubble-mark">?</span>
           <span>Portal Guide</span>
-        </a>
+        </AppLink>
       </div>
     </>
   );
