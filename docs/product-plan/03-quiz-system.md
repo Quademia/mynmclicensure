@@ -593,6 +593,26 @@ fails with Postgres's words.
   match — Next uses them all, or pick subtopics to narrow" with the
   chips built from the matches (recommended, code only); B, subtopics
   filled as content; C, both. **Sam: not now** (2026-09-27).
+- **Q19 — The admin preview says it is one.** `/session/<id>?preview=1`
+  shows an admin any student's sitting read-only: walked 2026-09-28 as
+  Sam's admin on the RM student's Untimed practice sitting — refused
+  without the flag, the start card with it, the student's saved answer
+  shown, the admin's clicks changing the screen and saving nothing (the
+  rows identical after, no save sent). But nothing on the card or the
+  runner says "Preview", and the card offers the admin "Don't show this
+  again", which is remembered by the browser, not the account. The slice:
+  a Preview label on both, the tick box left out. Also seen: opening a
+  sitting whose exam time has run out closes it, preview or not — right
+  (the student's next open would do the same), but looking has an
+  effect. Queued by Sam, 2026-09-28.
+- **Q20 — Preview this quiz.** Legacy's quiz and mock editors had a
+  Preview button that opened the runner with the quiz's id, which the
+  runner never read — it never worked (rebuild.md §9 #16), and the port
+  left it out. So the only preview today is Q19's, of a sitting that
+  already exists, reached by typing its address. The slice: a button on
+  the editor showing the admin a quiz's questions, answers and
+  rationales as a student would see them, with no sitting created.
+  Queued by Sam, 2026-09-28; its shape when it comes up.
 - **The legacy-check gap 7** (the builder's stuck status line) and the
   Learning History items on BUILD_LIST — runner and history work that
   belongs here when queued.
@@ -1054,7 +1074,7 @@ it needs a change log on every answer, a storage change and its own
 | Q5 The answers as rows and the write door | ✅ 2026-09-20 (`20260920150000_attempt_answers.sql`; walked as student4: per-tap saves and a flag read back, a reload restoring them, finish at 4 / 10, an exam closed at its deadline on the next open, a failed Submit's toast with the runner unlocked) |
 | Q6 The seal | ✅ 2026-09-20 (code only; walked as student4: a live exam's page with 0 keys, the closed exam's with 10, a practice quiz reloaded with exactly the 2 checked, the review filled from the finish reply) |
 | Q7 SATA partial credit | later, after S7 |
-| Q8 The runner as a player | ruled 2026-09-27 (Sam: `/session`, MyNclex's modes, four now, A); step 1 ✅ 2026-09-27 (code only; walked as the RM student — §4; ticked by Sam); steps 2 and 3 ✅ 2026-09-27 on §8 S21 (`20260927140000_four_modes.sql`; walked as the RM student, the admin's ticks not walked — §4; ticked by Sam); step 4, the exam's deadline, ✅ 2026-09-27 on §8 S22 (`20260927160000_exam_deadline.sql`; proven rolled back, the time-up walked — §4; ticked by Sam) |
+| Q8 The runner as a player | ruled 2026-09-27 (Sam: `/session`, MyNclex's modes, four now, A); step 1 ✅ 2026-09-27 (code only; walked as the RM student — §4; ticked by Sam); steps 2 and 3 ✅ 2026-09-27 on §8 S21 (`20260927140000_four_modes.sql`; walked as the RM student, the admin's ticks not walked — §4; ticked by Sam; the admin's ticks walked 2026-09-28 as Sam's admin on a fixed quiz and a mock, two admin-side gaps fixed: no ticks refused on the details step, the review's modes as chips); step 4, the exam's deadline, ✅ 2026-09-27 on §8 S22 (`20260927160000_exam_deadline.sql`; proven rolled back, the time-up walked — §4; ticked by Sam) |
 | Q9 The Check Answer pending state | ✅ 2026-09-27 (with Q8's step 1; walked as the RM student — §4; ticked by Sam) |
 | Q10 The attempt report | candidate, captured 2026-09-24 |
 | Q11 Time per question | candidate, captured 2026-09-24 |
@@ -1065,3 +1085,5 @@ it needs a change log on every answer, a storage change and its own
 | Q18 The results pop-up | ✅ 2026-09-27 (Sam: the pop-up and the score pill now, the report page later; code only; walked as the RM student — §4; ticked by Sam) |
 | Q17 The start screen on its own | ✅ 2026-09-27 (Sam: its own screen, no questions before Start, the card on every open, the tick box on every mode; code only; walked as the RM student — §4; ticked by Sam) |
 | Q16 The keyword step never says what the keyword found | ⬜ queued 2026-09-26 (Sam); found walking 08 B6; re-read and offered 2026-09-27, not now (Sam) |
+| Q19 The admin preview says it is one | ⬜ queued 2026-09-28 (Sam); found walking the admin preview — §4 |
+| Q20 Preview this quiz | ⬜ queued 2026-09-28 (Sam); legacy's button never worked — §4 |
