@@ -357,8 +357,9 @@ across the surfaces (Sam, 2026-09-21). Some are one page, some are
 every page.
 
 - ⬜ Speed: the avatar is served at full size (1.38 MB for a 24px circle) and re-fetched every page — resize and cache it (perf investigation, 2026-09-16)
-- ⬜ Speed: no loading state on any student surface, so a click is a silent stall for the whole server time — a route-level skeleton (perf investigation, 2026-09-16)
-- ⬜ Speed: ~34 in-page links are plain anchors, so a click discards the page and re-runs every query; MyNclex uses next/link in 48 files, this app in 3 (perf investigation, 2026-09-16)
+- ✅ Speed: a click was a silent stall — one loading placeholder, the pressed link, the phone menu waits — 2026-09-28
+- ✅ Speed: the student's plain links inside the app — 33 links, Resume / Review, both quiz exits — 2026-09-28
+- ⬜ Speed: the admin and public pages' plain links still reload the whole page, so no placeholder (2026-09-28)
 - ⬜ Speed: the unread badge is two serial queries and finishes last on every student page — one query, still counting distinct threads (perf investigation, 2026-09-16)
 - ⬜ Speed: the student layout's three queries block every student page, including pages needing none of them (perf investigation, 2026-09-16)
 - → Speed: the item-bank policy re-runs user_has_course() per row — ~230 ms per Quiz Builder course pick now, ~2.2 s per read at a 10,000-row course; eleven ALTER POLICY lines, no data change (perf investigation, 2026-09-16)
