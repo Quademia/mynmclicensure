@@ -76,6 +76,16 @@ import {
 import type { SessionExit } from '@/lib/attempts/links';
 import { modeOf } from '@/lib/attempts/modes';
 import type { AnswerPatch, Attempt, ChosenMap, FlagMap, Score, SealedItem, SecretsMap } from '@/lib/attempts/types';
+import {
+  close as closeClockItem,
+  createClock,
+  markSent,
+  pause as pauseClock,
+  resume as resumeClock,
+  setActive as setClockActive,
+  unsent as unsentTimes,
+  type QuestionClock,
+} from '@/lib/attempts/question-clock';
 
 type FeedbackMode = 'inline' | 'standalone' | 'hide';
 type ViewMode = 'ALL' | 'FLAGGED';
@@ -90,6 +100,19 @@ function feedbackModeLabel(m: FeedbackMode): string {
   if (m === 'standalone') return 'Standalone feedback';
   if (m === 'hide') return 'Hide explanations';
   return 'Inline feedback';
+}
+
+// 03 Q11: the sitting's time-per-question clock, made on first use from
+// the rows' stored seconds (Sequential's passed rows closed). Called only
+// from handlers and effects — never during render (the refs rule).
+function clockOf(ref: React.RefObject<QuestionClock | null>, items: SealedItem[]): QuestionClock {
+  if (!ref.current) {
+    ref.current = createClock(
+      items.map((i) => ({ item_id: i.item_id, time_spent_s: i.time_spent_s, closed: Boolean(i.passed_utc) })),
+      document.visibilityState === 'visible',
+    );
+  }
+  return ref.current;
 }
 
 function isDesktop(): boolean {
@@ -263,7 +286,12 @@ export function QuizRunner({
   // ── save (03 Q5; legacy saveInProgress) ──
   // Best effort: a failed flush is logged, its patches kept for the next
   // flush, and Submit surfaces a real error.
-  const flushSaves = useCallback(async (): Promise<boolean> => {
+  // 03 Q11: each question's running time rides with a save that is going
+  // anyway; `withTime` sends it on its own too (the page going out of
+  // view, Sequential's move, leaving, the finish). Not marked sent until
+  // the save lands, so a failed one goes again with the next.
+  const clockRef = useRef<QuestionClock | null>(null);
+  const flushSaves = useCallback(async (opts?: { withTime?: boolean }): Promise<boolean> => {
     if (flushTimerRef.current !== null) {
       window.clearTimeout(flushTimerRef.current);
       flushTimerRef.current = null;
@@ -271,14 +299,23 @@ export function QuizRunner({
     if (previewMode) return true;
     const rows = [...pendingRef.current.values()];
     pendingRef.current = new Map();
-    if (!rows.length) return true;
-    const result = await saveAnswers(attempt.attempt_id, rows);
+    const times = !reviewMode && (rows.length || opts?.withTime) ? unsentTimes(clockOf(clockRef, items), performance.now()) : [];
+    const sending = rows.map((r) => ({ ...r }));
+    for (const t of times) {
+      const row = sending.find((r) => r.item_id === t.item_id);
+      if (row) row.time_spent_s = t.time_spent_s;
+      else sending.push(t);
+    }
+    if (!sending.length) return true;
+    const result = await saveAnswers(attempt.attempt_id, sending);
     if (!result.ok) {
       console.warn('saveAnswers failed:', result.error);
       for (const r of rows) if (!pendingRef.current.has(r.item_id)) pendingRef.current.set(r.item_id, r);
+    } else if (times.length) {
+      markSent(clockOf(clockRef, items), times);
     }
     return result.ok;
-  }, [previewMode, attempt.attempt_id]);
+  }, [previewMode, reviewMode, attempt.attempt_id, items]);
 
   function queueSave(patch: AnswerPatch, immediate = false) {
     if (previewMode || locked || reviewMode) return;
@@ -383,6 +420,10 @@ export function QuizRunner({
     setAdvancing(true);
     try {
       if (!previewMode) {
+        // the answer, with the question's time riding along when a save
+        // is going anyway (Q11). Not forced: a time-only save here was a
+        // second round trip before every move (walked 2026-09-29), so a
+        // question's time runs to its last save, usually the answer.
         if (!(await flushSaves())) {
           setToast('Could not save your answer. Please check your connection and try again.');
           return;
@@ -392,6 +433,8 @@ export function QuizRunner({
           setToast(r.error);
           return;
         }
+        // passed: its time is no longer sent (save_answers refuses the row)
+        closeClockItem(clockOf(clockRef, items), currentItem.item_id);
       }
       setPassed((p) => ({ ...p, [currentItem.item_id]: true }));
       scrollToTop();
@@ -529,7 +572,8 @@ export function QuizRunner({
     const timeTakenS = startedAtRef.current ? Math.round((Date.now() - startedAtRef.current) / 1000) : null;
 
     if (!previewMode) {
-      await flushSaves();
+      // every question's last time goes with the last save (Q11)
+      await flushSaves({ withTime: true });
       const result = autoSubmit ? await expireAttempt(attempt.attempt_id) : await finishAttempt(attempt.attempt_id, timeTakenS);
       if (!result.ok) {
         finishingRef.current = false;
@@ -599,7 +643,7 @@ export function QuizRunner({
 
   async function saveAndExit() {
     setSaving('Saving your progress…');
-    await saveProgress();
+    await flushSaves({ withTime: true });
     // the loader stays up until the next page takes over — cleared here,
     // the quiz sat on screen with no sign of the move (walked 2026-09-28)
     leavingRef.current = true;
@@ -881,6 +925,52 @@ export function QuizRunner({
 
   const pageStart = safePage * perPage;
   const pageItems = source.slice(pageStart, pageStart + perPage);
+
+  // ── time per question (03 Q11, Sam 2026-09-29) ──
+  // The clock counts the question(s) on screen while the sitting is live
+  // — never in review, the admin's preview, or once finished — and pauses
+  // while the page is out of view, sending the totals as it goes.
+  const timing = booted && phase === 'quiz' && !locked && !reviewMode && !previewMode && !finishSent;
+  const onScreenKey = timing ? pageItems.map((i) => i.item_id).join('|') : '';
+  useEffect(() => {
+    setClockActive(clockOf(clockRef, items), onScreenKey ? onScreenKey.split('|') : [], performance.now());
+  }, [onScreenKey, items]);
+  useEffect(() => {
+    function onVisibility() {
+      const clock = clockOf(clockRef, items);
+      if (document.visibilityState === 'hidden') {
+        pauseClock(clock, performance.now());
+        // a phone may close a background tab to save memory: send now
+        if (timing) void flushSaves({ withTime: true });
+      } else {
+        resumeClock(clock, performance.now());
+      }
+    }
+    function onPageHide() {
+      pauseClock(clockOf(clockRef, items), performance.now());
+      if (timing) void flushSaves({ withTime: true });
+    }
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('pagehide', onPageHide);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('pagehide', onPageHide);
+    };
+  }, [timing, items, flushSaves]);
+  // Leaving the sitting some other way (the browser's Back) sends what the
+  // clock holds, while the sitting is still live. Not after our own exits:
+  // they saved already, and the loader's seconds on the way out are not
+  // time on the question (walked 2026-09-29: Save & Exit sent 5 s, then
+  // this 7).
+  const timingRef = useRef(false);
+  useEffect(() => {
+    timingRef.current = timing;
+  }, [timing]);
+  useEffect(() => {
+    return () => {
+      if (timingRef.current && !leavingRef.current) void flushSaves({ withTime: true });
+    };
+  }, [flushSaves]);
   const grade = gradeFor(score.pct);
   const showControls = feedbackEach || locked || reviewMode;
   // Q18's summary: the questions right, wrong and not answered, by the

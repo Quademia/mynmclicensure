@@ -118,6 +118,12 @@ export type AnswerPatch = {
   time_spent_s?: number | null;
 };
 
+// 03 Q11 (Sam, 2026-09-29): time per question (lib/attempts/question-clock).
+/** One unbroken stretch on a question counts at most this — a screen left on. */
+export const QUESTION_STRETCH_CAP_S = 10 * 60;
+/** A question's saved total is kept at or under this; the save refuses more. */
+export const TIME_SPENT_MAX_S = 3 * 60 * 60;
+
 // The runner's state maps, hydrated from the attempt's rows. MCQ / TF:
 // a letter; SATA: an array of letters.
 export type ChosenMap = Record<string, string | string[]>;

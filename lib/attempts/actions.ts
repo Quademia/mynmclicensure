@@ -39,6 +39,7 @@ import {
   ATTEMPT_MODES,
   BUILDER_MAX_QUESTIONS_DEFAULT,
   BUILDER_MINUTES_PER_QUESTION_DEFAULT,
+  TIME_SPENT_MAX_S,
   type ActionResult,
   type AdvanceResult,
   type AnswerPatch,
@@ -280,7 +281,8 @@ export async function saveAnswers(attemptId: string, rows: AnswerPatch[]): Promi
       if ('chosen' in r) patch.chosen = chosenToStored(r.chosen);
       if ('flagged' in r) patch.flagged = Boolean(r.flagged);
       if ('sata_checked' in r) patch.sata_checked = Boolean(r.sata_checked);
-      if ('time_spent_s' in r) patch.time_spent_s = r.time_spent_s === null ? null : Math.max(0, Math.floor(Number(r.time_spent_s) || 0));
+      // 03 Q11: the runner's running total, kept between 0 and 3 hours
+      if ('time_spent_s' in r) patch.time_spent_s = r.time_spent_s === null ? null : Math.min(TIME_SPENT_MAX_S, Math.max(0, Math.floor(Number(r.time_spent_s) || 0)));
       return patch;
     });
   if (!safe.length) return { ok: true };
