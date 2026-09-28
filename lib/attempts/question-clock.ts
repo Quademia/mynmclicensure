@@ -122,3 +122,15 @@ export function unsent(clock: QuestionClock, now: number): { item_id: string; ti
 export function markSent(clock: QuestionClock, rows: { item_id: string; time_spent_s: number }[]): void {
   for (const r of rows) clock.sent.set(r.item_id, r.time_spent_s);
 }
+
+/** The whole sitting's engaged seconds — the sum of the questions' saved
+ *  whole seconds, the open stretch banked to now, so it equals what a
+ *  report adding up time_spent_s will find. An untimed sitting's time
+ *  taken (Sam, 2026-09-29): every visit of a resumed sitting, none of the
+ *  time away. */
+export function sittingSeconds(clock: QuestionClock, now: number): number {
+  bank(clock, now);
+  let s = 0;
+  for (const ms of clock.totals.values()) s += Math.min(TIME_SPENT_MAX_S, Math.floor(ms / 1000));
+  return s;
+}

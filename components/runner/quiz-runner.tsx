@@ -83,6 +83,7 @@ import {
   pause as pauseClock,
   resume as resumeClock,
   setActive as setClockActive,
+  sittingSeconds,
   unsent as unsentTimes,
   type QuestionClock,
 } from '@/lib/attempts/question-clock';
@@ -569,7 +570,13 @@ export function QuizRunner({
     setGridOverlayOpen(false);
     setSaving('submitting');
 
-    const timeTakenS = startedAtRef.current ? Math.round((Date.now() - startedAtRef.current) / 1000) : null;
+    // An exam's time is its own clock from the server's start. A Study
+    // sitting's is the sum of its questions' engaged seconds (Sam,
+    // 2026-09-29): since this page opened, it missed every earlier visit
+    // of a resumed sitting and counted the time away.
+    const timeTakenS = hasClock || previewMode
+      ? (startedAtRef.current ? Math.round((Date.now() - startedAtRef.current) / 1000) : null)
+      : sittingSeconds(clockOf(clockRef, items), performance.now());
 
     if (!previewMode) {
       // every question's last time goes with the last save (Q11)
