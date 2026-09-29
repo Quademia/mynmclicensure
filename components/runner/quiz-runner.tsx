@@ -82,6 +82,7 @@ import {
   markSent,
   pause as pauseClock,
   resume as resumeClock,
+  questionSeconds,
   setActive as setClockActive,
   sittingSeconds,
   unsent as unsentTimes,
@@ -101,6 +102,15 @@ function feedbackModeLabel(m: FeedbackMode): string {
   if (m === 'standalone') return 'Standalone feedback';
   if (m === 'hide') return 'Hide explanations';
   return 'Inline feedback';
+}
+
+/** A clock's face: m:ss, h:mm:ss from an hour (MyNclex's formatClock). */
+function formatClock(seconds: number): string {
+  const t = Math.max(0, Math.floor(seconds));
+  const h = Math.floor(t / 3600);
+  const m = Math.floor((t % 3600) / 60);
+  const s = String(t % 60).padStart(2, '0');
+  return h > 0 ? `${h}:${String(m).padStart(2, '0')}:${s}` : `${m}:${s}`;
 }
 
 // 03 Q11: the sitting's time-per-question clock, made on first use from
@@ -189,6 +199,12 @@ export function QuizRunner({
     Object.fromEntries(items.filter((i) => i.passed_utc).map((i) => [i.item_id, true])),
   );
   const [advancing, setAdvancing] = useState(false);
+  // The quiz screen's clocks (Q11, Sam 2026-09-29): a toggle for this
+  // sitting only — shown at the start of a Study sitting, hidden at the
+  // start of an exam (a question clock is not standard there) — and the
+  // seconds they show, read from the recording clock once a second.
+  const [clocksShown, setClocksShown] = useState(!hasClock);
+  const [liveTimes, setLiveTimes] = useState<{ sitting: number; byItem: Record<string, number> }>({ sitting: 0, byItem: {} });
   const dismissToast = useCallback(() => setToast(null), []);
   const startedAtRef = useRef<number | null>(null);
   const finishingRef = useRef(false);
@@ -783,6 +799,13 @@ export function QuizRunner({
           <span className="q-num">Q{globalIdx + 1} / {items.length}</span>
           <KindChip hue={QUESTION_TYPE_HUE[item.question_type]}>{item.question_type}</KindChip>
           {item.maintopic ? <span className="q-topic">{item.maintopic}{item.subtopic ? ` › ${item.subtopic}` : ''}</span> : null}
+          {/* Q11's question clock, while shown (the toolbar's toggle) */}
+          {timing && clocksShown && liveTimes.byItem[item.item_id] !== undefined ? (
+            <span className="q-clock" aria-label={`Time on this question ${formatClock(liveTimes.byItem[item.item_id])}`}>
+              <Icon name="timer" />
+              {formatClock(liveTimes.byItem[item.item_id])}
+            </span>
+          ) : null}
           {flags[item.item_id] ? <span className="q-flag-indicator"><Icon name="flag" /></span> : null}
         </div>
         <div className="q-stem">{item.stem}</div>
@@ -978,6 +1001,25 @@ export function QuizRunner({
       if (timingRef.current && !leavingRef.current) void flushSaves({ withTime: true });
     };
   }, [flushSaves]);
+  // The clocks read what the recording clock holds, so what the student
+  // sees is what is saved; nothing ticks while they are hidden.
+  useEffect(() => {
+    if (!timing || !clocksShown) return;
+    const ids = onScreenKey ? onScreenKey.split('|') : [];
+    function read() {
+      const clock = clockOf(clockRef, items);
+      const now = performance.now();
+      const byItem: Record<string, number> = {};
+      for (const id of ids) byItem[id] = questionSeconds(clock, id, now);
+      setLiveTimes({ sitting: sittingSeconds(clock, now), byItem });
+    }
+    const first = window.setTimeout(read, 0);
+    const tick = window.setInterval(read, 1000);
+    return () => {
+      window.clearTimeout(first);
+      window.clearInterval(tick);
+    };
+  }, [timing, clocksShown, onScreenKey, items]);
   const grade = gradeFor(score.pct);
   const showControls = feedbackEach || locked || reviewMode;
   // Q18's summary: the questions right, wrong and not answered, by the
@@ -1050,18 +1092,41 @@ export function QuizRunner({
             <div className="timer-progress-wrap"><div className={`timer-progress-fill ${timerColor}`} style={{ width: `${timerPercent}%` }} /></div>
           </div>
         ) : null}
-        <div className={`header-controls${showControls ? '' : ' hidden'}`}>
-          <div className="control-group">
-            <span className="ctrl-label">Feedback:</span>
-            {(['inline', 'standalone', 'hide'] as FeedbackMode[]).map((m) => (
-              <button key={m} type="button" className={`fbtn${feedbackMode === m ? ' active' : ''}`} onClick={() => changeFeedbackMode(m)}>
-                {m === 'inline' ? 'Inline' : m === 'standalone' ? 'Standalone' : 'Hide'}
+        {/* Q11: a Study sitting's stopwatch, in the countdown's place */}
+        {!hasClock && timing && clocksShown ? (
+          <div className="timer-bar stopwatch-bar">
+            <div className="timer-display" role="timer" aria-label={`${formatClock(liveTimes.sitting)} time spent`}>
+              <span className="timer-icon"><Icon name="timer" /></span>
+              <span className="timer-value">{formatClock(liveTimes.sitting)}</span>
+              <span className="timer-label">time spent</span>
+            </div>
+          </div>
+        ) : null}
+        <div className={`header-controls${showControls || timing ? '' : ' hidden'}`}>
+          {showControls ? (
+            <div className="control-group">
+              <span className="ctrl-label">Feedback:</span>
+              {(['inline', 'standalone', 'hide'] as FeedbackMode[]).map((m) => (
+                <button key={m} type="button" className={`fbtn${feedbackMode === m ? ' active' : ''}`} onClick={() => changeFeedbackMode(m)}>
+                  {m === 'inline' ? 'Inline' : m === 'standalone' ? 'Standalone' : 'Hide'}
+                </button>
+              ))}
+            </div>
+          ) : null}
+          {/* Q11: the clocks' toggle, for this sitting, in reach while they are hidden */}
+          {timing ? (
+            <div className="control-group">
+              <button type="button" className="fbtn fbtn-timer" aria-pressed={clocksShown} onClick={() => setClocksShown((s) => !s)}>
+                <Icon name="timer" />
+                {clocksShown ? 'Hide timer' : 'Show timer'}
               </button>
-            ))}
-          </div>
-          <div className="control-group">
-            <span className="mode-pill">{M.fullName} | {feedbackModeLabel(feedbackMode)}</span>
-          </div>
+            </div>
+          ) : null}
+          {showControls ? (
+            <div className="control-group">
+              <span className="mode-pill">{M.fullName} | {feedbackModeLabel(feedbackMode)}</span>
+            </div>
+          ) : null}
         </div>
       </div>
 

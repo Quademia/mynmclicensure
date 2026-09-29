@@ -123,6 +123,13 @@ export function markSent(clock: QuestionClock, rows: { item_id: string; time_spe
   for (const r of rows) clock.sent.set(r.item_id, r.time_spent_s);
 }
 
+/** One question's whole seconds so far, as they would be saved — the
+ *  quiz screen's question clock (Sam, 2026-09-29). */
+export function questionSeconds(clock: QuestionClock, itemId: string, now: number): number {
+  bank(clock, now);
+  return Math.min(TIME_SPENT_MAX_S, Math.floor((clock.totals.get(itemId) ?? 0) / 1000));
+}
+
 /** The whole sitting's engaged seconds — the sum of the questions' saved
  *  whole seconds, the open stretch banked to now, so it equals what a
  *  report adding up time_spent_s will find. An untimed sitting's time
