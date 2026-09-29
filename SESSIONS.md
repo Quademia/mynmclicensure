@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-28, into 09-29 — admin mode ticks walked; a tap never silent (placeholder, pressed link, app links); 03 Q11 time per question and the quiz clocks
+  - ↳ step-1 mode check · review chips · Q19 Q20 preview · loading file per folder · prefetch prod only · drawer waits · 1.5 s pause out · totals ride on saves · Sequential Next one trip · Study time = sum · toggle per sitting · offline later
+
 - 2026-09-27, second — 08 B8 type fixed and the answer rule; 03 Q8 the runner as a player, four MyNclex modes (S21, S22); Q9, Q17 start screen, Q18 pop-up
   - ↳ B8 record wrong · switch not needed · a & c question · extend ours not MyNclex · A ticks · answer to move on · deadline gap · MyNclex sends paper early · card every open · tick per mode · status log out · 16 not 15
 

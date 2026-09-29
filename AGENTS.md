@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-09-27. Rules for **any** assistant working in this
+Last updated: 2026-09-29. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What is built and
@@ -144,7 +144,11 @@ above sit at the repo root; the audience grouping inside them is kept.
    (Sam, 2026-09-23). No other surface builds one. The two opening from
    opposite sides is temporary: the app's drawer moves to the right
    later (Sam). Content reflows and stacks below 768px in the surface's
-   own stylesheet.
+   own stylesheet. **Since 2026-09-28 the app's drawer differs on one
+   point:** a tap that changes the page keeps it open, the tapped row
+   spinning, until the address changes — the drawer closes then, as the
+   loading placeholder takes the page; a tap on the current page's own
+   row or an outside link still closes it at once (Sam: b).
 4. **One money voice: `GHS 350`, never `₵350`.** Amounts are stored as
    integer minor units and rendered through `formatMinor()`.
 5. **One brand name: `Quademia`. `QAcademy` never reaches a reader.**
@@ -152,6 +156,17 @@ above sit at the repo root; the audience grouping inside them is kept.
    and identifiers may keep the old name; a string that renders may not.
    MyNMCLicensure is a product name under the brand and has no logo of
    its own.
+6. **A tap is never silent** (Sam, 2026-09-28: most students are on slow
+   connections). A link to a page of the app is `AppLink`
+   (`components/shell/link-pending.tsx`) — `next/link` with the pressed
+   mark inside — or a `<Link>` holding `<LinkPending />`; never a plain
+   `<a>`, which reloads the whole page and skips the loading
+   placeholder. A button that only opens a page is that link too. A
+   plain `<a>` stays only for outside sites, downloads, `mailto:` and
+   jumps within the page. Every signed-in area shows the one placeholder
+   (`components/shell/page-loading.tsx`) through its `loading.tsx` (see
+   *Known Workarounds* for where one is needed). The admin and public
+   pages' plain links are queued, not yet converted.
 
 ## Non-Negotiable Rules
 
@@ -476,6 +491,30 @@ above sit at the repo root; the audience grouping inside them is kept.
   database; a delete of an entry in use is refused; a null is not
   checked (Not set). A cascade fires the table's row triggers, so they
   must treat it as the label change it is.
+- **A `loading.tsx` shows only when the page changes directly inside its
+  own folder.** The student area's file covers a move from the dashboard
+  to the history; it does NOT cover a move between two pages inside a
+  sub-folder — one course to another (`course/[id]`), My Packs to the
+  builder (`offline-packs/`) — which showed nothing until those folders
+  got their own (walked 2026-09-28). A new nested route gets its own
+  `loading.tsx` rendering `<PageLoading />`; check the move between two
+  of its pages, not only the way in.
+- **Prefetching runs only on a production build.** On the dev server no
+  link is fetched ahead, so every tap is the slow case (the pressed mark,
+  then the placeholder at the server's first reply). To see a prefetched
+  placeholder, `npm run build` and the `prod-local` entry in
+  `.claude/launch.json` (`next start` on :3001) — the pane's sign-in
+  carries across ports (cookies are per host). Each prefetch is one
+  request through the middleware's `getUser()` and no page reads
+  (Supabase's logs, 2026-09-28: 23 `/auth/v1/user` for 25 links, the
+  layout's reads 3 times) — the number to watch as students grow.
+- **The pane never hides a background tab**: `document.visibilityState`
+  stays `visible` when another pane tab is fronted, so "the student
+  switched app" cannot be walked by switching tabs. Walk it by defining
+  `visibilityState` / `hidden` on `document` in the page and dispatching
+  `visibilitychange` — the app's own handler then runs as a browser would
+  make it — and ask Sam for one real phone check on the dev site
+  (2026-09-29, 03 Q11).
 - **A migration that adds a rule to prod's data tidies that data
   first.** Prod cannot be read from here, and a constraint prod's rows
   fail stops the release's migrate job and so the deploy. Normalise what

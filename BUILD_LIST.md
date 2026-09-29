@@ -229,6 +229,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ 1 Runner autosave never fired under steady answering — closed by 03 Q5, one save per question per tap — 2026-09-20
 - ✅ 2 Runner: a dropped connection at Submit spun forever — closed by 03 Q5, a toast and the button back — 2026-09-20
 - ⬜ 7 Quiz Builder and Offline Pack builder: the status line sticks after a failure; "Select a course…" leaves the previous course's topics and counts
+- ⬜ The quiz lists read a student's attempts with select('*') on the cookie client — name the columns (2026-09-28)
 - ⏸ Learning history: the stats bar counts the loaded pages, not the whole history — legacy called true totals deferred (slice 7a, 2026-09-14) — with the page's redesign (Sam, 2026-09-29)
 - ⏸ Learning history: Source and Sort work over the loaded pages only; Course / Mode / Status / Search are database-side (slice 7a, 2026-09-14) — with the page's redesign (Sam, 2026-09-29)
 - ⏸ Learning history: no Mock option in the Source filter; a mock attempt’s chip shows the raw word "mock" (slice 7a, 2026-09-14) — with the page's redesign (Sam, 2026-09-29)
