@@ -142,6 +142,9 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ Profile: the photo is one file per student overwritten in place and the cached old one kept showing — a version stamp on the saved address (Sam, 2026-09-14)
 - ⬜ One limiter for the app: the counter table as the general tally, a rule per door in config; first doors e.g. register, messages, both builders, photo upload; shaped at build (Sam, 2026-09-18)
 - ⬜ Config registry: admin-only reads through a service-role accessor, typed and bounded keys, a stricter Config page, the dead row dropped; levels wired to the pickers; cohort a year (S13; D49, D51; Sam, 2026-09-18)
+- ⬜ Offline page — the app's own, by a service worker (a PWA), not the browser's "No internet" (Sam: later, 2026-09-29)
+- ⬜ Offline banner — "You're offline" when the connection drops mid-use, gone when it returns (Sam: later, 2026-09-29)
+- ⬜ A "couldn't load, try again" page — the app has no error page; a failed page shows nothing helpful (2026-09-28)
 
 #### [01-payments.md](docs/product-plan/01-payments.md)
 
