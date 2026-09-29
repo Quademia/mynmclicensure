@@ -205,7 +205,8 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ Q8.4 An exam's deadline in the database — no answer after time is up (§8 S22) — 2026-09-27
 - ✅ Q9 The Check Answer pending state — "Checking…" on the option until the reply lands, with Q8.1 — 2026-09-27
 - ⬜ Q10 The attempt report — breakdown by subject / topic / difficulty / type, what to fix next (2026-09-24)
-- ⬜ Q11 Time per question — the runner fills `time_spent_s`; pace and slowest on the report (2026-09-24)
+- ✅ Q11 Time per question — engaged seconds per question, saved with the answers; a Study time their sum — 2026-09-29
+- ✅ (unplanned) The quiz screen's clocks — a Study stopwatch, a question clock, Hide / Show in the sitting — 2026-09-29
 - ⬜ Q12 Progress across attempts — accuracy by topic over history, a trend, true totals (2026-09-24)
 - ⬜ Q13 Readiness and the cohort — a band, how others did per question, standing; with Q3 (2026-09-24)
 - ✅ Q14 The link tables — quiz_items and mock_quiz_items replacing the id arrays; delete refused (§8 S20) — 2026-09-27
@@ -225,9 +226,9 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ 1 Runner autosave never fired under steady answering — closed by 03 Q5, one save per question per tap — 2026-09-20
 - ✅ 2 Runner: a dropped connection at Submit spun forever — closed by 03 Q5, a toast and the button back — 2026-09-20
 - ⬜ 7 Quiz Builder and Offline Pack builder: the status line sticks after a failure; "Select a course…" leaves the previous course's topics and counts
-- ⬜ Learning history: the stats bar counts the loaded pages, not the whole history — legacy called true totals deferred (slice 7a, 2026-09-14)
-- ⬜ Learning history: Source and Sort work over the loaded pages only; Course / Mode / Status / Search are database-side (slice 7a, 2026-09-14)
-- ⬜ Learning history: no Mock option in the Source filter; a mock attempt’s chip shows the raw word "mock" (slice 7a, 2026-09-14)
+- ⏸ Learning history: the stats bar counts the loaded pages, not the whole history — legacy called true totals deferred (slice 7a, 2026-09-14) — with the page's redesign (Sam, 2026-09-29)
+- ⏸ Learning history: Source and Sort work over the loaded pages only; Course / Mode / Status / Search are database-side (slice 7a, 2026-09-14) — with the page's redesign (Sam, 2026-09-29)
+- ⏸ Learning history: no Mock option in the Source filter; a mock attempt’s chip shows the raw word "mock" (slice 7a, 2026-09-14) — with the page's redesign (Sam, 2026-09-29)
 - → Mock exams as a premium exam experience — moved to the 03-quiz-system.md section above as Q3 (2026-09-19)
 - → Quizzes and announcements floor (S12; D44–D48) — sliced into 03-quiz-system.md Q1–Q2 and 05-announcements.md A1–A2 above (2026-09-19)
 

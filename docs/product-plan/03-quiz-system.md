@@ -1044,6 +1044,30 @@ Sam orders them):
   column and the write path exist. Open: whether the clock pauses when
   the tab is hidden (MyNclex's engagement clock does); "rushed" against
   a budget needs a budget, which only a timed quiz has.
+  **Ruled and built 2026-09-29.** Sam's rulings: MyNclex's engaged
+  time — the clock runs only while a question is on screen and the page
+  is in view, a return adds on, all four modes, never in review or the
+  admin's preview; one unbroken stretch counts at most 10 minutes;
+  Learning's reading of the rationale is time on that question. How:
+  `lib/attempts/question-clock.ts` (plain functions, checked from a
+  script with made-up timings); unlike MyNclex's "+N seconds" request per
+  stretch, each question's running total rides with a save the runner
+  makes anyway, so a failed save heals on the next and no request is
+  added — on its own only when the page goes out of view and on leaving
+  by the browser's Back; a total kept between 0 and 3 hours by the save.
+  In Sequential a question's time runs to its last save (usually the
+  answer): a time-only save before each Next doubled the move's round
+  trips (walked). No storage change. Then, same day: **a Study sitting's
+  time taken is the sum of its questions' saved seconds** (the results
+  pop-up and the history card showed only the latest visit and counted
+  time away; an exam keeps its clock from the server's start), and **the
+  quiz screen's clocks** (Sam's idea) — a Study stopwatch in the
+  countdown's place and a question clock on each question's line, under
+  one "Hide timer" / "Show timer" toggle for the sitting (shown at the
+  start in Study, hidden in an exam, where a question clock is not
+  standard; not remembered on the device; the exam countdown never
+  hidden). The report (Q10) shows none of it yet; sittings before
+  2026-09-29 have no time.
 - **Q12 — Progress across attempts.** Learning History and the
   dashboard: accuracy by subject and topic over the student's whole
   history with a weakest-area nudge to the builder, a score trend, and
@@ -1077,7 +1101,7 @@ it needs a change log on every answer, a storage change and its own
 | Q8 The runner as a player | ruled 2026-09-27 (Sam: `/session`, MyNclex's modes, four now, A); step 1 ✅ 2026-09-27 (code only; walked as the RM student — §4; ticked by Sam); steps 2 and 3 ✅ 2026-09-27 on §8 S21 (`20260927140000_four_modes.sql`; walked as the RM student, the admin's ticks not walked — §4; ticked by Sam; the admin's ticks walked 2026-09-28 as Sam's admin on a fixed quiz and a mock, two admin-side gaps fixed: no ticks refused on the details step, the review's modes as chips); step 4, the exam's deadline, ✅ 2026-09-27 on §8 S22 (`20260927160000_exam_deadline.sql`; proven rolled back, the time-up walked — §4; ticked by Sam) |
 | Q9 The Check Answer pending state | ✅ 2026-09-27 (with Q8's step 1; walked as the RM student — §4; ticked by Sam) |
 | Q10 The attempt report | candidate, captured 2026-09-24 |
-| Q11 Time per question | candidate, captured 2026-09-24 |
+| Q11 Time per question | ✅ 2026-09-29 (Sam's three rulings; code only; walked as the RM student in all four modes against an in-page stopwatch, the time-up and a resume; with a Study sitting's time as the questions' sum and the quiz screen's clocks under a Hide / Show toggle — §4; ticked by Sam) |
 | Q12 Progress across attempts | candidate, captured 2026-09-24 |
 | Q13 Readiness and the cohort | candidate, captured 2026-09-24; with Q3 |
 | Q14 The link tables | ✅ 2026-09-27 (`20260927100000_quiz_item_rows.sql`; §8 S20; walked as Sam's admin, the RM student and the RN student — §4) |
