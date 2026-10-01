@@ -17,6 +17,21 @@ export function sessionHref(attemptId: string): string {
   return `/session/${encodeURIComponent(attemptId)}`;
 }
 
+/** A finished sitting's review opened at question `n` (1-based) — the report's links (03 Q10). */
+export function sessionQuestionHref(attemptId: string, n: number): string {
+  return `${sessionHref(attemptId)}?q=${n}`;
+}
+
+/** A finished sitting's report (03 Q10, Sam 2026-09-30): its own page in the student area. */
+export function reportHref(attemptId: string): string {
+  return `/student/report/${encodeURIComponent(attemptId)}`;
+}
+
+/** The Quiz Builder opened on a course with one topic ticked — the report's "Practise this topic". */
+export function builderTopicHref(courseId: string, topic: string): string {
+  return `/student/quiz-builder?course=${encodeURIComponent(courseId)}&topic=${encodeURIComponent(topic)}`;
+}
+
 export type SessionHome = 'builder' | 'fixed' | 'mock';
 
 export type SessionExit = { href: string; label: string };

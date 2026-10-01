@@ -74,6 +74,9 @@
 .slh .btn-resume:not(:disabled):hover { opacity: 0.85; }
 .slh .btn-review { background: #eef3f2; color: #25413d; }
 .slh .btn-review:not(:disabled):hover { background: #dde8e5; }
+/* 03 Q10: the report, on the tokens (a teal outline beside Review's fill) */
+.slh .btn-report { background: var(--surface); color: var(--brand-teal-hover); border: 1px solid var(--brand-teal); }
+.slh .btn-report:not(:disabled):hover { background: var(--brand-teal-pale); }
 .slh .btn-retake { background: #f9fafb; color: #374151; border: 1px solid #e5e7eb; }
 .slh .btn-retake:not(:disabled):hover { background: #f3f4f6; }
 

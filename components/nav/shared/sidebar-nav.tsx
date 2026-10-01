@@ -51,7 +51,10 @@ export function SidebarNav({
   const [toggled, setToggled] = useState<Record<string, boolean>>({});
 
   function isActive(href?: string): boolean {
-    return !!href && pathname === href;
+    if (!href) return false;
+    // 03 Q10 (Sam, 2026-09-30): a sitting's report belongs to Learning History
+    if (href === '/student/learning-history' && pathname.startsWith('/student/report/')) return true;
+    return pathname === href;
   }
 
   // Sam, 2026-09-28 (b): a tap that changes the page leaves the phone

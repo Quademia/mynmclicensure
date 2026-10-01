@@ -6,7 +6,11 @@
 // ones reach the dropdown, as legacy populateCourseSelect filtered), and
 // the `?course=` the course page passes — handed to the client half,
 // which is the wizard. A course's questions load on pick through a
-// Server Action, as legacy fetched them on change.
+// Server Action, as legacy fetched them on change. `&topic=` (the
+// attempt report's "Practise this topic", 03 Q10) ticks that main topic
+// and opens the wizard on its Topics step; it is kept only with a course
+// the student can open, and dropped by the wizard if the course has no
+// such topic.
 
 import type { Metadata } from 'next';
 import { requireStudent } from '@/lib/access';
@@ -23,9 +27,9 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-export default async function QuizBuilderPage({ searchParams }: { searchParams: Promise<{ course?: string }> }) {
+export default async function QuizBuilderPage({ searchParams }: { searchParams: Promise<{ course?: string; topic?: string }> }) {
   const { supabase, profile } = await requireStudent();
-  const { course } = await searchParams;
+  const { course, topic } = await searchParams;
 
   const [config, access, allCourses] = await Promise.all([
     getConfig(supabase),
@@ -41,6 +45,7 @@ export default async function QuizBuilderPage({ searchParams }: { searchParams: 
   const accessible = allCourses.filter((c) => Boolean(access[c.course_id])).map((c) => ({ course_id: c.course_id, title: c.title }));
   const fromUrl = String(course || '');
   const initialCourseId = fromUrl && access[fromUrl] ? fromUrl : '';
+  const initialTopic = initialCourseId ? String(topic || '').trim() : '';
 
   return (
     <>
@@ -50,6 +55,7 @@ export default async function QuizBuilderPage({ searchParams }: { searchParams: 
         maxQuestions={maxQuestions}
         minutesPerQuestion={minutesPerQuestion}
         initialCourseId={initialCourseId}
+        initialTopic={initialTopic}
       />
     </>
   );

@@ -10,7 +10,8 @@
 // on the card asks the server for the questions and mounts the runner,
 // which reads the mode from the attempt and the mode's behaviour from
 // lib/attempts/modes. `?preview=1` is the admin's read-only view of any
-// attempt.
+// attempt. `?q=14` opens a finished sitting's review at question 14 —
+// the attempt report's links (03 Q10).
 //
 // No sidebar, as legacy: the runner sits under the (app) auth boundary
 // with its own header (rebuild.md §12 slice 6).
@@ -34,7 +35,7 @@ export default async function SessionPage({
   searchParams,
 }: {
   params: Promise<{ attempt_id: string }>;
-  searchParams: Promise<{ preview?: string }>;
+  searchParams: Promise<{ preview?: string; q?: string }>;
 }) {
   const gate = await requireStudent();
   const { attempt_id } = await params;
@@ -58,6 +59,7 @@ export default async function SessionPage({
       previewMode={load.previewMode}
       exit={load.exit}
       retakeAllowed={load.retakeAllowed}
+      initialQuestion={Number(sp.q) || null}
     />
   );
 }

@@ -1,0 +1,183 @@
+/* styles/student-report.css
+ *
+ * The attempt report (03 Q10, Sam 2026-09-30): the score card, "Where
+ * you slipped", "What to fix next" and the question map, each on the
+ * shared .card, scoped under `.srp`. Tokens only (tokens.css). The
+ * counts repeat the results pop-up's look (runner.css) so the two read
+ * as one result. Phones first: one column, the map's numbers large
+ * enough to tap; the rows stack their figures under the name below
+ * 480px.
+ */
+
+.srp { max-width: 820px; }
+
+.srp-back {
+  display: inline-block;
+  margin-bottom: var(--space-12);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-ui-weight);
+  color: var(--brand-teal);
+}
+.srp-back:hover { color: var(--brand-teal-hover); }
+
+.srp .card { margin-bottom: var(--space-16); }
+
+.srp-notice-title { font-weight: 700; color: var(--ink); margin: 0 0 var(--space-6); }
+.srp-notice p { margin: 0; color: var(--ink-muted); }
+
+/* ── The score card ── */
+.srp-score-top { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--space-4) var(--space-12); }
+.srp-pct { font-size: 40px; line-height: 1; font-weight: 700; color: var(--brand-navy); }
+.srp-frac { font-size: var(--type-field-size); color: var(--ink-muted); }
+
+.srp-counts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-8);
+  margin-top: var(--space-16);
+  max-width: 420px;
+}
+.srp-count {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-10) var(--space-6);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: var(--type-meta-size);
+  color: var(--ink-muted);
+  text-align: center;
+}
+.srp-count .n { font-size: 20px; font-weight: 700; color: var(--ink); }
+.srp-count.correct { background: var(--badge-success-bg); border-color: var(--badge-success-border); }
+.srp-count.correct .n { color: var(--badge-success-ink); }
+.srp-count.wrong { background: var(--badge-danger-bg); border-color: var(--badge-danger-border); }
+.srp-count.wrong .n { color: var(--badge-danger-ink); }
+.srp-count.unanswered { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); }
+.srp-count.unanswered .n { color: var(--badge-neutral-ink); }
+
+.srp-facts { display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-24); margin: var(--space-16) 0 0; font-size: var(--type-ui-size); }
+.srp-fact { display: flex; gap: var(--space-6); }
+.srp-fact dt { color: var(--ink-muted); font-weight: 500; }
+.srp-fact dd { margin: 0; color: var(--ink); font-weight: 600; }
+
+.srp-actions { display: flex; flex-wrap: wrap; gap: var(--space-8); margin-top: var(--space-20); }
+
+/* ── A section card ── */
+.srp-h {
+  font-size: var(--type-section-title-size);
+  line-height: var(--type-section-title-line);
+  font-weight: var(--type-section-title-weight);
+  color: var(--ink);
+  margin: 0 0 var(--space-4);
+}
+.srp-sub { font-size: var(--type-ui-size); font-weight: 400; color: var(--ink-muted); margin: 0 0 var(--space-12); }
+.srp-view-one { font-size: var(--type-meta-size); font-weight: 600; color: var(--ink-muted); margin: 0 0 var(--space-12); }
+
+/* the view tabs: they wrap rather than scroll, so the one chosen is always in sight */
+.srp-tabs { display: flex; flex-wrap: wrap; gap: var(--space-6); margin-bottom: var(--space-16); }
+.srp-tab {
+  padding: var(--space-6) var(--space-12);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--type-ui-size);
+  font-weight: 600;
+  cursor: pointer;
+}
+.srp-tab:hover { background: var(--surface-page); }
+.srp-tab.on { background: var(--brand-teal-pale); border-color: var(--brand-teal); color: var(--brand-teal-hover); }
+
+/* ── Where you slipped: one row per value ── */
+.srp-rows { list-style: none; margin: 0; padding: 0; }
+.srp-row { margin: 0 0 var(--space-12); }
+.srp-row-top { display: flex; justify-content: space-between; gap: var(--space-12); font-size: var(--type-ui-size); }
+.srp-row-name { color: var(--ink); font-weight: 500; min-width: 0; overflow-wrap: break-word; }
+.srp-row-n { color: var(--ink-muted); font-weight: 600; white-space: nowrap; }
+.srp-row.is-thin .srp-row-name,
+.srp-row.is-notset .srp-row-name { color: var(--ink-muted); }
+.srp-row.is-thin .srp-row-n { font-weight: 500; }
+.srp-track { height: 6px; margin-top: var(--space-4); background: var(--surface-page); border: 1px solid var(--border); border-radius: var(--radius-pill); overflow: hidden; }
+.srp-fill { display: block; height: 100%; border-radius: var(--radius-pill); }
+.srp-fill.is-ok { background: var(--status-success); }
+.srp-fill.is-warn { background: var(--status-warning); }
+.srp-fill.is-bad { background: var(--status-danger); }
+.srp-more { margin-top: var(--space-4); }
+
+/* ── What to fix next ── */
+.srp-fix { list-style: none; margin: 0; padding: 0; }
+.srp-fix li { display: flex; align-items: center; gap: var(--space-12); padding: var(--space-10) 0; border-top: 1px solid var(--border); }
+.srp-fix li:first-child { border-top: none; padding-top: 0; }
+.srp-fix-n {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  background: var(--brand-teal-pale);
+  color: var(--brand-teal-hover);
+  font-size: var(--type-meta-size);
+  font-weight: 700;
+}
+.srp-fix-body { flex: 1; min-width: 0; }
+.srp-fix-title { margin: 0; font-size: var(--type-field-size); font-weight: 600; color: var(--ink); overflow-wrap: break-word; }
+.srp-fix-detail { margin: var(--space-2) 0 0; font-size: var(--type-meta-size); color: var(--ink-muted); }
+.srp-fix-action { flex: none; }
+
+/* ── Every question ── */
+.srp-map-card { scroll-margin-top: var(--space-16); }
+.srp-filters { display: flex; flex-wrap: wrap; gap: var(--space-6); margin-bottom: var(--space-12); }
+.srp-filter {
+  padding: var(--space-4) var(--space-12);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--type-meta-size);
+  font-weight: 600;
+  cursor: pointer;
+}
+.srp-filter:hover { background: var(--surface-page); }
+.srp-filter.on { background: var(--brand-navy); border-color: var(--brand-navy); color: var(--surface); }
+
+.srp-map { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: var(--space-6); }
+.srp-q {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: var(--type-ui-size);
+  font-weight: 600;
+  text-decoration: none;
+}
+.srp-q:hover { text-decoration: none; filter: brightness(0.96); }
+.srp-q.correct { background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink); }
+.srp-q.wrong { background: var(--badge-danger-bg); border-color: var(--badge-danger-border); color: var(--badge-danger-ink); }
+.srp-q.unanswered { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); color: var(--badge-neutral-ink); }
+.srp-empty { font-size: var(--type-ui-size); color: var(--ink-muted); margin: 0; }
+
+.srp-legend { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-12); margin: var(--space-12) 0 0; font-size: var(--type-meta-size); color: var(--ink-muted); }
+.srp-key { display: inline-block; width: 10px; height: 10px; margin-right: calc(-1 * var(--space-6)); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+.srp-key.correct { background: var(--badge-success-bg); border-color: var(--badge-success-border); }
+.srp-key.wrong { background: var(--badge-danger-bg); border-color: var(--badge-danger-border); }
+.srp-key.unanswered { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); }
+
+.srp-slowest { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); margin: var(--space-12) 0 0; font-size: var(--type-ui-size); color: var(--ink-muted); }
+.srp-slowest a { color: var(--brand-teal); font-weight: 600; }
+
+/* On a phone the button drops under its words (the number's 24px and
+   the 12px gap in from the edge), so a long topic keeps whole words —
+   squeezed beside the button it broke mid-word at 375px (walked). */
+@media (max-width: 480px) {
+  .srp-row-top { flex-direction: column; gap: 0; }
+  .srp-fix li { flex-wrap: wrap; row-gap: var(--space-8); }
+  .srp-fix-body { flex: 1 1 calc(100% - 36px); }
+  .srp-fix-action { margin-left: 36px; }
+}

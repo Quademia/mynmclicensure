@@ -195,7 +195,8 @@ async function sessionPlay(gate: AuthGateResult, attempt: Attempt, previewMode: 
 // builder sitting always (it has no quiz); a fixed quiz's or a mock's
 // while the quiz is open and still offers the mode — startRefusal, the
 // check Start and Retake share. The server checks again on the press.
-async function retakeOpen(gate: AuthGateResult, attempt: Attempt): Promise<boolean> {
+// The report page (03 Q10) offers Retake by the same rule.
+export async function retakeOpen(gate: AuthGateResult, attempt: Attempt): Promise<boolean> {
   const source = await originSource(gate.supabase, attempt);
   if (source === 'builder') return true;
   if ((source !== 'fixed' && source !== 'mock') || !attempt.quiz_id) return false;

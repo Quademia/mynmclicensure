@@ -118,20 +118,24 @@ export function QuizBuilderClient({
   maxQuestions,
   minutesPerQuestion,
   initialCourseId,
+  initialTopic,
 }: {
   courses: Course[];
   maxQuestions: number;
   minutesPerQuestion: number;
   initialCourseId: string;
+  /** 03 Q10: the report's "Practise this topic" — ticked, the wizard on its Topics step. */
+  initialTopic: string;
 }) {
   const router = useRouter();
 
   // ── wizard state (legacy `state`) ──
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(() => (initialTopic ? 1 : 0));
   const [courseId, setCourseId] = useState(() => initialCourseId || (courses.length === 1 ? courses[0].course_id : ''));
   const [selectionMode, setSelectionMode] = useState<SelectionMode>('topics');
   const [useAllTopics, setUseAllTopics] = useState(false);
-  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  // a topic the course does not have is dropped when its rows load (loadCourse)
+  const [selectedTopics, setSelectedTopics] = useState<string[]>(() => (initialTopic ? [initialTopic] : []));
   const [topicSearch, setTopicSearch] = useState('');
   const [conceptSearch, setConceptSearch] = useState('');
   const [selectedConcepts, setSelectedConcepts] = useState<string[]>([]);

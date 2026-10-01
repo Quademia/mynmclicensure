@@ -24,7 +24,7 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from '
 import { useRouter } from 'next/navigation';
 import { Toast } from '@/lib/toast/toast';
 import { loadHistoryPage, retakeAttempt } from '@/lib/attempts/actions';
-import { sessionHref } from '@/lib/attempts/links';
+import { reportHref, sessionHref } from '@/lib/attempts/links';
 import { MODES, MODE_ORDER, modeOf } from '@/lib/attempts/modes';
 import type { AttemptListRow, HistoryFilters, HistoryPage } from '@/lib/attempts/types';
 import { Icon } from '@/components/shell/icons';
@@ -261,6 +261,16 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
             ) : (
               <button type="button" className="act-btn btn-review" disabled title="Complete this attempt first">
                 <Icon name="eye" />Review
+              </button>
+            )}
+            {/* 03 Q10: the finished sitting's report, beside its review */}
+            {isCompleted ? (
+              <AppLink className="act-btn btn-report" href={reportHref(a.attempt_id)} title="See your report">
+                <Icon name="chart" />Report
+              </AppLink>
+            ) : (
+              <button type="button" className="act-btn btn-report" disabled title="Complete this attempt first">
+                <Icon name="chart" />Report
               </button>
             )}
             <button

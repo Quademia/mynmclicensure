@@ -9,7 +9,8 @@
 // emoji and word (kept — Sam, 2026-09-22: a student reading their own
 // result), the percentage, how many were correct, wrong and unanswered,
 // the time and the mode. Review answers, Retake where the quiz allows it,
-// and the way back. The report page with the breakdown is Q10, later.
+// and the way back. Since 03 Q10 (Sam, 2026-09-30) the main button is
+// "See your report", the page with the breakdown — MyNclex's order.
 //
 // On the app's one dialog (DS4), so it is portalled to <body> and its
 // look sits outside `.runner` in styles/runner.css.
@@ -17,6 +18,8 @@
 'use client';
 
 import { Dialog } from '@/lib/overlays/shared/dialog';
+import { formatSeconds } from '@/lib/attempts/report';
+import { AppLink } from '@/components/shell/link-pending';
 import { Icon } from '@/components/shell/icons';
 
 export type ResultsSummary = {
@@ -33,20 +36,10 @@ export type ResultsSummary = {
   modeName: string;
 };
 
-/** 252 → "4 min 12 s"; 58 → "58 s"; 3780 → "1 h 3 min". */
-function formatTime(s: number | null): string {
-  if (s === null || !Number.isFinite(s) || s < 0) return '—';
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  const sec = Math.floor(s % 60);
-  if (h) return `${h} h ${m} min`;
-  if (m) return sec ? `${m} min ${sec} s` : `${m} min`;
-  return `${sec} s`;
-}
-
 export function ResultsPopup({
   open,
   summary,
+  reportHref,
   onReview,
   onClose,
   retake,
@@ -54,6 +47,8 @@ export function ResultsPopup({
 }: {
   open: boolean;
   summary: ResultsSummary;
+  /** The sitting's report page; null in the admin's preview (the report is the student's own). */
+  reportHref: string | null;
   onReview: () => void;
   onClose: () => void;
   /** Shown only where a retake is allowed. */
@@ -84,11 +79,16 @@ export function ResultsPopup({
           <dt>Mode</dt>
           <dd>{s.modeName}</dd>
           <dt>Time</dt>
-          <dd>{formatTime(s.timeTakenS)}</dd>
+          <dd>{formatSeconds(s.timeTakenS)}</dd>
         </dl>
 
         <div className="dlg-actions stack">
-          <button type="button" className="btn btn-primary" onClick={onReview}>
+          {reportHref ? (
+            <AppLink className="btn btn-primary" href={reportHref}>
+              <Icon name="chart" />See your report
+            </AppLink>
+          ) : null}
+          <button type="button" className={reportHref ? 'btn btn-ghost' : 'btn btn-primary'} onClick={onReview}>
             <Icon name="book-open" />Review answers
           </button>
           {retake ? (

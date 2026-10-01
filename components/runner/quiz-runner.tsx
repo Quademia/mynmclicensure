@@ -57,7 +57,7 @@ import { useRouter } from 'next/navigation';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { Toast } from '@/lib/toast/toast';
 import { advanceAttempt, checkAnswer, expireAttempt, finishAttempt, retakeAttempt, saveAnswers } from '@/lib/attempts/actions';
-import { sessionHref } from '@/lib/attempts/links';
+import { reportHref, sessionHref } from '@/lib/attempts/links';
 import { ResultsPopup, type ResultsSummary } from './results-popup';
 import { Icon } from '@/components/shell/icons';
 import { KindChip, QUESTION_TYPE_HUE } from '@/components/shell/chips';
@@ -139,6 +139,7 @@ export function QuizRunner({
   previewMode,
   exit,
   retakeAllowed = false,
+  initialQuestion = null,
 }: {
   attempt: Attempt;
   items: SealedItem[];
@@ -150,6 +151,8 @@ export function QuizRunner({
   exit: SessionExit;
   /** 03 Q18: the results pop-up offers Retake (the server checks again on the press). */
   retakeAllowed?: boolean;
+  /** 03 Q10: a review opened at this question (1-based) — the report's links, `?q=`. */
+  initialQuestion?: number | null;
 }) {
   const router = useRouter();
   // The mode's row (03 Q8): the runner asks it, never the code.
@@ -163,6 +166,11 @@ export function QuizRunner({
   // A finished sitting's review moves freely, as every other review.
   const forwardOnly = M.nav === 'forward';
   const label = attempt.display_label || W.title;
+  // 03 Q10: the question the report's link asked for, when this review has it.
+  const jumpTarget =
+    reviewMode && initialQuestion !== null && Number.isInteger(initialQuestion) && initialQuestion >= 1 && initialQuestion <= items.length
+      ? initialQuestion
+      : null;
 
   // ── state (legacy ANSW / FLAGS / SATA_EVAL / LOCKED / …) ──
   const hydrated = useMemo(() => hydrateFromRows(items), [items]);
@@ -240,7 +248,9 @@ export function QuizRunner({
 
       // A finished sitting reopened: the review, with no pop-up (the pill
       // opens it) and, since Q18, no question map over it on a phone.
+      // From the report (Q10), on the page holding the question asked for.
       if (reviewMode) {
+        if (jumpTarget !== null) setPage(Math.floor((jumpTarget - 1) / questionsPerPage));
         setPhase('quiz');
         setBooted(true);
         return;
@@ -251,6 +261,19 @@ export function QuizRunner({
     return () => window.clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once, on mount
   }, []);
+
+  // 03 Q10: the report's question, once its page is on screen, scrolled
+  // to just under the sticky header. Once, on the review's first paint.
+  useEffect(() => {
+    if (!booted || jumpTarget === null) return;
+    const id = window.setTimeout(() => {
+      const el = document.getElementById(`q-${jumpTarget}`);
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY - (headerRef.current?.offsetHeight ?? 0) - 8;
+      window.scrollTo({ top: Math.max(0, top) });
+    }, 0);
+    return () => window.clearTimeout(id);
+  }, [booted, jumpTarget]);
 
   function hasAnswerFor(item: SealedItem): boolean {
     const c = answers[item.item_id];
@@ -794,7 +817,7 @@ export function QuizRunner({
     const showRationale = canReveal && feedbackMode !== 'hide' && (rat || (feedbackMode === 'standalone' && optFbs.length > 0) || imgUrl);
 
     return (
-      <div key={item.item_id} className="q-block">
+      <div key={item.item_id} id={`q-${globalIdx + 1}`} className="q-block">
         <div className="q-meta">
           <span className="q-num">Q{globalIdx + 1} / {items.length}</span>
           <KindChip hue={QUESTION_TYPE_HUE[item.question_type]}>{item.question_type}</KindChip>
@@ -1220,6 +1243,7 @@ export function QuizRunner({
           <ResultsPopup
             open={resultsOpen && finished}
             summary={results}
+            reportHref={previewMode ? null : reportHref(attempt.attempt_id)}
             onReview={reviewAnswers}
             onClose={() => setResultsOpen(false)}
             retake={retakeAllowed && !previewMode ? { onClick: () => void retakeNow(), pending: retaking } : null}
