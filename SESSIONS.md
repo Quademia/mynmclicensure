@@ -27,6 +27,9 @@ should stay rich.
 
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
+- 2026-09-30, into 10-01 — 03 Q10 the attempt report on its own page, ruled, built, walked, ticked, merged; two builder lines queued; doc 09 talked through
+  - ↳ views per sitting, not per course · dev bank is sample data · quizzes 100–180 · advice from 3 · builder min 5 later · All topics title queued · 0 free marked · G1 first, five rulings asked · port 3000 another worktree · build 404s dev
+
 - 2026-09-28, into 09-29 — admin mode ticks walked; a tap never silent (placeholder, pressed link, app links); 03 Q11 time per question and the quiz clocks
   - ↳ step-1 mode check · review chips · Q19 Q20 preview · loading file per folder · prefetch prod only · drawer waits · 1.5 s pause out · totals ride on saves · Sequential Next one trip · Study time = sum · toggle per sitting · offline later
 

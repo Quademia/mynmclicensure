@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-09-29. Rules for **any** assistant working in this
+Last updated: 2026-10-01. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What is built and
@@ -344,7 +344,19 @@ above sit at the repo root; the audience grouping inside them is kept.
   but `/` is a 404** — `/login` included, with no error in the log
   (2026-09-23: a worktree with a `.next` from 2026-09-13). Stop the
   server, delete `.next`, start it again. Check one inner page answers
-  200 before trusting the dev server.
+  200 before trusting the dev server. **`npm run build` leaves the same
+  trap:** a dev server started after a production build, on the build's
+  `.next`, answered 404 on every inner page (2026-10-01) — delete `.next`
+  before starting the dev server after a build. And check what holds
+  port 3000 before trusting it: after the desktop app lost the session's
+  server, the port was answered by another worktree's (`135d16`), older
+  code with no new route; the holder's command line names its worktree.
+- **Under a `loading.tsx`, `redirect()` and `notFound()` answer 200.**
+  The placeholder has already started the response, so the redirect or
+  the 404 travels in the page body (a meta refresh, Next's not-found
+  marker), not in the status: a probe by status alone reads a refusal as
+  a page served (the report's gates, 2026-10-01). Check the body — that
+  the page's own content is absent and the redirect's target is present.
 - **The dev server serves its scripts to `localhost` only.** Opened as
   `127.0.0.1:3000` the page renders but nothing hydrates (Next's
   `allowedDevOrigins` refusal, in the server log), so a second address
