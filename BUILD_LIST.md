@@ -207,7 +207,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ Q8.3 Sequential — one question at a time, an answer required, the lock in the database — 2026-09-27
 - ✅ Q8.4 An exam's deadline in the database — no answer after time is up (§8 S22) — 2026-09-27
 - ✅ Q9 The Check Answer pending state — "Checking…" on the option until the reply lands, with Q8.1 — 2026-09-27
-- ⬜ Q10 The attempt report — breakdown by subject / topic / difficulty / type, what to fix next (2026-09-24)
+- ✅ Q10 The attempt report — its own page: where you slipped, what to fix next, every question — 2026-10-01
 - ✅ Q11 Time per question — engaged seconds per question, saved with the answers; a Study time their sum — 2026-09-29
 - ✅ (unplanned) The quiz screen's clocks — a Study stopwatch, a question clock, Hide / Show in the sitting — 2026-09-29
 - ⬜ Q12 Progress across attempts — accuracy by topic over history, a trend, true totals (2026-09-24)

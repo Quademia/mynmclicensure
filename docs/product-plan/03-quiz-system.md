@@ -1038,6 +1038,32 @@ Sam orders them):
   No storage change. Open when sliced: the minimum per slice; whether
   it replaces the runner's score card or sits beside it; the grade
   bands' words.
+  **Ruled 2026-09-30, built and ticked 2026-10-01.** Sam's rulings: its
+  own page, `/student/report/<id>` (A — not the pop-up, not the review's
+  head), reached by "See your report", the results pop-up's main button,
+  and a Report link on each finished Learning History card, the sidebar
+  marking Learning History there; the views (topic, difficulty, subject,
+  question type) are offered per sitting when it has two or more values
+  on one, from the sitting's own questions, never from which course is
+  tagged how (Sam: the empty columns on dev are not forever); advice
+  only from a topic with at least 3 questions (a live fixed quiz is
+  100–180 questions); the weakest 8 rows then "Show all"; the question
+  map filtered All / Wrong / Unanswered in place of review filters, each
+  number opening the review at that question (`?q=`); "Practise this
+  topic" opens the Quiz Builder on its Topics step with the course and
+  topic set (`&topic=`). Time on task, pace and the three longest
+  questions from Q11's seconds, left out for sittings before 2026-09-29.
+  How: `lib/attempts/report.ts` — one read of the sitting's rows on the
+  student's own client, eight named columns, no question text; the sums
+  as plain functions checked from a script (26 cases); the server
+  computes and the client half only switches views; the map's numbers
+  do not prefetch. Not done: the grade words (the pop-up keeps them),
+  a pass mark (queued), an admin's view of a student's report. Walked
+  as the RM student on a 10-question sitting and a 50-question one
+  built for it; one phone defect fixed walking (topic names breaking
+  mid-word beside their button at 375 px). Found: an "All topics"
+  builder sitting is named after the course's first three topics, as
+  legacy did — queued.
 - **Q11 — Time per question.** The runner measures the time on each
   question and sends it with the answer it already saves; the report
   gains time on task, average pace and the slowest questions. The
@@ -1100,7 +1126,7 @@ it needs a change log on every answer, a storage change and its own
 | Q7 SATA partial credit | later, after S7 |
 | Q8 The runner as a player | ruled 2026-09-27 (Sam: `/session`, MyNclex's modes, four now, A); step 1 ✅ 2026-09-27 (code only; walked as the RM student — §4; ticked by Sam); steps 2 and 3 ✅ 2026-09-27 on §8 S21 (`20260927140000_four_modes.sql`; walked as the RM student, the admin's ticks not walked — §4; ticked by Sam; the admin's ticks walked 2026-09-28 as Sam's admin on a fixed quiz and a mock, two admin-side gaps fixed: no ticks refused on the details step, the review's modes as chips); step 4, the exam's deadline, ✅ 2026-09-27 on §8 S22 (`20260927160000_exam_deadline.sql`; proven rolled back, the time-up walked — §4; ticked by Sam) |
 | Q9 The Check Answer pending state | ✅ 2026-09-27 (with Q8's step 1; walked as the RM student — §4; ticked by Sam) |
-| Q10 The attempt report | candidate, captured 2026-09-24 |
+| Q10 The attempt report | ✅ 2026-10-01 (Sam: its own page, views per sitting, advice from 3 questions; code only; walked as the RM student on a 10- and a 50-question sitting against the database, the pop-up, the review at a question, the builder's topic, 375 px — §4; ticked by Sam) |
 | Q11 Time per question | ✅ 2026-09-29 (Sam's three rulings; code only; walked as the RM student in all four modes against an in-page stopwatch, the time-up and a resume; with a Study sitting's time as the questions' sum and the quiz screen's clocks under a Hide / Show toggle — §4; ticked by Sam) |
 | Q12 Progress across attempts | candidate, captured 2026-09-24 |
 | Q13 Readiness and the cohort | candidate, captured 2026-09-24; with Q3 |
