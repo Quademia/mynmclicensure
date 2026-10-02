@@ -347,9 +347,10 @@ Sam grants by hand are **Free Full Access**, their products' own name.
   paper (Claude's recommendation, the least exposed); the first 20–30
   questions of one paper; a short trial quiz made by the admin. Sam
   chose the papers.
-- **Still open:** repeat sign-ups (§4, now smaller); the end-of-trial
-  screen (F2); the locked papers' wording; how each mock's
-  `visibility` meets the product's yes or no.
+- **Still open:** the end-of-trial screen (F2); the locked papers'
+  wording; how each mock's `visibility` meets the product's yes or no.
+  Repeat sign-ups settled 2026-10-03: SMS verification, one trial per
+  verified number (§4).
 
 ### Real-world comparison — Claude's views, 2026-10-02, not ruled
 
@@ -484,6 +485,48 @@ Meta's WhatsApp pricing). To go through with Sam before G1 is sliced:
   made-up address. **Smaller since the trial was settled:** the trial
   papers are the same for every account, so a second account opens no
   new paper — what it adds is up to 150 new builder questions.
+  **Settled 2026-10-03 (Sam): SMS verification, with F4.** At
+  registration the student's number gets a code by SMS through a
+  Ghanaian SMS company; the trial is granted once the code is entered;
+  **one trial per verified number**, every number saved in one standard
+  form (+233…) so "024 123 4567" and "+233241234567" are one number.
+  The Ghanaian companies to consider (Sam), read 2026-10-03, the pick
+  at the build: **Arkesel** (from GHS 0.02 an SMS in bundles; its code
+  service generates, sends and checks the code, GHS 0.035 a check; 10
+  free SMS and a test mode at sign-up), **mNotify** (GHS 0.035 down to
+  0.027; 50 free at sign-up), **Hubtel** (from GHS 0.03; bundles to
+  about 0.019). Arkesel is the closest fit because it checks the code
+  itself — neither Supabase's phone sign-in (a switch on the shared
+  gamma project) nor a code store of our own is needed. About GHS 35
+  per 1,000 registrations; none has a free tier beyond sign-up credits.
+  Twilio, one of Supabase's built-in senders: US$0.3741 an SMS to
+  Ghana. **Weighed and set aside:** one trial per email only (a made-up
+  address gets another); the server drawing the builder's questions
+  instead of the page (the builder's own topic and keyword filters let
+  a patient person narrow to pools of 50 or fewer and take each whole —
+  about 12 accounts for a 1,800-question course either way; the server
+  takes the page's list today, checking course, held-back and count);
+  one trial per unverified number (a made-up number passes; two people
+  on one phone); a marker left in the browser (cleared in a moment),
+  one trial per internet address (Ghana's mobile networks and campus
+  Wi-Fi put many students behind one), a device fingerprint
+  (unreliable on phones; Act 843) — the device rule that exists is 2
+  live sign-ins per account, which stops sharing an account, not many
+  accounts on a device; email confirmation (addresses are free to make;
+  the shared Resend plan's 100 a day); **WhatsApp** — software cannot
+  send from an ordinary WhatsApp number without breaking WhatsApp's
+  terms (numbers are banned for it), so any WhatsApp check needs Meta's
+  WhatsApp Business Platform: the student sending us a code ("reverse
+  OTP") is free to run (Meta: a message from a user to a business is
+  not charged; the business's replies are charged from 2026-10-01
+  beyond 1,000 a month), a code sent by us is a paid message — both
+  wait on a Meta business account. **Open at the build:** the sender
+  name's registration and delivery times per network; a student whose
+  WhatsApp number is not the phone's own (the field says WhatsApp
+  Number); a foreign number (an international SMS costs more — Hubtel
+  lists GHS 0.25); a code that does not arrive (Resend; Arkesel also
+  offers a voice code, GHS 0.20 a minute); two people on one phone —
+  the second registers and gets the free account, no trial.
 - **Our prices beside GHS 6.** Unchecked; decides how the free floor
   and the trial are worded against each other.
 - **NAC and NAP as separate programmes; RPHN and RCN the same exam or
@@ -538,8 +581,11 @@ one-off buttons and cards.
   its own limits** (builder quizzes, packs per course, papers all or
   the trial paper only, mocks yes or no), copied onto the subscription
   at the grant, as MyNclex does; use counted from the student's own
-  sittings, inside the database. Columns on the products and the
-  subscriptions and the tick on the quizzes — storage changes, so it
+  sittings, inside the database. **SMS verification at registration**
+  through a Ghanaian SMS company, the trial granted once the code is
+  entered, **one trial per verified number** in one standard form (Sam,
+  2026-10-03; §4). Columns on the products and the subscriptions, the
+  tick on the quizzes, and the verified number — storage changes, so it
   needs its §8 row.
 - **F3 — Landing and copy.** "Free practice questions, forever"; the
   trial and the products as the route to the full bank.
@@ -584,7 +630,7 @@ one-off buttons and cards.
 | F1 The pool and its door | candidate; settled as the mark + two doors 2026-09-26; §8 S16 ✅ 2026-09-26; the column is 08 B4 |
 | F2 The free account | candidate |
 | F3 Landing and copy | candidate |
-| F4 The limited trial | candidate; decided in principle 2026-10-02 (14 days, admin-granted full access); settled the same day — from registration, a ticked paper per course, three builder quizzes, the limits on each product; needs its §8 row |
+| F4 The limited trial | candidate; decided in principle 2026-10-02 (14 days, admin-granted full access); settled the same day — from registration, a ticked paper per course, three builder quizzes, the limits on each product; SMS verification, one trial per verified number (2026-10-03); needs its §8 row |
 | G1 Streak, points, leaderboard (derived) | candidate; the NMC Prep walk done 2026-09-24 |
 | G2 The daily challenge | candidate; after G1; from the free pool (Sam, 2026-09-26), rotation and pool size open |
 | G3 Tiers | later |
