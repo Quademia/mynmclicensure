@@ -306,11 +306,12 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 
 Decided in principle in a cloud session on 2026-09-20; candidates, none sliced, the open questions in the doc's §4.
 
-- ⬜ What the trial gives, before F1 is sliced — a 7-day programme trial or `WELCOME_TRIAL`'s General Paper only. The 60 days are a stopgap from 2026-05-27, when the paid plans were paused and the trials bumped 7 → 60 the same day; the pause ends at cutover. Six active products are unreachable today: `WELCOME_TRIAL` and five `*_FULL_FREE` (30 days, the whole programme free), neither linked from a programme nor named in any code — Sam's view is the `*_FULL_FREE` stay admin-grant-only. Nothing needs deleting: `status` is one column (Sam, 2026-09-22)
+- ⬜ What the trial gives — answered in principle by Sam, 2026-10-02 (doc 09 §3): no automatic full trial; a taste of the real bank for 14 days (F4); full trials admin-granted through the `*_FULL_FREE` products. Open: when the 14 days start (registration or first taste quiz; read MyNclex's 21-day readiness pack first) and the taste's size. Not a tick until both are settled
 - ⬜ F1 The pool and its door — the mark is 08 B4's column; this slice is the two doors, the read policy and attempt creation, plus the free-only draws for a student with no course (§8 S16 ✅ 2026-09-26; a mark, not a separate table — Sam)
 - ⬜ F2 The free account — no course_access rows, the builder and runner on the pool, the dashboard's free-vs-trial line
 - ⬜ F3 Landing and copy — "free practice questions, forever"; the trial and the products as the route to the full bank
-- ⬜ G1 Streak, points, leaderboard — derived from the graded rows, no new tables; NMC Prep walked 2026-09-24
+- ⬜ F4 The taste — once per account, 1 fixed quiz and 2 Quiz Builder quizzes (~20 questions each) from the real bank within 14 days; mocks and packs paid only; a use counter at attempt creation; needs its §8 row (Sam, 2026-10-02; start of the window and size open)
+- ⬜ G1 Streak, points, leaderboard — derived from the graded rows, no new tables; NMC Prep walked 2026-09-24; real-world views of 2026-10-02 to go through first (doc 09 §3: weekly and neighbours, capped effort points since retakes farm, a grace day for offline study)
 - ⬜ G2 The daily challenge — five a day per programme from the free pool (Sam's yes, 2026-09-26; the rotation and the pool's size open), a new attempt source; after G1
 - ⬜ G3 Tiers — names on point bands; later
 

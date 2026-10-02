@@ -220,6 +220,92 @@ the leaderboard fair, since everyone answers the same five); paid
 attempts also earn points, with a weekly reset so a free account can
 still reach the top ten in a good week.
 
+### What a new student gets — Sam, cloud session 2026-10-02
+
+Decided in principle; not yet a §8 row or a tick. It answers §4's
+"what the trial gives" question, and replaces the automatic trial.
+
+- **No automatic full trial.** A 7-day (or 60-day) full-programme trial
+  lets a student drain or copy the bank in a week (Sam's concern). A
+  full trial becomes **admin-granted only** — schools, promotions, a
+  student who asks — through the existing `*_FULL_FREE` products
+  (already admin-grant-only in Sam's view, 2026-09-22).
+- **Free forever:** the free pool without limit, the daily challenge,
+  the streak and the leaderboard (as §3 above).
+- **A taste of the real bank**, once per account: proposed as **1 fixed
+  quiz of the student's choice and 2 Quiz Builder quizzes of up to
+  about 20 questions** — at most ~60–70 real questions an account,
+  enough to judge the bank, too little to copy. The size is a proposal,
+  not yet confirmed.
+- **The taste lasts 14 days** (Sam). The clock protects nothing — the
+  quiz cap does — it adds the deadline that makes a student decide.
+  **When the 14 days start is open**: at registration (simpler; an
+  early sign-up can lose it unused) or at the first taste quiz (one
+  more date stored; nobody loses it by signing up early — Claude's
+  preference). MyNclex's readiness pack carries 21 days; how its days
+  are counted (from the grant or from first open) was not checked —
+  that repo was not in the session — and is the precedent to read
+  first. When the 14 days end, only the unused taste is lost; the free
+  account stays.
+- **Paid only:** the full bank, mock exams, offline packs.
+
+Weighed and set aside the same day: the full 7-day trial (exposes the
+bank); the taste with no time limit (no reason to decide); a 7-day
+trial with a daily cap (two limits at once, harder to word). Sam's
+reason for preferring a taste over a timed trial was less code; it was
+checked and is not so — a time-limited trial reuses `course_access`'s
+end dates as built, the taste needs a new use counter — so the choice
+rests on protecting the bank, not on build cost. Whichever shape, a
+student with no live course meets today's locked pages (below, F2).
+
+### Real-world comparison — Claude's views, 2026-10-02, not ruled
+
+Asked by Sam: is there a better approach from real products? Sources
+were read on the web the same day (Duolingo's published figures and
+write-ups, a 2024 randomised trial on leaderboard leagues, Elena
+Verna's "reverse trial", Pocket Prep, Archer Review, Eneza Education,
+Meta's WhatsApp pricing). To go through with Sam before G1 is sliced:
+
+- **The free floor is a known pattern.** Free forever plus a sample of
+  the bank is Pocket Prep's shape (25–80 free questions plus a Question
+  of the Day). Dropping a lapsed student to a free floor rather than to
+  nothing is what "reverse trials" do (Toggl, Airtable).
+- **Leaderboard (G1): weekly, small, the student's neighbours.**
+  Duolingo's leagues are 30 people at a similar pace, reset weekly. A
+  2024 RCT with leagues of 30 found low performers +0.27 SD on exam
+  grades, top performers −0.25 SD and low performers more stressed — no
+  ranking is free. For small programmes: weekly, per programme, the top
+  3 plus the two above and two below the student. First name and
+  initial or a chosen name, with an opt-out (Act 843; NMC Prep shows
+  full names and has no privacy policy).
+- **Points (G1) are farmable as planned.** Instant mode shows the
+  answer after each question and Retake gives the same questions back,
+  so "a point per correct answer" pays for a second go at 100%.
+  Proposed: effort points (questions answered, sittings finished) with
+  a daily cap, plus a bonus for a first correct answer to a question —
+  still derived, no new tables.
+- **Streaks (G1): allow a missed day.** Duolingo reports its Streak
+  Freeze cut churn 21% among at-risk users. A strict daily streak
+  punishes offline-pack study, which writes no graded rows. Proposed: a
+  streak survives one missed day a week — a rule, not storage.
+- **The daily challenge (G2) needs a reminder.** NMC Prep's challenge
+  only waits to be opened and is 3% of its points. Cheapest first: the
+  day's link posted in the Telegram channel the sidebar already links;
+  email (Resend); web push once the PWA (queued under 00) lands;
+  WhatsApp Business messages reach furthest but cost about US$0.0225
+  each (Rest of Africa marketing rate, Oct 2026) — about US$675 a month
+  for 1,000 daily students.
+- **Repeats are fine.** A question returning after a couple of months is
+  retrieval practice, not a flaw; a pool of a few hundred per programme
+  with a ~60-day non-repeat window cuts the authoring load roughly
+  tenfold against §4's 1,800 a year.
+- **Readiness over points.** Licensure prep leads with "am I ready"
+  (Archer's Low / Borderline / High / Very High; UWorld's
+  self-assessments). 03 Q12 / Q13 are that, and a weak-topic readiness
+  line is the natural upgrade prompt for a free student.
+- **Proposed order:** F1 → F2 (with the end-of-taste screen) → F4 →
+  G1 as revised above → 03 Q12 / Q13 → G2 with its reminder → G3.
+
 ---
 
 ## 4. Open questions (Sam's, before slicing)
@@ -243,7 +329,12 @@ still reach the top ten in a good week.
   "import as free" choice on the importer, so it feels like its own
   bank without being one. Still open: the pool's size per programme and
   the challenge's rotation.
-- **What the trial gives, which this doc depends on and does not set**
+- **What the trial gives — answered in principle 2026-10-02** (§3,
+  *What a new student gets*): no automatic full trial; a taste of the
+  real bank for 14 days; full trials admin-granted. Still open: when
+  the 14 days start, and the taste's size. The record of the question
+  as it stood:
+  **What the trial gives, which this doc depends on and does not set**
   (opened 2026-09-22). The free-forever account is positioned here as
   retention, with the trial and the paid products as the only route to
   the real bank — but the trial currently gives **60 days of the entire
@@ -287,6 +378,10 @@ still reach the top ten in a good week.
   shown to anyone outside the hundred.
 - **Who plays:** trial and paid students too (the view: yes, all
   attempts count).
+- **Repeat sign-ups** (opened 2026-10-02). A taste per account is a
+  taste per email: a student can register again for another. A verified
+  phone number at registration would make that harder; whether the app
+  verifies the WhatsApp number today was not checked.
 - **Our prices beside GHS 6.** Unchecked; decides how the free floor
   and the trial are worded against each other.
 - **NAC and NAP as separate programmes; RPHN and RCN the same exam or
@@ -320,7 +415,21 @@ one-off buttons and cards.
   dashboard saying plainly "Free: practice on the free set" against
   "Trial: everything, N days left". Attempts snapshot from the pool like
   any other (03 Q4), so the runner needs nothing new; the seal holds
-  (03 Q6).
+  (03 Q6). Since 2026-10-02 there is no automatic trial (§3), so this
+  is every new student. **The pages a student with no live course
+  meets today** (read 2026-10-02): the course page says "No Access";
+  the attempt report says "No Course Access", so past attempts cannot
+  be reviewed; Learning History lists the attempts but its course
+  filter is empty and course names show as their ids; the fixed-quiz
+  list and the builder offer nothing. Each needs a free-account state.
+  An end-of-taste screen ("you answered N questions from the full
+  bank") is the upgrade moment.
+- **F4 — The taste** (Sam, 2026-10-02). Once per account: 1 fixed quiz
+  and 2 Quiz Builder quizzes (~20 questions each) from the real bank,
+  within 14 days; mocks and packs excluded. A use counter checked at
+  attempt creation and a 14-day window — the window's start (at
+  registration or at the first taste quiz) open. A storage change, so
+  it needs its §8 row.
 - **F3 — Landing and copy.** "Free practice questions, forever"; the
   trial and the products as the route to the full bank.
 
@@ -364,6 +473,7 @@ one-off buttons and cards.
 | F1 The pool and its door | candidate; settled as the mark + two doors 2026-09-26; §8 S16 ✅ 2026-09-26; the column is 08 B4 |
 | F2 The free account | candidate |
 | F3 Landing and copy | candidate |
+| F4 The taste | candidate; decided in principle 2026-10-02 (14 days, admin-granted full trials); the start of the 14 days and the size open |
 | G1 Streak, points, leaderboard (derived) | candidate; the NMC Prep walk done 2026-09-24 |
 | G2 The daily challenge | candidate; after G1; from the free pool (Sam, 2026-09-26), rotation and pool size open |
 | G3 Tiers | later |

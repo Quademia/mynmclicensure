@@ -20,6 +20,11 @@ should stay rich.
 
 ---
 
+## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
+
+- 2026-10-02 — doc 09 compared with real products; no automatic trial, a 14-day taste of the real bank, full trials admin-granted; docs only
+  - ↳ reverse trial · bank drain · taste 1 fixed + 2 builder · start of 14 days open · MyNclex 21 days unread · taste is more code · no-course pages · retakes farm points · grace day · weekly neighbours · views not ruled
+
 ## 2026-09 — [sessions/2026-09.md](sessions/2026-09.md)
 
 - 2026-09-28, into 09-29 — admin mode ticks walked; a tap never silent (placeholder, pressed link, app links); 03 Q11 time per question and the quiz clocks
