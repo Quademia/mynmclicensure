@@ -224,6 +224,9 @@ still reach the top ten in a good week.
 
 Decided in principle; not yet a §8 row or a tick. It answers §4's
 "what the trial gives" question, and replaces the automatic trial.
+This record keeps the cloud session's word, the *taste*; later the same
+day Sam named it the **trial, with limited access**, the word used from
+*The limited trial settled* (below) on.
 
 - **No automatic full trial.** A 7-day (or 60-day) full-programme trial
   lets a student drain or copy the bank in a week (Sam's concern). A
@@ -236,8 +239,8 @@ Decided in principle; not yet a §8 row or a tick. It answers §4's
   quiz of the student's choice and 2 Quiz Builder quizzes of up to
   about 20 questions** — at most ~60–70 real questions an account,
   enough to judge the bank, too little to copy. The size is a proposal,
-  not yet confirmed. **Superseded the same day** — a taster paper per
-  course and three builder quizzes (*The taste settled*, below).
+  not yet confirmed. **Superseded the same day** — one ticked paper per
+  course and three builder quizzes (*The limited trial settled*, below).
 - **The taste lasts 14 days** (Sam). The clock protects nothing — the
   quiz cap does — it adds the deadline that makes a student decide.
   **When the 14 days start is open**: at registration (simpler; an
@@ -259,59 +262,94 @@ end dates as built, the taste needs a new use counter — so the choice
 rests on protecting the bank, not on build cost. Whichever shape, a
 student with no live course meets today's locked pages (below, F2).
 
-### The taste settled — Sam, 2026-10-02 (desktop session)
+### The limited trial settled — Sam, 2026-10-02 (desktop session)
 
 Settled the same day as the above, in a second conversation (Claude, in
-the desktop app); not yet a §8 row or a tick.
+the desktop app); not yet a §8 row or a tick. **The word is the
+trial** — Sam: "trial, with limited access", not a taste. The full ones
+Sam grants by hand are **Free Full Access**, their products' own name.
 
+- **The trial is today's trial, reshaped.** Registration already
+  grants the programme's trial product (`programs.trial_product_id`:
+  `RN_TRIAL`, `RM_TRIAL`, `RMHN_TRIAL`, `RPHN_TRIAL`, `NACNAP_TRIAL`).
+  Those five become **14 days** — 60 today on dev (the 2026-05-27
+  stopgap; the original was 7) — with the limits below in place of the
+  whole bank. Unchanged: the five `*_FULL_FREE` products (30 days,
+  everything, granted by an admin only), the paid products, and
+  `WELCOME_TRIAL` (7 days, General Paper only, which registration does
+  not grant).
 - **The 14 days start at registration** (Sam: the simple way, and what
-  most platforms do). Weighed: at the first taste quiz, its start
+  most platforms do). Weighed: at the first trial quiz, its start
   screen saying the 14 days begin there (Claude's recommendation —
-  nobody loses the taste by signing up early). MyNclex was read first:
+  nobody loses the trial by signing up early). MyNclex was read first:
   its readiness pack's 21 days start on the student's "Start my 21
-  days", but a pack is a product sold on its own and the taste is not
+  days", but a pack is a product sold on its own and the trial is not
   (Sam), so that precedent does not carry; its 7-day bank trial also
   starts on the student's request, Sam's ruling there of 2026-09-04
   that registering grants nothing. At registration fits what is built:
   registration already grants a row with an end date.
-- **In each course of the programme, one Practice Paper** (a fixed
-  quiz; the name is 03 Q21) — **the one the admin ticks as that
-  course's taster, listed first**; the course's other papers show,
-  locked, as what subscribing opens. A tick on the quiz editor, at most
-  one per course, rather than "the first listed": the student's list is
+- **In each course of the programme, one Practice Paper is open** (a
+  fixed quiz; the name is 03 Q21) — the one the admin ticks **"Open in
+  trial"** on the quiz editor, at most one per course, **listed first**
+  with the badge **"Included in your trial"**; the course's other
+  papers show, locked, as what subscribing opens (their wording at the
+  build). A tick rather than "the first listed": the student's list is
   in title order, so a paper added, renamed or scheduled would change
   which one is open without anyone choosing. The tick is a column on the
-  quizzes and joins F4's §8 row. **Every account gets the same taster
-  papers**, so a second account never opens another paper; the
-  tasters' questions become public over time, and swapping one is a
-  tick. A course with no taster ticked opens no paper.
+  quizzes and joins F4's §8 row. **Every account gets the same trial
+  papers**, so a second account never opens another paper; their
+  questions become public over time, and swapping one is a tick. A
+  course with no paper ticked opens none in the trial.
 - **Three Quiz Builder quizzes in all**, spent in whichever courses the
   student likes (Sam: two per course is too generous), each at the
   normal builder limit (`builder_max_questions`, 50 on dev) — no
-  taste-specific cap. The builder draws at random per build, so these
+  trial-specific cap. The builder draws at random per build, so these
   differ for every student.
-- **A taste quiz is used when it is built**, not when finished: its
+- **A trial quiz is used when it is built**, not when finished: its
   questions reach the student at creation (03 Q4), and an unfinished
   one stays in Learning History with Resume. **Retakes do not count** —
   the same questions back, nothing new exposed.
-- **General Paper is treated like every other course** — one taster
-  paper. Sam recalled that the Sheets-era trial opened General Paper in
+- **General Paper is treated like every other course** — one paper
+  open. Sam recalled that the Sheets-era trial opened General Paper in
   full and nothing else (`WELCOME_TRIAL`'s shape, still a product);
   mentioned as an earlier idea, not taken.
-- **Mocks and packs stay paid.**
+- **Mocks and packs stay paid.** Packs already refuse a student who
+  holds only a trial (`trial_not_allowed`, legacy's rule).
+- **Each product carries its own limits** (Sam's proposal, agreed). A
+  product says today only which courses it opens and for how many days;
+  it gains what the student gets of each feature: **Quiz Builder
+  quizzes** (empty = unlimited, a number = that many in all over the
+  product's length); **offline packs** (per course; empty = unlimited,
+  0 = none — the Config page's `offline_packs_per_course` moves here);
+  **Practice Papers** (**all**, or **the trial paper only** — a choice,
+  since with a ticked paper a number has no meaning); **mock exams**
+  (yes or no — each mock's own `visibility` overlaps and is settled at
+  the build). The trial: 3, 0, the trial paper only, no; Free Full
+  Access and paid: unlimited, 5, all, yes. **MyNclex's shape:** its
+  products carry `cat_allowance` (empty = unlimited) and
+  `readiness_credits` (0 = none), **copied onto the subscription when
+  it is granted**, so editing a product changes new grants only — the
+  same here. **Use is counted from the student's own sittings** (the
+  builder quizzes built under the grant, retakes left out), checked
+  inside the database when a sitting is created, with no tally of its
+  own; where two grants cover one course, the more generous wins. A new
+  kind of offer — a school's promotion — is then a product row, not a
+  build. This replaces the Config settings offered for the trial's
+  numbers; the 14 days are the product's existing length.
+  `builder_max_questions` (a quiz's size, not access) stays in Config.
 - **What one account sees**, on the content's target size rather than
   dev's sample bank (Sam: a course will hold at least 180 × 5 questions
-  for its papers and perhaps 180 × 5 more for the builder): one taster
+  for its papers and perhaps 180 × 5 more for the builder): one trial
   paper per course (180, or 100 for General Paper) and up to 150
   builder questions. A first estimate made the same day from dev's
   counts was withdrawn on that correction.
 - **Weighed for the size:** three builder quizzes of up to 20 and no
   paper (Claude's recommendation, the least exposed); the first 20–30
-  questions of one paper; a short taster quiz made by the admin. Sam
+  questions of one paper; a short trial quiz made by the admin. Sam
   chose the papers.
-- **Still open:** repeat sign-ups (§4, now smaller); whether the 14
-  days and the three quizzes are Config settings, as the builder's
-  limit is (offered, not answered); the end-of-taste screen (F2).
+- **Still open:** repeat sign-ups (§4, now smaller); the end-of-trial
+  screen (F2); the locked papers' wording; how each mock's
+  `visibility` meets the product's yes or no.
 
 ### Real-world comparison — Claude's views, 2026-10-02, not ruled
 
@@ -387,9 +425,10 @@ Meta's WhatsApp pricing). To go through with Sam before G1 is sliced:
 - **What the trial gives — answered in principle 2026-10-02** (§3,
   *What a new student gets*): no automatic full trial; a taste of the
   real bank for 14 days; full trials admin-granted. When the 14 days
-  start (at registration) and the taste's size (a taster paper per
-  course, three builder quizzes) were settled the same day (§3, *The
-  taste settled*). The record of the question as it stood:
+  start (at registration) and what the trial opens (one ticked paper
+  per course, three builder quizzes, limits on each product) were
+  settled the same day (§3, *The limited trial settled*). The record of
+  the question as it stood:
   **What the trial gives, which this doc depends on and does not set**
   (opened 2026-09-22). The free-forever account is positioned here as
   retention, with the trial and the paid products as the only route to
@@ -434,15 +473,15 @@ Meta's WhatsApp pricing). To go through with Sam before G1 is sliced:
   shown to anyone outside the hundred.
 - **Who plays:** trial and paid students too (the view: yes, all
   attempts count).
-- **Repeat sign-ups** (opened 2026-10-02). A taste per account is a
-  taste per email: a student can register again for another. A verified
+- **Repeat sign-ups** (opened 2026-10-02). A trial per account is a
+  trial per email: a student can register again for another. A verified
   phone number at registration would make that harder; whether the app
   verifies the WhatsApp number today was not checked. **Read
   2026-10-02:** an account is unique by its email only
   (`users_email_lower_idx`); the WhatsApp number is checked for length
   (9 digits or more), neither verified nor unique; email confirmation
-  at sign-up is parked (BUILD_LIST, 04), so a second taste costs a
-  made-up address. **Smaller since the taste was settled:** the taster
+  at sign-up is parked (BUILD_LIST, 04), so a second trial costs a
+  made-up address. **Smaller since the trial was settled:** the trial
   papers are the same for every account, so a second account opens no
   new paper — what it adds is up to 150 new builder questions.
 - **Our prices beside GHS 6.** Unchecked; decides how the free floor
@@ -472,29 +511,36 @@ one-off buttons and cards.
   builder and the pack maker drawing free rows only for a student with
   no live course. The one storage change in this doc. Settled
   2026-09-26 (§4 above).
-- **F2 — The free account.** Registration without a trial row (or the
-  trial kept and the floor beneath it — Sam's call), the builder and the
-  runner drawing from the pool for a student with no live course, the
-  dashboard saying plainly "Free: practice on the free set" against
-  "Trial: everything, N days left". Attempts snapshot from the pool like
-  any other (03 Q4), so the runner needs nothing new; the seal holds
-  (03 Q6). Since 2026-10-02 there is no automatic trial (§3), so this
-  is every new student. **The pages a student with no live course
+- **F2 — The free account.** The floor beneath the trial (Sam's call,
+  answered 2026-10-02: registration keeps a trial row, the limited one
+  of F4), the builder and the runner drawing from the pool for a
+  student with no live course, the dashboard saying plainly "Free:
+  practice on the free set" against "Trial: N days left". Attempts
+  snapshot from the pool like any other (03 Q4), so the runner needs
+  nothing new; the seal holds (03 Q6). Since 2026-10-02 registration
+  grants only the limited trial (§3), so every new student meets these
+  pages — the locked papers during the 14 days, all of them after.
+  **The pages a student with no live course
   meets today** (read 2026-10-02): the course page says "No Access";
   the attempt report says "No Course Access", so past attempts cannot
   be reviewed; Learning History lists the attempts but its course
   filter is empty and course names show as their ids; the fixed-quiz
   list and the builder offer nothing. Each needs a free-account state.
-  An end-of-taste screen ("you answered N questions from the full
+  An end-of-trial screen ("you answered N questions from the full
   bank") is the upgrade moment.
-- **F4 — The taste** (Sam, 2026-10-02; settled in §3, *The taste
-  settled*). Once per account, for 14 days from registration: in each
-  course, the Practice Paper the admin ticks as its taster, listed
-  first, the others shown locked; three Quiz Builder quizzes in all, at
-  the normal builder limit, in any courses; a quiz used when built,
-  retakes free; mocks and packs excluded. A use counter checked at
-  attempt creation, the 14-day window, and the taster tick on the
-  quizzes — storage changes, so it needs its §8 row.
+- **F4 — The limited trial** (Sam, 2026-10-02; settled in §3, *The
+  limited trial settled*). Today's five programme trial products,
+  reshaped: 14 days from registration; in each course the Practice
+  Paper the admin ticks "Open in trial", listed first as "Included in
+  your trial", the others shown locked; three Quiz Builder quizzes in
+  all, at the normal builder limit, in any courses; a quiz used when
+  built, retakes free; mocks and packs excluded. **Each product carries
+  its own limits** (builder quizzes, packs per course, papers all or
+  the trial paper only, mocks yes or no), copied onto the subscription
+  at the grant, as MyNclex does; use counted from the student's own
+  sittings, inside the database. Columns on the products and the
+  subscriptions and the tick on the quizzes — storage changes, so it
+  needs its §8 row.
 - **F3 — Landing and copy.** "Free practice questions, forever"; the
   trial and the products as the route to the full bank.
 
@@ -538,7 +584,7 @@ one-off buttons and cards.
 | F1 The pool and its door | candidate; settled as the mark + two doors 2026-09-26; §8 S16 ✅ 2026-09-26; the column is 08 B4 |
 | F2 The free account | candidate |
 | F3 Landing and copy | candidate |
-| F4 The taste | candidate; decided in principle 2026-10-02 (14 days, admin-granted full trials); settled the same day — from registration, a ticked taster paper per course, three builder quizzes; needs its §8 row |
+| F4 The limited trial | candidate; decided in principle 2026-10-02 (14 days, admin-granted full access); settled the same day — from registration, a ticked paper per course, three builder quizzes, the limits on each product; needs its §8 row |
 | G1 Streak, points, leaderboard (derived) | candidate; the NMC Prep walk done 2026-09-24 |
 | G2 The daily challenge | candidate; after G1; from the free pool (Sam, 2026-09-26), rotation and pool size open |
 | G3 Tiers | later |

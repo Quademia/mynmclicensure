@@ -635,7 +635,8 @@ fails with Postgres's words.
   "Question Sets" (reads small for 180 questions); for the titles,
   "General Paper Practice Set 1" (a second word for one thing) and
   "General Paper Assessment 1" (reads as graded and one-off). About 32
-  strings reach a reader today. The taster tick on a paper is 09 F4's.
+  strings reach a reader today. The "Open in trial" tick on a paper,
+  and its "Included in your trial" badge, are 09 F4's.
 - **The legacy-check gap 7** (the builder's stuck status line) and the
   Learning History items on BUILD_LIST — runner and history work that
   belongs here when queued.

@@ -307,11 +307,11 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 
 Decided in principle in a cloud session on 2026-09-20; candidates, none sliced, the open questions in the doc's §4.
 
-- → What the trial gives — settled by Sam, 2026-10-02: no automatic trial, full trials admin-granted; the taste is F4
+- → What the trial gives — settled by Sam, 2026-10-02: limited, 14 days; Free Full Access by hand only; the build is F4
 - ⬜ F1 The pool and its door — the mark is 08 B4's column; this slice is the two doors, the read policy and attempt creation, plus the free-only draws for a student with no course (§8 S16 ✅ 2026-09-26; a mark, not a separate table — Sam)
 - ⬜ F2 The free account — no course_access rows, the builder and runner on the pool, the dashboard's free-vs-trial line
 - ⬜ F3 Landing and copy — "free practice questions, forever"; the trial and the products as the route to the full bank
-- ⬜ F4 The taste — 14 days from registration: a ticked taster paper per course, 3 builder quizzes; §8 row (Sam, 10-02)
+- ⬜ F4 The limited trial — 14 days from registration, a ticked paper per course, 3 builder quizzes; limits per product
 - ⬜ G1 Streak, points, leaderboard — derived from the graded rows, no new tables; NMC Prep walked 2026-09-24; real-world views of 2026-10-02 to go through first (doc 09 §3: weekly and neighbours, capped effort points since retakes farm, a grace day for offline study)
 - ⬜ G2 The daily challenge — five a day per programme from the free pool (Sam's yes, 2026-09-26; the rotation and the pool's size open), a new attempt source; after G1
 - ⬜ G3 Tiers — names on point bands; later
