@@ -145,6 +145,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⬜ Offline page — the app's own, by a service worker (a PWA), not the browser's "No internet" (Sam: later, 2026-09-29)
 - ⬜ Offline banner — "You're offline" when the connection drops mid-use, gone when it returns (Sam: later, 2026-09-29)
 - ⬜ A "couldn't load, try again" page — the app has no error page; a failed page shows nothing helpful (2026-09-28)
+- ⬜ Phone numbers: register, checkout, profile take any 9 digits, kept as typed — a format check (10-03, unruled)
 
 #### [01-payments.md](docs/product-plan/01-payments.md)
 
@@ -232,6 +233,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⬜ 7 Quiz Builder and Offline Pack builder: the status line sticks after a failure; "Select a course…" leaves the previous course's topics and counts
 - ⬜ Quiz Builder: an "All topics" build is named after the course's first three topics — legacy did (2026-10-01)
 - ⬜ Quiz Builder: at least 5 questions a build (Sam, 2026-09-30) — to discuss: fewer matching, where it lives, packs
+- ⬜ Quiz Builder: a timed build takes its time limit from the page — matters once G1 scores sittings (10-03, unruled)
 - ⬜ The quiz lists read a student's attempts with select('*') on the cookie client — name the columns (2026-09-28)
 - ⏸ Learning history: the stats bar counts the loaded pages, not the whole history — legacy called true totals deferred (slice 7a, 2026-09-14) — with the page's redesign (Sam, 2026-09-29)
 - ⏸ Learning history: Source and Sort work over the loaded pages only; Course / Mode / Status / Search are database-side (slice 7a, 2026-09-14) — with the page's redesign (Sam, 2026-09-29)

@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-02, into 10-03 — doc 09: the limited trial (14 days, a ticked paper a course, 3 builder quizzes, limits per product), SMS checks; Practice Papers
+  - ↳ at registration · bank is sample · admin ticks the paper · trial not taste · 60 days not 7 · MyNclex cat_allowance shape · server draw dropped · Ghana SMS GHS 0.035 · no free tier · 09-30 wrap-up carried · Q21
+
 - 2026-10-02 — doc 09 compared with real products; no automatic trial, a 14-day taste of the real bank, full trials admin-granted; docs only
   - ↳ reverse trial · bank drain · taste 1 fixed + 2 builder · start of 14 days open · MyNclex 21 days unread · taste is more code · no-course pages · retakes farm points · grace day · weekly neighbours · views not ruled
 

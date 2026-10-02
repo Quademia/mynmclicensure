@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-10-01. Rules for **any** assistant working in this
+Last updated: 2026-10-03. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What is built and
@@ -619,6 +619,13 @@ slice on the branch.
   the go-ahead. Reading is always fine.
 - Say who a defect reaches — a real user, or only dev — before
   proposing a fix; Sam prices the fix on that.
+- **Dev's content is sample data; size nothing from its counts** (Sam,
+  2026-09-30 and again 2026-10-02). Its empty columns, its 10-question
+  quizzes and its bank's size are not the product's shape. The target
+  Sam gave: a course holds at least 180 × 5 questions for its fixed
+  quizzes and perhaps 180 × 5 more for the builder; a fixed quiz is 100
+  (General Paper) or 180. Say what dev shows as a fact about today, and
+  ask Sam the real size before a rule or a limit rests on it.
 - Discussion is never authorisation. "What do you think?" gets a view;
   only "proceed" starts a build.
 - **Sam decides only from what is offered** (his words, 2026-09-22), so
