@@ -613,6 +613,29 @@ fails with Postgres's words.
   the editor showing the admin a quiz's questions, answers and
   rationales as a student would see them, with no sitting created.
   Queued by Sam, 2026-09-28; its shape when it comes up.
+- **Q21 — Practice Papers, the name readers see** (Sam, 2026-10-02).
+  "Fixed quiz" says how the quiz is stored, not what it is to a
+  student; it stays the word inside the code and these docs. What a
+  reader sees: the section is **Practice Papers** — sidebar, page
+  title, dashboard, course page, Learning History, the help page, the
+  public copy; the address `/student/fixed-quizzes` becomes
+  `/student/practice-papers` (free while the app is not live; a
+  redirect after cutover); the admin pages say the same, so a student's
+  message and the admin's screen use one word. Each quiz is titled
+  **"Practice Paper N"** — no course in the title, because the long
+  course names cannot be shortened without saying less than the course
+  covers (Sam: "Psychiatry Paper 1" reads as psychiatry only) — and
+  wherever a paper appears away from its course heading, the course's
+  **full name** sits on a line above it. Learning History and the
+  attempt report already show the course; the results pop-up does not
+  (it follows the sitting); the dashboard's recent list to be checked
+  at the build. The titles are typed by the admin, so the "Practice
+  Paper N" rule is a convention, not a check. Weighed: "Practice
+  Tests" (blurs with Mock Exams), "Ready-made Quizzes" (long),
+  "Question Sets" (reads small for 180 questions); for the titles,
+  "General Paper Practice Set 1" (a second word for one thing) and
+  "General Paper Assessment 1" (reads as graded and one-off). About 32
+  strings reach a reader today. The taster tick on a paper is 09 F4's.
 - **The legacy-check gap 7** (the builder's stuck status line) and the
   Learning History items on BUILD_LIST — runner and history work that
   belongs here when queued.
@@ -1137,3 +1160,4 @@ it needs a change log on every answer, a storage change and its own
 | Q16 The keyword step never says what the keyword found | ⬜ queued 2026-09-26 (Sam); found walking 08 B6; re-read and offered 2026-09-27, not now (Sam) |
 | Q19 The admin preview says it is one | ⬜ queued 2026-09-28 (Sam); found walking the admin preview — §4 |
 | Q20 Preview this quiz | ⬜ queued 2026-09-28 (Sam); legacy's button never worked — §4 |
+| Q21 Practice Papers, the name readers see | ⬜ ruled 2026-10-02 (Sam: the section, "Practice Paper N", the course's full name above, the address, the admin too) — §4 |

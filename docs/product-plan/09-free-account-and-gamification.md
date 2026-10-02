@@ -236,7 +236,8 @@ Decided in principle; not yet a §8 row or a tick. It answers §4's
   quiz of the student's choice and 2 Quiz Builder quizzes of up to
   about 20 questions** — at most ~60–70 real questions an account,
   enough to judge the bank, too little to copy. The size is a proposal,
-  not yet confirmed.
+  not yet confirmed. **Superseded the same day** — a taster paper per
+  course and three builder quizzes (*The taste settled*, below).
 - **The taste lasts 14 days** (Sam). The clock protects nothing — the
   quiz cap does — it adds the deadline that makes a student decide.
   **When the 14 days start is open**: at registration (simpler; an
@@ -246,7 +247,7 @@ Decided in principle; not yet a §8 row or a tick. It answers §4's
   are counted (from the grant or from first open) was not checked —
   that repo was not in the session — and is the precedent to read
   first. When the 14 days end, only the unused taste is lost; the free
-  account stays.
+  account stays. **Settled the same day: at registration** (below).
 - **Paid only:** the full bank, mock exams, offline packs.
 
 Weighed and set aside the same day: the full 7-day trial (exposes the
@@ -257,6 +258,60 @@ checked and is not so — a time-limited trial reuses `course_access`'s
 end dates as built, the taste needs a new use counter — so the choice
 rests on protecting the bank, not on build cost. Whichever shape, a
 student with no live course meets today's locked pages (below, F2).
+
+### The taste settled — Sam, 2026-10-02 (desktop session)
+
+Settled the same day as the above, in a second conversation (Claude, in
+the desktop app); not yet a §8 row or a tick.
+
+- **The 14 days start at registration** (Sam: the simple way, and what
+  most platforms do). Weighed: at the first taste quiz, its start
+  screen saying the 14 days begin there (Claude's recommendation —
+  nobody loses the taste by signing up early). MyNclex was read first:
+  its readiness pack's 21 days start on the student's "Start my 21
+  days", but a pack is a product sold on its own and the taste is not
+  (Sam), so that precedent does not carry; its 7-day bank trial also
+  starts on the student's request, Sam's ruling there of 2026-09-04
+  that registering grants nothing. At registration fits what is built:
+  registration already grants a row with an end date.
+- **In each course of the programme, one Practice Paper** (a fixed
+  quiz; the name is 03 Q21) — **the one the admin ticks as that
+  course's taster, listed first**; the course's other papers show,
+  locked, as what subscribing opens. A tick on the quiz editor, at most
+  one per course, rather than "the first listed": the student's list is
+  in title order, so a paper added, renamed or scheduled would change
+  which one is open without anyone choosing. The tick is a column on the
+  quizzes and joins F4's §8 row. **Every account gets the same taster
+  papers**, so a second account never opens another paper; the
+  tasters' questions become public over time, and swapping one is a
+  tick. A course with no taster ticked opens no paper.
+- **Three Quiz Builder quizzes in all**, spent in whichever courses the
+  student likes (Sam: two per course is too generous), each at the
+  normal builder limit (`builder_max_questions`, 50 on dev) — no
+  taste-specific cap. The builder draws at random per build, so these
+  differ for every student.
+- **A taste quiz is used when it is built**, not when finished: its
+  questions reach the student at creation (03 Q4), and an unfinished
+  one stays in Learning History with Resume. **Retakes do not count** —
+  the same questions back, nothing new exposed.
+- **General Paper is treated like every other course** — one taster
+  paper. Sam recalled that the Sheets-era trial opened General Paper in
+  full and nothing else (`WELCOME_TRIAL`'s shape, still a product);
+  mentioned as an earlier idea, not taken.
+- **Mocks and packs stay paid.**
+- **What one account sees**, on the content's target size rather than
+  dev's sample bank (Sam: a course will hold at least 180 × 5 questions
+  for its papers and perhaps 180 × 5 more for the builder): one taster
+  paper per course (180, or 100 for General Paper) and up to 150
+  builder questions. A first estimate made the same day from dev's
+  counts was withdrawn on that correction.
+- **Weighed for the size:** three builder quizzes of up to 20 and no
+  paper (Claude's recommendation, the least exposed); the first 20–30
+  questions of one paper; a short taster quiz made by the admin. Sam
+  chose the papers.
+- **Still open:** repeat sign-ups (§4, now smaller); whether the 14
+  days and the three quizzes are Config settings, as the builder's
+  limit is (offered, not answered); the end-of-taste screen (F2).
 
 ### Real-world comparison — Claude's views, 2026-10-02, not ruled
 
@@ -331,9 +386,10 @@ Meta's WhatsApp pricing). To go through with Sam before G1 is sliced:
   the challenge's rotation.
 - **What the trial gives — answered in principle 2026-10-02** (§3,
   *What a new student gets*): no automatic full trial; a taste of the
-  real bank for 14 days; full trials admin-granted. Still open: when
-  the 14 days start, and the taste's size. The record of the question
-  as it stood:
+  real bank for 14 days; full trials admin-granted. When the 14 days
+  start (at registration) and the taste's size (a taster paper per
+  course, three builder quizzes) were settled the same day (§3, *The
+  taste settled*). The record of the question as it stood:
   **What the trial gives, which this doc depends on and does not set**
   (opened 2026-09-22). The free-forever account is positioned here as
   retention, with the trial and the paid products as the only route to
@@ -381,7 +437,14 @@ Meta's WhatsApp pricing). To go through with Sam before G1 is sliced:
 - **Repeat sign-ups** (opened 2026-10-02). A taste per account is a
   taste per email: a student can register again for another. A verified
   phone number at registration would make that harder; whether the app
-  verifies the WhatsApp number today was not checked.
+  verifies the WhatsApp number today was not checked. **Read
+  2026-10-02:** an account is unique by its email only
+  (`users_email_lower_idx`); the WhatsApp number is checked for length
+  (9 digits or more), neither verified nor unique; email confirmation
+  at sign-up is parked (BUILD_LIST, 04), so a second taste costs a
+  made-up address. **Smaller since the taste was settled:** the taster
+  papers are the same for every account, so a second account opens no
+  new paper — what it adds is up to 150 new builder questions.
 - **Our prices beside GHS 6.** Unchecked; decides how the free floor
   and the trial are worded against each other.
 - **NAC and NAP as separate programmes; RPHN and RCN the same exam or
@@ -424,12 +487,14 @@ one-off buttons and cards.
   list and the builder offer nothing. Each needs a free-account state.
   An end-of-taste screen ("you answered N questions from the full
   bank") is the upgrade moment.
-- **F4 — The taste** (Sam, 2026-10-02). Once per account: 1 fixed quiz
-  and 2 Quiz Builder quizzes (~20 questions each) from the real bank,
-  within 14 days; mocks and packs excluded. A use counter checked at
-  attempt creation and a 14-day window — the window's start (at
-  registration or at the first taste quiz) open. A storage change, so
-  it needs its §8 row.
+- **F4 — The taste** (Sam, 2026-10-02; settled in §3, *The taste
+  settled*). Once per account, for 14 days from registration: in each
+  course, the Practice Paper the admin ticks as its taster, listed
+  first, the others shown locked; three Quiz Builder quizzes in all, at
+  the normal builder limit, in any courses; a quiz used when built,
+  retakes free; mocks and packs excluded. A use counter checked at
+  attempt creation, the 14-day window, and the taster tick on the
+  quizzes — storage changes, so it needs its §8 row.
 - **F3 — Landing and copy.** "Free practice questions, forever"; the
   trial and the products as the route to the full bank.
 
@@ -473,7 +538,7 @@ one-off buttons and cards.
 | F1 The pool and its door | candidate; settled as the mark + two doors 2026-09-26; §8 S16 ✅ 2026-09-26; the column is 08 B4 |
 | F2 The free account | candidate |
 | F3 Landing and copy | candidate |
-| F4 The taste | candidate; decided in principle 2026-10-02 (14 days, admin-granted full trials); the start of the 14 days and the size open |
+| F4 The taste | candidate; decided in principle 2026-10-02 (14 days, admin-granted full trials); settled the same day — from registration, a ticked taster paper per course, three builder quizzes; needs its §8 row |
 | G1 Streak, points, leaderboard (derived) | candidate; the NMC Prep walk done 2026-09-24 |
 | G2 The daily challenge | candidate; after G1; from the free pool (Sam, 2026-09-26), rotation and pool size open |
 | G3 Tiers | later |
