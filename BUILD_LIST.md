@@ -312,6 +312,7 @@ Decided in principle in a cloud session on 2026-09-20; candidates, none sliced, 
 - → What the trial gives — settled by Sam, 2026-10-02: limited, 14 days; Free Full Access by hand only; the build is F4
 - ⬜ F1 The pool and its door — the mark is 08 B4's column; this slice is the two doors, the read policy and attempt creation, plus the free-only draws for a student with no course (§8 S16 ✅ 2026-09-26; a mark, not a separate table — Sam)
 - ⬜ F2 The free account — no course_access rows, the builder and runner on the pool, the dashboard's free-vs-trial line
+- ⬜ F2 After the trial, page by page — locked, not gone; scores and report summary open, review locked; an unfinished sitting finishes; in each page's redesign (Sam, 10-03)
 - ⬜ F3 Landing and copy — "free practice questions, forever"; the trial and the products as the route to the full bank
 - ⬜ F4 The limited trial — 14 days, a ticked paper a course, 3 builder quizzes, product limits, SMS-verified number
 - ⬜ G1 Streak, points, leaderboard — derived from the graded rows, no new tables; NMC Prep walked 2026-09-24; real-world views of 2026-10-02 to go through first (doc 09 §3: weekly and neighbours, capped effort points since retakes farm, a grace day for offline study)

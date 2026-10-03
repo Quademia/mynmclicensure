@@ -347,10 +347,76 @@ Sam grants by hand are **Free Full Access**, their products' own name.
   paper (Claude's recommendation, the least exposed); the first 20–30
   questions of one paper; a short trial quiz made by the admin. Sam
   chose the papers.
-- **Still open:** the end-of-trial screen (F2); the locked papers'
+- **Still open:** the end-of-trial screen (F2) — settled page by page
+  2026-10-03 (*After the trial, page by page*, below); the locked papers'
   wording; how each mock's `visibility` meets the product's yes or no.
   Repeat sign-ups settled 2026-10-03: SMS verification, one trial per
   verified number (§4).
+
+### After the trial, page by page — Sam, 2026-10-03 (desktop session)
+
+Ruled; not yet a §8 row or a tick. Asked as the end-of-trial screen on
+the dashboard; **Sam widened it to every page** — the course pages,
+Learning History and the rest — and gave the reason it is written
+rather than built: **Sam plans to redesign every student page**, since
+they are legacy's, carried like for like, and "probably don't serve good
+purposes at the moment". So nothing here is built onto today's pages;
+it is what each page's redesign builds in, for a student whose trial
+has ended and who holds nothing else live.
+
+- **Locked, not gone** (Sam: yes). After the trial nothing the student
+  had disappears: what is paid shows with a lock and one way to open it
+  (Choose a package), and what they did stays theirs. Most products with
+  a trial work this way — a locked course on view sells, an empty page
+  does not. MyNclex goes part of the way: its access wall says why a
+  door is locked ("Your free trial has ended on …, choose a plan to pick
+  up where you left off"), but the locked things are not kept on view.
+- **Their own past sittings: the scores and the report's summary stay
+  open; the question-by-question review is locked** (Sam: b). The
+  report keeps how they did and what to work on; each question with its
+  answer and explanation says "Choose a package to review your
+  answers". Their results stay theirs; the answers and explanations stay
+  part of what is paid. Weighed: everything open, review included (a);
+  only the list, as today (c).
+- **A sitting started in the trial and unfinished when it ends can be
+  finished** (Sam). Its questions reached the student when it was built
+  (03 Q4), so finishing it shows nothing new — the same ruling as a
+  device signed out mid-quiz (04 item 6, Sam 2026-09-18: the attempt
+  finishes, the next page refuses).
+
+Page by page. "Today" was read in the code on 2026-10-03; the right-hand
+column is what each page's redesign builds.
+
+| Page | Today, after the trial | After the trial, redesigned |
+|---|---|---|
+| Dashboard | "No active subscription" in red with Subscribe Now; "No courses available yet."; the recent attempts listed | A recap card: the trial in numbers (questions answered, % correct, quizzes done), up to three topics to work on (03 Q10's advice from three), Choose a package |
+| Sidebar, My Courses | the courses vanish | the courses stay, marked locked |
+| Course page | "Access Denied — No Access" | the course stays: what it holds and what the student did in it, locked |
+| Practice Papers (03 Q21) | "You are not enrolled in any courses yet." | every paper listed: the trial paper with its score, the rest locked |
+| Mock Exams | the same | listed, locked |
+| Quiz Builder | "No builder access" | the three trial quizzes shown as used, the builder locked; once F1 is built, it builds from the free set |
+| Learning History | the attempts listed, but course names show as codes and the course filter is empty | every attempt under its course's name |
+| Attempt report (03 Q10) | "No Course Access" | the summary open, the question list locked |
+| A sitting — review, resume | "No Course Access"; an unfinished one cannot be finished | the review locked; an unfinished one finishes |
+| Offline packs | unchanged — a trial cannot make one, a pack made earlier still opens | unchanged |
+| Messages, profile, procedures, portal guide | unaffected | unaffected |
+
+Offered the same day for the dashboard, not answered, so open: whether
+the recap card stays on the dashboard while nothing is live (nothing to
+remember, no storage; recommended) or shows once as a pop-up (which must
+remember it was shown — on the phone, so again on another phone, or in
+the account, a §8 row); the trial's bar saying "Trial, limited access —
+N days left" from day one, amber in the last three days, with Choose a
+package (today: "Platform access · Active · Expires <date>", amber from
+seven days); the end of a paid package taking the same card, "Your
+access ended on …" (MyNclex words the two apart). Left with its own
+line: the email at the end (BUILD_LIST 02, expiry reminders — a daily
+timer and the email queue first, and the Resend plan shared with
+MyNclex caps at 100 a day). Not discussed: Retake after the trial (a new
+sitting, refused today); announcements scoped to a course stop reaching
+the student (today's behaviour). The redesign's order, and whether it
+gets a plan doc of its own as the design system got doc 10, were asked
+and are Sam's.
 
 ### Real-world comparison — Claude's views, 2026-10-02, not ruled
 
@@ -570,7 +636,11 @@ one-off buttons and cards.
   filter is empty and course names show as their ids; the fixed-quiz
   list and the builder offer nothing. Each needs a free-account state.
   An end-of-trial screen ("you answered N questions from the full
-  bank") is the upgrade moment.
+  bank") is the upgrade moment. **Both were set page by page on
+  2026-10-03** (§3, *After the trial, page by page*): locked, not gone;
+  the scores and the report's summary open, the review locked; an
+  unfinished sitting finishes — built into each page's redesign (Sam
+  plans one for every student page), not onto today's pages.
 - **F4 — The limited trial** (Sam, 2026-10-02; settled in §3, *The
   limited trial settled*). Today's five programme trial products,
   reshaped: 14 days from registration; in each course the Practice
@@ -628,7 +698,7 @@ one-off buttons and cards.
 | Slice | Date |
 |---|---|
 | F1 The pool and its door | candidate; settled as the mark + two doors 2026-09-26; §8 S16 ✅ 2026-09-26; the column is 08 B4 |
-| F2 The free account | candidate |
+| F2 The free account | candidate; what each page shows after the trial ruled 2026-10-03 (§3) — locked, not gone; built into each page's redesign |
 | F3 Landing and copy | candidate |
 | F4 The limited trial | candidate; decided in principle 2026-10-02 (14 days, admin-granted full access); settled the same day — from registration, a ticked paper per course, three builder quizzes, the limits on each product; SMS verification, one trial per verified number (2026-10-03); needs its §8 row |
 | G1 Streak, points, leaderboard (derived) | candidate; the NMC Prep walk done 2026-09-24 |
