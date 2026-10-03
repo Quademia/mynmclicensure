@@ -401,16 +401,20 @@ column is what each page's redesign builds.
 | Offline packs | unchanged — a trial cannot make one, a pack made earlier still opens | unchanged |
 | Messages, profile, procedures, portal guide | unaffected | unaffected |
 
-Offered the same day for the dashboard, not answered, so open: whether
-the recap card stays on the dashboard while nothing is live (nothing to
-remember, no storage; recommended) or shows once as a pop-up (which must
-remember it was shown — on the phone, so again on another phone, or in
-the account, a §8 row); the trial's bar saying "Trial, limited access —
-N days left" from day one, amber in the last three days, with Choose a
-package (today: "Platform access · Active · Expires <date>", amber from
-seven days); the end of a paid package taking the same card, "Your
-access ended on …" (MyNclex words the two apart). Left with its own
-line: the email at the end (BUILD_LIST 02, expiry reminders — a daily
+The dashboard, ruled the same day (Sam; "we will talk more about it when
+we actually build it", so the details are settled at the build):
+
+- **The recap card stays on the dashboard while nothing is live** —
+  nothing to remember, no storage. Weighed: a pop-up the first time back,
+  which must remember it was shown (on the phone, so again on another
+  phone, or in the account, a §8 row).
+- **The trial's bar** says "Trial, limited access — N days left" from day
+  one, amber in the last three days, with Choose a package (today:
+  "Platform access · Active · Expires <date>", amber from seven days).
+- **The end of a paid package takes the same card**, its first line "Your
+  access ended on …" (MyNclex words the two apart).
+
+Left with its own line: the email at the end (BUILD_LIST 02, expiry reminders — a daily
 timer and the email queue first, and the Resend plan shared with
 MyNclex caps at 100 a day). Not discussed: Retake after the trial (a new
 sitting, refused today); announcements scoped to a course stop reaching
