@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-03 — doc 09: what every page shows after the trial (locked, not gone), for the redesign; G1: the streak settled, points become questions mastered
+  - ↳ Sam redesigns every page · summary open, review locked · unfinished sitting finishes · recap card stays · streak private · one answer a day · a day forgiven · retake farm · effort points withdrawn · 5 s floor · leaderboard asked
+
 - 2026-10-02, into 10-03 — doc 09: the limited trial (14 days, a ticked paper a course, 3 builder quizzes, limits per product), SMS checks; Practice Papers
   - ↳ at registration · bank is sample · admin ticks the paper · trial not taste · 60 days not 7 · MyNclex cat_allowance shape · server draw dropped · Ghana SMS GHS 0.035 · no free tier · 09-30 wrap-up carried · Q21
 
