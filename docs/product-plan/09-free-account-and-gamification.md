@@ -422,6 +422,93 @@ the student (today's behaviour). The redesign's order, and whether it
 gets a plan doc of its own as the design system got doc 10, were asked
 and are Sam's.
 
+### G1, part by part — Sam, 2026-10-03 (desktop session)
+
+Taken in order — the streak, points, the leaderboard — since the
+leaderboard ranks on points. Sam asked first whether these three are
+gamification's pillars; answered: they are its most visible pieces (the
+textbook trio is points, badges and leaderboards), resting on four
+reasons people come back — **habit** (streak, daily challenge,
+reminder), **progress** (03 Q10–Q13: what to fix, accuracy by topic, a
+readiness band), **recognition** (points, G3's tiers) and **social**
+(leaderboard, how others did) — and points and a leaderboard alone fade
+within weeks unless tied to real progress, which for an exam student is
+"am I ready to pass". Three pieces outside the plan were offered as
+candidates and not taken up: a daily goal ("answer 20 today"), days to
+the student's exam, badges for milestones.
+
+**The streak** (Sam: agreed, all four):
+
+- **Private** — only the student sees their own streak; the leaderboard
+  ranks on points only. A streak is the student against yesterday, a
+  leaderboard against others; kept private, a low bar fools only whoever
+  games it, and nobody's no-data week or offline-pack days are shown to
+  others. Weighed: shown beside each name but not ranked; earning points
+  that rank (NMC Prep's streak points — 3% of its points, 2026-09-24).
+  Duolingo keeps the streak on the learner's own profile and ranks its
+  leagues on the week's points.
+- **A study day is one question answered** — MyNclex's rule (Sam's
+  ruling there, 2026-07-23): opening a quiz and closing it does not
+  count. Weighed: a quiz finished (doc 09's first plan — a half-done
+  180-question paper would count for nothing); at least 10 answered.
+- **One missed day a week is forgiven**, automatically — a rule in the
+  count, nothing bought or stored; for weak-data days and offline-pack
+  days, which record nothing. Weighed: strict.
+- **The student sees** the current streak, their best, and the last
+  seven days as a strip (MyNclex's three); where on the page waits for
+  the redesign.
+
+Counted from the graded rows already saved, so no new table; every
+student — free, trial, paid — keeps one; a day is the calendar day
+(Ghana is UTC all year).
+
+**Points — replaced by questions mastered** (Sam: A). Sam asked whether
+something could stand in for points, an idea taken from NMC Prep. Four
+were offered, combinable: **A**, count something real — questions
+mastered; **B**, compare without a list — a private percentile ("better
+than 62% of RN students who sat this paper", first sittings only;
+UWorld's way, already 03 Q13); **C**, compete as a school — a weekly
+board of schools, not people, which rests on students picking their
+school (D50); **D**, badges for milestones. Sam took A, with how many of
+the questions answered were right shown beside it.
+
+- **A question is mastered when the student gets it right the first
+  time they meet it.** Repeats — a retake, a builder question drawn
+  again, revision — earn nothing, though they keep the streak: new
+  ground earns, showing up keeps the streak. Each question can give a
+  student one, ever. The same for papers, builder quizzes and mocks.
+- **The student sees the effort beside the result**: "300 answered · 195
+  mastered · 65% right first time", "answered" being new questions met.
+  A ranking, if there is one, is on mastered only, since the answered
+  count can be pushed up by tapping.
+- **An answer given in under 5 seconds counts as answered, never as
+  mastered** (03 Q11 records the engaged seconds per question). Random
+  tapping takes a second or two; an honest reader rarely answers that
+  fast. Offered with A and kept unless Sam says otherwise, as is **no
+  bonus for timed quizzes or mocks** (the plan below had one): one rule
+  is easier to explain, and a bonus can be added later.
+- **Every question carries one mark** (dev, all 5,581 rows), so a point
+  per mastered question would only repeat the number — why "points"
+  became the count itself.
+
+Tested against the app's own features with three made-up students in a
+week — an honest one (300 new questions, 195 right), one retaking a
+50-question quiz nine times in instant mode after its answers were
+shown, one tapping at random through 600 new questions: **a point for
+every right answer, every time** (NMC Prep's; this doc's first plan)
+put the retaker first, 480 to 195; **Claude's effort points of
+2026-10-02** (every answer, capped per day) paid wrong answers, so
+random tapping earned in full — withdrawn; **right the first time**
+left only random tapping, about one in four right on four-option
+questions — hence the 5-second floor. Weighed for that gap and set
+aside: a daily cap (it also stops the hardest workers in exam season);
+accepting it and watching. B, C and D stay for the leaderboard talk
+and later: B is 03 Q13; C a shape for the leaderboard; D in place of
+G3's tiers, which were names on point bands. "The first time a student
+met a question" is each student's earliest graded row for it — derived,
+no new table; at many students the weekly board may need a stored tally
+refreshed every few minutes, a §8 row decided at the build.
+
 ### Real-world comparison — Claude's views, 2026-10-02, not ruled
 
 Asked by Sam: is there a better approach from real products? Sources
@@ -673,7 +760,12 @@ one-off buttons and cards.
   function, one dashboard card, one page. Since 03 Q5 every answer is a
   graded row, so this is reads only. The own rank is the one thing NMC
   Prep leaves out (walked 2026-09-24): a student below its hundred sees
-  nothing of their standing.
+  nothing of their standing. **Superseded in part on 2026-10-03** (§3,
+  *G1, part by part*): a study day is one question answered, one missed
+  day a week forgiven, the streak private; points replaced by questions
+  mastered (right the first time met, not under 5 seconds), shown beside
+  the questions answered, no bonus for timed; the leaderboard still to
+  settle.
 - **G2 — The daily challenge.** Five questions per programme, the same
   five for everyone, chosen by a seed from the date, run through the
   instant runner; a new attempt source (every list that switches on
@@ -705,7 +797,7 @@ one-off buttons and cards.
 | F2 The free account | candidate; what each page shows after the trial ruled 2026-10-03 (§3) — locked, not gone; built into each page's redesign |
 | F3 Landing and copy | candidate |
 | F4 The limited trial | candidate; decided in principle 2026-10-02 (14 days, admin-granted full access); settled the same day — from registration, a ticked paper per course, three builder quizzes, the limits on each product; SMS verification, one trial per verified number (2026-10-03); needs its §8 row |
-| G1 Streak, points, leaderboard (derived) | candidate; the NMC Prep walk done 2026-09-24 |
+| G1 Streak, points, leaderboard (derived) | candidate; the NMC Prep walk done 2026-09-24; the streak settled and points replaced by questions mastered 2026-10-03 (§3); the leaderboard open |
 | G2 The daily challenge | candidate; after G1; from the free pool (Sam, 2026-09-26), rotation and pool size open |
 | G3 Tiers | later |
 
