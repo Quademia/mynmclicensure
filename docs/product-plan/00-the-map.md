@@ -148,8 +148,13 @@ under the avatar in the top bar.
 - Why: one place to learn, as Duolingo, Spotify and Quizlet do; a menu
   or a landing that changes with status moves things when the student
   upgrades and hides what they could unlock ("locked, not gone", 03).
-- Open: a bar at the bottom of a phone's screen in place of the drawer —
-  decided when the first signed-in page is drawn.
+- **On a phone, a bar at the bottom** (Sam, 2026-10-04): four tabs that
+  never change — Dashboard, Practise, Progress, Offline. A group's other
+  pages sit in a row of tabs at the top of its pages (Practise: Papers ·
+  Mocks · Builder; Progress: History · Leaderboard; Offline: My packs ·
+  Build); each tab opens on the first, not remembered. The ☰ menu stays
+  the full list; a computer keeps the sidebar. A bar that swaps to the
+  group's items was drawn and declined: two taps between groups (09).
 
 ## The build order
 

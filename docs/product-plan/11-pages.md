@@ -44,8 +44,8 @@ opens it (00, The menu).
   the trial paper (05), Choose a package; a package's in numbers, Renew
   your package. **The full recap shows for 2 weeks after the end, then
   shrinks to one line above the free practice card** (Sam, 2026-10-04).
-- Open: a bar at the bottom of a phone's screen (and its four tabs) or
-  ☰ only; the cards' words, all new.
+- On a phone, the bottom bar's Dashboard tab; no row of sub-tabs (00).
+- Open: the cards' words, all new.
 
 ### My courses (sidebar) and the course page
 - Ended: the courses stay, marked locked; the course page shows what it

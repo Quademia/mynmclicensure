@@ -63,13 +63,19 @@ Detail and history: `archive/product-plan/10-design-system.md`.
   hamburger when anything is unread. The drawer comes from the left
   today and moves to the right, like the public menu (Sam, later). *(to
   build: DS21)*
+- **The student's bottom bar on a phone** (Sam, 2026-10-04): four fixed
+  tabs, a row of sub-tabs at the top of a group's pages that fits
+  without scrolling, the drawer still the full menu — MyNclex's pattern,
+  copied, not shared (00, The menu). *(to build: with the dashboard)*
 - **The wordmark** (Sam, 2026-09-26): the painted Q, QUADEMIA in small
   teal capitals over MyNMCLicensure in bold navy, on both bars.
 - **The public bar**: Home · Premium Prep · Packages · Dashboard, one
   action (Sign in); on a phone a menu from the right; a footer with the
   year computed.
 - The sitting and the offline pack take no chrome.
-- **Two menus only**: the app's drawer and the public menu.
+- **Two menus only**: the app's drawer and the public menu — plus, for
+  students on a phone, the bottom bar and the sub-tab row, which are
+  shortcuts into the drawer's own pages.
 - Every surface works on a phone, breakpoint 768px; student pages first.
 
 ### Still to join the system *(to build, as each page is touched)*
