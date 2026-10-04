@@ -349,7 +349,8 @@ Sam grants by hand are **Free Full Access**, their products' own name.
   chose the papers.
 - **Still open:** the end-of-trial screen (F2) — settled page by page
   2026-10-03 (*After the trial, page by page*, below); the locked papers'
-  wording; how each mock's `visibility` meets the product's yes or no —
+  wording — **approved 2026-10-04** (same section); how each mock's
+  `visibility` meets the product's yes or no —
   **settled 2026-10-04 with §8 S23**: the product's yes / no is the gate,
   `visibility` (stored, never checked) left for removal.
   Repeat sign-ups settled 2026-10-03: SMS verification, one trial per
@@ -418,11 +419,52 @@ we actually build it", so the details are settled at the build):
 
 Left with its own line: the email at the end (BUILD_LIST 02, expiry reminders — a daily
 timer and the email queue first, and the Resend plan shared with
-MyNclex caps at 100 a day). Not discussed: Retake after the trial (a new
-sitting, refused today); announcements scoped to a course stop reaching
-the student (today's behaviour). The redesign's order, and whether it
-gets a plan doc of its own as the design system got doc 10, were asked
-and are Sam's.
+MyNclex caps at 100 a day). Retake after the trial and the course's
+announcements, not discussed that day, were settled on 2026-10-04
+(below). The redesign's order, and whether it gets a plan doc of its own
+as the design system got doc 10, were asked and are Sam's.
+
+**Settled 2026-10-04 (Sam, all four as recommended):**
+
+- **Retake after the trial is locked**, the button kept with a lock and
+  "Choose a package to retake". Tested against the app's own features
+  first: a retake is a new sitting of the same questions in the
+  original's mode, so a Learning-mode retake's Check Answer would hand
+  back the answers and explanations the locked review keeps; a
+  score-only retake still leaks — one answer changed per retake, the
+  score moving, gives the right option, slow but doable on a short
+  builder quiz; and a retake copies each question fresh from the bank,
+  so an edited question is new content. Weighed: retakes in the test
+  modes with the score only.
+- **The unfinished sitting still finishes** (10-03's ruling kept), **its
+  reason corrected**: the questions reached the student at creation, but
+  their answers did not — they stay sealed until Check Answer (03 Q6) —
+  so finishing a Learning-mode sitting after the trial shows the answers
+  to the questions not yet answered. Kept because it is bounded: one
+  sitting, questions already in hand, answers they would have seen a day
+  earlier. Weighed: finishing with Check Answer off.
+- **A course's announcements reach every student who has held the
+  course** — live access or ended, revoked grants apart — so a lapsed
+  student keeps their course's news ("new questions in Surgery", "a mock
+  this weekend"), as *locked, not gone* asks. No storage change: the
+  ended `course_access` rows are kept. Every scope is AND, so a note for
+  subscribers only is the course plus Paid. Weighed: live access only
+  (today's); a tick per announcement for ended access (a column, a §8
+  row). Found the same day and queued apart (BUILD_LIST 02): four
+  readers trust the word `ACTIVE` without the date, so an ended
+  subscription counts as live — a lapsed trial student is still "Trial"
+  to announcements — until an admin presses Sync expired.
+- **The locked wording, approved:**
+
+| Where | Words |
+|---|---|
+| The trial paper, during the trial | "Included in your trial" (2026-10-02) |
+| The other papers, during and after | a lock, "Opens with a package", **Choose a package** |
+| The top of the paper list, after | "Your trial ended on 18 October. Your scores are still here." |
+| Retake, after | "Choose a package to retake" |
+| Mock exams | "Mock exams open with a package" |
+| Quiz Builder, the 3 used | "You've used your 3 trial quizzes" |
+| The review, after | "Choose a package to review your answers" (2026-10-03) |
 
 ### G1, part by part — Sam, 2026-10-03 (desktop session)
 
@@ -986,7 +1028,7 @@ one-off buttons and cards.
 | Slice | Date |
 |---|---|
 | F1 The pool and its door | candidate; settled as the mark + two doors 2026-09-26; §8 S16 ✅ 2026-09-26; the column is 08 B4; a free sitting is the real course's (2026-10-04) |
-| F2 The free account | candidate; what each page shows after the trial ruled 2026-10-03 (§3) — locked, not gone; built into each page's redesign |
+| F2 The free account | candidate; what each page shows after the trial ruled 2026-10-03 (§3) — locked, not gone; built into each page's redesign; Retake locked, course announcements to all who held the course, the locked wording approved (2026-10-04) |
 | F3 Landing and copy | candidate |
 | F4 The limited trial | candidate; decided in principle 2026-10-02 (14 days, admin-granted full access); settled the same day — from registration, a ticked paper per course, three builder quizzes, the limits on each product; SMS verification, one trial per verified number (2026-10-03); §8 S23 ✅ 2026-10-04 |
 | G1 Streak, points, leaderboard (derived) | candidate; the NMC Prep walk done 2026-09-24; the streak settled and points replaced by questions mastered 2026-10-03 (§3); the leaderboard settled 2026-10-04 (§3) — from G2, three views, generated usernames; avatars Noto's animals, Avataaars the alternative; needs its §8 row |

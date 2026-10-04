@@ -174,6 +174,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ (unplanned) One Grant dialog for Subscriptions and the Users drawer, the preview by the chain — 2026-09-19
 - ✅ (unplanned) The selling pages become cards — `/premium-prep` five cards, `/subscribe` the shop with a programme chooser that reorders and does not filter; both Server Components with no client half (660 lines deleted); D23 items 1, 2 and 5 built, item 3 built as `lib/catalogue/for-sale.ts` — 2026-09-22
 - ⬜ D23 item 3 open — `/student/upgrade` and `/premium-prep` still skip `isForSale()` (2026-09-23)
+- ⬜ Four readers trust ACTIVE without the date: an ended subscription counts as live until Sync expired (10-04)
 - → The product card duplicated between `.prep-*` and `.subp-*` — built as 10-design-system.md DS20 (2026-09-23)
 - ✅ C4 The checkout — one route, MyNclex's layout, four required fields, isForSale() at both doors — 2026-09-23
 - ⬜ The checkout and confirmation-page wording — all new, not approved; Sam to revisit (2026-09-23)
@@ -273,6 +274,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 *Not yet sliced — each gets an id when the doc is rewritten:*
 
 - ⬜ Announcements: each edit re-saves the body through the paragraph converter and adds a line break between paragraphs — legacy did (slice 11a, 2026-09-14)
+- ⬜ Course announcements reach every student who has held the course, revoked grants apart (Sam, 10-04; 09 F2)
 
 #### [06-offline-packs.md](docs/product-plan/06-offline-packs.md)
 
