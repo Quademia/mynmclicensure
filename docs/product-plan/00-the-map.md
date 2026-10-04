@@ -138,9 +138,13 @@ feedback (06).
 Dashboard, Practise, Progress, Study offline, Help and news; Account
 under the avatar in the top bar. In the sidebar (and the phone's
 drawer, the same menu) each group is a small heading with every row
-visible beneath — not groups that open and close — named as the phone's
-tabs: Practice papers, Mock exams, Quiz builder; My packs, Build a pack
-(Sam: A; built 2026-10-04, 09.7).
+visible beneath, named as the phone's tabs: Practice papers, Mock
+exams, Quiz builder; My packs, Build a pack (Sam: A; built 2026-10-04,
+09.7). To keep it short (Sam, 2026-10-04): tighter rows on a computer
+(a phone keeps a finger's sizes), the two channels as one row of two
+buttons, and a heading that folds its group away — every group open
+until the student folds one, remembered on that device; a folded group
+holding the current page still shows.
 
 - **One menu for every status** (Sam: A) — free, trial, paid and ended
   see the same items. A locked item carries a small lock and, tapped,
