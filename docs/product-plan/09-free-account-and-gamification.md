@@ -509,6 +509,121 @@ met a question" is each student's earliest graded row for it — derived,
 no new table; at many students the weekly board may need a stored tally
 refreshed every few minutes, a §8 row decided at the build.
 
+### The leaderboard settled — Sam, 2026-10-04 (desktop session)
+
+Sam opened unsure of the 10-03 shape (a weekly board on questions
+mastered, four questions unanswered) — "there seems to be no one better
+way" — and offered three ideas: a board from the daily challenge that
+runs through the week (a reason to come every day); a leaderboard for
+each school, its own students ranked (a reason to invite friends), from
+the challenge and from questions mastered across the bank; and counting
+who got a question right in the best time. Talked through; **Sam
+accepted every recommendation below.**
+
+**The numbers come from the daily challenge only (G2).**
+
+- Every student in a programme answers the same five a day — free,
+  trial or paid alike — and can score at most 5 a day, 35 a week, so
+  turning up wins, not hours of study or a package. A board on the whole
+  bank ranks by how much of it a student can open, which is who paid; a
+  free student could never place.
+- Each day's five can be answered only on that day, and once (otherwise
+  all seven on Sunday). The week runs Monday to Sunday, Ghana time (UTC).
+  **The best 6 of the 7 days count** — the streak's forgiven day.
+- **Questions mastered stays the student's own progress number** (10-03),
+  on no board; its 5-second floor stays (not contested).
+- So **G2 comes before the leaderboard**; the streak and questions
+  mastered need nothing from it.
+
+**Order on a board: right answers first, then the quicker time** (Sam's
+best time, as the tie-break; speed adds no points of its own). Everyone
+has the same five, so time compares like with like; a fast wrong answer
+never beats a slow right one, so random tapping cannot win and the
+challenge needs no 5-second floor. Not on the bank: a one-line question
+and a case scenario take different reading, so time there would rank the
+questions, not the students. The time is the phone's (03 Q11's engaged
+seconds): waiting on the network costs nobody, which matters on weak
+data; someone who knows how can fake it, which matters only with a
+prize.
+
+**Three views of one score:**
+
+- **My school** — the student's own school's board (Sam's idea: people
+  you know are the reason to come back, and to bring a friend). Shown
+  first. **One board per school, every programme together** — each
+  answers its own programme's five, scored out of 5 the same way; split
+  by programme the boards would be tiny. **Everyone sees the school's top
+  10; each student sees their own rank privately** ("You: 41st of 58"),
+  so nobody sees who is at the bottom of a class they sit in.
+- **All of my programme** — the national board: the top 3, and the two
+  above and two below the student with their own rank (strangers, so the
+  neighbours are shown).
+- **Schools** — schools ranked against each other (Claude's first
+  reading of Sam's school idea, kept by Sam as a second board): **the
+  average of each school's best 10 players**, like a team's eleven on the
+  pitch — a small college can beat a big university, and one heavy user
+  cannot carry a school; a school with fewer than 10 shows "N more players
+  and your school enters the board", an invite prompt. Only school names
+  show. Weighed: the total (the biggest schools always win); the plain
+  average (an inactive classmate drags it down, so inviting is
+  discouraged).
+- The school is the one picked at registration — required, from the
+  regulator's list of 141. A student who chose "My school isn't listed"
+  has no school board until the typed name is matched to the list: admin
+  work, and today the list cannot be changed (D50). A student can change
+  their school on the profile at any time; points count for the school
+  they were in when they earned them.
+
+**Names: a username on the profile, generated, with spins** (Sam).
+
+- **Display only** — sign-in stays email, Google or the email link.
+  Unique; seen and changed on the Profile page; the admin sees it beside
+  the real name, so a name can be traced to its owner. Alpha's
+  `users.username` (a login name, made from the first name) was never
+  written after sign-in moved to email and was dropped with S9 on
+  2026-09-19; this is a new field for a new purpose. Sam chose a
+  username over a name used only by the game: one name for every social
+  part of the app, now and later.
+- **Generated, Kahoot's way** — its friendly nickname generator gives an
+  adjective and an animal (800 pairs) and three spins, made because
+  players typed rude names. Ours: an adjective and a noun from word
+  lists, a number added when two would clash. Nobody polices it.
+  Weighed: typed by the student — more personal, but it needs rules, a
+  "that name's taken" check, a blocked-words list that misses Twi, Ga
+  and Ewe slang, an admin reset, and many would type their real name.
+  The word lists are a proposal Sam sees before anyone gets a name.
+- **Given at the student's first daily challenge, with up to 3 spins
+  then; changed once a week after that.** Registration stays short.
+- **The boards show the username and an avatar, never the real name or
+  the photo** — which retires the hide-my-name switch accepted earlier
+  the same day. The photo stays the account's (top bar, admin, messages).
+- **Avatars: a ready-made set, not the photo** (Sam's idea), bundled in
+  the app — a few KB each, arriving with the page, where a board of 13
+  photos would be 13 downloads (today's photo is served at 1.38 MB, a
+  queued speed line). **People or animals is open:** people need skin
+  tones that look like our students; animals can match the name. Sets go
+  to Sam side by side before one is picked (an asset is a proposal until
+  adopted). Sources: DiceBear (open-source; Lorelei and Open Peeps CC0,
+  others CC BY) or a set drawn for us. MyNclex has neither usernames nor
+  avatars (checked 2026-10-04).
+- Two columns on `users` (the username, the avatar) — a §8 row before
+  the build.
+
+**Inviting: a "Share on WhatsApp" button** sending a register link with
+the school filled in; no storage. Who invited whom (credit, a reward)
+would be new storage — later, if ever.
+
+**No prizes for now** (Sam). A prize would first need a server check on
+the phone's time, and a defence against a school's group chat sharing
+the day's answers (on a school board, sharing helps the school); the
+answer options shuffled per student blunt "the answer is C" — a view,
+for the build.
+
+Derived from the challenge's graded rows; a stored weekly tally if the
+reads grow slow, decided at the build with its own §8 row (as 10-03).
+**Still open:** people or animal avatars; the word lists; G2's pool size
+and rotation; where the boards sit in the redesign.
+
 ### Real-world comparison — Claude's views, 2026-10-02, not ruled
 
 Asked by Sam: is there a better approach from real products? Sources
@@ -628,9 +743,13 @@ Meta's WhatsApp pricing). To go through with Sam before G1 is sliced:
   all time; real names, first names, or a chosen display name with an
   opt-out. NMC Prep's answer (walked 2026-09-24): all time, the top
   100, full real names, per track with an all-tracks view, no rank
-  shown to anyone outside the hundred.
+  shown to anyone outside the hundred. **Settled 2026-10-04** (§3, *The
+  leaderboard settled*): weekly, from the daily challenge only; three
+  views — my school, my programme, schools; generated usernames and
+  ready-made avatars, never real names.
 - **Who plays:** trial and paid students too (the view: yes, all
-  attempts count).
+  attempts count). **Settled 2026-10-04:** everyone plays, on the same
+  five a day; only the daily challenge counts towards a board.
 - **Repeat sign-ups** (opened 2026-10-02). A trial per account is a
   trial per email: a student can register again for another. A verified
   phone number at registration would make that harder; whether the app
@@ -764,8 +883,16 @@ one-off buttons and cards.
   *G1, part by part*): a study day is one question answered, one missed
   day a week forgiven, the streak private; points replaced by questions
   mastered (right the first time met, not under 5 seconds), shown beside
-  the questions answered, no bonus for timed; the leaderboard still to
-  settle.
+  the questions answered, no bonus for timed. **The leaderboard settled
+  on 2026-10-04** (§3, *The leaderboard settled*): weekly, from the daily
+  challenge only (G2), right answers then the quicker time, the best 6
+  of 7 days; three views — my school (top 10 shown, the student's own
+  rank private), my programme (top 3 and neighbours), schools (the
+  average of each school's best 10); a generated username on the profile
+  and a ready-made avatar on the boards, never the real name or photo; a
+  Share on WhatsApp button. The board waits on G2; the streak and
+  questions mastered do not. The username and avatar are two columns on
+  `users`, so G1 is no longer reads only — its §8 row comes first.
 - **G2 — The daily challenge.** Five questions per programme, the same
   five for everyone, chosen by a seed from the date, run through the
   instant runner; a new attempt source (every list that switches on
@@ -776,7 +903,9 @@ one-off buttons and cards.
   some months, and the pool's size per programme is the open number.
   The seal (03 Q6) holds for the challenge as for any quiz — the NMC
   Prep walk found theirs sends the answers to the browser before it is
-  opened.
+  opened. **Since 2026-10-04 the challenge feeds the leaderboard** (§3),
+  so it comes before G1's board: each day's five answered only on that
+  day, once; the engaged seconds kept, since time breaks a tie.
 - **G3 — Tiers.** Names on point bands, Passwell's shape, once real
   numbers exist. Cosmetic.
 
@@ -797,8 +926,8 @@ one-off buttons and cards.
 | F2 The free account | candidate; what each page shows after the trial ruled 2026-10-03 (§3) — locked, not gone; built into each page's redesign |
 | F3 Landing and copy | candidate |
 | F4 The limited trial | candidate; decided in principle 2026-10-02 (14 days, admin-granted full access); settled the same day — from registration, a ticked paper per course, three builder quizzes, the limits on each product; SMS verification, one trial per verified number (2026-10-03); needs its §8 row |
-| G1 Streak, points, leaderboard (derived) | candidate; the NMC Prep walk done 2026-09-24; the streak settled and points replaced by questions mastered 2026-10-03 (§3); the leaderboard open |
-| G2 The daily challenge | candidate; after G1; from the free pool (Sam, 2026-09-26), rotation and pool size open |
+| G1 Streak, points, leaderboard (derived) | candidate; the NMC Prep walk done 2026-09-24; the streak settled and points replaced by questions mastered 2026-10-03 (§3); the leaderboard settled 2026-10-04 (§3) — from G2, three views, generated usernames; avatars open; needs its §8 row |
+| G2 The daily challenge | candidate; from the free pool (Sam, 2026-09-26); feeds the leaderboard, so before G1's board (2026-10-04); rotation and pool size open |
 | G3 Tiers | later |
 
 ---

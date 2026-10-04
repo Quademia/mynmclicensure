@@ -315,8 +315,8 @@ Decided in principle in a cloud session on 2026-09-20; candidates, none sliced, 
 - ⬜ F2 After the trial, page by page — locked, not gone; scores and report summary open, review locked; an unfinished sitting finishes; in each page's redesign (Sam, 10-03)
 - ⬜ F3 Landing and copy — "free practice questions, forever"; the trial and the products as the route to the full bank
 - ⬜ F4 The limited trial — 14 days, a ticked paper a course, 3 builder quizzes, product limits, SMS-verified number
-- ⬜ G1 Streak, questions mastered, leaderboard — derived from the graded rows; the streak private, a day = one question answered, one missed day a week forgiven; points replaced by questions mastered (right the first time, not under 5 s) beside questions answered (Sam, 10-03); the leaderboard open
-- ⬜ G2 The daily challenge — five a day per programme from the free pool (Sam's yes, 2026-09-26; the rotation and the pool's size open), a new attempt source; after G1
+- ⬜ G1 Streak, questions mastered, leaderboard — the board from the daily challenge, 3 views, usernames (Sam, 10-04)
+- ⬜ G2 The daily challenge — five a day per programme from the free pool; feeds the leaderboard, so before it (10-04)
 - ⬜ G3 Tiers — names on point bands; later
 
 #### [10-design-system.md](docs/product-plan/10-design-system.md)
