@@ -43,6 +43,10 @@ app as it will be:
   changes with Sam's tick, and the Open list (what is still Sam's).
 - `11-pages.md` — per page, what it shows to a free, trial, paid and
   ended student, completed when that page's redesign starts.
+- `12-tables.md` — every table in plain words: each column, who can
+  read or change it, and every decided change on the column it changes,
+  with Sam's tick and date. Written from the dev database (Sam,
+  2026-10-04, in place of referring to changes by S-number).
 
 `BUILD_LIST.md` holds each piece's status, one section per plan file.
 A decision is written once, in its file; its status once, in the list.
@@ -53,8 +57,13 @@ old build list — is looked up, never the spec: it says what the old app
 did or why something was decided; the plan files say what to build.
 
 ⭐ **Nothing is built without Sam's go-ahead in the session.** A change
-to storage needs Sam's tick with a date, written in its plan file's
-Storage section, before it is built (the ticks S1–S24 kept their ids).
+to storage is written on its table and column in `12-tables.md` — what
+changes and why — and needs Sam's tick with a date there before it is
+built. **Every migration updates `12-tables.md` in the same commit**:
+the change's line becomes plain description, and a column added,
+dropped or renamed is added, removed or renamed there. The changes
+ticked before 2026-10-04 were numbered S1–S24; that history is in
+`archive/product-plan/rebuild.md` §8, and new changes take no number.
 A finding is not a decision; a decision is a ruling in a plan file or a
 `BUILD_LIST.md` line. New features are each Sam's call, one at a time.
 If something looks wrong, log it and ask; do not fix it silently.

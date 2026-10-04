@@ -131,7 +131,7 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
   draft or active mock names a question, the builder, the pack maker,
   the paper picker and the daily challenge skip it, and it can never be
   marked free. Archiving a mock releases them.
-- **Mocks open only when the package says yes** (03 S23).
+- **Mocks open only when the package says yes** (03 F4).
 - Mocks as a premium exam experience is a design item not yet started
   (Q3, parked). Noted for it: mocks serve members who come near the
   exam and leave; a mock stays active across cohorts; its questions are

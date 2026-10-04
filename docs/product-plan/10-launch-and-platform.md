@@ -78,12 +78,14 @@ announcements start empty.
 ### Settings and reference data
 
 - **Settings are admin-only, read through a typed registry** (Sam,
-  2026-09-18, S13): every known key with its type, bounds and default;
-  the Config page edits typed fields and refuses out-of-range values;
-  the dead key dropped. Levels kept and wired to the pickers; a cohort
-  is a year. *(to build: S13)*
-- `db/schema.sql` and `db/rls.sql` are snapshots that miss three tables;
-  the migrations are the record.
+  2026-09-18): every known key with its type, bounds and default; the
+  Config page edits typed fields and refuses out-of-range values; the
+  dead key dropped. Levels kept and wired to the pickers; a cohort is a
+  year. *(to build: 10.7)*
+- **Every table is described in `12-tables.md`**, which every database
+  change updates in the same commit. `db/schema.sql` and `db/rls.sql`
+  are older snapshots that miss three tables; the migrations are the
+  record.
 
 ### Speed and scale
 
@@ -114,12 +116,13 @@ read that can grow past 1,000 rows reads in batches (AGENTS.md rule 10).
 - About 14 columns and one settings row with no reader or writer —
   reviewed one at a time (Sam, 2026-09-18). *(to build)*
 - The mock's `visibility` — stored, never checked; the package's mock
-  yes / no is the gate (03 S23). *(to build)*
+  yes / no is the gate (03 F4). *(to build)*
 
 ## Storage
 
-- **S13** Settings admin-only with a registry; levels keyed; cohort a
-  year; the level scope as a list (08) — ticked 2026-09-18, not built.
+Written on the tables in `12-tables.md`: `config` admin-only with a
+registry; `users.level` keyed to `levels`; `users.cohort` a year — all
+ticked 2026-09-18.
 
 ## Open
 

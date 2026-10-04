@@ -25,15 +25,17 @@ up; nothing here is described against them.
 | [09 Design system](09-design-system.md) | The look and the shared pieces every page uses |
 | [10 Launch and platform](10-launch-and-platform.md) | Going live, security, emails, speed, settings |
 | [11 Pages](11-pages.md) | Per page: what it shows to a free, trial, paid and ended student |
+| [12 Tables](12-tables.md) | Every table: each column, who can read or change it, and every decided change with Sam's tick |
 
 Each feature file has three parts: **how it works** (the feature as it
 will be — built and decided together, the unbuilt parts marked *to
-build* with their id), **storage** (each change to the database still to build, with
-Sam's tick and its date — none is built without one) and **open** (what
-is still Sam's to rule, one line each). The status of every piece —
-queued or built — is one line in [`BUILD_LIST.md`](../../BUILD_LIST.md),
-one section per file. A decision is written once, in its file; its
-status once, in the build list.
+build* with their id), **storage** (a short pointer to the tables its
+decisions change) and **open** (what is still Sam's to rule, one line
+each). A change to the database is written on its table and column in
+`12-tables.md`, with Sam's tick and its date — none is built without
+one. The status of every piece — queued or built — is one line in
+[`BUILD_LIST.md`](../../BUILD_LIST.md), one section per file. A decision
+is written once, in its file; its status once, in the build list.
 
 ## Who uses it
 
@@ -175,7 +177,8 @@ are in `AGENTS.md`.
   file buckets carry a `licensure-gh-` prefix. A project per product is
   paid compute not yet earned; a schema is the cheapest real separation,
   and copying that one schema out is the move the day it gets its own.
-  The sign-in table belongs to the project and is shared.
+  The sign-in table belongs to the project and is shared. Every table
+  is described in [`12-tables.md`](12-tables.md).
 - **The database is the gate** — the browser never writes to a product
   table. Every write goes through the server, behind a check that the
   caller is a signed-in student or admin, with a key only the server

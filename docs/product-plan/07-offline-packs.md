@@ -22,7 +22,7 @@ app's description) and the built code in `lib/offline-packs/` and
 - **No repeats until the pool runs out**: questions not in the student's
   earlier packs for the course (this subscription) come first, at
   random; repeats only fill a shortfall.
-- **The allowance comes from the package** (03 S23): packs per course,
+- **The allowance comes from the package** (03 F4): packs per course,
   copied onto the subscription and counted inside the database (empty
   means unlimited, 0 means none). The trial's is 0. *(to build: F4)*
   A pack holds at most the Config limit of questions.

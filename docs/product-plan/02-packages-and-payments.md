@@ -33,7 +33,8 @@ findings D4, D20, D23, D31–D36 in `archive/product-plan/post-rebuild-diagnosis
   status, a price in GHS, a length in days, and premium yes / no.
 - **Each package carries four limits** — builder quizzes, offline packs
   per course, papers (all, or the trial paper only), mocks (yes / no) —
-  copied onto each receipt by the database when it is written (03 S23).
+  copied onto each receipt by the database when it is written (03; 12,
+  `products` and `subscriptions`).
   Free Full Access and paid packages: unlimited · 5 · all · yes.
   *(to build: F4)*
 - **Bought means kept**: editing a package changes it for new buyers
@@ -121,12 +122,13 @@ findings D4, D20, D23, D31–D36 in `archive/product-plan/post-rebuild-diagnosis
 
 ## Storage
 
-- **S24** Open to the public — ticked 2026-10-04, not built (C5).
-- **S23** The package limits and their copy on each receipt; trials
-  14 days — ticked 2026-10-04, not built (03 F4).
-- D31 and D34 change the payments table (three setup columns go, a
-  status goes, "abandoned" comes): ruled 2026-09-18, no storage tick
-  recorded — see Open.
+Written on the tables in `12-tables.md`:
+
+- `programs` — Open to the public — ticked 2026-10-04 (C5).
+- `products` and `subscriptions` — the four limits and their copy;
+  trials 14 days — ticked 2026-10-04 (03 F4).
+- `payments` — the setup columns and a status go, "abandoned" comes
+  (D31, D34): ruled 2026-09-18, no tick recorded — see Open.
 
 ## Open
 

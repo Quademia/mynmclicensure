@@ -17,7 +17,8 @@ before then, and the old list's history, is in
 - **Ids:** an old id is kept (C5, F4, Q21, DS17…); a new line takes its
   file's number and a count (`01.1`).
 - **Built** means the line turns ✅ with the date, and the plan file's
-  "(to build)" tag goes, in the same commit.
+  "(to build)" tag goes, in the same commit — and, for a change to the
+  database, its line in `12-tables.md` becomes plain description.
 - **There is no "next" marker.** The build order is in
   [`00-the-map.md`](docs/product-plan/00-the-map.md); Sam decides each
   session.
@@ -43,7 +44,7 @@ before then, and the old list's history, is in
 
 ## [02 Packages and payments](docs/product-plan/02-packages-and-payments.md)
 
-- ⬜ C5 Programmes — Open to the public (S24 ✅); NACNAP into NAC and NAP; RCN added, closed
+- ⬜ C5 Programmes — Open to the public (tables ticked ✅); NACNAP into NAC and NAP; RCN added, closed
 - ⬜ 02.1 Ended means ended — the four places that trust "active" without the date
 - ⬜ D31 The account made at payment — a set-password link; the setup token and its rescue go
 - ⬜ D33 The same browser sees the password form, another the emailed link; a check tells status only
@@ -58,11 +59,11 @@ before then, and the old list's history, is in
 
 ## [03 Free account and trial](docs/product-plan/03-free-account-and-trial.md)
 
-- ⬜ F1 The free set's two doors (S16 ✅) — free-only draws; a free sitting is its real course's
+- ⬜ F1 The free set's two doors (table ticked ✅) — free-only draws; a free sitting is its real course's
 - ⬜ F2 The free account — its door, the builder on the free set, the dashboard's free line
 - ⬜ F2 After the trial — locked, not gone; the summary open, the review locked; Retake locked
 - ⬜ F3 The home page and its copy — free questions, forever; the trial and packages the way in
-- ⬜ F4 The limited trial — 14 days from taking it, a ticked paper a course, 3 builder quizzes, SMS (S23 ✅)
+- ⬜ F4 The limited trial — 14 days from taking it, a ticked paper a course, 3 builder quizzes, SMS (tables ✅)
 
 ## [04 Practice](docs/product-plan/04-practice.md)
 
@@ -110,7 +111,7 @@ Nothing of its own; the allowance per package comes with 03 F4.
 - ⬜ 08.1 Course news to everyone who has held the course, revoked grants apart (Sam, 10-04)
 - ⬜ A4 A real quiz-link picker in the announcement editor
 - ⬜ A3 The body stored once, no extra line break per edit, the dead read removed — later
-- ⬜ 08.2 The support desk (S11 ✅) — general and course threads, server writes, paged inbox; Bulk Send out
+- ⬜ 08.2 The support desk (tables ✅) — general and course threads, server writes, a paged inbox, Bulk Send out
 - ⬜ 08.3 NMC procedures — the manual links into a table the admin manages
 - ⬜ 17 The Telegram group — a Connect page, link codes, a bot, the allowlist from subscriptions
 
@@ -136,7 +137,7 @@ Nothing of its own; the allowance per package comes with 03 F4.
 - ⬜ 10.4 Supabase's sender set to Resend as the fallback, its templates in neutral Quademia words
 - ⬜ 10.5 Resend's paid plan — the shared free plan stops at 100 emails a day
 - ⬜ 10.6 Supabase's sign-in settings recorded and the live address added
-- ⬜ 10.7 The settings registry (S13 ✅) — admin-only, typed keys, a stricter Config page; levels
+- ⬜ 10.7 The settings registry (table ticked ✅) — admin-only, typed keys, a stricter Config page; levels
 - ⬜ 10.8 One limiter — one counter table, a rule per door in the settings
 - ⬜ 10.9 A nightly purge of old devices and sign-in log rows (D29)
 - ⬜ 10.10 A "couldn't load, try again" page

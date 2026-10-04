@@ -25,7 +25,7 @@ Detail and history: `archive/product-plan/09-free-account-and-gamification.md` �
   the builder and draws that course's free questions. No stand-in
   course. Learning History, the report and "Practise this topic" work
   as they do for any sitting. *(to build: F1)*
-- **Two doors let the free set in** (storage S16): any signed-in
+- **Two doors let the free set in** (12, `question_bank`): any signed-in
   student may read a question marked free, and a sitting may be made
   from a set where every question is free. Every place that checks a
   course's access lets an all-free set through — the builder, its
@@ -90,18 +90,15 @@ Detail and history: `archive/product-plan/09-free-account-and-gamification.md` �
 
 ## Storage
 
-- **S16** The free set's two doors — ticked 2026-09-26, not built (F1).
-  The free mark itself is built (06 B4).
-- **S23** The limited trial — ticked 2026-10-04, not built (F4):
-  - four limits on the package, copied onto the subscription by the
-    database (02);
-  - the "Open in trial" tick on a paper, one per course;
-  - the number kept as +233… with its verification time, a list of
-    numbers that have had a trial, a changed number going through the
-    server and clearing the verification (01);
-  - the trials' length 60 → 14 days;
-  - mocks gated by the package's yes / no; the mock's unused
-    `visibility` left for removal (10).
+Written on the tables in `12-tables.md`:
+
+- The free set's second read rule — `question_bank` — ticked 2026-09-26
+  (F1). The free mark itself is built.
+- The trial — ticked 2026-10-04 (F4): the four limits on `products`,
+  copied onto `subscriptions` by the database; the trials 14 days;
+  `open_in_trial` on `quizzes`; the verified number on `users`; a new
+  list of the numbers that have had a trial; mocks gated by the
+  package, the mock's unused `visibility` left for removal (10).
 
 ## Open
 

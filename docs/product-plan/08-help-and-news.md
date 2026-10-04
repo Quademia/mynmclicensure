@@ -7,7 +7,7 @@ Telegram group.
 
 Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
 `archive/product-plan/07-messaging.md`, and `archive/product-plan/rebuild.md`
-§8 S11–S13.
+§8.
 
 ## How it works
 
@@ -42,7 +42,7 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
 - **No Bulk Send**: announcements are the broadcast, with the same
   targeting; New Thread reaches one student (Sam, 2026-09-18).
 
-### Messages — the support desk *(to build: S11)*
+### Messages — the support desk *(to build: 08.2)*
 
 Ruled by Sam, 2026-09-18.
 
@@ -79,11 +79,12 @@ Ruled by Sam, 2026-09-18.
 
 ## Storage
 
-- **S11** Messaging as a support desk — ticked 2026-09-18, not built.
-- **S12** (the announcements half) — the scoping function and the three
-  notice timestamps — ticked 2026-09-18, not built (A1, A2).
-- **S13** (its rider) — the level scope as a list — ticked 2026-09-18,
-  not built (A1).
+Written on the tables in `12-tables.md`, all ticked 2026-09-18:
+
+- `messages_threads` and `messages` — the support desk (08.2).
+- `announcements` — read through one function, admin-only, the level
+  scope a list (A1).
+- `user_notice_state` — read, clicked, dismissed (A2).
 
 ## Open
 

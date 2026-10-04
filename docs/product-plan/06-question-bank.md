@@ -19,7 +19,7 @@ Detail and history: `archive/product-plan/08-question-bank.md` (B1–B8).
   admin reads all.
 - **A student's browser can read only the ten filter columns** — id,
   course, subject, topic, subtopic, difficulty, type, batch, published,
-  free — never the question, its options or its answer (S19). The
+  free — never the question, its options or its answer (12). The
   answer reaches a student only through a sitting (04's seal).
 - **Every write goes through the server behind the admin's check**
   (Sam, 2026-09-21); the browser has no write access at all.
@@ -40,7 +40,7 @@ Detail and history: `archive/product-plan/08-question-bank.md` (B1–B8).
 - **Difficulty** Easy / Moderate / Hard; **level** Remember, Understand,
   Apply, Analyse, Evaluate, Create (Ghana's spelling; "Analyze" in a
   file lands as "Analyse") (Sam, 2026-09-26).
-- **Subjects and topics come from a list per course** (S18): the subject
+- **Subjects and topics come from a list per course** (12): the subject
   is the academic module, the paper is the course. Renaming a word in
   the list reaches every question; a word in use cannot be deleted.
   Subtopic stays free text. An empty subject or topic is **Not set** —

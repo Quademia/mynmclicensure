@@ -208,7 +208,7 @@ where they show.
 - **Check**: the note that numbers cover at most 5,000 sittings (05).
 
 ### Config
-- Typed fields (10 S13). **Check**: a failed read shows "No config keys
+- Typed fields (10). **Check**: a failed read shows "No config keys
   found." instead of an error.
 
 ### New: Security, Emails, Question reports
