@@ -3,8 +3,10 @@
 // The menu itself — legacy mynmclicensure-student-sidebar.js and
 // -admin-sidebar.js sections A, C and D, rendered from a NavItem[]:
 //   - the active link (exact path, as legacy: href === path);
-//   - dropdowns (My Courses, Offline Packs, My Account) that toggle on
-//     click and open by themselves when a child is the current page;
+//   - a group's heading, a label above its rows (the student menu's
+//     groups, 00 The menu, Sam 2026-10-04: A);
+//   - dropdowns (My courses; the admin's) that toggle on click and open
+//     by themselves when a child is the current page;
 //   - the My Courses rows from the student's course access ("No courses
 //     found" when empty);
 //   - the Messages badge (99+ cap), shown only when the count is > 0.
@@ -70,7 +72,6 @@ export function SidebarNav({
 
   function childActive(item: NavItem): boolean {
     if (item.dynamic === 'courses') return pathname.startsWith('/student/course/');
-    if (item.key === 'offline') return pathname.startsWith('/student/offline-packs');
     return (item.children ?? []).some((c) => isActive(c.href));
   }
 
@@ -172,11 +173,18 @@ export function SidebarNav({
     <nav className="sidebar-nav">
       {items
         .filter((i) => !i.hidden)
-        .map((item) => (
-          <div key={item.key} className="sidebar-item">
-            {item.children ? renderDropdown(item) : renderLink(item)}
-          </div>
-        ))}
+        .map((item) =>
+          // A group's heading (00 The menu: A) — a label, not a row.
+          item.heading ? (
+            <div key={item.key} className="sidebar-heading">
+              {item.label}
+            </div>
+          ) : (
+            <div key={item.key} className="sidebar-item">
+              {item.children ? renderDropdown(item) : renderLink(item)}
+            </div>
+          ),
+        )}
     </nav>
   );
 }

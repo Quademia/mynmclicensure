@@ -215,15 +215,23 @@
 /* which side you are on — "Admin" / "Student" — as a
    section label above Dashboard (Sam, 2026-09-22), not a second
    wordmark: the brand is the top bar's */
-.sidebar-audience {
-  margin: 4px 24px 10px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+.sidebar-audience,
+.sidebar-heading {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.5);
+}
+.sidebar-audience {
+  margin: 4px 24px 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+/* a group's heading above its rows (00 The menu, Sam 2026-10-04: A) —
+   the student menu's Practise, Progress, Study offline, Help and news */
+.sidebar-heading {
+  padding: 16px 24px 4px;
 }
 
 .sidebar-nav a {

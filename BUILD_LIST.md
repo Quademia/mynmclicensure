@@ -135,6 +135,7 @@ before then, and the old list's history, is in
 - ⬜ 09.4 Dark mode — after the above
 - ⬜ 09.5 The old token names retired once no page uses them
 - ✅ 09.6 The phone's bottom bar and sub-tab row — four fixed tabs, a row per group, the drawer kept — 2026-10-04
+- ✅ 09.7 The student menu in its groups — a heading per group, every row visible, the phone's names — 2026-10-04
 - ⏸ DS9 About eight pages on their own button classes — they join as each is touched
 
 ## [10 Launch and platform](docs/product-plan/10-launch-and-platform.md)

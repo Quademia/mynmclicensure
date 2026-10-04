@@ -91,6 +91,8 @@ export type NavItem = {
   hidden?: boolean;
   /** "My Courses": rows come from the student's course access at runtime. */
   dynamic?: 'courses';
+  /** A group's heading — a small label above its rows, not a link (00 The menu: A). */
+  heading?: boolean;
 };
 
 /** One page of a phone tab's group — a tab in the row at the top. */

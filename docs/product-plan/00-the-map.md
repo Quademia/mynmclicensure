@@ -136,7 +136,11 @@ feedback (06).
 
 **Confirmed by Sam, 2026-10-04.** The student menu in the groups above:
 Dashboard, Practise, Progress, Study offline, Help and news; Account
-under the avatar in the top bar.
+under the avatar in the top bar. In the sidebar (and the phone's
+drawer, the same menu) each group is a small heading with every row
+visible beneath — not groups that open and close — named as the phone's
+tabs: Practice papers, Mock exams, Quiz builder; My packs, Build a pack
+(Sam: A; built 2026-10-04, 09.7).
 
 - **One menu for every status** (Sam: A) — free, trial, paid and ended
   see the same items. A locked item carries a small lock and, tapped,

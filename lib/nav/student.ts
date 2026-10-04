@@ -1,15 +1,15 @@
 // lib/nav/student.ts
 //
-// The student sidebar, transcribed from legacy
-// js/mynmclicensure-student-sidebar.js in its order. Two legacy rows
-// are not here: "Teacher Assess" (MyTeacher's, left with the April
-// split) and the My Account block that ended the menu — My Profile and
-// Upgrade / Extend are the top bar's avatar menu under A3
-// (10-design-system.md DS5; components/shell/top-bar.tsx). The Telegram
-// row IS here, hidden until slice 17 builds its page (rebuild.md §9 #10).
+// The student sidebar — and the phone's drawer, the same menu — in the
+// groups Sam confirmed (00 The menu, 2026-10-04: A): Dashboard, then
+// Practise, Progress, Study offline and Help and news, each under a small
+// heading with every row visible; Account is the top bar's avatar menu
+// (My Profile, Upgrade / Extend; components/shell/top-bar.tsx). The
+// names match the phone's tabs; "Practice papers" is Q21's name (the
+// page's own title and address follow with Q21). The Telegram row is
+// here, hidden until item 17 builds its page.
 //
-// The emoji legacy wrote into each label ('🏠 Dashboard') left with DS6;
-// each row names its icon instead (components/shell/icons.tsx).
+// Each row names its icon (components/shell/icons.tsx).
 
 import type { NavItem, PhoneTab } from './types';
 
@@ -51,35 +51,36 @@ export const STUDENT_PHONE_TABS: PhoneTab[] = [
 
 export const STUDENT_NAV: NavItem[] = [
   { key: 'dashboard', label: 'Dashboard', icon: 'home', href: `${S}/dashboard` },
-  { key: 'courses', label: 'My Courses', icon: 'book', dynamic: 'courses', children: [] },
-  { key: 'fixed-quizzes', label: 'Fixed Quizzes', icon: 'clipboard', href: `${S}/fixed-quizzes` },
-  { key: 'mock-exams', label: 'Mock Exams', icon: 'target', href: `${S}/mock-exams` },
-  { key: 'quiz-builder', label: 'Quiz Builder', icon: 'wrench', href: `${S}/quiz-builder` },
-  { key: 'learning-history', label: 'Learning History', icon: 'chart', href: `${S}/learning-history` },
+
+  { key: 'h-practise', label: 'Practise', heading: true },
+  { key: 'courses', label: 'My courses', icon: 'book', dynamic: 'courses', children: [] },
+  { key: 'fixed-quizzes', label: 'Practice papers', icon: 'clipboard', href: `${S}/fixed-quizzes` },
+  { key: 'mock-exams', label: 'Mock exams', icon: 'target', href: `${S}/mock-exams` },
+  { key: 'quiz-builder', label: 'Quiz builder', icon: 'wrench', href: `${S}/quiz-builder` },
+
+  { key: 'h-progress', label: 'Progress', heading: true },
+  { key: 'learning-history', label: 'Learning history', icon: 'chart', href: `${S}/learning-history` },
+
+  { key: 'h-offline', label: 'Study offline', heading: true },
+  { key: 'offline-packs', label: 'My packs', icon: 'download', href: `${S}/offline-packs` },
+  { key: 'offline-build', label: 'Build a pack', icon: 'package', href: `${S}/offline-packs/build` },
+
+  { key: 'h-help', label: 'Help and news', heading: true },
   { key: 'announcements', label: 'Announcements', icon: 'megaphone', href: `${S}/announcements` },
-  {
-    key: 'offline',
-    label: 'Offline Packs',
-    icon: 'download',
-    children: [
-      { key: 'offline-packs', label: 'My Packs', href: `${S}/offline-packs` },
-      { key: 'offline-build', label: 'Build New Pack', href: `${S}/offline-packs/build` },
-    ],
-  },
-  { key: 'procedures', label: 'NMC Procedures', icon: 'stethoscope', href: `${S}/procedures` },
-  { key: 'portal-guide', label: 'Portal Guide', icon: 'help', href: `${S}/portal-guide` },
   { key: 'messages', label: 'Messages', icon: 'message', href: `${S}/messages`, badge: 'messages' },
+  { key: 'portal-guide', label: 'Portal guide', icon: 'help', href: `${S}/portal-guide` },
+  { key: 'procedures', label: 'NMC procedures', icon: 'stethoscope', href: `${S}/procedures` },
   { key: 'telegram', label: 'Telegram', icon: 'send', href: `${S}/telegram`, hidden: true },
   {
     key: 'whatsapp-channel',
-    label: 'WhatsApp Channel',
+    label: 'WhatsApp channel',
     icon: 'phone',
     href: 'https://www.whatsapp.com/channel/0029Vb6ActpBA1ewCfBmAF3O',
     external: true,
   },
   {
     key: 'telegram-channel',
-    label: 'Telegram Channel',
+    label: 'Telegram channel',
     icon: 'send',
     href: 'https://t.me/QAcademynurseshub',
     external: true,
