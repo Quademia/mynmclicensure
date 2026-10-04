@@ -32,7 +32,8 @@ Detail and history: `archive/product-plan/09-free-account-and-gamification.md` Â
   keyword search, starting and opening a sitting, the report. *(to
   build: F1)*
 - Timed mode, mock exams and offline packs are not free. Mocks and
-  packs are for packages only (Sam, 2026-10-02).
+  packs are for packages only (Sam, 2026-10-02); **a free account cannot
+  use the offline pack maker** (Sam, 2026-10-04).
 - The daily challenge, the streak and questions mastered are open to
   free accounts (04, 05).
 - The wording: "free practice questions, forever" is true and is used;
@@ -120,5 +121,3 @@ Written on the tables in `12-tables.md`:
   authoring work, "perhaps monthly".
 - Which trial package NAC, NAP and RCN get once the programmes split
   (02 C5).
-- F1 lists the pack maker drawing free questions for a free student,
-  while packs are for packages only â€” keep or drop.

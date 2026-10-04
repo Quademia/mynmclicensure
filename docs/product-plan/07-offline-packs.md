@@ -2,7 +2,8 @@
 
 A student with a package builds a set of questions from one course to
 study without a connection, and prints it or saves it as a PDF through
-the browser. Packs are for packages only: not free, not in the trial.
+the browser. Packs are for packages only: not in the trial, and a free
+account cannot use the pack maker (Sam, 2026-10-04).
 
 Detail and history: `archive/product-plan/06-offline-packs.md` (the old
 app's description) and the built code in `lib/offline-packs/` and
@@ -46,8 +47,5 @@ app's description) and the built code in `lib/offline-packs/` and
 
 ## Open
 
-- **Can a free account make a pack?** The decisions disagree: 03 F1
-  lists the pack maker among the places that let an all-free set
-  through, while packs are for packages only (2026-09-20, 2026-10-02).
 - Whether the builder's minimum of 5 questions applies to packs too
   (04).
