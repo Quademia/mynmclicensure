@@ -11,6 +11,7 @@
 // Server only.
 
 import type { createServiceRoleClient } from '@/lib/supabase/server';
+import { isForOpenProgramme } from '@/lib/catalogue/for-sale';
 import type { ProductKind, ProductStatus } from '@/lib/catalogue/types';
 import type { Subscription } from '@/lib/subscriptions/types';
 import type { Payment, PaymentUser } from './types';
@@ -42,6 +43,28 @@ export async function getProductForPayment(db: ServiceDb, productId: string, req
   const { data, error } = await query.maybeSingle();
   if (error) throw new Error(`Supabase select failed on products: ${error.message}`);
   return (data as PaymentProduct | null) ?? null;
+}
+
+/**
+ * 02 C5a: is this package for an open programme? The two payment doors
+ * ask after isForSale(), so a closed programme's package cannot be paid
+ * for even by a form sent by hand. Three small reads with the service
+ * role: the package's courses, their programmes, the open programmes.
+ */
+export async function isProductForOpenProgramme(db: ServiceDb, productId: string): Promise<boolean> {
+  const [links, open] = await Promise.all([
+    db.from('product_courses').select('course_id').eq('product_id', productId),
+    db.from('programs').select('program_id').eq('is_open', true),
+  ]);
+  if (links.error) throw new Error(`Supabase select failed on product_courses: ${links.error.message}`);
+  if (open.error) throw new Error(`Supabase select failed on programs: ${open.error.message}`);
+  const courseIds = (links.data ?? []).map((r) => String(r.course_id));
+  const { data: courses, error } = courseIds.length
+    ? await db.from('courses').select('course_id, program_scope').in('course_id', courseIds)
+    : { data: [], error: null };
+  if (error) throw new Error(`Supabase select failed on courses: ${error.message}`);
+  const scope = new Map((courses ?? []).map((c) => [String(c.course_id), (c.program_scope ?? []) as string[]]));
+  return isForOpenProgramme({ courses: courseIds }, scope, (open.data ?? []).map((p) => String(p.program_id)));
 }
 
 export async function getUserByEmail(db: ServiceDb, email: string): Promise<PaymentUser | null> {

@@ -30,7 +30,11 @@ findings D4, D20, D23, D31–D36 in `archive/product-plan/post-rebuild-diagnosis
   2026-10-04). Open: the programme shows on the home page, at
   registration and in the shop. Closed: hidden, and the server refuses
   it at registration and at checkout ("This programme is not open
-  yet."); the admin can still grant its packages for testing; closing
+  yet."); **its packages follow it** — hidden from the shop, Premium
+  Prep and the in-app Packages page, "not available to buy" at
+  checkout, and refused at both payment doors (a package is open when
+  it is for at least one open programme, or for everyone — the General
+  Paper alone); the admin can still grant its packages for testing; closing
   stops new sign-ups only. A new programme starts closed; the rest open
   in batches as each bank is ready. The tick on the admin's Courses
   page, beside the programme's name, comes with its redesign *(to

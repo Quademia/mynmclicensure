@@ -46,7 +46,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { getCourses, getOpenPrograms, getProducts } from '@/lib/catalogue/queries';
-import { courseScopeMap, isForSale, partitionByProgramme, programmesOf } from '@/lib/catalogue/for-sale';
+import { courseScopeMap, isForOpenProgramme, isForSale, partitionByProgramme, programmesOf } from '@/lib/catalogue/for-sale';
 import { formatMinor } from '@/lib/money/format-minor';
 import { PublicTopBar } from '@/components/shell/public-top-bar';
 import { PublicFooter } from '@/components/shell/public-footer';
@@ -88,8 +88,10 @@ export default async function SubscribePage({
   const courseTitle = new Map(courses.map((c) => [c.course_id, c.title]));
   const scope = courseScopeMap(courses);
 
-  // The shop is everything for sale that is not a Premium Prep product.
-  const forSale = products.filter((p) => isForSale(p) && p.is_premium !== true);
+  // The shop is everything for sale that is not a Premium Prep product,
+  // and only for an open programme (02 C5a).
+  const openIds = programs.map((p) => p.program_id);
+  const forSale = products.filter((p) => isForSale(p) && p.is_premium !== true && isForOpenProgramme(p, scope, openIds));
   const programmesFor = (p: Product) => programmesOf(p, scope, programs.length);
 
   // Biggest bundle first inside each group, then by price — a student

@@ -39,7 +39,7 @@ import Link from 'next/link';
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { findProfileByAuthId } from '@/lib/auth/profile';
 import { getCourses, getOpenPrograms, getProducts } from '@/lib/catalogue/queries';
-import { courseScopeMap, isForSale, programmesOf } from '@/lib/catalogue/for-sale';
+import { courseScopeMap, isForOpenProgramme, isForSale, programmesOf } from '@/lib/catalogue/for-sale';
 import { formatMinor } from '@/lib/money/format-minor';
 import { PublicTopBar } from '@/components/shell/public-top-bar';
 import { PublicFooter } from '@/components/shell/public-footer';
@@ -90,8 +90,13 @@ export default async function CheckoutPage({
     signedInBuyer(supabase),
   ]);
 
+  // For sale, and for an open programme (02 C5a) — the server's two
+  // payment doors ask the same.
+  const openIds = programs.map((p) => p.program_id);
   const product =
-    products.find((p) => p.product_id.toUpperCase() === wanted && isForSale(p)) ?? null;
+    products.find(
+      (p) => p.product_id.toUpperCase() === wanted && isForSale(p) && isForOpenProgramme(p, courseScopeMap(courses), openIds),
+    ) ?? null;
 
   // "Change package" goes back to the page the buyer most likely came from.
   const backHref = product?.is_premium ? '/premium-prep' : '/subscribe';

@@ -32,7 +32,7 @@ import { createServiceRoleClient } from '@/lib/supabase/server';
 import { appOrigin } from '@/lib/site/app-origin';
 import { makePaymentReference } from './ids';
 import { paystackInitialize } from './paystack';
-import { getProductForPayment } from './queries';
+import { getProductForPayment, isProductForOpenProgramme } from './queries';
 import { checkPaymentRateLimit } from './rate-limit';
 import { trimInitReply } from './trim';
 import type { InitPublicInput, InitResult } from './types';
@@ -80,6 +80,15 @@ export async function initPublicPayment(input: InitPublicInput): Promise<InitRes
   }
   if (!product || !isForSale(product)) {
     return { ok: false, error: 'product_not_for_sale', message: 'This package is not available to buy.' };
+  }
+  // 02 C5a: a closed programme's package is not for sale either.
+  try {
+    if (!(await isProductForOpenProgramme(db, product.product_id))) {
+      return { ok: false, error: 'product_not_for_sale', message: 'This package is not available to buy.' };
+    }
+  } catch (err) {
+    console.error('[payments] init-public programme check failed:', err);
+    return { ok: false, error: 'server_error', message: 'Could not start payment. Please try again.' };
   }
 
   const reference = makePaymentReference();

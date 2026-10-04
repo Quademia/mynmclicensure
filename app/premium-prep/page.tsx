@@ -41,7 +41,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
-import { getCourses, getProducts } from '@/lib/catalogue/queries';
+import { getCourses, getOpenPrograms, getProducts } from '@/lib/catalogue/queries';
+import { courseScopeMap, isForOpenProgramme } from '@/lib/catalogue/for-sale';
 import { formatMinor } from '@/lib/money/format-minor';
 import { PublicTopBar } from '@/components/shell/public-top-bar';
 import { PublicFooter } from '@/components/shell/public-footer';
@@ -75,17 +76,21 @@ export default async function PremiumPrepPage() {
   // which is arguably right (a syllabus is not a secret, and the legacy
   // site showed it) but is a change to the storage floor and would need
   // its §8 row first. Put to Sam 2026-09-22; unruled.
-  const [products, courses] = await Promise.all([
+  const [products, courses, openPrograms] = await Promise.all([
     getProducts(supabase),
     getCourses(createServiceRoleClient()),
+    getOpenPrograms(supabase),
   ]);
 
   const courseTitle = new Map(courses.map((c) => [c.course_id, c.title]));
+  const scope = courseScopeMap(courses);
+  const openIds = openPrograms.map((p) => p.program_id);
 
   // is_premium is the marker since §8 S14; the price gate is the rule the
-  // other two selling doors have always had and this page never did.
+  // other two selling doors have always had and this page never did. A
+  // closed programme's package is hidden too (02 C5a).
   const premium = products
-    .filter((p) => p.is_premium === true && Number(p.price_minor) > 0)
+    .filter((p) => p.is_premium === true && Number(p.price_minor) > 0 && isForOpenProgramme(p, scope, openIds))
     .sort((a, b) => a.name.localeCompare(b.name));
 
   return (

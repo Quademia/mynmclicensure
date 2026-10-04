@@ -89,6 +89,31 @@ export function courseScopeMap(courses: Course[]): Map<string, string[]> {
 }
 
 /**
+ * 02 C5a (Sam, 2026-10-04): a closed programme's packages follow it —
+ * the public can neither see nor buy them. A product is open when it is
+ * everyone's (only courses every open programme sits — the General
+ * Paper) or it is for at least one open programme. A course counts as
+ * everyone's when its scope covers every open programme, so closing a
+ * programme cannot make the General Paper look like anyone's own.
+ */
+export function isForOpenProgramme(
+  product: Pick<Product, 'courses'>,
+  courseScope: Map<string, string[]>,
+  openProgrammeIds: string[],
+): boolean {
+  const open = new Set(openProgrammeIds);
+  const forProgrammes = new Set<string>();
+  for (const courseId of product.courses) {
+    const scope = courseScope.get(courseId) ?? [];
+    if (scope.length === 0) continue;
+    if (open.size > 0 && [...open].every((p) => scope.includes(p))) continue;
+    for (const programme of scope) forProgrammes.add(programme);
+  }
+  if (forProgrammes.size === 0) return true;
+  return [...forProgrammes].some((p) => open.has(p));
+}
+
+/**
  * D23 item 1: the page ADAPTS, it does not filter. With a programme
  * chosen, its products come first and everything else follows under a
  * divider — nothing is removed, and a student can still buy across

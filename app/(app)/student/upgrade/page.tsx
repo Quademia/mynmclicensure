@@ -12,7 +12,8 @@
 
 import type { Metadata } from 'next';
 import { requireStudent } from '@/lib/access';
-import { getPrograms, getProducts } from '@/lib/catalogue/queries';
+import { getCourses, getPrograms, getProducts } from '@/lib/catalogue/queries';
+import { courseScopeMap, isForOpenProgramme } from '@/lib/catalogue/for-sale';
 import { getActiveSubscriptionsWithProduct } from '@/lib/subscriptions/queries';
 import { UpgradeClient } from './upgrade-client';
 import '@/styles/student-upgrade.css';
@@ -26,11 +27,18 @@ export const dynamic = 'force-dynamic';
 export default async function UpgradePage() {
   const { supabase, profile } = await requireStudent();
 
-  const [subscriptions, programs, products] = await Promise.all([
+  const [subscriptions, programs, allProducts, courses] = await Promise.all([
     getActiveSubscriptionsWithProduct(supabase, profile.user_id),
     getPrograms(supabase),
     getProducts(supabase),
+    getCourses(supabase),
   ]);
+
+  // A closed programme's packages are not offered (02 C5a); the payment
+  // door refuses them too.
+  const openIds = programs.filter((p) => p.is_open).map((p) => p.program_id);
+  const scope = courseScopeMap(courses);
+  const products = allProducts.filter((p) => isForOpenProgramme(p, scope, openIds));
 
   return (
     <UpgradeClient
