@@ -93,6 +93,7 @@ the gamma-era list it replaces is in git history and in `qacademy-gamma`.
 - ✅ §8 S20 the quiz and mock question lists as rows, keyed to the bank — ticked 2026-09-27, the build is 03 Q14
 - ✅ §8 S21 four modes of a sitting, MyNclex's codes; a quiz's modes a ticked list; Sequential's lock — ticked 09-27
 - ✅ §8 S22 an exam's deadline held by the database, 10 s of grace — ticked 2026-09-27, the build is 03 Q8.4
+- ✅ §8 S23 the limited trial — product allowances, the trial paper, the verified number — ticked 10-04; build 09 F4
 - ⬜ §8 has no row for `courses_select` — the policy is `auth.uid() is not null`, so a signed-out visitor reads nothing from `courses`; `/premium-prep` and `/subscribe` both work around it with a service-role read, and D23 item 5 (a sales row lists its courses) cannot be met on any public page without it (2026-09-22)
 
 ## Improvements
@@ -136,6 +137,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⬜ Reference data: schools is a regulator's list with no way to change it (D50, unruled since 2026-09-18)
 - ⬜ Reference data: telegram_group_keys is free text and holds junk — no list, no validation (D3)
 - ⬜ Storage hygiene: ~14 columns, the `levels` table and one config row with no reader or writer (list in the 2026-09-18 session entry) — Sam: some have an unbuilt purpose; review one at a time (2026-09-18); the auth group's five settled by the trace and the read-back (S9, items 7 and 8)
+- ⬜ Storage hygiene: `mock_quizzes.visibility` — stored, never checked; a product's mock yes / no gates instead (S23, 10-04)
 - ⬜ Before cutover: Resend's free plan caps the account shared with MyNclex at 100 emails a day (MyNclex's notes); re-registration day would pass it and lose the rest — the Pro upgrade first (slice 10, 2026-09-16)
 - ⬜ 17 Telegram gate — Connect page, link codes, bot Worker on the DB, allowlist from subscriptions (moved from the rebuild, Sam, 2026-09-16)
 - ⬜ Procedures: the thirteen NMC manual links are fixed in the page; move them to a table with an admin management page (slice 7c, 2026-09-14)
@@ -314,7 +316,7 @@ Decided in principle in a cloud session on 2026-09-20; candidates, none sliced, 
 - ⬜ F2 The free account — no course_access rows, the builder and runner on the pool, the dashboard's free-vs-trial line
 - ⬜ F2 After the trial, page by page — locked, not gone; scores and report summary open, review locked; an unfinished sitting finishes; in each page's redesign (Sam, 10-03)
 - ⬜ F3 Landing and copy — "free practice questions, forever"; the trial and the products as the route to the full bank
-- ⬜ F4 The limited trial — 14 days, a ticked paper a course, 3 builder quizzes, product limits, SMS-verified number
+- ⬜ F4 The limited trial — 14 days, a ticked paper a course, 3 builder quizzes, product limits, SMS check; S23 ✅
 - ⬜ G1 Streak, questions mastered, leaderboard — the board from the daily challenge, 3 views, usernames (Sam, 10-04)
 - ⬜ G2 The daily challenge — five a day per programme from the free pool; feeds the leaderboard, so before it (10-04)
 - ⬜ G3 Tiers — names on point bands; later

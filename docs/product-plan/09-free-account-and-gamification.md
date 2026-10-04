@@ -349,7 +349,9 @@ Sam grants by hand are **Free Full Access**, their products' own name.
   chose the papers.
 - **Still open:** the end-of-trial screen (F2) — settled page by page
   2026-10-03 (*After the trial, page by page*, below); the locked papers'
-  wording; how each mock's `visibility` meets the product's yes or no.
+  wording; how each mock's `visibility` meets the product's yes or no —
+  **settled 2026-10-04 with §8 S23**: the product's yes / no is the gate,
+  `visibility` (stored, never checked) left for removal.
   Repeat sign-ups settled 2026-10-03: SMS verification, one trial per
   verified number (§4).
 
@@ -916,7 +918,13 @@ one-off buttons and cards.
   entered, **one trial per verified number** in one standard form (Sam,
   2026-10-03; §4). Columns on the products and the subscriptions, the
   tick on the quizzes, and the verified number — storage changes, so it
-  needs its §8 row.
+  needs its §8 row: **§8 S23, ticked 2026-10-04** — the allowances on
+  the product, copied onto the subscription by the database when it is
+  written; the trial-paper tick, one per course; the number in one
+  standard form with its verification time, a list of numbers that have
+  had a trial, a changed number through the server clearing the
+  verification; the trials 60 → 14 days; the product's yes / no gating
+  mocks, `visibility` left for removal.
 - **F3 — Landing and copy.** "Free practice questions, forever"; the
   trial and the products as the route to the full bank.
 
@@ -980,7 +988,7 @@ one-off buttons and cards.
 | F1 The pool and its door | candidate; settled as the mark + two doors 2026-09-26; §8 S16 ✅ 2026-09-26; the column is 08 B4; a free sitting is the real course's (2026-10-04) |
 | F2 The free account | candidate; what each page shows after the trial ruled 2026-10-03 (§3) — locked, not gone; built into each page's redesign |
 | F3 Landing and copy | candidate |
-| F4 The limited trial | candidate; decided in principle 2026-10-02 (14 days, admin-granted full access); settled the same day — from registration, a ticked paper per course, three builder quizzes, the limits on each product; SMS verification, one trial per verified number (2026-10-03); needs its §8 row |
+| F4 The limited trial | candidate; decided in principle 2026-10-02 (14 days, admin-granted full access); settled the same day — from registration, a ticked paper per course, three builder quizzes, the limits on each product; SMS verification, one trial per verified number (2026-10-03); §8 S23 ✅ 2026-10-04 |
 | G1 Streak, points, leaderboard (derived) | candidate; the NMC Prep walk done 2026-09-24; the streak settled and points replaced by questions mastered 2026-10-03 (§3); the leaderboard settled 2026-10-04 (§3) — from G2, three views, generated usernames; avatars Noto's animals, Avataaars the alternative; needs its §8 row |
 | G2 The daily challenge | candidate; from the free pool (Sam, 2026-09-26); feeds the leaderboard, so before G1's board; one course a day in turn (2026-10-04); rotation and pool size open |
 | G3 Tiers | later |
