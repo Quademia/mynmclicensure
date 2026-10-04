@@ -17,21 +17,35 @@ opens it (00, The menu).
 
 ### Dashboard
 - **Where sign-in lands, for every status; its top card is this
-  student's next step** (Sam, 2026-10-04: A) — free: today's challenge
-  and the rank line; trial: days left, carry on, today's challenge;
-  paid: carry on, today's challenge; ended: the recap card.
-- Free: "Free: practice on the free set" (03 F2).
-- Trial: a bar — "Trial, limited access — N days left" — from day one,
-  amber in the last three days, with Choose a package (03).
-- Ended: **a recap card** — the trial in numbers (questions answered, %
-  correct, quizzes done), up to three topics to work on, the percentile
-  on the trial paper (05), Choose a package; it stays while nothing is
-  live, no storage. When a package ends, the same card with "Your
-  access ended on …".
-- Paid with only a future access row: "RN Full access starts 13 Oct
-  2026" in place of an offer (02).
-- The announcement strip (08); the last five sittings; accuracy and the
-  trend (05 Q12); the streak and questions mastered — where, open (05).
+  student's next step** (Sam, 2026-10-04: A).
+- **The blocks, top to bottom** (Sam, 2026-10-04 — a redesign, not
+  today's page; drawn in the chat): the top card → today's challenge
+  with the rank line (when G2 lands) → the streak and questions
+  mastered → your weakest topic, one tap into the builder (shown once
+  there are enough answers to be honest) → my courses, a compact list
+  with days left and progress → news, the two newest (08) → recent
+  sittings, the last 3–5 with Resume and Report. A profile nudge only
+  while something is missing (the school). Off the page: the plan
+  status bar (into the top card), the channels card (to Help and
+  news), the Create a Custom Quiz and NMC Procedures cards (the menu
+  has them).
+- Trial: the top card — "Trial · limited access", the days left (amber
+  in the last three), carry on where they left off, Choose a package
+  (03).
+- Paid: the package and its days left, carry on. With only a future
+  access row: "RN Full access starts 13 Oct 2026" in place of an offer
+  (02).
+- **On the floor** — a trial or package ended, or free with no trial
+  (03): the recap card, then **the free practice card** ("Build a free
+  quiz" from the free questions of their courses), then today's
+  challenge; the courses locked, "free questions only"; Report links
+  stay. The recap, no storage: a trial's 14 days in numbers (answered,
+  % correct, quizzes), up to three topics to work on, the percentile on
+  the trial paper (05), Choose a package; a package's in numbers, Renew
+  your package. **The full recap shows for 2 weeks after the end, then
+  shrinks to one line above the free practice card** (Sam, 2026-10-04).
+- Open: a bar at the bottom of a phone's screen (and its four tabs) or
+  ☰ only; the cards' words, all new.
 
 ### My courses (sidebar) and the course page
 - Ended: the courses stay, marked locked; the course page shows what it
