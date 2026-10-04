@@ -282,13 +282,15 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `version` | Goes up by one on a content change to a published question |
 | `created_at`, `updated_at`, `updated_by` | When made, last changed, by whom |
 
-- *To build — ticked 2026-09-26 (03 F1):* **a second read rule** — any
-  signed-in student may read a question marked free (the same ten
-  columns). Why: the free account practises on it.
+- Two read rules: the course rule, and the free rule (03 F1, built
+  2026-10-04) — any signed-in student may read a question that is
+  published and marked free, in any course. Why: the free account
+  practises on it.
 - Browser: a student reads only `item_id`, `course_id`, `subject`,
   `maintopic`, `subtopic`, `difficulty`, `question_type`, `batch_id`,
   `is_published`, `is_free_sample`, of published questions in courses
-  they hold — never the question or its answer. Writes through the
+  they hold or marked free — never the question or its answer; a
+  signed-out visitor reads nothing. Writes through the
   server only.
 
 ### `question_bank_history` — past versions
@@ -529,10 +531,12 @@ the browser can call only the first two lines.
 - **The sitting** (server only): `create_attempt`, `start_timed_attempt`,
   `save_answers`, `check_answer`, `advance_attempt`, `finish_attempt`,
   `abandon_attempt`, `expire_attempt`; grading inside (`grade_answer`).
-  `create_attempt` refuses a student without a live grant for the course
-  and applies the package's limits — a paper only on all papers or the
-  ticked one, a mock only with mocks, builder quizzes within the count
-  (retakes free); the most generous of two grants wins.
+  `create_attempt` applies the package's limits to a student with a live
+  grant for the course — a paper only on all papers or the ticked one, a
+  mock only with mocks, builder quizzes within the count (retakes free);
+  the most generous of two grants wins. Without a live grant it allows
+  only a builder quiz (or its retake) of published free questions, in a
+  course of the student's programme, in a Study mode.
 - **Packs and the bank** (server only): `create_offline_pack` (the same
   live-grant check, and packs per course since the grant began within
   its limit), `search_question_bank_ids`, `save_quiz`.

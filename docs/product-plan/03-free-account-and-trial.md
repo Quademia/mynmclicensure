@@ -24,13 +24,16 @@ Detail and history: `archive/product-plan/09-free-account-and-gamification.md` �
   (Sam, 2026-10-04): the student picks a course of their programme in
   the builder and draws that course's free questions. No stand-in
   course. Learning History, the report and "Practise this topic" work
-  as they do for any sitting. *(to build: F1)*
-- **Two doors let the free set in** (12, `question_bank`): any signed-in
-  student may read a question marked free, and a sitting may be made
-  from a set where every question is free. Every place that checks a
-  course's access lets an all-free set through — the builder, its
-  keyword search, starting and opening a sitting, the report. *(to
-  build: F1)*
+  as they do for any sitting.
+- **Two doors let the free set in** (12, `question_bank`), built in the
+  database (F1, 2026-10-04): any signed-in student may read a question
+  marked free; a student with no package may start a builder quiz (or
+  its retake) whose questions are all published free questions of a
+  course of their programme, in a Study mode — papers, mocks and the
+  Exam modes refused. The app's own checks that let a free sitting
+  through — the builder drawing only free questions for a free student,
+  its keyword search, opening a sitting, the report — come with the
+  free account's pages *(to build: F2)*.
 - **A free account uses the Study modes only** — Learning and Untimed
   practice; the Exam modes (Free Navigation, Sequential) are for the
   trial and packages (Sam, 2026-10-04: A, reading 2026-09-20's "timed
@@ -103,8 +106,8 @@ show the locks *(F2, 11)*.
 
 Written on the tables in `12-tables.md`:
 
-- The free set's second read rule — `question_bank` — ticked 2026-09-26
-  (F1). The free mark itself is built.
+- The free set's second read rule — `question_bank` — ticked 2026-09-26,
+  built 2026-10-04 (F1). The free mark itself is built.
 - The trial — ticked 2026-10-04. **Built (F4a, 2026-10-04):** the four
   limits on `products`, copied onto `subscriptions` by the database; the
   trials 14 days; `open_in_trial` on `quizzes`; mocks gated by the

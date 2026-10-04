@@ -59,7 +59,7 @@ before then, and the old list's history, is in
 
 ## [03 Free account and trial](docs/product-plan/03-free-account-and-trial.md)
 
-- ⬜ F1 The free set's two doors (table ticked ✅) — free-only draws; a free sitting is its real course's
+- ✅ F1 The free set's two doors in the database — the read rule, free builder quizzes in Study modes — 2026-10-04
 - ⬜ F2 The free account — its door, the builder on the free set, the dashboard's free line
 - ⬜ F2 After the trial — locked, not gone; the summary open, the review locked; Retake locked
 - ⬜ F3 The home page and its copy — free questions, forever; the trial and packages the way in
