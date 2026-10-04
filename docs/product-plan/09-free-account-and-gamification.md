@@ -972,7 +972,8 @@ one-off buttons and cards.
 
 ### G — gamification
 
-- **G1 — Derived, no new tables.** Streak = consecutive days with a
+- **G1 — as first planned; split on 2026-10-04 into G1a and G1b
+  (below; Sam).** Derived, no new tables. Streak = consecutive days with a
   completed attempt; points = a formula over graded rows (one per
   correct answer, a bonus for timed); the leaderboard = the top ten in
   the student's programme this period plus their own rank. One SQL
@@ -994,6 +995,24 @@ one-off buttons and cards.
   Share on WhatsApp button. The board waits on G2; the streak and
   questions mastered do not. The username and avatar are two columns on
   `users`, so G1 is no longer reads only — its §8 row comes first.
+- **G1a — The streak and questions mastered** (split from G1, Sam,
+  2026-10-04: the half that waits on nothing). Counted from the graded
+  rows every student already saves — no new table, no §8 row; every
+  student, free, trial or paid. The streak private: a study day is one
+  question answered, one missed day a week forgiven, the current, the
+  best and the last seven days shown. Questions mastered: right the
+  first time a question is met, not under 5 seconds, beside the questions
+  answered and the share right first time ("300 answered · 195 mastered
+  · 65% right first time"). Needs nothing from F1, G2 or G1b. Where it
+  shows waits for the redesign (10-03), so when it is built is open: the
+  counts now with a plain card the redesign moves, or with the page's
+  redesign.
+- **G1b — The leaderboard** (split from G1, Sam, 2026-10-04). As
+  settled in §3, *The leaderboard settled*: weekly, from the daily
+  challenge only, three views, a generated username and a Noto animal,
+  a Share on WhatsApp button. Waits on G2, which waits on F1 and on the
+  free questions being written; the username and the animal are two
+  columns on `users`, so its §8 row comes before the build.
 - **G2 — The daily challenge.** Five questions per programme, the same
   five for everyone, chosen by a seed from the date, run through the
   instant runner; a new attempt source (every list that switches on
@@ -1005,7 +1024,7 @@ one-off buttons and cards.
   The seal (03 Q6) holds for the challenge as for any quiz — the NMC
   Prep walk found theirs sends the answers to the browser before it is
   opened. **Since 2026-10-04 the challenge feeds the leaderboard** (§3),
-  so it comes before G1's board: each day's five answered only on that
+  so it comes before G1b: each day's five answered only on that
   day, once; the engaged seconds kept, since time breaks a tie. **The
   day's five come from one course, the programme's courses in turn**
   (Sam, 2026-10-04; §4, *What a free attempt belongs to*) — a sitting
@@ -1031,8 +1050,10 @@ one-off buttons and cards.
 | F2 The free account | candidate; what each page shows after the trial ruled 2026-10-03 (§3) — locked, not gone; built into each page's redesign; Retake locked, course announcements to all who held the course, the locked wording approved (2026-10-04) |
 | F3 Landing and copy | candidate |
 | F4 The limited trial | candidate; decided in principle 2026-10-02 (14 days, admin-granted full access); settled the same day — from registration, a ticked paper per course, three builder quizzes, the limits on each product; SMS verification, one trial per verified number (2026-10-03); §8 S23 ✅ 2026-10-04 |
-| G1 Streak, points, leaderboard (derived) | candidate; the NMC Prep walk done 2026-09-24; the streak settled and points replaced by questions mastered 2026-10-03 (§3); the leaderboard settled 2026-10-04 (§3) — from G2, three views, generated usernames; avatars Noto's animals, Avataaars the alternative; needs its §8 row |
-| G2 The daily challenge | candidate; from the free pool (Sam, 2026-09-26); feeds the leaderboard, so before G1's board; one course a day in turn (2026-10-04); rotation and pool size open |
+| G1 Streak, points, leaderboard (derived) | split 2026-10-04 into G1a and G1b (Sam); the NMC Prep walk done 2026-09-24; the streak settled and points replaced by questions mastered 2026-10-03 (§3); the leaderboard settled 2026-10-04 (§3) |
+| G1a The streak and questions mastered | candidate; settled 2026-10-03 (§3); waits on nothing, no §8 row; when to build open (now with a plain card, or with the page's redesign) |
+| G1b The leaderboard | candidate; settled 2026-10-04 (§3) — from G2, three views, generated usernames; avatars Noto's animals, Avataaars the alternative; after G2; needs its §8 row |
+| G2 The daily challenge | candidate; from the free pool (Sam, 2026-09-26); feeds the leaderboard, so before G1b; one course a day in turn (2026-10-04); rotation and pool size open |
 | G3 Tiers | later |
 
 ---
