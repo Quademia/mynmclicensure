@@ -600,12 +600,27 @@ prize.
 - **Avatars: a ready-made set, not the photo** (Sam's idea), bundled in
   the app — a few KB each, arriving with the page, where a board of 13
   photos would be 13 downloads (today's photo is served at 1.38 MB, a
-  queued speed line). **People or animals is open:** people need skin
-  tones that look like our students; animals can match the name. Sets go
-  to Sam side by side before one is picked (an asset is a proposal until
-  adopted). Sources: DiceBear (open-source; Lorelei and Open Peeps CC0,
-  others CC BY) or a set drawn for us. MyNclex has neither usernames nor
-  avatars (checked 2026-10-04).
+  queued speed line). MyNclex has neither usernames nor avatars (checked
+  2026-10-04).
+- **The set: Google's Noto animals, the animal matching the username**
+  (Sam, 2026-10-04, from ten sets shown side by side): "SwiftLion 27"
+  has a lion — Google Docs' "Anonymous Capybara" shape. No skin-tone or
+  hair question; one rule a student can say. The files come from
+  `googlefonts/noto-emoji` (`2D/svg`, Apache 2.0: free for commercial
+  use, the licence notice kept with the files), about 4 KB each, bundled
+  in the app. Only animals with a drawing can be in the word list (no
+  hornbill, no antelope), and the list leaves out monkeys and apes and
+  any animal used as an insult; Sam sees the list first. **Documented
+  alternative: DiceBear's Avataaars** (Pablo Stanley; free for
+  commercial use, no credit), the people set with the widest hair —
+  locs, afros, a hijab — drawn by code with no files; its skin tones and
+  hairstyles limited to ones that fit our students. Weighed: Big Smile,
+  Personas, Adventurer (people, CC BY, a credit line); Notionists (black
+  and white line art, no skin tone, CC0); Open Peeps (CC0); Twemoji's
+  flat animals (CC BY); DiceBear's Thumbs and Bottts' robots (neither
+  people nor animals; may read as childish for nurses-to-be). **Open:**
+  whether the student picks the animal from a grid and spins only the
+  word, or the spin changes both.
 - Two columns on `users` (the username, the avatar) — a §8 row before
   the build.
 
@@ -621,8 +636,9 @@ for the build.
 
 Derived from the challenge's graded rows; a stored weekly tally if the
 reads grow slow, decided at the build with its own §8 row (as 10-03).
-**Still open:** people or animal avatars; the word lists; G2's pool size
-and rotation; where the boards sit in the redesign.
+**Still open:** the word lists (the adjectives and the animals); pick
+the animal or spin both; G2's pool size and rotation; where the boards
+sit in the redesign.
 
 ### Real-world comparison — Claude's views, 2026-10-02, not ruled
 
@@ -889,7 +905,8 @@ one-off buttons and cards.
   of 7 days; three views — my school (top 10 shown, the student's own
   rank private), my programme (top 3 and neighbours), schools (the
   average of each school's best 10); a generated username on the profile
-  and a ready-made avatar on the boards, never the real name or photo; a
+  and an animal matching it on the boards (Noto's animals; Avataaars the
+  documented alternative), never the real name or photo; a
   Share on WhatsApp button. The board waits on G2; the streak and
   questions mastered do not. The username and avatar are two columns on
   `users`, so G1 is no longer reads only — its §8 row comes first.
@@ -926,7 +943,7 @@ one-off buttons and cards.
 | F2 The free account | candidate; what each page shows after the trial ruled 2026-10-03 (§3) — locked, not gone; built into each page's redesign |
 | F3 Landing and copy | candidate |
 | F4 The limited trial | candidate; decided in principle 2026-10-02 (14 days, admin-granted full access); settled the same day — from registration, a ticked paper per course, three builder quizzes, the limits on each product; SMS verification, one trial per verified number (2026-10-03); needs its §8 row |
-| G1 Streak, points, leaderboard (derived) | candidate; the NMC Prep walk done 2026-09-24; the streak settled and points replaced by questions mastered 2026-10-03 (§3); the leaderboard settled 2026-10-04 (§3) — from G2, three views, generated usernames; avatars open; needs its §8 row |
+| G1 Streak, points, leaderboard (derived) | candidate; the NMC Prep walk done 2026-09-24; the streak settled and points replaced by questions mastered 2026-10-03 (§3); the leaderboard settled 2026-10-04 (§3) — from G2, three views, generated usernames; avatars Noto's animals, Avataaars the alternative; needs its §8 row |
 | G2 The daily challenge | candidate; from the free pool (Sam, 2026-09-26); feeds the leaderboard, so before G1's board (2026-10-04); rotation and pool size open |
 | G3 Tiers | later |
 
