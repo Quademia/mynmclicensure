@@ -287,7 +287,9 @@ Sam grants by hand are **Free Full Access**, their products' own name.
   (Sam), so that precedent does not carry; its 7-day bank trial also
   starts on the student's request, Sam's ruling there of 2026-09-04
   that registering grants nothing. At registration fits what is built:
-  registration already grants a row with an end date.
+  registration already grants a row with an end date. **Replaced on
+  2026-10-04** (*Three ways in*, below): registration grants nothing by
+  itself; the 14 days start when the student takes the trial.
 - **In each course of the programme, one Practice Paper is open** (a
   fixed quiz; the name is 03 Q21) — the one the admin ticks **"Open in
   trial"** on the quiz editor, at most one per course, **listed first**
@@ -723,6 +725,42 @@ offered with what it costs and tested against the app's own features.
   table, a §8 row at the build. The badge art is a set Sam approves
   (for nurses-to-be, not children).
 
+### Three ways in — Sam, 2026-10-04 (desktop session)
+
+Asked by Sam: does everyone get a free account under the plan? Yes —
+every account is a free account underneath, with the trial, a package
+or Free Full Access on top, and falls back to it when those end. The
+one case the plan left out — a buyer who pays before registering, whose
+account the payment creates (D31): does the trial come too? — led Sam
+to what registering means.
+
+- **Registration grants nothing by itself** (Sam: "registration should
+  not automatically do that"). "Register" means one of three, the
+  student's choice: **"register me a free account"**, **"register me on
+  the trial"**, **"register me on this package"**. One account in all
+  three, the free account always underneath; what differs is what is
+  put on top — nothing, the 14-day trial (with its SMS check), or the
+  package (paid first; the account made at payment, 01's D31). Free Full
+  Access stays the admin's grant. This is MyNclex's rule (Sam's ruling
+  there, 2026-09-04: registering grants nothing), set aside here on
+  10-02 when the trial was meant to come with every account.
+- **The 14 days start when the student takes the trial**, replacing
+  10-02's "at registration" (*The limited trial settled*), which
+  assumed registration handed the trial out.
+- **Today's register page becomes the trial's door**, linked from a
+  trial card — it already makes the account and grants the trial. The
+  free account's door and the screens are the redesign's and F3's (the
+  landing page's) — "we are going to redesign things anyway"; settled:
+  there are three ways in.
+- **Left for the build** (Sam): whether a free-account student can start
+  the trial later, from the dashboard, once per verified number, the 14
+  days from the press (Claude's view: yes — otherwise a student who
+  signs up free loses the trial by not choosing it at the door); and
+  whether the SMS code is asked only when a trial starts, not for a free
+  account (Claude's view: yes — a second free account costs nothing,
+  and every free sign-up saves the fee and a step on weak data; 10-03
+  put the code at registration because registration gave the trial).
+
 ### Real-world comparison — Claude's views, 2026-10-02, not ruled
 
 Asked by Sam: is there a better approach from real products? Sources
@@ -887,7 +925,10 @@ Meta's WhatsApp pricing). To go through with Sam before G1 is sliced:
   made-up address. **Smaller since the trial was settled:** the trial
   papers are the same for every account, so a second account opens no
   new paper — what it adds is up to 150 new builder questions.
-  **Settled 2026-10-03 (Sam): SMS verification, with F4.** At
+  **Settled 2026-10-03 (Sam): SMS verification, with F4** (since
+  2026-10-04 registration grants nothing by itself — §3, *Three ways in*;
+  whether the code moves to the trial's start only, a free account
+  asking none, is left for the build). At
   registration the student's number gets a code by SMS through a
   Ghanaian SMS company; the trial is granted once the code is entered;
   **one trial per verified number**, every number saved in one standard
@@ -930,7 +971,17 @@ Meta's WhatsApp pricing). To go through with Sam before G1 is sliced:
   offers a voice code, GHS 0.20 a minute); two people on one phone —
   the second registers and gets the free account, no trial.
 - **Our prices beside GHS 6.** Unchecked; decides how the free floor
-  and the trial are worded against each other.
+  and the trial are worded against each other. **Parked 2026-10-04**
+  (Sam): dev's prices "can be changed anytime and they are not final" —
+  the comparison waits for the real prices. Offered for then: a monthly
+  figure beside each price ("GHS 150 · 1 year, about GHS 13 a month"),
+  since a year beside NMC Prep's GHS 6 a month reads 25 times dearer; a
+  30-day pass dearer per month than the year (a product row, no build);
+  "until your exam" passes with the parked countdown; instalments
+  (MyNclex has deposits and instalments) later. The three levels'
+  wording goes with F3. The bigger lever than the price: a free set big
+  enough that students stay, against NMC Prep's free-everything — G2's
+  pool size.
 - **NAC and NAP as separate programmes; RPHN and RCN the same exam or
   not.** A programme question NMC Prep's track list raised. **Settled
   2026-10-04 (Sam): four different programmes, so seven in all.** The
@@ -994,6 +1045,9 @@ one-off buttons and cards.
   nothing new; the seal holds (03 Q6). Since 2026-10-02 registration
   grants only the limited trial (§3), so every new student meets these
   pages — the locked papers during the 14 days, all of them after.
+  **Since 2026-10-04 registration grants nothing by itself** (§3, *Three
+  ways in*): a free account, the trial or a package, the student's
+  choice; this slice builds the free account's door.
   **The pages a student with no live course
   meets today** (read 2026-10-02): the course page says "No Access";
   the attempt report says "No Course Access", so past attempts cannot
@@ -1008,7 +1062,10 @@ one-off buttons and cards.
   plans one for every student page), not onto today's pages.
 - **F4 — The limited trial** (Sam, 2026-10-02; settled in §3, *The
   limited trial settled*). Today's five programme trial products,
-  reshaped: 14 days from registration; in each course the Practice
+  reshaped: 14 days from when the student takes the trial (2026-10-04,
+  *Three ways in* — registration grants nothing by itself; today's
+  register page becomes the trial's door, linked from a trial card);
+  in each course the Practice
   Paper the admin ticks "Open in trial", listed first as "Included in
   your trial", the others shown locked; three Quiz Builder quizzes in
   all, at the normal builder limit, in any courses; a quiz used when
@@ -1115,7 +1172,7 @@ one-off buttons and cards.
 | F1 The pool and its door | candidate; settled as the mark + two doors 2026-09-26; §8 S16 ✅ 2026-09-26; the column is 08 B4; a free sitting is the real course's (2026-10-04) |
 | F2 The free account | candidate; what each page shows after the trial ruled 2026-10-03 (§3) — locked, not gone; built into each page's redesign; Retake locked, course announcements to all who held the course, the locked wording approved (2026-10-04) |
 | F3 Landing and copy | candidate |
-| F4 The limited trial | candidate; decided in principle 2026-10-02 (14 days, admin-granted full access); settled the same day — from registration, a ticked paper per course, three builder quizzes, the limits on each product; SMS verification, one trial per verified number (2026-10-03); §8 S23 ✅ 2026-10-04 |
+| F4 The limited trial | candidate; decided in principle 2026-10-02 (14 days, admin-granted full access); settled the same day — from registration, a ticked paper per course, three builder quizzes, the limits on each product; SMS verification, one trial per verified number (2026-10-03); §8 S23 ✅ 2026-10-04; three ways in — the 14 days from when the student takes the trial, not registration (2026-10-04) |
 | G1 Streak, points, leaderboard (derived) | split 2026-10-04 into G1a and G1b (Sam); the NMC Prep walk done 2026-09-24; the streak settled and points replaced by questions mastered 2026-10-03 (§3); the leaderboard settled 2026-10-04 (§3) |
 | G1a The streak and questions mastered | candidate; settled 2026-10-03 (§3); waits on nothing, no §8 row; when to build open (now with a plain card, or with the page's redesign) |
 | G1b The leaderboard | candidate; settled 2026-10-04 (§3) — from G2, three views, generated usernames; avatars Noto's animals, Avataaars the alternative; after G2; needs its §8 row |
