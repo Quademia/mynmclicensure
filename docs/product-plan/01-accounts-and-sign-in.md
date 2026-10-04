@@ -35,8 +35,8 @@ Detail and history: `archive/product-plan/04-access-control.md`,
   school isn't listed" is allowed, and an admin matches the typed name
   later (10, D50). The student can change school on the profile at any
   time.
-- **A programme not Open to the public is refused** (02 C5). *(to
-  build: C5)*
+- **A programme not Open to the public is refused** (02 C5a, built
+  2026-10-04): "This programme is not open yet."
 - **The email is lowercased and unique.** The student's own browser may
   change only the profile's fields. **The phone number is changed
   through the server**, which clears its verification (03; 12, `users`).

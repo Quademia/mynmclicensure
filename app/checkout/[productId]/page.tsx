@@ -38,7 +38,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { findProfileByAuthId } from '@/lib/auth/profile';
-import { getCourses, getPrograms, getProducts } from '@/lib/catalogue/queries';
+import { getCourses, getOpenPrograms, getProducts } from '@/lib/catalogue/queries';
 import { courseScopeMap, isForSale, programmesOf } from '@/lib/catalogue/for-sale';
 import { formatMinor } from '@/lib/money/format-minor';
 import { PublicTopBar } from '@/components/shell/public-top-bar';
@@ -82,7 +82,9 @@ export default async function CheckoutPage({
 
   const supabase = await createClient();
   const [programs, products, courses, buyer] = await Promise.all([
-    getPrograms(supabase),
+    // Open to the public only (02 C5a): the chooser and "every programme"
+    // count what a visitor may choose.
+    getOpenPrograms(supabase),
     getProducts(supabase),
     getCourses(createServiceRoleClient()),
     signedInBuyer(supabase),

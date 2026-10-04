@@ -15,13 +15,32 @@ import type { ConfigMap, ConfigRow, Course, Product, Program } from './types';
 
 type Db = Awaited<ReturnType<typeof createClient>>;
 
+// Every programme, open or not — the admin's pages and a student's own
+// programme name read this.
 export async function getPrograms(db: Db): Promise<Program[]> {
   const { data, error } = await db
     .from('programs')
-    .select('program_id, program_name, trial_product_id')
+    .select('program_id, program_name, trial_product_id, is_open')
     .order('program_name');
   if (error) {
     console.error('getPrograms:', error);
+    return [];
+  }
+  return (data ?? []) as Program[];
+}
+
+// The programmes Open to the public (02 C5a, Sam 2026-10-04) — what a
+// visitor may see and choose: the home page, registration, the shop,
+// checkout. A closed one is being prepared; the admin can still grant
+// its packages for testing.
+export async function getOpenPrograms(db: Db): Promise<Program[]> {
+  const { data, error } = await db
+    .from('programs')
+    .select('program_id, program_name, trial_product_id, is_open')
+    .eq('is_open', true)
+    .order('program_name');
+  if (error) {
+    console.error('getOpenPrograms:', error);
     return [];
   }
   return (data ?? []) as Program[];

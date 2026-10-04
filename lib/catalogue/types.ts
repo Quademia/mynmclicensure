@@ -9,6 +9,8 @@ export type Program = {
   program_id: string;
   program_name: string;
   trial_product_id: string | null;
+  /** Open to the public (02 C5a): off = hidden, refused at registration and checkout */
+  is_open: boolean;
 };
 
 export const COURSE_STATUSES = ['active', 'draft', 'archived'] as const;

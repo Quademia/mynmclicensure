@@ -14,16 +14,27 @@ findings D4, D20, D23, D31–D36 in `archive/product-plan/post-rebuild-diagnosis
 
 - **Seven programmes** (Sam, 2026-10-04), each with the General Paper:
   RN, RM, RMHN, RPHN; **RCN**, new, its courses and bank to come; **NAC**
-  (Basic Clinical Nursing) and **NAP** (Basic Preventive Nursing), split
-  from NACNAP — its four packages become a NAC set and a NAP set, and
-  NACNAP closes once both are open. *(to build: C5)*
-- **Open to the public — one tick per programme**, on the admin's
-  Courses page beside the programme's name. Ticked: the programme shows
-  on the home page, at registration and in the shop. Not ticked: hidden,
-  and the server refuses it at registration and checkout; the admin can
-  still grant its packages for testing; unticking stops new sign-ups
-  only. A new programme starts closed; today's five start open; the rest
-  open in batches as each bank is ready. *(to build: C5)*
+  ("Nursing Assistant Clinical", course Basic Clinical Nursing) and
+  **NAP** ("Nursing Assistant Preventive", course Basic Preventive
+  Nursing), split from NACNAP. NAC, NAP and RCN exist, closed, with
+  working names (C5a, 2026-10-04).
+- **The switch-over, on the day NAC and NAP open — one step** *(to
+  build: C5b)*: NACNAP's two courses move to NAC and NAP and the General
+  Paper takes in NAC, NAP and RCN; NACNAP's four packages become a NAC
+  set and a NAP set (copied at today's prices, corrected later); NAC and
+  NAP opened, NACNAP closed — its students keep their access. One step,
+  because a package's programme is read from its courses: moved early,
+  NACNAP's packages would vanish from the shop; left behind, a NAC
+  package would show as NACNAP's.
+- **Open to the public — one switch per programme** (C5a, built
+  2026-10-04). Open: the programme shows on the home page, at
+  registration and in the shop. Closed: hidden, and the server refuses
+  it at registration and at checkout ("This programme is not open
+  yet."); the admin can still grant its packages for testing; closing
+  stops new sign-ups only. A new programme starts closed; the rest open
+  in batches as each bank is ready. The tick on the admin's Courses
+  page, beside the programme's name, comes with its redesign *(to
+  build: 02.9)*; until then it is set by hand.
 
 ### Packages
 
@@ -127,7 +138,7 @@ findings D4, D20, D23, D31–D36 in `archive/product-plan/post-rebuild-diagnosis
 
 Written on the tables in `12-tables.md`:
 
-- `programs` — Open to the public — ticked 2026-10-04 (C5).
+- `programs` — Open to the public — ticked 2026-10-04, built (C5a).
 - `products` and `subscriptions` — the four limits and their copy;
   trials 14 days — ticked 2026-10-04 (03 F4).
 - `payments` — the setup columns and a status go, "abandoned" comes
@@ -135,7 +146,7 @@ Written on the tables in `12-tables.md`:
 
 ## Open
 
-- **For C5**: NAC and NAP package prices (prices parked until Sam's
+- **For C5b**: NAC and NAP package prices (prices parked until Sam's
   real numbers, 2026-10-04) and RCN's courses.
 - **Does D31 / D34's change to the payments table need its own tick?**
 - **Signed-out visitors cannot read courses**, so public pages read them

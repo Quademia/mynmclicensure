@@ -145,15 +145,18 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `program_id` | The short code — RN, RM, RMHN, RPHN, NACNAP (NAC, NAP and RCN to come) |
 | `program_name` | The full name shown to students |
 | `trial_product_id` | The package a student gets on this programme's trial → `products` |
+| `is_open` | Open to the public — the one place it is set |
 
-- *To build — ticked 2026-10-04 (02 C5):* **`is_open`**, Open to the
-  public. On: the programme shows on the home page, at registration and
-  in the shop. Off: hidden, and the server refuses it at registration
-  and checkout; the admin can still grant its packages for testing;
-  turning it off stops new sign-ups only. New rows start off; today's
-  five start on. Why: programmes are released in batches as each
-  question bank is ready.
-- Browser: anyone reads; admin write. *Old defaults.*
+- `is_open` (02 C5a, built 2026-10-04). On: the programme shows on the
+  home page, at registration and in the shop. Off: hidden, and the
+  server refuses it at registration and checkout; the admin can still
+  grant its packages for testing; turning it off stops new sign-ups
+  only. A new row starts off. Open: RN, RM, RMHN, RPHN, NACNAP; closed:
+  NAC, NAP, RCN (added 2026-10-04, no courses or packages yet — 02 C5b).
+  Why: programmes are released in batches as each question bank is
+  ready. Set by hand until the Courses page gets its tick *(to build:
+  02.9)*.
+- Browser: anyone reads; writes through the server only.
 
 ### `courses` — the courses
 | Column | Holds |

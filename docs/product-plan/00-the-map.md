@@ -117,7 +117,7 @@ feedback (06).
 | Subscriptions | Who holds what: grant, update, revoke |
 | Payments | Every Paystack payment; rescue a stuck one; revenue |
 | Packages | What is for sale: courses, price, days, the trial's limits |
-| Courses | The courses of each programme; Open to the public, one tick per programme (*new*, 02 C5) |
+| Courses | The courses of each programme; Open to the public, one tick per programme (*new*, 02 C5a, the tick 02.9) |
 | Announcements | Notices, targeted |
 | Practice papers | The set papers; the one open in the trial (03 F4) |
 | Mock exams | The timed papers |
@@ -145,7 +145,7 @@ item; a new idea is parked in one line in its file, not worked through.
    - ~~The trial's limits in the database (03 F4a)~~ — done 2026-10-04.
    - ~~The free set's two doors (03 F1)~~ — done 2026-10-04.
    - ~~An ended subscription stops counting as live everywhere (02.1)~~ — done 2026-10-04.
-   - Programmes open to the public, and NAC, NAP and RCN (02 C5).
+   - ~~Programmes open to the public, NAC, NAP and RCN added closed (02 C5a)~~ — done 2026-10-04; NACNAP's switch-over (C5b) on the day NAC and NAP open.
 2. **The student pages, redesigned — in the order a new student meets
    them.** Home and the three doors (01, 03 F3) → dashboard (with the
    streak card, 05 G1a) → practice (course, papers, mocks, builder, the

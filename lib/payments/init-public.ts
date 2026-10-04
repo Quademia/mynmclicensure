@@ -66,11 +66,14 @@ export async function initPublicPayment(input: InitPublicInput): Promise<InitRes
     product = await getProductForPayment(db, productId, true);
     const { data: program, error: programError } = await db
       .from('programs')
-      .select('program_id')
+      .select('program_id, is_open')
       .eq('program_id', programId)
       .maybeSingle();
     if (programError) throw new Error(`Supabase select failed on programs: ${programError.message}`);
     if (!program) return { ok: false, error: 'unknown_program', message: 'Please select your programme.' };
+    // Open to the public (02 C5a): a closed programme is refused here even
+    // if a form sent by hand names it.
+    if (!program.is_open) return { ok: false, error: 'program_closed', message: 'This programme is not open yet.' };
   } catch (err) {
     console.error('[payments] init-public product lookup failed:', err);
     return { ok: false, error: 'server_error', message: 'Could not start payment. Please try again.' };

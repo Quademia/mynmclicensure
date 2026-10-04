@@ -21,7 +21,8 @@ export default async function RegisterPage() {
   const supabase = await createClient();
 
   const [programsRes, schoolsRes] = await Promise.all([
-    supabase.from('programs').select('program_id, program_name, trial_product_id').order('program_name'),
+    // Open to the public only (02 C5a); the action refuses any other.
+    supabase.from('programs').select('program_id, program_name, trial_product_id').eq('is_open', true).order('program_name'),
     supabase
       .from('schools')
       .select('id, name, region')

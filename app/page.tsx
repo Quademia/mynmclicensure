@@ -32,7 +32,8 @@ type ProgCard = { program_id: string; program_name: string };
 
 export default async function LandingPage() {
   const supabase = await createClient();
-  const { data, error } = await supabase.from('programs').select('program_id, program_name').order('program_id');
+  // Open to the public only (02 C5a): a closed programme is being prepared.
+  const { data, error } = await supabase.from('programs').select('program_id, program_name').eq('is_open', true).order('program_id');
   const programs = (error ? [] : (data ?? [])) as ProgCard[];
 
   return (

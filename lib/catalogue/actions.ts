@@ -43,16 +43,20 @@ export async function saveProgram(input: {
   programId: string;
   name: string;
 }): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
+  await requireAdmin();
   const progId = input.programId.trim().toUpperCase();
   const name = input.name.trim();
 
   if (input.isNew && !progId) return fail('Programme ID is required.');
   if (!name) return fail('Programme name is required.');
 
+  // Rule 9 (02 C5a): the browser roles no longer write `programs`; the
+  // save goes through the service role behind requireAdmin(). A new
+  // programme starts closed — the column's default.
+  const db = createServiceRoleClient();
   const { error } = input.isNew
-    ? await supabase.from('programs').insert({ program_id: progId, program_name: name })
-    : await supabase.from('programs').update({ program_name: name }).eq('program_id', progId);
+    ? await db.from('programs').insert({ program_id: progId, program_name: name })
+    : await db.from('programs').update({ program_name: name }).eq('program_id', progId);
   if (error) return fail(error.message);
 
   revalidatePath('/admin/courses');

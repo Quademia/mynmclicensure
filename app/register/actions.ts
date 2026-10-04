@@ -69,6 +69,21 @@ export async function registerAction(formData: FormData): Promise<RegisterResult
 
   const supabase = await createClient();
 
+  // Open to the public (02 C5a, Sam 2026-10-04): the list offers only open
+  // programmes, and this refuses any other — a form sent by hand
+  // included — before an account is made.
+  const { data: programme, error: programmeError } = await supabase
+    .from('programs')
+    .select('is_open')
+    .eq('program_id', programId)
+    .maybeSingle();
+  if (programmeError) {
+    console.error('[register] programme read failed:', programmeError);
+    return { ok: false, error: 'Signup failed. Please try again.' };
+  }
+  if (!programme) return { ok: false, error: 'Please select your programme.' };
+  if (!programme.is_open) return { ok: false, error: 'This programme is not open yet.' };
+
   // Step 1: the Supabase Auth account. Supabase's own message on failure,
   // as legacy showed it (e.g. "User already registered").
   const { data, error } = await supabase.auth.signUp({ email, password });
