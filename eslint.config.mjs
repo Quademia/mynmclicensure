@@ -13,9 +13,9 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     ".open-next/**",
-    // The old product, kept verbatim as the reference until cutover.
-    // Never linted: it is read, not maintained (AGENTS.md rule #8).
-    "legacy/**",
+    // The archive: the old product and the old plan docs, kept as the
+    // reference. Never linted: it is read, not maintained (AGENTS.md).
+    "archive/**",
     // Assistant tooling, not application code.
     ".claude/**",
   ]),
