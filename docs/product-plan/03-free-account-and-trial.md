@@ -31,9 +31,13 @@ Detail and history: `archive/product-plan/09-free-account-and-gamification.md` �
   course's access lets an all-free set through — the builder, its
   keyword search, starting and opening a sitting, the report. *(to
   build: F1)*
-- Timed mode, mock exams and offline packs are not free. Mocks and
-  packs are for packages only (Sam, 2026-10-02); **a free account cannot
-  use the offline pack maker** (Sam, 2026-10-04).
+- **A free account uses the Study modes only** — Learning and Untimed
+  practice; the Exam modes (Free Navigation, Sequential) are for the
+  trial and packages (Sam, 2026-10-04: A, reading 2026-09-20's "timed
+  mode stays trial or paid" against the four modes).
+- Mock exams and offline packs are not free: they are for packages
+  only (Sam, 2026-10-02); **a free account cannot use the offline pack
+  maker** (Sam, 2026-10-04).
 - The daily challenge, the streak and questions mastered are open to
   free accounts (04, 05).
 - The wording: "free practice questions, forever" is true and is used;
