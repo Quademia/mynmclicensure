@@ -757,8 +757,35 @@ Meta's WhatsApp pricing). To go through with Sam before G1 is sliced:
 - **What a free attempt belongs to.** An attempt needs a course. Either
   a stand-in "free practice" course per programme, or `course_id` made
   optional (a storage change). Small either way; it has to be chosen.
+  **Settled 2026-10-04 (Sam: option 1): a free sitting belongs to the
+  real course its questions come from.** The question was written on
+  09-20, when the pool was to be a place of its own with no course;
+  since 09-26 a free question is a bank row with a mark, so it already
+  sits in a real course. A free student picks a course of their
+  programme in the builder and draws that course's free rows; the sitting
+  is that course's, as every sitting is today — `create_attempt` copies
+  only the named course's questions, and that stays. No storage change,
+  no stand-in course; Learning History, the report and "Practise this
+  topic" work as built, the course named; free practice sits inside the
+  course the student knows, so the upgrade reads "unlock the rest of
+  this course". The work is F1's as planned (§8 S16 ✅): the places that
+  check a course's access — the builder's load, its keyword search, the
+  start, opening a sitting, the report, the pack maker — let in a set
+  whose every question is marked free. **The daily challenge takes one
+  course a day, in turn** (Sam), so it fits the same rule; the order at
+  G2. Weighed: a stand-in course per programme (every course list must
+  hide it, and the one-course rule bends anyway, since the questions sit
+  in the real courses); a sitting with no course (a storage change — the
+  course optional, the programme stored, every course reader handling
+  none, and each question's course kept for the report's topic advice) —
+  the route if a challenge mixing courses is ever wanted, with its own §8
+  row.
 - **Programme scoping.** A midwife should not get RN questions. The
-  pool is per programme, and `users.program_id` picks it.
+  pool is per programme, and `users.program_id` picks it. **Read
+  2026-10-04:** each programme has its two own courses and the General
+  Paper, which all five share (`courses.program_scope`); a programme's
+  free pool is the marked rows of those three, so the General Paper's
+  free questions are free to every programme.
 - **The leaderboard:** per programme or platform-wide; weekly reset or
   all time; real names, first names, or a chosen display name with an
   opt-out. NMC Prep's answer (walked 2026-09-24): all time, the top
@@ -849,7 +876,10 @@ one-off buttons and cards.
   and `create_attempt` accepting an all-free set of ids, plus the
   builder and the pack maker drawing free rows only for a student with
   no live course. The one storage change in this doc. Settled
-  2026-09-26 (§4 above).
+  2026-09-26 (§4 above). **A free sitting belongs to the real course its
+  questions come from** (Sam, 2026-10-04; §4): the free student picks a
+  course of their programme, and the places that check a course's access
+  let in an all-free set.
 - **F2 — The free account.** The floor beneath the trial (Sam's call,
   answered 2026-10-02: registration keeps a trial row, the limited one
   of F4), the builder and the runner drawing from the pool for a
@@ -926,7 +956,11 @@ one-off buttons and cards.
   Prep walk found theirs sends the answers to the browser before it is
   opened. **Since 2026-10-04 the challenge feeds the leaderboard** (§3),
   so it comes before G1's board: each day's five answered only on that
-  day, once; the engaged seconds kept, since time breaks a tie.
+  day, once; the engaged seconds kept, since time breaks a tie. **The
+  day's five come from one course, the programme's courses in turn**
+  (Sam, 2026-10-04; §4, *What a free attempt belongs to*) — a sitting
+  stays one course's; the order, and whether a General Paper day is the
+  same five for every programme, at the build.
 - **G3 — Tiers.** Names on point bands, Passwell's shape, once real
   numbers exist. Cosmetic.
 
@@ -943,12 +977,12 @@ one-off buttons and cards.
 
 | Slice | Date |
 |---|---|
-| F1 The pool and its door | candidate; settled as the mark + two doors 2026-09-26; §8 S16 ✅ 2026-09-26; the column is 08 B4 |
+| F1 The pool and its door | candidate; settled as the mark + two doors 2026-09-26; §8 S16 ✅ 2026-09-26; the column is 08 B4; a free sitting is the real course's (2026-10-04) |
 | F2 The free account | candidate; what each page shows after the trial ruled 2026-10-03 (§3) — locked, not gone; built into each page's redesign |
 | F3 Landing and copy | candidate |
 | F4 The limited trial | candidate; decided in principle 2026-10-02 (14 days, admin-granted full access); settled the same day — from registration, a ticked paper per course, three builder quizzes, the limits on each product; SMS verification, one trial per verified number (2026-10-03); needs its §8 row |
 | G1 Streak, points, leaderboard (derived) | candidate; the NMC Prep walk done 2026-09-24; the streak settled and points replaced by questions mastered 2026-10-03 (§3); the leaderboard settled 2026-10-04 (§3) — from G2, three views, generated usernames; avatars Noto's animals, Avataaars the alternative; needs its §8 row |
-| G2 The daily challenge | candidate; from the free pool (Sam, 2026-09-26); feeds the leaderboard, so before G1's board (2026-10-04); rotation and pool size open |
+| G2 The daily challenge | candidate; from the free pool (Sam, 2026-09-26); feeds the leaderboard, so before G1's board; one course a day in turn (2026-10-04); rotation and pool size open |
 | G3 Tiers | later |
 
 ---
