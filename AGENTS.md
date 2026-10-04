@@ -1,12 +1,13 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-10-03. Rules for **any** assistant working in this
+Last updated: 2026-10-04. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
-`SESSIONS.md` (the index) and `sessions/` (the log). What is built and
-what is queued lives in `BUILD_LIST.md`. What is being built and in
-what order lives in `docs/product-plan/rebuild.md`. Do not write
-session history into this file; if a RULE changes, change the rule.
+`SESSIONS.md` (the index) and `sessions/` (the log). What the app is
+and what is decided lives in `docs/product-plan/` (`00-the-map.md`
+first, which also holds the build order). What is built and what is
+queued lives in `BUILD_LIST.md`. Do not write session history into this
+file; if a RULE changes, change the rule.
 
 Claude Code reads `CLAUDE.md`, which points here. Codex reads this
 file directly. There is one rules file.
@@ -14,8 +15,9 @@ file directly. There is one rules file.
 ## What This Is
 
 MyNMCLicensure is the NMC Ghana licensure exam-prep product under the
-**Quademia** brand: five programmes (RN, RM, RPHN, RMHN, NACNAP),
-per-course question banks, fixed quizzes and mock exams, a quiz builder,
+**Quademia** brand: five programmes open today (RN, RM, RPHN, RMHN,
+NACNAP), seven decided (NAC and NAP split from NACNAP, RCN added — 02
+C5), per-course question banks, practice papers and mock exams, a quiz builder,
 instant and timed runners, subscriptions and Paystack checkout,
 announcements, support messaging, and offline question packs for
 students with unreliable connectivity. Audience: nursing students in
@@ -23,42 +25,39 @@ Ghana.
 
 ## Current Status
 
-**The port is finished (Sam, 2026-09-16); the work now is improving
-the app.** The product was moved, like for like, from the vanilla-JS
-site onto the MyNclex stack — slices 0–14 of
-`docs/product-plan/rebuild.md`, then a page-by-page check against
-`legacy/` that found nothing missing. That was a port, not a redesign
-(the plan called it "the rebuild"; the name stays in the slice ids and
-the record): the behaviour and the data shapes came across as they
-were. What follows is one stream of improvement — security and storage
-shape first, so the database is the gate, then everything else — with
-cutover to the live domain as one item in it, not a wall the list is
-sorted around (Sam, 2026-09-18). The findings are
-`docs/product-plan/post-rebuild-diagnosis.md`; the one list is
-`BUILD_LIST.md` under *Improvements*; Sam orders it. The live product is
-still the vanilla-JS site served from the `qacademy-gamma` repo; its
-code stays here under `legacy/` as a reference — it says what the old
-app did, and Sam decides whether the new app should do the same. The
-feature docs `00–10` are the **living plan per feature** (Sam,
-2026-09-19, replacing the 2026-09-12 ruling that they were not build
-plans): each holds what the feature does today, what the diagnosis
-found, Sam's rulings, and the sliced plan with the doc's own slice
-ids; `BUILD_LIST.md` carries a section per doc, and **every queued line
-sits under the surface that will build it** (Sam, 2026-09-21) — there
-are no flat lists of unhomed work, and a line with no slice id gets one
-when its doc is rewritten. A doc is rewritten into that shape when its
-feature comes up, not before; until then it still describes the legacy
-product above a *Diagnosis findings for this surface* table (rewritten
-so far: 02, 03, 05, 08; 09 and 10 were written in the shape). The
-diagnosis stays the register of findings; the feature doc is where a
-finding becomes a slice.
+**The port is finished (Sam, 2026-09-16), and the plan was written
+fresh on 2026-10-04 (Sam); the work now is building the app it
+describes.** The product was moved, like for like, from the vanilla-JS
+site onto the MyNclex stack (slices 0–14, "the rebuild"), then improved
+— security and storage shape first, so the database is the gate. Sam
+plans to redesign every page. On 2026-10-04 Sam found the planning
+"going in circles" because it was written on top of the old app, so
+the old plan docs, the old build list and the old app's code moved to
+`archive/`, and `docs/product-plan/` was rewritten to describe only the
+app as it will be:
+
+- `00-the-map.md` — who uses the app, the ways in, every page in one
+  line, the menu, **the build order**, and how it is built.
+- `01`–`10` — one file per feature: how it works (built and decided
+  together; unbuilt parts marked *to build* with their id), storage
+  changes with Sam's tick, and the Open list (what is still Sam's).
+- `11-pages.md` — per page, what it shows to a free, trial, paid and
+  ended student, completed when that page's redesign starts.
+
+`BUILD_LIST.md` holds each piece's status, one section per plan file.
+A decision is written once, in its file; its status once, in the list.
+The live product is still the vanilla-JS site served from the
+`qacademy-gamma` repo. `archive/` — the old app, the old plan docs (the
+rebuild plan, the diagnosis's findings D1–D52, the feature docs), the
+old build list — is looked up, never the spec: it says what the old app
+did or why something was decided; the plan files say what to build.
 
 ⭐ **Nothing is built without Sam's go-ahead in the session.** A change
-to storage still needs its row in `rebuild.md` §8, ticked by Sam with a
-date, before it is built. A finding in the diagnosis is not a decision;
-a decision is a §8 tick or a `BUILD_LIST.md` line. New features are
-allowed now that the port is done; each is still Sam's call, one at a
-time. If something looks wrong, log it and ask; do not fix it silently.
+to storage needs Sam's tick with a date, written in its plan file's
+Storage section, before it is built (the ticks S1–S24 kept their ids).
+A finding is not a decision; a decision is a ruling in a plan file or a
+`BUILD_LIST.md` line. New features are each Sam's call, one at a time.
+If something looks wrong, log it and ask; do not fix it silently.
 
 ## Stack
 
@@ -84,10 +83,12 @@ stack and the source of the plumbing. MyTeacher follows later.
 - `db/` — schema, RLS, seeds, migrations for the `licensure_gh` schema.
 - `scripts/` — the lint baseline and the migration runner.
 - `public/` — static assets.
-- `docs/product-plan/` — flat: the rebuild plan, the feature specs
-  `00–10`, the mock-exams reference, and the gamma-era plans kept for
-  history. One folder until there is a reason to separate.
-- `sessions/` — period logs. `legacy/` — the old product, read-only.
+- `docs/product-plan/` — flat: the map (`00`), the feature files
+  (`01`–`10`) and the pages (`11`).
+- `sessions/` — period logs.
+- `archive/` — read-only: `archive/legacy/` (the old product),
+  `archive/product-plan/` (the old plan docs), `archive/BUILD_LIST.md`.
+  Never linted, never type-checked.
 
 Layout is **flat**: no `src/` wrapper. This only means the folders
 above sit at the repo root; the audience grouping inside them is kept.
@@ -102,7 +103,8 @@ above sit at the repo root; the audience grouping inside them is kept.
    `components/nav/shared/` is genuinely shared.
 3. **Single-use components live next to their caller.**
 4. **`lib/nav/` is data-driven.** Each audience exports its sidebar as a
-   `NavItem[]`; the menu items are the legacy sidebar's, in order.
+   `NavItem[]`; the menu follows the map (`00-the-map.md`) — today's
+   order until the redesign changes it.
 5. **`styles/` is top-level.** New surface, new file.
 6. **Each audience renders its own chrome.** `(app)/layout.tsx` is a
    slim auth boundary. Each audience layout loads its chrome data and
@@ -115,10 +117,12 @@ above sit at the repo root; the audience grouping inside them is kept.
 9. **Cross-cutting UI lives in `lib/overlays/`, `lib/toast/`, `lib/hints/`.**
    Generic primitives in `shared/`; surface-specific instances beside
    their area.
-10. **Legacy pages map to routes one to one.** Before writing a page,
-    open its legacy `.html` and read the whole thing, including the
-    script block. The page's copy, order of fields, validation messages
-    and empty states are the spec.
+10. **A page is built from the plan, not from the old app.** Before
+    writing a page, read its entry in `11-pages.md` and the feature
+    files it names; that entry is completed with Sam when the page's
+    redesign starts. `archive/legacy/` is looked up only to see what the
+    old page did — never the spec (Sam, 2026-10-04, retiring the port's
+    "legacy is the spec").
 
 ## UI Conventions
 
@@ -152,7 +156,7 @@ above sit at the repo root; the audience grouping inside them is kept.
 4. **One money voice: `GHS 350`, never `₵350`.** Amounts are stored as
    integer minor units and rendered through `formatMinor()`.
 5. **One brand name: `Quademia`. `QAcademy` never reaches a reader.**
-   Copy, titles, emails, `aria-label`s say Quademia. Comments, `legacy/`,
+   Copy, titles, emails, `aria-label`s say Quademia. Comments, `archive/`,
    and identifiers may keep the old name; a string that renders may not.
    MyNMCLicensure is a product name under the brand and has no logo of
    its own.
@@ -179,7 +183,7 @@ above sit at the repo root; the audience grouping inside them is kept.
    The schema must be listed under Exposed schemas on both projects
    (dashboard) — see `db/README.md`.
 2. **No imports from sibling products.** Never import from
-   `qacademy-mynclex`, `myteacher`, or `legacy/`. Copy-paste a helper if
+   `qacademy-mynclex`, `myteacher`, or `archive/`. Copy-paste a helper if
    the same one is needed; sharing is not allowed.
 3. **The extraction test.** `cp -r` of this repo elsewhere must produce
    a working independent repo.
@@ -192,9 +196,10 @@ above sit at the repo root; the audience grouping inside them is kept.
    in client code. The service role is a Worker secret.
 6. **Flat layout, no `src/`.**
 7. **Do not touch `public.*` or `teacher_*`.** The legacy product and
-   MyTeacher read them live. The one exception is the read-only content
-   copy in `rebuild.md` §6.6 and the cutover script in §11.
-8. **Do not edit `legacy/`.** It is the reference. Deleted at cutover.
+   MyTeacher read them live. The one exception is going live's content
+   copy and old-logins delete (`10-launch-and-platform.md`).
+8. **Do not edit `archive/`.** It is kept to look things up. The old
+   app (`archive/legacy/`) is deleted at going live.
 9. **A slice that touches a table takes that table's grants back.** Not
    just a table it creates — one it changes at all. `revoke all` from
    `anon` and `authenticated`, then grant back the one thing that table
@@ -453,7 +458,7 @@ above sit at the repo root; the audience grouping inside them is kept.
   service role; the failure is silent otherwise, because a missing title
   falls through to the id and a missing scope makes every product look
   like everyone's. Opening the policy is the cleaner fix and needs its
-  own §8 row (unruled, 2026-09-22).
+  own storage tick (`02-packages-and-payments.md`, Open; unruled since 2026-09-22).
 - **A row of chips that scrolls sideways hides the chosen one** when the
   choice is a link: the page reloads scrolled to the left, so the chip
   just tapped is off-screen. Wrap the row and shorten the labels
@@ -585,10 +590,11 @@ Sam says we are stopping. Do this, in this order.
    not claim merge or release status.
 2. **Two lines in `SESSIONS.md`** under the period heading: the title
    line (under 160 characters) and the keyword line (under 250). Count.
-3. **Ticks.** A closed slice gets its date in `BUILD_LIST.md` **and** in
-   `rebuild.md` §14, in the same commit. Off-plan work gets an
-   `(unplanned)` line. Found-and-not-done gets a ⬜ or ⏸ line with its
-   reason.
+3. **Ticks.** A closed piece turns ✅ with its date in `BUILD_LIST.md`,
+   and its plan file loses the "(to build)" tag, in the same commit.
+   Off-plan work gets an `(unplanned)` line. Found-and-not-done gets a ⬜
+   or ⏸ line with its reason; a question for Sam goes to the plan
+   file's Open list.
 4. **This file, only if a rule changed** or a workaround was learned.
 5. **`npm run lint:check`** once; the log says what was checked.
 6. **One docs commit** on the session branch.
@@ -628,6 +634,11 @@ slice on the branch.
   ask Sam the real size before a rule or a limit rests on it.
 - Discussion is never authorisation. "What do you think?" gets a view;
   only "proceed" starts a build.
+- **Build more, plan less** (Sam, 2026-10-04: "we need to stop this
+  ongoing planning and planning that is not really helping"). Plan only
+  what the next build needs; write a ruling into its plan file in a few
+  lines, not pages; park an idea for later in one line instead of
+  working it through; steer each session toward building something.
 - **Sam decides only from what is offered** (his words, 2026-09-22), so
   an option left out is a decision made for him. Every choice of tool,
   library or approach comes in three parts: what the world does, what
@@ -659,8 +670,8 @@ gives one hard rule and two habits:
   it; never overwrite it.
 - The session log entry is the handoff. Write it so the other agent
   can pick up from it without this conversation, and name yourself in it.
-- The plan (`rebuild.md`) is edited by whichever agent is in session,
-  only on Sam's go-ahead, and the edit is logged. A disagreement with
+- The plan (`docs/product-plan/`) is edited by whichever agent is in
+  session, only on Sam's go-ahead, and the edit is logged. A disagreement with
   the plan goes in the session entry and to Sam; it is not resolved by
   quietly building something else.
 
@@ -668,8 +679,9 @@ gives one hard rule and two habits:
 
 - This file.
 - `SESSIONS.md`, then the head of the latest `sessions/` period file.
+- `docs/product-plan/00-the-map.md` (the build order is there), then
+  the plan file of the piece Sam picks.
 - `BUILD_LIST.md`.
-- `docs/product-plan/rebuild.md` §2, §3, §12 at least.
 - `git fetch --prune`, `git log --oneline -10`, the tips of `origin/main`
   and `origin/production`, `git branch --no-merged main`.
 

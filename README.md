@@ -1,29 +1,31 @@
 # MyNMCLicensure
 
 NMC Ghana licensure exam prep for nursing students, a **Quademia**
-product. Five programmes (RN, RM, RPHN, RMHN, NACNAP), per-course
-question banks, fixed quizzes and mock exams, a quiz builder, instant
-and timed runners, subscriptions with Paystack checkout, announcements,
-support messaging, and offline question packs.
+product. Seven programmes decided (RN, RM, RMHN, RPHN, RCN, NAC, NAP),
+per-course question banks, practice papers and mock exams, a quiz
+builder, instant and timed runners, subscriptions with Paystack
+checkout, announcements, support messaging, and offline question packs.
 
 ## Status
 
-**Being rebuilt onto the Quademia web stack, like for like.** The live
-product is still the vanilla-JS site served from `qacademy-gamma`; its
-code sits in this repo under `legacy/` as the reference until cutover.
+**Ported onto the Quademia web stack; now being built out and
+redesigned.** The live product is still the vanilla-JS site served from
+`qacademy-gamma`; its code is kept under `archive/legacy/` to look
+things up until going live.
 
 - **Rules for working here:** [`AGENTS.md`](AGENTS.md) — for people and
   for assistants (Claude reads it through `CLAUDE.md`; Codex reads it
   directly).
-- **The plan:** [`docs/product-plan/rebuild.md`](docs/product-plan/rebuild.md)
-  — decisions, the stack-versus-product boundary, the database, the
-  slice ladder.
-- **The inventory:** [`BUILD_LIST.md`](BUILD_LIST.md) — one line per
-  slice, ticked with a date when built.
+- **The plan:** [`docs/product-plan/`](docs/product-plan/) — start with
+  [`00-the-map.md`](docs/product-plan/00-the-map.md): every page, the
+  build order, how it is built; then one file per feature and
+  `11-pages.md`.
+- **The build list:** [`BUILD_LIST.md`](BUILD_LIST.md) — one line per
+  piece, ticked with a date when built.
 - **The log:** [`SESSIONS.md`](SESSIONS.md) (index) and
   [`sessions/`](sessions/) (detail).
-- **The feature specs:** [`docs/product-plan/`](docs/product-plan/)
-  `00–07`, beside the plan.
+- **The archive:** [`archive/`](archive/) — the old app, the old plan
+  docs and the old build list, kept to look things up.
 - **How this repo came to be:** [`SPLIT.md`](SPLIT.md).
 
 ## Stack
