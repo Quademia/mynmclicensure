@@ -40,7 +40,7 @@ Detail and history: `archive/product-plan/04-access-control.md`,
 - **The email is lowercased and unique.** The student's own browser may
   change only the profile's fields. **The phone number is changed
   through the server**, which clears its verification (03; 12, `users`).
-  *(to build: F4)*
+  *(to build: F4b)*
 
 ### Signing in
 

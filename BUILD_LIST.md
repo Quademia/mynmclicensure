@@ -63,7 +63,9 @@ before then, and the old list's history, is in
 - ⬜ F2 The free account — its door, the builder on the free set, the dashboard's free line
 - ⬜ F2 After the trial — locked, not gone; the summary open, the review locked; Retake locked
 - ⬜ F3 The home page and its copy — free questions, forever; the trial and packages the way in
-- ⬜ F4 The limited trial — 14 days from taking it, a ticked paper a course, 3 builder quizzes, SMS (tables ✅)
+- ✅ F4a The trial's limits in the database — on packages and receipts, the trial paper, 14 days — 2026-10-04
+- ⬜ F4b The trial's SMS half — the verified number, one trial per number; needs an SMS account (tables ✅)
+- ⬜ 03.1 The admin's forms — the four limits on Packages, the Open in trial tick — with their redesign
 
 ## [04 Practice](docs/product-plan/04-practice.md)
 
@@ -102,7 +104,7 @@ before then, and the old list's history, is in
 
 ## [07 Offline packs](docs/product-plan/07-offline-packs.md)
 
-Nothing of its own; the allowance per package comes with 03 F4.
+- ⬜ 07.1 The pack page reads its allowance from the package; Config's setting retires — with its redesign
 
 ## [08 Help and news](docs/product-plan/08-help-and-news.md)
 

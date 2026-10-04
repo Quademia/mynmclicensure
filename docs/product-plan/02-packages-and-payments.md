@@ -35,8 +35,9 @@ findings D4, D20, D23, D31–D36 in `archive/product-plan/post-rebuild-diagnosis
   per course, papers (all, or the trial paper only), mocks (yes / no) —
   copied onto each receipt by the database when it is written (03; 12,
   `products` and `subscriptions`).
-  Free Full Access and paid packages: unlimited · 5 · all · yes.
-  *(to build: F4)*
+  Free Full Access and paid packages: unlimited · 5 · all · yes. Built
+  in the database (F4a, 2026-10-04); the admin's package form gets the
+  four fields with its redesign *(to build: 03.1)*.
 - **Bought means kept**: editing a package changes it for new buyers
   only.
 - **The package is the only unit of sale, one per payment.**

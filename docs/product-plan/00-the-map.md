@@ -142,8 +142,7 @@ its own page or on the dashboard — is open (05).
 item; a new idea is parked in one line in its file, not worked through.
 
 1. **Behind the scenes — no page design needed.**
-   - The trial's database and server half (03 F4) — the packages'
-     limits, the trial paper, 14 days, mocks gated by the package.
+   - ~~The trial's limits in the database (03 F4a)~~ — done 2026-10-04.
    - The free set's two doors (03 F1).
    - An ended subscription stops counting as live everywhere (02).
    - Programmes open to the public, and NAC, NAP and RCN (02 C5).

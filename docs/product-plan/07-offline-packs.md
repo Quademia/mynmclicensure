@@ -23,9 +23,13 @@ app's description) and the built code in `lib/offline-packs/` and
   earlier packs for the course (this subscription) come first, at
   random; repeats only fill a shortfall.
 - **The allowance comes from the package** (03 F4): packs per course,
-  copied onto the subscription and counted inside the database (empty
-  means unlimited, 0 means none). The trial's is 0. *(to build: F4)*
-  A pack holds at most the Config limit of questions.
+  copied onto the subscription and counted inside the database since
+  the grant began (empty means unlimited, 0 means none); the trial's is
+  0. Built in the database (F4a, 2026-10-04). The pack page still shows
+  its count from the old Config setting, which agrees today (5); it
+  reads the package instead, and the setting retires, with the page's
+  redesign *(to build: 07.1)*. A pack holds at most the Config limit of
+  questions.
 - **A pack is a snapshot**: its questions are copied when it is made, so
   later bank edits never change it. A pack made earlier still opens
   after a trial or package ends.

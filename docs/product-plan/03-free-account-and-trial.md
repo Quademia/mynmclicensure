@@ -40,7 +40,13 @@ Detail and history: `archive/product-plan/09-free-account-and-gamification.md` �
 - The dashboard says plainly which the student is on — "Free: practice
   on the free set" or the trial's line (11). *(to build: F2)*
 
-### The trial — limited access *(to build: F4)*
+### The trial — limited access
+
+The limits are built in the database (F4a, 2026-10-04): a trial
+student is refused a locked paper, a mock, a fourth builder quiz and a
+pack, with a plain sentence. Still to build: the SMS check *(F4b)*, the
+admin's forms for the limits and the tick *(03.1)*, and the pages that
+show the locks *(F2, 11)*.
 
 - The word is **the trial**. The full grants an admin makes by hand are
   **Free Full Access** (30 days, everything, admin only) — not a trial.
@@ -68,7 +74,7 @@ Detail and history: `archive/product-plan/09-free-account-and-gamification.md` �
   form (+233…). A second person on the same phone gets the free account
   and no trial. Arkesel is the closest fit (it checks the code itself);
   mNotify and Hubtel the others; about GHS 35 per 1,000 sign-ups. The
-  company is picked at the build.
+  company is picked at the build. *(to build: F4b)*
 - The welcome trial product (`WELCOME_TRIAL`) is unchanged and not
   granted by registering.
 
@@ -94,11 +100,12 @@ Written on the tables in `12-tables.md`:
 
 - The free set's second read rule — `question_bank` — ticked 2026-09-26
   (F1). The free mark itself is built.
-- The trial — ticked 2026-10-04 (F4): the four limits on `products`,
-  copied onto `subscriptions` by the database; the trials 14 days;
-  `open_in_trial` on `quizzes`; the verified number on `users`; a new
-  list of the numbers that have had a trial; mocks gated by the
-  package, the mock's unused `visibility` left for removal (10).
+- The trial — ticked 2026-10-04. **Built (F4a, 2026-10-04):** the four
+  limits on `products`, copied onto `subscriptions` by the database; the
+  trials 14 days; `open_in_trial` on `quizzes`; mocks gated by the
+  package. **Still to build (F4b):** the verified number on `users` and
+  a new list of the numbers that have had a trial. The mock's unused
+  `visibility` is left for removal (10).
 
 ## Open
 

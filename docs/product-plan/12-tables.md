@@ -48,7 +48,7 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `created_utc` | When the account was made |
 | `last_login_utc` | Last sign-in — exists, not written yet *(to build: 01.6)* |
 
-- *To build — ticked 2026-10-04 (03 F4):* `phone_number` kept in one
+- *To build — ticked 2026-10-04 (03 F4b, the SMS half):* `phone_number` kept in one
   form (+233…) with **the time it was verified**; a change to it goes
   through the server and clears the verification, so it leaves the
   browser's list. Why: one trial per verified number.
@@ -61,7 +61,7 @@ table by table as each is next changed (AGENTS.md rule 9).
 - Browser: a student reads their own row and can change only `name`,
   `forename`, `surname`, `phone_number`, `school_id`, `school_other`,
   `cohort`, `level`, `avatar_url`; an admin reads all. Three leftover
-  permissions (truncate, references, trigger) go with the trial's change.
+  permissions (truncate, references, trigger) go with the SMS half (F4b).
 
 ### `schools` — the regulator's list of nursing schools (141)
 | Column | Holds |
@@ -175,17 +175,19 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `kind` | `PAID`, `TRIAL` or `FREE` (Free Full Access) |
 | `status` | Active, draft or archived |
 | `price_minor`, `currency` | The price in pesewas, GHS |
-| `duration_days` | How long a grant lasts |
+| `duration_days` | How long a grant lasts (the programme trials 14, the welcome trial 7) |
 | `is_premium` | Shown on Premium Prep |
 | `telegram_group_keys` | The Telegram groups it admits — free text (open, 10) |
+| `allow_builder_quizzes` | Quiz Builder quizzes over the whole grant, in any of its courses; empty = unlimited |
+| `allow_packs_per_course` | Offline packs per course; empty = unlimited, 0 = none (new packages start at 5) |
+| `allow_papers` | `all`, or `trial_paper` — only each course's paper ticked "Open in trial" |
+| `allow_mocks` | Whether mock exams open |
 
-- *To build — ticked 2026-10-04 (03 F4):* **four limits** — Quiz
-  Builder quizzes (empty = unlimited, a number = that many over the
-  grant), offline packs per course (empty = unlimited, 0 = none),
-  Practice Papers (`all` or `trial_paper`), mock exams (yes / no). The
-  trials 3 · 0 · trial paper · no; Free Full Access and paid packages
-  unlimited · 5 · all · yes. The trials' `duration_days` 60 → 14. Why:
-  each package says what it opens, not only which courses and how long.
+- The four limits (03 F4, built 2026-10-04): the trials 3 · 0 · trial
+  paper · no; Free Full Access and paid packages unlimited · 5 · all ·
+  yes. Why: each package says what it opens, not only which courses and
+  for how long. Set by the database for now; the admin's form gets the
+  four fields with its redesign *(to build: 03.1)*.
 - Browser: anyone reads; writes through the server only.
 
 ### `product_courses` — which courses each package opens
@@ -211,10 +213,12 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `requested_start_utc` | A start the admin chose |
 | `created_utc` | When written |
 | `expiry_reminded` | Unused — goes or moves with the expiry reminders *(02.3)* |
+| `allow_builder_quizzes`, `allow_packs_per_course`, `allow_papers`, `allow_mocks` | A copy of the package's four limits |
 
-- *To build — ticked 2026-10-04 (03 F4):* **a copy of the package's
-  four limits**, made by the database when the row is written. Why: one
-  place for every writer, and editing a package changes new grants only.
+- The copy is made by the database when a receipt is written, whatever
+  the writer sends, and again only if its package changes — re-saving a
+  receipt keeps it (03 F4, built 2026-10-04). Why: one place for every
+  writer, and what was bought is kept when a package is edited later.
 - Browser: the owner and an admin read; writes through the server only.
 
 ### `course_access` — the gate: one row per course per receipt
@@ -322,12 +326,14 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `published`, `publish_at`, `unpublish_at` | Published, and its window |
 | `notes` | The admin's notes |
 | `created_at`, `updated_at` | When made, last changed |
+| `open_in_trial` | The one paper of its course a trial opens; at most one per course |
 
-- *To build — ticked 2026-10-04 (03 F4):* **`open_in_trial`**, at most
-  one per course, the database refusing a second. Why: the trial opens
-  one paper a course, chosen by the admin.
+- `open_in_trial` (03 F4, built 2026-10-04): the database refuses a
+  second in a course. Why: the trial opens one paper a course, chosen by
+  the admin. Set by hand for now; the paper editor gets the tick with
+  its redesign *(to build: 03.1)*.
 - Browser: a student reads open, published papers of courses they hold
-  — every column but `notes`.
+  — every column but `notes` and `open_in_trial` (no page reads it yet).
 
 ### `quiz_items` — a paper's questions
 | Column | Holds |
@@ -505,7 +511,7 @@ table by table as each is next changed (AGENTS.md rule 9).
 
 ## Decided, no table yet
 
-- **The numbers that have had a trial** — *ticked 2026-10-04 (03 F4)*:
+- **The numbers that have had a trial** — *ticked 2026-10-04 (03 F4b)*:
   the database refuses a second trial for a number on it. No browser
   access. (No table of SMS codes — the SMS company checks the code.)
 - **Question reports** (06.2) — needs Sam's tick at the build.
@@ -523,10 +529,15 @@ the browser can call only the first two lines.
 - **The sitting** (server only): `create_attempt`, `start_timed_attempt`,
   `save_answers`, `check_answer`, `advance_attempt`, `finish_attempt`,
   `abandon_attempt`, `expire_attempt`; grading inside (`grade_answer`).
-- **Packs and the bank** (server only): `create_offline_pack`,
-  `search_question_bank_ids`, `save_quiz`.
+  `create_attempt` refuses a student without a live grant for the course
+  and applies the package's limits — a paper only on all papers or the
+  ticked one, a mock only with mocks, builder quizzes within the count
+  (retakes free); the most generous of two grants wins.
+- **Packs and the bank** (server only): `create_offline_pack` (the same
+  live-grant check, and packs per course since the grant began within
+  its limit), `search_question_bank_ids`, `save_quiz`.
 - **Sign-in and payments** (server only): `check_login_rate_limit`,
   `check_reset_rate_limit`, `check_payment_rate_limit`,
   `log_auth_event`, `log_reset_request`, `mark_reset_used`.
 - Housekeeping triggers: timestamps, lowercasing the email, writing the
-  question history.
+  question history, copying a package's limits onto a receipt.
