@@ -490,6 +490,34 @@ same-browser cookie (D33), the confirmation page's own rate limit
 (D35 — Sam: a separate job, next), the nightly sweep (D34). "What
 happens next" describes today's pay-first flow and changes with D31.
 
+### C5 — Programmes: open to the public, and seven of them (added 2026-10-04)
+
+Ruled in doc 09's talk (§4, *NAC and NAP as separate programmes*) and
+§8 S24, both 2026-10-04 (Sam).
+
+- **One tick per programme, "Open to the public"** (S24): ticked, new
+  students can register for it and buy its packages, and it shows on
+  the landing page, at registration and in the shop; not ticked, the
+  public cannot see it or get in. The server refuses a closed programme
+  at registration and at checkout; the admin can still grant its
+  packages, for testing; unticking stops new sign-ups only. A new
+  programme starts closed; today's five start open. Set beside the
+  programme's name on the admin Courses page, a badge Open / Not open in
+  its list.
+- **Seven programmes**: RN, RM, RMHN, RPHN as today; **NACNAP split into
+  NAC** (Basic Clinical Nursing) **and NAP** (Basic Preventive Nursing),
+  each with the General Paper, NACNAP's four packages becoming a NAC set
+  and a NAP set; **RCN** (Registered Community Nursing) added with its
+  courses and bank to come. NAC, NAP and RCN start closed and open in
+  batches as each bank is confirmed (Sam); NACNAP closes once NAC and
+  NAP are open, then goes. Catalogue rows on dev and prod, apart from
+  S24's column; before launch, so no student is asked which programme
+  they are. Prices with doc 09 §4's price question.
+- Done when: the tick on the Courses page, the five readers following
+  it, the three new programmes closed with their courses and packages,
+  and a closed programme refused by registration and checkout when sent
+  by hand.
+
 ### Later, under this doc
 
 - **The shop (D2, D19, D23):** one "for sale" helper on `kind` and
@@ -518,3 +546,4 @@ happens next" describes today's pay-first flow and changes with D31.
 | C3a The queued start | ✅ 2026-09-19 (code only; proven on dev by running the writer — RN_FULL queued behind the FREE receipt, RM_FULL's GP behind that, the RM courses starting today past the trial; walked by Sam: an RN_FULL grant, the dashboard's ends) |
 | C3b The panel shows the rows; the chain re-packed on every write; the receipt's window from its rows; created_utc and requested_start_utc | ✅ 2026-09-19 (`20260919235000_subscriptions_created_utc.sql`, `20260920003000_subscriptions_requested_start.sql`; three shapes in one day, the third proven on the five chain cases by running the writers; walked by Sam: the panel, Grant queued behind a live receipt, the live one revoked and the next pulled forward, both revoked and the dashboard back to Subscribe) |
 | C4 The checkout | ✅ 2026-09-23 (code only; walked in the pane both ways to Paystack's page — a student's INIT row through init-upgrade, a new buyer's through init-public with the mismatch and short-number refusals; the not-for-sale cases by address; phone at 375px) |
+| C5 Programmes: open to the public, seven of them | candidate; ruled 2026-10-04 (Sam); §8 S24 ✅ 2026-10-04 |

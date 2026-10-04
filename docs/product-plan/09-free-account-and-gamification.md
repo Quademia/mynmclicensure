@@ -706,7 +706,9 @@ offered with what it costs and tested against the app's own features.
   list, a §8 row), and perhaps each student picking the sitting they aim
   for (a column). How the NMC sets its dates — one for every programme
   or one per programme, how many sittings a year — was asked, not
-  answered; where it shows waits for the dashboard's redesign.
+  answered; where it shows waits for the dashboard's redesign. The NMC's
+  site (read the same day): licensing exams in February / March, June /
+  July, August and November / December each year.
 - **A daily goal ("answer 20 today") — later** (Sam). The streak covers
   showing up; a goal adds how much. A fixed 20 needs no storage; a goal
   the student picks is a standing choice, so it is kept on the account
@@ -930,7 +932,33 @@ Meta's WhatsApp pricing). To go through with Sam before G1 is sliced:
 - **Our prices beside GHS 6.** Unchecked; decides how the free floor
   and the trial are worded against each other.
 - **NAC and NAP as separate programmes; RPHN and RCN the same exam or
-  not.** A programme question NMC Prep's track list raised.
+  not.** A programme question NMC Prep's track list raised. **Settled
+  2026-10-04 (Sam): four different programmes, so seven in all.** The
+  NMC's own pages (read 2026-10-04) list Registered Community Nursing (a
+  three-year diploma in Community Health Nursing) and Public Health
+  Nursing as separate exams, the latter among the post-basic
+  specialties; for NAC and NAP the evidence was less direct — NMC Prep
+  splits them and the NMC names its "Post NAC/NAP" midwifery route that
+  way — and the call is Sam's. The list (Sam: "fine"), each with the
+  General Paper: **RN** Registered Nursing (Medicine & Medical Nursing;
+  Surgery & Surgical Nursing); **RM** Registered Midwifery (Midwifery;
+  Paediatric, Obstetric Anatomy & High-Risk Neonates); **RMHN**
+  Registered Mental Health Nursing (its two psychiatric courses); **RPHN**
+  Registered Public Health Nursing (Principles of Public Health Nursing;
+  Principles of Disease Management & Control); **RCN** Registered
+  Community Nursing — new, its courses and bank to come; **NAC** Nurse
+  Assistant Clinical (Basic Clinical Nursing) and **NAP** Nurse
+  Assistant Preventive (Basic Preventive Nursing), split from NACNAP,
+  whose four packages become a NAC set and a NAP set (prices with §4's
+  price question). Not served: Post NAC/NAP Midwifery and the post-basic
+  specialties (peri-operative, ophthalmic, critical care, ear, nose and
+  throat). **Released in batches** (Sam: "this is not available to anyone
+  now and I can release in batches as I confirm and build the actual
+  bank") — **§8 S24, ticked 2026-10-04**: one tick per programme, "Open to
+  the public"; a new programme starts closed, today's five open; at
+  launch Sam leaves open what he has confirmed. Catalogue rows, not the
+  database's shape, apart from S24's column; cheapest before launch,
+  when no student has to be asked which programme they are.
 - ~~**The past-papers claim**~~ — **settled 2026-09-24** by the walk
   (§2): question books and a university's papers, labelled "past
   questions"; nothing by year, nothing from the NMC. The daily

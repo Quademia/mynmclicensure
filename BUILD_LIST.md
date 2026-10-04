@@ -94,6 +94,7 @@ the gamma-era list it replaces is in git history and in `qacademy-gamma`.
 - ✅ §8 S21 four modes of a sitting, MyNclex's codes; a quiz's modes a ticked list; Sequential's lock — ticked 09-27
 - ✅ §8 S22 an exam's deadline held by the database, 10 s of grace — ticked 2026-09-27, the build is 03 Q8.4
 - ✅ §8 S23 the limited trial — product allowances, the trial paper, the verified number — ticked 10-04; build 09 F4
+- ✅ §8 S24 Open to the public — one tick per programme, a new one closed, the server refusing it — ticked 10-04
 - ⬜ §8 has no row for `courses_select` — the policy is `auth.uid() is not null`, so a signed-out visitor reads nothing from `courses`; `/premium-prep` and `/subscribe` both work around it with a service-role read, and D23 item 5 (a sales row lists its courses) cannot be met on any public page without it (2026-09-22)
 
 ## Improvements
@@ -177,6 +178,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ⬜ Four readers trust ACTIVE without the date: an ended subscription counts as live until Sync expired (10-04)
 - → The product card duplicated between `.prep-*` and `.subp-*` — built as 10-design-system.md DS20 (2026-09-23)
 - ✅ C4 The checkout — one route, MyNclex's layout, four required fields, isForSale() at both doors — 2026-09-23
+- ⬜ C5 Programmes — Open to the public (S24); NACNAP split into NAC and NAP; RCN added, closed (Sam, 10-04)
 - ⬜ The checkout and confirmation-page wording — all new, not approved; Sam to revisit (2026-09-23)
 - ✅ The public top bar offers Sign In / Register Free to a buyer already signed in (2026-09-23) — closed by DS21 without a check: the bar has Sign in and a Dashboard link, and the middleware lands either kind of visitor right (Sam) — 2026-09-23
 - ⬜ A signed-in buyer with no WhatsApp number on the profile pays without one (setup-form accounts)
