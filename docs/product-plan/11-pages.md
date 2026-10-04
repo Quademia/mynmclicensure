@@ -138,17 +138,19 @@ opens it (00, The menu).
 
 ## Visitor
 
-### Home
-- Free practice questions, forever; the trial and the packages as the
-  way to the full bank; the three ways in (03 F3, 01); only programmes
-  open to the public (02); a link to Premium Prep.
+### Home page
+- "Start your 14-day trial, then free practice, forever"; the two ways
+  in — register (the trial) or buy a package (03 F3, 01); only
+  programmes open to the public (02); a link to Premium Prep. Built
+  last, on the pages that exist (00).
 - **Check**: the hero says "Sign In" and "Sign In to Portal" beside the
   bar's "Sign in"; eight private colour tokens; the device font (800)
   against Inter — for the redesign.
 
 ### Register, sign in, forgot and reset password
-- Register: the trial's door, from a trial card; the school required;
-  closed programmes not offered; where the SMS code sits — open (03).
+- Register: registering starts the 14-day trial (01); the school
+  required; closed programmes not offered; the SMS code here, before the
+  trial starts (03 F4b).
 - Sign in: "This account has been deactivated" (01). Reset: signed in
   on success (01).
 - **Check**: the "N-day free trial — no card required" hint never shows;

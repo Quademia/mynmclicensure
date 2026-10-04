@@ -10,17 +10,20 @@ Detail and history: `archive/product-plan/04-access-control.md`,
 
 ## How it works
 
-### One account, three ways in
+### One account, two ways in, one floor
 
-- **Registering grants nothing by itself** (Sam, 2026-10-04). The
-  student chooses one of three: **a free account**, **the trial**, or
-  **a package**. It is one account in all three, the free account
-  always underneath (03).
-- **The trial's door is today's register page**, reached from a trial
-  card; the free account's door and the screens come with the
-  redesign and the home page (03 F3).
-- **The package's door is checkout**: the buyer pays first and the
-  payment makes the account (02, D31).
+- **Two ways in** (Sam, 2026-10-04, replacing the morning's "three ways
+  in"): **registering starts the 14-day trial** — today's register page,
+  which already does this — and **buying a package makes the account**
+  at checkout (02, D31). There is no free account door.
+- **The free account is the floor**: every account keeps it for good,
+  and a student whose trial or package ends lands on it — the account
+  kept, free practice forever, the rest locked, not gone (03). Why: one
+  sign-up gives everything a student can try, with no choice between
+  "free" and "trial" before they know the difference; the offer fits a
+  line — "start your 14-day trial, then free practice, forever" (the
+  reverse trial Grammarly, Notion and Duolingo use); and the door is
+  already built.
 - **Free Full Access** is only ever the admin's grant (02).
 - **Two roles**, student and admin; any other is refused at sign-in. An
   admin passes every student gate. After sign-in each lands on their
@@ -29,7 +32,8 @@ Detail and history: `archive/product-plan/04-access-control.md`,
 ### Registering
 
 - One step on the server: the login is made, the profile written, the
-  grant (if any), the welcome email; then a "now sign in" screen. If
+  programme's trial granted (after the SMS check, F4b), the welcome
+  email; then a "now sign in" screen. If
   the profile fails, the login is removed.
 - **A school is required**, picked from the regulator's list; "My
   school isn't listed" is allowed, and an admin matches the typed name

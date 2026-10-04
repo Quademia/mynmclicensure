@@ -49,19 +49,22 @@ is written once, in its file; its status once, in the build list.
 ## The ways in
 
 ```
-                      Home page — free questions, forever
-                 ┌────────────────┼──────────────────┐
-           Free account      14-day trial        Buy a package
-           register free     one per phone       account made on paying
-                 └────────────────┼──────────────────┘
-                      One account — free underneath, always
+                 Home page — "start your 14-day trial,
+                 then free practice, forever"
+                 ┌────────────────┴──────────────────┐
+           Register = 14-day trial              Buy a package
+           one per phone                        account made on paying
+                 └────────────────┬──────────────────┘
+                      Student app — trial or paid
                                   │
-                      Student app — free, trial or paid
-       ↻ when a trial or package ends: back to free — locked, not gone
+       ↓ when a trial or package ends: the free account, the floor —
+         the account kept, free practice forever, the rest locked, not gone
 ```
 
-Registering grants nothing by itself; the student chooses one of the
-three (01, 03). Free Full Access stays the admin's grant (02).
+Two ways in, one floor (Sam, 2026-10-04): registering starts the trial,
+buying a package makes the account; the free account is not a door but
+where every student lands when a trial or package ends (01, 03). Free
+Full Access stays the admin's grant (02).
 
 ## The pages
 
@@ -158,11 +161,15 @@ item; a new idea is parked in one line in its file, not worked through.
    - ~~The free set's two doors (03 F1)~~ — done 2026-10-04.
    - ~~An ended subscription stops counting as live everywhere (02.1)~~ — done 2026-10-04.
    - ~~Programmes open to the public, NAC, NAP and RCN added closed (02 C5a)~~ — done 2026-10-04; NACNAP's switch-over (C5b) on the day NAC and NAP open.
-2. **The student pages, redesigned — in the order a new student meets
-   them.** The home page and the three doors (01, 03 F3) → dashboard (with the
-   streak card, 05 G1a) → practice (course, papers, mocks, builder, the
-   sitting, the report) → history → offline packs → help and news →
-   profile and packages. Each page built with its four states (11).
+2. **The student pages, redesigned — the inside first, the shop window
+   last** (Sam, 2026-10-04: the home page is built on what exists). The
+   dashboard, with its four top cards and the streak card (05 G1a) — it
+   sets the look; the free account's floor comes with it (03 F2) →
+   practice (course, papers, mocks, builder, the sitting, the report) →
+   history → offline packs → help and news → profile and packages →
+   last, the visitor pages together: the home page (03 F3), the shop,
+   Premium Prep, checkout and confirmation. Each page built with its
+   four states (11).
 3. **The new features on the new pages.** The daily challenge (04 G2)
    → the leaderboard (05 G1b) → badges (05 G3).
 4. **The admin pages, redesigned**, with the new ones (security,
