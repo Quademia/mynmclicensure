@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-04, second — the plan written fresh (archive, map, 01–12, tables from the DB); F4a, F1, 02.1, C5a built and merged; Premium Prep keeps groups
+  - ↳ planning on top of legacy · S-numbers retired · build more plan less · free: no packs, Study modes · one builder · C5b on the day · shop sold closed packages · mocks premium only · Elite Nurses · deploy ignores migration
+
 - 2026-10-04 — doc 09 worked through: the leaderboard settled, §8 S23 the limited trial and S24 Open to the public ticked, seven programmes, three ways in
   - ↳ a board in each school · usernames generated, spins · Noto animals, Avataaars alt · free sitting = real course · Retake locked · news to past holders · G1a/G1b · percentile on trial paper · badges · prices parked · ACTIVE readers
 
