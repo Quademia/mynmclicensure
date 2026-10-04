@@ -618,9 +618,14 @@ prize.
   Personas, Adventurer (people, CC BY, a credit line); Notionists (black
   and white line art, no skin tone, CC0); Open Peeps (CC0); Twemoji's
   flat animals (CC BY); DiceBear's Thumbs and Bottts' robots (neither
-  people nor animals; may read as childish for nurses-to-be). **Open:**
-  whether the student picks the animal from a grid and spins only the
-  word, or the spin changes both.
+  people nor animals; may read as childish for nurses-to-be). **The
+  student picks the animal from a grid and spins only the word** (Sam:
+  a) — the choice of an avatar was Sam's idea, and the word stays
+  generated, so nothing needs policing. Weighed: one spin changing both,
+  Kahoot's way (simpler; no choice of animal). With the first-challenge
+  rule above: the card arrives with an animal and a word already filled,
+  so one tap accepts it; another animal from the grid, or up to 3 spins
+  of the word, before it is kept.
 - Two columns on `users` (the username, the avatar) — a §8 row before
   the build.
 
@@ -636,9 +641,8 @@ for the build.
 
 Derived from the challenge's graded rows; a stored weekly tally if the
 reads grow slow, decided at the build with its own §8 row (as 10-03).
-**Still open:** the word lists (the adjectives and the animals); pick
-the animal or spin both; G2's pool size and rotation; where the boards
-sit in the redesign.
+**Still open:** the word lists (the adjectives and the animals); G2's
+pool size and rotation; where the boards sit in the redesign.
 
 ### Real-world comparison — Claude's views, 2026-10-02, not ruled
 
