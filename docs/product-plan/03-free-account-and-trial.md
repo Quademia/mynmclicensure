@@ -39,7 +39,8 @@ Detail and history: `archive/product-plan/09-free-account-and-gamification.md` Â
   trial and packages (Sam, 2026-10-04: A, reading 2026-09-20's "timed
   mode stays trial or paid" against the four modes).
 - Mock exams and offline packs are not free: they are for packages
-  only (Sam, 2026-10-02); **a free account cannot use the offline pack
+  only (Sam, 2026-10-02) â€” mocks for Premium Prep only (02.10, Sam,
+  2026-10-04); **a free account cannot use the offline pack
   maker** (Sam, 2026-10-04).
 - The daily challenge, the streak and questions mastered are open to
   free accounts (04, 05).
