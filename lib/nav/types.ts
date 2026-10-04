@@ -91,8 +91,13 @@ export type NavItem = {
   hidden?: boolean;
   /** "My Courses": rows come from the student's course access at runtime. */
   dynamic?: 'courses';
-  /** A group's heading — a small label above its rows, not a link (00 The menu: A). */
+  /**
+   * A group's heading — a small label above its rows, not a link (00 The
+   * menu: A); a tap folds the group away or opens it again (b).
+   */
   heading?: boolean;
+  /** Outside links side by side in one row — the WhatsApp and Telegram channels. */
+  inline?: NavItem[];
 };
 
 /** One page of a phone tab's group — a tab in the row at the top. */
