@@ -184,13 +184,16 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `allow_builder_quizzes` | Quiz Builder quizzes over the whole grant, in any of its courses; empty = unlimited |
 | `allow_packs_per_course` | Offline packs per course; empty = unlimited, 0 = none (new packages start at 5) |
 | `allow_papers` | `all`, or `trial_paper` — only each course's paper ticked "Open in trial" |
-| `allow_mocks` | Whether mock exams open — *to build (02.10, Sam 2026-10-04):* yes only on Premium Prep packages (`is_premium`), new packages start without |
+| `allow_mocks` | Whether mock exams open — follows `is_premium`: set from the tick when a package is added or its tick changes; a new package starts without |
 
 - The four limits (03 F4, built 2026-10-04): the trials 3 · 0 · trial
-  paper · no; Free Full Access and paid packages unlimited · 5 · all ·
-  yes. Why: each package says what it opens, not only which courses and
-  for how long. Set by the database for now; the admin's form gets the
-  four fields with its redesign *(to build: 03.1)*.
+  paper · no; Free Full Access and paid packages unlimited · 5 · all;
+  mocks yes on the Premium Prep packages only (02.10, built 2026-10-04 —
+  Sam: mocks are seasonal and, with the channel, what Premium Prep has
+  and Full Access does not). Why: each package says what it opens, not
+  only which courses and for how long. Set by the database for now; the
+  admin's form gets the four fields with its redesign *(to build:
+  03.1)*.
 - Browser: anyone reads; writes through the server only.
 
 ### `product_courses` — which courses each package opens

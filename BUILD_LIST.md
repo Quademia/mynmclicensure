@@ -47,7 +47,7 @@ before then, and the old list's history, is in
 - ✅ C5a Programmes Open to the public — the switch, the refusals, open lists; NAC, NAP, RCN closed — 2026-10-04
 - ⬜ C5b NACNAP's switch-over — courses and packages to NAC and NAP, both opened, NACNAP closed — on the day
 - ⬜ 02.9 The Open to the public tick on the admin's Courses page — with its redesign
-- ⬜ 02.10 Mocks on Premium Prep packages only — the mocks limit follows the premium mark (Sam, 10-04)
+- ✅ 02.10 Mocks on Premium Prep packages only — the mocks limit follows the premium tick — 2026-10-04
 - ⬜ 02.11 Public pages' words Sam's to edit — Premium Prep's text, a season banner — with their redesign
 - ⬜ 02.12 Premium Prep's page reads its prices from the packages — GHS 99 and 150 typed in today
 - ✅ 02.1 Ended means ended — the four places that trusted "active" now read the dates — 2026-10-04

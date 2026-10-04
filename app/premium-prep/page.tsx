@@ -22,13 +22,13 @@
 // of the order, and D23 item 1 lets anyone buy any product.
 //
 // ⚠ WHAT THIS PAGE MAY NOT SAY, until each is built:
-//   - the Telegram study group (BUILD_LIST item 17, not built), which is
-//     the only thing in the data Premium Prep has and Full Access does
-//     not (telegram_group_keys on these five products alone);
-//   - premium-only mock exams (`mock_quizzes.visibility` exists and
-//     every row is still ALL — nothing reads the column);
+//   - the premium channel (BUILD_LIST item 17, not built;
+//     telegram_group_keys on these five products alone);
 //   - a larger offline-pack allowance (one global config number today,
 //     `offline_packs_per_course`, the same for everyone).
+// Premium-only mock exams ARE built (02.10, 2026-10-04: products.allow_mocks
+// follows is_premium), so the page may now say so — in words Sam approves;
+// until he does, the copy below is unchanged.
 // Sam ruled these are added to Premium Prep rather than taken from the
 // others, and that the page ships on what is true and grows as each
 // lands (2026-09-22). Until then the honest offer is the one below: the

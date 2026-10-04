@@ -50,17 +50,20 @@ findings D4, D20, D23, D31–D36 in `archive/product-plan/post-rebuild-diagnosis
   per course, papers (all, or the trial paper only), mocks (yes / no) —
   copied onto each receipt by the database when it is written (03; 12,
   `products` and `subscriptions`).
-  Free Full Access and paid packages: unlimited · 5 · all · yes. Built
-  in the database (F4a, 2026-10-04); the admin's package form gets the
-  four fields with its redesign *(to build: 03.1)*.
+  Free Full Access and paid packages: unlimited · 5 · all, and mocks on
+  Premium Prep only (below). Built in the database (F4a, 02.10,
+  2026-10-04); the admin's package form gets the four fields with its
+  redesign *(to build: 03.1)*.
 - **Mock exams open only on Premium Prep packages** — the ones marked
   premium (Sam, 2026-10-04: "the most important thing is that mock is
   for premium prep products"): mocks are seasonal, built for the main
   August/September sitting. Full Access, the single-course packages and
   Free Full Access carry no mocks; a tester is granted a Premium Prep
   package. Packages already bought keep what they came with. Product
-  names are labels Sam changes at will. *(to build: 02.10 — the mocks
-  limit follows the premium mark; new packages start without)*
+  names are labels Sam changes at will. The mocks limit follows the
+  premium tick, and a new package starts without (02.10, built
+  2026-10-04). A student whose package has no mocks is told "Mock exams
+  aren't included in your package." (Sam's words) when they start one.
 - **Premium Prep includes the premium channel** for its programme (Sam,
   2026-10-04: "yes we need the groups") — the human layer the platform
   does not replace (08). Mocks and the channel are what set it apart

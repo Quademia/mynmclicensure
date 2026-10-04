@@ -133,7 +133,7 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
   marked free. Archiving a mock releases them.
 - **Mocks open only when the package says yes** (03 F4) — and **only
   Premium Prep packages say yes** (Sam, 2026-10-04): mocks are seasonal,
-  built for the main August/September sitting (02). *(to build: 02.10)*
+  built for the main August/September sitting (02, built 2026-10-04).
 - Mocks as a premium exam experience is a design item not yet started
   (Q3, parked). Noted for it: mocks serve members who come near the
   exam and leave; a mock stays active across cohorts; its questions are
