@@ -1129,7 +1129,16 @@ Sam orders them):
   student's own history; how everyone did on each question (a minimum
   count before it shows); standing among those who sat the same fixed
   quiz or mock. Belongs with Q3's mock design — the mock's own results
-  screen is where NMC Prep is strongest.
+  screen is where NMC Prep is strongest. **The standing's first home,
+  2026-10-04** (Sam, from doc 09 §3, *Four parked ideas*): the trial
+  paper — under 09 F4 every new student in a programme sits the same
+  ticked paper in each course, so it is the one paper with a crowd to
+  compare against early. "Better than 62% of RN students on this paper"
+  on its report and on the end-of-trial recap card (09 F2); first
+  sittings only, so a retake cannot lift it; shown only once enough
+  students have sat the paper (about 30, set at the build), below which
+  it is noise and in a small programme could point at someone. Counted
+  from the saved sittings, no storage change.
 
 Not proposed: an answer-change history ("you changed N answers") —
 it needs a change log on every answer, a storage change and its own
@@ -1153,7 +1162,7 @@ it needs a change log on every answer, a storage change and its own
 | Q10 The attempt report | ✅ 2026-10-01 (Sam: its own page, views per sitting, advice from 3 questions; code only; walked as the RM student on a 10- and a 50-question sitting against the database, the pop-up, the review at a question, the builder's topic, 375 px — §4; ticked by Sam) |
 | Q11 Time per question | ✅ 2026-09-29 (Sam's three rulings; code only; walked as the RM student in all four modes against an in-page stopwatch, the time-up and a resume; with a Study sitting's time as the questions' sum and the quiz screen's clocks under a Hide / Show toggle — §4; ticked by Sam) |
 | Q12 Progress across attempts | candidate, captured 2026-09-24 |
-| Q13 Readiness and the cohort | candidate, captured 2026-09-24; with Q3 |
+| Q13 Readiness and the cohort | candidate, captured 2026-09-24; with Q3; the standing first on the trial paper (Sam, 2026-10-04) |
 | Q14 The link tables | ✅ 2026-09-27 (`20260927100000_quiz_item_rows.sql`; §8 S20; walked as Sam's admin, the RM student and the RN student — §4) |
 | Q15 The student's own marks across attempts | candidate, captured 2026-09-26 |
 | Q18 The results pop-up | ✅ 2026-09-27 (Sam: the pop-up and the score pill now, the report page later; code only; walked as the RM student — §4; ticked by Sam) |

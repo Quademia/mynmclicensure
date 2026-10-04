@@ -688,6 +688,39 @@ reads grow slow, decided at the build with its own §8 row (as 10-03).
 **Still open:** the word lists (the adjectives and the animals); G2's
 pool size and rotation; where the boards sit in the redesign.
 
+### Four parked ideas — Sam, 2026-10-04 (desktop session)
+
+The pieces offered on 10-03 and not taken up then (a daily goal, days to
+the exam, badges) and B of the points talk (a private percentile), each
+offered with what it costs and tested against the app's own features.
+
+- **The private percentile — yes, in 03 Q13, first on the trial
+  paper.** Under F4 every new student in a programme sits the same
+  ticked paper in each course, so it is the one paper with a crowd to
+  compare against early: "better than 62% of RN students on this paper"
+  on its report and on the recap card (F2). First sittings only; shown
+  once enough have sat it (about 30, at the build). No storage change.
+  Detail in 03 Q13.
+- **Days left to the exam — later** (Sam). It needs the NMC's dates,
+  which the app does not hold: the admin entering each sitting (a small
+  list, a §8 row), and perhaps each student picking the sitting they aim
+  for (a column). How the NMC sets its dates — one for every programme
+  or one per programme, how many sittings a year — was asked, not
+  answered; where it shows waits for the dashboard's redesign.
+- **A daily goal ("answer 20 today") — later** (Sam). The streak covers
+  showing up; a goal adds how much. A fixed 20 needs no storage; a goal
+  the student picks is a standing choice, so it is kept on the account
+  (a column, a §8 row), not the phone.
+- **Badges — yes, in place of G3's tiers** (tiers were names on point
+  bands, and points are gone), **after G1a has real numbers**, so the
+  milestones come from how students actually study. Milestones on
+  questions mastered and the streak ("first 100 mastered", "a 7-day
+  streak", "a first full Practice Paper"), not on questions answered,
+  which tapping and retakes can farm. Counted from the saved rows;
+  showing "New badge!" once means remembering what was shown — a small
+  table, a §8 row at the build. The badge art is a set Sam approves
+  (for nurses-to-be, not children).
+
 ### Real-world comparison — Claude's views, 2026-10-02, not ruled
 
 Asked by Sam: is there a better approach from real products? Sources
@@ -1031,7 +1064,10 @@ one-off buttons and cards.
   stays one course's; the order, and whether a General Paper day is the
   same five for every programme, at the build.
 - **G3 — Tiers.** Names on point bands, Passwell's shape, once real
-  numbers exist. Cosmetic.
+  numbers exist. Cosmetic. **Replaced on 2026-10-04 by badges** (Sam;
+  §3, *Four parked ideas*): milestones on questions mastered and the
+  streak, after G1a has real numbers; the "New badge!" memory a §8 row,
+  the art a set Sam approves.
 
 ### Later, under this doc
 
@@ -1039,6 +1075,8 @@ one-off buttons and cards.
   needs history it cannot recompute — a storage change, its own row.
 - Notifications and a community area — NMC Prep has them; not borrowed
   now.
+- Days left to the exam, and a daily goal — later (Sam, 2026-10-04; §3,
+  *Four parked ideas*).
 
 ---
 
@@ -1054,7 +1092,7 @@ one-off buttons and cards.
 | G1a The streak and questions mastered | candidate; settled 2026-10-03 (§3); waits on nothing, no §8 row; when to build open (now with a plain card, or with the page's redesign) |
 | G1b The leaderboard | candidate; settled 2026-10-04 (§3) — from G2, three views, generated usernames; avatars Noto's animals, Avataaars the alternative; after G2; needs its §8 row |
 | G2 The daily challenge | candidate; from the free pool (Sam, 2026-09-26); feeds the leaderboard, so before G1b; one course a day in turn (2026-10-04); rotation and pool size open |
-| G3 Tiers | later |
+| G3 Tiers → Badges | later; badges in place of tiers (Sam, 2026-10-04), after G1a has real numbers |
 
 ---
 

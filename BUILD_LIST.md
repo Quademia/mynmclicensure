@@ -215,7 +215,7 @@ that belongs to no single surface — cutover, the Telegram gate (Sam,
 - ✅ Q11 Time per question — engaged seconds per question, saved with the answers; a Study time their sum — 2026-09-29
 - ✅ (unplanned) The quiz screen's clocks — a Study stopwatch, a question clock, Hide / Show in the sitting — 2026-09-29
 - ⬜ Q12 Progress across attempts — accuracy by topic over history, a trend, true totals (2026-09-24)
-- ⬜ Q13 Readiness and the cohort — a band, how others did per question, standing; with Q3 (2026-09-24)
+- ⬜ Q13 Readiness and the cohort — a band, how others did per question, standing; first on the trial paper (10-04)
 - ✅ Q14 The link tables — quiz_items and mock_quiz_items replacing the id arrays; delete refused (§8 S20) — 2026-09-27
 - ⬜ Q15 The student's own marks across attempts — a "Marked" pool for the builder, MyNclex's shape (captured 2026-09-26, unruled)
 - ⬜ Q16 The keyword step never says what matched — chips a name filter; "No matching concepts" in 5 courses (09-26)
@@ -323,7 +323,8 @@ Decided in principle in a cloud session on 2026-09-20; candidates, none sliced, 
 - ⬜ G1a The streak and questions mastered — from the saved answers, no storage change; when to build open (10-04)
 - ⬜ G1b The leaderboard — the daily challenge, 3 views, usernames and Noto animals; after G2, its §8 row first (10-04)
 - ⬜ G2 The daily challenge — five a day per programme from the free pool, one course a day; before G1b (10-04)
-- ⬜ G3 Tiers — names on point bands; later
+- ⬜ G3 Badges — milestones on questions mastered and the streak, in place of tiers; after G1a (Sam, 10-04)
+- ⏸ Days left to the exam and a daily goal — later (Sam, 10-04); the NMC dates asked
 
 #### [10-design-system.md](docs/product-plan/10-design-system.md)
 
