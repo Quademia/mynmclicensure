@@ -65,21 +65,21 @@ three (01, 03). Free Full Access stays the admin's grant (02).
 
 ## The pages
 
-### Student — grouped as the proposed menu
+### Student — grouped as the menu
 
 | Group | Page | What it is for |
 |---|---|---|
-| Home | Dashboard | The student's day: plan status, carry on, today's challenge, streak |
+| Dashboard | Dashboard | Where sign-in lands, for every status; its top card is this student's next step — today's challenge, days left, carry on, the recap (11) |
 | Practise | My courses | One course: its papers, days left, its news |
 | | Practice papers | The set papers of each course (today "Fixed quizzes") |
 | | Mock exams | Timed papers in exam conditions |
 | | Quiz builder | A quiz built from chosen topics |
-| | Daily challenge — *new* | Five questions a day, one course in turn (04 G2) |
+| | Daily challenge — *new* | Five questions a day, one course in turn; opened from the dashboard's top card, no menu item (04 G2) |
 | | The sitting | Answering questions, in four modes |
 | | Report | One sitting's debrief: what to fix next |
 | Progress | Learning history | Every past sitting: resume, review, retake |
 | | Streak and questions mastered — *new* | A card on the dashboard, not a page (05 G1a) |
-| | Leaderboard — *new* | My school, my programme, schools (05 G1b) |
+| | Leaderboard — *new* | My school, my programme, schools; a "your rank" line on the challenge card opens it (05 G1b) |
 | | Badges — *later* | Milestones, once there are real numbers (05 G3) |
 | | Progress across sittings — *later* | Topic accuracy over time — not ruled (05 Q12) |
 | Study offline | My packs | The packs the student has made |
@@ -101,7 +101,7 @@ feedback (06).
 
 | Page | What it is for |
 |---|---|
-| Home | Free practice questions, forever; the trial and the packages as the way to the full bank (03 F3) |
+| Home page | Free practice questions, forever; the trial and the packages as the way to the full bank (03 F3) |
 | Premium Prep | The premium packages |
 | Packages | Every package for sale, chosen by programme |
 | Checkout | One package: four fields, then Paystack |
@@ -131,10 +131,22 @@ feedback (06).
 
 ## The menu
 
-**Proposed, 2026-10-04 — Sam to confirm.** The student menu in the six
-groups above: Home, Practise, Progress, Study offline, Help and news;
-Account under the avatar in the top bar. Where the leaderboard sits —
-its own page or on the dashboard — is open (05).
+**Confirmed by Sam, 2026-10-04.** The student menu in the groups above:
+Dashboard, Practise, Progress, Study offline, Help and news; Account
+under the avatar in the top bar.
+
+- **One menu for every status** (Sam: A) — free, trial, paid and ended
+  see the same items. A locked item carries a small lock and, tapped,
+  says what opens it; upgrading removes the locks and moves nothing.
+- **Sign-in lands on the dashboard for everyone**; its top card changes
+  with the student's status (11).
+- The daily challenge has no menu item — its card is on the dashboard.
+  The leaderboard is one item under Progress and a line on that card.
+- Why: one place to learn, as Duolingo, Spotify and Quizlet do; a menu
+  or a landing that changes with status moves things when the student
+  upgrades and hides what they could unlock ("locked, not gone", 03).
+- Open: a bar at the bottom of a phone's screen in place of the drawer —
+  decided when the first signed-in page is drawn.
 
 ## The build order
 
@@ -147,7 +159,7 @@ item; a new idea is parked in one line in its file, not worked through.
    - ~~An ended subscription stops counting as live everywhere (02.1)~~ — done 2026-10-04.
    - ~~Programmes open to the public, NAC, NAP and RCN added closed (02 C5a)~~ — done 2026-10-04; NACNAP's switch-over (C5b) on the day NAC and NAP open.
 2. **The student pages, redesigned — in the order a new student meets
-   them.** Home and the three doors (01, 03 F3) → dashboard (with the
+   them.** The home page and the three doors (01, 03 F3) → dashboard (with the
    streak card, 05 G1a) → practice (course, papers, mocks, builder, the
    sitting, the report) → history → offline packs → help and news →
    profile and packages. Each page built with its four states (11).

@@ -124,6 +124,8 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
 - A new kind of sitting: every list that sorts sittings by kind learns
   it.
 - A student's first challenge brings the username card (05).
+- **Opened from the dashboard's top card**, for every status; no menu
+  item of its own (Sam, 2026-10-04; 00, The menu).
 
 ### Mock exams
 

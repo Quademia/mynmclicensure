@@ -12,7 +12,14 @@ where they show.
 
 ## Student
 
+One menu for every status; a locked item carries a lock and says what
+opens it (00, The menu).
+
 ### Dashboard
+- **Where sign-in lands, for every status; its top card is this
+  student's next step** (Sam, 2026-10-04: A) — free: today's challenge
+  and the rank line; trial: days left, carry on, today's challenge;
+  paid: carry on, today's challenge; ended: the recap card.
 - Free: "Free: practice on the free set" (03 F2).
 - Trial: a bar — "Trial, limited access — N days left" — from day one,
   amber in the last three days, with Choose a package (03).
@@ -44,8 +51,11 @@ where they show.
   still here."
 
 ### Mock exams
-- Free, trial, ended: listed, locked — "Mock exams open with a package".
-- Paid: open when the package says yes (03).
+- Free, trial, ended, and paid without Premium Prep: listed, locked,
+  with the way to Premium Prep — the words at the redesign (02.10;
+  Start refused today with "Mock exams aren't included in your
+  package.").
+- Paid with Premium Prep: open (02.10).
 
 ### Quiz builder
 - Free: pick a course, build from its free questions (03 F1).

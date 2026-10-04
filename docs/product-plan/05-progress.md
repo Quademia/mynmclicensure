@@ -52,6 +52,10 @@ already saves — no new table.
 
 Settled by Sam, 2026-10-04.
 
+- **Where it sits**: its own page, one item under Progress in the menu,
+  and a "your rank" line on the dashboard's challenge card that opens it
+  (00, The menu).
+
 - **From the daily challenge only** — the same five a day for free,
   trial and paid students. At most 5 a day, 35 a week; the week Monday
   to Sunday (UTC); the best 6 of the 7 days count.
@@ -128,7 +132,6 @@ Settled by Sam, 2026-10-04.
   30); the readiness band's signals and words.
 - The username word lists — adjectives and animals; Sam sees them
   before anyone gets a name.
-- Where the leaderboard sits — its own page or on the dashboard.
 - When to build G1a — now with a plain dashboard card, or with the
   dashboard's redesign; and where the streak shows.
 - The badge milestones and the art set.
