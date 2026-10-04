@@ -144,7 +144,7 @@ item; a new idea is parked in one line in its file, not worked through.
 1. **Behind the scenes — no page design needed.**
    - ~~The trial's limits in the database (03 F4a)~~ — done 2026-10-04.
    - ~~The free set's two doors (03 F1)~~ — done 2026-10-04.
-   - An ended subscription stops counting as live everywhere (02).
+   - ~~An ended subscription stops counting as live everywhere (02.1)~~ — done 2026-10-04.
    - Programmes open to the public, and NAC, NAP and RCN (02 C5).
 2. **The student pages, redesigned — in the order a new student meets
    them.** Home and the three doors (01, 03 F3) → dashboard (with the

@@ -101,11 +101,13 @@ findings D4, D20, D23, D31–D36 in `archive/product-plan/post-rebuild-diagnosis
   re-packs the chain: a revoke pulls the later ones forward, an
   extension pushes them back. A renewal is a receipt of its own. Trials
   sit outside the chain.
-- **An ended subscription is ended everywhere** — four places still
-  trust the "active" word without the date (announcements' scope,
-  messaging's targeting, the Users drawer, the admin dashboard's
-  count), so an ended one counts as live until an admin presses Sync.
-  *(to build)*
+- **A subscription is live by its dates** — started and not yet ended
+  — everywhere: the gate, the profile, the Packages page, announcements'
+  scope, messaging's targeting, the Users drawer and the admin
+  dashboard's count (the last four since 02.1, 2026-10-04). The status
+  word ACTIVE outlasts the end date until an admin presses Sync expired,
+  and nothing reads it alone any more; a receipt queued to start later
+  is not live either.
 - **Expiry reminders**: a daily job emails a student whose access is
   ending, through the outbox (10); a status line on the admin
   dashboard; no run-now button. *(to build)*

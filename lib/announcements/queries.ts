@@ -23,6 +23,7 @@
 import type { ServerSupabaseClient } from '@/lib/access';
 import type { Profile } from '@/lib/auth/profile';
 import { readAll } from '@/lib/supabase/read-all';
+import { nowIso } from '@/lib/subscriptions/dates';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import { filterAnnouncementsForStudent, mergeNoticeStates } from './scoping';
 import type { Announcement, EngageMap, StudentNoticeMap, StudentScope } from './types';
@@ -96,15 +97,21 @@ export async function getActiveAnnouncements(db: ServerSupabaseClient): Promise<
 }
 
 // The student's scope: the profile fields legacy read, the subscription
-// kind and product from the most recently expiring ACTIVE subscription
+// kind and product from the most recently expiring live subscription
 // (FREE and '' when none), and the courses the access map covers.
+// Live is the dates', not the status word's (02.1, 2026-10-04): the word
+// stays ACTIVE after the end date until an admin presses Sync expired,
+// so a lapsed trial kept counting as "trial" for its notices.
 export async function getStudentScope(db: ServerSupabaseClient, profile: Profile): Promise<StudentScope> {
+  const now = nowIso();
   const [{ data: activeSub }, access] = await Promise.all([
     db
       .from('subscriptions')
       .select('product_id, products(kind)')
       .eq('user_id', profile.user_id)
       .eq('status', 'ACTIVE')
+      .lte('start_utc', now)
+      .gt('expires_utc', now)
       .order('expires_utc', { ascending: false })
       .limit(1)
       .maybeSingle(),

@@ -45,7 +45,7 @@ before then, and the old list's history, is in
 ## [02 Packages and payments](docs/product-plan/02-packages-and-payments.md)
 
 - ⬜ C5 Programmes — Open to the public (tables ticked ✅); NACNAP into NAC and NAP; RCN added, closed
-- ⬜ 02.1 Ended means ended — the four places that trust "active" without the date
+- ✅ 02.1 Ended means ended — the four places that trusted "active" now read the dates — 2026-10-04
 - ⬜ D31 The account made at payment — a set-password link; the setup token and its rescue go
 - ⬜ D33 The same browser sees the password form, another the emailed link; a check tells status only
 - ⬜ D34 A nightly sweep — unfinished payments checked with Paystack; paid activated, rest abandoned

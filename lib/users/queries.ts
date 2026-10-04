@@ -3,7 +3,7 @@
 // The admin Users page's and dashboard's reads (slice 14a), transcribed
 // one for one: getUsers (js/mynmclicensure-api.js — name / forename /
 // surname / email search, role and programme filters, newest first, 50
-// a page), getUserById (the row, the ACTIVE subscription with the
+// a page), getUserById (the row, the live subscription with the
 // latest expiry, the history newest start first) with the school
 // joined on the S4 key instead of legacy's map, the dashboard's four
 // head counts and its last ten registrations (admin/dashboard.html).
@@ -52,12 +52,17 @@ export async function getUserDetail(db: ServerSupabaseClient, userId: string): P
     return null;
   }
 
+  // The current subscription is the live one by its dates, not the word
+  // ACTIVE, which outlasts the end date until Sync expired (02.1).
+  const now = nowIso();
   const [activeRes, historyRes] = await Promise.all([
     db
       .from('subscriptions')
       .select('subscription_id, product_id, start_utc, expires_utc, status, source, products ( name, kind )')
       .eq('user_id', userId)
       .eq('status', 'ACTIVE')
+      .lte('start_utc', now)
+      .gt('expires_utc', now)
       .order('expires_utc', { ascending: false })
       .limit(1)
       .maybeSingle(),
@@ -85,7 +90,8 @@ export async function getDashboardCounts(db: ServerSupabaseClient): Promise<Dash
   const [total, students, active, expiring] = await Promise.all([
     db.from('users').select('*', { count: 'exact', head: true }),
     db.from('users').select('*', { count: 'exact', head: true }).eq('role', 'STUDENT'),
-    db.from('subscriptions').select('*', { count: 'exact', head: true }).eq('status', 'ACTIVE'),
+    // live by the dates (02.1), not the word alone
+    db.from('subscriptions').select('*', { count: 'exact', head: true }).eq('status', 'ACTIVE').lte('start_utc', now).gt('expires_utc', now),
     db.from('subscriptions').select('*', { count: 'exact', head: true }).eq('status', 'ACTIVE').gte('expires_utc', now).lte('expires_utc', in7days),
   ]);
   for (const r of [total, students, active, expiring]) if (r.error) console.error('getDashboardCounts:', r.error);

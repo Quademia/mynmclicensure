@@ -196,14 +196,19 @@ export async function resolveRecipients(db: ServerSupabaseClient, scope: Recipie
   // past a few hundred ids the list is too long for the request's address.
   // As before, a failed read narrows to nobody (D39).
   if (scope.subscription_kinds?.length) {
+    // A subscription counts while its dates are live, not while its word
+    // still says ACTIVE (02.1, 2026-10-04).
     const want = new Set(scope.subscription_kinds.map((k) => k.toUpperCase()));
     const matched = new Set<string>();
+    const now = nowIso();
     for (const ids of slices(userIds)) {
       const { data: subs } = await readAll<unknown>((from, to) =>
         db
           .from('subscriptions')
           .select('user_id, products ( kind )')
           .eq('status', 'ACTIVE')
+          .lte('start_utc', now)
+          .gt('expires_utc', now)
           .in('user_id', ids)
           .order('subscription_id')
           .range(from, to),
