@@ -61,9 +61,23 @@ findings D4, D20, D23, D31–D36 in `archive/product-plan/post-rebuild-diagnosis
   package. Packages already bought keep what they came with. Product
   names are labels Sam changes at will. *(to build: 02.10 — the mocks
   limit follows the premium mark; new packages start without)*
-- **Premium Prep includes the private study group** for its batch (Sam,
+- **Premium Prep includes the premium channel** for its programme (Sam,
   2026-10-04: "yes we need the groups") — the human layer the platform
-  does not replace: a tutor and the batch sitting the same exam (08).
+  does not replace (08). Mocks and the channel are what set it apart
+  from Full Access, which is the app alone.
+- **Premium Prep is open all year, never a batch** (Sam, 2026-10-04):
+  bought any day, its 240 days counted from then, every buyer in the
+  same channel for their programme. A batch, a season or a resit
+  ("August/September batch") is words on the public page, changed by
+  Sam; underneath it is the same package. Why: the NMC sits several
+  times a year, with resits; a question bank sells by length from any
+  day (as UWorld and Archer Review do); batches suit live classes, and
+  Sam runs the channel alone. Later audiences work the same way — KNUST
+  or UCC affiliate exams, level 100 or 200: a package with its courses
+  and a group or none, on its own public page (when picked up: accounts
+  and the public lists are grouped by NMC programme today).
+- **The public pages' words** — Premium Prep's text, a season banner —
+  become Sam's to edit with their redesign *(to build: 02.11)*.
 - **Bought means kept**: editing a package changes it for new buyers
   only.
 - **The package is the only unit of sale, one per payment.**
@@ -173,6 +187,9 @@ Written on the tables in `12-tables.md`:
   Prep without a word (2026-09-22).
 - The checkout and confirmation-page wording — all new, not approved
   (2026-09-23).
+- An account made at payment has no school (checkout asks email,
+  WhatsApp and programme), and the my-school board needs one (05 G1b):
+  ask at checkout, as Elite Nurses does, or at first sign-in.
 - A course's programmes as a link table (D23 item 6) — ruled "when
   convenient" on 2026-09-18, never queued: queue or drop.
 - The Sync button on Subscriptions — does it go once every reader uses

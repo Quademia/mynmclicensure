@@ -90,7 +90,7 @@ three (01, 03). Free Full Access stays the admin's grant (02).
 | | Portal guide | How to use the app |
 | | NMC procedures | The NMC's procedure manuals |
 | | WhatsApp and Telegram channels | Links out |
-| | Telegram group — *later* | The members-only group, by link code (08) |
+| | Premium channel — *later* | Premium Prep's Telegram channel, one per programme, joined through the bot (08) |
 | Account | Profile | Details and photo; the username and animal for the boards (*new*, 05) |
 | | Packages | Buy or extend a package (today "Upgrade") |
 

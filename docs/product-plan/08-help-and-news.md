@@ -2,8 +2,8 @@
 
 How Quademia speaks to students and students speak back: announcements
 (the broadcast), messages (the support desk), the portal guide, the NMC
-procedures, the WhatsApp and Telegram channels, and the members-only
-Telegram group.
+procedures, the WhatsApp and Telegram channels, and Premium Prep's
+members-only channel.
 
 Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
 `archive/product-plan/07-messaging.md`, and `archive/product-plan/rebuild.md`
@@ -73,13 +73,20 @@ Ruled by Sam, 2026-09-18.
   list. The manual links move from the page into a table the admin
   manages. *(to build)*
 - **WhatsApp and Telegram channels** — links out.
-- **The Telegram group — Premium Prep's private study group** (Sam,
-  2026-10-04: "yes we need the groups"). The platform carries the
-  questions, tests, explanations and news; the group is the human layer
-  it does not replace — a tutor's revision, quick answers, the batch
-  sitting the same exam. Worth it only while someone runs it. Members
-  only: a Connect page, link codes, a bot on the database, the allowlist
-  drawn from the premium packages. *(to build: 17)*
+- **The premium channel — Premium Prep's private Telegram channel**, one
+  per programme, open all year, never a batch (Sam, 2026-10-04: "yes we
+  need the groups"; 02). The platform carries the questions, tests,
+  explanations and news; the channel is the human layer: Sam posts —
+  revision, voice notes, reminders that point into the app — and
+  members read. Sam runs it until he finds people. Saving and
+  forwarding are restricted (Telegram's setting). *(to build: 17)*
+- **Members only, through the bot**: the student links their Telegram
+  account to their Quademia account with a one-time code (the Sheets
+  era's Connect page); the channel takes join requests only, and the bot
+  approves one only from a linked account with live Premium Prep, so a
+  forwarded link admits nobody. Each day the bot removes members whose
+  Premium Prep has ended, with a message to renew, and lets them back
+  in when they do. *(to build: 17)*
 
 ## Storage
 
@@ -92,6 +99,6 @@ Written on the tables in `12-tables.md`, all ticked 2026-09-18:
 
 ## Open
 
-- Who runs the premium groups — a tutor posting and answering most days
-  (needed before 17 is worth building).
+- The Sheets era's bot script (`Telegram_By_Worker-DEV`, not in this
+  repo) — Sam to find it; read before 17 is planned.
 - The Telegram group's keys list (free text holding junk) is under 10.

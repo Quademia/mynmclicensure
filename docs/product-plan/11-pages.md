@@ -148,6 +148,10 @@ where they show.
 ### Packages (the shop) and Premium Prep
 - On a computer, a side panel of tickable filters in place of the chip
   row (Sam, 2026-09-22).
+- Premium Prep's words and a season banner, Sam's to edit (02.11).
+- **Check**: Premium Prep's paragraph has GHS 99 and GHS 150 typed in,
+  not read from the packages — a price changed by the admin leaves the
+  page wrong (found 2026-10-04; 02.12).
 
 ### Checkout
 - The package with "Change package"; the details; a side panel with the

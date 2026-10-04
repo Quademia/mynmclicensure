@@ -48,6 +48,8 @@ before then, and the old list's history, is in
 - ⬜ C5b NACNAP's switch-over — courses and packages to NAC and NAP, both opened, NACNAP closed — on the day
 - ⬜ 02.9 The Open to the public tick on the admin's Courses page — with its redesign
 - ⬜ 02.10 Mocks on Premium Prep packages only — the mocks limit follows the premium mark (Sam, 10-04)
+- ⬜ 02.11 Public pages' words Sam's to edit — Premium Prep's text, a season banner — with their redesign
+- ⬜ 02.12 Premium Prep's page reads its prices from the packages — GHS 99 and 150 typed in today
 - ✅ 02.1 Ended means ended — the four places that trusted "active" now read the dates — 2026-10-04
 - ⬜ D31 The account made at payment — a set-password link; the setup token and its rescue go
 - ⬜ D33 The same browser sees the password form, another the emailed link; a check tells status only
@@ -118,7 +120,7 @@ before then, and the old list's history, is in
 - ⬜ A3 The body stored once, no extra line break per edit, the dead read removed — later
 - ⬜ 08.2 The support desk (tables ✅) — general and course threads, server writes, a paged inbox, Bulk Send out
 - ⬜ 08.3 NMC procedures — the manual links into a table the admin manages
-- ⬜ 17 The Telegram group — a Connect page, link codes, a bot, the allowlist from subscriptions
+- ⬜ 17 The premium channel — one per programme, all year; link codes; the bot admits and removes members
 
 ## [09 Design system](docs/product-plan/09-design-system.md)
 

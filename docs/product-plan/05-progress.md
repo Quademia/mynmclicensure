@@ -134,4 +134,6 @@ Settled by Sam, 2026-10-04.
 - The badge milestones and the art set.
 - The percentile's threshold (about 30) — set at the build.
 - Later, parked (Sam, 2026-10-04): days left to the exam (needs the
-  NMC's dates — asked, not answered) and a daily goal.
+  NMC's dates — asked, not answered; the student's sitting asked once,
+  which also lets the premium channel address "August candidates") and
+  a daily goal.
