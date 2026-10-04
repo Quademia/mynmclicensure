@@ -53,6 +53,17 @@ findings D4, D20, D23, D31–D36 in `archive/product-plan/post-rebuild-diagnosis
   Free Full Access and paid packages: unlimited · 5 · all · yes. Built
   in the database (F4a, 2026-10-04); the admin's package form gets the
   four fields with its redesign *(to build: 03.1)*.
+- **Mock exams open only on Premium Prep packages** — the ones marked
+  premium (Sam, 2026-10-04: "the most important thing is that mock is
+  for premium prep products"): mocks are seasonal, built for the main
+  August/September sitting. Full Access, the single-course packages and
+  Free Full Access carry no mocks; a tester is granted a Premium Prep
+  package. Packages already bought keep what they came with. Product
+  names are labels Sam changes at will. *(to build: 02.10 — the mocks
+  limit follows the premium mark; new packages start without)*
+- **Premium Prep includes the private study group** for its batch (Sam,
+  2026-10-04: "yes we need the groups") — the human layer the platform
+  does not replace: a tutor and the batch sitting the same exam (08).
 - **Bought means kept**: editing a package changes it for new buyers
   only.
 - **The package is the only unit of sale, one per payment.**

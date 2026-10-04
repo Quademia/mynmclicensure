@@ -184,7 +184,7 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `allow_builder_quizzes` | Quiz Builder quizzes over the whole grant, in any of its courses; empty = unlimited |
 | `allow_packs_per_course` | Offline packs per course; empty = unlimited, 0 = none (new packages start at 5) |
 | `allow_papers` | `all`, or `trial_paper` — only each course's paper ticked "Open in trial" |
-| `allow_mocks` | Whether mock exams open |
+| `allow_mocks` | Whether mock exams open — *to build (02.10, Sam 2026-10-04):* yes only on Premium Prep packages (`is_premium`), new packages start without |
 
 - The four limits (03 F4, built 2026-10-04): the trials 3 · 0 · trial
   paper · no; Free Full Access and paid packages unlimited · 5 · all ·

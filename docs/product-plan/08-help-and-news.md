@@ -73,9 +73,13 @@ Ruled by Sam, 2026-09-18.
   list. The manual links move from the page into a table the admin
   manages. *(to build)*
 - **WhatsApp and Telegram channels** — links out.
-- **The Telegram group** — members only: a Connect page, link codes, a
-  bot on the database, the allowlist drawn from subscriptions. *(to
-  build: 17, later)*
+- **The Telegram group — Premium Prep's private study group** (Sam,
+  2026-10-04: "yes we need the groups"). The platform carries the
+  questions, tests, explanations and news; the group is the human layer
+  it does not replace — a tutor's revision, quick answers, the batch
+  sitting the same exam. Worth it only while someone runs it. Members
+  only: a Connect page, link codes, a bot on the database, the allowlist
+  drawn from the premium packages. *(to build: 17)*
 
 ## Storage
 
@@ -88,5 +92,6 @@ Written on the tables in `12-tables.md`, all ticked 2026-09-18:
 
 ## Open
 
-- None of Sam's. The Telegram group's keys list (free text holding
-  junk) is under 10.
+- Who runs the premium groups — a tutor posting and answering most days
+  (needed before 17 is worth building).
+- The Telegram group's keys list (free text holding junk) is under 10.
