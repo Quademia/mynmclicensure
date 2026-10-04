@@ -150,5 +150,6 @@
   .sdash .attempts-head { flex-wrap: wrap; }
   .sdash .attempts-table { min-width: 620px; }
   .sdash .attempts-empty-btns { flex-direction: column; }
-  .sdash .guide-bubble { bottom: 12px; right: 12px; padding: 8px 14px; }
+  /* above the phone's bottom bar (styles/phone-tabs.css, 56px) */
+  .sdash .guide-bubble { bottom: calc(12px + 56px + env(safe-area-inset-bottom)); right: 12px; padding: 8px 14px; }
 }

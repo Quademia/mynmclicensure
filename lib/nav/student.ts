@@ -11,9 +11,43 @@
 // The emoji legacy wrote into each label ('🏠 Dashboard') left with DS6;
 // each row names its icon instead (components/shell/icons.tsx).
 
-import type { NavItem } from './types';
+import type { NavItem, PhoneTab } from './types';
 
 const S = '/student';
+
+// The bottom bar on a phone (Sam, 2026-10-04: A — 00 The menu, 09). The
+// drawer below stays the full menu; these are shortcuts into its pages.
+// Progress gains Leaderboard with 05 G1b, so its row appears then.
+export const STUDENT_PHONE_TABS: PhoneTab[] = [
+  { key: 'dashboard', label: 'Dashboard', icon: 'home', pages: [{ label: 'Dashboard', href: `${S}/dashboard` }] },
+  {
+    key: 'practise',
+    label: 'Practise',
+    icon: 'clipboard',
+    pages: [
+      { label: 'Papers', href: `${S}/fixed-quizzes` },
+      { label: 'Mocks', href: `${S}/mock-exams` },
+      { label: 'Builder', href: `${S}/quiz-builder` },
+    ],
+    also: [`${S}/course`],
+  },
+  {
+    key: 'progress',
+    label: 'Progress',
+    icon: 'chart',
+    pages: [{ label: 'History', href: `${S}/learning-history` }],
+    also: [`${S}/report`],
+  },
+  {
+    key: 'offline',
+    label: 'Offline',
+    icon: 'download',
+    pages: [
+      { label: 'My packs', href: `${S}/offline-packs`, exact: true },
+      { label: 'Build', href: `${S}/offline-packs/build` },
+    ],
+  },
+];
 
 export const STUDENT_NAV: NavItem[] = [
   { key: 'dashboard', label: 'Dashboard', icon: 'home', href: `${S}/dashboard` },

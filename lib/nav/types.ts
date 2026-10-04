@@ -92,3 +92,26 @@ export type NavItem = {
   /** "My Courses": rows come from the student's course access at runtime. */
   dynamic?: 'courses';
 };
+
+/** One page of a phone tab's group — a tab in the row at the top. */
+export type PhoneTabPage = {
+  label: string;
+  href: string;
+  /** Only this address, not the addresses under it (My packs, not Build). */
+  exact?: boolean;
+};
+
+/**
+ * A tab of the student's bottom bar on a phone (Sam, 2026-10-04; 00 The
+ * menu). The bar's four tabs never change; a group's pages sit in a row
+ * at the top of those pages, and a row of one is not drawn. A tap on the
+ * tab opens the group's first page.
+ */
+export type PhoneTab = {
+  key: string;
+  label: string;
+  icon: NavIcon;
+  pages: PhoneTabPage[];
+  /** Addresses that belong to the group without a row: the tab is lit there. */
+  also?: string[];
+};

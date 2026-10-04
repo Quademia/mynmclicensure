@@ -21,9 +21,11 @@ opens it (00, The menu).
 - **The blocks, top to bottom** (Sam, 2026-10-04 — a redesign, not
   today's page; drawn in the chat): the top card → today's challenge
   with the rank line (when G2 lands) → the streak and questions
-  mastered → your weakest topic, one tap into the builder (shown once
-  there are enough answers to be honest) → my courses, a compact list
-  with days left and progress → news, the two newest (08) → recent
+  mastered → your weakest topic, one tap into the builder (shown from
+  20 answers, naming only a topic with at least 5 — Sam, 2026-10-04,
+  MyNclex's gate) → my courses, a compact list with days left and
+  questions met out of the course's bank ("212 of 1,080 met" — Sam,
+  2026-10-04) → news, the two newest (08) → recent
   sittings, the last 3–5 with Resume and Report. A profile nudge only
   while something is missing (the school). Off the page: the plan
   status bar (into the top card), the channels card (to Help and

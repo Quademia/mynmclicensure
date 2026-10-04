@@ -17,16 +17,21 @@ import { cookies } from 'next/headers';
 import { ShellFrame } from './shell-state';
 import { TopBar, type TopBarProps } from './top-bar';
 import { MobileDrawer } from './mobile/mobile-drawer';
+import { PhoneSubTabs, PhoneTabBar } from './mobile/phone-tabs';
 import { NAV_COOKIE } from './nav-cookie';
+import type { PhoneTab } from '@/lib/nav/types';
 
 export async function AppShell({
   sidebar,
   topBar,
+  phoneTabs,
   children,
 }: {
   /** The menu — a <SidebarNav> inside the audience's wrapper. */
   sidebar: React.ReactNode;
   topBar: TopBarProps;
+  /** The bottom bar on a phone — students only (Sam, 2026-10-04); none for the admin. */
+  phoneTabs?: PhoneTab[];
   children: React.ReactNode;
 }) {
   const jar = await cookies();
@@ -36,7 +41,11 @@ export async function AppShell({
     <ShellFrame initialDesktopOpen={initialDesktopOpen}>
       <TopBar {...topBar} />
       <MobileDrawer>{sidebar}</MobileDrawer>
-      <main className="main-content">{children}</main>
+      <main className="main-content">
+        {phoneTabs ? <PhoneSubTabs tabs={phoneTabs} /> : null}
+        {children}
+      </main>
+      {phoneTabs ? <PhoneTabBar tabs={phoneTabs} /> : null}
     </ShellFrame>
   );
 }

@@ -88,6 +88,7 @@ before then, and the old list's history, is in
 ## [05 Progress](docs/product-plan/05-progress.md)
 
 - ⬜ G1a The streak and questions mastered — from the saved answers, no storage change
+- ⬜ 05.4 The dashboard redesigned — the top card per status, the blocks, one read for the numbers (with G1a)
 - ⬜ Q12 Progress across sittings — true totals, topic accuracy over time, a nudge, a trend
 - ⬜ Q13 Readiness and standing — the percentile first on the trial paper; a band; how others did
 - ⬜ G1b The leaderboard — from G2; three views; usernames and Noto animals; its storage tick first
@@ -133,6 +134,7 @@ before then, and the old list's history, is in
 - ⬜ 09.3 A content width limit above 1440px
 - ⬜ 09.4 Dark mode — after the above
 - ⬜ 09.5 The old token names retired once no page uses them
+- ✅ 09.6 The phone's bottom bar and sub-tab row — four fixed tabs, a row per group, the drawer kept — 2026-10-04
 - ⏸ DS9 About eight pages on their own button classes — they join as each is touched
 
 ## [10 Launch and platform](docs/product-plan/10-launch-and-platform.md)

@@ -19,6 +19,7 @@ import { displayNameOf } from '@/components/shell/page-header';
 import { getCourses } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import { getUnreadCountForUser } from '@/lib/messaging/queries';
+import { STUDENT_PHONE_TABS } from '@/lib/nav/student';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,6 +37,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
   return (
     <AppShell
       sidebar={<StudentSidebar courses={courses} badges={{ messages: unread }} />}
+      phoneTabs={STUDENT_PHONE_TABS}
       topBar={{
         product: 'MyNMCLicensure',
         messagesHref: '/student/messages',

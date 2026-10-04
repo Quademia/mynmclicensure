@@ -66,7 +66,7 @@ Detail and history: `archive/product-plan/10-design-system.md`.
 - **The student's bottom bar on a phone** (Sam, 2026-10-04): four fixed
   tabs, a row of sub-tabs at the top of a group's pages that fits
   without scrolling, the drawer still the full menu — MyNclex's pattern,
-  copied, not shared (00, The menu). *(to build: with the dashboard)*
+  copied, not shared (00, The menu). Built 2026-10-04 (09.6).
 - **The wordmark** (Sam, 2026-09-26): the painted Q, QUADEMIA in small
   teal capitals over MyNMCLicensure in bold navy, on both bars.
 - **The public bar**: Home · Premium Prep · Packages · Dashboard, one
