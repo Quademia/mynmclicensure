@@ -72,18 +72,17 @@ export const STUDENT_NAV: NavItem[] = [
   { key: 'procedures', label: 'NMC procedures', icon: 'stethoscope', href: `${S}/procedures` },
   { key: 'telegram', label: 'Telegram', icon: 'send', href: `${S}/telegram`, hidden: true },
   {
-    // One row, two buttons (Sam, 2026-10-04: 2) — a shorter menu.
-    key: 'channels',
-    label: 'Our channels',
-    inline: [
-      {
-        key: 'whatsapp-channel',
-        label: 'WhatsApp',
-        icon: 'phone',
-        href: 'https://www.whatsapp.com/channel/0029Vb6ActpBA1ewCfBmAF3O',
-        external: true,
-      },
-      { key: 'telegram-channel', label: 'Telegram', icon: 'send', href: 'https://t.me/QAcademynurseshub', external: true },
-    ],
+    key: 'whatsapp-channel',
+    label: 'WhatsApp channel',
+    icon: 'phone',
+    href: 'https://www.whatsapp.com/channel/0029Vb6ActpBA1ewCfBmAF3O',
+    external: true,
+  },
+  {
+    key: 'telegram-channel',
+    label: 'Telegram channel',
+    icon: 'send',
+    href: 'https://t.me/QAcademynurseshub',
+    external: true,
   },
 ];

@@ -229,73 +229,9 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 /* a group's heading above its rows (00 The menu, Sam 2026-10-04: A) —
-   the student menu's Practise, Progress, Study offline, Help and news.
-   A button: a tap folds the group's rows away or opens them (b). */
+   the student menu's Practise, Progress, Study offline, Help and news */
 .sidebar-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  min-height: 44px; /* a finger's target in the phone's drawer */
-  padding: 12px 24px 4px;
-  background: none;
-  border: 0;
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-.sidebar-heading:hover {
-  color: var(--ink-on-navy-soft);
-}
-.sidebar-heading:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: -2px;
-}
-.sidebar-heading-arrow {
-  font-size: 10px;
-  transition: transform 0.2s;
-}
-.sidebar-group.folded .sidebar-heading-arrow {
-  transform: rotate(-90deg);
-}
-.sidebar-group.folded .sidebar-group-rows {
-  display: none;
-}
-
-/* the two channels as one row of two buttons (Sam, 2026-10-04: 2) */
-.sidebar-inline {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-8);
-  padding: var(--space-6) 24px var(--space-8);
-}
-.sidebar-nav .sidebar-inline-link {
-  justify-content: center;
-  gap: var(--space-6);
-  min-height: 44px;
-  padding: var(--space-6) var(--space-8);
-  font-size: 13px;
-  border: 1px solid var(--ink-on-navy);
-  border-radius: var(--radius);
-}
-
-/* tighter on a computer, the student menu only — rows 42 → 34px,
-   headings 44 → 26px — so the grouped menu fits a laptop's screen
-   (Sam, 2026-10-04: 1); a phone's drawer keeps a finger's sizes */
-@media (min-width: 769px) {
-  .student-menu .sidebar-nav a,
-  .student-menu .sidebar-dropdown-toggle {
-    padding-top: 6px;
-    padding-bottom: 6px;
-  }
-  .student-menu .sidebar-heading {
-    min-height: 0;
-    padding: 10px 24px 2px;
-  }
-  .student-menu .sidebar-nav .sidebar-inline-link {
-    min-height: 0;
-    padding: var(--space-4) var(--space-8);
-  }
+  padding: 16px 24px 4px;
 }
 
 .sidebar-nav a {

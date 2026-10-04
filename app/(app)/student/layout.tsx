@@ -12,9 +12,7 @@
 // under A3 the same count sits on the top bar's envelope, so a closed
 // sidebar cannot hide a reply (10-design-system.md DS5).
 
-import { cookies } from 'next/headers';
 import { requireStudent } from '@/lib/access';
-import { MENU_FOLD_COOKIE, parseFolded } from '@/components/shell/nav-cookie';
 import { AppShell } from '@/components/shell/app-shell';
 import { StudentSidebar } from '@/components/nav/student/student-sidebar';
 import { displayNameOf } from '@/components/shell/page-header';
@@ -35,13 +33,10 @@ export default async function StudentLayout({ children }: { children: React.Reac
   const courses = allCourses
     .filter((c) => Boolean(access[c.course_id]))
     .map((c) => ({ course_id: c.course_id, title: c.title }));
-  // The menu's folded groups on this device (00 The menu, Sam 2026-10-04:
-  // b), read here so the first paint is already folded.
-  const folded = parseFolded((await cookies()).get(MENU_FOLD_COOKIE)?.value);
 
   return (
     <AppShell
-      sidebar={<StudentSidebar courses={courses} badges={{ messages: unread }} folded={folded} />}
+      sidebar={<StudentSidebar courses={courses} badges={{ messages: unread }} />}
       phoneTabs={STUDENT_PHONE_TABS}
       topBar={{
         product: 'MyNMCLicensure',
