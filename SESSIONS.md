@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-04 — doc 09 worked through: the leaderboard settled, §8 S23 the limited trial and S24 Open to the public ticked, seven programmes, three ways in
+  - ↳ a board in each school · usernames generated, spins · Noto animals, Avataaars alt · free sitting = real course · Retake locked · news to past holders · G1a/G1b · percentile on trial paper · badges · prices parked · ACTIVE readers
+
 - 2026-10-03 — doc 09: what every page shows after the trial (locked, not gone), for the redesign; G1: the streak settled, points become questions mastered
   - ↳ Sam redesigns every page · summary open, review locked · unfinished sitting finishes · recap card stays · streak private · one answer a day · a day forgiven · retake farm · effort points withdrawn · 5 s floor · leaderboard asked
 
