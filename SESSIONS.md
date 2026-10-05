@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-04, third — Premium Prep all year, 02.10 built; two ways in and the floor; menu grouped, phone bottom bar; dashboard redesigned (D2a, D2b)
+  - ↳ never a batch · channel via bot · Elite Nurses read · free account not a door · one dashboard per status · inside first, shop last · shorter menu too busy · streak forgiven Mon–Sun · 20 and 5 · states to test · D3 next
+
 - 2026-10-04, second — the plan written fresh (archive, map, 01–12, tables from the DB); F4a, F1, 02.1, C5a built and merged; Premium Prep keeps groups
   - ↳ planning on top of legacy · S-numbers retired · build more plan less · free: no packs, Study modes · one builder · C5b on the day · shop sold closed packages · mocks premium only · Elite Nurses · deploy ignores migration
 

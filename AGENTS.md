@@ -305,6 +305,9 @@ above sit at the repo root; the audience grouping inside them is kept.
   `react-hooks/set-state-in-effect`): read the clock through a
   module-level helper, never in render; write a ref only in a handler;
   stamp `Date.now()` into state from a **handler**, not an effect body.
+  It also refuses a write to `document` (a cookie) inside a component,
+  even in a handler (`react-hooks/immutability`): put the write in a
+  module-level helper and call that (2026-10-04, the menu's fold cookie).
 - **Browser storage is read through `useSyncExternalStore`**, never in
   render and never through an effect that calls `setState`. Reading
   `sessionStorage` / `localStorage` during render splits the server's
@@ -438,7 +441,10 @@ above sit at the repo root; the audience grouping inside them is kept.
   student pages — and signs itself out between sessions; every
   authenticated page needs Sam to sign the pane in. The admin holds no
   course access, so the Quiz Builder and the pack builder need a
-  student's sign-in (2026-09-26). For a change
+  student's sign-in (2026-09-26). The pane is one of that account's two
+  devices: if Sam also signs the same account in elsewhere, a third
+  sign-in bumps the pane mid-walk (2026-10-04) — ask him to use one
+  place while a walk runs. For a change
   across many such pages, `npm run build` (webpack, all 50 routes) is
   the check that actually exercises them; for CSS, render a proof sheet
   from the repo's own stylesheets and screenshot it, rather than
@@ -492,7 +498,10 @@ above sit at the repo root; the audience grouping inside them is kept.
   count a migration raises — what a tidy step left out — is seen only in
   the proof run, never in the release job's log; a number that matters
   on prod goes into the data itself (03 Q14 set `n` to the rows copied,
-  2026-09-27).
+  2026-09-27). **The database's day is UTC**, which can differ from the
+  conversation's date by hours: a test that counts days ("today minus 3",
+  a week's edge) uses fixed calendar dates, or prints the database's own
+  `current_date` first (2026-10-04, the streak's proof).
 - **A `select('*')` under a cookie client breaks the moment a table's
   grant becomes a column list.** PostgREST hands `*` to Postgres as a
   literal `*`, which needs SELECT on every column it expands to, so a

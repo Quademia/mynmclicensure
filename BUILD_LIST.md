@@ -87,8 +87,8 @@ before then, and the old list's history, is in
 
 ## [05 Progress](docs/product-plan/05-progress.md)
 
-- ⬜ G1a The streak and questions mastered — from the saved answers, no storage change
-- ⬜ 05.4 The dashboard redesigned — the top card per status, the blocks, one read for the numbers (with G1a)
+- ⬜ G1a The streak and questions mastered — built with 05.4 (the streak card); ticks with it
+- ⬜ 05.4 The dashboard redesigned — built (D2a, D2b), walked as paid; the other states for Sam to test
 - ⬜ Q12 Progress across sittings — true totals, topic accuracy over time, a nudge, a trend
 - ⬜ Q13 Readiness and standing — the percentile first on the trial paper; a band; how others did
 - ⬜ G1b The leaderboard — from G2; three views; usernames and Noto animals; its storage tick first
