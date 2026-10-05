@@ -543,6 +543,14 @@ the browser can call only the first two lines.
   the most generous of two grants wins. Without a live grant it allows
   only a builder quiz (or its retake) of published free questions, in a
   course of the student's programme, in a Study mode.
+- **The dashboard** (server only, reads only): `student_dashboard` — one
+  student's numbers in one read: the streak (a study day is one answer,
+  the UTC day; one missed day a week, Monday to Sunday, forgiven; today
+  never breaks it), questions met and mastered (right the first time
+  met, not in under 5 s), the weakest topic (from 20 answers, at least 5
+  in the topic), questions met of each course's published bank, the
+  latest unfinished sitting, and a recap inside a window the page passes
+  (05.4, G1a; built 2026-10-04).
 - **Packs and the bank** (server only): `create_offline_pack` (the same
   live-grant check, and packs per course since the grant began within
   its limit), `search_question_bank_ids`, `save_quiz`.
