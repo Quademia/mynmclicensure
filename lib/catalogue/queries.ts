@@ -10,6 +10,7 @@
 // RLS is the floor, not the filter (AGENTS.md): the "active only" reads
 // name their filter here.
 
+import { cache } from 'react';
 import type { createClient } from '@/lib/supabase/server';
 import type { ConfigMap, ConfigRow, Course, Product, Program } from './types';
 
@@ -97,15 +98,25 @@ export async function getAllProducts(db: Db): Promise<Product[]> {
   return flattenProducts((data ?? []) as unknown as ProductRow[]);
 }
 
-/** Active courses only, by title. */
-export async function getCourses(db: Db): Promise<Course[]> {
-  const { data, error } = await db.from('courses').select('*').eq('status', 'active').order('title');
+/**
+ * Active courses only, by title. Wrapped in cache() so a request reads
+ * once however many callers — the student layout's menu and the dashboard
+ * both ask (D2b, 10.13 in passing). The columns are named, so a narrower
+ * grant later cannot break it (AGENTS.md, select('*') under a cookie
+ * client).
+ */
+export const getCourses = cache(async function getCourses(db: Db): Promise<Course[]> {
+  const { data, error } = await db
+    .from('courses')
+    .select('course_id, title, program_scope, status, page_slug')
+    .eq('status', 'active')
+    .order('title');
   if (error) {
     console.error('getCourses:', error);
     return [];
   }
   return (data ?? []) as Course[];
-}
+});
 
 /** One course by id, any status — legacy getCourseById (the course page, 7d). */
 export async function getCourseById(db: Db, courseId: string): Promise<Course | null> {
