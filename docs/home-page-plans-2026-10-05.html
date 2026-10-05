@@ -1,0 +1,753 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home page plans — 5 Oct 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #1e3a5f; --teal: #2d7d72; --teal-dark: #235f56; --teal-pale: #edf6f5;
+  --ink: #111827; --muted: #6b7280; --border: #e5e7eb; --surface: #ffffff; --page: #f9fafb;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--surface); color: var(--ink); font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.6; }
+main { max-width: 1360px; margin: 0 auto; padding: 40px 16px 80px; }
+.prose { max-width: 820px; }
+h1 { font-size: 30px; line-height: 1.2; letter-spacing: -0.02em; margin: 0 0 8px; }
+h2 { font-size: 22px; line-height: 1.3; margin: 56px 0 12px; padding-top: 24px; border-top: 1px solid var(--border); }
+h3 { font-size: 17px; margin: 28px 0 8px; }
+p, li { margin: 0 0 8px; }
+ul, ol { padding-left: 22px; margin: 0 0 12px; }
+.lede { color: var(--muted); font-size: 16px; }
+.tag { display: inline-block; font-size: 12px; font-weight: 600; line-height: 16px; padding: 2px 8px; border-radius: 6px; background: var(--teal-pale); color: var(--teal-dark); vertical-align: 1px; }
+.tag.todo { background: #fffbeb; color: #92400e; }
+.note { background: var(--teal-pale); border-radius: 8px; padding: 12px 16px; margin: 12px 0 16px; }
+.warn { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 16px; margin: 12px 0 16px; }
+table { border-collapse: collapse; width: 100%; margin: 8px 0 16px; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+th { font-weight: 600; background: var(--page); }
+.table-wrap { overflow-x: auto; }
+code { font-size: 13px; background: var(--page); border: 1px solid var(--border); border-radius: 4px; padding: 0 4px; }
+a { color: var(--teal-dark); }
+nav.toc { background: var(--page); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin: 24px 0; }
+nav.toc ol { margin: 0; }
+.design { margin: 24px 0 40px; }
+.design-label { font-size: 13px; font-weight: 600; color: var(--muted); margin: 16px 0 8px; text-transform: uppercase; letter-spacing: 0.04em; }
+.frame { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--page); }
+.frame.phone { width: 377px; max-width: 100%; }
+.frame > div { margin: 0; }
+</style>
+</head>
+<body>
+<main>
+
+<div class="prose">
+<h1>Home page plans: what we decided</h1>
+<p class="lede">Sam and Claude, 5 October 2026. One file holding the day's decisions, what each tier includes, the cards' words, the edits proposed for the plan files, and the three drawings (A, B and C). Nothing in <code>docs/product-plan/</code> was changed; this file is for Sam to place.</p>
+<p>The same drawings live on the canvas <a href="https://claude.ai/artifact/P6gbE7sDmJLp3nXmA1CCEs">Home page plan cards</a> (private to Sam).</p>
+
+<nav class="toc">
+<ol>
+<li><a href="#decisions">The decisions</a></li>
+<li><a href="#tiers">What each tier includes</a></li>
+<li><a href="#cards">The cards' words (approved)</a></li>
+<li><a href="#found">Found while checking</a></li>
+<li><a href="#today">Today's home page</a></li>
+<li><a href="#edits">Proposed edits to the plan files</a></li>
+<li><a href="#open">Still open</a></li>
+<li><a href="#drawings">The drawings: C (chosen), A, B</a></li>
+</ol>
+</nav>
+
+<h2 id="decisions">1. The decisions (Sam, 2026-10-05)</h2>
+
+<h3>1.1 The free account stays the floor; its public name is "Free forever"</h3>
+<ul>
+<li>Confirms 4 October's <em>two ways in, one floor</em>: registering starts the 14-day trial, buying a package makes the account, and every student lands on the free account when a trial or package ends.</li>
+<li>Readers see it as <strong>Free forever</strong>. "Free account" stays the plan's working word.</li>
+<li>No Free card on the home page, and no button anywhere says "free account". The only way-in wording is <strong>Start your 14-day trial</strong>.</li>
+<li><strong>Why:</strong> Claude's plans page (Free, Pro, Max) was the prompt. Claude's Free is a tier that never ends, which matches our floor, not our trial; the trial is a 14-day head start. Calling the trial "Free" would make "Free" shrink on day 15. Claude can keep Free forever because every chat is new; a question bank is used up once seen, so the forever part stays the free set, not the real bank.</li>
+</ul>
+
+<h3>1.2 The home page plans row is design C</h3>
+<ul>
+<li>Three cards: <strong>Trial</strong>, <strong>Standard Prep</strong>, <strong>Premium Prep</strong>, under the heading "Start your 14-day trial, then free practice, forever".</li>
+<li>The trial card carries the full <strong>Free forever</strong> box (four lines), then "Plus, for 14 days", the only filled button ("Start your 14-day trial") and "After 14 days, Free forever stays."</li>
+<li>Standard Prep and Premium Prep each carry a one-line strip: "<strong>Free forever</strong> included, and kept when the package ends", then what is paid for, and an outlined button.</li>
+<li>Under the row, the single-course line (1.4).</li>
+<li><strong>Why C over A and B:</strong> A's Free card has no button, so on a phone the first card is a dead end. B prints the free list three times, makes the phone about 2,600px long against C's 2,100, and puts free things ahead of what a package is paid for. C keeps the trial first, says the free list once, and lets the paid cards lead with what they sell. If a card is ever shown alone (the Premium Prep page, a screenshot), use B's full box there.</li>
+</ul>
+
+<h3>1.3 Full Access is renamed Standard Prep</h3>
+<ul>
+<li><strong>Standard Prep</strong>: all your programme's courses for 365 days. <strong>Premium Prep</strong>: the same, plus mock exams and the premium channel, for 240 days.</li>
+<li><strong>Why:</strong> "Full" promised everything, but Premium Prep has more. Standard and Premium read as a pair, and the shared "Prep" says they are the same kind of thing.</li>
+<li>Considered and passed over: <em>Full Year</em> (true, but Sam was unsure); <em>Regular Prep</em> (in Ghanaian education "regular" means full-time students, against sandwich and distance); <em>Standard / Premium Access</em> ("Access" only says a door opens, every package is access, it carries the old Full Access confusion, and Premium Prep already exists with its page and channel); anything with <em>Pass</em> (reads as a promise to pass the NMC exam).</li>
+<li>Standard fits either price plan Sam has in mind: <strong>both the same price</strong> (Standard's card then shows "for 365 days" so the choice is more time or mocks and the channel) or <strong>Premium higher</strong> (Standard is simply the cheaper way in).</li>
+<li>Package names are labels edited in the admin; package ids do not change.</li>
+</ul>
+
+<h3>1.4 Single courses come as Standard Prep or Premium Prep</h3>
+<ul>
+<li>A single course can be bought as Standard Prep or Premium Prep, with the <strong>same days as the related prep</strong>: 365 and 240.</li>
+<li>Names: <strong>"&lt;Course&gt; Standard Prep"</strong> and <strong>"&lt;Course&gt; Premium Prep"</strong>, e.g. "Midwifery Standard Prep". Today they are "&lt;Course&gt; Standalone Access".</li>
+<li>A Premium single course opens that course's mock exams, and its buyer <strong>joins the programme's premium channel</strong>.</li>
+<li>No code change: ticking premium on a package already turns its mocks on (02.10) and lists it on the Premium Prep page. The channel's bot (17, not built) must count a Premium single course as live Premium Prep.</li>
+<li>The card line: "<strong>Only need one course?</strong> Take it on its own, as Standard Prep or Premium Prep, from GHS [PRICE]." with a link, <em>See single courses</em>.</li>
+</ul>
+
+<h3>1.5 Smaller calls</h3>
+<ul>
+<li><strong>Quiz Builder keeps its name.</strong> Customised Practice Builder, Practice Builder and Custom Practice were weighed and left.</li>
+<li><strong>Free Full Access stays as it is</strong>: the admin's grant, not sold. (A student holding one does see its name on the dashboard's "Then … until …" line; renaming it later is one field in the admin.)</li>
+<li><strong>The cards say "All your programme's courses"</strong> and never single out the General Paper.</li>
+</ul>
+
+<h2 id="tiers">2. What each tier includes</h2>
+<p>Checked on 2026-10-05 against <code>docs/product-plan/</code> 02–08 and 11, and the dev database (packages, question bank, Config). <span class="tag">built</span> works today; <span class="tag todo">to build</span> is decided but not built.</p>
+
+<h3>Free forever (every account, after a trial or package ends)</h3>
+<div class="table-wrap"><table>
+<tr><th>What</th><th>Status</th></tr>
+<tr><td>Quiz Builder on the <strong>free questions</strong> of a course of the student's programme; as many quizzes as they like</td><td><span class="tag">built</span> in the database (F1) · <span class="tag todo">to build</span> the builder page (D3)</td></tr>
+<tr><td><strong>Learning and Untimed</strong> modes only; no Exam modes</td><td><span class="tag">built</span></td></tr>
+<tr><td>No practice papers, no mock exams, no offline packs</td><td><span class="tag">built</span></td></tr>
+<tr><td><strong>Daily challenge</strong>: 5 a day, the same for everyone in the programme, from the free questions</td><td><span class="tag todo">to build</span> G2</td></tr>
+<tr><td><strong>Streak</strong> and <strong>questions mastered</strong></td><td><span class="tag">built</span> on the dashboard (D2)</td></tr>
+<tr><td><strong>Leaderboard</strong>: my school, my programme, schools; from the daily challenge</td><td><span class="tag todo">to build</span> G1b</td></tr>
+<tr><td><strong>Learning history</strong>, a report for every sitting, "Practise this topic", the weakest topic</td><td><span class="tag">built</span></td></tr>
+<tr><td>Announcements, support messages, portal guide, NMC procedures, the WhatsApp and Telegram channels</td><td>the same for every status</td></tr>
+<tr><td><strong>Kept</strong> when a trial or package ends: scores, history and report summaries; an unfinished sitting can be finished; packs already made still open</td><td>ruled · <span class="tag todo">to build</span> the pages (F2)</td></tr>
+<tr><td><strong>Locked</strong> when it ends: the question-by-question review of those sittings, and Retake</td><td>ruled · <span class="tag todo">to build</span> (F2)</td></tr>
+</table></div>
+
+<h3>Trial: 14 days from registering</h3>
+<ul>
+<li>All the programme's courses.</li>
+<li><strong>One practice paper per course</strong>: the one ticked "Open in trial". A course with no ticked paper opens none.</li>
+<li><strong>3 Quiz Builder quizzes</strong> in all, from the full bank, up to 50 questions each; retakes do not count.</li>
+<li>All four modes, Study and Exam. Full review and retakes while the trial lasts.</li>
+<li>No mock exams, no offline packs.</li>
+<li>The phone number checked by SMS before it starts; one trial per number. <span class="tag todo">to build</span> F4b</li>
+</ul>
+
+<h3>Standard Prep (today "Full Access")</h3>
+<ul>
+<li>All the programme's courses, 365 days.</li>
+<li>Every practice paper. Unlimited Quiz Builder, up to 50 questions each. All four modes.</li>
+<li>Offline packs: 5 per course, up to 100 questions each.</li>
+<li>Full review and retakes.</li>
+<li>No mock exams, no premium channel.</li>
+</ul>
+
+<h3>Premium Prep</h3>
+<ul>
+<li>Everything in Standard Prep, the same courses, for 240 days.</li>
+<li><strong>Mock exams</strong> <span class="tag">built</span> (the gate, 02.10; the mocks' own design, Q3, is parked).</li>
+<li><strong>The premium channel</strong>: a private Telegram channel per programme; Sam posts, members read; joined through the bot, removed when Premium Prep ends. <span class="tag todo">to build</span> 17</li>
+</ul>
+
+<h3>Single courses</h3>
+<ul>
+<li>One course, as Standard Prep (365 days) or Premium Prep (240 days), with what that tier gives, for that course (1.4).</li>
+</ul>
+
+<h2 id="cards">3. The cards' words (approved)</h2>
+<div class="table-wrap"><table>
+<tr><th>Card</th><th>Header</th><th>Lines</th><th>Button</th></tr>
+<tr><td><strong>Trial</strong><br>"Start here"</td><td>Try the real question bank<br><strong>GHS 0</strong> for 14 days</td><td><strong>Free forever</strong> box:<br>· Quizzes from the free questions in each of your courses<br>· Learning and Untimed modes<br>· Your history, reports and streak<br>· The daily challenge and leaderboard<br><br><strong>Plus, for 14 days:</strong><br>· All your programme's courses<br>· One practice paper per course<br>· 3 Quiz Builder quizzes from the full bank<br>· Exam modes<br>· <em>No mock exams or offline packs</em></td><td><strong>Start your 14-day trial</strong> (filled)<br>under it: "After 14 days, Free forever stays."</td></tr>
+<tr><td><strong>Standard Prep</strong></td><td>Your whole programme, at your own pace<br><strong>GHS [PRICE]</strong> for 365 days</td><td>Strip: "<strong>Free forever</strong> included, and kept when the package ends"<br><br><strong>While your package lasts:</strong><br>· All your programme's courses<br>· Every practice paper<br>· Unlimited Quiz Builder<br>· Exam modes<br>· Offline packs, 5 per course<br>· Review and retake any sitting<br>· <em>Mock exams come with Premium Prep</em></td><td>See packages (outlined)</td></tr>
+<tr><td><strong>Premium Prep</strong></td><td>For the exam: mocks and the channel<br><strong>GHS [PRICE]</strong> for 240 days</td><td>Strip, as above<br><br><strong>For 240 days:</strong><br>· Everything in Standard Prep<br>· Mock exams<br>· The premium channel for your programme</td><td>See Premium Prep (outlined)</td></tr>
+<tr><td><strong>Under the row</strong></td><td colspan="3"><strong>Only need one course?</strong> Take it on its own, as Standard Prep or Premium Prep, from GHS [PRICE]. · <em>See single courses</em></td></tr>
+</table></div>
+<ul>
+<li>Prices are read from the packages on sale, never typed in.</li>
+<li>"Everything in Standard Prep" means its features; the days are on each price line.</li>
+<li>A feature not live at launch comes off its card (today: the daily challenge, the leaderboard, the premium channel).</li>
+<li>Claude's wording, Sam's to change: the taglines ("Try the real question bank", "Your whole programme, at your own pace", "For the exam: mocks and the channel") and the strip.</li>
+</ul>
+
+<h2 id="found">4. Found while checking</h2>
+<div class="warn">
+<p><strong>The free set is empty on dev.</strong> 0 of about 5,600 published questions are marked free (<code>is_free_sample</code>), in every course. Free forever and the daily challenge have nothing to draw from until questions are marked. This is authoring work before launch.</p>
+</div>
+<ul>
+<li><strong>Dev's trial papers:</strong> 5 practice papers on dev, one each in GP, RM_MID, RM_PED_OBS_HRN, RN_MED and RN_SURG; only the General Paper's is ticked "Open in trial". Content on prod may differ.</li>
+<li><strong>Dev's prices</strong> (parked, not final): Full Access GHS 150 for 365 days; Premium Prep GHS 99 for 240 days; single courses GHS 59 for 365 days. On these, Premium is cheaper than Standard while giving more; Sam plans either equal prices or Premium higher.</li>
+<li><strong>Every programme's package</strong> holds its two courses plus the General Paper (RN: GP, RN_MED, RN_SURG), the trial the same.</li>
+<li><strong>Config:</strong> builder up to 50 questions (40 by default); a pack up to 100; 5 packs per course.</li>
+<li><strong>Hand-typed "Full Access"</strong> in public copy: <code>app/premium-prep/page.tsx</code> (the lede, the "Not sitting the exam this year?" note, the metadata), <code>app/subscribe/page.tsx</code> (line 211), <code>app/page.tsx</code> (line 190). These go with 02.11 / 02.12 and the redesign.</li>
+</ul>
+
+<h2 id="today">5. Today's home page (<code>app/page.tsx</code>)</h2>
+<ol>
+<li>Hero: "Pass your NMC exam. Study smarter with confidence." A badge: "Free trial access on registration — no payment needed to start". Buttons <em>Create Free Account</em> and <em>Sign In</em>; a link "Subscribe to full access →".</li>
+<li>Social buttons: Telegram, WhatsApp, TikTok, YouTube.</li>
+<li>Stats strip: 5 Programmes · 460+ questions · 2 Quiz modes · Free / Trial on signup · PDF offline packs.</li>
+<li>"Where do you start?": Start Free Trial (button <em>Create Free Account</em>), Subscribe to Full Access ("Recommended"), Sign In, Extend / Upgrade.</li>
+<li>Programmes, the exam's structure, features, "4 steps", and a closing <em>Create Your Free Account</em>.</li>
+</ol>
+<p><strong>Check, for the redesign:</strong> "Create Free Account" three times, though it starts the trial; the Full Access card promises mock exams (Premium Prep only since 02.10); "2 Quiz modes" (there are four); an Extend / Upgrade card on a public page; the stats typed in, not read.</p>
+
+<h2 id="edits">6. Proposed edits to the plan files</h2>
+<p>What Claude would have written, file by file, for Sam to place.</p>
+<ol>
+<li><strong><code>11-pages.md</code>, Home page:</strong> the plans row as in C (1.2) with the cards' words (3); no Free card and no "free account" button; prices from the packages; the row replaces "Where do you start?"; a feature not live at launch comes off its card; the Check faults (5). <strong>Dashboard:</strong> "RN Full access starts 13 Oct 2026" becomes "RN Standard Prep starts …".</li>
+<li><strong><code>02-packages-and-payments.md</code>:</strong> Full Access renamed Standard Prep, and why (1.3); single courses as Standard Prep or Premium Prep, same days, their names, a Premium single course's mocks and channel, no code change (1.4); names are labels, ids unchanged; hand-typed copy goes with 02.11 / 02.12; Free Full Access unchanged. Open: equal prices or Premium higher. Lines 60 and 70 say "Full Access".</li>
+<li><strong><code>08-help-and-news.md</code>:</strong> the premium channel admits anyone with live Premium Prep, a Premium Prep single course included, to their programme's channel.</li>
+<li><strong><code>01-accounts-and-sign-in.md</code> and <code>03-free-account-and-trial.md</code>:</strong> "Free forever" as the floor's public name; "Start your 14-day trial" the only way-in wording (1.1). 03 Open: the free set to mark before launch (4).</li>
+<li><strong><code>00-the-map.md</code>:</strong> the Visitor table's Home page line (the plans row); the ways-in note stays. <strong><code>12-tables.md</code></strong> line 193: "Full Access does not" becomes Standard Prep.</li>
+<li><strong><code>BUILD_LIST.md</code>:</strong> rename the packages on dev and prod (Full Access → "&lt;Programme&gt; Standard Prep", Standalone Access → "&lt;Course&gt; Standard Prep"; Sam in the admin, or by SQL with his yes); add the Premium Prep single-course packages at Sam's prices; mark the free set before launch.</li>
+<li><strong>Session log</strong> (<code>sessions/2026-10.md</code>, <code>SESSIONS.md</code>): the decisions and why; what went wrong (the first card lists were drawn before being checked against the repo; "Every course in your programme" was wrong); what is open.</li>
+</ol>
+
+<h2 id="open">7. Still open</h2>
+<ul>
+<li><strong>Prices:</strong> Standard and Premium the same, or Premium higher.</li>
+<li><strong>At launch:</strong> which of the daily challenge, leaderboard and premium channel are live; the rest come off the cards.</li>
+<li><strong>The free set:</strong> its size per programme and how often it is refreshed ("perhaps monthly", 03).</li>
+<li><strong>The cards' taglines and the strip's words</strong> (3).</li>
+<li><strong>The in-app Packages page</strong> could reuse the row later (Free forever marked "Your plan" for a student on the floor); not discussed.</li>
+</ul>
+
+<h2 id="drawings">8. The drawings</h2>
+<p>Drawn in the MyNMCLicensure design system (navy, teal, Inter; 12px cards, 8px buttons, 44px targets). The computer frames are 1280px wide and scroll sideways on a smaller screen; the phone frames are 375px.</p>
+<div class="note"><strong>C is the one chosen</strong> and carries the approved words. A and B are kept as drawn earlier, before the rename and the check against the repo: they still say "Full Access" and older card lines.</div>
+</div>
+
+<section class="design" id="design-c">
+<h3>C · The full Free forever box on the trial, one line on the packages (chosen)</h3>
+<div class="design-label">Computer</div>
+<div class="frame">
+<div style="width: 1280px; box-sizing: border-box; padding: 64px 80px; background: #f9fafb; font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif; color: #111827; display: flex; flex-direction: column; gap: 40px">
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center">
+<span style="font-size: 12px; line-height: 16px; font-weight: 600; color: #235f56; background: #edf6f5; border-radius: 999px; padding: 4px 12px">Plans</span>
+<h2 style="margin: 0; font-size: 28px; line-height: 34px; font-weight: 700; letter-spacing: -0.02em; color: #111827">Start your 14-day trial, then free practice, forever</h2>
+<p style="margin: 0; font-size: 15px; line-height: 22px; color: #6b7280; max-width: 560px">No payment needed to start. You pick your programme when you register.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; align-items: stretch">
+
+<article style="background: #ffffff; border: 2px solid #2d7d72; border-radius: 12px; padding: 23px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px"><h3 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #111827">Trial</h3><span style="font-size: 12px; line-height: 16px; font-weight: 600; color: #235f56; background: #edf6f5; border-radius: 999px; padding: 3px 10px">Start here</span></div>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280">Try the real question bank</p>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 8px"><span style="font-size: 36px; line-height: 40px; font-weight: 700; letter-spacing: -0.02em; color: #111827">GHS 0</span><span style="font-size: 14px; line-height: 20px; color: #6b7280">for 14 days</span></div>
+</div>
+<div style="background: #edf6f5; border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 8px; font-size: 13px; line-height: 18px; font-weight: 700; color: #235f56"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M5.2 5.5C3.4 5.5 2 6.6 2 8s1.4 2.5 3.2 2.5C7.8 10.5 8.2 5.5 10.8 5.5 12.6 5.5 14 6.6 14 8s-1.4 2.5-3.2 2.5C8.2 10.5 7.8 5.5 5.2 5.5z"></path></svg><span>Free forever</span></div>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Quizzes from the free questions in each of your courses</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Learning and Untimed modes</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Your history, reports and streak</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>The daily challenge and leaderboard</span></li>
+</ul>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: #111827">Plus, for 14 days:</p>
+<ul style="list-style: none; margin: 0; margin-top: -10px; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>All your programme's courses</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>One practice paper per course</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>3 Quiz Builder quizzes from the full bank</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Exam modes</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #6b7280"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M4 8h8"></path></svg><span>No mock exams or offline packs</span></li>
+</ul>
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px">
+<a href="#" style="display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 8px; background: #1e3a5f; color: #ffffff; font-size: 14px; font-weight: 600; text-decoration: none">Start your 14-day trial</a>
+<p style="margin: 0; font-size: 12px; line-height: 16px; color: #6b7280; text-align: center">After 14 days, Free forever stays.</p>
+</div>
+</article>
+
+<article style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #111827">Standard Prep</h3>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280">Your whole programme, at your own pace</p>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 8px; flex-wrap: wrap"><span style="font-size: 36px; line-height: 40px; font-weight: 700; letter-spacing: -0.02em; color: #111827">GHS [PRICE]</span><span style="font-size: 14px; line-height: 20px; color: #6b7280">for 365 days</span></div>
+</div>
+<div style="background: #edf6f5; border-radius: 8px; padding: 10px 12px; display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 18px; color: #235f56"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 1px"><path d="M5.2 5.5C3.4 5.5 2 6.6 2 8s1.4 2.5 3.2 2.5C7.8 10.5 8.2 5.5 10.8 5.5 12.6 5.5 14 6.6 14 8s-1.4 2.5-3.2 2.5C8.2 10.5 7.8 5.5 5.2 5.5z"></path></svg><span><strong style="font-weight: 700">Free forever</strong> included, and kept when the package ends</span></div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: #111827">While your package lasts:</p>
+<ul style="list-style: none; margin: 0; margin-top: -10px; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>All your programme's courses</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Every practice paper</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Unlimited Quiz Builder</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Exam modes</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Offline packs, 5 per course</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Review and retake any sitting</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #6b7280"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M4 8h8"></path></svg><span>Mock exams come with Premium Prep</span></li>
+</ul>
+<a href="#" style="margin-top: auto; display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 8px; background: #ffffff; border: 1px solid #1e3a5f; color: #1e3a5f; font-size: 14px; font-weight: 600; text-decoration: none">See packages</a>
+</article>
+
+<article style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #111827">Premium Prep</h3>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280">For the exam: mocks and the channel</p>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 8px; flex-wrap: wrap"><span style="font-size: 36px; line-height: 40px; font-weight: 700; letter-spacing: -0.02em; color: #111827">GHS [PRICE]</span><span style="font-size: 14px; line-height: 20px; color: #6b7280">for 240 days</span></div>
+</div>
+<div style="background: #edf6f5; border-radius: 8px; padding: 10px 12px; display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 18px; color: #235f56"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 1px"><path d="M5.2 5.5C3.4 5.5 2 6.6 2 8s1.4 2.5 3.2 2.5C7.8 10.5 8.2 5.5 10.8 5.5 12.6 5.5 14 6.6 14 8s-1.4 2.5-3.2 2.5C8.2 10.5 7.8 5.5 5.2 5.5z"></path></svg><span><strong style="font-weight: 700">Free forever</strong> included, and kept when the package ends</span></div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: #111827">For 240 days:</p>
+<ul style="list-style: none; margin: 0; margin-top: -10px; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Everything in Standard Prep</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Mock exams</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>The premium channel for your programme</span></li>
+</ul>
+<a href="#" style="margin-top: auto; display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 8px; background: #ffffff; border: 1px solid #1e3a5f; color: #1e3a5f; font-size: 14px; font-weight: 600; text-decoration: none">See Premium Prep</a>
+</article>
+
+</div>
+
+<div style="display: flex; align-items: center; justify-content: center; gap: 8px 20px; flex-wrap: wrap; padding: 12px 24px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 14px; line-height: 20px; color: #111827; text-align: center">
+<span><strong style="font-weight: 600">Only need one course?</strong> Take it on its own, as Standard Prep or Premium Prep, from GHS [PRICE].</span>
+<a href="#" style="display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; color: #235f56; text-decoration: underline">See single courses</a>
+</div>
+</div>
+</div>
+<div class="design-label">Phone</div>
+<div class="frame phone">
+<div style="width: 375px; box-sizing: border-box; padding: 32px 16px; background: #f9fafb; font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif; color: #111827; display: flex; flex-direction: column; gap: 24px">
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center">
+<span style="font-size: 12px; line-height: 16px; font-weight: 600; color: #235f56; background: #edf6f5; border-radius: 999px; padding: 4px 12px">Plans</span>
+<h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 700; letter-spacing: -0.02em; color: #111827">Start your 14-day trial, then free practice, forever</h2>
+<p style="margin: 0; font-size: 15px; line-height: 22px; color: #6b7280">No payment needed to start. You pick your programme when you register.</p>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 16px">
+
+<article style="background: #ffffff; border: 2px solid #2d7d72; border-radius: 12px; padding: 19px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px"><h3 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #111827">Trial</h3><span style="font-size: 12px; line-height: 16px; font-weight: 600; color: #235f56; background: #edf6f5; border-radius: 999px; padding: 3px 10px">Start here</span></div>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280">Try the real question bank</p>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 6px"><span style="font-size: 32px; line-height: 38px; font-weight: 700; letter-spacing: -0.02em; color: #111827">GHS 0</span><span style="font-size: 14px; line-height: 20px; color: #6b7280">for 14 days</span></div>
+</div>
+<div style="background: #edf6f5; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center; gap: 8px; font-size: 13px; line-height: 18px; font-weight: 700; color: #235f56"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M5.2 5.5C3.4 5.5 2 6.6 2 8s1.4 2.5 3.2 2.5C7.8 10.5 8.2 5.5 10.8 5.5 12.6 5.5 14 6.6 14 8s-1.4 2.5-3.2 2.5C8.2 10.5 7.8 5.5 5.2 5.5z"></path></svg><span>Free forever</span></div>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Quizzes from the free questions in each of your courses</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Learning and Untimed modes</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Your history, reports and streak</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>The daily challenge and leaderboard</span></li>
+</ul>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: #111827">Plus, for 14 days:</p>
+<ul style="list-style: none; margin: 0; margin-top: -8px; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>All your programme's courses</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>One practice paper per course</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>3 Quiz Builder quizzes from the full bank</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Exam modes</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #6b7280"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M4 8h8"></path></svg><span>No mock exams or offline packs</span></li>
+</ul>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<a href="#" style="display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 8px; background: #1e3a5f; color: #ffffff; font-size: 14px; font-weight: 600; text-decoration: none">Start your 14-day trial</a>
+<p style="margin: 0; font-size: 12px; line-height: 16px; color: #6b7280; text-align: center">After 14 days, Free forever stays.</p>
+</div>
+</article>
+
+<article style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #111827">Standard Prep</h3>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280">Your whole programme, at your own pace</p>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 6px; flex-wrap: wrap"><span style="font-size: 32px; line-height: 38px; font-weight: 700; letter-spacing: -0.02em; color: #111827">GHS [PRICE]</span><span style="font-size: 14px; line-height: 20px; color: #6b7280">for 365 days</span></div>
+</div>
+<div style="background: #edf6f5; border-radius: 8px; padding: 10px 12px; display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 18px; color: #235f56"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 1px"><path d="M5.2 5.5C3.4 5.5 2 6.6 2 8s1.4 2.5 3.2 2.5C7.8 10.5 8.2 5.5 10.8 5.5 12.6 5.5 14 6.6 14 8s-1.4 2.5-3.2 2.5C8.2 10.5 7.8 5.5 5.2 5.5z"></path></svg><span><strong style="font-weight: 700">Free forever</strong> included, and kept when the package ends</span></div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: #111827">While your package lasts:</p>
+<ul style="list-style: none; margin: 0; margin-top: -8px; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>All your programme's courses</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Every practice paper</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Unlimited Quiz Builder</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Exam modes</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Offline packs, 5 per course</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Review and retake any sitting</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #6b7280"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M4 8h8"></path></svg><span>Mock exams come with Premium Prep</span></li>
+</ul>
+<a href="#" style="display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 8px; background: #ffffff; border: 1px solid #1e3a5f; color: #1e3a5f; font-size: 14px; font-weight: 600; text-decoration: none">See packages</a>
+</article>
+
+<article style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #111827">Premium Prep</h3>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280">For the exam: mocks and the channel</p>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 6px; flex-wrap: wrap"><span style="font-size: 32px; line-height: 38px; font-weight: 700; letter-spacing: -0.02em; color: #111827">GHS [PRICE]</span><span style="font-size: 14px; line-height: 20px; color: #6b7280">for 240 days</span></div>
+</div>
+<div style="background: #edf6f5; border-radius: 8px; padding: 10px 12px; display: flex; align-items: flex-start; gap: 8px; font-size: 13px; line-height: 18px; color: #235f56"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 1px"><path d="M5.2 5.5C3.4 5.5 2 6.6 2 8s1.4 2.5 3.2 2.5C7.8 10.5 8.2 5.5 10.8 5.5 12.6 5.5 14 6.6 14 8s-1.4 2.5-3.2 2.5C8.2 10.5 7.8 5.5 5.2 5.5z"></path></svg><span><strong style="font-weight: 700">Free forever</strong> included, and kept when the package ends</span></div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: #111827">For 240 days:</p>
+<ul style="list-style: none; margin: 0; margin-top: -8px; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Everything in Standard Prep</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Mock exams</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>The premium channel for your programme</span></li>
+</ul>
+<a href="#" style="display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 8px; background: #ffffff; border: 1px solid #1e3a5f; color: #1e3a5f; font-size: 14px; font-weight: 600; text-decoration: none">See Premium Prep</a>
+</article>
+
+<div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 14px 20px 6px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 14px; line-height: 20px; color: #111827">
+<span><strong style="font-weight: 600">Only need one course?</strong> Take it on its own, as Standard Prep or Premium Prep, from GHS [PRICE].</span>
+<a href="#" style="display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; color: #235f56; text-decoration: underline">See single courses</a>
+</div>
+
+</div>
+</div>
+</div>
+</section>
+
+<section class="design" id="design-a">
+<h3>A · A Free card with no button, then the trial and packages (earlier wording)</h3>
+<div class="design-label">Computer</div>
+<div class="frame">
+<div style="width: 1280px; box-sizing: border-box; padding: 64px 80px; background: #f9fafb; font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif; color: #111827; display: flex; flex-direction: column; gap: 40px">
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center">
+<span style="font-size: 12px; line-height: 16px; font-weight: 600; color: #235f56; background: #edf6f5; border-radius: 999px; padding: 4px 12px">Plans</span>
+<h2 style="margin: 0; font-size: 28px; line-height: 34px; font-weight: 700; letter-spacing: -0.02em; color: #111827">Start your 14-day trial, then free practice, forever</h2>
+<p style="margin: 0; font-size: 15px; line-height: 22px; color: #6b7280; max-width: 560px">No payment needed to start. You pick your programme when you register.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; align-items: stretch">
+
+<article style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #111827">Free</h3>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280">On every account, for good</p>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 8px"><span style="font-size: 36px; line-height: 40px; font-weight: 700; letter-spacing: -0.02em; color: #111827">GHS 0</span><span style="font-size: 14px; line-height: 20px; color: #6b7280">forever</span></div>
+</div>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Free practice questions in every course of your programme</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Learning and Untimed practice modes</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>The daily challenge and your streak</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Your scores and history, kept</span></li>
+</ul>
+<p style="margin: 0; margin-top: auto; padding-top: 16px; border-top: 1px solid #e5e7eb; font-size: 13px; line-height: 18px; color: #6b7280">No sign-up of its own. Every account keeps Free when its trial or package ends.</p>
+</article>
+
+<article style="background: #ffffff; border: 2px solid #2d7d72; border-radius: 12px; padding: 23px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px"><h3 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #111827">Trial</h3><span style="font-size: 12px; line-height: 16px; font-weight: 600; color: #235f56; background: #edf6f5; border-radius: 999px; padding: 3px 10px">Start here</span></div>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280">Try the real question bank</p>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 8px"><span style="font-size: 36px; line-height: 40px; font-weight: 700; letter-spacing: -0.02em; color: #111827">GHS 0</span><span style="font-size: 14px; line-height: 20px; color: #6b7280">for 14 days</span></div>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: #111827">Everything in Free, plus:</p>
+<ul style="list-style: none; margin: 0; margin-top: -10px; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>One practice paper per course</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>3 Quiz Builder quizzes</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Exam modes: Free Navigation and Sequential</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #6b7280"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M4 8h8"></path></svg><span>No mock exams or offline packs</span></li>
+</ul>
+<a href="#" style="margin-top: auto; display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 8px; background: #1e3a5f; color: #ffffff; font-size: 14px; font-weight: 600; text-decoration: none">Start your 14-day trial</a>
+</article>
+
+<article style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #111827">Full Access</h3>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280">Every course in your programme</p>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 8px"><span style="font-size: 14px; line-height: 20px; color: #6b7280">from</span><span style="font-size: 36px; line-height: 40px; font-weight: 700; letter-spacing: -0.02em; color: #111827">GHS [PRICE]</span></div>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: #111827">Everything in the trial, plus:</p>
+<ul style="list-style: none; margin: 0; margin-top: -10px; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Every practice paper</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Unlimited Quiz Builder</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Offline packs, 5 per course</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #6b7280"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M4 8h8"></path></svg><span>Mock exams come with Premium Prep</span></li>
+</ul>
+<a href="#" style="margin-top: auto; display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 8px; background: #ffffff; border: 1px solid #1e3a5f; color: #1e3a5f; font-size: 14px; font-weight: 600; text-decoration: none">See packages</a>
+</article>
+
+<article style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #111827">Premium Prep</h3>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280">For the exam: mocks and the channel</p>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 8px; flex-wrap: wrap"><span style="font-size: 36px; line-height: 40px; font-weight: 700; letter-spacing: -0.02em; color: #111827">GHS [PRICE]</span><span style="font-size: 14px; line-height: 20px; color: #6b7280">for 240 days</span></div>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: #111827">Everything in Full Access, plus:</p>
+<ul style="list-style: none; margin: 0; margin-top: -10px; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Mock exams</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>The premium channel for your programme</span></li>
+</ul>
+<a href="#" style="margin-top: auto; display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 8px; background: #ffffff; border: 1px solid #1e3a5f; color: #1e3a5f; font-size: 14px; font-weight: 600; text-decoration: none">See Premium Prep</a>
+</article>
+
+</div>
+</div>
+</div>
+<div class="design-label">Phone</div>
+<div class="frame phone">
+<div style="width: 375px; box-sizing: border-box; padding: 32px 16px; background: #f9fafb; font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif; color: #111827; display: flex; flex-direction: column; gap: 24px">
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center">
+<span style="font-size: 12px; line-height: 16px; font-weight: 600; color: #235f56; background: #edf6f5; border-radius: 999px; padding: 4px 12px">Plans</span>
+<h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 700; letter-spacing: -0.02em; color: #111827">Start your 14-day trial, then free practice, forever</h2>
+<p style="margin: 0; font-size: 15px; line-height: 22px; color: #6b7280">No payment needed to start. You pick your programme when you register.</p>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 16px">
+
+<article style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #111827">Free</h3>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280">On every account, for good</p>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 6px"><span style="font-size: 32px; line-height: 38px; font-weight: 700; letter-spacing: -0.02em; color: #111827">GHS 0</span><span style="font-size: 14px; line-height: 20px; color: #6b7280">forever</span></div>
+</div>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Free practice questions in every course of your programme</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Learning and Untimed practice modes</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>The daily challenge and your streak</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Your scores and history, kept</span></li>
+</ul>
+<p style="margin: 0; padding-top: 14px; border-top: 1px solid #e5e7eb; font-size: 13px; line-height: 18px; color: #6b7280">No sign-up of its own. Every account keeps Free when its trial or package ends.</p>
+</article>
+
+<article style="background: #ffffff; border: 2px solid #2d7d72; border-radius: 12px; padding: 19px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px"><h3 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #111827">Trial</h3><span style="font-size: 12px; line-height: 16px; font-weight: 600; color: #235f56; background: #edf6f5; border-radius: 999px; padding: 3px 10px">Start here</span></div>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280">Try the real question bank</p>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 6px"><span style="font-size: 32px; line-height: 38px; font-weight: 700; letter-spacing: -0.02em; color: #111827">GHS 0</span><span style="font-size: 14px; line-height: 20px; color: #6b7280">for 14 days</span></div>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: #111827">Everything in Free, plus:</p>
+<ul style="list-style: none; margin: 0; margin-top: -8px; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>One practice paper per course</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>3 Quiz Builder quizzes</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Exam modes: Free Navigation and Sequential</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #6b7280"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M4 8h8"></path></svg><span>No mock exams or offline packs</span></li>
+</ul>
+<a href="#" style="display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 8px; background: #1e3a5f; color: #ffffff; font-size: 14px; font-weight: 600; text-decoration: none">Start your 14-day trial</a>
+</article>
+
+<article style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #111827">Full Access</h3>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280">Every course in your programme</p>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 6px"><span style="font-size: 14px; line-height: 20px; color: #6b7280">from</span><span style="font-size: 32px; line-height: 38px; font-weight: 700; letter-spacing: -0.02em; color: #111827">GHS [PRICE]</span></div>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: #111827">Everything in the trial, plus:</p>
+<ul style="list-style: none; margin: 0; margin-top: -8px; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Every practice paper</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Unlimited Quiz Builder</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Offline packs, 5 per course</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #6b7280"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M4 8h8"></path></svg><span>Mock exams come with Premium Prep</span></li>
+</ul>
+<a href="#" style="display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 8px; background: #ffffff; border: 1px solid #1e3a5f; color: #1e3a5f; font-size: 14px; font-weight: 600; text-decoration: none">See packages</a>
+</article>
+
+<article style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #111827">Premium Prep</h3>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280">For the exam: mocks and the channel</p>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 6px; flex-wrap: wrap"><span style="font-size: 32px; line-height: 38px; font-weight: 700; letter-spacing: -0.02em; color: #111827">GHS [PRICE]</span><span style="font-size: 14px; line-height: 20px; color: #6b7280">for 240 days</span></div>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: #111827">Everything in Full Access, plus:</p>
+<ul style="list-style: none; margin: 0; margin-top: -8px; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Mock exams</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>The premium channel for your programme</span></li>
+</ul>
+<a href="#" style="display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 8px; background: #ffffff; border: 1px solid #1e3a5f; color: #1e3a5f; font-size: 14px; font-weight: 600; text-decoration: none">See Premium Prep</a>
+</article>
+
+</div>
+</div>
+</div>
+</section>
+
+<section class="design" id="design-b">
+<h3>B · Free forever inside every card (earlier wording)</h3>
+<div class="design-label">Computer</div>
+<div class="frame">
+<div style="width: 1280px; box-sizing: border-box; padding: 64px 80px; background: #f9fafb; font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif; color: #111827; display: flex; flex-direction: column; gap: 40px">
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center">
+<span style="font-size: 12px; line-height: 16px; font-weight: 600; color: #235f56; background: #edf6f5; border-radius: 999px; padding: 4px 12px">Plans</span>
+<h2 style="margin: 0; font-size: 28px; line-height: 34px; font-weight: 700; letter-spacing: -0.02em; color: #111827">Start your 14-day trial, then free practice, forever</h2>
+<p style="margin: 0; font-size: 15px; line-height: 22px; color: #6b7280; max-width: 560px">No payment needed to start. You pick your programme when you register.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; align-items: stretch">
+
+<article style="background: #ffffff; border: 2px solid #2d7d72; border-radius: 12px; padding: 23px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px"><h3 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #111827">Trial</h3><span style="font-size: 12px; line-height: 16px; font-weight: 600; color: #235f56; background: #edf6f5; border-radius: 999px; padding: 3px 10px">Start here</span></div>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280">Try the real question bank</p>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 8px"><span style="font-size: 36px; line-height: 40px; font-weight: 700; letter-spacing: -0.02em; color: #111827">GHS 0</span><span style="font-size: 14px; line-height: 20px; color: #6b7280">for 14 days</span></div>
+</div>
+<div style="background: #edf6f5; border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 8px; font-size: 13px; line-height: 18px; font-weight: 700; color: #235f56"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M5.2 5.5C3.4 5.5 2 6.6 2 8s1.4 2.5 3.2 2.5C7.8 10.5 8.2 5.5 10.8 5.5 12.6 5.5 14 6.6 14 8s-1.4 2.5-3.2 2.5C8.2 10.5 7.8 5.5 5.2 5.5z"></path></svg><span>Free forever</span></div>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Free practice questions in every course of your programme</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Learning and Untimed practice modes</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>The daily challenge and your streak</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Your scores and history, kept</span></li>
+</ul>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: #111827">Plus, for 14 days:</p>
+<ul style="list-style: none; margin: 0; margin-top: -10px; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>One practice paper per course</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>3 Quiz Builder quizzes</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Exam modes: Free Navigation and Sequential</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #6b7280"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M4 8h8"></path></svg><span>No mock exams or offline packs</span></li>
+</ul>
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px">
+<a href="#" style="display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 8px; background: #1e3a5f; color: #ffffff; font-size: 14px; font-weight: 600; text-decoration: none">Start your 14-day trial</a>
+<p style="margin: 0; font-size: 12px; line-height: 16px; color: #6b7280; text-align: center">After 14 days, Free forever stays.</p>
+</div>
+</article>
+
+<article style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #111827">Full Access</h3>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280">Every course in your programme</p>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 8px"><span style="font-size: 14px; line-height: 20px; color: #6b7280">from</span><span style="font-size: 36px; line-height: 40px; font-weight: 700; letter-spacing: -0.02em; color: #111827">GHS [PRICE]</span></div>
+</div>
+<div style="background: #edf6f5; border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 8px; font-size: 13px; line-height: 18px; font-weight: 700; color: #235f56"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M5.2 5.5C3.4 5.5 2 6.6 2 8s1.4 2.5 3.2 2.5C7.8 10.5 8.2 5.5 10.8 5.5 12.6 5.5 14 6.6 14 8s-1.4 2.5-3.2 2.5C8.2 10.5 7.8 5.5 5.2 5.5z"></path></svg><span>Free forever</span></div>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Free practice questions in every course of your programme</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Learning and Untimed practice modes</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>The daily challenge and your streak</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Your scores and history, kept</span></li>
+</ul>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: #111827">Plus, while your package lasts:</p>
+<ul style="list-style: none; margin: 0; margin-top: -10px; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Every practice paper</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Unlimited Quiz Builder</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Exam modes: Free Navigation and Sequential</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Offline packs, 5 per course</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #6b7280"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M4 8h8"></path></svg><span>Mock exams come with Premium Prep</span></li>
+</ul>
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px">
+<a href="#" style="display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 8px; background: #ffffff; border: 1px solid #1e3a5f; color: #1e3a5f; font-size: 14px; font-weight: 600; text-decoration: none">See packages</a>
+<p style="margin: 0; font-size: 12px; line-height: 16px; color: #6b7280; text-align: center">When it ends, Free forever stays.</p>
+</div>
+</article>
+
+<article style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #111827">Premium Prep</h3>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280">For the exam: mocks and the channel</p>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 8px; flex-wrap: wrap"><span style="font-size: 36px; line-height: 40px; font-weight: 700; letter-spacing: -0.02em; color: #111827">GHS [PRICE]</span><span style="font-size: 14px; line-height: 20px; color: #6b7280">for 240 days</span></div>
+</div>
+<div style="background: #edf6f5; border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 8px; font-size: 13px; line-height: 18px; font-weight: 700; color: #235f56"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M5.2 5.5C3.4 5.5 2 6.6 2 8s1.4 2.5 3.2 2.5C7.8 10.5 8.2 5.5 10.8 5.5 12.6 5.5 14 6.6 14 8s-1.4 2.5-3.2 2.5C8.2 10.5 7.8 5.5 5.2 5.5z"></path></svg><span>Free forever</span></div>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Free practice questions in every course of your programme</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Learning and Untimed practice modes</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>The daily challenge and your streak</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Your scores and history, kept</span></li>
+</ul>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: #111827">Plus, for 240 days:</p>
+<ul style="list-style: none; margin: 0; margin-top: -10px; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Everything in Full Access</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Mock exams</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>The premium channel for your programme</span></li>
+</ul>
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px">
+<a href="#" style="display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 8px; background: #ffffff; border: 1px solid #1e3a5f; color: #1e3a5f; font-size: 14px; font-weight: 600; text-decoration: none">See Premium Prep</a>
+<p style="margin: 0; font-size: 12px; line-height: 16px; color: #6b7280; text-align: center">When it ends, Free forever stays.</p>
+</div>
+</article>
+
+</div>
+</div>
+</div>
+<div class="design-label">Phone</div>
+<div class="frame phone">
+<div style="width: 375px; box-sizing: border-box; padding: 32px 16px; background: #f9fafb; font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif; color: #111827; display: flex; flex-direction: column; gap: 24px">
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center">
+<span style="font-size: 12px; line-height: 16px; font-weight: 600; color: #235f56; background: #edf6f5; border-radius: 999px; padding: 4px 12px">Plans</span>
+<h2 style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 700; letter-spacing: -0.02em; color: #111827">Start your 14-day trial, then free practice, forever</h2>
+<p style="margin: 0; font-size: 15px; line-height: 22px; color: #6b7280">No payment needed to start. You pick your programme when you register.</p>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 16px">
+
+<article style="background: #ffffff; border: 2px solid #2d7d72; border-radius: 12px; padding: 19px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px"><h3 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #111827">Trial</h3><span style="font-size: 12px; line-height: 16px; font-weight: 600; color: #235f56; background: #edf6f5; border-radius: 999px; padding: 3px 10px">Start here</span></div>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280">Try the real question bank</p>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 6px"><span style="font-size: 32px; line-height: 38px; font-weight: 700; letter-spacing: -0.02em; color: #111827">GHS 0</span><span style="font-size: 14px; line-height: 20px; color: #6b7280">for 14 days</span></div>
+</div>
+<div style="background: #edf6f5; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center; gap: 8px; font-size: 13px; line-height: 18px; font-weight: 700; color: #235f56"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M5.2 5.5C3.4 5.5 2 6.6 2 8s1.4 2.5 3.2 2.5C7.8 10.5 8.2 5.5 10.8 5.5 12.6 5.5 14 6.6 14 8s-1.4 2.5-3.2 2.5C8.2 10.5 7.8 5.5 5.2 5.5z"></path></svg><span>Free forever</span></div>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Free practice questions in every course of your programme</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Learning and Untimed practice modes</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>The daily challenge and your streak</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Your scores and history, kept</span></li>
+</ul>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: #111827">Plus, for 14 days:</p>
+<ul style="list-style: none; margin: 0; margin-top: -8px; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>One practice paper per course</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>3 Quiz Builder quizzes</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Exam modes: Free Navigation and Sequential</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #6b7280"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M4 8h8"></path></svg><span>No mock exams or offline packs</span></li>
+</ul>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<a href="#" style="display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 8px; background: #1e3a5f; color: #ffffff; font-size: 14px; font-weight: 600; text-decoration: none">Start your 14-day trial</a>
+<p style="margin: 0; font-size: 12px; line-height: 16px; color: #6b7280; text-align: center">After 14 days, Free forever stays.</p>
+</div>
+</article>
+
+<article style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #111827">Full Access</h3>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280">Every course in your programme</p>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 6px"><span style="font-size: 14px; line-height: 20px; color: #6b7280">from</span><span style="font-size: 32px; line-height: 38px; font-weight: 700; letter-spacing: -0.02em; color: #111827">GHS [PRICE]</span></div>
+</div>
+<div style="background: #edf6f5; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center; gap: 8px; font-size: 13px; line-height: 18px; font-weight: 700; color: #235f56"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M5.2 5.5C3.4 5.5 2 6.6 2 8s1.4 2.5 3.2 2.5C7.8 10.5 8.2 5.5 10.8 5.5 12.6 5.5 14 6.6 14 8s-1.4 2.5-3.2 2.5C8.2 10.5 7.8 5.5 5.2 5.5z"></path></svg><span>Free forever</span></div>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Free practice questions in every course of your programme</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Learning and Untimed practice modes</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>The daily challenge and your streak</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Your scores and history, kept</span></li>
+</ul>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: #111827">Plus, while your package lasts:</p>
+<ul style="list-style: none; margin: 0; margin-top: -8px; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Every practice paper</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Unlimited Quiz Builder</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Exam modes: Free Navigation and Sequential</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Offline packs, 5 per course</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #6b7280"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M4 8h8"></path></svg><span>Mock exams come with Premium Prep</span></li>
+</ul>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<a href="#" style="display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 8px; background: #ffffff; border: 1px solid #1e3a5f; color: #1e3a5f; font-size: 14px; font-weight: 600; text-decoration: none">See packages</a>
+<p style="margin: 0; font-size: 12px; line-height: 16px; color: #6b7280; text-align: center">When it ends, Free forever stays.</p>
+</div>
+</article>
+
+<article style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #111827">Premium Prep</h3>
+<p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280">For the exam: mocks and the channel</p>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 6px; flex-wrap: wrap"><span style="font-size: 32px; line-height: 38px; font-weight: 700; letter-spacing: -0.02em; color: #111827">GHS [PRICE]</span><span style="font-size: 14px; line-height: 20px; color: #6b7280">for 240 days</span></div>
+</div>
+<div style="background: #edf6f5; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center; gap: 8px; font-size: 13px; line-height: 18px; font-weight: 700; color: #235f56"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M5.2 5.5C3.4 5.5 2 6.6 2 8s1.4 2.5 3.2 2.5C7.8 10.5 8.2 5.5 10.8 5.5 12.6 5.5 14 6.6 14 8s-1.4 2.5-3.2 2.5C8.2 10.5 7.8 5.5 5.2 5.5z"></path></svg><span>Free forever</span></div>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Free practice questions in every course of your programme</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Learning and Untimed practice modes</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>The daily challenge and your streak</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Your scores and history, kept</span></li>
+</ul>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 18px; font-weight: 600; color: #111827">Plus, for 240 days:</p>
+<ul style="list-style: none; margin: 0; margin-top: -8px; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Everything in Full Access</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>Mock exams</span></li>
+<li style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 20px; color: #111827"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#2d7d72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M3 8.5l3 3 7-7"></path></svg><span>The premium channel for your programme</span></li>
+</ul>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<a href="#" style="display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 8px; background: #ffffff; border: 1px solid #1e3a5f; color: #1e3a5f; font-size: 14px; font-weight: 600; text-decoration: none">See Premium Prep</a>
+<p style="margin: 0; font-size: 12px; line-height: 16px; color: #6b7280; text-align: center">When it ends, Free forever stays.</p>
+</div>
+</article>
+
+</div>
+</div>
+</div>
+</section>
+
+</main>
+</body>
+</html>
