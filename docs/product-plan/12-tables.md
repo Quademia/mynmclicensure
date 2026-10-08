@@ -378,7 +378,11 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `ts_iso` | When made |
 | `started_utc`, `ended_utc` | An exam's clock: started, ended |
 
-- *To build (04 G2):* a new `source` for the daily challenge.
+- *To build (04 G2), awaiting Sam's tick:* a `source` value
+  `challenge` and a mode of its own (Untimed's screen, timed by the
+  server from Start to Submit, closed at its limit); a challenge sitting
+  names the day's draw, and one per student per day. Why: the daily
+  challenge (Sam, 2026-10-08).
 - Browser: the owner and an admin read; every write through the
   database's own functions.
 
@@ -506,6 +510,9 @@ table by table as each is next changed (AGENTS.md rule 9).
   a typed list of known settings with their bounds; the unused
   `builder_default_questions` dropped. Why: today any signed-in account
   reads every setting, and any text is accepted for any key.
+- *To build (04 G2), awaiting Sam's tick:* a setting for the daily
+  challenge's number of questions, 5 to start; its time limit uses
+  `builder_minutes_per_question` (Sam, 2026-10-08).
 - Browser: signed-in read; admin write. *Old defaults.*
 
 ### `migrations` — the record of database changes
@@ -525,6 +532,11 @@ table by table as each is next changed (AGENTS.md rule 9).
 - **Question reports** (06.2) — needs Sam's tick at the build.
 - **The email outbox** (10.2) — needs Sam's tick at the build.
 - **The badges already shown** (05 G3) — needs Sam's tick at the build.
+- **The daily challenge's draw** (04 G2) — *awaiting Sam's tick*: one
+  row per programme per day — the date, the programme, the course, the
+  questions in order, and any voided — made by the first student to
+  open that day's challenge and fixed after. Read only through the
+  database's own functions; no browser access.
 
 ## The database's own functions
 

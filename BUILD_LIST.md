@@ -75,7 +75,7 @@ before then, and the old list's history, is in
 ## [04 Practice](docs/product-plan/04-practice.md)
 
 - ⬜ Q21 Practice Papers — the name, "Practice Paper N", the course in full above, the address
-- ⬜ G2 The daily challenge — five a day per programme from the free set, one course a day
+- ⬜ G2 The daily challenge — a set number a day per programme (config, 5), one course a day in turn, the draw stored, its own mode (planned 10-08; storage to tick; fairness open)
 - ⬜ Q19 The admin's preview says Preview — on the card and in the sitting
 - ⬜ Q20 Preview this paper — an editor button: questions, answers, rationales, no sitting
 - ⬜ Q7 Select-all partial credit — the rule first (open), then the three-state display

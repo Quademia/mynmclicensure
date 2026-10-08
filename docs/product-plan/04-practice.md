@@ -48,6 +48,8 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
     *Sequential* (a wall clock, one question at a time, an answer
     required to move on, no going back, no flags; the lock held in the
     database).
+- The daily challenge plays in a fifth mode of its own, never offered
+  elsewhere (below; Sam, 2026-10-08).
 - The admin ticks which modes a paper or mock allows (at least one);
   the lists show a section per allowed mode; the builder offers all
   four. One mode table drives every screen.
@@ -113,14 +115,36 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
 
 ### The daily challenge *(to build: G2, before the leaderboard)*
 
-- **Five questions a day per programme**, the same five for everyone in
-  it — free, trial and paid — drawn from the free set (03) by a seed
-  from the date, played in the instant runner (Sam, 2026-09-26).
-- **One course a day**, the programme's courses in turn (Sam,
-  2026-10-04); a sitting stays one course's.
-- Each day's five can be answered only that day, and once. The engaged
-  seconds are kept — time breaks a tie on the board (05). The seal
-  holds. A question may return after some months.
+Settled by Sam, 2026-10-08, replacing the 09-26 "seed from the date"
+and "instant runner", which predate the four modes.
+
+- **A set number of questions a day per programme** — an admin setting,
+  5 to start — the same for everyone in it, free, trial and paid, from
+  the free set (03). A change applies from the next day's draw.
+- **The draw, made once a day**, by the first student to open it, and
+  kept: the day, the programme, the course, the questions in order.
+  - **One course a day**, the programme's own courses in their listed
+    order, in turn. A General Paper is one of those courses only where
+    the programme has one; no draw is shared between programmes (a
+    programme may lack a General Paper or have its own).
+  - A course with fewer free questions than the day needs is skipped;
+    if none has enough, no challenge that day ("Back tomorrow").
+  - Published, free, not held by a mock; the least recently drawn
+    first, at random among equals, so a question returns as late as
+    the pool allows.
+  - The same order for everyone; the options shuffled per student.
+  - An admin may swap a question before anyone has played that day;
+    after that, void it — it leaves every score.
+- **Its own mode**: Untimed practice's screen — a clock counting up,
+  move freely, change answers until Submit, the answers and rationales
+  straight after Submit. Unlike Untimed, the time is the server's from
+  Start to Submit, leaving the page does not stop it, and the sitting
+  submits what is answered at the limit: the number of questions × the
+  builder's minutes per question (`builder_minutes_per_question`; NMC
+  questions share one pace). The start screen says the time counts
+  towards the ranking.
+- **Once a day**: one challenge sitting per student per day, counted for
+  the day it started.
 - A new kind of sitting: every list that sorts sittings by kind learns
   it.
 - A student's first challenge brings the username card (05).
@@ -173,9 +197,8 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
   questions match" and build the chips from the matches (recommended);
   B, fill subtopics as content; C, both. Sam: not now (2026-09-27).
 - **The word on screen** — "attempt", "sitting" or "session" (2026-09-20).
-- **The daily challenge**: the size of its question set and how it
-  rotates; the courses' order; whether a General Paper day is the same
-  five for every programme; shuffling options per student (a view).
+- **The daily challenge**: fairness between programmes on the school
+  board, where each programme plays its own questions (05, Open).
 - **Wording waiting for Sam** (2026-09-27): the pop-up's words, a
   resumed exam's brief, the help page's "Study and Exam modes".
 - An admin's view of a student's report — not done, not queued (10-01).

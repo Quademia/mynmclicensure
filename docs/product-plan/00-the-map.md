@@ -77,7 +77,7 @@ Full Access stays the admin's grant (02).
 | | Practice papers | The set papers of each course (today "Fixed quizzes") |
 | | Mock exams | Timed papers in exam conditions |
 | | Quiz builder | A quiz built from chosen topics |
-| | Daily challenge — *new* | Five questions a day, one course in turn; opened from the dashboard's top card, no menu item (04 G2) |
+| | Daily challenge — *new* | A set number of questions a day (5 to start), one course in turn; opened from the dashboard's top card, no menu item (04 G2) |
 | | The sitting | Answering questions, in four modes |
 | | Report | One sitting's debrief: what to fix next |
 | Progress | Learning history | Every past sitting: resume, review, retake |

@@ -56,8 +56,9 @@ Settled by Sam, 2026-10-04.
   and a "your rank" line on the dashboard's challenge card that opens it
   (00, The menu).
 
-- **From the daily challenge only** — the same five a day for free,
-  trial and paid students. At most 5 a day, 35 a week; the week Monday
+- **From the daily challenge only** — the same questions a day for free,
+  trial and paid students: at most the day's number (an admin setting,
+  5 to start; 04) a day; the week Monday
   to Sunday (UTC); the best 6 of the 7 days count.
 - **Order**: right answers first, then the quicker time — the phone's
   engaged seconds, so a slow network costs nobody. Speed adds no points
@@ -134,6 +135,9 @@ Settled by Sam, 2026-10-04.
   before anyone gets a name.
 - When to build G1a — now with a plain dashboard card, or with the
   dashboard's redesign; and where the streak shows.
+- **Fairness between programmes** on the school board: every programme
+  of a school is on one board, but each plays its own daily questions
+  (Sam, 2026-10-08: to be talked through on its own).
 - The badge milestones and the art set.
 - The percentile's threshold (about 30) — set at the build.
 - Later, parked (Sam, 2026-10-04): days left to the exam (needs the
