@@ -118,7 +118,8 @@ opens it (00, The menu).
   raw word "mock".
 
 ### Leaderboard
-- My school first — the top 10 and the student's own rank, privately;
+- My school (in the student's programme) first — the top 10 and the
+  student's own rank, privately;
   my programme — the top 3 and the neighbours; schools — "N more players
   and your school enters the board"; Share on WhatsApp; usernames and
   animals only (05).

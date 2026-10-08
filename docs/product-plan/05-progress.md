@@ -60,18 +60,22 @@ Settled by Sam, 2026-10-04.
   trial and paid students: at most the day's number (an admin setting,
   5 to start; 04) a day; the week Monday
   to Sunday (UTC); the best 6 of the 7 days count.
-- **Order**: right answers first, then the quicker time — the phone's
-  engaged seconds, so a slow network costs nobody. Speed adds no points
-  of its own.
+- **Order**: right answers first, then the quicker time — the server's
+  time from Start to Submit, the challenge's own mode (04; Sam,
+  2026-10-08, replacing the phone's engaged seconds, which leaving the
+  page stopped). Speed adds no points of its own.
+- **Every board is one programme's** (Sam, 2026-10-08): each programme
+  plays its own questions, so only students who played the same ones are
+  ranked together.
 - **Three views:**
-  - **My school**, shown first — one board per school, every programme
-    together. The top 10 are public; the student's own rank is private
-    ("You: 41st of 58").
+  - **My school**, shown first — the student's school and programme
+    ("St Mary's · RN"). The top 10 are public; the student's own rank is
+    private ("You: 41st of 58").
   - **My programme** — the top 3, plus the two above and two below the
     student.
-  - **Schools** — the average of each school's best 10; a school with
-    fewer shows "N more players and your school enters the board". Only
-    school names show.
+  - **Schools** — per programme ("RN schools"): the average of each
+    school's best 10 in it; a school with fewer shows "N more players
+    and your school enters the board". Only school names show.
 - Points count for the school the student was in when they earned them.
   A student who typed in an unlisted school waits for an admin to match
   it (01).
@@ -135,9 +139,6 @@ Settled by Sam, 2026-10-04.
   before anyone gets a name.
 - When to build G1a — now with a plain dashboard card, or with the
   dashboard's redesign; and where the streak shows.
-- **Fairness between programmes** on the school board: every programme
-  of a school is on one board, but each plays its own daily questions
-  (Sam, 2026-10-08: to be talked through on its own).
 - The badge milestones and the art set.
 - The percentile's threshold (about 30) — set at the build.
 - Later, parked (Sam, 2026-10-04): days left to the exam (needs the

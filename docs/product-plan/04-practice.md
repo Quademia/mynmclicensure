@@ -197,8 +197,6 @@ and "instant runner", which predate the four modes.
   questions match" and build the chips from the matches (recommended);
   B, fill subtopics as content; C, both. Sam: not now (2026-09-27).
 - **The word on screen** — "attempt", "sitting" or "session" (2026-09-20).
-- **The daily challenge**: fairness between programmes on the school
-  board, where each programme plays its own questions (05, Open).
 - **Wording waiting for Sam** (2026-09-27): the pop-up's words, a
   resumed exam's brief, the help page's "Study and Exam modes".
 - An admin's view of a student's report — not done, not queued (10-01).

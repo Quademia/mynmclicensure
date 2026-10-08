@@ -82,7 +82,7 @@ Full Access stays the admin's grant (02).
 | | Report | One sitting's debrief: what to fix next |
 | Progress | Learning history | Every past sitting: resume, review, retake |
 | | Streak and questions mastered — *new* | A card on the dashboard, not a page (05 G1a) |
-| | Leaderboard — *new* | My school, my programme, schools; a "your rank" line on the challenge card opens it (05 G1b) |
+| | Leaderboard — *new* | My school, my programme, schools — each board one programme's; a "your rank" line on the challenge card opens it (05 G1b) |
 | | Badges — *later* | Milestones, once there are real numbers (05 G3) |
 | | Progress across sittings — *later* | Topic accuracy over time — not ruled (05 Q12) |
 | Study offline | My packs | The packs the student has made |
