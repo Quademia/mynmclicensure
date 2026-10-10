@@ -87,7 +87,8 @@ function Recap({ card, recap }: { card: Extract<TopCard, { kind: 'floor' }>; rec
         </div>
         <div className="sd-stat">
           <span className="sd-stat-num">{pct(r.correct, r.answered)}%</span>
-          <span className="sd-stat-label">correct</span>
+          {/* Of the answers given, not of the papers' questions — a sitting's own score counts its unanswered ones too (Sam, 2026-10-10: A). */}
+          <span className="sd-stat-label">of answers right</span>
         </div>
         <div className="sd-stat">
           <span className="sd-stat-num">{fmtNumber(r.quizzes)}</span>
@@ -103,7 +104,8 @@ function Recap({ card, recap }: { card: Extract<TopCard, { kind: 'floor' }>; rec
   );
 }
 
-function FreePractice() {
+/** `offer`: the package link, only when no recap above already carries one (Sam, 2026-10-10). */
+function FreePractice({ offer }: { offer: boolean }) {
   return (
     <div className="card sd-card sd-top">
       <p className="sd-label sd-label-accent">Free practice · forever</p>
@@ -112,9 +114,11 @@ function FreePractice() {
         <AppLink href={BUILDER_HREF} className="btn btn-primary">
           Build a free quiz
         </AppLink>
-        <AppLink href={PACKAGES_HREF} className="sd-link">
-          Choose a package →
-        </AppLink>
+        {offer ? (
+          <AppLink href={PACKAGES_HREF} className="sd-link">
+            Choose a package →
+          </AppLink>
+        ) : null}
       </div>
     </div>
   );
@@ -184,7 +188,7 @@ export function TopCardView({
   return (
     <>
       <Recap card={card} recap={recap} />
-      <FreePractice />
+      <FreePractice offer={!card.ended} />
     </>
   );
 }
