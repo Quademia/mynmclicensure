@@ -53,7 +53,8 @@
 .sdash .profile-nudge .pn-main { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; text-decoration: none; color: var(--badge-warning-ink); font-size: 13px; font-weight: 600; }
 .sdash .profile-nudge .pn-text { flex: 1; min-width: 0; }
 .sdash .profile-nudge .pn-cta { color: var(--badge-warning-ink); white-space: nowrap; }
-.sdash .profile-nudge .pn-close { background: none; border: none; color: var(--badge-warning-ink); font-size: 18px; line-height: 1; cursor: pointer; padding: 0 2px; opacity: 0.7; flex-shrink: 0; font-family: inherit; }
+/* The ✕ is a 44px square for a finger; the negative margins keep the strip its height (2026-10-10). */
+.sdash .profile-nudge .pn-close { background: none; border: none; color: var(--badge-warning-ink); font-size: 18px; line-height: 1; cursor: pointer; padding: 0; opacity: 0.7; flex-shrink: 0; font-family: inherit; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin: -13px -12px -13px -8px; }
 .sdash .profile-nudge .pn-close:hover { opacity: 1; }
 
 /* ── the page ── */
@@ -85,8 +86,10 @@
 .sd-meta { margin: 0; font-size: var(--type-meta-size); line-height: var(--type-meta-line); color: var(--ink-muted); }
 .sd-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); flex-wrap: wrap; }
 .sd-grow { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); }
-.sd-link { font-size: var(--type-ui-size); font-weight: 600; color: var(--accent); text-decoration: none; align-self: flex-start; }
+.sd-link { position: relative; font-size: var(--type-ui-size); font-weight: 600; color: var(--accent); text-decoration: none; align-self: flex-start; }
 .sd-link:hover { text-decoration: underline; }
+/* A text link's tap area reaches 44px tall without changing its look (2026-10-10). */
+.sd-link::after { content: ''; position: absolute; inset: -12px -6px; }
 .sd-wide { width: 100%; }
 .sd-empty { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-8); padding: var(--space-4) 0; }
 

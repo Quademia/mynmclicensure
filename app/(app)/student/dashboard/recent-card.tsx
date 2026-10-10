@@ -3,7 +3,9 @@
 // Recent sittings — the last five, short: what it was, the score or how
 // far it got, and one action: Resume an unfinished one, the Report of a
 // finished one (03 Q10). An abandoned one shows its state and no action.
-// "History" opens Learning History, where every sitting is.
+// "History" opens Learning History, where every sitting is. With no
+// sittings, a line and no button: the top card above always carries the
+// next step, and a paper is no door for a free student (Sam, 2026-10-10).
 
 import { AppLink } from '@/components/shell/link-pending';
 import { Icon } from '@/components/shell/icons';
@@ -29,9 +31,6 @@ export function RecentCard({ attempts, titleOf }: { attempts: AttemptListRow[]; 
       {attempts.length === 0 ? (
         <div className="sd-empty">
           <p className="sd-meta">No sittings yet — your first one will show here.</p>
-          <AppLink href="/student/fixed-quizzes" className="btn btn-outline">
-            Pick a practice paper
-          </AppLink>
         </div>
       ) : (
         <ul className="sd-list">
