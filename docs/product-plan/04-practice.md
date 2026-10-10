@@ -38,6 +38,40 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
   stats keep papers and mocks apart and show retakes and abandons
   separately.
 
+### The Quiz Builder *(to build: 04.4)*
+
+Ruled by Sam, 2026-10-11, from his canvas "Quiz Builder Redesign"
+(2026-10-09; layout C there).
+
+- **One page, sections folded**: Course · What to practise · Filters ·
+  Mode, each folded to one line saying what is chosen; the count and
+  Start pinned at the bottom. On a computer every section is open.
+  "Repeat last" on top, remembered on that device; a "Weakest topic"
+  start is later.
+- **What to practise, two ways — By topic | By keyword** (Sam: they are
+  different). By topic: the topic list, All topics, and a Find a topic
+  box that only searches the list. By keyword: a word matched from the
+  start of a word in the question, its rationale, its topic or subtopic
+  ("malar" finds malaria, "iron" not environment); "N questions contain
+  …"; the topics they sit in, to narrow — the word stays applied. Only
+  the side showing counts; switching keeps the other's choice. The
+  subtopic picker goes (free text, uneven).
+- **Filters**: Which questions — All, New to me (never answered), Got
+  wrong before (the latest answer wrong); Difficulty; Type.
+- **How many**: − / + from 5 to the builder's limit. Fewer than 5 match:
+  Start greyed, "Only 3 questions match — untick a filter or clear the
+  keyword" (04.1). The quiz is named by what was chosen: "All topics"
+  never names three topics.
+- **One builder for every status** (Sam, 2026-10-04, kept 2026-10-11):
+  the server decides once, per student and course, whatever page opened
+  it — the whole bank, the free questions only (03), or nothing; the
+  modes open; the trial's quizzes left; the banner (11).
+- **A trial student whose 3 quizzes are used** keeps building from the
+  free questions, Study modes only, until the trial ends (Sam,
+  2026-10-11: b).
+- The offline pack builder keeps today's steps until its own redesign,
+  then reuses the topic picker.
+
 ### Modes
 
 - **Four modes in two groups** (Sam, 2026-09-27; MyNclex's codes):
@@ -187,15 +221,12 @@ and "instant runner", which predate the four modes.
 - **Q7 — the partial-credit rule**: a fraction of the options;
   MyNclex's plus-and-minus with a floor of zero; or all-or-nothing kept
   for mocks.
-- **The builder's minimum of 5 questions** (Sam, 2026-09-30): what
-  happens when fewer match, where the check lives, whether packs too.
+- **The builder's minimum for packs** — the quiz builder's is 5
+  (2026-10-11); whether the pack builder takes it too, at its redesign.
 - **A timed build taking its limit from the page** (10-03, unruled) —
   its reason ("matters once points score sittings") went with points.
 - **Q15** — a "Marked" pool for the builder, marks kept across sittings
   (captured 2026-09-26, never ruled; needs storage).
-- **Q16** — the keyword step never says what matched: A, say "N
-  questions match" and build the chips from the matches (recommended);
-  B, fill subtopics as content; C, both. Sam: not now (2026-09-27).
 - **The word on screen** — "attempt", "sitting" or "session" (2026-09-20).
 - **Wording waiting for Sam** (2026-09-27): the pop-up's words, a
   resumed exam's brief, the help page's "Study and Exam modes".

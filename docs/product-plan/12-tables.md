@@ -555,6 +555,11 @@ the browser can call only the first two lines.
   the most generous of two grants wins. Without a live grant it allows
   only a builder quiz (or its retake) of published free questions, in a
   course of the student's programme, in a Study mode.
+  - *To build — ticked 2026-10-11 (04.4; Sam: go, b):* a grant whose
+    builder count is used up still allows a builder quiz of published
+    free questions of that course, in a Study mode — what a free
+    account gets. Why: a trial student who used their 3 quizzes would
+    otherwise have less than a free account until the trial ends.
 - **The dashboard** (server only, reads only): `student_dashboard` — one
   student's numbers in one read: the streak (a study day is one answer,
   the UTC day; one missed day a week, Monday to Sunday, forgiven; today
@@ -566,6 +571,13 @@ the browser can call only the first two lines.
 - **Packs and the bank** (server only): `create_offline_pack` (the same
   live-grant check, and packs per course since the grant began within
   its limit), `search_question_bank_ids`, `save_quiz`.
+  - *To build — ticked 2026-10-11 (04.4; Sam: go):*
+    `search_question_bank_ids` matches the word from the start of a
+    word, not anywhere inside one ("malar" finds malaria, "iron" no
+    longer finds environment), and can answer with the free questions
+    only. Why: the keyword's count must hold only questions about the
+    word, and a free student's search only their own questions. The
+    pack builder's keyword gets the same matching.
 - **Sign-in and payments** (server only): `check_login_rate_limit`,
   `check_reset_rate_limit`, `check_payment_rate_limit`,
   `log_auth_event`, `log_reset_request`, `mark_reset_used`.

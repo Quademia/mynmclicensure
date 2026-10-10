@@ -33,8 +33,9 @@ Detail and history: `archive/product-plan/09-free-account-and-gamification.md` �
   course of their programme, in a Study mode — papers, mocks and the
   Exam modes refused. The app's own checks that let a free sitting
   through — the builder drawing only free questions for a free student,
-  its keyword search, opening a sitting, the report — come with the
-  free account's pages *(to build: F2)*.
+  its keyword search — come with the Quiz Builder's redesign *(to build:
+  04.4)*; opening a sitting and the report with the free account's pages
+  *(to build: F2)*.
 - **A free account uses the Study modes only** — Learning and Untimed
   practice; the Exam modes (Free Navigation, Sequential) are for the
   trial and packages (Sam, 2026-10-04: A, reading 2026-09-20's "timed
@@ -71,7 +72,9 @@ show the locks *(F2, 11)*.
   opens nothing new. The General Paper is a course like any other.
 - **Three Quiz Builder quizzes in all**, in any courses, at the normal
   builder size. A quiz is used when it is built, not when finished;
-  retakes do not count.
+  retakes do not count. With the three used, the builder carries on
+  with the free questions, Study modes only, until the trial ends (Sam,
+  2026-10-11: b) *(to build: 04.4)*.
 - **No mock exams and no offline packs** in the trial.
 - **Each package carries its own limits** (02): builder quizzes, packs
   per course, papers (all, or the trial paper only), mocks (yes / no).

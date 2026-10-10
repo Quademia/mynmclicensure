@@ -29,7 +29,7 @@ and `archive/product-plan/03-quiz-system.md` (Q10–Q13).
 - Paper cards show attempts and the best score per mode; the dashboard
   shows the last five sittings.
 
-### The streak and questions mastered *(to build: G1a)*
+### The streak and questions mastered
 
 Settled by Sam, 2026-10-03. Counted from the answers every student
 already saves — no new table.
@@ -137,8 +137,6 @@ Settled by Sam, 2026-10-04.
   30); the readiness band's signals and words.
 - The username word lists — adjectives and animals; Sam sees them
   before anyone gets a name.
-- When to build G1a — now with a plain dashboard card, or with the
-  dashboard's redesign; and where the streak shows.
 - The badge milestones and the art set.
 - The percentile's threshold (about 30) — set at the build.
 - Later, parked (Sam, 2026-10-04): days left to the exam (needs the

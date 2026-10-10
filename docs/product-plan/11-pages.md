@@ -74,14 +74,22 @@ opens it (00, The menu).
 - Paid with Premium Prep: open (02.10).
 
 ### Quiz builder
-- Free: pick a course, build from its free questions (03 F1).
-- Trial: three quizzes in all. Ended: "You've used your 3 trial
-  quizzes", locked.
-- Four mode cards under Study and Exam; the Topics step can open with a
-  course and topic already set (from the report).
-- **Check**: the status line sticks after a failure; picking another
-  course leaves the previous course's topics and counts; an "All
-  topics" quiz is named after the course's first three topics.
+- The page: 04, The Quiz Builder (layout C, Sam 2026-10-11). Opened
+  with a course and topic already set from the report and the dashboard.
+- Paid: the whole bank of the courses held, all four modes, no banner.
+- Trial: "Trial · 2 of 3 quizzes left — a quiz counts when you build
+  it; retakes don't count". Used up: "You've used your 3 trial quizzes
+  — keep practising on the free questions, or choose a package", then
+  as free.
+- Free and ended (the floor): "Free practice — you build from the free
+  questions in each course, in the Study modes"; the programme's
+  courses with their free counts; the Exam modes locked, "The exam
+  modes open with a package."
+- **Check** (today's page, gone with 04.4): the status line sticks after
+  a failure; picking another course leaves the previous course's topics
+  and counts; an "All topics" quiz is named after the course's first
+  three topics; a trial's fourth quiz shows "We could not build your
+  quiz" instead of the database's sentence.
 
 ### Daily challenge
 - The first visit brings the username card: an animal and a word

@@ -79,16 +79,17 @@ before then, and the old list's history, is in
 - ⬜ Q19 The admin's preview says Preview — on the card and in the sitting
 - ⬜ Q20 Preview this paper — an editor button: questions, answers, rationales, no sitting
 - ⬜ Q7 Select-all partial credit — the rule first (open), then the three-state display
-- ⬜ 04.1 The builder's minimum of 5 questions (Sam, 09-30) — its details open
+- ⬜ 04.4 The Quiz Builder redesigned — layout C, By topic | By keyword, Filters, one door for every status
+- ⬜ 04.1 The builder's minimum of 5 questions (Sam, 09-30) — ruled 10-11, Start greyed below 5; with 04.4
 - ⏸ 04.2 A pass mark per paper, Passed / Didn't pass on the results — Sam: later (09-27)
 - ⏸ Q3 Mock exams as a premium exam experience — a design item; Sam picks when
-- ⏸ Q16 The keyword step says what matched — options offered; Sam: not now (09-27)
+- ⬜ Q16 The keyword step says what matched — ruled 10-11, "N questions contain …"; with 04.4
 - ⏸ 04.3 Undo "Don't show this again" — in a settings page, if one is ever built
 
 ## [05 Progress](docs/product-plan/05-progress.md)
 
-- ⬜ G1a The streak and questions mastered — built with 05.4 (the streak card); ticks with it
-- ⬜ 05.4 The dashboard redesigned — built (D2a, D2b), walked as paid; the other states for Sam to test
+- ✅ G1a The streak and questions mastered — the dashboard's streak card, with 05.4 — 2026-10-10
+- ✅ 05.4 The dashboard redesigned — D2a, D2b; six states walked, the words approved — 2026-10-10
 - ⬜ Q12 Progress across sittings — true totals, topic accuracy over time, a nudge, a trend
 - ⬜ Q13 Readiness and standing — the percentile first on the trial paper; a band; how others did
 - ⬜ G1b The leaderboard — from G2; three views; usernames and Noto animals; its storage tick first
