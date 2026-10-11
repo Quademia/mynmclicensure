@@ -43,11 +43,16 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
 Ruled by Sam, 2026-10-11, from his canvas "Quiz Builder Redesign"
 (2026-10-09; layout C there).
 
-- **One page, sections folded**: Course · What to practise · Filters ·
-  Mode, each folded to one line saying what is chosen; the count and
-  Start pinned at the bottom. On a computer every section is open.
-  "Repeat last" on top, remembered on that device; a "Weakest topic"
-  start is later.
+- **Four steps** (Sam, 2026-10-11, later the same night, joining the
+  old wizard to the canvas): 1 Course · 2 What to practise · 3 Filters ·
+  4 How to take it (with How many). The old wizard's circles at the top,
+  joined by a line, a tick on each step passed, each with its choice
+  under it; any circle jumps there; Next and Back in the step; no Review
+  step — "Your quiz" (the count, a summary, Start) is a card on the
+  right on a computer and a bar pinned above the phone's bottom bar.
+  **Start works from any step.** "Repeat your last setup" on top,
+  remembered on that device for that student; a "Weakest topic" start
+  is later.
 - **What to practise, two ways — By topic | By keyword** (Sam: they are
   different). By topic: the topic list, All topics, and a Find a topic
   box that only searches the list. By keyword: a word matched from the

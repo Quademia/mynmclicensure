@@ -31,11 +31,18 @@ import { BUILDER_MIN_QUESTIONS, CONCEPT_SEARCH_DELAY_MS, type AttemptMode, type 
 import { AppLink } from '@/components/shell/link-pending';
 import { Icon } from '@/components/shell/icons';
 import { Toast } from '@/lib/toast/toast';
-import { ArrowRight, Banner, Chip, ModeCard, Section } from './builder-parts';
+import { ArrowRight, Banner, Chip, ModeCard } from './builder-parts';
 
 type Way = 'topic' | 'keyword';
 type Which = 'all' | 'new' | 'wrong';
-type SectionId = 'course' | 'what' | 'filters' | 'mode';
+// The four steps (Sam, 2026-10-11: four steps, Start from any step, the
+// old wizard's ticks at the top). short: the phone's name under its circle.
+const STEPS = [
+  { id: 'course', name: 'Course', short: 'Course' },
+  { id: 'what', name: 'What to practise', short: 'Practise' },
+  { id: 'filters', name: 'Filters', short: 'Filters' },
+  { id: 'how', name: 'How to take it', short: 'How' },
+] as const;
 
 const MIN = BUILDER_MIN_QUESTIONS;
 const COUNT_STEP = 5;
@@ -178,7 +185,8 @@ export function QuizBuilderClient({
   const [types, setTypes] = useState<string[]>([]);
   const [mode, setMode] = useState<AttemptMode>('UNTIMED_LEARNING');
   const [count, setCount] = useState(COUNT_DEFAULT);
-  const [open, setOpen] = useState<SectionId | null>('what');
+  // A course from the address (the course page, the report) skips step 1.
+  const [step, setStep] = useState(() => (initialCourseId ? 1 : 0));
   const [examNote, setExamNote] = useState(false);
 
   // ── the course's rows, the keyword's ids, Start ──
@@ -316,15 +324,13 @@ export function QuizBuilderClient({
         : 'type a word';
   const quizName = `${course.title} · ${selection} · ${questions(n)}`;
 
-  // ── the folded lines ──
+  // ── each step's choice, under its circle ──
   const courseLine = course.title + (free ? ' · free questions' : '');
-  const whatLine = `${way === 'topic' ? 'By topic' : 'By keyword'} · ${selection}`;
   const filtersLine = [
     which === 'all' ? 'All questions' : WHICH.find((w) => w.id === which)!.label,
     diffs.length ? diffs.join(', ') : 'any difficulty',
     types.length ? types.map((t) => TYPE_LABEL[t] || t).join(', ') : 'any type',
   ].join(' · ');
-  const modeLine = `${modeDef.groupLabel} · ${modeDef.name} · ${exam ? 'a running clock' : 'no clock'}`;
 
   // ── "Your quiz", the card on the right (a computer); the phone's bar keeps one line ──
   const chosenFilters = [...diffs, ...types.map((t) => TYPE_LABEL[t] || t)];
@@ -342,14 +348,19 @@ export function QuizBuilderClient({
         ? 'Uses your last trial quiz.'
         : `Uses one of your ${course.quizzesLeft} trial quizzes left.`
       : '';
-  const countNoteShort = !enough ? `At least ${MIN} needed` : matching < maxQuestions ? `Up to ${matching} — all that match` : `${MIN} to ${maxQuestions} questions`;
   const countNote = !enough
     ? `A quiz needs at least ${MIN} questions.`
     : matching < maxQuestions
       ? `Only ${matching} questions match, so this quiz can have up to ${matching}.`
       : `Between ${MIN} and ${maxQuestions} questions.`;
 
-  const toggle = (id: SectionId) => setOpen((o) => (o === id ? null : id));
+  function goStep(i: number) {
+    setStep(Math.max(0, Math.min(STEPS.length - 1, i)));
+    setExamNote(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  const stepValues = [courseLine, selection, filtersLine, `${modeDef.name} · ${enough ? n : '—'}`];
 
   function pickCourse(id: string) {
     if (id === courseId) return;
@@ -360,7 +371,6 @@ export function QuizBuilderClient({
     setTopicFind('');
     setShowAllTopics(false);
     setExamNote(false);
-    setOpen('what');
   }
 
   function repeatLast() {
@@ -377,7 +387,7 @@ export function QuizBuilderClient({
     setCount(Number(last.count) || COUNT_DEFAULT);
     setTopicFind('');
     setShowAllTopics(false);
-    setOpen(null);
+    setStep(STEPS.length - 1);
   }
 
   async function start() {
@@ -428,226 +438,267 @@ export function QuizBuilderClient({
           </button>
         ) : null}
 
-        <Section id="course" num={1} title="Course" value={courseLine} open={open === 'course'} onToggle={() => toggle('course')}>
-          <div className="qb-options">
-            {courses.map((c) => {
-              const on = c.course_id === courseId;
-              const none = c.total === 0;
-              return (
-                <button
-                  key={c.course_id}
-                  type="button"
-                  className={on ? 'qb-option is-on' : 'qb-option'}
-                  aria-pressed={on}
-                  disabled={none && !on}
-                  onClick={() => pickCourse(c.course_id)}
-                >
-                  <span className="qb-radio" aria-hidden="true" />
-                  <span className="qb-option-text">
-                    <span className="qb-option-title">{c.title}</span>
-                    <span className="qb-option-count">
-                      {none ? (c.pool === 'free' ? 'No free questions yet' : 'No questions yet') : c.pool === 'free' ? `${c.total.toLocaleString('en-GB')} free` : questions(c.total)}
-                    </span>
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </Section>
-
-        <Section id="what" num={2} title="What to practise" value={whatLine} open={open === 'what'} onToggle={() => toggle('what')}>
-          <div className="qb-seg" role="group" aria-label="Choose questions">
-            <button type="button" className={way === 'topic' ? 'qb-seg-btn is-on' : 'qb-seg-btn'} aria-pressed={way === 'topic'} onClick={() => setWay('topic')}>
-              By topic
-            </button>
-            <button type="button" className={way === 'keyword' ? 'qb-seg-btn is-on' : 'qb-seg-btn'} aria-pressed={way === 'keyword'} onClick={() => setWay('keyword')}>
-              By keyword
-            </button>
-          </div>
-
-          {!loaded && !loadFailed ? <p className="qb-meta">Loading the questions…</p> : null}
-          {loadFailed ? (
-            <p className="qb-meta">
-              {loadFailed}{' '}
-              <button type="button" className="qb-more" onClick={retryLoad}>
-                Try again
+        <ol className="qb-steps" aria-label="Quiz builder steps">
+          {STEPS.map((s, i) => (
+            <li key={s.id} className={`qb-steps-item${i < step ? ' is-done' : ''}${i === step ? ' is-now' : ''}`}>
+              <button type="button" className="qb-steps-btn" aria-current={i === step ? 'step' : undefined} onClick={() => goStep(i)}>
+                <span className="qb-steps-dot" aria-hidden="true">
+                  {i < step ? '✓' : i + 1}
+                </span>
+                <span className="qb-steps-name">
+                  <span className="qb-phone">{s.short}</span>
+                  <span className="qb-wide">{s.name}</span>
+                </span>
+                <span className="qb-steps-value qb-wide">{stepValues[i]}</span>
               </button>
+            </li>
+          ))}
+        </ol>
+
+        <section className="qb-panel" aria-labelledby="qb-panel-title">
+          <div className="qb-panel-head">
+            <p className="qb-panel-kicker">
+              Step {step + 1} of {STEPS.length}
             </p>
+            <h2 className="qb-panel-title" id="qb-panel-title">
+              {STEPS[step].name}
+            </h2>
+          </div>
+
+          {step === 0 ? (
+            <div className="qb-options">
+              {courses.map((c) => {
+                const on = c.course_id === courseId;
+                const none = c.total === 0;
+                return (
+                  <button
+                    key={c.course_id}
+                    type="button"
+                    className={on ? 'qb-option is-on' : 'qb-option'}
+                    aria-pressed={on}
+                    disabled={none && !on}
+                    onClick={() => pickCourse(c.course_id)}
+                  >
+                    <span className="qb-radio" aria-hidden="true" />
+                    <span className="qb-option-text">
+                      <span className="qb-option-title">{c.title}</span>
+                      <span className="qb-option-count">
+                        {none ? (c.pool === 'free' ? 'No free questions yet' : 'No questions yet') : c.pool === 'free' ? `${c.total.toLocaleString('en-GB')} free` : questions(c.total)}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           ) : null}
 
-          {way === 'topic' ? (
-            <div className="qb-block">
-              {topicList.length > TOPICS_SHOWN ? (
-                <div className="qb-field">
-                  <label htmlFor="qb-find" className="qb-label">
-                    Find a topic
-                  </label>
-                  <div className="qb-input-wrap">
-                    <Icon name="search" className="qb-input-icon" />
-                    <input
-                      id="qb-find"
-                      type="text"
-                      className="qb-input"
-                      autoComplete="off"
-                      placeholder="Search this list"
-                      value={topicFind}
-                      onChange={(e) => setTopicFind(e.target.value)}
-                    />
-                  </div>
-                </div>
-              ) : null}
-              <div className="qb-chips">
-                {!find ? <Chip label="All topics" count={loaded ? pool.length : undefined} pressed={!pickedTopics.length} onClick={() => setTopics([])} /> : null}
-                {shownTopics.map(([t, c]) => (
-                  <Chip key={t} label={t} count={c} pressed={pickedTopics.includes(t)} onClick={() => setTopics((s) => toggleIn(s, t))} />
-                ))}
-                {find && !shownTopics.length ? <p className="qb-meta">No topic has “{topicFind.trim()}” in its name.</p> : null}
-              </div>
-              {!find && topicList.length > TOPICS_SHOWN ? (
-                <button type="button" className="qb-more" onClick={() => setShowAllTopics((v) => !v)}>
-                  {showAllTopics ? 'Show fewer topics' : `Show all ${topicList.length} topics`}
+          {step === 1 ? (
+            <>
+              <div className="qb-seg" role="group" aria-label="Choose questions">
+                <button type="button" className={way === 'topic' ? 'qb-seg-btn is-on' : 'qb-seg-btn'} aria-pressed={way === 'topic'} onClick={() => setWay('topic')}>
+                  By topic
                 </button>
+                <button type="button" className={way === 'keyword' ? 'qb-seg-btn is-on' : 'qb-seg-btn'} aria-pressed={way === 'keyword'} onClick={() => setWay('keyword')}>
+                  By keyword
+                </button>
+              </div>
+
+              {!loaded && !loadFailed ? <p className="qb-meta">Loading the questions…</p> : null}
+              {loadFailed ? (
+                <p className="qb-meta">
+                  {loadFailed}{' '}
+                  <button type="button" className="qb-more" onClick={retryLoad}>
+                    Try again
+                  </button>
+                </p>
               ) : null}
-            </div>
-          ) : (
-            <div className="qb-block">
-              <div className="qb-field">
-                <label htmlFor="qb-word" className="qb-label">
-                  Keyword <span className="qb-label-soft">(optional)</span>
-                </label>
-                <div className="qb-input-wrap">
-                  <Icon name="search" className="qb-input-icon" />
-                  <input
-                    id="qb-word"
-                    type="text"
-                    className="qb-input"
-                    autoComplete="off"
-                    placeholder="Type a word, e.g. malaria"
-                    value={word}
-                    onChange={(e) => setWord(e.target.value)}
-                  />
-                  {word ? (
-                    <button type="button" className="qb-input-clear" aria-label="Clear the keyword" onClick={() => setWord('')}>
-                      <Icon name="x" />
+
+              {way === 'topic' ? (
+                <div className="qb-block">
+                  {topicList.length > TOPICS_SHOWN ? (
+                    <div className="qb-field">
+                      <label htmlFor="qb-find" className="qb-label">
+                        Find a topic
+                      </label>
+                      <div className="qb-input-wrap">
+                        <Icon name="search" className="qb-input-icon" />
+                        <input
+                          id="qb-find"
+                          type="text"
+                          className="qb-input"
+                          autoComplete="off"
+                          placeholder="Search this list"
+                          value={topicFind}
+                          onChange={(e) => setTopicFind(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  ) : null}
+                  <div className="qb-chips">
+                    {!find ? <Chip label="All topics" count={loaded ? pool.length : undefined} pressed={!pickedTopics.length} onClick={() => setTopics([])} /> : null}
+                    {shownTopics.map(([t, c]) => (
+                      <Chip key={t} label={t} count={c} pressed={pickedTopics.includes(t)} onClick={() => setTopics((s) => toggleIn(s, t))} />
+                    ))}
+                    {find && !shownTopics.length ? <p className="qb-meta">No topic has “{topicFind.trim()}” in its name.</p> : null}
+                  </div>
+                  {!find && topicList.length > TOPICS_SHOWN ? (
+                    <button type="button" className="qb-more" onClick={() => setShowAllTopics((v) => !v)}>
+                      {showAllTopics ? 'Show fewer topics' : `Show all ${topicList.length} topics`}
                     </button>
                   ) : null}
                 </div>
-                {typed ? (
-                  <p className={kwReady && !kwPool.length ? 'qb-kw-line is-none' : 'qb-kw-line'} aria-live="polite">
-                    {searching ? 'Searching…' : kwPool.length ? `${questions(kwPool.length)} contain “${typed}”` : `No question contains “${typed}”`}
-                  </p>
-                ) : null}
-                <p className="qb-meta">
-                  {!typed
-                    ? 'Finds every question with a word starting this way — in the question, its explanation or its topic.'
-                    : kwPool.length
-                      ? 'They are in the topics below. Tick some to narrow it down, or leave All.'
-                      : 'Try the start of the word: “malar” finds malaria and malarial.'}
-                </p>
+              ) : (
+                <div className="qb-block">
+                  <div className="qb-field">
+                    <label htmlFor="qb-word" className="qb-label">
+                      Keyword <span className="qb-label-soft">(optional)</span>
+                    </label>
+                    <div className="qb-input-wrap">
+                      <Icon name="search" className="qb-input-icon" />
+                      <input
+                        id="qb-word"
+                        type="text"
+                        className="qb-input"
+                        autoComplete="off"
+                        placeholder="Type a word, e.g. malaria"
+                        value={word}
+                        onChange={(e) => setWord(e.target.value)}
+                      />
+                      {word ? (
+                        <button type="button" className="qb-input-clear" aria-label="Clear the keyword" onClick={() => setWord('')}>
+                          <Icon name="x" />
+                        </button>
+                      ) : null}
+                    </div>
+                    {typed ? (
+                      <p className={kwReady && !kwPool.length ? 'qb-kw-line is-none' : 'qb-kw-line'} aria-live="polite">
+                        {searching ? 'Searching…' : kwPool.length ? `${questions(kwPool.length)} contain “${typed}”` : `No question contains “${typed}”`}
+                      </p>
+                    ) : null}
+                    <p className="qb-meta">
+                      {!typed
+                        ? 'Finds every question with a word starting this way — in the question, its explanation or its topic.'
+                        : kwPool.length
+                          ? 'They are in the topics below. Tick some to narrow it down, or leave All.'
+                          : 'Try the start of the word: “malar” finds malaria and malarial.'}
+                    </p>
+                  </div>
+                  {kwPool.length ? (
+                    <>
+                      <p className="qb-label">Topics with “{typed}”</p>
+                      <div className="qb-chips">
+                        <Chip label={`All ${kwList.length} ${kwList.length === 1 ? 'topic' : 'topics'}`} count={kwPool.length} pressed={!pickedKw.length} onClick={() => setKwTopics([])} />
+                        {kwList.map(([t, c]) => (
+                          <Chip key={t} label={t} count={c} pressed={pickedKw.includes(t)} onClick={() => setKwTopics((s) => toggleIn(s, t))} />
+                        ))}
+                      </div>
+                    </>
+                  ) : null}
+                </div>
+              )}
+            </>
+          ) : null}
+
+          {step === 2 ? (
+            <>
+              <p className="qb-label">Which questions</p>
+              <div className="qb-chips">
+                {WHICH.map((w) => (
+                  <Chip key={w.id} label={w.label} count={whichCounts.get(w.id) ?? 0} pressed={which === w.id} onClick={() => setWhich(w.id)} />
+                ))}
               </div>
-              {kwPool.length ? (
-                <>
-                  <p className="qb-label">Topics with “{typed}”</p>
-                  <div className="qb-chips">
-                    <Chip label={`All ${kwList.length} ${kwList.length === 1 ? 'topic' : 'topics'}`} count={kwPool.length} pressed={!pickedKw.length} onClick={() => setKwTopics([])} />
-                    {kwList.map(([t, c]) => (
-                      <Chip key={t} label={t} count={c} pressed={pickedKw.includes(t)} onClick={() => setKwTopics((s) => toggleIn(s, t))} />
+              <p className="qb-label">Difficulty</p>
+              <div className="qb-chips">
+                {diffNames.map((d) => (
+                  <Chip key={d} label={d} count={diffCounts.get(d) ?? 0} pressed={diffs.includes(d)} onClick={() => setDiffs((s) => toggleIn(s, d))} />
+                ))}
+              </div>
+              <p className="qb-label">Question type</p>
+              <div className="qb-chips">
+                {typeNames.map((t) => (
+                  <Chip key={t} label={TYPE_LABEL[t] || t} count={typeCounts.get(t) ?? 0} pressed={types.includes(t)} onClick={() => setTypes((s) => toggleIn(s, t))} />
+                ))}
+              </div>
+              <p className="qb-meta">Leave a row unticked to include everything in it.</p>
+            </>
+          ) : null}
+
+          {step === 3 ? (
+            <>
+              <div className="qb-mode-cols">
+                <div className="qb-mode-group">
+                  <p className="qb-label">Study</p>
+                  <div className="qb-modes">
+                    {MODE_ORDER.filter((m) => MODES[m].group === 'study').map((m) => (
+                      <ModeCard key={m} mode={MODES[m]} pressed={modeNow === m} locked={false} onClick={() => { setMode(m); setExamNote(false); }} />
                     ))}
                   </div>
-                </>
-              ) : null}
-            </div>
-          )}
-        </Section>
-
-        <Section id="filters" num={3} title="Filters" value={filtersLine} open={open === 'filters'} onToggle={() => toggle('filters')}>
-          <p className="qb-label">Which questions</p>
-          <div className="qb-chips">
-            {WHICH.map((w) => (
-              <Chip key={w.id} label={w.label} count={whichCounts.get(w.id) ?? 0} pressed={which === w.id} onClick={() => setWhich(w.id)} />
-            ))}
-          </div>
-          <p className="qb-label">Difficulty</p>
-          <div className="qb-chips">
-            {diffNames.map((d) => (
-              <Chip key={d} label={d} count={diffCounts.get(d) ?? 0} pressed={diffs.includes(d)} onClick={() => setDiffs((s) => toggleIn(s, d))} />
-            ))}
-          </div>
-          <p className="qb-label">Question type</p>
-          <div className="qb-chips">
-            {typeNames.map((t) => (
-              <Chip key={t} label={TYPE_LABEL[t] || t} count={typeCounts.get(t) ?? 0} pressed={types.includes(t)} onClick={() => setTypes((s) => toggleIn(s, t))} />
-            ))}
-          </div>
-        </Section>
-
-        <Section id="mode" num={4} title="How to take it" value={modeLine} open={open === 'mode'} onToggle={() => toggle('mode')}>
-          <div className="qb-mode-cols">
-            <div className="qb-mode-group">
-              <p className="qb-label">Study</p>
-              <div className="qb-modes">
-                {MODE_ORDER.filter((m) => MODES[m].group === 'study').map((m) => (
-                  <ModeCard key={m} mode={MODES[m]} pressed={modeNow === m} locked={false} onClick={() => { setMode(m); setExamNote(false); }} />
-                ))}
+                </div>
+                <div className="qb-mode-group">
+                  <p className="qb-label">Exam</p>
+                  <div className="qb-modes">
+                    {MODE_ORDER.filter((m) => MODES[m].group === 'exam').map((m) => (
+                      <ModeCard
+                        key={m}
+                        mode={MODES[m]}
+                        pressed={modeNow === m}
+                        locked={free}
+                        onClick={() => (free ? setExamNote(true) : setMode(m))}
+                      />
+                    ))}
+                  </div>
+                  {free ? (
+                    <p id="qb-exam-locked" className={examNote ? 'qb-note is-shown' : 'qb-note'}>
+                      The exam modes open with a package.{' '}
+                      <AppLink href={PACKAGES_HREF} className="qb-note-link">
+                        Choose a package
+                      </AppLink>
+                    </p>
+                  ) : null}
+                </div>
               </div>
-            </div>
-            <div className="qb-mode-group">
-              <p className="qb-label">Exam</p>
-              <div className="qb-modes">
-                {MODE_ORDER.filter((m) => MODES[m].group === 'exam').map((m) => (
-                  <ModeCard
-                    key={m}
-                    mode={MODES[m]}
-                    pressed={modeNow === m}
-                    locked={free}
-                    onClick={() => (free ? setExamNote(true) : setMode(m))}
-                  />
-                ))}
-              </div>
-              {free ? (
-                <p id="qb-exam-locked" className={examNote ? 'qb-note is-shown' : 'qb-note'}>
-                  The exam modes open with a package.{' '}
-                  <AppLink href={PACKAGES_HREF} className="qb-note-link">
-                    Choose a package
-                  </AppLink>
+
+              <div className="qb-howmany">
+                <p className="qb-label" id="qb-count-title">
+                  How many questions
                 </p>
-              ) : null}
-            </div>
-          </div>
-        </Section>
+                <div className="qb-count-controls" role="group" aria-labelledby="qb-count-title">
+                  <div className="qb-stepper">
+                    <button type="button" className="qb-step" aria-label="Five fewer" disabled={!enough || n <= MIN} onClick={() => setCount(Math.max(MIN, n - COUNT_STEP))}>
+                      −
+                    </button>
+                    <span className="qb-count-num" aria-live="polite">
+                      {enough ? n : '—'}
+                    </span>
+                    <button type="button" className="qb-step" aria-label="Five more" disabled={!enough || n >= cap} onClick={() => setCount(Math.min(cap, n + COUNT_STEP))}>
+                      +
+                    </button>
+                  </div>
+                  <div className="qb-chips">
+                    {COUNT_PICKS.filter((v) => v <= maxQuestions).map((v) => (
+                      <Chip key={v} label={String(v)} pressed={enough && n === v} disabled={v > matching} onClick={() => setCount(v)} />
+                    ))}
+                  </div>
+                </div>
+                <p className="qb-meta">{countNote}</p>
+              </div>
+            </>
+          ) : null}
 
-        <section className="qb-count" aria-labelledby="qb-count-title">
-          <div className="qb-count-head">
-            <span className="qb-num" aria-hidden="true">
-              5
-            </span>
-            <span className="qb-count-text">
-              <span className="qb-sec-title" id="qb-count-title">
-                <span className="qb-phone">How many</span>
-                <span className="qb-wide">How many questions</span>
-              </span>
-              <span className="qb-sec-value qb-phone">{countNoteShort}</span>
-            </span>
-          </div>
-          <div className="qb-count-controls">
-            <div className="qb-stepper">
-              <button type="button" className="qb-step" aria-label="Five fewer" disabled={!enough || n <= MIN} onClick={() => setCount(Math.max(MIN, n - COUNT_STEP))}>
-                −
+          <div className="qb-nav">
+            {step > 0 ? (
+              <button type="button" className="btn btn-ghost qb-nav-btn" onClick={() => goStep(step - 1)}>
+                ← Back
               </button>
-              <span className="qb-count-num" aria-live="polite">
-                {enough ? n : '—'}
-              </span>
-              <button type="button" className="qb-step" aria-label="Five more" disabled={!enough || n >= cap} onClick={() => setCount(Math.min(cap, n + COUNT_STEP))}>
-                +
+            ) : (
+              <span />
+            )}
+            {step < STEPS.length - 1 ? (
+              <button type="button" className="btn btn-outline qb-nav-btn" onClick={() => goStep(step + 1)}>
+                Next: {STEPS[step + 1].name} →
               </button>
-            </div>
-            <div className="qb-chips qb-wide">
-              {COUNT_PICKS.filter((v) => v <= maxQuestions).map((v) => (
-                <Chip key={v} label={String(v)} pressed={enough && n === v} disabled={v > matching} onClick={() => setCount(v)} />
-              ))}
-            </div>
+            ) : null}
           </div>
-          <p className="qb-meta qb-wide">{countNote}</p>
         </section>
       </div>
 

@@ -1,7 +1,7 @@
 // app/(app)/student/quiz-builder/builder-parts.tsx
 //
-// The Quiz Builder's small pieces (04.4): a folded section, a chip, a
-// mode card and the status banner. Single-use, so they live beside their
+// The Quiz Builder's small pieces (04.4): Start's arrow, a chip, a mode
+// card and the status banner. Single-use, so they live beside their
 // page. The words are the canvas's (Sam's "Quiz Builder Redesign",
 // 2026-10-09), Sam's to change.
 
@@ -13,50 +13,6 @@ import type { ModeDef } from '@/lib/attempts/modes';
 import type { BuilderDoorCourse } from '@/lib/attempts/types';
 
 const PACKAGES_HREF = '/student/upgrade';
-
-/**
- * A section folded to one line saying what is chosen; "Change" opens it,
- * "Done" folds it. On a computer every section is open and the line's
- * button does nothing to the look (student-quiz-builder.css).
- */
-export function Section({
-  id,
-  num,
-  title,
-  value,
-  open,
-  onToggle,
-  children,
-}: {
-  id: string;
-  /** The canvas numbers its sections 1, 2, 3… — the order to fill them in. */
-  num: number;
-  title: string;
-  value: string;
-  open: boolean;
-  onToggle: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className={open ? 'qb-sec is-open' : 'qb-sec'} aria-labelledby={`qb-${id}-title`}>
-      <button type="button" className="qb-sec-head" aria-expanded={open} aria-controls={`qb-${id}-body`} onClick={onToggle}>
-        <span className="qb-num" aria-hidden="true">
-          {num}
-        </span>
-        <span className="qb-sec-text">
-          <span className="qb-sec-title" id={`qb-${id}-title`}>
-            {title}
-          </span>
-          <span className="qb-sec-value">{value}</span>
-        </span>
-        <span className="qb-sec-action">{open ? 'Done' : 'Change'}</span>
-      </button>
-      <div className="qb-sec-body" id={`qb-${id}-body`}>
-        {children}
-      </div>
-    </section>
-  );
-}
 
 /** Start's arrow, as the canvas draws it. */
 export function ArrowRight() {
