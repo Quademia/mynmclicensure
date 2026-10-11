@@ -38,7 +38,7 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
   stats keep papers and mocks apart and show retakes and abandons
   separately.
 
-### The Quiz Builder *(to build: 04.4)*
+### The Quiz Builder
 
 Ruled by Sam, 2026-10-11, from his canvas "Quiz Builder Redesign"
 (2026-10-09; layout C there).

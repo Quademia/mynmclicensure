@@ -31,11 +31,11 @@ Detail and history: `archive/product-plan/09-free-account-and-gamification.md` �
   marked free; a student with no package may start a builder quiz (or
   its retake) whose questions are all published free questions of a
   course of their programme, in a Study mode — papers, mocks and the
-  Exam modes refused. The app's own checks that let a free sitting
-  through — the builder drawing only free questions for a free student,
-  its keyword search — come with the Quiz Builder's redesign *(to build:
-  04.4)*; opening a sitting and the report with the free account's pages
-  *(to build: F2)*.
+  Exam modes refused. The app lets a free sitting through: the builder
+  draws only free questions for a free student, its keyword search
+  answers with free ones, and a builder quiz of free questions opens,
+  plays, reviews, retakes and has its report without the course (built
+  with 04.4, 2026-10-11).
 - **A free account uses the Study modes only** — Learning and Untimed
   practice; the Exam modes (Free Navigation, Sequential) are for the
   trial and packages (Sam, 2026-10-04: A, reading 2026-09-20's "timed
@@ -48,8 +48,8 @@ Detail and history: `archive/product-plan/09-free-account-and-gamification.md` �
   free accounts (04, 05).
 - The wording: "free practice questions, forever" is true and is used;
   "unlimited access" is not (Sam, 2026-09-20).
-- The dashboard says plainly which the student is on — "Free: practice
-  on the free set" or the trial's line (11). *(to build: F2)*
+- The dashboard says plainly which the student is on — "Free practice ·
+  forever" or the trial's line (11; built with 05.4, 2026-10-04).
 
 ### The trial — limited access
 
@@ -74,7 +74,7 @@ show the locks *(F2, 11)*.
   builder size. A quiz is used when it is built, not when finished;
   retakes do not count. With the three used, the builder carries on
   with the free questions, Study modes only, until the trial ends (Sam,
-  2026-10-11: b) *(to build: 04.4)*.
+  2026-10-11: b).
 - **No mock exams and no offline packs** in the trial.
 - **Each package carries its own limits** (02): builder quizzes, packs
   per course, papers (all, or the trial paper only), mocks (yes / no).

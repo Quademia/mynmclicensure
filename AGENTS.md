@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-10-04. Rules for **any** assistant working in this
+Last updated: 2026-10-11. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What the app is
@@ -314,7 +314,10 @@ above sit at the repo root; the audience grouping inside them is kept.
   paint from the browser's (a hydration mismatch), and the effect that
   would fix it trips the lint above. Give the hook a module-level
   subscribe, a getSnapshot that reads storage in a try/catch, and a
-  server snapshot of whatever the first paint should show.
+  server snapshot of whatever the first paint should show. **A choice
+  kept for a student is keyed by that student** (`<key>:<user_id>`):
+  phones are shared, and the builder's "Repeat your last setup" showed
+  one test account's quiz to the next (2026-10-11).
 - **A realtime subscription needs the table in the `supabase_realtime`
   publication** and the client's `schema: 'licensure_gh'` on the
   subscription — a table outside the publication fires nothing, with
@@ -550,6 +553,12 @@ above sit at the repo root; the audience grouping inside them is kept.
   `visibilitychange` — the app's own handler then runs as a browser would
   make it — and ask Sam for one real phone check on the dev site
   (2026-09-29, 03 Q11).
+- **A pane tab opened in the background never shows a page behind a
+  `loading.tsx`.** The page arrives (200, its content in a hidden
+  `S:1` block and the `$RC` swap in the HTML) but React waits for an
+  animation frame to reveal it, and a background tab gets none: the
+  placeholder stays and reads as a broken page (2026-10-11, the report).
+  Front the tab (`tabs_select`) before reading it.
 - **A migration that adds a rule to prod's data tidies that data
   first.** Prod cannot be read from here, and a constraint prod's rows
   fail stops the release's migrate job and so the deploy. Normalise what
@@ -664,6 +673,12 @@ slice on the branch.
   he cannot read to check), and what it costs from here — then a
   recommendation, and a note when the recommendation defends what is
   already built. Look at how MyNclex does it first.
+- **A page conforms to the design system; the system grows only on
+  Sam's yes** (2026-10-11). Use its pieces — the tokens, `.card`, the
+  button family at its sizes, `.btn-link`, the badges — before drawing
+  your own; where it has no piece, the page keeps its own on tokens
+  only, and a new shared piece is offered to Sam, never added (a
+  `BUILD_LIST.md` line, 09).
 - **An asset in an artifact is a proposal until Sam adopts it.** The
   vector Q of 2026-08-12 was used as the logo and taken back the same
   day; the symbol is the painted Q MyNclex carries as `app/icon.png`.

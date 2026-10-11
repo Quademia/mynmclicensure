@@ -22,6 +22,12 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-10, into 10-11 — dashboard states walked, ticked; Quiz Builder rebuilt for every status (04.4): one door, free quizzes, four steps
+  - ↳ of answers right · one builder kept · topic ≠ keyword, word-start · trial used up → free (b) · free sittings open · old ticks, Change links · old topic tiles · DS conform, nothing added · Repeat last per student
+
+- 2026-10-08 — the daily challenge planned (G2), its storage ticked; every leaderboard one programme's (cloud session, logged 10-11)
+  - ↳ 5 a day per programme · draw stored, first student · one course a day in turn · shuffle per student · swap or void · own mode, server time · one a day · boards per programme
+
 - 2026-10-04, third — Premium Prep all year, 02.10 built; two ways in and the floor; menu grouped, phone bottom bar; dashboard redesigned (D2a, D2b)
   - ↳ never a batch · channel via bot · Elite Nurses read · free account not a door · one dashboard per status · inside first, shop last · shorter menu too busy · streak forgiven Mon–Sun · 20 and 5 · states to test · D3 next
 

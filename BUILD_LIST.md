@@ -65,7 +65,7 @@ before then, and the old list's history, is in
 ## [03 Free account and trial](docs/product-plan/03-free-account-and-trial.md)
 
 - ✅ F1 The free set's two doors in the database — the read rule, free builder quizzes in Study modes — 2026-10-04
-- ⬜ F2 The free account, the floor — the builder on the free set, the dashboard's free line (no door)
+- ✅ F2 The free account, the floor — the builder on the free set, the dashboard's free line — 2026-10-11
 - ⬜ F2 After the trial — locked, not gone; the summary open, the review locked; Retake locked
 - ⬜ F3 The home page and its copy — free questions, forever; the trial and packages the way in
 - ✅ F4a The trial's limits in the database — on packages and receipts, the trial paper, 14 days — 2026-10-04
@@ -75,15 +75,15 @@ before then, and the old list's history, is in
 ## [04 Practice](docs/product-plan/04-practice.md)
 
 - ⬜ Q21 Practice Papers — the name, "Practice Paper N", the course in full above, the address
-- ⬜ G2 The daily challenge — a set number a day per programme (config, 5), one course a day in turn, the draw stored, its own mode (planned 10-08; storage ticked 10-08)
+- ⬜ G2 The daily challenge — 5 a day per programme, one course a day in turn, its own mode (storage ticked 10-08)
 - ⬜ Q19 The admin's preview says Preview — on the card and in the sitting
 - ⬜ Q20 Preview this paper — an editor button: questions, answers, rationales, no sitting
 - ⬜ Q7 Select-all partial credit — the rule first (open), then the three-state display
-- ⬜ 04.4 The Quiz Builder redesigned — layout C, By topic | By keyword, Filters, one door for every status
-- ⬜ 04.1 The builder's minimum of 5 questions (Sam, 09-30) — ruled 10-11, Start greyed below 5; with 04.4
+- ✅ 04.4 The Quiz Builder redesigned — four steps, By topic | By keyword, one door for every status — 2026-10-11
+- ✅ 04.1 The builder's minimum of 5 questions — Start greyed below 5, the words say why — 2026-10-11
 - ⏸ 04.2 A pass mark per paper, Passed / Didn't pass on the results — Sam: later (09-27)
 - ⏸ Q3 Mock exams as a premium exam experience — a design item; Sam picks when
-- ⬜ Q16 The keyword step says what matched — ruled 10-11, "N questions contain …"; with 04.4
+- ✅ Q16 The keyword says what matched — "N questions contain …", the topics it sits in — 2026-10-11
 - ⏸ 04.3 Undo "Don't show this again" — in a settings page, if one is ever built
 
 ## [05 Progress](docs/product-plan/05-progress.md)
