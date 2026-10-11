@@ -342,7 +342,7 @@ table by table as each is next changed (AGENTS.md rule 9).
   its redesign *(to build: 03.1)*.
 - Browser: a student reads open, published papers of courses they hold
   — every column but `notes` and `open_in_trial` (no page reads it yet).
-- *To build (04.5) — awaiting Sam's tick:* a `first_mode` column — the
+- *To build (04.5) — ticked 2026-10-11:* a `first_mode` column — the
   mode a student's first sitting of the paper must be in, one of
   `allowed_modes`, `TIMED_FREE_NAV` on a new paper (and on today's
   papers). `create_attempt` refuses a paper's other modes to a student
@@ -360,7 +360,7 @@ table by table as each is next changed (AGENTS.md rule 9).
 
 - A question a paper uses cannot be deleted.
 - Browser: nothing.
-- *To build (04.6) — awaiting Sam's tick:* a question a draft or active
+- *To build (04.6) — ticked 2026-10-11:* a question a draft or active
   paper uses is held back as a mock's is — the database refuses it in a
   builder quiz (whole bank or free), and refuses marking it free or
   saving a paper with a free question. Why: a paper's questions are met
