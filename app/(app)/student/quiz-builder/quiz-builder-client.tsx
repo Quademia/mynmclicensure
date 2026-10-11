@@ -29,7 +29,7 @@ import { BUILDER_MIN_QUESTIONS, CONCEPT_SEARCH_DELAY_MS, type AttemptMode, type 
 import { AppLink } from '@/components/shell/link-pending';
 import { Icon } from '@/components/shell/icons';
 import { Toast } from '@/lib/toast/toast';
-import { Banner, Chip, ModeCard, Section } from './builder-parts';
+import { ArrowRight, Banner, Chip, ModeCard, Section } from './builder-parts';
 
 type Way = 'topic' | 'keyword';
 type Which = 'all' | 'new' | 'wrong';
@@ -38,6 +38,7 @@ type SectionId = 'course' | 'what' | 'filters' | 'mode';
 const MIN = BUILDER_MIN_QUESTIONS;
 const COUNT_STEP = 5;
 const COUNT_DEFAULT = 20;
+const COUNT_PICKS = [10, 20, 30, 50];
 const TOPICS_SHOWN = 8;
 const NOT_SET = 'Not set';
 const PACKAGES_HREF = '/student/upgrade';
@@ -319,6 +320,27 @@ export function QuizBuilderClient({
   ].join(' · ');
   const modeLine = `${modeDef.groupLabel} · ${modeDef.name} · ${exam ? 'a running clock' : 'no clock'}`;
 
+  // ── "Your quiz", the card on the right (a computer); the phone's bar keeps one line ──
+  const chosenFilters = [...diffs, ...types.map((t) => TYPE_LABEL[t] || t)];
+  const recap: [string, string][] = [
+    ['Course', course.title],
+    way === 'topic' ? ['Topics', selection] : ['Keyword', typed ? selection : '—'],
+    ['Questions', WHICH.find((w) => w.id === which)!.label + (free ? ' · free only' : '')],
+    ['Filters', chosenFilters.length ? chosenFilters.join(', ') : 'Any'],
+    ['Mode', `${modeDef.groupLabel} · ${modeDef.name}`],
+  ];
+  const clockText = exam ? `${minutes} min` : 'no clock';
+  const trialNote =
+    course.reason === 'trial' && course.quizzesLeft
+      ? `Uses one of your ${course.quizzesLeft} trial ${course.quizzesLeft === 1 ? 'quiz' : 'quizzes'} left.`
+      : '';
+  const countNoteShort = !enough ? `At least ${MIN} needed` : matching < maxQuestions ? `Up to ${matching} — all that match` : `${MIN} to ${maxQuestions} questions`;
+  const countNote = !enough
+    ? `A quiz needs at least ${MIN} questions.`
+    : matching < maxQuestions
+      ? `Only ${matching} questions match, so this quiz can have up to ${matching}.`
+      : `Between ${MIN} and ${maxQuestions} questions.`;
+
   const toggle = (id: SectionId) => setOpen((o) => (o === id ? null : id));
 
   function pickCourse(id: string) {
@@ -377,25 +399,28 @@ export function QuizBuilderClient({
   const kwList = ranked(kwTopicCounts);
 
   const lastSummary = last && lastCourse
-    ? `${lastCourse.title} · ${last.way === 'keyword' ? `“${last.word}”` : last.topics?.length ? shortList(last.topics) : 'All topics'} · ${last.count}`
+    ? `${lastCourse.title} · ${last.way === 'keyword' ? `“${last.word}”` : last.topics?.length ? shortList(last.topics) : 'All topics'} · ${last.count} · ${modeOf(last.mode).name}`
     : '';
 
   return (
     <div className="qb">
       <div className="qb-main">
+        <p className="qb-intro">Pick what to practise and how. The count updates as you go.</p>
         <Banner course={course} />
 
         {lastCourse ? (
           <button type="button" className="qb-quick" onClick={repeatLast}>
-            <Icon name="refresh" className="qb-quick-icon" />
+            <span className="qb-quick-tile" aria-hidden="true">
+              <Icon name="refresh" />
+            </span>
             <span className="qb-quick-text">
-              <span className="qb-quick-title">Repeat last</span>
+              <span className="qb-quick-title">Repeat your last setup</span>
               <span className="qb-quick-sub">{lastSummary}</span>
             </span>
           </button>
         ) : null}
 
-        <Section id="course" title="Course" value={courseLine} open={open === 'course'} onToggle={() => toggle('course')}>
+        <Section id="course" num={1} title="Course" value={courseLine} open={open === 'course'} onToggle={() => toggle('course')}>
           <div className="qb-options">
             {courses.map((c) => {
               const on = c.course_id === courseId;
@@ -420,7 +445,7 @@ export function QuizBuilderClient({
           </div>
         </Section>
 
-        <Section id="what" title="What to practise" value={whatLine} open={open === 'what'} onToggle={() => toggle('what')}>
+        <Section id="what" num={2} title="What to practise" value={whatLine} open={open === 'what'} onToggle={() => toggle('what')}>
           <div className="qb-seg" role="group" aria-label="Choose questions">
             <button type="button" className={way === 'topic' ? 'qb-seg-btn is-on' : 'qb-seg-btn'} aria-pressed={way === 'topic'} onClick={() => setWay('topic')}>
               By topic
@@ -462,7 +487,7 @@ export function QuizBuilderClient({
                 </div>
               ) : null}
               <div className="qb-chips">
-                {!find ? <Chip label="All topics" count={pool.length} pressed={!pickedTopics.length} onClick={() => setTopics([])} /> : null}
+                {!find ? <Chip label="All topics" count={loaded ? pool.length : undefined} pressed={!pickedTopics.length} onClick={() => setTopics([])} /> : null}
                 {shownTopics.map(([t, c]) => (
                   <Chip key={t} label={t} count={c} pressed={pickedTopics.includes(t)} onClick={() => setTopics((s) => toggleIn(s, t))} />
                 ))}
@@ -478,7 +503,7 @@ export function QuizBuilderClient({
             <div className="qb-block">
               <div className="qb-field">
                 <label htmlFor="qb-word" className="qb-label">
-                  Keyword
+                  Keyword <span className="qb-label-soft">(optional)</span>
                 </label>
                 <div className="qb-input-wrap">
                   <Icon name="search" className="qb-input-icon" />
@@ -525,7 +550,7 @@ export function QuizBuilderClient({
           )}
         </Section>
 
-        <Section id="filters" title="Filters" value={filtersLine} open={open === 'filters'} onToggle={() => toggle('filters')}>
+        <Section id="filters" num={3} title="Filters" value={filtersLine} open={open === 'filters'} onToggle={() => toggle('filters')}>
           <p className="qb-label">Which questions</p>
           <div className="qb-chips">
             {WHICH.map((w) => (
@@ -546,7 +571,7 @@ export function QuizBuilderClient({
           </div>
         </Section>
 
-        <Section id="mode" title="Mode" value={modeLine} open={open === 'mode'} onToggle={() => toggle('mode')}>
+        <Section id="mode" num={4} title="How to take it" value={modeLine} open={open === 'mode'} onToggle={() => toggle('mode')}>
           <p className="qb-label">Study</p>
           <div className="qb-modes">
             {MODE_ORDER.filter((m) => MODES[m].group === 'study').map((m) => (
@@ -575,36 +600,74 @@ export function QuizBuilderClient({
           ) : null}
         </Section>
 
-        <div className="qb-count">
-          <span className="qb-count-text">
-            <span className="qb-sec-title">How many</span>
-            <span className="qb-sec-value">
-              {!enough ? `At least ${MIN} needed` : matching < maxQuestions ? `Up to ${matching} — all that match` : `${MIN} to ${maxQuestions} questions`}
+        <section className="qb-count" aria-labelledby="qb-count-title">
+          <div className="qb-count-head">
+            <span className="qb-num" aria-hidden="true">
+              5
             </span>
-          </span>
-          <button type="button" className="qb-step" aria-label="Five fewer" disabled={!enough || n <= MIN} onClick={() => setCount(Math.max(MIN, n - COUNT_STEP))}>
-            −
-          </button>
-          <span className="qb-count-num" aria-live="polite">
-            {enough ? n : '—'}
-          </span>
-          <button type="button" className="qb-step" aria-label="Five more" disabled={!enough || n >= cap} onClick={() => setCount(Math.min(cap, n + COUNT_STEP))}>
-            +
-          </button>
-        </div>
+            <span className="qb-count-text">
+              <span className="qb-sec-title" id="qb-count-title">
+                <span className="qb-phone">How many</span>
+                <span className="qb-wide">How many questions</span>
+              </span>
+              <span className="qb-sec-value qb-phone">{countNoteShort}</span>
+            </span>
+          </div>
+          <div className="qb-count-controls">
+            <div className="qb-stepper">
+              <button type="button" className="qb-step" aria-label="Five fewer" disabled={!enough || n <= MIN} onClick={() => setCount(Math.max(MIN, n - COUNT_STEP))}>
+                −
+              </button>
+              <span className="qb-count-num" aria-live="polite">
+                {enough ? n : '—'}
+              </span>
+              <button type="button" className="qb-step" aria-label="Five more" disabled={!enough || n >= cap} onClick={() => setCount(Math.min(cap, n + COUNT_STEP))}>
+                +
+              </button>
+            </div>
+            <div className="qb-chips qb-wide">
+              {COUNT_PICKS.filter((v) => v <= maxQuestions).map((v) => (
+                <Chip key={v} label={String(v)} pressed={enough && n === v} disabled={v > matching} onClick={() => setCount(v)} />
+              ))}
+            </div>
+          </div>
+          <p className="qb-meta qb-wide">{countNote}</p>
+        </section>
       </div>
 
       <aside className="qb-side" aria-label="Your quiz">
         <div className="qb-bar">
+          <p className="qb-bar-label qb-wide">Your quiz</p>
+          <p className="qb-bar-big qb-wide">
+            <span className="qb-bar-num">{loaded ? matching.toLocaleString('en-GB') : '…'}</span>
+            <span className="qb-bar-word">{matching === 1 ? 'question matches' : 'questions match'}</span>
+          </p>
+          <dl className="qb-recap qb-wide">
+            {recap.map(([label, value]) => (
+              <div key={label} className="qb-recap-row">
+                <dt>{label}</dt>
+                <dd>{value}</dd>
+              </div>
+            ))}
+          </dl>
           <div className="qb-bar-text">
-            <span className="qb-bar-count">{loaded ? `${matching.toLocaleString('en-GB')} ${matching === 1 ? 'question matches' : 'questions match'}` : 'Loading…'}</span>
+            <span className="qb-bar-count qb-phone">{loaded ? `${matching.toLocaleString('en-GB')} ${matching === 1 ? 'question matches' : 'questions match'}` : 'Loading…'}</span>
             <span className={ready ? 'qb-bar-line' : 'qb-bar-line is-warn'}>
-              {ready ? `${questions(n)} · ${modeDef.name} · ${exam ? `${minutes} min` : 'no clock'}` : reason}
+              {ready ? (
+                <>
+                  {questions(n)} · <span className="qb-phone">{modeDef.name} · </span>
+                  {clockText}
+                </>
+              ) : (
+                reason
+              )}
             </span>
           </div>
           <button type="button" className="btn btn-accent qb-start" disabled={!ready || building} onClick={() => void start()}>
             {building ? 'Starting…' : exam ? 'Start exam' : 'Start quiz'}
+            {building ? null : <ArrowRight />}
           </button>
+          {trialNote ? <p className="qb-trial-note qb-wide">{trialNote}</p> : null}
         </div>
       </aside>
 

@@ -21,6 +21,7 @@ const PACKAGES_HREF = '/student/upgrade';
  */
 export function Section({
   id,
+  num,
   title,
   value,
   open,
@@ -28,6 +29,8 @@ export function Section({
   children,
 }: {
   id: string;
+  /** The canvas numbers its sections 1, 2, 3… — the order to fill them in. */
+  num: number;
   title: string;
   value: string;
   open: boolean;
@@ -37,6 +40,9 @@ export function Section({
   return (
     <section className={open ? 'qb-sec is-open' : 'qb-sec'} aria-labelledby={`qb-${id}-title`}>
       <button type="button" className="qb-sec-head" aria-expanded={open} aria-controls={`qb-${id}-body`} onClick={onToggle}>
+        <span className="qb-num" aria-hidden="true">
+          {num}
+        </span>
         <span className="qb-sec-text">
           <span className="qb-sec-title" id={`qb-${id}-title`}>
             {title}
@@ -49,6 +55,15 @@ export function Section({
         {children}
       </div>
     </section>
+  );
+}
+
+/** Start's arrow, as the canvas draws it. */
+export function ArrowRight() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
   );
 }
 
