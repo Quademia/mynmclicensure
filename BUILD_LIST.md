@@ -138,7 +138,7 @@ before then, and the old list's history, is in
 - ✅ 09.6 The phone's bottom bar and sub-tab row — four fixed tabs, a row per group, the drawer kept — 2026-10-04
 - ✅ 09.7 The student menu in its groups — a heading per group, every row visible, the phone's names — 2026-10-04
 - ⏸ DS9 About eight pages on their own button classes — they join as each is touched
-- ⏸ 09.8 The Quiz Builder's own chips, switch, choice cards, step circles, search box — none in the system; Sam to rule
+- ⏸ 09.8 The builder's own chips, switch, choice cards, step circles, search box — not in the system; Sam to rule
 
 ## [10 Launch and platform](docs/product-plan/10-launch-and-platform.md)
 
