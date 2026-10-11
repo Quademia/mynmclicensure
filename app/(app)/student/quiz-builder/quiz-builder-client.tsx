@@ -435,9 +435,11 @@ export function QuizBuilderClient({
                   onClick={() => pickCourse(c.course_id)}
                 >
                   <span className="qb-radio" aria-hidden="true" />
-                  <span className="qb-option-title">{c.title}</span>
-                  <span className="qb-option-count">
-                    {none ? (c.pool === 'free' ? 'No free questions yet' : 'No questions yet') : c.pool === 'free' ? `${c.total.toLocaleString('en-GB')} free` : questions(c.total)}
+                  <span className="qb-option-text">
+                    <span className="qb-option-title">{c.title}</span>
+                    <span className="qb-option-count">
+                      {none ? (c.pool === 'free' ? 'No free questions yet' : 'No questions yet') : c.pool === 'free' ? `${c.total.toLocaleString('en-GB')} free` : questions(c.total)}
+                    </span>
                   </span>
                 </button>
               );
@@ -572,32 +574,38 @@ export function QuizBuilderClient({
         </Section>
 
         <Section id="mode" num={4} title="How to take it" value={modeLine} open={open === 'mode'} onToggle={() => toggle('mode')}>
-          <p className="qb-label">Study</p>
-          <div className="qb-modes">
-            {MODE_ORDER.filter((m) => MODES[m].group === 'study').map((m) => (
-              <ModeCard key={m} mode={MODES[m]} pressed={modeNow === m} locked={false} onClick={() => { setMode(m); setExamNote(false); }} />
-            ))}
+          <div className="qb-mode-cols">
+            <div className="qb-mode-group">
+              <p className="qb-label">Study</p>
+              <div className="qb-modes">
+                {MODE_ORDER.filter((m) => MODES[m].group === 'study').map((m) => (
+                  <ModeCard key={m} mode={MODES[m]} pressed={modeNow === m} locked={false} onClick={() => { setMode(m); setExamNote(false); }} />
+                ))}
+              </div>
+            </div>
+            <div className="qb-mode-group">
+              <p className="qb-label">Exam</p>
+              <div className="qb-modes">
+                {MODE_ORDER.filter((m) => MODES[m].group === 'exam').map((m) => (
+                  <ModeCard
+                    key={m}
+                    mode={MODES[m]}
+                    pressed={modeNow === m}
+                    locked={free}
+                    onClick={() => (free ? setExamNote(true) : setMode(m))}
+                  />
+                ))}
+              </div>
+              {free ? (
+                <p id="qb-exam-locked" className={examNote ? 'qb-note is-shown' : 'qb-note'}>
+                  The exam modes open with a package.{' '}
+                  <AppLink href={PACKAGES_HREF} className="qb-note-link">
+                    Choose a package
+                  </AppLink>
+                </p>
+              ) : null}
+            </div>
           </div>
-          <p className="qb-label">Exam</p>
-          <div className="qb-modes">
-            {MODE_ORDER.filter((m) => MODES[m].group === 'exam').map((m) => (
-              <ModeCard
-                key={m}
-                mode={MODES[m]}
-                pressed={modeNow === m}
-                locked={free}
-                onClick={() => (free ? setExamNote(true) : setMode(m))}
-              />
-            ))}
-          </div>
-          {free ? (
-            <p id="qb-exam-locked" className={examNote ? 'qb-note is-shown' : 'qb-note'}>
-              The exam modes open with a package.{' '}
-              <AppLink href={PACKAGES_HREF} className="qb-note-link">
-                Choose a package
-              </AppLink>
-            </p>
-          ) : null}
         </Section>
 
         <section className="qb-count" aria-labelledby="qb-count-title">

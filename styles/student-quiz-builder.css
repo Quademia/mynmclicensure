@@ -238,8 +238,14 @@
 .qb-option.is-on,
 .qb-mode.is-on { background: var(--brand-teal-pale); border-color: var(--brand-teal); }
 .qb-option:disabled { opacity: 0.55; cursor: not-allowed; }
-.qb-option-title { flex: 1; min-width: 0; font-size: var(--type-ui-size); font-weight: 600; }
+/* a phone: the name left, the count right; a computer: the count under the name */
+.qb-option-text { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); }
+.qb-option-title { min-width: 0; font-size: var(--type-ui-size); font-weight: 600; }
 .qb-option-count { flex: none; font-size: var(--type-meta-size); color: var(--ink-muted); }
+
+/* How to take it: Study then Exam on a phone, side by side on a computer */
+.qb-mode-cols { display: flex; flex-direction: column; gap: var(--space-10); }
+.qb-mode-group { display: flex; flex-direction: column; gap: var(--space-8); min-width: 0; }
 .qb-option.is-on .qb-option-count { color: var(--brand-teal-hover); }
 
 .qb-radio { position: relative; flex: none; width: 18px; height: 18px; box-sizing: border-box; border: 2px solid var(--ink-faint); border-radius: 50%; }
@@ -386,6 +392,18 @@
   .qb-sec-value,
   .qb-sec-action { display: none; }
   .qb-sec-body { display: flex; padding: 0 var(--space-24) var(--space-20); }
+
+  /* the canvas's columns: the courses three across, each name over its
+     count; the modes in two, Study | Exam, the radio at the top line */
+  .qb-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+  .qb-option { align-items: flex-start; min-height: 64px; padding: var(--space-12) var(--space-12); }
+  .qb-option-text { flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: var(--space-2); }
+  .qb-option-title { overflow-wrap: anywhere; }
+  .qb-mode-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-16); align-items: start; }
+  .qb-mode { align-items: flex-start; }
+  .qb-option .qb-radio,
+  .qb-mode .qb-radio { margin-top: 1px; }
+  .qb-mode-group .qb-label { margin-top: 0; }
 
   .qb-count { flex-direction: column; align-items: stretch; gap: var(--space-12); padding: var(--space-20) var(--space-24); }
 
