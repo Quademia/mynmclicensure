@@ -1,24 +1,24 @@
 /* styles/student-quiz-builder.css
  *
- * The Quiz Builder (04.4; Sam, 2026-10-11, layout C of his canvas) —
- * app/(app)/student/quiz-builder/. Tokens only. The legacy five-step
- * wizard's rules went with it.
+ * The Quiz Builder (04.4) — app/(app)/student/quiz-builder/. Sam,
+ * 2026-10-11, later the same day: the old five-step wizard's look back
+ * (slice 6a's stylesheet, transcribed from the legacy page), on the new
+ * builder's rules. Scoped under `.qbld`.
  *
- * A phone: one column of folded sections, each a line saying what is
- * chosen; the count and Start pinned above the bottom bar. A computer
- * (1024px and up): every section open, the count and Start in a card on
- * the right. Every control a finger uses is 44px on a touch screen (09).
+ * Tokens only, and the design system's pieces where it has them (Sam,
+ * 2026-10-11): the two boxes are the shared .card, the buttons the shared
+ * family at its sizes (Next .btn-primary, Back .btn-ghost, Build
+ * .btn-accent, all .btn-lg; the small ones .btn-ghost .btn-sm), Edit and
+ * Try again .btn-link. The wizard's own pieces — the circles, the topic
+ * tiles, the tick boxes, the mode cards — stay its own, on tokens. The
+ * legacy breakpoints (760px, 480px) are kept; they sit inside the repo's
+ * 768px rule. Every control a finger uses is 44px on a touch screen (09).
  */
 
-.qb {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-12);
-  max-width: 1100px;
-}
-.qb-main { display: flex; flex-direction: column; gap: var(--space-12); min-width: 0; }
+.qbld { display: flex; flex-direction: column; gap: var(--space-20); }
 
-/* ── the status line at the top ── */
+/* ── the status line above the circles: a trial's quizzes left, a
+   trial's used up, free practice ── */
 .qb-banner {
   display: flex;
   flex-direction: column;
@@ -36,433 +36,285 @@
 /* the link's tap area 44px tall without changing its look */
 .qb-banner-link::after { content: ''; position: absolute; inset: -14px -6px; }
 
-/* ── Repeat last ── */
-.qb-quick {
-  display: flex;
-  align-items: center;
-  gap: var(--space-12);
-  width: 100%;
-  min-height: 56px;
-  padding: var(--space-10) var(--space-16);
-  font: inherit;
-  color: var(--ink);
-  text-align: left;
-  cursor: pointer;
-}
-/* its box is the shared .card; a tap target, so its edge turns teal under the pointer */
-.qb-quick:hover { border-color: var(--brand-teal); }
-.qb-quick-tile {
-  flex: none;
-  width: 36px;
-  height: 36px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius);
-  background: var(--brand-teal-pale);
-  color: var(--brand-teal-hover);
-}
-.qb-quick-text { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
-.qb-quick-title { font-size: var(--type-ui-size); font-weight: 600; }
-.qb-quick-sub { font-size: var(--type-meta-size); color: var(--ink-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-/* the page's line under its title — a computer only */
-.qb-intro { margin: 0; font-size: var(--type-field-size); line-height: var(--type-field-line); color: var(--ink-muted); }
-
-/* ── the four steps: the old wizard's circles joined by a line, a tick on
-   each step passed, the current one filled (Sam, 2026-10-11); any circle
-   is a way to that step ── */
-.qb-steps { display: flex; margin: 0; padding: 0; list-style: none; }
-.qb-steps-item { position: relative; flex: 1; min-width: 0; }
-/* the line from the circle before to this one, through both centres */
-.qb-steps-item + .qb-steps-item::before {
-  content: '';
-  position: absolute;
-  top: 15px;
-  right: 50%;
-  width: 100%;
-  height: 2px;
-  background: var(--border);
-}
-.qb-steps-item.is-done + .qb-steps-item::before { background: var(--brand-teal); }
-.qb-steps-btn {
+/* ── Progress block (its box the shared .card) ── */
+.qbld .prog-block { padding: 20px 24px; }
+.qbld .prog-bar { display: flex; align-items: center; margin-bottom: 14px; }
+.qbld .prog-step { display: flex; align-items: center; flex: 1; }
+.qbld .prog-step.last { flex: 0; }
+.qbld .prog-circle {
   position: relative;
-  z-index: 1;
-  width: 100%;
-  min-height: 44px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-4);
-  padding: 0 var(--space-4);
-  background: none;
-  border: 0;
-  font: inherit;
-  color: var(--ink-muted);
-  text-align: center;
-  cursor: pointer;
-}
-.qb-steps-dot {
-  width: 32px;
-  height: 32px;
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid var(--border);
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: var(--surface);
-  font-size: var(--type-ui-size);
-  font-weight: 700;
-  color: var(--ink-muted);
-}
-.qb-steps-item.is-done .qb-steps-dot { background: var(--brand-teal); border-color: var(--brand-teal); color: var(--surface); }
-.qb-steps-item.is-now .qb-steps-dot { background: var(--brand-navy); border-color: var(--brand-navy); color: var(--surface); }
-.qb-steps-name,
-.qb-steps-value { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--type-meta-size); line-height: var(--type-meta-line); }
-.qb-steps-name { font-weight: 600; }
-.qb-steps-item.is-now .qb-steps-name { color: var(--ink); }
-.qb-steps-item.is-done .qb-steps-name { color: var(--brand-teal-hover); }
-.qb-steps-value { font-weight: 500; color: var(--ink-muted); }
-
-/* ── the step's own card: its name, its choices, Back and Next ── */
-.qb-panel {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-10);
-  padding: var(--space-16); /* the box is the shared .card; a phone wants it closer */
-}
-.qb-panel-head { display: flex; flex-direction: column; gap: var(--space-2); }
-.qb-panel-kicker {
-  margin: 0;
-  font-size: var(--type-micro-size);
-  line-height: var(--type-micro-line);
-  letter-spacing: var(--type-micro-track);
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-}
-.qb-panel-title {
-  margin: 0;
-  font-size: var(--type-section-title-size);
-  line-height: var(--type-section-title-line);
-  font-weight: var(--type-section-title-weight);
-  color: var(--ink);
-}
-.qb-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-12);
-  margin-top: var(--space-6);
-  padding-top: var(--space-12);
-  border-top: 1px solid var(--border);
-}
-
-/* ── By topic | By keyword ── */
-.qb-seg { display: flex; gap: var(--space-4); padding: var(--space-4); background: var(--surface-page); border: 1px solid var(--border); border-radius: var(--radius); }
-.qb-seg-btn {
-  flex: 1;
-  min-height: 40px;
-  border: 0;
-  border-radius: var(--radius-sm);
-  background: none;
-  font: inherit;
-  font-size: var(--type-ui-size);
-  font-weight: 600;
-  color: var(--ink-muted);
-  cursor: pointer;
-}
-.qb-seg-btn.is-on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm); }
-
-.qb-block,
-.qb-field { display: flex; flex-direction: column; gap: var(--space-8); }
-.qb-label {
-  margin: var(--space-4) 0 0;
-  font-size: var(--type-micro-size);
-  line-height: var(--type-micro-line);
-  letter-spacing: var(--type-micro-track);
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-}
-.qb-meta { margin: 0; font-size: var(--type-meta-size); line-height: var(--type-meta-line); color: var(--ink-muted); }
-.qb-label-soft { font-weight: 500; letter-spacing: 0; text-transform: none; }
-
-/* the two boxes: Find a topic (searches the list), Keyword (finds questions) */
-.qb-input-wrap { position: relative; }
-.qb-input {
-  width: 100%;
-  height: 44px;
-  box-sizing: border-box;
-  padding: 0 44px 0 40px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  font: inherit;
-  font-size: 16px; /* a phone does not zoom on a 16px box */
-  color: var(--ink);
-}
-.qb-input:focus { outline: 2px solid var(--brand-teal); outline-offset: 1px; border-color: var(--brand-teal); }
-.qb-input-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--ink-muted); pointer-events: none; }
-.qb-input-clear {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 44px;
-  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.18s;
+  border: 1.5px solid var(--border);
+  background: var(--surface-page);
+  color: var(--ink-muted);
+}
+/* a 44px tap area round a smaller circle, changing nothing you see */
+.qbld .prog-circle::after { content: ''; position: absolute; inset: -6px; }
+.qbld .prog-circle.active { background: var(--brand-navy); border-color: var(--brand-navy); color: var(--surface); }
+.qbld .prog-circle.done { background: var(--brand-teal); border-color: var(--brand-teal); color: var(--surface); font-size: 12px; }
+.qbld .prog-line { flex: 1; height: 1.5px; background: var(--border); margin: 0 6px; transition: background 0.18s; }
+.qbld .prog-line.done { background: var(--brand-teal); }
+.qbld .prog-labels { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin-bottom: 14px; }
+.qbld .prog-lbl { font-size: 11px; color: var(--ink-muted); text-align: center; cursor: pointer; padding-top: 6px; line-height: 1.3; }
+.qbld .prog-lbl.active { color: var(--brand-navy); font-weight: 600; }
+.qbld .prog-lbl.done { color: var(--brand-teal); }
+.qbld .prog-step-label { font-size: 13px; color: var(--ink-muted); border-top: 1px solid var(--border); padding-top: 12px; margin-top: 0; }
+.qbld .prog-step-label strong { color: var(--ink); font-weight: 600; }
+
+/* ── Wizard panes (each box the shared .card) ── */
+.qbld .pane-title { font-size: 20px; font-weight: 700; color: var(--brand-navy); margin: 0 0 4px; }
+.qbld .pane-sub { font-size: 13px; color: var(--ink-muted); margin: 0 0 20px; line-height: 1.5; }
+
+/* ── Nav bar (Back / Next / Build) ── */
+.qbld .nav-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); gap: 10px; }
+
+/* ── Recent setups ── */
+.qbld .recent-collapse { background: var(--surface-page); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; }
+.qbld .recent-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  min-height: 24px;
+  padding: 0;
   background: none;
   border: 0;
-  color: var(--ink-muted);
-  cursor: pointer;
-}
-.qb-kw-line { margin: 0; font-size: var(--type-ui-size); font-weight: 600; color: var(--ink); }
-.qb-kw-line.is-none { color: var(--badge-warning-ink); }
-
-/* ── chips: they wrap, never scroll sideways (a chosen one stays in view) ── */
-.qb-chips { display: flex; flex-wrap: wrap; gap: var(--space-8); }
-.qb-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-6);
-  min-height: 40px;
-  padding: 0 var(--space-12);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-  font: inherit;
-  font-size: var(--type-ui-size);
-  color: var(--ink);
+  font-family: inherit;
   text-align: left;
   cursor: pointer;
+  user-select: none;
 }
-.qb-chip-count { font-size: var(--type-meta-size); color: var(--ink-muted); font-variant-numeric: tabular-nums; }
-.qb-chip.is-on { background: var(--brand-teal-pale); border-color: var(--brand-teal); }
-.qb-chip.is-on .qb-chip-count { color: var(--brand-teal-hover); }
-.qb-chip:disabled { opacity: 0.5; cursor: not-allowed; }
+.qbld .recent-toggle-lbl { font-size: 13px; font-weight: 600; color: var(--ink); }
+.qbld .recent-count { font-size: 12px; font-weight: 400; color: var(--ink-muted); }
+.qbld .recent-toggle-caret { font-size: 12px; color: var(--ink-muted); transition: transform 0.18s; display: inline-block; }
+.qbld .recent-toggle-caret.open { transform: rotate(180deg); }
+.qbld .recent-body { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.qbld .recent-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; gap: 12px; }
+.qbld .recent-main { min-width: 0; }
+.qbld .recent-title { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.qbld .recent-sub { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
+.qbld .qbld-small-btn { flex-shrink: 0; white-space: nowrap; }
 
-/* ── the topics as the old wizard drew them (Sam, 2026-10-11): a grid of
-   tiles in a box that scrolls, each a dot, the name and a count pill ── */
-.qb-topic-tools { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-8); }
-.qb-topic-find { flex: 1; min-width: 180px; }
-.qb-tiles {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: var(--space-8);
-  max-height: 280px;
-  overflow-y: auto;
-  padding: var(--space-12);
+/* ── Form fields ── */
+.qbld .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.qbld .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.qbld fieldset.field { margin: 0 0 16px; padding: 0; border: 0; }
+/* the field's own label only — a tick box inside it is a <label> too */
+.qbld .field > label,
+.qbld .field > .field-label,
+.qbld .field > legend { padding: 0; font-size: 13px; font-weight: 600; color: var(--ink); }
+.qbld .field > legend { margin-bottom: 6px; }
+.qbld .field select { width: 100%; }
+.qbld .field .hint,
+.qbld .hint { font-size: 12px; color: var(--ink-muted); }
+.qbld .hint.block { display: block; margin-bottom: 8px; }
+.qbld select,
+.qbld input[type='text'],
+.qbld input[type='number'] { padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit; color: var(--ink); background: var(--surface); box-sizing: border-box; }
+.qbld select:focus,
+.qbld input[type='text']:focus,
+.qbld input[type='number']:focus { outline: none; border-color: var(--brand-navy); }
+.qbld input:disabled { opacity: 0.6; }
+
+/* ── Segmented control: Topics | Keyword ── */
+.qbld .segmented { display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.qbld .segmented button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 12px;
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-}
-.qb-tiles-empty { grid-column: 1 / -1; padding: var(--space-8); }
-.qb-tile {
-  display: flex;
-  align-items: center;
-  gap: var(--space-8);
-  min-height: 40px;
-  padding: var(--space-8) var(--space-12);
-  background: var(--surface-page);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font: inherit;
-  font-size: var(--type-ui-size);
-  line-height: var(--type-ui-line);
-  color: var(--ink-muted);
-  text-align: left;
+  border: 0;
+  border-right: 1px solid var(--border);
+  font-family: inherit;
+  font-size: 13px;
   cursor: pointer;
-}
-.qb-tile:hover { border-color: var(--brand-teal); color: var(--ink); }
-.qb-tile.is-on { background: var(--brand-teal-pale); border-color: var(--brand-teal); color: var(--brand-teal-hover); font-weight: 600; }
-.qb-tile-all { grid-column: 1 / -1; }
-.qb-tile-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
-.qb-tile.is-on .qb-tile-dot { background: var(--brand-teal); }
-.qb-tile-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.qb-tile-count {
-  flex: none;
-  margin-left: auto;
-  padding: 1px var(--space-6);
-  background: var(--surface-page);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-  font-size: var(--type-micro-size);
-  font-weight: 600;
   color: var(--ink-muted);
-  font-variant-numeric: tabular-nums;
+  transition: all 0.15s;
 }
-.qb-tile.is-on .qb-tile-count { background: var(--surface); border-color: var(--brand-teal); color: var(--brand-teal-hover); }
+.qbld .segmented button:last-child { border-right: none; }
+.qbld .segmented button.picked { background: var(--brand-teal-pale); color: var(--brand-navy); font-weight: 600; }
 
-/* the shared .btn-link, with a 44px tap area that changes nothing you see */
-.qb-more { position: relative; align-self: flex-start; }
-.qb-more::after { content: ''; position: absolute; inset: -14px -6px; }
-
-/* ── the course list and the mode cards ── */
-.qb-options,
-.qb-modes { display: flex; flex-direction: column; gap: var(--space-8); }
-.qb-option,
-.qb-mode {
+/* ── Topics ── */
+.qbld .topics-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.qbld .topics-toolbar input[type='text'] { flex: 1; min-width: 140px; }
+.qbld .topics-box { border: 1px solid var(--border); border-radius: 10px; background: var(--surface); padding: 12px; max-height: 280px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+.qbld .topics-empty { font-size: 13px; color: var(--ink-muted); grid-column: 1 / -1; padding: 8px; }
+.qbld .topic-chip {
   display: flex;
   align-items: center;
-  gap: var(--space-12);
+  gap: 8px;
   width: 100%;
-  min-height: 48px;
-  padding: var(--space-10) var(--space-12);
-  background: var(--surface);
+  padding: 8px 12px;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font: inherit;
-  color: var(--ink);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
   text-align: left;
   cursor: pointer;
+  background: var(--surface-page);
+  color: var(--ink-muted);
+  transition: all 0.13s;
 }
-.qb-option.is-on,
-.qb-mode.is-on { background: var(--brand-teal-pale); border-color: var(--brand-teal); }
-.qb-option:disabled { opacity: 0.55; cursor: not-allowed; }
-/* a phone: the name left, the count right; a computer: the count under the name */
-.qb-option-text { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); }
-.qb-option-title { min-width: 0; font-size: var(--type-ui-size); font-weight: 600; }
-.qb-option-count { flex: none; font-size: var(--type-meta-size); color: var(--ink-muted); }
+.qbld .topic-chip:hover { border-color: var(--brand-teal); color: var(--ink); }
+.qbld .topic-chip.picked { border-color: var(--brand-teal); background: var(--brand-teal-pale); color: var(--brand-navy); font-weight: 600; }
+.qbld .topic-chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); flex-shrink: 0; transition: background 0.13s; }
+.qbld .topic-chip.picked .dot { background: var(--brand-teal); }
+.qbld .topic-chip-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.qbld .topic-chip-count { font-size: 11px; font-weight: 600; color: var(--ink-muted); background: var(--surface-page); border: 1px solid var(--border); padding: 1px 6px; border-radius: 999px; margin-left: auto; flex-shrink: 0; }
+.qbld .topic-chip.picked .topic-chip-count { color: var(--brand-teal-hover); border-color: var(--brand-teal); background: var(--surface); }
+.qbld .use-all-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.qbld .use-all-row input { accent-color: var(--brand-teal); }
+.qbld .use-all-row label { font-size: 13px; color: var(--ink); cursor: pointer; }
+.qbld .chips-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.qbld .picked-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--brand-teal-pale); color: var(--brand-navy); border: 1px solid var(--border); }
+.qbld .picked-chip-remove { position: relative; cursor: pointer; font-size: 14px; line-height: 1; color: var(--brand-navy); opacity: 0.7; background: none; border: none; padding: 0; font-family: inherit; }
+.qbld .picked-chip-remove:hover { opacity: 1; }
+/* the × a fingertip's size without changing its look */
+.qbld .picked-chip-remove::after { content: ''; position: absolute; inset: -15px -18px; }
 
-/* How to take it: Study then Exam on a phone, side by side on a computer */
-.qb-mode-cols { display: flex; flex-direction: column; gap: var(--space-10); }
-.qb-mode-group { display: flex; flex-direction: column; gap: var(--space-8); min-width: 0; }
-.qb-option.is-on .qb-option-count { color: var(--brand-teal-hover); }
+/* ── Keyword ── */
+.qbld .concept-search-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-bottom: 10px; }
+.qbld .kw-line { margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--ink); }
+.qbld .kw-line.is-none { color: var(--badge-warning-ink); }
 
-.qb-radio { position: relative; flex: none; width: 18px; height: 18px; box-sizing: border-box; border: 2px solid var(--ink-faint); border-radius: 50%; }
-.is-on > .qb-radio { border-color: var(--brand-teal); }
-.is-on > .qb-radio::after { content: ''; position: absolute; inset: 3px; border-radius: 50%; background: var(--brand-teal); }
+/* ── Filters: tick boxes with counts ── */
+.qbld .checks-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.qbld .check-item { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; background: var(--surface-page); transition: all 0.13s; }
+.qbld .check-item:hover { border-color: var(--brand-teal); }
+.qbld .check-item.picked { border-color: var(--brand-teal); background: var(--brand-teal-pale); }
+.qbld .check-item input { margin: 0; accent-color: var(--brand-teal); }
+.qbld .check-item-name { font-size: 13px; color: var(--ink); }
+.qbld .check-item-count { font-size: 11px; font-weight: 600; color: var(--ink-muted); background: var(--surface); border: 1px solid var(--border); padding: 1px 6px; border-radius: 999px; margin-left: auto; flex-shrink: 0; }
+.qbld .check-item.picked .check-item-count { color: var(--brand-teal-hover); border-color: var(--brand-teal); }
 
-.qb-mode-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); }
-.qb-mode-name { font-size: var(--type-ui-size); font-weight: 600; }
-.qb-mode-line { font-size: var(--type-meta-size); line-height: var(--type-meta-line); color: var(--ink-muted); }
+/* ── Pool bar ── */
+.qbld .pool-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--brand-teal-pale); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; margin-top: 20px; }
+.qbld .pool-bar-lbl { font-size: 13px; color: var(--ink-muted); }
+.qbld .pool-bar-count { font-size: 15px; font-weight: 700; color: var(--brand-navy); }
+
+/* ── Count & mode ── */
+.qbld .count-display-row { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+.qbld .count-big { font-size: 36px; font-weight: 700; color: var(--brand-navy); min-width: 56px; line-height: 1; }
+.qbld .count-sub { font-size: 13px; color: var(--ink-muted); }
+.qbld .count-controls { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.qbld .count-controls input[type='range'] { width: 100%; accent-color: var(--brand-teal); }
+.qbld .count-input-row { display: flex; align-items: center; gap: 8px; }
+.qbld .count-input-row input[type='number'] { width: 120px; padding: 8px 10px; }
+.qbld .count-input-row .hint { margin: 0; }
+.qbld .count-hint { font-size: 12px; color: var(--ink-muted); margin-bottom: 20px; }
+.qbld .mode-label { font-size: 13px; font-weight: 600; color: var(--ink); display: block; margin-bottom: 10px; }
+.qbld .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 4px; }
+/* the modes under their group, Study or Exam */
+.qbld .mode-group { display: grid; gap: 10px; align-content: start; }
+.qbld .mode-group-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-muted); }
+.qbld .mode-card {
+  display: block;
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: var(--surface-page);
+  transition: all 0.15s;
+}
+.qbld .mode-card:hover { border-color: var(--brand-teal); }
+.qbld .mode-card.picked { border-color: var(--brand-navy); background: var(--brand-teal-pale); }
+.qbld .mode-card-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+.qbld .mode-card-desc { display: block; font-size: 12px; color: var(--ink-muted); line-height: 1.55; }
 /* muted text is 4.4:1 on the pale tint, so a chosen card's line is full ink */
-.qb-mode.is-on .qb-mode-line { color: var(--ink); }
-.qb-mode.is-locked { background: var(--surface-page); }
-.qb-mode.is-locked .qb-mode-name { color: var(--ink-muted); }
-.qb-mode-lock { flex: none; color: var(--ink-muted); }
-
-.qb-note {
+.qbld .mode-card.picked .mode-card-desc { color: var(--ink); }
+.qbld .mode-badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; margin-top: 10px; }
+.qbld .badge-instant { background: var(--brand-teal-pale); color: var(--brand-teal-hover); }
+.qbld .badge-timed { background: var(--badge-warning-bg); color: var(--badge-warning-ink); }
+/* an exam mode on the free questions: shown, locked, the way to a package under it */
+.qbld .mode-card.locked .mode-card-title { color: var(--ink-muted); }
+.qbld .mode-card-lock { flex: none; color: var(--ink-muted); }
+.qbld .exam-note {
   display: none;
   margin: 0;
-  padding: var(--space-8) var(--space-12);
+  padding: 8px 12px;
   background: var(--badge-warning-bg);
   border: 1px solid var(--badge-warning-border);
   border-radius: var(--radius-sm);
-  font-size: var(--type-meta-size);
-  line-height: var(--type-meta-line);
+  font-size: 12px;
+  line-height: 1.5;
   color: var(--badge-warning-ink);
 }
-.qb-note.is-shown { display: block; }
-.qb-note-link { color: inherit; font-weight: 600; }
+.qbld .exam-note.is-shown { display: block; }
+.qbld .exam-note-link { color: inherit; font-weight: 600; }
+.qbld .mode-hint { font-size: 12px; color: var(--ink-muted); margin-top: 10px; }
 
-/* ── how many: inside step 4, under the modes ── */
-.qb-howmany { display: flex; flex-direction: column; gap: var(--space-8); padding-top: var(--space-12); border-top: 1px solid var(--border); }
-.qb-count-controls { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-12); }
-.qb-stepper { display: flex; align-items: center; gap: var(--space-8); }
-/* − and +: the shared .btn-ghost .btn-lg, made square */
-.qb .qb-step { flex: none; width: 44px; height: 44px; padding: 0; font-size: 20px; line-height: 1; }
-.qb-count-num { min-width: 2.5ch; text-align: center; font-size: var(--type-card-title-size); font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
+/* ── Review & build ── */
+.qbld .stats-row { display: flex; gap: 12px; margin-bottom: 20px; }
+.qbld .stat-card { flex: 1; background: var(--surface-page); border-radius: 8px; padding: 14px; text-align: center; border: 1px solid var(--border); }
+.qbld .stat-num { font-size: 24px; font-weight: 700; color: var(--brand-navy); }
+.qbld .stat-lbl { font-size: 12px; color: var(--ink-muted); margin-top: 4px; }
+.qbld .summary-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.qbld .summary-item { background: var(--surface-page); border-radius: 8px; padding: 12px 14px; border: 1px solid var(--border); min-width: 0; }
+.qbld .summary-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.qbld .summary-label { font-size: 12px; color: var(--ink-muted); margin-bottom: 4px; }
+.qbld .summary-value { font-size: 13px; font-weight: 600; color: var(--ink); overflow-wrap: anywhere; }
+/* Edit: the shared .btn-link, with a 44px tap area that changes nothing you see */
+.qbld .review-edit { position: relative; flex: none; font-size: 11px; font-weight: 600; }
+.qbld .review-edit::after { content: ''; position: absolute; inset: -14px -8px; }
+.qbld .status-box { font-size: 13px; color: var(--ink-muted); background: var(--surface-page); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; }
+.qbld .status-box.is-warn { color: var(--badge-warning-ink); background: var(--badge-warning-bg); border-color: var(--badge-warning-border); }
+.qbld .trial-note { margin: 10px 0 0; font-size: 12px; line-height: 1.5; color: var(--badge-warning-ink); }
 
-/* ── the count and Start, pinned ── */
-.qb-side { position: sticky; bottom: 0; z-index: 5; }
-.qb-bar {
-  display: flex;
-  align-items: center;
-  gap: var(--space-12);
-  padding: var(--space-12) var(--space-16); /* the box is the shared .card */
-}
-.qb-bar-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); }
-.qb-bar-count { font-size: var(--type-ui-size); font-weight: 700; color: var(--ink); }
-.qb-bar-line { font-size: var(--type-meta-size); line-height: var(--type-meta-line); color: var(--ink-muted); }
-.qb-bar-line.is-warn { color: var(--badge-warning-ink); }
-.qb .qb-start { flex: none; } /* the shared .btn-accent .btn-lg */
-
-/* "Your quiz" — the card's parts a computer shows */
-.qb-bar-label {
-  margin: 0;
-  font-size: var(--type-micro-size);
-  line-height: var(--type-micro-line);
-  letter-spacing: var(--type-micro-track);
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-}
-.qb-bar-big { display: flex; align-items: baseline; gap: var(--space-8); margin: 0; }
-.qb-bar-num {
-  font-size: var(--type-price-size);
-  line-height: var(--type-price-line);
-  letter-spacing: var(--type-price-track);
-  font-weight: var(--type-price-weight);
-  color: var(--brand-navy);
-  font-variant-numeric: tabular-nums;
-}
-.qb-bar-word { font-size: var(--type-field-size); color: var(--ink-muted); }
-.qb-recap { display: flex; flex-direction: column; gap: var(--space-8); margin: 0; }
-.qb-recap-row { display: flex; gap: var(--space-12); font-size: var(--type-ui-size); line-height: var(--type-ui-line); }
-.qb-recap-row dt { flex: 0 0 84px; color: var(--ink-muted); font-weight: 500; }
-.qb-recap-row dd { flex: 1; min-width: 0; margin: 0; font-weight: 600; color: var(--ink); overflow-wrap: anywhere; }
-/* Change — to the step that sets this row (the old Review's Edit); a 44px
-   tap area that changes nothing you see */
-.qb-recap-change { position: relative; flex: none; } /* the shared .btn-link */
-.qb-recap-change::after { content: ''; position: absolute; inset: -14px -6px; }
-
-/* a phone: the summary closes step 4, so the last step is the review */
-.qb-review { display: flex; flex-direction: column; gap: var(--space-8); padding-top: var(--space-12); border-top: 1px solid var(--border); }
-.qb-review .qb-recap { gap: var(--space-16); }
-.qb-trial-note { margin: 0; font-size: var(--type-meta-size); line-height: var(--type-meta-line); color: var(--badge-warning-ink); }
-
-/* ── nothing to build from ── */
+/* ── nothing to build from (page.tsx) ── */
 .qb-empty { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-12); max-width: 560px; }
 .qb-empty-title { margin: 0; font-size: var(--type-card-title-size); font-weight: 600; color: var(--ink); }
+.qb-meta { margin: 0; font-size: var(--type-meta-size); line-height: var(--type-meta-line); color: var(--ink-muted); }
 
-/* a touch screen: every chip and switch a finger's size */
+/* a touch screen: every tile, box and small button a finger's size */
 @media (pointer: coarse) {
-  .qb-chip,
-  .qb-seg-btn,
-  .qb-tile,
-  .qb .qb-tool-btn { min-height: 44px; }
+  .qbld .topic-chip,
+  .qbld .check-item,
+  .qbld .segmented button,
+  .qbld .qbld-small-btn,
+  .qbld .recent-toggle,
+  .qbld select,
+  .qbld input[type='text'],
+  .qbld input[type='number'] { min-height: 44px; }
+  /* "Use all topics": the words are the tap area, a finger tall */
+  .qbld .use-all-row label { padding: 13px 0; }
 }
 
-/* a phone: the bar sits above the bottom tab bar (phone-tabs.css: 56px and its 1px top border) */
-@media (max-width: 768px) {
-  .qb-side { bottom: calc(57px + env(safe-area-inset-bottom)); }
+@media (max-width: 760px) {
+  .qbld .field-grid,
+  .qbld .mode-grid,
+  .qbld .summary-grid { grid-template-columns: 1fr; }
+  .qbld .stats-row { flex-direction: column; }
+  .qbld .checks-grid { grid-template-columns: 1fr 1fr; }
+  .qbld .prog-lbl { font-size: 10px; }
+  .qbld .count-big { font-size: 28px; }
+  .qbld .count-display-row { flex-direction: column; align-items: stretch; }
+  .qbld .prog-block,
+  .qbld .pane-card { padding: 16px; }
+  /* a phone does not zoom into a 16px box */
+  .qbld select,
+  .qbld input[type='text'],
+  .qbld input[type='number'] { font-size: 16px; }
 }
-
-/* below a computer's width: the compact parts only */
-@media (max-width: 1023.98px) {
-  .qb .qb-wide,
-  .qb-intro,
-  .qb-start svg { display: none; }
-  .qb-bar { box-shadow: var(--shadow-md); }
-}
-
-/* a computer: every section open with its numbered heading, the bar the
-   "Your quiz" card on the right (the canvas's computer board) */
-@media (min-width: 1024px) {
-  .qb { grid-template-columns: minmax(0, 1fr) 300px; gap: var(--space-20); align-items: start; }
-  .qb .qb-phone { display: none; }
-  .qb-quick { min-height: 64px; }
-
-  .qb-panel { gap: var(--space-12); padding: var(--space-20) var(--space-24); }
-
-  /* the canvas's columns: the courses three across, each name over its
-     count; the modes in two, Study | Exam, the radio at the top line */
-  .qb-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-  .qb-option { align-items: flex-start; min-height: 64px; padding: var(--space-12) var(--space-12); }
-  .qb-option-text { flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: var(--space-2); }
-  .qb-option-title { overflow-wrap: anywhere; }
-  .qb-mode-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-16); align-items: start; }
-  .qb-mode { align-items: flex-start; }
-  .qb-option .qb-radio,
-  .qb-mode .qb-radio { margin-top: 1px; }
-  .qb-mode-group .qb-label { margin-top: 0; }
-
-  .qb-side { top: var(--space-16); bottom: auto; }
-  .qb-bar { flex-direction: column; align-items: stretch; gap: var(--space-12); padding: var(--space-20); }
-  .qb-bar-text { padding-top: var(--space-12); border-top: 1px solid var(--border); }
-  .qb .qb-start { width: 100%; }
+@media (max-width: 480px) {
+  .qbld .prog-circle { width: 28px; height: 28px; font-size: 12px; }
+  .qbld .prog-circle::after { inset: -8px; }
+  .qbld .checks-grid { grid-template-columns: 1fr; }
 }

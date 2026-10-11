@@ -1,6 +1,6 @@
-// app/(app)/student/quiz-builder/page.tsx — the Quiz Builder (04.4;
-// Sam, 2026-10-11, layout C of his "Quiz Builder Redesign" canvas).
-// Built from the plan, not from the legacy wizard it replaces.
+// app/(app)/student/quiz-builder/page.tsx — the Quiz Builder (04.4):
+// the old five-step wizard's look on the new builder's rules (Sam,
+// 2026-10-11, later the same day).
 //
 // The server half: the gate, the builder's door — every course this
 // student may build from, each with its pool (the whole bank or the free
@@ -22,7 +22,7 @@ import { QuizBuilderClient } from './quiz-builder-client';
 import '@/styles/student-quiz-builder.css';
 
 export const metadata: Metadata = {
-  title: 'Quiz builder | MyNMCLicensure',
+  title: 'Quiz Builder | MyNMCLicensure',
 };
 
 export const dynamic = 'force-dynamic';
@@ -41,7 +41,7 @@ export default async function QuizBuilderPage({ searchParams }: { searchParams: 
   if (!courses.length) {
     return (
       <>
-        <PageHeader title="Quiz builder" />
+        <PageHeader title="Quiz Builder" subtitle="Build a custom quiz from one course at a time." />
         <div className="card qb-empty">
           <p className="qb-empty-title">No courses to build from yet</p>
           <p className="qb-meta">Your programme&apos;s courses show here once your profile names your programme, or with a package.</p>
@@ -59,7 +59,7 @@ export default async function QuizBuilderPage({ searchParams }: { searchParams: 
 
   return (
     <>
-      <PageHeader title="Quiz builder" />
+      <PageHeader title="Quiz Builder" subtitle="Build a custom quiz from one course at a time." />
       <QuizBuilderClient
         courses={courses}
         maxQuestions={maxQuestions}
