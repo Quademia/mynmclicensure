@@ -74,9 +74,9 @@ opens it (00, The menu).
 - Paid with Premium Prep: open (02.10).
 
 ### Quiz builder
-- The page: 04, The Quiz Builder (four steps, Sam 2026-10-11). Opened
-  with a course and topic already set from the report and the dashboard,
-  at step 2.
+- The page: 04, The Quiz Builder (the old five-step wizard's look, Sam
+  2026-10-11). Opened with a course and topic already set from the
+  report and the dashboard, at step 2.
 - Paid: the whole bank of the courses held, all four modes, no banner.
 - Trial: "Trial · 2 of 3 quizzes left — a quiz counts when you build
   it; retakes don't count". Used up: "You've used your 3 trial quizzes

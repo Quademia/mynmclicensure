@@ -79,7 +79,7 @@ before then, and the old list's history, is in
 - ⬜ Q19 The admin's preview says Preview — on the card and in the sitting
 - ⬜ Q20 Preview this paper — an editor button: questions, answers, rationales, no sitting
 - ⬜ Q7 Select-all partial credit — the rule first (open), then the three-state display
-- ✅ 04.4 The Quiz Builder redesigned — four steps, By topic | By keyword, one door for every status — 2026-10-11
+- ✅ 04.4 The Quiz Builder — the old five-step wizard's look on one door for every status (Sam) — 2026-10-11
 - ✅ 04.1 The builder's minimum of 5 questions — Start greyed below 5, the words say why — 2026-10-11
 - ⏸ 04.2 A pass mark per paper, Passed / Didn't pass on the results — Sam: later (09-27)
 - ⏸ Q3 Mock exams as a premium exam experience — a design item; Sam picks when
@@ -138,7 +138,7 @@ before then, and the old list's history, is in
 - ✅ 09.6 The phone's bottom bar and sub-tab row — four fixed tabs, a row per group, the drawer kept — 2026-10-04
 - ✅ 09.7 The student menu in its groups — a heading per group, every row visible, the phone's names — 2026-10-04
 - ⏸ DS9 About eight pages on their own button classes — they join as each is touched
-- ⏸ 09.8 The builder's own chips, switch, choice cards, step circles, search box — not in the system; Sam to rule
+- ✖ 09.8 The builder's own chips, switch, cards, circles, search box — gone with the four-step page (10-11)
 
 ## [10 Launch and platform](docs/product-plan/10-launch-and-platform.md)
 

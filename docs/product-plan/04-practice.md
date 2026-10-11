@@ -40,42 +40,44 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
 
 ### The Quiz Builder
 
-Ruled by Sam, 2026-10-11, from his canvas "Quiz Builder Redesign"
-(2026-10-09; layout C there).
+Ruled by Sam, 2026-10-11: the old five-step wizard's look on the new
+builder's rules. His 10-09 canvas "Quiz Builder Redesign", and the
+four-step page built from it, were set aside the same day.
 
-- **Four steps** (Sam, 2026-10-11, later the same night, joining the
-  old wizard to the canvas): 1 Course · 2 What to practise · 3 Filters ·
-  4 How to take it (with How many). The old wizard's circles at the top,
-  joined by a line, a tick on each step passed, each with its choice
-  under it; any circle jumps there; Next and Back in the step; no Review
-  step — "Your quiz" (the count, a summary, Start) is a card on the
-  right on a computer and a bar pinned above the phone's bottom bar.
-  **Start works from any step.** "Repeat your last setup" on top,
-  remembered on that device for that student; a "Weakest topic" start
-  is later.
-- **What to practise, two ways — By topic | By keyword** (Sam: they are
-  different). By topic: the topic list, All topics, and a Find a topic
-  box that only searches the list. By keyword: a word matched from the
+- **Five steps, the old wizard's**: 1 Course & selection mode (the
+  course list, Topics | Keyword, Recent setups) · 2 Topics or Keyword ·
+  3 Filters · 4 Count & mode · 5 Review & build. The circles at the top,
+  a tick on each step passed, any circle a way there; Next and Back in
+  the step; the quiz built from the Review step only (its pool, count
+  and time, the summary with Edit, the status box). The status line
+  (below) sits above the circles. **Recent setups**: the last 5, kept
+  on that device for that student. A "Weakest topic" start is later.
+- **Topics or Keyword** (Sam: they are different). Topics: Use all
+  topics, or tick some; a filter box that only searches the list,
+  Select all shown, Clear; the picked ones as chips under the list.
+  Keyword (Sam's word for the old Concept): a word matched from the
   start of a word in the question, its rationale, its topic or subtopic
   ("malar" finds malaria, "iron" not environment); "N questions contain
-  …"; the topics they sit in, to narrow — the word stays applied. Only
-  the side showing counts; switching keeps the other's choice. The
-  subtopic picker goes (free text, uneven).
+  …"; the topics they sit in, to narrow. The old subtopic list goes
+  (free text, uneven).
 - **Filters**: Which questions — All, New to me (never answered), Got
-  wrong before (the latest answer wrong); Difficulty; Type.
-- **How many**: − / + from 5 to the builder's limit. Fewer than 5 match:
-  Start greyed, "Only 3 questions match — untick a filter or clear the
-  keyword" (04.1). The quiz is named by what was chosen: "All topics"
-  never names three topics.
+  wrong before (the latest answer wrong); Difficulty; Question type. A
+  tick the next course lacks is dropped.
+- **Count**: a slider and a number box from 5 to the builder's limit.
+  Fewer than 5 match: Build greyed, the status box says why (04.1). The
+  quiz is named by what was chosen: "All topics" never names three
+  topics.
 - **One builder for every status** (Sam, 2026-10-04, kept 2026-10-11):
   the server decides once, per student and course, whatever page opened
   it — the whole bank, the free questions only (03), or nothing; the
-  modes open; the trial's quizzes left; the banner (11).
+  modes open (on the free questions the exam modes shown locked, "open
+  with a package"); the trial's quizzes left; the status line (11).
 - **A trial student whose 3 quizzes are used** keeps building from the
   free questions, Study modes only, until the trial ends (Sam,
   2026-10-11: b).
-- The offline pack builder keeps today's steps until its own redesign,
-  then reuses the topic picker.
+- A dropped connection says so and offers Try again; the page never
+  freezes.
+- The offline pack builder keeps today's steps until its own redesign.
 
 ### Modes
 
