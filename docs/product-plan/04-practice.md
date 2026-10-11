@@ -220,6 +220,12 @@ and "instant runner", which predate the four modes.
 
 ## Open
 
+- **Practice Papers' look** (2026-10-11, unanswered): today's page kept
+  and Q21, the trial's lock and the ended line added (recommended), or
+  a design first.
+- **A free student who never trialled, on Practice Papers** (2026-10-11,
+  unanswered): the programme's papers listed and locked, "Opens with a
+  package" (recommended), or the empty page of today.
 - **Q3 — mock exams' design**, none decided: an exam window with one
   timed sitting, no retake, no Study modes; results released on a date;
   cohort standing; notices when a mock opens and results land; a

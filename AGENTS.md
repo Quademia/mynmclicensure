@@ -322,6 +322,14 @@ above sit at the repo root; the audience grouping inside them is kept.
   publication** and the client's `schema: 'licensure_gh'` on the
   subscription — a table outside the publication fires nothing, with
   no error. Add it in the migration that creates the table (guarded).
+- **A Server Action whose request fails rejects; it does not return
+  `{ ok: false }`.** On a dropped connection the `await` throws, so a
+  page that checks only `result.ok` stays on "Starting…" or "Loading…"
+  for good — the four-step builder did (2026-10-11). Wrap every call a
+  page makes in `try/catch`, say "Could not … Please check your
+  connection", and give the button back or offer Try again, as the
+  runner does. Walk it by making the page's POSTs fail in the pane
+  (replace `window.fetch` for `method: 'POST'`, then restore it).
 - **A `<form action={fn}>` resets its fields after the action returns**
   (React 19). When the fields must survive — a submit that only opens a
   confirm step — use a plain `onSubmit` + `new FormData(form)`.
