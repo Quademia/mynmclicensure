@@ -342,6 +342,14 @@ table by table as each is next changed (AGENTS.md rule 9).
   its redesign *(to build: 03.1)*.
 - Browser: a student reads open, published papers of courses they hold
   — every column but `notes` and `open_in_trial` (no page reads it yet).
+- *To build (04.5) — awaiting Sam's tick:* a `first_mode` column — the
+  mode a student's first sitting of the paper must be in, one of
+  `allowed_modes`, `TIMED_FREE_NAV` on a new paper (and on today's
+  papers). `create_attempt` refuses a paper's other modes to a student
+  until they have a finished sitting of it — submitted or timed out, not
+  abandoned. Why: the first sitting is the honest measure, and the
+  admin can change the mode if the official exam changes (Sam,
+  2026-10-11).
 
 ### `quiz_items` — a paper's questions
 | Column | Holds |
@@ -352,6 +360,11 @@ table by table as each is next changed (AGENTS.md rule 9).
 
 - A question a paper uses cannot be deleted.
 - Browser: nothing.
+- *To build (04.6) — awaiting Sam's tick:* a question a draft or active
+  paper uses is held back as a mock's is — the database refuses it in a
+  builder quiz (whole bank or free), and refuses marking it free or
+  saving a paper with a free question. Why: a paper's questions are met
+  first in the paper (Sam, 2026-10-11).
 
 ### `mock_quizzes`, `mock_quiz_items` — mock exams and their questions
 - The same columns as `quizzes` and `quiz_items`, plus `visibility`

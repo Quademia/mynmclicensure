@@ -16,8 +16,11 @@ Detail and history: `archive/product-plan/09-free-account-and-gamification.md` Â
 - A free account practises without limit on the **free set**: bank
   questions the admin marks free (06), per programme. It holds no
   course access. The free set is not the bank.
-- A free question stays inside its own paid course; a question any mock
-  uses can never be free (06).
+- A free question stays inside its own paid course; a question any
+  paper or mock uses can never be free (06; papers: Sam, 2026-10-11).
+- **Practice Papers are not free**: with no package, the page lists the
+  programme's papers, locked â€” "Opens with a package" (Sam, 2026-10-11;
+  11).
 - A programme's free set is the free questions of its courses plus the
   General Paper's, so the General Paper's free questions are free to
   every programme.

@@ -23,7 +23,7 @@ should stay rich.
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
 - 2026-10-11, evening — Quiz Builder reviewed; the old five-step wizard's look back on its new rules (04.4); Practice Papers explained
-  - ↳ stuck filter · dropped connection froze it · Sam's a–g · Filters step · Concept → Keyword · Build on Review only · Recent setups per student · 09.8 ✖ · trial sees Start on locked paper · two questions open · app crashed
+  - ↳ stuck filter · dropped connection froze it · a–g · Filters step · Keyword · Build on Review · papers: first sitting per paper, finished · kept out of builder · free sees locked · dev papers by cloud · crash
 
 - 2026-10-10, into 10-11 — dashboard states walked, ticked; Quiz Builder rebuilt for every status (04.4): one door, free quizzes, four steps
   - ↳ of answers right · one builder kept · topic ≠ keyword, word-start · trial used up → free (b) · free sittings open · old ticks, Change links · old topic tiles · DS conform, nothing added · Repeat last per student

@@ -56,15 +56,22 @@ opens it (00, The menu).
   course (08); days left from the stored end (02).
 
 ### Practice papers
+- **Redesigned once its rulings are settled** (Sam, 2026-10-11; 04.7):
+  drawn first, then built.
 - The name and "Practice Paper N", the course in full above (04 Q21);
-  one section per allowed mode; UPCOMING / CLOSED by the server's clock;
-  a paper holding a draft question refuses to start, with the message on
-  the card.
+  UPCOMING / CLOSED by the server's clock; a paper holding a draft
+  question refuses to start, with the message on the card.
+- The first sitting in the paper's first-sitting mode; its other ways
+  locked until that sitting is finished — "Opens after your first exam
+  sitting" (04.5; the words at the redesign).
 - Trial: the ticked paper first, "Included in your trial"; the others
   locked — "Opens with a package", Choose a package (03).
 - Ended: every paper listed, the trial paper with its score, the rest
   locked; at the top "Your trial ended on 18 October. Your scores are
   still here."
+- Free, with no package (Sam, 2026-10-11): every paper of the
+  programme's courses listed and locked, "Opens with a package", Choose a
+  package — the ended view, with scores only where they exist.
 
 ### Mock exams
 - Free, trial, ended, and paid without Premium Prep: listed, locked,
@@ -225,7 +232,9 @@ opens it (00, The menu).
   open badge (02 C5).
 
 ### Practice papers and Mock exams
-- Mode ticks under Study and Exam (refused with none); the modes as
+- A paper: "First sitting in" (a dropdown, Free Navigation already
+  picked) and the other ways allowed after it (04.5). A mock: mode ticks
+  under Study and Exam (refused with none). The modes as
   chips; an "Allows …" filter; the "Open in trial" tick (03); a Preview
   button (04 Q20); the mock list "Showing 50 of N"; the paper picker
   hides held-back questions and marks one already in the paper "In a

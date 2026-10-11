@@ -76,6 +76,11 @@ Detail and history: `archive/product-plan/08-question-bank.md` (B1–B8).
   the pack maker, the paper picker and the daily challenge skip it, and
   it can never be marked free — both the free tick and the mock's save
   refuse. Archiving the mock releases it (04).
+- **So is a question a draft or active Practice Paper uses** (Sam,
+  2026-10-11): the builder, the pack maker, the free set and the daily
+  challenge skip it, and the free tick and the paper's save refuse;
+  archiving the paper releases it. The bank page marks it "In a paper".
+  *(to build: 04.6)*
 
 ### The importer
 

@@ -19,7 +19,8 @@ app's description) and the built code in `lib/offline-packs/` and
   every question belongs to the course (Sam, 2026-09-14) — a tampered
   request cannot make a pack.
 - **What a pack draws**: published questions only; questions held back
-  by a mock are not offered (06).
+  by a mock — or, once 04.6 is built, by a Practice Paper — are not
+  offered (06).
 - **No repeats until the pool runs out**: questions not in the student's
   earlier packs for the course (this subscription) come first, at
   random; repeats only fill a shortfall.

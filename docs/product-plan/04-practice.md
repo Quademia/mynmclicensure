@@ -26,6 +26,26 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
   it shows away from its course; the address `/student/practice-papers`.
   "Fixed quiz" stays the word in the code (Sam, 2026-10-02). *(to
   build: Q21)*
+- **The first sitting of a paper is in its first-sitting mode** (Sam,
+  2026-10-11). The admin picks it per paper from a dropdown, "First
+  sitting in", with Free Navigation already picked on a new paper (the
+  official exam is like Free Navigation: one clock, move freely). The
+  paper's other ways, which the admin ticks, open to a student once they
+  have **finished** it in that mode — submitted, or the time ran out; an
+  abandoned or unfinished sitting does not count. Every first sitting of
+  a paper is then alike, which the percentile counts on (05). *(to
+  build: 04.5)*
+- **A paper's questions are kept out of the Quiz Builder** (Sam,
+  2026-10-11), as a mock's are: the builder, the pack maker, the free
+  set and the daily challenge skip them (06). A student studies them
+  through the paper, in its other ways, once the first sitting is done.
+  So a course needs questions beyond its papers — five papers of 180
+  (General Paper 100) and about as many again for the builder: about
+  1,800 a course (General Paper 1,000), mocks on top. *(to build: 04.6)*
+- **Practice Papers is redesigned once its rulings are settled** (Sam,
+  2026-10-11): Q21, the trial's lock, the ended and free states and the
+  first-sitting lock, the page drawn first, then built. *(to build:
+  04.7)*
 - A paper or mock is offered only when active, published and inside its
   window, on the server's clock — one check serves the lists, Start and
   Retake; outside it the card says UPCOMING or CLOSED. A student reads
@@ -208,9 +228,10 @@ and "instant runner", which predate the four modes.
 
 ### For the admin
 
-- Mode ticks under Study and Exam on the paper and mock editors; the
-  "Open in trial" tick on a paper (03). The mock list shows 50 at a
-  time.
+- On the paper editor, "First sitting in" (a dropdown, Free Navigation
+  already picked) and the other ways allowed after it (ticks) (04.5); on
+  the mock editor, mode ticks under Study and Exam. The "Open in trial"
+  tick on a paper (03). The mock list shows 50 at a time.
 - The admin can preview any sitting, read-only. It will say Preview on
   the card and in the sitting, with no "Don't show this again". *(to
   build: Q19)*
@@ -220,12 +241,6 @@ and "instant runner", which predate the four modes.
 
 ## Open
 
-- **Practice Papers' look** (2026-10-11, unanswered): today's page kept
-  and Q21, the trial's lock and the ended line added (recommended), or
-  a design first.
-- **A free student who never trialled, on Practice Papers** (2026-10-11,
-  unanswered): the programme's papers listed and locked, "Opens with a
-  package" (recommended), or the empty page of today.
 - **Q3 — mock exams' design**, none decided: an exam window with one
   timed sitting, no retake, no Study modes; results released on a date;
   cohort standing; notices when a mock opens and results land; a
