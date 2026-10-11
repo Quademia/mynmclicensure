@@ -159,7 +159,7 @@ function Recap({ rows, onChange, className }: { rows: [string, string, number][]
         <div key={label} className="qb-recap-row">
           <dt>{label}</dt>
           <dd>{value}</dd>
-          <button type="button" className="qb-recap-change" aria-label={`Change ${label.toLowerCase()}`} onClick={() => onChange(to)}>
+          <button type="button" className="btn btn-link qb-recap-change" aria-label={`Change ${label.toLowerCase()}`} onClick={() => onChange(to)}>
             Change
           </button>
         </div>
@@ -456,7 +456,7 @@ export function QuizBuilderClient({
         <Banner course={course} />
 
         {lastCourse ? (
-          <button type="button" className="qb-quick" onClick={repeatLast}>
+          <button type="button" className="card qb-quick" onClick={repeatLast}>
             <span className="qb-quick-tile" aria-hidden="true">
               <Icon name="refresh" />
             </span>
@@ -484,7 +484,7 @@ export function QuizBuilderClient({
           ))}
         </ol>
 
-        <section className="qb-panel" aria-labelledby="qb-panel-title">
+        <section className="card qb-panel" aria-labelledby="qb-panel-title">
           <div className="qb-panel-head">
             <p className="qb-panel-kicker">
               Step {step + 1} of {STEPS.length}
@@ -536,7 +536,7 @@ export function QuizBuilderClient({
               {loadFailed ? (
                 <p className="qb-meta">
                   {loadFailed}{' '}
-                  <button type="button" className="qb-more" onClick={retryLoad}>
+                  <button type="button" className="btn btn-link qb-more" onClick={retryLoad}>
                     Try again
                   </button>
                 </p>
@@ -572,17 +572,17 @@ export function QuizBuilderClient({
                   </div>
                   <div className="qb-chip-actions">
                     {!find && topicList.length > TOPICS_SHOWN ? (
-                      <button type="button" className="qb-more" onClick={() => setShowAllTopics((v) => !v)}>
+                      <button type="button" className="btn btn-link qb-more" onClick={() => setShowAllTopics((v) => !v)}>
                         {showAllTopics ? 'Show fewer topics' : `Show all ${topicList.length} topics`}
                       </button>
                     ) : null}
                     {unticked.length ? (
-                      <button type="button" className="qb-more" onClick={() => setTopics((s) => [...new Set([...s, ...unticked])])}>
+                      <button type="button" className="btn btn-link qb-more" onClick={() => setTopics((s) => [...new Set([...s, ...unticked])])}>
                         Tick all {shownTopics.length} shown
                       </button>
                     ) : null}
                     {pickedTopics.length ? (
-                      <button type="button" className="qb-more" onClick={() => setTopics([])}>
+                      <button type="button" className="btn btn-link qb-more" onClick={() => setTopics([])}>
                         Clear
                       </button>
                     ) : null}
@@ -705,13 +705,13 @@ export function QuizBuilderClient({
                 </p>
                 <div className="qb-count-controls" role="group" aria-labelledby="qb-count-title">
                   <div className="qb-stepper">
-                    <button type="button" className="qb-step" aria-label="Five fewer" disabled={!enough || n <= MIN} onClick={() => setCount(Math.max(MIN, n - COUNT_STEP))}>
+                    <button type="button" className="btn btn-ghost btn-lg qb-step" aria-label="Five fewer" disabled={!enough || n <= MIN} onClick={() => setCount(Math.max(MIN, n - COUNT_STEP))}>
                       −
                     </button>
                     <span className="qb-count-num" aria-live="polite">
                       {enough ? n : '—'}
                     </span>
-                    <button type="button" className="qb-step" aria-label="Five more" disabled={!enough || n >= cap} onClick={() => setCount(Math.min(cap, n + COUNT_STEP))}>
+                    <button type="button" className="btn btn-ghost btn-lg qb-step" aria-label="Five more" disabled={!enough || n >= cap} onClick={() => setCount(Math.min(cap, n + COUNT_STEP))}>
                       +
                     </button>
                   </div>
@@ -733,14 +733,14 @@ export function QuizBuilderClient({
 
           <div className="qb-nav">
             {step > 0 ? (
-              <button type="button" className="btn btn-ghost qb-nav-btn" onClick={() => goStep(step - 1)}>
+              <button type="button" className="btn btn-ghost btn-lg" onClick={() => goStep(step - 1)}>
                 ← Back
               </button>
             ) : (
               <span />
             )}
             {step < STEPS.length - 1 ? (
-              <button type="button" className="btn btn-outline qb-nav-btn" onClick={() => goStep(step + 1)}>
+              <button type="button" className="btn btn-outline btn-lg" onClick={() => goStep(step + 1)}>
                 Next: {STEPS[step + 1].name} →
               </button>
             ) : null}
@@ -749,7 +749,7 @@ export function QuizBuilderClient({
       </div>
 
       <aside className="qb-side" aria-label="Your quiz">
-        <div className="qb-bar">
+        <div className="card qb-bar">
           <p className="qb-bar-label qb-wide">Your quiz</p>
           <p className="qb-bar-big qb-wide">
             <span className="qb-bar-num">{loaded ? matching.toLocaleString('en-GB') : '…'}</span>
@@ -769,7 +769,7 @@ export function QuizBuilderClient({
               )}
             </span>
           </div>
-          <button type="button" className="btn btn-accent qb-start" disabled={!ready || building} onClick={() => void start()}>
+          <button type="button" className="btn btn-accent btn-lg qb-start" disabled={!ready || building} onClick={() => void start()}>
             {building ? 'Starting…' : exam ? 'Start exam' : 'Start quiz'}
             {building ? null : <ArrowRight />}
           </button>

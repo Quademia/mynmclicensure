@@ -45,7 +45,7 @@ export default async function QuizBuilderPage({ searchParams }: { searchParams: 
         <div className="card qb-empty">
           <p className="qb-empty-title">No courses to build from yet</p>
           <p className="qb-meta">Your programme&apos;s courses show here once your profile names your programme, or with a package.</p>
-          <AppLink href="/student/upgrade" className="btn btn-primary">
+          <AppLink href="/student/upgrade" className="btn btn-primary btn-lg">
             See packages
           </AppLink>
         </div>
