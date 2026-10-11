@@ -250,6 +250,9 @@
 .qb-chip.is-on .qb-chip-count { color: var(--brand-teal-hover); }
 .qb-chip:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* under the topics: Show all, Tick all N shown (while searching), Clear */
+.qb-chip-actions { display: flex; flex-wrap: wrap; column-gap: var(--space-20); }
+
 .qb-more {
   align-self: flex-start;
   min-height: 44px;
@@ -384,6 +387,26 @@
 .qb-recap-row { display: flex; gap: var(--space-12); font-size: var(--type-ui-size); line-height: var(--type-ui-line); }
 .qb-recap-row dt { flex: 0 0 84px; color: var(--ink-muted); font-weight: 500; }
 .qb-recap-row dd { flex: 1; min-width: 0; margin: 0; font-weight: 600; color: var(--ink); overflow-wrap: anywhere; }
+/* Change — to the step that sets this row (the old Review's Edit); a 44px
+   tap area without changing its look */
+.qb-recap-change {
+  position: relative;
+  flex: none;
+  padding: 0;
+  background: none;
+  border: 0;
+  font: inherit;
+  font-size: var(--type-meta-size);
+  font-weight: 600;
+  color: var(--brand-teal);
+  cursor: pointer;
+}
+.qb-recap-change::after { content: ''; position: absolute; inset: -13px -6px; }
+.qb-recap-change:hover { text-decoration: underline; }
+
+/* a phone: the summary closes step 4, so the last step is the review */
+.qb-review { display: flex; flex-direction: column; gap: var(--space-8); padding-top: var(--space-12); border-top: 1px solid var(--border); }
+.qb-review .qb-recap { gap: var(--space-16); }
 .qb-trial-note { margin: 0; font-size: var(--type-meta-size); line-height: var(--type-meta-line); color: var(--badge-warning-ink); }
 
 /* ── nothing to build from ── */

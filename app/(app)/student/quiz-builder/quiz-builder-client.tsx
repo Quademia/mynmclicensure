@@ -151,6 +151,23 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
+/** The summary — each row's choice and a Change that goes to its step (the old Review's Edit). */
+function Recap({ rows, onChange, className }: { rows: [string, string, number][]; onChange: (step: number) => void; className?: string }) {
+  return (
+    <dl className={className ? `qb-recap ${className}` : 'qb-recap'}>
+      {rows.map(([label, value, to]) => (
+        <div key={label} className="qb-recap-row">
+          <dt>{label}</dt>
+          <dd>{value}</dd>
+          <button type="button" className="qb-recap-change" aria-label={`Change ${label.toLowerCase()}`} onClick={() => onChange(to)}>
+            Change
+          </button>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 export function QuizBuilderClient({
   courses,
   maxQuestions,
@@ -322,6 +339,16 @@ export function QuizBuilderClient({
       : typed
         ? `“${typed}”${pickedKw.length ? ` in ${shortList(pickedKw)}` : ''}`
         : 'type a word';
+  // The card and the circles have room for one name: "Community Health +6 more".
+  const oneAndMore = (names: string[]) => (names.length <= 1 ? names.join('') : `${names[0]} +${names.length - 1} more`);
+  const selectionShort =
+    way === 'topic'
+      ? pickedTopics.length
+        ? oneAndMore(pickedTopics)
+        : 'All topics'
+      : typed
+        ? `“${typed}”${pickedKw.length ? ` in ${oneAndMore(pickedKw)}` : ''}`
+        : 'type a word';
   const quizName = `${course.title} · ${selection} · ${questions(n)}`;
 
   // ── each step's choice, under its circle ──
@@ -334,12 +361,13 @@ export function QuizBuilderClient({
 
   // ── "Your quiz", the card on the right (a computer); the phone's bar keeps one line ──
   const chosenFilters = [...diffs, ...types.map((t) => TYPE_LABEL[t] || t)];
-  const recap: [string, string][] = [
-    ['Course', course.title],
-    way === 'topic' ? ['Topics', selection] : ['Keyword', typed ? selection : '—'],
-    ['Questions', WHICH.find((w) => w.id === which)!.label + (free ? ' · free only' : '')],
-    ['Filters', chosenFilters.length ? chosenFilters.join(', ') : 'Any'],
-    ['Mode', `${modeDef.groupLabel} · ${modeDef.name}`],
+  // [label, value, the step that changes it] — the old Review step's Edit links
+  const recap: [string, string, number][] = [
+    ['Course', course.title, 0],
+    way === 'topic' ? ['Topics', selectionShort, 1] : ['Keyword', typed ? selectionShort : '—', 1],
+    ['Questions', WHICH.find((w) => w.id === which)!.label + (free ? ' · free only' : ''), 2],
+    ['Filters', chosenFilters.length ? chosenFilters.join(', ') : 'Any', 2],
+    ['Mode', `${modeDef.groupLabel} · ${modeDef.name}`, 3],
   ];
   const clockText = exam ? `${minutes} min` : 'no clock';
   const trialNote =
@@ -360,7 +388,7 @@ export function QuizBuilderClient({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  const stepValues = [courseLine, selection, filtersLine, `${modeDef.name} · ${enough ? n : '—'}`];
+  const stepValues = [courseLine, selectionShort, filtersLine, `${modeDef.name} · ${enough ? n : '—'}`];
 
   function pickCourse(id: string) {
     if (id === courseId) return;
@@ -414,6 +442,7 @@ export function QuizBuilderClient({
     : showAllTopics
       ? topicList
       : topicList.filter(([t], idx) => idx < TOPICS_SHOWN || pickedTopics.includes(t));
+  const unticked = find ? shownTopics.map(([t]) => t).filter((t) => !pickedTopics.includes(t)) : [];
   const kwList = ranked(kwTopicCounts);
 
   const lastSummary = last && lastCourse
@@ -541,11 +570,23 @@ export function QuizBuilderClient({
                     ))}
                     {find && !shownTopics.length ? <p className="qb-meta">No topic has “{topicFind.trim()}” in its name.</p> : null}
                   </div>
-                  {!find && topicList.length > TOPICS_SHOWN ? (
-                    <button type="button" className="qb-more" onClick={() => setShowAllTopics((v) => !v)}>
-                      {showAllTopics ? 'Show fewer topics' : `Show all ${topicList.length} topics`}
-                    </button>
-                  ) : null}
+                  <div className="qb-chip-actions">
+                    {!find && topicList.length > TOPICS_SHOWN ? (
+                      <button type="button" className="qb-more" onClick={() => setShowAllTopics((v) => !v)}>
+                        {showAllTopics ? 'Show fewer topics' : `Show all ${topicList.length} topics`}
+                      </button>
+                    ) : null}
+                    {unticked.length ? (
+                      <button type="button" className="qb-more" onClick={() => setTopics((s) => [...new Set([...s, ...unticked])])}>
+                        Tick all {shownTopics.length} shown
+                      </button>
+                    ) : null}
+                    {pickedTopics.length ? (
+                      <button type="button" className="qb-more" onClick={() => setTopics([])}>
+                        Clear
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
               ) : (
                 <div className="qb-block">
@@ -682,6 +723,11 @@ export function QuizBuilderClient({
                 </div>
                 <p className="qb-meta">{countNote}</p>
               </div>
+
+              <div className="qb-review qb-phone">
+                <p className="qb-label">Your quiz</p>
+                <Recap rows={recap} onChange={goStep} />
+              </div>
             </>
           ) : null}
 
@@ -709,14 +755,7 @@ export function QuizBuilderClient({
             <span className="qb-bar-num">{loaded ? matching.toLocaleString('en-GB') : '…'}</span>
             <span className="qb-bar-word">{matching === 1 ? 'question matches' : 'questions match'}</span>
           </p>
-          <dl className="qb-recap qb-wide">
-            {recap.map(([label, value]) => (
-              <div key={label} className="qb-recap-row">
-                <dt>{label}</dt>
-                <dd>{value}</dd>
-              </div>
-            ))}
-          </dl>
+          <Recap rows={recap} onChange={goStep} className="qb-wide" />
           <div className="qb-bar-text">
             <span className="qb-bar-count qb-phone">{loaded ? `${matching.toLocaleString('en-GB')} ${matching === 1 ? 'question matches' : 'questions match'}` : 'Loading…'}</span>
             <span className={ready ? 'qb-bar-line' : 'qb-bar-line is-warn'}>
