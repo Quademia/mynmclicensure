@@ -338,7 +338,9 @@ export function QuizBuilderClient({
   const clockText = exam ? `${minutes} min` : 'no clock';
   const trialNote =
     course.reason === 'trial' && course.quizzesLeft
-      ? `Uses one of your ${course.quizzesLeft} trial ${course.quizzesLeft === 1 ? 'quiz' : 'quizzes'} left.`
+      ? course.quizzesLeft === 1
+        ? 'Uses your last trial quiz.'
+        : `Uses one of your ${course.quizzesLeft} trial quizzes left.`
       : '';
   const countNoteShort = !enough ? `At least ${MIN} needed` : matching < maxQuestions ? `Up to ${matching} — all that match` : `${MIN} to ${maxQuestions} questions`;
   const countNote = !enough
