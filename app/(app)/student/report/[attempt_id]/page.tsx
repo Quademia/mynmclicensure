@@ -27,6 +27,7 @@ import { getCourseById } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import { getAttemptById } from '@/lib/attempts/queries';
 import { retakeOpen } from '@/lib/attempts/runner-load';
+import { isFreeSitting } from '@/lib/attempts/free-sitting';
 import { modeOf } from '@/lib/attempts/modes';
 import { sessionHref } from '@/lib/attempts/links';
 import {
@@ -64,11 +65,12 @@ export default async function ReportPage({ params }: { params: Promise<{ attempt
   if (attempt.status === 'in_progress') redirect(sessionHref(attempt.attempt_id));
   if (attempt.status !== 'completed') redirect(HISTORY_PATH);
 
-  const [access, course, rows, retakeAllowed] = await Promise.all([
+  const [access, course, rows, retakeAllowed, free] = await Promise.all([
     getStudentCourseAccess(supabase, profile.user_id),
     getCourseById(supabase, attempt.course_id),
     readReportRows(supabase, attempt.attempt_id),
     retakeOpen(gate, attempt),
+    isFreeSitting(attempt),
   ]);
 
   const label = attempt.display_label || (attempt.quiz_id ? 'Fixed Quiz' : 'Custom Quiz');
@@ -79,8 +81,9 @@ export default async function ReportPage({ params }: { params: Promise<{ attempt
   );
 
   // The review's CHECK 5, in its words: the report's links (the review,
-  // the builder) would refuse, so the page does too.
-  if (!access[attempt.course_id]) {
+  // the builder) would refuse, so the page does too — a free sitting
+  // apart, whose review and builder stay open (03, 04.4).
+  if (!access[attempt.course_id] && !free) {
     return (
       <div className="srp">
         {back}

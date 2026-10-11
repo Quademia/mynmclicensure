@@ -88,18 +88,23 @@ export async function knownItemIds(db: Db, courseId: string, itemIds: string[]):
 // matched subtopic, main topic, stem and rationale; the last two are no
 // longer in the browser, so the match runs in the database and only item
 // ids come back — never a stem. search_question_bank_ids() takes the
-// keyword as a bound parameter and tests it as a plain case-insensitive
-// substring, which is what String.includes() did over the same rows.
-// Service role: it reads the rationale. The caller's gate is
-// requireStudent() plus the course-access check.
-export async function searchConceptItemIds(db: ServiceDb, courseId: string, query: string): Promise<string[]> {
+// keyword as a bound parameter and, since 04.4 (2026-10-11), matches it
+// from the start of a word, case ignored ("malar" finds malaria, "iron"
+// not environment); `freeOnly` answers with the free questions alone, for
+// a student building from the free set. Service role: it reads the
+// rationale. The caller's gate is requireStudent() plus the course check
+// (the pack builder's access, the quiz builder's door).
+export async function searchConceptItemIds(db: ServiceDb, courseId: string, query: string, freeOnly = false): Promise<string[]> {
   const q = String(query || '').trim();
   if (!q) return [];
 
   // a set-returning function is cut at 1,000 too: "a" matches all 1,080
   // of RM_PED_OBS_HRN (B7)
   const { data, error } = await readAll<{ item_id: string }>((from, to) =>
-    db.rpc('search_question_bank_ids', { p_course_id: courseId, p_query: q }).order('item_id').range(from, to),
+    db
+      .rpc('search_question_bank_ids', { p_course_id: courseId, p_query: q, p_free_only: freeOnly })
+      .order('item_id')
+      .range(from, to),
   );
   if (error) {
     console.error('searchConceptItemIds:', error);

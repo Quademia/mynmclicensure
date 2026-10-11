@@ -28,6 +28,7 @@ import { getQuizById } from '@/lib/quizzes/queries';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import type { AuthGateResult } from '@/lib/access';
+import { isFreeSitting } from './free-sitting';
 import { SESSION_EXITS, type SessionExit } from './links';
 import { modeOf } from './modes';
 import { getAttemptById, originSource, readAttemptItems } from './queries';
@@ -117,10 +118,11 @@ async function checkSession(
   // The sitting's home, now that it is known to be theirs (03 Q8).
   const exit = SESSION_EXITS[(await originSource(supabase, attempt)) ?? 'fixed'];
 
-  // CHECK 5 — Course access
+  // CHECK 5 — Course access, or a free sitting: a builder quiz of free
+  // questions opens for a student without the course (03, 04.4).
   if (!previewMode) {
     const access = await getStudentCourseAccess(supabase, profile.user_id);
-    if (!access[attempt.course_id]) {
+    if (!access[attempt.course_id] && !(await isFreeSitting(attempt))) {
       return { kind: 'error', title: 'No Course Access', message: 'You do not have an active subscription for this course.', exit };
     }
   }

@@ -169,6 +169,62 @@ export async function getBuilderCourseItems(db: ServerSupabaseClient, courseId: 
   return data;
 }
 
+// The Quiz Builder's pool (04.4): the light columns it counts and
+// filters on, a whole course (readAll, rule 10), published rows only —
+// and with `freeOnly` the free set's rows alone (03), named in the query
+// although a student without the course reads no other rows anyway (RLS
+// is the floor, not the filter). Null on an error, so the page can say so.
+export async function getQuizBuilderRows(
+  db: ServerSupabaseClient,
+  courseId: string,
+  freeOnly: boolean,
+): Promise<{ item_id: string; maintopic: string | null; difficulty: string | null; question_type: string }[] | null> {
+  type Row = { item_id: string; maintopic: string | null; difficulty: string | null; question_type: string };
+  const { data, error } = await readAll<Row>((from, to) => {
+    let q = db.from('question_bank').select('item_id, maintopic, difficulty, question_type').eq('course_id', courseId).eq('is_published', true);
+    if (freeOnly) q = q.eq('is_free_sample', true);
+    return q.order('item_id').range(from, to);
+  });
+  if (error) {
+    console.error('getQuizBuilderRows:', courseId, error);
+    return null;
+  }
+  return data;
+}
+
+// "New to me" and "Got wrong before" (04.4; Sam, 2026-10-11): every
+// question this student has answered in a course, and whether the
+// latest answer was wrong — no table of its own, read from their own
+// sittings. One student's rows, but a busy student passes 1,000 answers
+// in a course, so readAll() on the row's own key (rule 10). An answer
+// not yet graded (an unsubmitted Untimed sitting) counts as seen, never
+// as wrong. Null on an error.
+export async function getAnswerHistory(db: ServerSupabaseClient, userId: string, courseId: string): Promise<Map<string, boolean> | null> {
+  type Row = { item_id: string; is_correct: boolean | null; answered_utc: string };
+  const { data, error } = await readAll<Row>((from, to) =>
+    db
+      .from('attempt_items')
+      .select('item_id, is_correct, answered_utc, attempts!inner ( user_id, course_id )')
+      .eq('attempts.user_id', userId)
+      .eq('attempts.course_id', courseId)
+      .not('answered_utc', 'is', null)
+      .order('attempt_item_id')
+      .range(from, to),
+  );
+  if (error) {
+    console.error('getAnswerHistory:', userId, courseId, error);
+    return null;
+  }
+  // item → [when, wrong] of its latest answer
+  const latest = new Map<string, [number, boolean]>();
+  for (const r of data) {
+    const at = Date.parse(r.answered_utc);
+    const before = latest.get(r.item_id);
+    if (!before || at >= before[0]) latest.set(r.item_id, [at, r.is_correct === false]);
+  }
+  return new Map([...latest].map(([id, [, wrong]]) => [id, wrong]));
+}
+
 // getStudentAttemptsPaginated: the learning history page's read (7a) —
 // the card columns only, newest first, one page of `pageSize`, with the
 // exact total for the "Showing N of M" line and the Load more button.

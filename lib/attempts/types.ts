@@ -166,19 +166,50 @@ export type BuilderItem = {
   question_type: string;
 };
 
-// What the builder sends with a build (legacy spawnBuilderAttempt meta).
-export type BuilderMeta = {
-  n: number;
-  selection_mode: 'topics' | 'concept';
-  maintopics: string[];
-  subtopics: string[];
-  difficulties: string[];
-  question_types: string[];
-  concepts: string[];
-  concept_query: string;
-  display_label: string;
-  duration_min_override: number;
+// ── the Quiz Builder (04.4; Sam, 2026-10-11) ───────────────────────────
+// The offline pack builder keeps BuilderItem and today's steps until its
+// own redesign; the quiz builder reads these.
+
+/** A quiz needs at least this many questions (04.1; Sam, 2026-09-30, ruled 2026-10-11). */
+export const BUILDER_MIN_QUESTIONS = 5;
+
+/** What a course is open for in the builder: the whole bank, or its free questions only (03). */
+export type BuilderPool = 'all' | 'free';
+
+/**
+ * Why: a grant with no count (a package, Free Full Access); a trial with
+ * quizzes left; a trial whose quizzes are used (the free questions, Sam
+ * 2026-10-11: b); no grant at all — the free account's floor.
+ */
+export type BuilderReason = 'paid' | 'trial' | 'trial-used' | 'free';
+
+/** One course the door opens, decided on the server (lib/attempts/builder-door.ts). */
+export type BuilderDoorCourse = {
+  course_id: string;
+  title: string;
+  pool: BuilderPool;
+  reason: BuilderReason;
+  /** A trial's builder quizzes: left and in all; null without a count. */
+  quizzesLeft: number | null;
+  quizzesTotal: number | null;
+  /** The questions this pool holds — published, not held back by a mock. */
+  total: number;
 };
+
+/** The quiz builder's light row: what it counts and filters on, and what the student did with it. */
+export type QuizBuilderItem = {
+  item_id: string;
+  maintopic: string | null;
+  difficulty: string | null;
+  question_type: string;
+  /** Answered before, in any sitting. */
+  seen: boolean;
+  /** The latest answer to it was wrong ("Got wrong before"). */
+  wrong: boolean;
+};
+
+export type QuizBuilderLoad = { ok: true; items: QuizBuilderItem[] } | { ok: false; error: string };
+export type KeywordResult = { ok: true; itemIds: string[] } | { ok: false; error: string };
 
 export type Score = { raw: number; total: number; pct: number };
 

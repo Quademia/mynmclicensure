@@ -1,57 +1,67 @@
-// app/(app)/student/quiz-builder/page.tsx — legacy student/quiz-builder.html.
+// app/(app)/student/quiz-builder/page.tsx — the Quiz Builder (04.4;
+// Sam, 2026-10-11, layout C of his "Quiz Builder Redesign" canvas).
+// Built from the plan, not from the legacy wizard it replaces.
 //
-// The server half: the gate, then what the page loaded on init — the
-// config caps (builder_max_questions, builder_minutes_per_question), the
-// student's course access and the active courses (only the accessible
-// ones reach the dropdown, as legacy populateCourseSelect filtered), and
-// the `?course=` the course page passes — handed to the client half,
-// which is the wizard. A course's questions load on pick through a
-// Server Action, as legacy fetched them on change. `&topic=` (the
-// attempt report's "Practise this topic", 03 Q10) ticks that main topic
-// and opens the wizard on its Topics step; it is kept only with a course
-// the student can open, and dropped by the wizard if the course has no
-// such topic.
+// The server half: the gate, the builder's door — every course this
+// student may build from, each with its pool (the whole bank or the free
+// questions), why, a trial's quizzes left, and the question count it
+// holds — and the config caps. The door decides from the student's
+// grants, whichever page opened the builder; nothing in the address says
+// "free". `?course=` (the course page, the dashboard) picks a course the
+// door opened; `&topic=` (the report's and the dashboard's "Practise this
+// topic") ticks that topic, kept only with that course.
 
 import type { Metadata } from 'next';
 import { requireStudent } from '@/lib/access';
-import { getConfig, getCourses } from '@/lib/catalogue/queries';
-import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
+import { getConfig } from '@/lib/catalogue/queries';
+import { getBuilderDoor, withTotals } from '@/lib/attempts/builder-door';
 import { BUILDER_MAX_QUESTIONS_DEFAULT, BUILDER_MINUTES_PER_QUESTION_DEFAULT } from '@/lib/attempts/types';
 import { PageHeader } from '@/components/shell/page-header';
+import { AppLink } from '@/components/shell/link-pending';
 import { QuizBuilderClient } from './quiz-builder-client';
 import '@/styles/student-quiz-builder.css';
 
 export const metadata: Metadata = {
-  title: 'Quiz Builder | MyNMCLicensure',
+  title: 'Quiz builder | MyNMCLicensure',
 };
 
 export const dynamic = 'force-dynamic';
 
 export default async function QuizBuilderPage({ searchParams }: { searchParams: Promise<{ course?: string; topic?: string }> }) {
-  const { supabase, profile } = await requireStudent();
+  const gate = await requireStudent();
   const { course, topic } = await searchParams;
 
-  const [config, access, allCourses] = await Promise.all([
-    getConfig(supabase),
-    getStudentCourseAccess(supabase, profile.user_id),
-    getCourses(supabase),
-  ]);
+  const [config, door] = await Promise.all([getConfig(gate.supabase), getBuilderDoor(gate)]);
+  const courses = await withTotals(gate, door);
 
-  // legacy effectiveBuilderLimit / MINUTES_PER_QUESTION
   const maxQuestions = Number(config.builder_max_questions) > 0 ? Number(config.builder_max_questions) : BUILDER_MAX_QUESTIONS_DEFAULT;
   const minutesPerQuestion =
     Number(config.builder_minutes_per_question) > 0 ? Number(config.builder_minutes_per_question) : BUILDER_MINUTES_PER_QUESTION_DEFAULT;
 
-  const accessible = allCourses.filter((c) => Boolean(access[c.course_id])).map((c) => ({ course_id: c.course_id, title: c.title }));
+  if (!courses.length) {
+    return (
+      <>
+        <PageHeader title="Quiz builder" />
+        <div className="card qb-empty">
+          <p className="qb-empty-title">No courses to build from yet</p>
+          <p className="qb-meta">Your programme&apos;s courses show here once your profile names your programme, or with a package.</p>
+          <AppLink href="/student/upgrade" className="btn btn-primary">
+            See packages
+          </AppLink>
+        </div>
+      </>
+    );
+  }
+
   const fromUrl = String(course || '');
-  const initialCourseId = fromUrl && access[fromUrl] ? fromUrl : '';
+  const initialCourseId = courses.some((c) => c.course_id === fromUrl) ? fromUrl : '';
   const initialTopic = initialCourseId ? String(topic || '').trim() : '';
 
   return (
     <>
-      <PageHeader title="Quiz Builder" subtitle="Build a custom quiz from one course at a time." />
+      <PageHeader title="Quiz builder" />
       <QuizBuilderClient
-        courses={accessible}
+        courses={courses}
         maxQuestions={maxQuestions}
         minutesPerQuestion={minutesPerQuestion}
         initialCourseId={initialCourseId}
