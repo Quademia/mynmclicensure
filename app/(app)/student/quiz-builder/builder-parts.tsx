@@ -33,6 +33,21 @@ export function Chip({ label, count, pressed, onClick, disabled }: { label: stri
   );
 }
 
+/**
+ * A topic as the old wizard drew it (Sam, 2026-10-11: "the old one looked
+ * better"): a tile with a dot, the name and its count in a small pill; in
+ * a grid inside a box that scrolls. `wide` spans the row (All topics).
+ */
+export function TopicTile({ label, count, pressed, onClick, wide }: { label: string; count?: number; pressed: boolean; onClick: () => void; wide?: boolean }) {
+  return (
+    <button type="button" className={`qb-tile${pressed ? ' is-on' : ''}${wide ? ' qb-tile-all' : ''}`} aria-pressed={pressed} onClick={onClick}>
+      <span className="qb-tile-dot" aria-hidden="true" />
+      <span className="qb-tile-name">{label}</span>
+      {count !== undefined ? <span className="qb-tile-count">{count.toLocaleString('en-GB')}</span> : null}
+    </button>
+  );
+}
+
 /** One mode, from the mode table; locked on the free questions (Exam modes open with a package). */
 export function ModeCard({ mode, pressed, locked, onClick }: { mode: ModeDef; pressed: boolean; locked: boolean; onClick: () => void }) {
   return (

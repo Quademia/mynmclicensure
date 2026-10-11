@@ -244,8 +244,57 @@
 .qb-chip.is-on .qb-chip-count { color: var(--brand-teal-hover); }
 .qb-chip:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* under the topics: Show all, Tick all N shown (while searching), Clear */
-.qb-chip-actions { display: flex; flex-wrap: wrap; column-gap: var(--space-20); }
+/* ── the topics as the old wizard drew them (Sam, 2026-10-11): a grid of
+   tiles in a box that scrolls, each a dot, the name and a count pill ── */
+.qb-topic-tools { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-8); }
+.qb-topic-find { flex: 1; min-width: 180px; }
+.qb-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: var(--space-8);
+  max-height: 280px;
+  overflow-y: auto;
+  padding: var(--space-12);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.qb-tiles-empty { grid-column: 1 / -1; padding: var(--space-8); }
+.qb-tile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: 40px;
+  padding: var(--space-8) var(--space-12);
+  background: var(--surface-page);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font: inherit;
+  font-size: var(--type-ui-size);
+  line-height: var(--type-ui-line);
+  color: var(--ink-muted);
+  text-align: left;
+  cursor: pointer;
+}
+.qb-tile:hover { border-color: var(--brand-teal); color: var(--ink); }
+.qb-tile.is-on { background: var(--brand-teal-pale); border-color: var(--brand-teal); color: var(--brand-teal-hover); font-weight: 600; }
+.qb-tile-all { grid-column: 1 / -1; }
+.qb-tile-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
+.qb-tile.is-on .qb-tile-dot { background: var(--brand-teal); }
+.qb-tile-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.qb-tile-count {
+  flex: none;
+  margin-left: auto;
+  padding: 1px var(--space-6);
+  background: var(--surface-page);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  font-size: var(--type-micro-size);
+  font-weight: 600;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+.qb-tile.is-on .qb-tile-count { background: var(--surface); border-color: var(--brand-teal); color: var(--brand-teal-hover); }
 
 /* the shared .btn-link, with a 44px tap area that changes nothing you see */
 .qb-more { position: relative; align-self: flex-start; }
@@ -373,7 +422,9 @@
 /* a touch screen: every chip and switch a finger's size */
 @media (pointer: coarse) {
   .qb-chip,
-  .qb-seg-btn { min-height: 44px; }
+  .qb-seg-btn,
+  .qb-tile,
+  .qb .qb-tool-btn { min-height: 44px; }
 }
 
 /* a phone: the bar sits above the bottom tab bar (phone-tabs.css: 56px and its 1px top border) */

@@ -31,7 +31,7 @@ import { BUILDER_MIN_QUESTIONS, CONCEPT_SEARCH_DELAY_MS, type AttemptMode, type 
 import { AppLink } from '@/components/shell/link-pending';
 import { Icon } from '@/components/shell/icons';
 import { Toast } from '@/lib/toast/toast';
-import { ArrowRight, Banner, Chip, ModeCard } from './builder-parts';
+import { ArrowRight, Banner, Chip, ModeCard, TopicTile } from './builder-parts';
 
 type Way = 'topic' | 'keyword';
 type Which = 'all' | 'new' | 'wrong';
@@ -48,6 +48,7 @@ const MIN = BUILDER_MIN_QUESTIONS;
 const COUNT_STEP = 5;
 const COUNT_DEFAULT = 20;
 const COUNT_PICKS = [10, 20, 30, 50];
+/** Above this many topics, a Find a topic box sits over the list. */
 const TOPICS_SHOWN = 8;
 const NOT_SET = 'Not set';
 const PACKAGES_HREF = '/student/upgrade';
@@ -194,7 +195,6 @@ export function QuizBuilderClient({
   const [way, setWay] = useState<Way>('topic');
   const [topics, setTopics] = useState<string[]>(() => (initialTopic ? [initialTopic] : []));
   const [topicFind, setTopicFind] = useState('');
-  const [showAllTopics, setShowAllTopics] = useState(false);
   const [word, setWord] = useState('');
   const [kwTopics, setKwTopics] = useState<string[]>([]);
   const [which, setWhich] = useState<Which>('all');
@@ -397,7 +397,6 @@ export function QuizBuilderClient({
     setKwTopics([]);
     setWord('');
     setTopicFind('');
-    setShowAllTopics(false);
     setExamNote(false);
   }
 
@@ -414,7 +413,6 @@ export function QuizBuilderClient({
     setMode(MODE_ORDER.includes(last.mode) ? last.mode : 'UNTIMED_LEARNING');
     setCount(Number(last.count) || COUNT_DEFAULT);
     setTopicFind('');
-    setShowAllTopics(false);
     setStep(STEPS.length - 1);
   }
 
@@ -434,14 +432,10 @@ export function QuizBuilderClient({
     router.push(sessionHref(result.attemptId));
   }
 
-  // ── the topic chips ──
+  // ── the topic tiles ──
   const topicList = ranked(topicCounts);
   const find = topicFind.trim().toLowerCase();
-  const shownTopics = find
-    ? topicList.filter(([t]) => t.toLowerCase().includes(find))
-    : showAllTopics
-      ? topicList
-      : topicList.filter(([t], idx) => idx < TOPICS_SHOWN || pickedTopics.includes(t));
+  const shownTopics = find ? topicList.filter(([t]) => t.toLowerCase().includes(find)) : topicList;
   const unticked = find ? shownTopics.map(([t]) => t).filter((t) => !pickedTopics.includes(t)) : [];
   const kwList = ranked(kwTopicCounts);
 
@@ -544,48 +538,43 @@ export function QuizBuilderClient({
 
               {way === 'topic' ? (
                 <div className="qb-block">
-                  {topicList.length > TOPICS_SHOWN ? (
-                    <div className="qb-field">
-                      <label htmlFor="qb-find" className="qb-label">
-                        Find a topic
-                      </label>
-                      <div className="qb-input-wrap">
-                        <Icon name="search" className="qb-input-icon" />
-                        <input
-                          id="qb-find"
-                          type="text"
-                          className="qb-input"
-                          autoComplete="off"
-                          placeholder="Search this list"
-                          value={topicFind}
-                          onChange={(e) => setTopicFind(e.target.value)}
-                        />
+                  <div className="qb-topic-tools">
+                    {topicList.length > TOPICS_SHOWN ? (
+                      <div className="qb-field qb-topic-find">
+                        <label htmlFor="qb-find" className="qb-label">
+                          Find a topic
+                        </label>
+                        <div className="qb-input-wrap">
+                          <Icon name="search" className="qb-input-icon" />
+                          <input
+                            id="qb-find"
+                            type="text"
+                            className="qb-input"
+                            autoComplete="off"
+                            placeholder="Search this list"
+                            value={topicFind}
+                            onChange={(e) => setTopicFind(e.target.value)}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  ) : null}
-                  <div className="qb-chips">
-                    {!find ? <Chip label="All topics" count={loaded ? pool.length : undefined} pressed={!pickedTopics.length} onClick={() => setTopics([])} /> : null}
-                    {shownTopics.map(([t, c]) => (
-                      <Chip key={t} label={t} count={c} pressed={pickedTopics.includes(t)} onClick={() => setTopics((s) => toggleIn(s, t))} />
-                    ))}
-                    {find && !shownTopics.length ? <p className="qb-meta">No topic has “{topicFind.trim()}” in its name.</p> : null}
-                  </div>
-                  <div className="qb-chip-actions">
-                    {!find && topicList.length > TOPICS_SHOWN ? (
-                      <button type="button" className="btn btn-link qb-more" onClick={() => setShowAllTopics((v) => !v)}>
-                        {showAllTopics ? 'Show fewer topics' : `Show all ${topicList.length} topics`}
-                      </button>
                     ) : null}
                     {unticked.length ? (
-                      <button type="button" className="btn btn-link qb-more" onClick={() => setTopics((s) => [...new Set([...s, ...unticked])])}>
+                      <button type="button" className="btn btn-lite qb-tool-btn" onClick={() => setTopics((s) => [...new Set([...s, ...unticked])])}>
                         Tick all {shownTopics.length} shown
                       </button>
                     ) : null}
                     {pickedTopics.length ? (
-                      <button type="button" className="btn btn-link qb-more" onClick={() => setTopics([])}>
+                      <button type="button" className="btn btn-lite qb-tool-btn" onClick={() => setTopics([])}>
                         Clear
                       </button>
                     ) : null}
+                  </div>
+                  <div className="qb-tiles" role="group" aria-label="Topics">
+                    {!find ? <TopicTile wide label="All topics" count={loaded ? pool.length : undefined} pressed={!pickedTopics.length} onClick={() => setTopics([])} /> : null}
+                    {shownTopics.map(([t, c]) => (
+                      <TopicTile key={t} label={t} count={c} pressed={pickedTopics.includes(t)} onClick={() => setTopics((s) => toggleIn(s, t))} />
+                    ))}
+                    {find && !shownTopics.length ? <p className="qb-meta qb-tiles-empty">No topic has “{topicFind.trim()}” in its name.</p> : null}
                   </div>
                 </div>
               ) : (
@@ -627,10 +616,10 @@ export function QuizBuilderClient({
                   {kwPool.length ? (
                     <>
                       <p className="qb-label">Topics with “{typed}”</p>
-                      <div className="qb-chips">
-                        <Chip label={`All ${kwList.length} ${kwList.length === 1 ? 'topic' : 'topics'}`} count={kwPool.length} pressed={!pickedKw.length} onClick={() => setKwTopics([])} />
+                      <div className="qb-tiles" role="group" aria-label={`Topics with ${typed}`}>
+                        <TopicTile wide label={`All ${kwList.length} ${kwList.length === 1 ? 'topic' : 'topics'}`} count={kwPool.length} pressed={!pickedKw.length} onClick={() => setKwTopics([])} />
                         {kwList.map(([t, c]) => (
-                          <Chip key={t} label={t} count={c} pressed={pickedKw.includes(t)} onClick={() => setKwTopics((s) => toggleIn(s, t))} />
+                          <TopicTile key={t} label={t} count={c} pressed={pickedKw.includes(t)} onClick={() => setKwTopics((s) => toggleIn(s, t))} />
                         ))}
                       </div>
                     </>
