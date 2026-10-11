@@ -66,6 +66,7 @@ export default async function QuizBuilderPage({ searchParams }: { searchParams: 
         minutesPerQuestion={minutesPerQuestion}
         initialCourseId={initialCourseId}
         initialTopic={initialTopic}
+        userKey={gate.profile.user_id}
       />
     </>
   );

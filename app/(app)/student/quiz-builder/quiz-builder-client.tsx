@@ -16,7 +16,9 @@
 // the first N and asks the server, which checks it all again; the
 // database's own refusal shows in its words.
 //
-// "Repeat last" is remembered on this device only (Sam, 2026-10-11).
+// "Repeat last" is remembered on this device only (Sam, 2026-10-11), and
+// only for the student who built it — a shared phone does not hand one
+// student's last quiz to the next (found walking student4 after +7).
 
 'use client';
 
@@ -73,6 +75,7 @@ type LastSetup = {
 };
 
 const LAST_KEY = 'qa_builder_last_v2';
+const lastKeyOf = (userKey: string) => `${LAST_KEY}:${userKey}`;
 const lastListeners = new Set<() => void>();
 
 function subscribeLast(onChange: () => void): () => void {
@@ -81,9 +84,9 @@ function subscribeLast(onChange: () => void): () => void {
     lastListeners.delete(onChange);
   };
 }
-function readLast(): string {
+function readLast(userKey: string): string {
   try {
-    return window.localStorage.getItem(LAST_KEY) || '';
+    return window.localStorage.getItem(lastKeyOf(userKey)) || '';
   } catch {
     return '';
   }
@@ -91,9 +94,9 @@ function readLast(): string {
 function lastOnServer(): string {
   return '';
 }
-function saveLast(setup: LastSetup): void {
+function saveLast(userKey: string, setup: LastSetup): void {
   try {
-    window.localStorage.setItem(LAST_KEY, JSON.stringify(setup));
+    window.localStorage.setItem(lastKeyOf(userKey), JSON.stringify(setup));
   } catch {
     /* storage blocked — Repeat last simply does not show */
   }
@@ -147,6 +150,7 @@ export function QuizBuilderClient({
   minutesPerQuestion,
   initialCourseId,
   initialTopic,
+  userKey,
 }: {
   courses: BuilderDoorCourse[];
   maxQuestions: number;
@@ -154,6 +158,8 @@ export function QuizBuilderClient({
   initialCourseId: string;
   /** The report's and the dashboard's "Practise this topic". */
   initialTopic: string;
+  /** The student's own id — Repeat last is kept per student on a device. */
+  userKey: string;
 }) {
   const router = useRouter();
 
@@ -186,7 +192,7 @@ export function QuizBuilderClient({
 
   const course = courses.find((c) => c.course_id === courseId) ?? courses[0];
   const free = course.pool === 'free';
-  const lastRaw = useSyncExternalStore(subscribeLast, readLast, lastOnServer);
+  const lastRaw = useSyncExternalStore(subscribeLast, () => readLast(userKey), lastOnServer);
   const last = useMemo(() => parseLast(lastRaw), [lastRaw]);
   const lastCourse = last ? courses.find((c) => c.course_id === last.courseId) : undefined;
 
@@ -384,7 +390,7 @@ export function QuizBuilderClient({
       setBuilding(false);
       return;
     }
-    saveLast({ courseId, way, topics: pickedTopics, word: typed, kwTopics: pickedKw, which, diffs, types, mode: modeNow, count: n });
+    saveLast(userKey, { courseId, way, topics: pickedTopics, word: typed, kwTopics: pickedKw, which, diffs, types, mode: modeNow, count: n });
     router.push(sessionHref(result.attemptId));
   }
 
