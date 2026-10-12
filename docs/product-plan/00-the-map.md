@@ -73,7 +73,7 @@ Full Access stays the admin's grant (02).
 | Group | Page | What it is for |
 |---|---|---|
 | Dashboard | Dashboard | Where sign-in lands, for every status; its top card is this student's next step — today's challenge, days left, carry on, the recap (11) |
-| Practise | My courses | One course: its papers, days left, its news |
+| Practise | My courses | A card for each course — days left, how far through, where to carry on; a plain row with no dropdown (Sam, 2026-10-12). Each opens the course page: a front door to its papers, mocks and builder, with its news (11) |
 | | Practice papers | The set papers of each course (today "Fixed quizzes") |
 | | Mock exams | Timed papers in exam conditions |
 | | Quiz builder | A quiz built from chosen topics |

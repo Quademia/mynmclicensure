@@ -77,6 +77,8 @@ before then, and the old list's history, is in
 - ✅ Q21 Practice Papers — the name, "Practice Paper N", the course in full above, the address `/student/practice-papers` (student side built 2026-10-12; `/student/fixed-quizzes` redirects; the admin's "Fixed Quizzes" wording, the help page and the public copy are not changed)
 - ✅ 04.5 The first sitting in the paper's own mode — `first_mode` and the database's rule, the admin's "First sitting in" dropdown, the paper's page (built 2026-10-12; the admin form not yet walked by eye, needs an admin sign-in)
 - ✅ 04.6 A paper's questions kept out of the builder, packs, free set and challenge — as a mock's (no column; built 2026-10-12; the challenge reads it when G2 is built; the bank page's "In a paper" mark not done)
+- ⬜ 04.8 The My courses page — `/student/courses`, a card per course; the menu row plain, its dropdown gone (drawn and ruled 2026-10-12, 11-pages)
+- ⬜ 04.9 The course page redesigned — tabs on a computer, Up next, three rows into the stand-alone pages, news; the four states (drawn and ruled 2026-10-12, 11-pages)
 - ✅ 04.7 Practice Papers redesigned — drawn and ruled 2026-10-12 (04, 11), built the same day: courses → a course → a paper's page with Practise again; walked as an RM paid student (computer, 375px, a failed request); the trial, ended and free states and the locked rows to walk as those students (one link each, Sam)
 - ⬜ G2 The daily challenge — 5 a day per programme, one course a day in turn, its own mode (storage ticked 10-08)
 - ⬜ Q19 The admin's preview says Preview — on the card and in the sitting

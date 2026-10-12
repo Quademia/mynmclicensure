@@ -49,11 +49,47 @@ opens it (00, The menu).
 - On a phone, the bottom bar's Dashboard tab; no row of sub-tabs (00).
 - Open: the cards' words, all new.
 
-### My courses (sidebar) and the course page
-- Ended: the courses stay, marked locked; the course page shows what it
-  holds and what the student did in it, locked (03).
-- The course's announcements; "Message us" opening a draft about the
-  course (08); days left from the stored end (02).
+### My courses and the course page
+- **Redesigned (Sam, 2026-10-12; 04.8, 04.9)**, drawn at
+  https://claude.ai/artifact/QmaN7QNr2gZ4D62LC1WuER. The course page is a
+  **front door and a progress summary**, not a second copy of the papers
+  and mocks: those keep their own pages (Practice papers, Mock exams, Quiz
+  builder), and the course page leads into them set to this course.
+- **The menu**: "My courses" is one plain row, no dropdown (its child
+  rows go); it opens `/student/courses`.
+- **My courses** (`/student/courses`): a card per course the student
+  holds — the name, a days-left chip from the stored end (amber at 7 or
+  fewer), a thin bar of questions met out of the course's bank, "N of M
+  papers", and a carry-on line (the sitting in progress, else the next
+  paper to start). A student holding nothing sees their programme's
+  courses, locked. Ended: the courses stay, an "Ended" chip, "See your
+  scores", the ended note. A card opens its course page.
+- **The course page** (`/student/course/[id]`), top to bottom: on a
+  computer a row of tabs — "‹ My courses" and the student's other
+  courses, the current one underlined — and on a phone only "‹ My
+  courses"; the title, the days-left chip with the end date, "Message us
+  about this course" (opens a draft about the course, 08); one progress
+  card (questions met out of the bank, papers done); **Up next**, one
+  card and one button — the sitting in progress first, else the next
+  paper not yet done; three rows, each a link into its stand-alone page
+  set to this course — Practice papers ("Paper 4 in progress", "All
+  done"), Mock exams ("Mock 1 opens 20 October", "With Premium Prep"),
+  Quiz builder ("Practise {topic}, 41%" when the dashboard's weakest topic
+  is in this course, else "Build a quiz"); the course's news, the two
+  newest announcements scoped to it (hidden when none). Off the page: the
+  papers' and mocks' own lists, the Procedures block (in the menu), the
+  programme badges.
+- **Trial**: "Trial · N days left"; Up next is the trial paper, "Included
+  in your trial"; mocks a locked line, "With Premium Prep"; the builder
+  row "N of 3 trial quizzes left"; Choose a package once, at the bottom.
+- **Ended**: an "Ended 5 October" chip and the note "Your package ended
+  on 5 October. Your scores are still here."; the progress stays; no Up
+  next; papers "Your scores are here"; mocks locked; the builder "Free
+  questions only"; Choose a package once.
+- **Free, no package ever**: a "Free" chip, no days; papers and mocks
+  locked lines; the builder "Free questions only"; Choose a package once.
+- No days, count, paper number or paper name is written into either
+  page: each is read from the student's own data and the course.
 
 ### Practice papers
 - **Redesigned (Sam, 2026-10-12; 04.7)**, drawn at
