@@ -1,14 +1,14 @@
 // components/quizzes/student-quiz-list.tsx
 //
-// The script block of legacy student/fixed-quizzes.html and
-// student/mock-exams.html (slice 5b) — one script twice, a few lines
-// apart, so one component with a `kind`. The page (server half) loads
-// what legacy's initPage loaded — the enrolled courses, each course's
-// published quizzes and the student's attempts — and hands them here;
+// The script block of legacy student/mock-exams.html (slice 5b), which
+// also served the Fixed Quizzes page until Practice Papers was rebuilt
+// (04.7, 2026-10-12; lib/practice-papers) — only the mock page uses it now.
+// The page (server half) loads what legacy's initPage loaded — the
+// enrolled courses, each course's published mocks and the student's
+// attempts — and hands them here;
 // this half is the filters, the course accordions, the cards with their
-// Practice / Exam sections, and the buttons. The words that differ by
-// page are in WORDS below; the mock page also shows a "Closes in N days"
-// line on an active exam.
+// Practice / Exam sections, and the buttons. The page's words are in
+// WORDS below; an active exam also shows a "Closes in N days" line.
 //
 // Start / Resume, Retake and Abandon go through Server Actions
 // (lib/attempts/actions); legacy wrote from the browser. Every sitting
@@ -36,7 +36,7 @@ import { sessionHref } from '@/lib/attempts/links';
 import { MODES, MODE_ORDER, modeOf, orderModes } from '@/lib/attempts/modes';
 import type { AttemptWithProgress, AttemptMode } from '@/lib/attempts/types';
 import { getQuizAvailability } from '@/lib/quizzes/availability';
-import type { Availability, QuizCard, QuizKind } from '@/lib/quizzes/types';
+import type { Availability, QuizCard } from '@/lib/quizzes/types';
 import { Icon } from '@/components/shell/icons';
 import type { IconName } from '@/lib/nav/types';
 import { AppLink } from '@/components/shell/link-pending';
@@ -44,7 +44,7 @@ import { AppLink } from '@/components/shell/link-pending';
 type CourseLite = { course_id: string; title: string };
 
 type Props = {
-  kind: QuizKind;
+  kind: 'mock';
   /** the enrolled courses, in catalogue order */
   courses: CourseLite[];
   quizzesByCourse: Record<string, QuizCard[]>;
@@ -63,15 +63,9 @@ type ModeFilter = '' | AttemptMode;
 type LaunchAction = 'start' | 'resume' | 'retake';
 
 const WORDS: Record<
-  QuizKind,
+  'mock',
   { path: string; emptyIcon: IconName; countNoun: (n: number) => string; noneForCourse: string }
 > = {
-  fixed: {
-    path: '/student/fixed-quizzes',
-    emptyIcon: 'clipboard',
-    countNoun: (n) => `${n} quiz${n !== 1 ? 'zes' : ''}`,
-    noneForCourse: 'No quizzes available for this course yet.',
-  },
   mock: {
     path: '/student/mock-exams',
     emptyIcon: 'target',

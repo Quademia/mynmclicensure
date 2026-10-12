@@ -30,7 +30,6 @@ import { nowIso } from '@/lib/subscriptions/dates';
 import { makeBulkBatchId, makeMessageId, makeThreadId } from './ids';
 import {
   getAdminThreads,
-  getDistinctLevelsAndCohorts,
   getStudentCourseIds,
   resolveRecipients,
   searchStudentsForMessaging,
@@ -161,11 +160,6 @@ export async function studentCoursesAction(userIdIn: string): Promise<string[]> 
   const userId = String(userIdIn || '').trim();
   if (!userId) return [];
   return getStudentCourseIds(supabase, userId);
-}
-
-export async function bulkPickersAction(): Promise<{ levels: string[]; cohorts: string[] }> {
-  const { supabase } = await requireAdmin();
-  return getDistinctLevelsAndCohorts(supabase);
 }
 
 // legacy ensureThread for an admin-made thread: reuse an OPEN thread of

@@ -24,7 +24,6 @@ export type PaperRow = {
   time_limit_sec: number | null;
   availability: Exclude<Availability, 'HIDDEN'>;
   publish_at: string | null;
-  unpublish_at: string | null;
   /** The trial paper (03): open to a trial student. */
   in_trial: boolean;
 };

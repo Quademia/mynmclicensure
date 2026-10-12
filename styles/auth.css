@@ -195,16 +195,6 @@
   color: var(--text-muted);
 }
 
-.auth-footer-sub {
-  text-align: center;
-  margin-top: 12px;
-}
-
-.auth-footer-sub a {
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
 /* --- Reset page: invalid link message --- */
 .auth-invalid p + p {
   margin-top: 1rem;
@@ -563,39 +553,6 @@
 .reg-success-ways ul { margin: 0; padding-left: 18px; }
 .reg-success-ways li { font-size: 13px; color: #334155; margin-bottom: 6px; line-height: 1.45; }
 .reg-success-btn { display: inline-block; margin-top: 4px; text-decoration: none; width: auto; padding: 12px 24px; }
-
-/* ══════════════════════════════════════════════════════════
-   /router (router.html <style>)
-   ══════════════════════════════════════════════════════════ */
-.router-wrap {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg);
-}
-.router-card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 40px 32px;
-  text-align: center;
-  box-shadow: 0 4px 20px rgba(30, 58, 95, 0.06);
-  max-width: 360px;
-  width: 100%;
-}
-.router-spinner {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 3px solid rgba(30, 58, 95, 0.12);
-  border-top-color: var(--primary);
-  animation: routerSpin 0.8s linear infinite;
-  margin: 0 auto 16px;
-}
-@keyframes routerSpin { to { transform: rotate(360deg); } }
-.router-msg { font-size: 15px; font-weight: 600; color: var(--primary); margin: 0 0 6px; }
-.router-sub { font-size: 13px; color: var(--text-muted); margin: 0; }
 
 /* --- Phone (UI convention #3, 768px) --- */
 @media (max-width: 768px) {

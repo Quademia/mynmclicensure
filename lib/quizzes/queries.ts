@@ -44,23 +44,20 @@ const CARD_COLUMNS =
   'quiz_id, course_id, title, n, allowed_modes, shuffle, time_limit_sec, published, publish_at, unpublish_at, status, created_at, updated_at';
 const MOCK_CARD_COLUMNS = `${CARD_COLUMNS}, visibility`;
 
-function cardColumns(kind: QuizKind): string {
-  return kind === 'mock' ? MOCK_CARD_COLUMNS : CARD_COLUMNS;
-}
-
-// getQuizzes / getMockQuizzes: one course, by title, for a student's
-// page — published + active rows, the card's columns. The policy is the
-// floor beneath: a course the student does not hold returns nothing.
-export async function getQuizzesForCourse(db: ServerSupabaseClient, kind: QuizKind, courseId: string): Promise<QuizCard[]> {
+// getMockQuizzesForCourse: one course's mock exams, by title, for a
+// student's page — published + active rows, the card's columns. The policy
+// is the floor beneath: a course the student does not hold returns nothing.
+// (Practice papers are read in lib/practice-papers/queries.ts.)
+export async function getMockQuizzesForCourse(db: ServerSupabaseClient, courseId: string): Promise<QuizCard[]> {
   const { data, error } = await db
-    .from(QUIZ_TABLES[kind])
-    .select(cardColumns(kind))
+    .from(QUIZ_TABLES.mock)
+    .select(MOCK_CARD_COLUMNS)
     .eq('course_id', courseId)
     .eq('published', true)
     .eq('status', 'active')
     .order('title');
   if (error) {
-    console.error('getQuizzesForCourse:', error);
+    console.error('getMockQuizzesForCourse:', error);
     return [];
   }
   return (data ?? []) as unknown as QuizCard[];

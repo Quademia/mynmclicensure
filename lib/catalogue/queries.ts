@@ -100,8 +100,8 @@ export async function getAllProducts(db: Db): Promise<Product[]> {
 
 /**
  * Active courses only, by title. Wrapped in cache() so a request reads
- * once however many callers — the student layout's menu and the dashboard
- * both ask (D2b, 10.13 in passing). The columns are named, so a narrower
+ * once however many callers (the dashboard, the courses pages and the
+ * shop ask). The columns are named, so a narrower
  * grant later cannot break it (AGENTS.md, select('*') under a cookie
  * client).
  */

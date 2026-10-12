@@ -13,7 +13,7 @@ import { getDashboardNumbers } from '@/lib/dashboard/student/queries';
 import { getAnnouncementsForStudent } from '@/lib/announcements/queries';
 import type { Announcement } from '@/lib/announcements/types';
 import { builderDoorFor } from '@/lib/attempts/builder-door';
-import { getQuizzesForCourse } from '@/lib/quizzes/queries';
+import { getMockQuizzesForCourse } from '@/lib/quizzes/queries';
 import { getQuizAvailability } from '@/lib/quizzes/availability';
 import { loadPracticePapers, type PracticePapers } from '@/lib/practice-papers/queries';
 import { formatDay, scoredPaper, shortName, upNext, type CourseView, type PaperView } from '@/lib/practice-papers/derive';
@@ -107,7 +107,7 @@ export async function loadCoursePage(gate: AuthGateResult, courseId: string): Pr
   // The mocks' row: included in the package, or a locked line.
   let mocksLine: CoursePageData['mocksLine'] = { text: 'With Premium Prep', open: false };
   if (course.mocksIncluded) {
-    const mocks = await getQuizzesForCourse(supabase, 'mock', courseId);
+    const mocks = await getMockQuizzesForCourse(supabase, courseId);
     const now = new Date();
     const open = mocks.find((m) => getQuizAvailability(m, now) === 'ACTIVE');
     const upcoming = mocks.find((m) => getQuizAvailability(m, now) === 'UPCOMING');

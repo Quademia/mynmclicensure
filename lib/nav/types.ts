@@ -70,18 +70,16 @@ export type IconName =
 export type NavIcon = IconName;
 
 export type NavItem = {
-  /** Stable key — used for dropdown state, badges and the active test. */
+  /** Stable key — used for badges and the active test. */
   key: string;
   /** Rendered text, exactly as the legacy sidebar showed it, minus the emoji (DS6). */
   label: string;
-  /** The row's icon, drawn before the label. Absent on a dropdown's child rows. */
+  /** The row's icon, drawn before the label. */
   icon?: NavIcon;
-  /** Route or URL. Absent on a dropdown parent. */
+  /** Route or URL. */
   href?: string;
   /** Opens in a new tab (the WhatsApp / Telegram channel links). */
   external?: boolean;
-  /** A dropdown: rendered as a toggle with these rows beneath it. */
-  children?: NavItem[];
   /** The Messages badge slot: the count comes from the layout (slice 12). */
   badge?: 'messages';
   /**
@@ -89,8 +87,6 @@ export type NavItem = {
    * (rebuild.md §9 #10); the sidebar must never show a dead link.
    */
   hidden?: boolean;
-  /** "My Courses": rows come from the student's course access at runtime. */
-  dynamic?: 'courses';
   /** A group's heading — a small label above its rows, not a link (00 The menu: A). */
   heading?: boolean;
 };

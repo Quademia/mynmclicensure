@@ -36,7 +36,6 @@
 
 /* ── Notices ── */
 .opr .err { color: #7f1d1d; background: #fff1f2; border: 1px solid rgba(127, 29, 29, 0.18); padding: 10px 12px; border-radius: 12px; font-size: 13px; margin-top: 12px; }
-.opr .warn { color: #7c2d12; background: #fff7ed; border: 1px solid rgba(124, 45, 18, 0.15); padding: 10px 12px; border-radius: 12px; font-size: 13px; margin-top: 12px; }
 
 /* ── Cards ── */
 .opr .card { background: var(--opr-card); border: 1px solid var(--opr-soft); border-radius: 14px; padding: 14px; margin-top: 12px; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06); }
@@ -107,7 +106,7 @@
 @media print {
   .opr { background: #fff; min-height: 0; }
   .opr .wrap { max-width: none; margin: 0; padding: 0; }
-  .opr .topbar, .opr .err, .opr .warn { display: none !important; }
+  .opr .topbar, .opr .err { display: none !important; }
   .opr .card { box-shadow: none; border: 1px solid #ddd; border-radius: 0; margin: 0 0 10mm 0; }
   .opr .ownerSep { border-radius: 0; }
   .opr .q { break-inside: avoid; page-break-inside: avoid; }

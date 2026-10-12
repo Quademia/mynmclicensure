@@ -1,8 +1,9 @@
 /* styles/student-quizzes.css
  *
- * The student Fixed Quizzes and Mock Exams pages (slice 5b). Transcribed
- * from the legacy pages' inline <style> block (student/fixed-quizzes.html
- * and student/mock-exams.html — the same block), scoped under `.sqz`.
+ * The student Mock Exams page (slice 5b; it also served Fixed Quizzes
+ * until Practice Papers was rebuilt, 2026-10-12). Transcribed from the
+ * legacy pages' inline <style> block (student/mock-exams.html), scoped
+ * under `.sqz`.
  * The .top-nav block every page carried is in shell.css already. The
  * legacy alert() messages are toasts (UI convention #1); the Abandon
  * confirm box stays the browser's (Sam, 2026-09-11).

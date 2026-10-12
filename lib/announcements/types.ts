@@ -9,17 +9,12 @@
 
 // rebuild.md §9 #18: no 'scheduled' — Active plus a start date schedules.
 export const ANNOUNCEMENT_STATUSES = ['draft', 'active', 'archived'] as const;
-export type AnnouncementStatus = (typeof ANNOUNCEMENT_STATUSES)[number];
 
 // legacy computeDisplayStatus: what the table's badge and the stats count.
 export type DisplayStatus = 'active' | 'scheduled' | 'expired' | 'draft' | 'archived';
 
 export const NOTICE_STATES = ['read', 'clicked', 'dismissed'] as const;
 export type NoticeState = (typeof NOTICE_STATES)[number];
-
-export const SUBSCRIPTION_KINDS = ['PAID', 'TRIAL', 'FREE'] as const;
-export const AUDIENCES = ['ALL', 'STUDENTS'] as const;
-export type Audience = (typeof AUDIENCES)[number];
 
 // legacy's fixed level picker
 export const LEVELS = ['L100', 'L200', 'L300', 'L400'] as const;

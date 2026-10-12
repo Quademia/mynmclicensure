@@ -2,15 +2,14 @@
 //
 // The runner's error card (legacy showError(title, msg) in
 // runner/instant.html and runner/timed.html): the icon, the title, the
-// message and the way back — since 03 Q8 the sitting's own home once the
-// attempt is known (links.ts), else Fixed Quizzes as legacy. Server
-// Component; the header is hidden, as legacy hid it.
+// message and the way back — the sitting's own home (03 Q8, links.ts), which
+// both callers pass. Server Component; the header is hidden, as legacy hid it.
 
 import { Icon } from '@/components/shell/icons';
-import { SESSION_EXITS, type SessionExit } from '@/lib/attempts/links';
+import type { SessionExit } from '@/lib/attempts/links';
 import { AppLink } from '@/components/shell/link-pending';
 
-export function RunnerError({ title, message, exit = SESSION_EXITS.fixed }: { title: string; message: string; exit?: SessionExit }) {
+export function RunnerError({ title, message, exit }: { title: string; message: string; exit: SessionExit }) {
   return (
     <div className="runner">
       <div className="runner-wrap">

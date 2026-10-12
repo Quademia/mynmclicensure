@@ -10,7 +10,7 @@
  * The `#0b7a75` teal, the 18px radius, the big soft shadow and the
  * slate greys are gone; the page's own names now point at the app's
  * tokens. The names are kept because they are scoped to this page and
- * every rule below reads them; they go when DS3 reaches this surface.
+ * the rules below read them; they go when DS3 reaches this surface.
  * Structure, spacing and copy are untouched.
  */
 
@@ -20,10 +20,7 @@
   --muted: var(--ink-muted);
   --card: var(--surface);
   --line: var(--border);
-  --ok: var(--badge-success-ink);
-  --ok-bg: var(--badge-success-bg);
   --danger: var(--status-danger);
-  --danger-bg: var(--badge-danger-bg);
   --shadow: var(--shadow-sm);
   color: var(--ink);
 }

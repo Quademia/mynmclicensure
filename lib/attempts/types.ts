@@ -143,7 +143,6 @@ export type CheckResult =
 
 // The config keys with the legacy fallbacks (equal to seed_data.sql).
 export const RUNNER_QUESTIONS_PER_PAGE_DEFAULT = 1;
-export const RUNNER_AUTOSAVE_SEC_DEFAULT = 60;
 export const BUILDER_MAX_QUESTIONS_DEFAULT = 50;
 export const BUILDER_MINUTES_PER_QUESTION_DEFAULT = 1;
 

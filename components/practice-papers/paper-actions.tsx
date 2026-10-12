@@ -67,19 +67,17 @@ export function LaunchButton({
   quizId,
   mode,
   label,
-  tone = 'accent',
 }: {
   quizId: string;
   mode: AttemptMode;
   label: string;
-  tone?: 'accent' | 'ghost';
 }) {
   const { busy, launch, toast } = useLaunch();
   return (
     <>
       <button
         type="button"
-        className={`btn btn-lg ${tone === 'ghost' ? 'btn-ghost' : 'btn-accent'}`}
+        className="btn btn-lg btn-accent"
         disabled={Boolean(busy)}
         onClick={() => launch('main', quizId, { mode, action: 'start' })}
       >

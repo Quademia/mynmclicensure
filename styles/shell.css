@@ -263,57 +263,9 @@
   opacity: 0.85;
 }
 .sidebar-nav a:hover .nav-icon,
-.sidebar-nav a.active .nav-icon,
-.sidebar-dropdown-toggle:hover .nav-icon,
-.sidebar-dropdown-toggle.active .nav-icon {
+.sidebar-nav a.active .nav-icon {
   opacity: 1;
 }
-
-/* --- Sidebar dropdowns (injected by the legacy student sidebar) --- */
-.sidebar-dropdown { position: relative; }
-.sidebar-dropdown-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 10px 24px;
-  font-size: 14px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  transition: background 0.15s;
-  user-select: none;
-}
-.sidebar-dropdown-label {
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.sidebar-dropdown-toggle:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
-.sidebar-dropdown-toggle.active { background: var(--accent); color: #fff; }
-.sidebar-dropdown-arrow { font-size: 11px; transition: transform 0.2s; }
-.sidebar-dropdown.open .sidebar-dropdown-arrow { transform: rotate(180deg); }
-.sidebar-dropdown-menu {
-  display: none;
-  flex-direction: column;
-  background: rgba(0, 0, 0, 0.15);
-}
-.sidebar-dropdown.open .sidebar-dropdown-menu { display: flex; }
-.sidebar-dropdown-menu a {
-  padding: 8px 24px 8px 40px;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.6);
-  text-decoration: none;
-  transition: background 0.15s;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: block;
-}
-.sidebar-dropdown-menu a:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
-.sidebar-dropdown-menu a.active { color: #fff; font-weight: 600; background: transparent; }
-.sidebar-dropdown-loading { padding: 8px 24px 8px 40px; font-size: 12px; color: rgba(255, 255, 255, 0.4); }
 
 /* --- Messages badge (student .sidebar-msg-badge = admin .admin-msg-badge) --- */
 .sidebar-msg-badge {
@@ -353,13 +305,7 @@
 
 /* --- Cards ---
  * `.card` itself moved to components.css (DS20, 2026-09-23), so the
- * public pages can use it too. The grid stays: the student dashboard's
- * course cards are its one user. */
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
-}
+ * public pages can use it too. */
 
 /* --- Overlay — phone only, beneath the bar --- */
 .sidebar-overlay {

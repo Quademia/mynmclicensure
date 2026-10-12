@@ -68,15 +68,6 @@ export async function getCohorts(db: ServerSupabaseClient): Promise<string[]> {
   return [...new Set(data.map((u) => u.cohort).filter((c): c is string => Boolean(c)))].sort();
 }
 
-export async function getAnnouncementById(db: ServerSupabaseClient, id: string): Promise<Announcement | null> {
-  const { data, error } = await db.from('announcements').select('*').eq('announcement_id', id).maybeSingle();
-  if (error) {
-    console.error('getAnnouncementById:', error);
-    return null;
-  }
-  return (data as Announcement | null) ?? null;
-}
-
 // ── student ────────────────────────────────────────────────────────────
 // legacy getAnnouncements: active, in schedule, pinned first, then priority.
 export async function getActiveAnnouncements(db: ServerSupabaseClient): Promise<Announcement[]> {

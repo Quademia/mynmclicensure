@@ -50,7 +50,6 @@
 }
 /* base.css underlines every link on hover; a row shows its hover by its ground instead */
 a.pp-row:hover { background: var(--surface-page); text-decoration: none; }
-.pp-row-course { padding: var(--space-16); }
 .pp-row-main { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; flex: 1; }
 .pp-row-locked .pp-name { color: var(--ink-muted); font-weight: 500; }
 .pp-row-locked .pp-status { color: var(--ink-faint); }

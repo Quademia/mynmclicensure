@@ -134,7 +134,6 @@ export async function loadPracticePapers(supabase: ServerSupabaseClient, profile
         time_limit_sec: q.time_limit_sec,
         availability,
         publish_at: q.publish_at,
-        unpublish_at: q.unpublish_at,
         in_trial: q.open_in_trial,
       };
       return [paperView(row, kind, attempts)];

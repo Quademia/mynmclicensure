@@ -83,11 +83,6 @@
 .usr-overlay .history-table tr:last-child td { border-bottom: none; }
 
 .usr-overlay .panel-actions { display: flex; flex-direction: column; gap: 10px; }
-.usr-overlay .btn-sm { padding: 8px 16px; border-radius: var(--radius); font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; border: none; }
-.usr-overlay .btn-sm:disabled { opacity: 0.6; cursor: not-allowed; }
-.usr-overlay .btn-sm-primary { background: var(--primary); color: var(--white); }
-.usr-overlay .btn-sm-primary:hover { background: var(--primary-dark); }
-.usr-overlay .btn-sm-cancel { background: var(--white); color: var(--text-muted); border: 1px solid var(--border); }
 
 @media (max-width: 768px) {
   .usr .page-toolbar { flex-direction: column; align-items: stretch; }

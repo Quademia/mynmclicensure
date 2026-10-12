@@ -5,9 +5,7 @@
 // (lib/access/internal.ts), so a page calling requireStudent() again
 // costs nothing.
 //
-// The My Courses rows are the active courses the student's subscriptions
-// cover (legacy populateCourseDropdown(courseAccessMap, allCourses) —
-// slice 8). The Messages badge is legacy getUnreadCountForUser — the
+// The Messages badge is legacy getUnreadCountForUser — the
 // student's open threads holding a message not yet read (slice 12a);
 // under A3 the same count sits on the top bar's envelope, so a closed
 // sidebar cannot hide a reply (10-design-system.md DS5).
@@ -16,8 +14,6 @@ import { requireStudent } from '@/lib/access';
 import { AppShell } from '@/components/shell/app-shell';
 import { StudentSidebar } from '@/components/nav/student/student-sidebar';
 import { displayNameOf } from '@/components/shell/page-header';
-import { getCourses } from '@/lib/catalogue/queries';
-import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import { getUnreadCountForUser } from '@/lib/messaging/queries';
 import { STUDENT_PHONE_TABS } from '@/lib/nav/student';
 
@@ -25,18 +21,11 @@ export const dynamic = 'force-dynamic';
 
 export default async function StudentLayout({ children }: { children: React.ReactNode }) {
   const { supabase, profile } = await requireStudent();
-  const [access, allCourses, unread] = await Promise.all([
-    getStudentCourseAccess(supabase, profile.user_id),
-    getCourses(supabase),
-    getUnreadCountForUser(supabase, profile.user_id),
-  ]);
-  const courses = allCourses
-    .filter((c) => Boolean(access[c.course_id]))
-    .map((c) => ({ course_id: c.course_id, title: c.title }));
+  const unread = await getUnreadCountForUser(supabase, profile.user_id);
 
   return (
     <AppShell
-      sidebar={<StudentSidebar courses={courses} badges={{ messages: unread }} />}
+      sidebar={<StudentSidebar badges={{ messages: unread }} />}
       phoneTabs={STUDENT_PHONE_TABS}
       topBar={{
         product: 'MyNMCLicensure',

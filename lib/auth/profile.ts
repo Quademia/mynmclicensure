@@ -11,8 +11,6 @@ import type { createClient } from '@/lib/supabase/server';
 
 type Db = Awaited<ReturnType<typeof createClient>>;
 
-export type Role = 'STUDENT' | 'ADMIN';
-
 export type Profile = {
   user_id: string;
   auth_id: string;

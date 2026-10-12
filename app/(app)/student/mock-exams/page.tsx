@@ -9,7 +9,7 @@ import type { Metadata } from 'next';
 import { requireStudent } from '@/lib/access';
 import { getCourses } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
-import { getQuizzesForCourse } from '@/lib/quizzes/queries';
+import { getMockQuizzesForCourse } from '@/lib/quizzes/queries';
 import { getStudentAttempts } from '@/lib/attempts/queries';
 import type { QuizCard } from '@/lib/quizzes/types';
 import type { AttemptWithProgress } from '@/lib/attempts/types';
@@ -38,7 +38,7 @@ export default async function StudentMockExamsPage({ searchParams }: { searchPar
   await Promise.all(
     enrolled.map(async (c) => {
       const [quizzes, attempts] = await Promise.all([
-        getQuizzesForCourse(supabase, 'mock', c.course_id),
+        getMockQuizzesForCourse(supabase, c.course_id),
         getStudentAttempts(supabase, profile.user_id, c.course_id),
       ]);
       const mockIds = new Set(quizzes.map((q) => q.quiz_id));
