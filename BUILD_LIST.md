@@ -134,7 +134,7 @@ before then, and the old list's history, is in
 - ⬜ DS20 About 20 stylesheets drawing their own white box — onto .card as each is touched
 - ⬜ DS21 The app's drawer opens from the right, like the public menu (Sam, later)
 - ⬜ 09.1 One form field — three copies of one field today
-- ⬜ 09.2 One link style — a link inside a sentence always underlined (Sam, later)
+- ⬜ 09.2 One link style — a link inside a sentence always underlined, a control (row, card, button, tab) never, the global hover-only underline in base.css gone (recommended and logged 2026-10-12; Sam's yes still to give before it is built)
 - ⬜ 09.3 A content width limit above 1440px
 - ⬜ 09.4 Dark mode — after the above
 - ⬜ 09.5 The old token names retired once no page uses them

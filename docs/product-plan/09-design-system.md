@@ -86,7 +86,15 @@ Detail and history: `archive/product-plan/10-design-system.md`.
 - DS20 — about 20 stylesheets drawing their own white box, onto `.card`.
 - One form field (three copies of one field today).
 - One link style — a link inside a sentence always underlined (phones
-  have no hover) (Sam, later).
+  have no hover) (Sam, later). Recommended 2026-10-12 and logged at
+  Sam's word: a link in running text underlined always; a link that is
+  plainly a control (a row, a card, a button, a tab) not underlined, its
+  hover shown by its ground; the global `a:hover { text-decoration:
+  underline }` in `styles/base.css` (from the port's slice 2a, 2026-09-11)
+  goes, because it out-ranks any class that says "no underline" — 59
+  rules across the stylesheets set `none`, and many are undone on hover
+  by it; the Practice Papers rows set it off on hover themselves. A new
+  shared style, so each page is walked when it changes; not built.
 - A content width limit above 1440px.
 - Dark mode — after the above.
 - Shell data (the unread badge, My Courses, name and photo) loaded once
