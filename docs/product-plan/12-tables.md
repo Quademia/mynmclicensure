@@ -328,6 +328,7 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `title` | Its title |
 | `n` | Number of questions |
 | `allowed_modes` | The modes it offers (at least one of the four) |
+| `first_mode` | The mode a student's first sitting of the paper must be in — one of `allowed_modes`, Free Navigation on a new paper; the other modes open once a sitting in it is completed (04.5, built 2026-10-12) |
 | `shuffle` | Whether questions are shuffled |
 | `time_limit_sec` | An exam's time limit, if set |
 | `status` | `draft`, `active` or `archived` |
@@ -342,14 +343,12 @@ table by table as each is next changed (AGENTS.md rule 9).
   its redesign *(to build: 03.1)*.
 - Browser: a student reads open, published papers of courses they hold
   — every column but `notes` and `open_in_trial` (no page reads it yet).
-- *To build (04.5) — ticked 2026-10-11:* a `first_mode` column — the
-  mode a student's first sitting of the paper must be in, one of
-  `allowed_modes`, `TIMED_FREE_NAV` on a new paper (and on today's
-  papers). `create_attempt` refuses a paper's other modes to a student
-  until they have a finished sitting of it — submitted or timed out, not
-  abandoned. Why: the first sitting is the honest measure, and the
-  admin can change the mode if the official exam changes (Sam,
-  2026-10-11).
+- `first_mode` (04.5, ticked 2026-10-11, built 2026-10-12): a check
+  keeps it inside `allowed_modes`; students read it, as they read
+  `allowed_modes`. Papers whose modes lacked Free Navigation took their
+  first exam mode, else their first allowed mode. Why: the first sitting
+  is the honest measure, and the admin can change the mode if the
+  official exam changes (Sam, 2026-10-11).
 
 ### `quiz_items` — a paper's questions
 | Column | Holds |
@@ -571,7 +570,10 @@ the browser can call only the first two lines.
   builder count is used up still allows a builder quiz of published
   free questions of that course, in a Study mode — what a free account
   gets, so a trial student past 3 quizzes never has less (04.4; ticked
-  and built 2026-10-11).
+  and built 2026-10-11). A paper's sitting (or its retake) in a mode
+  other than its `first_mode` is refused until the student has a
+  completed sitting of that paper in the first mode — abandoned or
+  unfinished does not count (04.5, 2026-10-12).
 - **The dashboard** (server only, reads only): `student_dashboard` — one
   student's numbers in one read: the streak (a study day is one answer,
   the UTC day; one missed day a week, Monday to Sunday, forgiven; today
