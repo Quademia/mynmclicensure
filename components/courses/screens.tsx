@@ -184,21 +184,23 @@ export function CourseScreen({ data }: { data: CoursePageData }) {
           ) : null}
         </div>
 
-        {news.length ? (
-          <aside className="cp-side">
-            <h2 className="cp-section">Course news</h2>
-            <div className="card cp-news">
-              {news.map((a) => (
+        <aside className="cp-side">
+          <h2 className="cp-section">Course news</h2>
+          <div className="card cp-news">
+            {news.length ? (
+              news.map((a) => (
                 <div key={a.announcement_id} className="cp-news-item">
                   <span className="cp-name">{a.title}</span>
                   <AnnouncementBody html={a.body_html || a.body_text || ''} className="cp-news-body" />
                   {a.created_at ? <span className="cp-line">{formatDay(a.created_at)}</span> : null}
                 </div>
-              ))}
-            </div>
-            <AppLink href="/student/announcements" className="btn-link">See all announcements</AppLink>
-          </aside>
-        ) : null}
+              ))
+            ) : (
+              <p className="cp-news-empty">No news for this course yet.</p>
+            )}
+          </div>
+          {news.length ? <AppLink href="/student/announcements" className="btn-link">See all announcements</AppLink> : null}
+        </aside>
       </div>
     </div>
   );

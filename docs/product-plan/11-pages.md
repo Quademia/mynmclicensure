@@ -76,7 +76,7 @@ opens it (00, The menu).
   done"), Mock exams ("Mock 1 opens 20 October", "With Premium Prep"),
   Quiz builder ("Practise {topic}, 41%" when the dashboard's weakest topic
   is in this course, else "Build a quiz"); the course's news, the two
-  newest announcements scoped to it (hidden when none). Off the page: the
+  newest announcements scoped to it, "No news for this course yet." when none (Sam, 2026-10-12: shown, not hidden). Off the page: the
   papers' and mocks' own lists, the Procedures block (in the menu), the
   programme badges.
 - **Trial**: "Trial · N days left"; Up next is the trial paper, "Included
