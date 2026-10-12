@@ -272,11 +272,13 @@ export function QuizManager({
   function toggleMode(code: AttemptMode, on: boolean) {
     setForm((f) => {
       const modes = orderModes(on ? [...f.modes, code] : f.modes.filter((m) => m !== code));
-      // 04.5: the first sitting's mode stays one of the ticked ones — Free
-      // Navigation if it is ticked, else the first that is.
+      // 04.5: the first sitting's mode stays one of the ticked ones — the
+      // closest to the real exam that is ticked (as the migration's tidy
+      // chose: Free Navigation, Sequential, Untimed practice, Learning).
+      const closest: AttemptMode[] = ['TIMED_FREE_NAV', 'TIMED_SEQUENTIAL', 'UNTIMED_TEST', 'UNTIMED_LEARNING'];
       const firstMode = modes.includes(f.firstMode)
         ? f.firstMode
-        : modes.includes('TIMED_FREE_NAV') ? 'TIMED_FREE_NAV' : (modes[0] ?? f.firstMode);
+        : (closest.find((m) => modes.includes(m)) ?? f.firstMode);
       return { ...f, modes, firstMode };
     });
   }
@@ -951,6 +953,9 @@ export function QuizManager({
                     : '—'}
                 </span>
               </div>
+              {kind === 'fixed' ? (
+                <div className="detail-row"><span className="detail-label">First sitting in</span><span className="detail-value">{MODES[form.firstMode].name}</span></div>
+              ) : null}
               <div className="detail-row"><span className="detail-label">Status</span><span className="detail-value"><span className={`badge ${form.status}`}>{form.status}</span></span></div>
               <div className="detail-row"><span className="detail-label">Published</span><span className="detail-value">{form.published ? 'Yes' : 'No'}</span></div>
               <div className="detail-row"><span className="detail-label">Shuffle</span><span className="detail-value">{form.shuffle ? 'Yes — randomised per attempt' : 'No — fixed order'}</span></div>
