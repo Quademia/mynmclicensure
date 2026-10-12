@@ -125,7 +125,7 @@ export default async function CoursePage({ params }: { params: Params }) {
   const mocks = visibleOf(mockRows);
   const courseAnnouncements = myAnnouncements.filter((a) => (a.scope_courses || []).includes(courseId));
 
-  const fixedHref = `/student/fixed-quizzes?course=${encodeURIComponent(courseId)}`;
+  const fixedHref = `/student/practice-papers/${encodeURIComponent(courseId)}`;
   const mockHref = `/student/mock-exams?course=${encodeURIComponent(courseId)}`;
   const days = access.totalDays;
   const daysClass = `course-access-badge${days <= 7 ? ' warning' : ''}${days <= 0 ? ' expired' : ''}`;

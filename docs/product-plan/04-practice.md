@@ -24,8 +24,7 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
   dashboard, course page, history, help, public copy, admin. Each paper
   is "Practice Paper N", with the course's full name above it wherever
   it shows away from its course; the address `/student/practice-papers`.
-  "Fixed quiz" stays the word in the code (Sam, 2026-10-02). *(to
-  build: Q21)*
+  "Fixed quiz" stays the word in the code (Sam, 2026-10-02). *(built 2026-10-12 on the student side)*
 - **The first sitting of a paper is in its first-sitting mode** (Sam,
   2026-10-11). The admin picks it per paper from a dropdown, "First
   sitting in", with Free Navigation already picked on a new paper (the
@@ -33,8 +32,8 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
   paper's other ways, which the admin ticks, open to a student once they
   have **finished** it in that mode — submitted, or the time ran out; an
   abandoned or unfinished sitting does not count. Every first sitting of
-  a paper is then alike, which the percentile counts on (05). *(to
-  build: 04.5)*
+  a paper is then alike, which the percentile counts on (05). *(built
+  2026-10-12)*
 - **A paper's questions are kept out of the Quiz Builder** (Sam,
   2026-10-11), as a mock's are: the builder, the pack maker, the free
   set and the daily challenge skip them (06). A student studies them
@@ -59,8 +58,7 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
   counts a paper's questions, time or number of papers into the page:**
   each comes from the paper (its size, its time limit or one minute a
   question, as many papers as the course has). Not a single-course
-  shortcut (the General Paper makes two courses the norm). *(to build:
-  04.7)*
+  shortcut (the General Paper makes two courses the norm). *(built 2026-10-12)*
 - A paper or mock is offered only when active, published and inside its
   window, on the server's clock — one check serves the lists, Start and
   Retake; outside it the card says UPCOMING or CLOSED. A student reads

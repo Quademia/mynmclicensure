@@ -38,6 +38,6 @@ export type SessionExit = { href: string; label: string };
 
 export const SESSION_EXITS: Record<SessionHome, SessionExit> = {
   builder: { href: '/student/quiz-builder', label: 'Back to Quiz Builder' },
-  fixed: { href: '/student/fixed-quizzes', label: 'Back to Fixed Quizzes' },
+  fixed: { href: '/student/practice-papers', label: 'Back to Practice Papers' },
   mock: { href: '/student/mock-exams', label: 'Back to Mock Exams' },
 };

@@ -25,7 +25,7 @@ export const STUDENT_PHONE_TABS: PhoneTab[] = [
     label: 'Practise',
     icon: 'clipboard',
     pages: [
-      { label: 'Papers', href: `${S}/fixed-quizzes` },
+      { label: 'Papers', href: `${S}/practice-papers` },
       { label: 'Mocks', href: `${S}/mock-exams` },
       { label: 'Builder', href: `${S}/quiz-builder` },
     ],
@@ -54,7 +54,7 @@ export const STUDENT_NAV: NavItem[] = [
 
   { key: 'h-practise', label: 'Practise', heading: true },
   { key: 'courses', label: 'My courses', icon: 'book', dynamic: 'courses', children: [] },
-  { key: 'fixed-quizzes', label: 'Practice papers', icon: 'clipboard', href: `${S}/fixed-quizzes` },
+  { key: 'fixed-quizzes', label: 'Practice papers', icon: 'clipboard', href: `${S}/practice-papers` },
   { key: 'mock-exams', label: 'Mock exams', icon: 'target', href: `${S}/mock-exams` },
   { key: 'quiz-builder', label: 'Quiz builder', icon: 'wrench', href: `${S}/quiz-builder` },
 

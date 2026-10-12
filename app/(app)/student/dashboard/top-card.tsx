@@ -13,7 +13,7 @@ import type { DashCarryOn, DashReceipt, DashRecap, TopCard } from '@/lib/dashboa
 import { fmtDate, fmtNumber, pct, plural } from './format';
 
 const PACKAGES_HREF = '/student/upgrade';
-const PAPERS_HREF = '/student/fixed-quizzes';
+const PAPERS_HREF = '/student/practice-papers';
 const BUILDER_HREF = '/student/quiz-builder';
 
 /** A package queued after this one: "Then RM Free Full Access until 17 Jun 2027". */

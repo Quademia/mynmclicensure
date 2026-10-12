@@ -1,0 +1,107 @@
+/* styles/practice-papers.css
+ *
+ * The three Practice Papers screens (04.7; Sam, 2026-10-12): the courses,
+ * a course, a paper's own page. Drawn at
+ * https://claude.ai/artifact/XyTdnfwmtswW6Xf6Wq69Cg (boards D, E, F).
+ * Tokens only; the card, the buttons and the dialog are the design
+ * system's own (components.css). Breakpoint 768px: the paper's page puts
+ * the card beside the sittings on a computer and stacks them on a phone.
+ */
+
+.pp-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  max-width: 720px;
+}
+
+.pp-back { align-self: flex-start; }
+
+.pp-note {
+  margin: 0;
+  padding: var(--space-12) var(--space-16);
+  background: var(--badge-warning-bg);
+  border: 1px solid var(--badge-warning-border);
+  border-radius: var(--radius);
+  color: var(--badge-warning-ink);
+  font-size: var(--type-ui-size);
+  line-height: var(--type-meta-line);
+}
+
+/* A list of rows in one card. */
+.pp-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.pp-list li + li { border-top: 1px solid var(--border); }
+
+.pp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  min-height: 52px;
+  padding: var(--space-12) var(--space-16);
+  color: var(--ink);
+  text-decoration: none;
+  box-sizing: border-box;
+}
+a.pp-row:hover { background: var(--surface-page); }
+.pp-row-course { padding: var(--space-16); }
+.pp-row-main { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; flex: 1; }
+.pp-row-locked .pp-name { color: var(--ink-muted); font-weight: 500; }
+.pp-row-locked .pp-status { color: var(--ink-faint); }
+
+.pp-name { font-size: var(--type-body-strong-size); font-weight: var(--type-body-strong-weight); line-height: var(--type-field-line); }
+.pp-line { font-size: var(--type-ui-size); color: var(--ink-muted); line-height: var(--type-meta-line); font-weight: 400; }
+.pp-status { display: inline-flex; align-items: center; gap: var(--space-8); font-size: var(--type-ui-size); color: var(--ink); white-space: nowrap; }
+.pp-chev { color: var(--ink-faint); font-size: 18px; line-height: 1; }
+
+/* The papers of a course, one segment each: done, going, to do. */
+.pp-bar { display: flex; gap: var(--space-4); max-width: 240px; margin-top: var(--space-6); }
+.pp-seg { flex: 1; height: 6px; border-radius: 3px; background: var(--border); }
+.pp-seg-done { background: var(--brand-teal); }
+.pp-seg-going { background: var(--badge-info-border); }
+
+/* The main card: what to do now. */
+.pp-card { display: flex; flex-direction: column; gap: var(--space-6); }
+.pp-card .btn, .pp-actions .btn { margin-top: var(--space-8); }
+.pp-eyebrow {
+  font-size: var(--type-meta-size);
+  font-weight: 600;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.pp-big { font-size: 18px; line-height: 24px; font-weight: 700; color: var(--ink); }
+.pp-progress { width: 100%; max-width: 360px; height: 8px; accent-color: var(--brand-teal); }
+.pp-actions { display: flex; flex-wrap: wrap; gap: var(--space-8); }
+
+.pp-package { align-self: flex-start; }
+
+.pp-hint { margin: 0; font-size: var(--type-ui-size); color: var(--ink-faint); line-height: var(--type-meta-line); }
+
+/* A paper's page: the card, and beside it the sittings. */
+.pp-paper-grid { display: flex; flex-direction: column; gap: var(--space-20); }
+.pp-section { margin: 0 0 var(--space-8); font-size: var(--type-ui-size); font-weight: 600; color: var(--ink-muted); }
+@media (min-width: 769px) {
+  .pp-page:has(.pp-paper-grid) { max-width: 960px; }
+  .pp-paper-grid { flex-direction: row; align-items: flex-start; }
+  .pp-paper-grid > * { flex: 1; min-width: 0; }
+}
+
+/* The ways to practise, in the dialog. */
+.pp-ways { list-style: none; margin: 0 0 var(--space-16); padding: 0; display: flex; flex-direction: column; }
+.pp-way {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  padding: var(--space-12) 0;
+  border-top: 1px solid var(--border);
+}
+.pp-way:first-child { border-top: 0; }
+.pp-way-text { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
+.pp-way-name { font-weight: 600; color: var(--ink); }
+.pp-way-blurb { font-size: var(--type-ui-size); color: var(--ink-muted); line-height: var(--type-meta-line); }
