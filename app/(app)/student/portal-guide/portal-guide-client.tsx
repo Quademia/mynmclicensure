@@ -27,7 +27,7 @@ type Section = { id: string; label: string };
 
 const SECTIONS: Section[] = [
   { id: 'sec-dashboard', label: 'Dashboard' },
-  { id: 'sec-fixed-quizzes', label: 'Fixed Quizzes' },
+  { id: 'sec-practice-papers', label: 'Practice Papers' },
   { id: 'sec-quiz-builder', label: 'Quiz Builder' },
   { id: 'sec-modes', label: 'Study and Exam modes' },
   { id: 'sec-after-quiz', label: 'After Your Quiz' },
@@ -53,8 +53,8 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
     a: 'Refresh the page, confirm your internet connection, and sign in again if needed. If the issue persists, try a different browser tab and then message support with the course and mode (for example Study · Learning).',
   },
   {
-    q: "What's the difference between Fixed Quizzes and Quiz Builder?",
-    a: 'Fixed Quizzes are ready-made sets you can start immediately. Quiz Builder creates custom practice based on your selected topics and difficulty — best for targeting weak areas.',
+    q: "What's the difference between Practice Papers and Quiz Builder?",
+    a: 'Practice Papers are ready-made sets you can start immediately. Quiz Builder creates custom practice based on your selected topics and difficulty — best for targeting weak areas.',
   },
   {
     q: 'How do I use Learning History properly?',
@@ -149,16 +149,16 @@ export function PortalGuide() {
               <h3>Use the Dashboard to:</h3>
               <ul>
                 <li>See your active courses and access status</li>
-                <li>Jump into Fixed Quizzes, Quiz Builder, Learning History, Downloads, and Messages</li>
+                <li>Jump into Practice Papers, Quiz Builder, Learning History, Downloads, and Messages</li>
                 <li>Continue your study routine without searching for links</li>
               </ul>
             </div>
           </div>
 
-          {/* Fixed Quizzes */}
-          <div className="guide-section" id="sec-fixed-quizzes" data-section="Fixed Quizzes">
-            <h2>Fixed Quizzes (Ready-made practice)</h2>
-            <p className="lead">Fixed Quizzes are prepared sets you can start immediately — no topic selection required.</p>
+          {/* Practice Papers */}
+          <div className="guide-section" id="sec-practice-papers" data-section="Practice Papers">
+            <h2>Practice Papers (Ready-made practice)</h2>
+            <p className="lead">Practice Papers are prepared sets you can start immediately — no topic selection required.</p>
             <div className="guide-grid">
               <div className="guide-inner-card">
                 <h3>Recommended for</h3>
@@ -225,7 +225,7 @@ export function PortalGuide() {
               <ul>
                 <li>Review explanations carefully — focus on <em>why</em> an option is correct</li>
                 <li>Identify repeated weak areas</li>
-                <li>Build your next session around weak topics (Quiz Builder) or repeat a similar Fixed Quiz</li>
+                <li>Build your next session around weak topics (Quiz Builder) or repeat a similar Practice Paper</li>
               </ul>
             </div>
           </div>

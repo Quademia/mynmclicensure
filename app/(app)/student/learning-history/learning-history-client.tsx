@@ -58,7 +58,7 @@ function formatStatus(s: string): string {
 }
 
 function formatSource(s: string): string {
-  if (s === 'fixed') return 'Fixed Quiz';
+  if (s === 'fixed') return 'Practice Paper';
   if (s === 'builder') return 'Builder';
   if (s === 'retake') return 'Retake';
   return s;
@@ -196,7 +196,7 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
     const dateStr = a.ts_iso ? new Date(a.ts_iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
     const timeStr = a.ts_iso ? new Date(a.ts_iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '';
     const courseName = courses.find((c) => c.course_id === a.course_id)?.title || a.course_id || '—';
-    const title = a.display_label || (a.quiz_id ? 'Fixed Quiz' : 'Custom Quiz');
+    const title = a.display_label || (a.quiz_id ? 'Practice Paper' : 'Custom Quiz');
 
     let scoreMain: string;
     let scoreSub: string;
@@ -340,7 +340,7 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
           <label htmlFor="sourceFilter">Source</label>
           <select id="sourceFilter" className="filter-select" value={source} onChange={(e) => { setSource(e.target.value); applyFilters({}); }}>
             <option value="">All Sources</option>
-            <option value="fixed">Fixed Quiz</option>
+            <option value="fixed">Practice Paper</option>
             <option value="builder">Builder</option>
             <option value="retake">Retake</option>
           </select>

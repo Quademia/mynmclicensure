@@ -95,7 +95,7 @@ async function checkSession(
   // CHECK 2 — the attempt id
   const attemptId = params.attemptId.trim();
   if (!attemptId) {
-    return { kind: 'error', title: 'Missing Quiz', message: 'No attempt ID was provided. Please start a quiz from the Fixed Quizzes page.', exit: fallback };
+    return { kind: 'error', title: 'Missing Quiz', message: 'No attempt ID was provided. Please start a quiz from the Practice Papers page.', exit: fallback };
   }
 
   // CHECK 9 — Preview mode (admin only)

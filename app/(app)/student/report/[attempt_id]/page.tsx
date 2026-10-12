@@ -73,7 +73,7 @@ export default async function ReportPage({ params }: { params: Promise<{ attempt
     isFreeSitting(attempt),
   ]);
 
-  const label = attempt.display_label || (attempt.quiz_id ? 'Fixed Quiz' : 'Custom Quiz');
+  const label = attempt.display_label || (attempt.quiz_id ? 'Practice Paper' : 'Custom Quiz');
   const back = (
     <AppLink className="srp-back" href={HISTORY_PATH}>
       ← Learning History
