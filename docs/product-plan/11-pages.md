@@ -56,22 +56,37 @@ opens it (00, The menu).
   course (08); days left from the stored end (02).
 
 ### Practice papers
-- **Redesigned once its rulings are settled** (Sam, 2026-10-11; 04.7):
-  drawn first, then built.
-- The name and "Practice Paper N", the course in full above (04 Q21);
+- **Redesigned (Sam, 2026-10-12; 04.7)**, drawn at
+  https://claude.ai/artifact/XyTdnfwmtswW6Xf6Wq69Cg (boards D, E, F);
+  the rules are in 04. Three screens: the courses → a course → a
+  paper's own page. Computer: a narrow column in the app's shell; only
+  the paper's page takes two columns (the card, the sittings).
+- Names: "Practice Paper N", the course in full above it (04 Q21).
   UPCOMING / CLOSED by the server's clock; a paper holding a draft
   question refuses to start, with the message on the card.
-- The first sitting in the paper's first-sitting mode; its other ways
-  locked until that sitting is finished — "Opens after your first exam
-  sitting" (04.5; the words at the redesign).
-- Trial: the ticked paper first, "Included in your trial"; the others
-  locked — "Opens with a package", Choose a package (03).
-- Ended: every paper listed, the trial paper with its score, the rest
-  locked; at the top "Your trial ended on 18 October. Your scores are
-  still here."
+- **Courses**: a row per course the student holds — name, one line
+  ("Paper 3 in progress", "Next: Paper 1", "All done"), a bar with one
+  segment per paper (done, in progress, to do).
+- **A course**: "Up next" (the paper in progress, else the next
+  unstarted one) with Resume or Start; then a row per paper — name and
+  one word on the right (the score, In progress, Not started).
+- **A paper's page**: the main card by moment — before: "Your first
+  sitting", the mode, size and time, Start; in progress: progress bar,
+  time left, Resume; finished: the score, See your report, Practise
+  again (the dialog: the four ways, each Start). Before the first
+  sitting is finished, one grey line: more ways open after it (04.5). A
+  list of the student's sittings with their score or Resume.
+- Trial: Paper 1's card "Included in your trial" with Start; the others
+  grey lines, "Opens with a package"; Choose a package once, at the
+  bottom (03).
+- Ended: the trial paper's card with its score and See your report;
+  the others grey lines; at the top "Your trial ended on 18 October.
+  Your scores are still here."; Choose a package at the bottom.
 - Free, with no package (Sam, 2026-10-11): every paper of the
-  programme's courses listed and locked, "Opens with a package", Choose a
-  package — the ended view, with scores only where they exist.
+  programme's courses listed as grey lines, "Opens with a package",
+  Choose a package — the ended view, with scores only where they exist.
+- No size, time or paper count is written into the page: each is read
+  from the paper.
 
 ### Mock exams
 - Free, trial, ended, and paid without Premium Prep: listed, locked,

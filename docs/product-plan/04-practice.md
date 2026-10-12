@@ -42,9 +42,24 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
   So a course needs questions beyond its papers — five papers of 180
   (General Paper 100) and about as many again for the builder: about
   1,800 a course (General Paper 1,000), mocks on top. *(to build: 04.6)*
-- **Practice Papers is redesigned once its rulings are settled** (Sam,
-  2026-10-11): Q21, the trial's lock, the ended and free states and the
-  first-sitting lock, the page drawn first, then built. *(to build:
+- **Practice Papers, redesigned** (Sam, 2026-10-12; drawn on the canvas
+  https://claude.ai/artifact/XyTdnfwmtswW6Xf6Wq69Cg, boards D, E, F; the
+  page described in `11-pages.md`). Three screens, none sized by a
+  number: **the courses** (one row each: name, one line, a bar of the
+  course's papers), **a course** (an "Up next" card, then one plain row
+  per paper) and **a paper's own page**. No chips, badges, filters or
+  strips. A paper the student cannot open is a grey line, "Opens with a
+  package", no button; Choose a package appears once, at the bottom.
+  A paper's page has one main card that follows the student: Start in
+  the first-sitting mode, then Resume, then the score with See your
+  report and **Practise again**; Practise again opens the shared dialog
+  with the four ways, each with a Start. Before the first sitting is
+  finished one grey line says more ways open after it. The page lists
+  the student's sittings, each with its score or Resume. **Nothing
+  counts a paper's questions, time or number of papers into the page:**
+  each comes from the paper (its size, its time limit or one minute a
+  question, as many papers as the course has). Not a single-course
+  shortcut (the General Paper makes two courses the norm). *(to build:
   04.7)*
 - A paper or mock is offered only when active, published and inside its
   window, on the server's clock — one check serves the lists, Start and
