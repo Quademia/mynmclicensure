@@ -98,6 +98,13 @@ opens it (00, The menu).
   paper's own page. Computer: a narrow column in the app's shell; only
   the paper's page takes two columns (the card, the sittings).
 - Names: "Practice Paper N", the course in full above it (04 Q21).
+- **The course header and the cards** (Sam, 2026-10-12): inside a course the
+  page wears the course page's header — tabs ("‹ Practice papers" and the
+  other courses, the tabs staying in Practice Papers; on a phone only the
+  way back), the title, the days-left chip and the end date; no Message us,
+  no progress card. The courses list is cards like My courses', the bar one
+  segment per paper and the line about papers. The paper's own page keeps
+  its own title and its way back to the course.
   UPCOMING / CLOSED by the server's clock; a paper holding a draft
   question refuses to start, with the message on the card.
 - **Courses**: a row per course the student holds — name, one line

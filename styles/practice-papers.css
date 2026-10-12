@@ -16,6 +16,7 @@
 }
 
 .pp-back { align-self: flex-start; }
+.pp-page-wide { max-width: 1040px; }
 
 .pp-note {
   margin: 0;

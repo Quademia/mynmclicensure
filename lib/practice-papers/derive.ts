@@ -49,6 +49,9 @@ export type CourseView = {
   access: PaperAccess;
   /** The package of this course includes mock exams (02.10). */
   mocksIncluded: boolean;
+  /** Days left on the stored end, and that end; null with no live grant. */
+  days: number | null;
+  expires: string | null;
   papers: PaperView[];
 };
 

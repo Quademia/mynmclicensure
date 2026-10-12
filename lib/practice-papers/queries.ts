@@ -139,7 +139,7 @@ export async function loadPracticePapers(supabase: ServerSupabaseClient, profile
       };
       return [paperView(row, kind, attempts)];
     });
-    return { course_id: c.course_id, title: c.title, access: kind, mocksIncluded: accessBy[c.course_id]?.mocks ?? false, papers };
+    return { course_id: c.course_id, title: c.title, access: kind, mocksIncluded: accessBy[c.course_id]?.mocks ?? false, days: access[c.course_id]?.totalDays ?? null, expires: access[c.course_id]?.expires ?? null, papers };
   });
 
   // The banner: nothing live now, and a trial or package that ran out.

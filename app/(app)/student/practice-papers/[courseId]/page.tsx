@@ -20,5 +20,5 @@ export default async function StudentPracticePapersCoursePage({ params }: { para
   const data = await loadPracticePapers(supabase, profile);
   const course = data.courses.find((c) => c.course_id === decodeURIComponent(courseId));
   if (!course) notFound();
-  return <CourseScreen course={course} ended={data.ended} />;
+  return <CourseScreen course={course} tabs={data.courses.map((c) => ({ course_id: c.course_id, title: c.title }))} ended={data.ended} />;
 }

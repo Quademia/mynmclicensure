@@ -26,6 +26,7 @@ import {
   type PaperView,
 } from '@/lib/practice-papers/derive';
 import type { PracticePapers } from '@/lib/practice-papers/queries';
+import { CourseChip, CourseHeading, CourseTabs } from '@/components/courses/course-header';
 import { LaunchButton, PractiseAgain, type Way } from './paper-actions';
 import '@/styles/practice-papers.css';
 
@@ -68,20 +69,28 @@ export function CoursesScreen({ data }: { data: PracticePapers }) {
   const { courses, ended } = data;
   const anyLocked = courses.some((c) => c.papers.some((p) => !p.open));
   return (
-    <div className="pp-page">
+    <div className="pp-page pp-page-wide">
       <PageHeader title="Practice Papers" />
       <EndedNote ended={ended} />
       {courses.length ? (
-        <ul className="card pp-list">
+        <ul className="cp-grid">
           {courses.map((c) => (
             <li key={c.course_id}>
-              <AppLink href={`${LIST}/${encodeURIComponent(c.course_id)}`} className="pp-row pp-row-course">
-                <span className="pp-row-main">
-                  <span className="pp-name">{c.title}</span>
-                  <span className="pp-line">{courseLine(c)}</span>
-                  <Bar papers={c.papers} />
+              <AppLink href={`${LIST}/${encodeURIComponent(c.course_id)}`} className="card cp-card">
+                <span className="cp-row">
+                  <span className="cp-name">{c.title}</span>
+                  <CourseChip access={c.access} days={c.days} ended={ended} />
                 </span>
-                <span className="pp-chev" aria-hidden="true">›</span>
+                <Bar papers={c.papers} />
+                {c.papers.length ? (
+                  <span className="cp-line">
+                    {c.papers.filter((p) => p.state === 'done').length} of {c.papers.length} papers done
+                  </span>
+                ) : null}
+                <span className="cp-next">
+                  <span className="cp-next-text">{courseLine(c)}</span>
+                  <span className="cp-chev" aria-hidden="true">›</span>
+                </span>
               </AppLink>
             </li>
           ))}
@@ -95,14 +104,20 @@ export function CoursesScreen({ data }: { data: PracticePapers }) {
 }
 
 // ── 2 · a course ────────────────────────────────────────────────────────
-export function CourseScreen({ course, ended }: { course: CourseView; ended: PracticePapers['ended'] }) {
+export function CourseScreen({ course, tabs, ended }: { course: CourseView; tabs: { course_id: string; title: string }[]; ended: PracticePapers['ended'] }) {
   const next = upNext(course.papers);
   const scored = next ? null : scoredPaper(course.papers);
   const anyLocked = course.papers.some((p) => !p.open);
   return (
     <div className="pp-page">
-      <AppLink href={LIST} className="btn-link pp-back">‹ Practice Papers</AppLink>
-      <PageHeader title={course.title} />
+      <CourseTabs
+        backHref={LIST}
+        backLabel="Practice papers"
+        tabs={tabs}
+        currentId={course.course_id}
+        hrefFor={(courseId) => `${LIST}/${encodeURIComponent(courseId)}`}
+      />
+      <CourseHeading title={course.title} access={course.access} days={course.days} expires={course.expires} ended={ended} />
       {course.access === 'none' ? <EndedNote ended={ended} /> : null}
 
       {next ? <NextCard paper={next} access={course.access} /> : null}

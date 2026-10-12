@@ -13,8 +13,9 @@ import { PageHeader } from '@/components/shell/page-header';
 import { AnnouncementBody } from '@/components/announcements/announcement-body';
 import { LaunchButton } from '@/components/practice-papers/paper-actions';
 import { Icon } from '@/components/shell/icons';
+import { CourseChip, CourseHeading, CourseTabs } from './course-header';
 import { courseLine, formatDay, scoredPaper, shortName } from '@/lib/practice-papers/derive';
-import type { CoursePageData, CourseSummary, MyCourses } from '@/lib/courses/queries';
+import type { CoursePageData, MyCourses } from '@/lib/courses/queries';
 import { reportHref } from '@/lib/attempts/links';
 import '@/styles/courses.css';
 
@@ -22,20 +23,6 @@ const PACKAGE_HREF = '/student/upgrade';
 
 function num(n: number): string {
   return n.toLocaleString('en-US');
-}
-
-function chipOf(s: CourseSummary, ended: MyCourses['ended']): { text: string; tone: 'ok' | 'warn' | 'neutral' } {
-  const { access } = s.course;
-  if (access === 'all' && s.days != null) return { text: `${s.days} day${s.days === 1 ? '' : 's'} left`, tone: s.days <= 7 ? 'warn' : 'ok' };
-  if (access === 'trial' && s.days != null) return { text: `Trial · ${s.days} day${s.days === 1 ? '' : 's'} left`, tone: 'warn' };
-  if (ended) return { text: `Ended ${formatDay(ended.on)}`, tone: 'neutral' };
-  return { text: 'Free', tone: 'neutral' };
-}
-
-function Chip({ s, ended }: { s: CourseSummary; ended: MyCourses['ended'] }) {
-  const c = chipOf(s, ended);
-  const cls = c.tone === 'ok' ? 'badge badge-success' : c.tone === 'warn' ? 'badge badge-warning' : 'badge badge-neutral';
-  return <span className={cls}>{c.text}</span>;
 }
 
 function EndedNote({ ended }: { ended: MyCourses['ended'] }) {
@@ -71,7 +58,7 @@ export function MyCoursesScreen({ data }: { data: MyCourses }) {
               <AppLink href={`/student/course/${encodeURIComponent(s.course.course_id)}`} className="card cp-card">
                 <span className="cp-row">
                   <span className="cp-name">{s.course.title}</span>
-                  <Chip s={s} ended={ended} />
+                  <CourseChip access={s.course.access} days={s.days} ended={ended} />
                 </span>
                 <Bar met={s.met} bank={s.bank} />
                 <span className="cp-line">
@@ -122,27 +109,19 @@ export function CourseScreen({ data }: { data: CoursePageData }) {
 
   return (
     <div className="cp-page cp-course">
-      <nav className="cp-tabs" aria-label="Your courses">
-        <AppLink href="/student/courses" className="cp-tab-back">‹ My courses</AppLink>
-        {tabs.map((t) =>
-          t.course_id === c.course_id ? (
-            <span key={t.course_id} className="cp-tab cp-tab-on" aria-current="page">{t.title}</span>
-          ) : (
-            <AppLink key={t.course_id} href={`/student/course/${encodeURIComponent(t.course_id)}`} className="cp-tab">{t.title}</AppLink>
-          ),
-        )}
-      </nav>
+      <CourseTabs
+        backHref="/student/courses"
+        backLabel="My courses"
+        tabs={tabs}
+        currentId={c.course_id}
+        hrefFor={(courseId) => `/student/course/${encodeURIComponent(courseId)}`}
+      />
 
-      <div className="cp-head">
-        <PageHeader title={c.title} />
-        <div className="cp-head-line">
-          <Chip s={s} ended={ended} />
-          {s.expires && c.access !== 'none' ? <span className="cp-line">Ends {formatDay(s.expires)}</span> : null}
-          <AppLink href={`/student/messages?course_id=${id}`} className="cp-message">
-            <Icon name="message" />Message us about this course
-          </AppLink>
-        </div>
-      </div>
+      <CourseHeading title={c.title} access={c.access} days={s.days} expires={s.expires} ended={ended}>
+        <AppLink href={`/student/messages?course_id=${id}`} className="cp-message">
+          <Icon name="message" />Message us about this course
+        </AppLink>
+      </CourseHeading>
 
       {c.access === 'none' ? <EndedNote ended={ended} /> : null}
 
