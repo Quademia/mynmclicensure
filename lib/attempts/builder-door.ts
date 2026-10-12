@@ -155,7 +155,7 @@ export async function withTotals(gate: AuthGateResult, door: Omit<BuilderDoorCou
         .eq('course_id', c.course_id)
         .eq('is_published', true);
       if (c.pool === 'free') q = q.eq('is_free_sample', true);
-      const [{ count, error }, held] = await Promise.all([q, c.pool === 'all' ? heldBackIds(svc, c.course_id) : Promise.resolve(new Set<string>())]);
+      const [{ count, error }, held] = await Promise.all([q, c.pool === 'all' ? heldBackIds(svc, c.course_id, { papers: true }) : Promise.resolve(new Set<string>())]);
       if (error) console.error('builder door, total:', c.course_id, error);
       let heldPublished = 0;
       if (held && held.size) {

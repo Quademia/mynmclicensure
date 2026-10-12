@@ -156,7 +156,7 @@ export async function loadBuilderCourse(courseId: string): Promise<BuilderCourse
 
   const [all, held] = await Promise.all([
     getBuilderCourseItems(supabase, courseId),
-    heldBackIds(createServiceRoleClient(), courseId),
+    heldBackIds(createServiceRoleClient(), courseId, { papers: true }),
   ]);
   if (!held) return fail(HELD_BACK_UNREADABLE);
   const items = all.filter((i) => !held.has(i.item_id));
@@ -187,7 +187,7 @@ export async function searchBuilderConcepts(courseId: string, query: string): Pr
 
   // 08 B6: a held-back question's id never leaves the server either
   const svc = createServiceRoleClient();
-  const [ids, held] = await Promise.all([searchConceptItemIds(svc, courseId, q), heldBackIds(svc, courseId)]);
+  const [ids, held] = await Promise.all([searchConceptItemIds(svc, courseId, q), heldBackIds(svc, courseId, { papers: true })]);
   if (!held) return fail(HELD_BACK_UNREADABLE);
   return { ok: true, itemIds: ids.filter((id) => !held.has(id)) };
 }
@@ -209,7 +209,7 @@ export async function loadQuizBuilderCourse(courseId: string): Promise<QuizBuild
 
   const [rows, held, history] = await Promise.all([
     getQuizBuilderRows(gate.supabase, door.course_id, door.pool === 'free'),
-    heldBackIds(createServiceRoleClient(), door.course_id),
+    heldBackIds(createServiceRoleClient(), door.course_id, { papers: true }),
     getAnswerHistory(gate.supabase, gate.profile.user_id, door.course_id),
   ]);
   if (!rows || !held || !history) return fail(HELD_BACK_UNREADABLE);
@@ -232,7 +232,7 @@ export async function searchQuizBuilderKeyword(courseId: string, word: string): 
   if (!q) return { ok: true, itemIds: [] };
 
   const svc = createServiceRoleClient();
-  const [ids, held] = await Promise.all([searchConceptItemIds(svc, door.course_id, q, door.pool === 'free'), heldBackIds(svc, door.course_id)]);
+  const [ids, held] = await Promise.all([searchConceptItemIds(svc, door.course_id, q, door.pool === 'free'), heldBackIds(svc, door.course_id, { papers: true })]);
   if (!held) return fail(HELD_BACK_UNREADABLE);
   return { ok: true, itemIds: ids.filter((id) => !held.has(id)) };
 }
@@ -266,7 +266,7 @@ export async function startQuizBuilderQuiz(courseId: string, itemIds: string[], 
   // drops here too — and not held back by a mock (08 B6).
   const [known, held] = await Promise.all([
     knownItemIds(supabase, door.course_id, safeIds),
-    heldBackIds(createServiceRoleClient(), door.course_id),
+    heldBackIds(createServiceRoleClient(), door.course_id, { papers: true }),
   ]);
   if (!held) return fail(HELD_BACK_UNREADABLE);
   const orderedIds = safeIds.filter((id) => known.has(id) && !held.has(id));

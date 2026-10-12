@@ -152,7 +152,11 @@ export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
   // save refuses the free tick on a question a mock names; this is the
   // same rule from the other side. Service role: the free mark is
   // readable by the admin's client, but the rule should not rest on it.
-  if (input.kind === 'mock') {
+  // 04.6 (Sam, 2026-10-11): a Practice Paper's questions are held back
+  // like a mock's, so a paper holds no free question either; same check,
+  // the noun changes.
+  {
+    const noun = input.kind === 'mock' ? 'mock exam' : 'practice paper';
     const { data: free, error: freeError } = await createServiceRoleClient()
       .from('question_bank')
       .select('item_id')
@@ -161,8 +165,8 @@ export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
       .order('item_id');
     if (freeError) return fail('Could not check the questions. Please try again.');
     const freeIds = (free ?? []).map((r) => (r as { item_id: string }).item_id);
-    if (freeIds.length === 1) return fail(`Question ${freeIds[0]} is a free question and cannot be in a mock exam.`);
-    if (freeIds.length > 1) return fail(`Questions ${freeIds.join(', ')} are free questions and cannot be in a mock exam.`);
+    if (freeIds.length === 1) return fail(`Question ${freeIds[0]} is a free question and cannot be in a ${noun}.`);
+    if (freeIds.length > 1) return fail(`Questions ${freeIds.join(', ')} are free questions and cannot be in a ${noun}.`);
   }
 
   const timeLimitRaw = input.timeLimitSec.trim();

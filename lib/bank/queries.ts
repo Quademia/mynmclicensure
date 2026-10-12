@@ -202,29 +202,42 @@ export async function getItemFilterOptions(
  * draws, the fixed-quiz picker and the free tick's refusal. `courseId`
  * narrows to one course's mocks. Null when the rows could not be read —
  * every caller then refuses rather than guesses.
+ *
+ * 04.6 (Sam, 2026-10-11): with `papers`, the questions a draft or active
+ * Practice Paper names are held back too — the builder, the pack maker
+ * and the free tick pass it. The fixed-quiz picker and a paper's own
+ * save do not: they must still see a paper's questions, and only a
+ * mock's keep a question out of a paper.
  */
-export async function heldBackIds(db: ServiceDb, courseId?: string): Promise<Set<string> | null> {
-  const build = () => {
-    let query = db.from(QUIZ_TABLES.mock).select('quiz_id').in('status', ['draft', 'active']);
-    if (courseId) query = query.eq('course_id', courseId);
-    return query.order('quiz_id');
-  };
-  const mocks = await readAll<{ quiz_id: string }>((from, to) => build().range(from, to));
-  if (mocks.error) {
-    console.error('heldBackIds:', mocks.error);
-    return null;
-  }
-
+export async function heldBackIds(
+  db: ServiceDb,
+  courseId?: string,
+  options: { papers?: boolean } = {},
+): Promise<Set<string> | null> {
+  const kinds: Array<'mock' | 'fixed'> = options.papers ? ['mock', 'fixed'] : ['mock'];
   const ids = new Set<string>();
-  for (const quizIds of slices(mocks.data.map((m) => m.quiz_id))) {
-    const { data, error } = await readAll<{ item_id: string }>((from, to) =>
-      db.from(QUIZ_ITEM_TABLES.mock).select('item_id').in('quiz_id', quizIds).order('quiz_id').order('item_id').range(from, to),
-    );
-    if (error) {
-      console.error('heldBackIds rows:', error);
+  for (const kind of kinds) {
+    const build = () => {
+      let query = db.from(QUIZ_TABLES[kind]).select('quiz_id').in('status', ['draft', 'active']);
+      if (courseId) query = query.eq('course_id', courseId);
+      return query.order('quiz_id');
+    };
+    const quizzes = await readAll<{ quiz_id: string }>((from, to) => build().range(from, to));
+    if (quizzes.error) {
+      console.error('heldBackIds:', quizzes.error);
       return null;
     }
-    for (const r of data) ids.add(r.item_id);
+
+    for (const quizIds of slices(quizzes.data.map((m) => m.quiz_id))) {
+      const { data, error } = await readAll<{ item_id: string }>((from, to) =>
+        db.from(QUIZ_ITEM_TABLES[kind]).select('item_id').in('quiz_id', quizIds).order('quiz_id').order('item_id').range(from, to),
+      );
+      if (error) {
+        console.error('heldBackIds rows:', error);
+        return null;
+      }
+      for (const r of data) ids.add(r.item_id);
+    }
   }
   return ids;
 }

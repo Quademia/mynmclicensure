@@ -80,7 +80,7 @@ Detail and history: `archive/product-plan/08-question-bank.md` (B1–B8).
   2026-10-11): the builder, the pack maker, the free set and the daily
   challenge skip it, and the free tick and the paper's save refuse;
   archiving the paper releases it. The bank page marks it "In a paper".
-  *(to build: 04.6)*
+  *(built 2026-10-12; the "In a paper" mark on the bank page is not)*
 
 ### The importer
 

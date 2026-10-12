@@ -79,7 +79,7 @@ function fail(error: string): ActionResult {
 
 // The free mark's refusal, in one place: the tick and (08 B4's second
 // session) the importer's "import as free" say the same thing.
-const FREE_IN_MOCK = 'This question is in a mock exam and cannot be free.';
+const FREE_IN_MOCK = 'This question is in a mock exam or a practice paper and cannot be free.';
 
 // 08 B8: the editor offers no type change on a saved question; this is
 // the server saying so when one arrives anyway.
@@ -208,7 +208,7 @@ export async function saveQuestion(input: SaveQuestionInput, image: FormData | n
   // here and in saveQuiz holds the rule from both sides until 03 Q14's
   // link table lets SQL hold it.
   if (input.isFreeSample) {
-    const reserved = await heldBackIds(db);
+    const reserved = await heldBackIds(db, undefined, { papers: true });
     if (!reserved) return fail('Could not check the mock exams. Please try again.');
     if (reserved.has(itemId)) return fail(FREE_IN_MOCK);
   }
@@ -349,7 +349,7 @@ export async function importItems(
   const db = createServiceRoleClient();
   const [inUse, reserved, lists] = await Promise.all([
     tagSpellingsInUse(db),
-    freeNew ? heldBackIds(db) : Promise.resolve(new Set<string>()),
+    freeNew ? heldBackIds(db, undefined, { papers: true }) : Promise.resolve(new Set<string>()),
     courseLists(db, courseId),
   ]);
   if (!reserved) return { ok: false, error: 'Could not check the mock exams. Please try again.' };

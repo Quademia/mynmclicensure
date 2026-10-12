@@ -41,7 +41,7 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
   through the paper, in its other ways, once the first sitting is done.
   So a course needs questions beyond its papers — five papers of 180
   (General Paper 100) and about as many again for the builder: about
-  1,800 a course (General Paper 1,000), mocks on top. *(to build: 04.6)*
+  1,800 a course (General Paper 1,000), mocks on top. *(built 2026-10-12)*
 - **Practice Papers, redesigned** (Sam, 2026-10-12; drawn on the canvas
   https://claude.ai/artifact/XyTdnfwmtswW6Xf6Wq69Cg, boards D, E, F; the
   page described in `11-pages.md`). Three screens, none sized by a

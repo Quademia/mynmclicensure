@@ -76,7 +76,7 @@ before then, and the old list's history, is in
 
 - ⬜ Q21 Practice Papers — the name, "Practice Paper N", the course in full above, the address
 - ⬜ 04.5 The first sitting in the paper's own mode — the admin's dropdown; the other ways once it is finished
-- ⬜ 04.6 A paper's questions kept out of the builder, packs, free set and challenge — as a mock's (storage ticked)
+- ✅ 04.6 A paper's questions kept out of the builder, packs, free set and challenge — as a mock's (no column; built 2026-10-12; the challenge reads it when G2 is built; the bank page's "In a paper" mark not done)
 - ⬜ 04.7 Practice Papers redesigned — drawn and ruled 2026-10-12 (04, 11): courses → a course → a paper's page with Practise again; to build with Q21, the trial's lock, ended and free states, 04.5
 - ⬜ G2 The daily challenge — 5 a day per programme, one course a day in turn, its own mode (storage ticked 10-08)
 - ⬜ Q19 The admin's preview says Preview — on the card and in the sitting

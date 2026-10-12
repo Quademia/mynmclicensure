@@ -99,7 +99,7 @@ export async function createOfflinePack(input: CreatePackInput): Promise<CreateP
   // the builder never offered.
   const [known, held] = await Promise.all([
     knownItemIds(supabase, safeCourseId, safeIds),
-    heldBackIds(createServiceRoleClient(), safeCourseId),
+    heldBackIds(createServiceRoleClient(), safeCourseId, { papers: true }),
   ]);
   if (!held) {
     return { ok: false, reason: 'insert_failed', message: 'Could not check the questions. Please try again.', allowance };

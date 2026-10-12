@@ -359,10 +359,12 @@ table by table as each is next changed (AGENTS.md rule 9).
 
 - A question a paper uses cannot be deleted.
 - Browser: nothing.
-- *To build (04.6) — ticked 2026-10-11:* a question a draft or active
-  paper uses is held back as a mock's is — the database refuses it in a
-  builder quiz (whole bank or free), and refuses marking it free or
-  saving a paper with a free question. Why: a paper's questions are met
+- 04.6 (ticked 2026-10-11, built 2026-10-12, no column): a question a
+  draft or active paper uses is held back as a mock's is — derived from
+  the rows, never stored, and held in the server's code as a mock's is
+  (`heldBackIds`), not by a database rule: the builder, the pack maker
+  and the daily challenge skip it, and marking it free or saving a paper
+  with a free question is refused. Why: a paper's questions are met
   first in the paper (Sam, 2026-10-11).
 
 ### `mock_quizzes`, `mock_quiz_items` — mock exams and their questions
