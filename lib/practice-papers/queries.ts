@@ -49,8 +49,8 @@ type QuizRowRead = {
 };
 
 /** Per course, the most a live grant lets the student do with papers. */
-async function paperAccessByCourse(userId: string, held: string[]): Promise<Record<string, PaperAccess>> {
-  const out: Record<string, PaperAccess> = {};
+async function paperAccessByCourse(userId: string, held: string[]): Promise<Record<string, { papers: PaperAccess; mocks: boolean }>> {
+  const out: Record<string, { papers: PaperAccess; mocks: boolean }> = {};
   if (!held.length) return out;
   const db = createServiceRoleClient();
   const nowIso = new Date().toISOString();
@@ -67,18 +67,24 @@ async function paperAccessByCourse(userId: string, held: string[]): Promise<Reco
   }
   const grants = (rows ?? []) as { course_id: string; subscription_id: string }[];
   const allowAll = new Set<string>();
+  const allowMocks = new Set<string>();
   for (const ids of slices([...new Set(grants.map((g) => g.subscription_id))])) {
-    const { data, error: subError } = await db.from('subscriptions').select('subscription_id, allow_papers').in('subscription_id', ids);
+    const { data, error: subError } = await db.from('subscriptions').select('subscription_id, allow_papers, allow_mocks').in('subscription_id', ids);
     if (subError) {
       console.error('paperAccessByCourse subscriptions:', subError);
       continue;
     }
-    for (const s of (data ?? []) as { subscription_id: string; allow_papers: string | null }[]) {
+    for (const s of (data ?? []) as { subscription_id: string; allow_papers: string | null; allow_mocks: boolean | null }[]) {
       if (s.allow_papers === 'all') allowAll.add(s.subscription_id);
+      if (s.allow_mocks) allowMocks.add(s.subscription_id);
     }
   }
-  for (const courseId of held) out[courseId] = 'trial';
-  for (const g of grants) if (allowAll.has(g.subscription_id)) out[g.course_id] = 'all';
+  for (const courseId of held) out[courseId] = { papers: 'trial', mocks: false };
+  for (const g of grants) {
+    if (!out[g.course_id]) continue;
+    if (allowAll.has(g.subscription_id)) out[g.course_id].papers = 'all';
+    if (allowMocks.has(g.subscription_id)) out[g.course_id].mocks = true;
+  }
   return out;
 }
 
@@ -114,7 +120,7 @@ export async function loadPracticePapers(supabase: ServerSupabaseClient, profile
 
   const now = new Date();
   const courses: CourseView[] = shown.map((c) => {
-    const kind: PaperAccess = accessBy[c.course_id] ?? 'none';
+    const kind: PaperAccess = accessBy[c.course_id]?.papers ?? 'none';
     const papers = byTitle(quizRows.filter((q) => q.course_id === c.course_id)).flatMap((q) => {
       const availability = getQuizAvailability(q as never, now);
       if (availability === 'HIDDEN') return [];
@@ -133,7 +139,7 @@ export async function loadPracticePapers(supabase: ServerSupabaseClient, profile
       };
       return [paperView(row, kind, attempts)];
     });
-    return { course_id: c.course_id, title: c.title, access: kind, papers };
+    return { course_id: c.course_id, title: c.title, access: kind, mocksIncluded: accessBy[c.course_id]?.mocks ?? false, papers };
   });
 
   // The banner: nothing live now, and a trial or package that ran out.

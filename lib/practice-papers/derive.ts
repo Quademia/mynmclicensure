@@ -47,6 +47,8 @@ export type CourseView = {
   course_id: string;
   title: string;
   access: PaperAccess;
+  /** The package of this course includes mock exams (02.10). */
+  mocksIncluded: boolean;
   papers: PaperView[];
 };
 

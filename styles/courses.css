@@ -1,0 +1,105 @@
+/* styles/courses.css
+ *
+ * My courses and the course page (04.8, 04.9; Sam, 2026-10-12). Drawn at
+ * https://claude.ai/artifact/QmaN7QNr2gZ4D62LC1WuER. Tokens only; the card,
+ * the buttons and the badges are the design system's own (components.css).
+ * Breakpoint 768px: the tabs across the top of a course become the one
+ * "‹ My courses" link, the cards stack, the news goes below.
+ */
+
+.cp-page { display: flex; flex-direction: column; gap: var(--space-20); }
+.cp-wide { max-width: 1040px; }
+.cp-course { max-width: 960px; }
+
+.cp-note {
+  margin: 0;
+  padding: var(--space-12) var(--space-16);
+  background: var(--badge-warning-bg);
+  border: 1px solid var(--badge-warning-border);
+  border-radius: var(--radius);
+  color: var(--badge-warning-ink);
+  font-size: var(--type-ui-size);
+  line-height: var(--type-meta-line);
+}
+
+/* My courses: a card each, three across on a computer. */
+.cp-grid { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-16); grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.cp-grid > li { display: flex; min-width: 0; }
+.cp-card { display: flex; flex-direction: column; gap: var(--space-8); flex: 1; min-width: 0; color: var(--ink); text-decoration: none; }
+a.cp-card:hover { box-shadow: var(--shadow-md); text-decoration: none; }
+.cp-static { cursor: default; }
+.cp-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); }
+.cp-name { font-size: var(--type-body-strong-size); font-weight: var(--type-body-strong-weight); line-height: var(--type-field-line); }
+.cp-line { font-size: var(--type-ui-size); color: var(--ink-muted); line-height: var(--type-meta-line); font-weight: 400; }
+.cp-eyebrow { font-size: var(--type-meta-size); font-weight: 600; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.cp-big { font-size: 18px; line-height: 24px; font-weight: 700; color: var(--ink); }
+.cp-chev { color: var(--ink-faint); font-size: 18px; line-height: 1; }
+.cp-next { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); padding-top: var(--space-8); margin-top: var(--space-2); }
+.cp-next-text { font-size: var(--type-ui-size); font-weight: 600; color: var(--brand-teal-hover); }
+
+.cp-bar { display: block; height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; }
+.cp-bar-fill { display: block; height: 100%; background: var(--brand-teal); }
+
+.cp-package { align-self: flex-start; }
+
+/* The course page. */
+.cp-tabs { display: flex; align-items: center; gap: var(--space-8); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.cp-tab-back { padding: var(--space-10) var(--space-12) var(--space-10) 0; font-size: var(--type-ui-size); font-weight: 600; color: var(--brand-teal-hover); }
+.cp-tab {
+  padding: var(--space-10) 14px;
+  font-size: var(--type-ui-size);
+  font-weight: 600;
+  color: var(--ink-muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  text-decoration: none;
+}
+a.cp-tab:hover { color: var(--brand-navy); text-decoration: none; }
+.cp-tab-on { color: var(--brand-navy); border-bottom-color: var(--brand-teal); }
+
+.cp-head { display: flex; flex-direction: column; gap: var(--space-8); }
+.cp-head .page-header { margin-bottom: 0; }
+.cp-head-line { display: flex; align-items: center; gap: var(--space-12); flex-wrap: wrap; }
+.cp-message { margin-left: auto; display: inline-flex; align-items: center; gap: var(--space-6); font-size: var(--type-ui-size); font-weight: 600; color: var(--brand-teal-hover); }
+
+.cp-grid2 { display: flex; flex-direction: column; gap: var(--space-20); }
+.cp-main { display: flex; flex-direction: column; gap: var(--space-16); min-width: 0; }
+.cp-side { display: flex; flex-direction: column; gap: var(--space-8); min-width: 0; }
+.cp-card .btn { align-self: flex-start; margin-top: var(--space-8); }
+
+.cp-ways { padding: 0; }
+.cp-way {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  min-height: 56px;
+  padding: var(--space-12) var(--space-16);
+  color: var(--ink);
+  text-decoration: none;
+  box-sizing: border-box;
+}
+.cp-way + .cp-way { border-top: 1px solid var(--border); }
+a.cp-way:hover { background: var(--surface-page); text-decoration: none; }
+.cp-row-main { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
+.cp-way-locked .cp-name { color: var(--ink-muted); font-weight: 500; }
+.cp-way-locked .cp-line { color: var(--ink-faint); }
+
+.cp-section { margin: 0; font-size: var(--type-ui-size); font-weight: 600; color: var(--ink-muted); }
+.cp-news { padding: 0; }
+.cp-news-item { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-12) var(--space-16); }
+.cp-news-item + .cp-news-item { border-top: 1px solid var(--border); }
+.cp-news-body { font-size: var(--type-ui-size); color: var(--ink-muted); line-height: var(--type-meta-line); }
+
+@media (min-width: 769px) {
+  .cp-grid2 { flex-direction: row; align-items: flex-start; }
+  .cp-main { flex: 1.2; }
+  .cp-side { flex: 1; }
+}
+@media (max-width: 768px) {
+  .cp-grid { grid-template-columns: 1fr; }
+  /* a phone has the one link, not the row of courses */
+  .cp-tab { display: none; }
+  .cp-tabs { border-bottom: 0; }
+  .cp-message { margin-left: 0; }
+}

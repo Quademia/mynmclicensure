@@ -56,6 +56,8 @@ export function SidebarNav({
     if (!href) return false;
     // 03 Q10 (Sam, 2026-09-30): a sitting's report belongs to Learning History
     if (href === '/student/learning-history' && pathname.startsWith('/student/report/')) return true;
+    // 04.8 (Sam, 2026-10-12): a course's page belongs to My courses
+    if (href === '/student/courses' && pathname.startsWith('/student/course/')) return true;
     return pathname === href;
   }
 

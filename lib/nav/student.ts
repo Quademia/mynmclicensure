@@ -53,7 +53,7 @@ export const STUDENT_NAV: NavItem[] = [
   { key: 'dashboard', label: 'Dashboard', icon: 'home', href: `${S}/dashboard` },
 
   { key: 'h-practise', label: 'Practise', heading: true },
-  { key: 'courses', label: 'My courses', icon: 'book', dynamic: 'courses', children: [] },
+  { key: 'courses', label: 'My courses', icon: 'book', href: `${S}/courses` },
   { key: 'fixed-quizzes', label: 'Practice papers', icon: 'clipboard', href: `${S}/practice-papers` },
   { key: 'mock-exams', label: 'Mock exams', icon: 'target', href: `${S}/mock-exams` },
   { key: 'quiz-builder', label: 'Quiz builder', icon: 'wrench', href: `${S}/quiz-builder` },
