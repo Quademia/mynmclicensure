@@ -589,6 +589,12 @@ above sit at the repo root; the audience grouping inside them is kept.
   `{ papers: true }`. A new place that draws questions for a student
   (the daily challenge, G2) must call it with `papers: true`.
 
+- **Some files here have mixed line endings** (CRLF and LF together), so a
+  scripted multi-line find-and-replace that contains `\n` can match
+  nothing and say nothing. After any scripted or `sed` edit, `grep` for
+  the new text; for a multi-line change use the Edit tool, or normalise
+  `\r\n` to `\n` in the script first (2026-10-12).
+
 ## Branching workflow
 
 Two long-lived branches on the remote:
