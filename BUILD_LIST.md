@@ -142,6 +142,8 @@ before then, and the old list's history, is in
 - ⬜ 09.5 The old token names retired once no page uses them
 - ✅ 09.6 The phone's bottom bar and sub-tab row — four fixed tabs, a row per group, the drawer kept — 2026-10-04
 - ✅ 09.7 The student menu in its groups — a heading per group, every row visible, the phone's names — 2026-10-04
+- ✅ 09.9 The menu's Home group — Dashboard and My courses under Home; the phone's first tab Home with Dashboard · Courses (Sam, 2026-10-12)
+- ✅ (unplanned) Leftover code removed — the sidebar's dropdown, the layout's course reads, the fixed-quiz side of the quiz list and older unused code and styles; CSS 534 → 519 (2026-10-12)
 - ⏸ DS9 About eight pages on their own button classes — they join as each is touched
 - ✖ 09.8 The builder's own chips, switch, cards, circles, search box — gone with the four-step page (10-11)
 

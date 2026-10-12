@@ -22,8 +22,8 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
-- 2026-10-12 — Practice Papers redesigned and built (04.7): first-sitting mode (04.5), held-back questions (04.6), three screens; cloud session bank checked
-  - ↳ designed from decisions, not the old page · courses, course, paper page · Practise again box · grey locked lines · no counts written in · save_quiz names columns · base.css hover underline (09.2) · My courses and course page
+- 2026-10-12 — Practice Papers rebuilt (04.5–04.7); My courses and the course page (04.8, 04.9); a Home menu group; leftover code removed
+  - ↳ designed from decisions, not the old page · Practise again box · course page a front door, tabs · Home = Dashboard + My courses · save_quiz names columns · hover underline (09.2) · dead-code audit · mixed line endings
 
 - 2026-10-11, evening — Quiz Builder reviewed; the old five-step wizard's look back on its new rules (04.4); Practice Papers explained
   - ↳ stuck filter · dropped connection froze it · a–g · Filters step · Keyword · Build on Review · papers: first sitting per paper, finished · kept out of builder · free sees locked · dev papers by cloud · crash
