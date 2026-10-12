@@ -72,9 +72,9 @@ Full Access stays the admin's grant (02).
 
 | Group | Page | What it is for |
 |---|---|---|
-| Dashboard | Dashboard | Where sign-in lands, for every status; its top card is this student's next step — today's challenge, days left, carry on, the recap (11) |
-| Practise | My courses | A card for each course — days left, how far through, where to carry on; a plain row with no dropdown (Sam, 2026-10-12). Each opens the course page: a front door to its papers, mocks and builder, with its news (11) |
-| | Practice papers | The set papers of each course (today "Fixed quizzes") |
+| Home | Dashboard | Where sign-in lands, for every status; its top card is this student's next step — today's challenge, days left, carry on, the recap (11) |
+| | My courses | A card for each course — days left, how far through, where to carry on; a plain row with no dropdown (Sam, 2026-10-12). Each opens the course page: a front door to its papers, mocks and builder, with its news (11) |
+| Practise | Practice papers | The set papers of each course (today "Fixed quizzes") |
 | | Mock exams | Timed papers in exam conditions |
 | | Quiz builder | A quiz built from chosen topics |
 | | Daily challenge — *new* | A set number of questions a day (5 to start), one course in turn; opened from the dashboard's top card, no menu item (04 G2) |
@@ -135,7 +135,7 @@ feedback (06).
 ## The menu
 
 **Confirmed by Sam, 2026-10-04.** The student menu in the groups above:
-Dashboard, Practise, Progress, Study offline, Help and news; Account
+Home (Dashboard, My courses — Sam, 2026-10-12), Practise, Progress, Study offline, Help and news; Account
 under the avatar in the top bar. In the sidebar (and the phone's
 drawer, the same menu) each group is a small heading with every row
 visible beneath — not groups that open and close — named as the phone's
@@ -155,8 +155,9 @@ taken back the same day: "too busy" (Sam, 2026-10-04).
   or a landing that changes with status moves things when the student
   upgrades and hides what they could unlock ("locked, not gone", 03).
 - **On a phone, a bar at the bottom** (Sam, 2026-10-04): four tabs that
-  never change — Dashboard, Practise, Progress, Offline. A group's other
-  pages sit in a row of tabs at the top of its pages (Practise: Papers ·
+  never change — Home, Practise, Progress, Offline. A group's other
+  pages sit in a row of tabs at the top of its pages (Home: Dashboard ·
+  Courses, a course's own page with only its way back; Practise: Papers ·
   Mocks · Builder; Progress: History · Leaderboard; Offline: My packs ·
   Build); each tab opens on the first, not remembered. The ☰ menu stays
   the full list; a computer keeps the sidebar. A bar that swaps to the

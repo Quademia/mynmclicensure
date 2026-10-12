@@ -1,8 +1,8 @@
 // lib/nav/student.ts
 //
 // The student sidebar — and the phone's drawer, the same menu — in the
-// groups Sam confirmed (00 The menu, 2026-10-04: A): Dashboard, then
-// Practise, Progress, Study offline and Help and news, each under a small
+// groups Sam confirmed (00 The menu, 2026-10-04: A; Home added 2026-10-12):
+// Home (Dashboard, My courses), then Practise, Progress, Study offline and Help and news, each under a small
 // heading with every row visible; Account is the top bar's avatar menu
 // (My Profile, Upgrade / Extend; components/shell/top-bar.tsx). The
 // names match the phone's tabs; "Practice papers" is Q21's name (the
@@ -19,7 +19,17 @@ const S = '/student';
 // drawer below stays the full menu; these are shortcuts into its pages.
 // Progress gains Leaderboard with 05 G1b, so its row appears then.
 export const STUDENT_PHONE_TABS: PhoneTab[] = [
-  { key: 'dashboard', label: 'Dashboard', icon: 'home', pages: [{ label: 'Dashboard', href: `${S}/dashboard` }] },
+  {
+    key: 'home',
+    label: 'Home',
+    icon: 'home',
+    pages: [
+      { label: 'Dashboard', href: `${S}/dashboard` },
+      { label: 'Courses', href: `${S}/courses` },
+    ],
+    // a course's page has no row of its own, only its way back (Sam, 2026-10-12)
+    also: [`${S}/course`],
+  },
   {
     key: 'practise',
     label: 'Practise',
@@ -29,7 +39,6 @@ export const STUDENT_PHONE_TABS: PhoneTab[] = [
       { label: 'Mocks', href: `${S}/mock-exams` },
       { label: 'Builder', href: `${S}/quiz-builder` },
     ],
-    also: [`${S}/course`],
   },
   {
     key: 'progress',
@@ -50,10 +59,11 @@ export const STUDENT_PHONE_TABS: PhoneTab[] = [
 ];
 
 export const STUDENT_NAV: NavItem[] = [
+  { key: 'h-home', label: 'Home', heading: true },
   { key: 'dashboard', label: 'Dashboard', icon: 'home', href: `${S}/dashboard` },
+  { key: 'courses', label: 'My courses', icon: 'book', href: `${S}/courses` },
 
   { key: 'h-practise', label: 'Practise', heading: true },
-  { key: 'courses', label: 'My courses', icon: 'book', href: `${S}/courses` },
   { key: 'fixed-quizzes', label: 'Practice papers', icon: 'clipboard', href: `${S}/practice-papers` },
   { key: 'mock-exams', label: 'Mock exams', icon: 'target', href: `${S}/mock-exams` },
   { key: 'quiz-builder', label: 'Quiz builder', icon: 'wrench', href: `${S}/quiz-builder` },
