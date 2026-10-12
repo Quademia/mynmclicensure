@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-10-11. Rules for **any** assistant working in this
+Last updated: 2026-10-12. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What the app is
@@ -574,6 +574,20 @@ above sit at the repo root; the audience grouping inside them is kept.
   file even when dev needs none, and leave out a rule nothing needs
   (2026-09-26, 08 B5: the tidy step found nothing on dev; a comma rule
   was dropped).
+
+- **`save_quiz()` names the columns it writes.** A column added to
+  `quizzes` or `mock_quizzes` must be added to that function in the same
+  migration, or the admin's form never saves it and nothing errors
+  (`first_mode`, 2026-10-12). Send it from `saveQuiz` as well.
+- **`styles/base.css` underlines every link on hover** (`a:hover`), and
+  that out-ranks any class saying `text-decoration: none`. A row or card
+  that is a link sets it off on its own `:hover` too; the app-wide fix is
+  09.2 (Sam's yes pending). Check by hovering, not by reading the CSS.
+- **A question's "held back" is held in the server's code**, not by a
+  database rule: `heldBackIds` (`lib/bank/queries.ts`) — a draft or active
+  mock's questions always, a draft or active paper's too with
+  `{ papers: true }`. A new place that draws questions for a student
+  (the daily challenge, G2) must call it with `papers: true`.
 
 ## Branching workflow
 
