@@ -64,6 +64,7 @@ type Form = {
   courseId: string;
   title: string;
   modes: AllowedModes;
+  firstMode: AttemptMode;
   status: QuizStatus;
   timeLimit: string;
   shuffle: boolean;
@@ -78,6 +79,7 @@ const EMPTY_FORM: Form = {
   title: '',
   // legacy's BOTH, as the table's default (§8 S21)
   modes: ['UNTIMED_LEARNING', 'TIMED_FREE_NAV'],
+  firstMode: 'TIMED_FREE_NAV',
   status: 'draft',
   timeLimit: '',
   shuffle: false,
@@ -268,7 +270,15 @@ export function QuizManager({
 
   // §8 S21: a mode ticked or unticked, the list kept in the table's order
   function toggleMode(code: AttemptMode, on: boolean) {
-    setForm((f) => ({ ...f, modes: orderModes(on ? [...f.modes, code] : f.modes.filter((m) => m !== code)) }));
+    setForm((f) => {
+      const modes = orderModes(on ? [...f.modes, code] : f.modes.filter((m) => m !== code));
+      // 04.5: the first sitting's mode stays one of the ticked ones — Free
+      // Navigation if it is ticked, else the first that is.
+      const firstMode = modes.includes(f.firstMode)
+        ? f.firstMode
+        : modes.includes('TIMED_FREE_NAV') ? 'TIMED_FREE_NAV' : (modes[0] ?? f.firstMode);
+      return { ...f, modes, firstMode };
+    });
   }
 
   // ── pane 3: the picker ──
@@ -354,6 +364,7 @@ export function QuizManager({
       courseId: quiz.course_id,
       title: quiz.title,
       modes: orderModes(quiz.allowed_modes),
+      firstMode: quiz.first_mode ?? 'TIMED_FREE_NAV',
       status: quiz.status,
       timeLimit: quiz.time_limit_sec ? String(quiz.time_limit_sec) : '',
       shuffle: quiz.shuffle,
@@ -492,6 +503,7 @@ export function QuizManager({
       courseId: form.courseId,
       title: form.title,
       allowedModes: form.modes,
+      firstMode: form.firstMode,
       status: form.status,
       published: form.published,
       shuffle: form.shuffle,
@@ -723,8 +735,23 @@ export function QuizManager({
                   </div>
                 ))}
               </div>
-              <p className="form-hint">Students choose one of the ticked modes when they start.</p>
+              <p className="form-hint">
+                {kind === 'fixed'
+                  ? "Once a student has finished their first sitting, they choose any ticked mode."
+                  : 'Students choose one of the ticked modes when they start.'}
+              </p>
             </div>
+            {kind === 'fixed' ? (
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="fieldFirstMode">First sitting in</label>
+                  <select id="fieldFirstMode" value={form.firstMode} onChange={(e) => setField('firstMode', e.target.value as AttemptMode)}>
+                    {form.modes.map((code) => <option key={code} value={code}>{MODES[code].name}</option>)}
+                  </select>
+                  <p className="form-hint">The first sitting of this paper is in this mode, for every student. The other ticked modes open after it.</p>
+                </div>
+              </div>
+            ) : null}
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="fieldStatus">Status</label>

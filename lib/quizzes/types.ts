@@ -48,6 +48,8 @@ export type Quiz = {
   item_ids: string[];
   n: number;
   allowed_modes: AllowedModes;
+  /** A paper's first sitting is in this mode (04.5); mocks have none. */
+  first_mode?: AttemptMode;
   shuffle: boolean;
   /** null = one minute per question (legacy's fallback, everywhere). */
   time_limit_sec: number | null;
@@ -110,6 +112,8 @@ export type SaveQuizInput = {
   courseId: string;
   title: string;
   allowedModes: AllowedModes;
+  /** A paper's first-sitting mode (04.5); ignored for a mock. */
+  firstMode?: AttemptMode;
   status: QuizStatus;
   published: boolean;
   shuffle: boolean;

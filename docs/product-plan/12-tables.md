@@ -348,7 +348,10 @@ table by table as each is next changed (AGENTS.md rule 9).
   `allowed_modes`. Papers whose modes lacked Free Navigation took their
   first exam mode, else their first allowed mode. Why: the first sitting
   is the honest measure, and the admin can change the mode if the
-  official exam changes (Sam, 2026-10-11).
+  official exam changes (Sam, 2026-10-11). `save_quiz` writes it (an edit
+  that sends none keeps the stored one; a new paper takes Free
+  Navigation); the admin sets it from "First sitting in" beside the mode
+  ticks (2026-10-12).
 
 ### `quiz_items` — a paper's questions
 | Column | Holds |
