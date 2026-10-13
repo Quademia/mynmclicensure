@@ -352,7 +352,7 @@ table by table as each is next changed (AGENTS.md rule 9).
   that sends none keeps the stored one; a new paper takes Free
   Navigation); the admin sets it from "First sitting in" beside the mode
   ticks (2026-10-12).
-- *To build (04.10, 04.12, 04.13) — **awaiting Sam's tick**:* three
+- *To build (04.10, 04.12, 04.13) — ticked 2026-10-14 (Sam):* three
   columns, each empty on every paper today, so nothing changes until an
   admin sets one.
   - `sittings_allowed` — a whole number above 0; empty = no limit.
@@ -399,7 +399,7 @@ table by table as each is next changed (AGENTS.md rule 9).
   (`ALL`, `PAID` or `TRIAL`) — stored, never checked.
 - *To build:* `visibility` removed *(10.17)* — the package's mock yes /
   no is the gate (ticked 2026-10-04).
-- *To build (04.11, 04.10, 04.12, 04.13) — **awaiting Sam's tick**:*
+- *To build (04.11, 04.10, 04.12, 04.13) — ticked 2026-10-14 (Sam):*
   `first_mode` as on `quizzes` (Free Navigation on a new mock; a mock
   today takes Free Navigation where it allows it, else its first exam
   mode, else its first mode, as 04.5 did for papers), and the same three
