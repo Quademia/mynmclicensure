@@ -352,6 +352,30 @@ table by table as each is next changed (AGENTS.md rule 9).
   that sends none keeps the stored one; a new paper takes Free
   Navigation); the admin sets it from "First sitting in" beside the mode
   ticks (2026-10-12).
+- *To build (04.10, 04.12, 04.13) — **awaiting Sam's tick**:* three
+  columns, each empty on every paper today, so nothing changes until an
+  admin sets one.
+  - `sittings_allowed` — a whole number above 0; empty = no limit.
+    `create_attempt` refuses a sitting once the student's sittings of
+    the paper — in progress, completed or abandoned — reach it.
+  - `results_at` — a date and time; empty = Immediately. Until then the
+    score, the report, the answers and the explanations of every sitting
+    of the paper are held (from Submit when Submit is later); while they
+    are held, a sitting in a mode other than `first_mode` is refused,
+    and `first_mode` must be an exam mode (a check).
+  - `review_days` — a whole number above 0; empty = no limit. The review
+    and sittings in the other modes close that many days after a
+    student's results came out.
+  - `save_quiz` writes all three; students read them (the card shows
+    them). The owner's own direct read of the score (`attempts`) and of
+    `is_correct` (`attempt_items`) must follow the hold too — how is
+    settled in the build's proof.
+  - Why: papers and mocks carry the same settings, and a mock reused
+    across groups needs its answers kept from the next group (Sam,
+    2026-10-13, 04).
+- *To build (04.14), no column:* a sitting in an untimed mode still in
+  progress when its paper closes is finished at `unpublish_at`, on what
+  was answered; a timed one keeps its own clock.
 
 ### `quiz_items` — a paper's questions
 | Column | Holds |
@@ -375,6 +399,13 @@ table by table as each is next changed (AGENTS.md rule 9).
   (`ALL`, `PAID` or `TRIAL`) — stored, never checked.
 - *To build:* `visibility` removed *(10.17)* — the package's mock yes /
   no is the gate (ticked 2026-10-04).
+- *To build (04.11, 04.10, 04.12, 04.13) — **awaiting Sam's tick**:*
+  `first_mode` as on `quizzes` (Free Navigation on a new mock; a mock
+  today takes Free Navigation where it allows it, else its first exam
+  mode, else its first mode, as 04.5 did for papers), and the same three
+  columns as `quizzes` — `sittings_allowed`, `results_at`,
+  `review_days` — under the same rules, written by `save_quiz`. The
+  close (04.14) as for papers. Why: as on `quizzes`.
 - Browser: as for papers.
 
 ### `attempts` — a sitting

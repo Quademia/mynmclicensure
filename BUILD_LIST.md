@@ -80,6 +80,16 @@ before then, and the old list's history, is in
 - ✅ 04.8 The My courses page — `/student/courses`, a card per course; the menu row plain, its dropdown gone (drawn and ruled 2026-10-12, 11-pages) — built 2026-10-12, walked as paid, trial, ended and free students
 - ✅ 04.9 The course page redesigned — tabs on a computer, Up next, three rows into the stand-alone pages, news; the four states (drawn and ruled 2026-10-12, 11-pages) — built 2026-10-12, walked as paid (computer, 375px), trial, ended and free students; a course with news and an open mock not yet seen (none in dev)
 - ✅ 04.7 Practice Papers redesigned — drawn and ruled 2026-10-12 (04, 11), built the same day: courses → a course → a paper's page with Practise again; walked as an RM paid student (computer, 375px, a failed request); the trial, ended and free states and the locked rows to walk as those students (one link each, Sam)
+- ⬜ 04.10 Sittings allowed — papers and mocks; every sitting started counts; "N of M left"; start screen always shown
+- ⬜ 04.11 A mock's first sitting in its own mode — as a paper's (04.5), the dropdown on the mock form
+- ⬜ 04.12 Results on a date — papers and mocks; everything held to the date, by the database
+- ⬜ 04.13 A review period — N days after results, then the review and Practise again lock; papers and mocks
+- ⬜ 04.14 At the close — an untimed sitting finished at the close; the card's Resume follows the sitting's mode
+- ⬜ 04.15 The Mock exams page redesigned — by time: Open now, Coming up, Past mocks; a mock's own page
+- ⬜ 04.16 The mock form refuses a live mock holding a draft question — says how many
+- ⬜ 04.17 The mock form warns when its questions are edited after students have sat it
+- ⏸ 04.18 Status and Published as one switch — at the admin redesign (Sam, 2026-10-13)
+- ⏸ 04.19 An admin's extra sitting for one student — when a support case asks
 - ⬜ G2 The daily challenge — 5 a day per programme, one course a day in turn, its own mode (storage ticked 10-08)
 - ⬜ Q19 The admin's preview says Preview — on the card and in the sitting
 - ⬜ Q20 Preview this paper — an editor button: questions, answers, rationales, no sitting
@@ -87,7 +97,7 @@ before then, and the old list's history, is in
 - ✅ 04.4 The Quiz Builder — the old five-step wizard's look on one door for every status (Sam) — 2026-10-11
 - ✅ 04.1 The builder's minimum of 5 questions — Start greyed below 5, the words say why — 2026-10-11
 - ⏸ 04.2 A pass mark per paper, Passed / Didn't pass on the results — Sam: later (09-27)
-- ⏸ Q3 Mock exams as a premium exam experience — a design item; Sam picks when
+- ⏸ Q3 The rest of the mocks' design — notices, the real paper's timing, standing (ruled in part 10-13: 04.10–04.17)
 - ✅ Q16 The keyword says what matched — "N questions contain …", the topics it sits in — 2026-10-11
 - ⏸ 04.3 Undo "Don't show this again" — in a settings page, if one is ever built
 

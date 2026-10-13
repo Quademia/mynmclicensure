@@ -71,6 +71,61 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
   stats keep papers and mocks apart and show retakes and abandons
   separately.
 
+### A paper's and a mock's settings *(to build: 04.10–04.14)*
+
+Papers and mocks carry the same settings (Sam, 2026-10-13: "they are
+the same settings almost"). Drawn with the Mock exams page at
+https://claude.ai/artifact/5QQCWH9ECauT7k69cUUxC3 (board B).
+
+- **First sitting in** — a mock's first sitting is in its own mode, as
+  a paper's is (04.5): the same dropdown on the mock form. *(to build:
+  04.11)*
+- **Sittings allowed** — how many times a student may sit it; empty is
+  no limit, and every paper and mock starts empty. One count for every
+  mode together, the first sitting included, so "1" is one sitting only.
+  A sitting counts when it starts — finished, in progress or abandoned
+  (else Abandon is a free look and restart); one in progress resumes,
+  never a second. The database counts, so Start, Practise again and
+  Retake (Learning History, the report) are refused alike. The student
+  sees it only when it is set: "You can sit this mock 2 times", "1 of 2
+  sittings left"; with none left the score and the report stay and
+  Practise again goes. With a limit set the start screen always shows,
+  with "This uses 1 of your 2 sittings" and no "Don't show this again".
+  A trial's sittings count too. Moodle's "Attempts allowed" works so.
+  Parked: an admin giving one student an extra sitting. *(to build:
+  04.10)*
+- **Results** — Immediately (the default) or On a date and time (Ghana
+  time). On a date holds everything — the score, the report, the
+  answers and the explanations — until the date, or until Submit when
+  that is later. The results pop-up says "Submitted. Your results come
+  out on …"; every place a score shows says "Results on …"; questions
+  mastered and the weakest topic wait too, or they would give the score
+  away. While results are held Practise again stays shut, and the first
+  sitting must be in an exam mode (the form refuses a Study mode). The
+  database holds them, not only the page. Papers normally stay on
+  Immediately; the trial paper has no rule of its own (Sam). *(to build:
+  04.12)*
+- **Review period** — "Review open for N days after results"; empty is
+  no limit. Counted per student from their own results (from the date
+  when results are held), since a mock reused across groups gives each
+  student their results at a different time. After it the score, the
+  report's summary and the sittings stay; the question-by-question
+  review and the question map's way into it lock — "The review of this
+  mock closed on 20 November" — and Practise again closes with it (a
+  Learning sitting would hand the review back). The server holds it; it
+  is F2's lock (03) with a date. *(to build: 04.13)*
+- **When a paper or mock closes** — no new sitting starts. A timed
+  sitting started before the close runs to the end of its own clock; an
+  untimed one is finished at the close, scored on what was answered, the
+  next time it is opened or an answer is saved. The card's Resume
+  follows the same rule (today it refuses after the close, while Resume
+  in Learning History works). *(to build: 04.14)*
+- **What a student keeps of a closed paper or mock they sat**: the
+  score, the report, the review (inside its period) and the sittings —
+  no new sitting. A student whose package ended keeps the score and the
+  summary, the review locked (03 F2). A student who moved from Premium
+  Prep to Full Access keeps the review of the mocks they sat (Sam).
+
 ### The Quiz Builder
 
 Ruled by Sam, 2026-10-11: the old five-step wizard's look on the new
@@ -234,17 +289,42 @@ and "instant runner", which predate the four modes.
 - **Mocks open only when the package says yes** (03 F4) — and **only
   Premium Prep packages say yes** (Sam, 2026-10-04): mocks are seasonal,
   built for the main August/September sitting (02, built 2026-10-04).
-- Mocks as a premium exam experience is a design item not yet started
-  (Q3, parked). Noted for it: mocks serve members who come near the
-  exam and leave; a mock stays active across cohorts; its questions are
-  written as drafts and published when it goes live.
+- **How many mocks is not fixed** (Sam, 2026-10-13): they come with the
+  exam periods, so nothing is sized by a count. Mocks serve members who
+  come near the exam and leave; a mock stays active across cohorts; its
+  questions are written as drafts and published when it goes live.
+- **The Mock exams page, redesigned** (Sam, 2026-10-13: layout A; drawn
+  at https://claude.ai/artifact/5QQCWH9ECauT7k69cUUxC3, boards A and B;
+  the page described in `11-pages.md`): one screen, by time. A card for
+  the mock to start — a sitting in progress first, else the open mock
+  that closes soonest — then plain rows under Open now (the soonest to
+  close first), Coming up and Past mocks; a row opens the mock's own
+  page, built as a paper's. Not by course (board C): one tap more, and
+  between exam periods every course would say the same. *(to build:
+  04.15)*
+- Q3, the premium exam experience, is ruled in part (2026-10-13): the
+  settings above and the page. The rest is in Open.
 
 ### For the admin
 
 - On the paper editor, "First sitting in" (a dropdown, Free Navigation
   already picked) and the other ways allowed after it (ticks) (04.5); on
-  the mock editor, mode ticks under Study and Exam. The "Open in trial"
+  the mock editor, mode ticks under Study and Exam and, to build,
+  "First sitting in" as on a paper (04.11). Both editors, to build:
+  Sittings allowed, Results (Immediately / On a date and time) and
+  Review open for N days (04.10, 04.12, 04.13). The "Open in trial"
   tick on a paper (03). The mock list shows 50 at a time.
+- **The mock form refuses a live mock holding a draft question** —
+  Active and Published are refused while any of its questions is a
+  draft, saying how many (Sam, 2026-10-13). A one-step "publish its
+  questions too" can come with the admin redesign. *(to build: 04.16)*
+- **Editing a mock's questions after students have sat it warns**:
+  "12 students have sat this mock. Their scores stay on the questions
+  they had." Their sittings keep their own copy; a lock waits until one
+  is needed (Sam, 2026-10-13). *(to build: 04.17)*
+- Status (Draft / Active / Archived — the mock's life) and Published
+  (a pause: hidden, its questions still held back) both stay; they
+  become one at the admin redesign (Sam, 2026-10-13, parked: 04.18).
 - The admin can preview any sitting, read-only. It will say Preview on
   the card and in the sitting, with no "Don't show this again". *(to
   build: Q19)*
@@ -254,11 +334,11 @@ and "instant runner", which predate the four modes.
 
 ## Open
 
-- **Q3 — mock exams' design**, none decided: an exam window with one
-  timed sitting, no retake, no Study modes; results released on a date;
-  cohort standing; notices when a mock opens and results land; a
-  closing window submitting what is in progress; timing like the real
-  paper; how many mocks per programme.
+- **Q3 — the rest of mock exams' design** (ruled 2026-10-13: the first
+  sitting, sittings allowed, results on a date, the review period, the
+  close, the page — above): notices when a mock opens and when results
+  land (with the announcements and the email outbox); timing like the
+  real paper; standing among those who sat it (05 Q13).
 - **Q7 — the partial-credit rule**: a fraction of the options;
   MyNclex's plus-and-minus with a floor of zero; or all-or-nothing kept
   for mocks.

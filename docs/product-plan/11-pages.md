@@ -90,6 +90,8 @@ opens it (00, The menu).
   locked lines; the builder "Free questions only"; Choose a package once.
 - No days, count, paper number or paper name is written into either
   page: each is read from the student's own data and the course.
+- The course page's mocks row opens the course's open mock's own page
+  when there is one, else the Mock exams page (2026-10-13, with 04.15).
 
 ### Practice papers
 - **Redesigned (Sam, 2026-10-12; 04.7)**, drawn at
@@ -130,13 +132,44 @@ opens it (00, The menu).
   Choose a package — the ended view, with scores only where they exist.
 - No size, time or paper count is written into the page: each is read
   from the paper.
+- **Sittings, results and review** (04, Sam, 2026-10-13): a paper's card
+  says the sittings left when the admin sets a number; held results and
+  a closed review show as on a mock's page (below). *(to build: 04.10,
+  04.12, 04.13)*
 
 ### Mock exams
-- Free, trial, ended, and paid without Premium Prep: listed, locked,
-  with the way to Premium Prep — the words at the redesign (02.10;
-  Start refused today with "Mock exams aren't included in your
-  package.").
-- Paid with Premium Prep: open (02.10).
+- **Redesigned (Sam, 2026-10-13: layout A; 04.15)**, drawn at
+  https://claude.ai/artifact/5QQCWH9ECauT7k69cUUxC3 (A, A with several
+  open, B; C by course declined). One screen, by time; the rules in 04.
+- **The list**: one card for the mock to start — a sitting in progress
+  (answered so far, time left, Resume), else the open mock that closes
+  soonest (Start); then plain rows under **Open now** (the soonest to
+  close first, the course and "until 30 Oct" under the name), **Coming
+  up** (a grey line, "Opens 6 November") and **Past mocks** (closed and
+  sat by this student, whatever the mock's status since). A row's right
+  side: Not started, In progress, the score, "Results 30 Oct". With every
+  open mock sat the card says so; between exam periods "No mock is open
+  right now". A row opens the mock's own page; Start is two taps from the
+  menu.
+- **A mock's own page**, as a paper's: the card that follows the student
+  — Your first sitting (the mode, size, time, closing date), Resume, then
+  the score, See your report and Practise again; "You can sit this mock N
+  times" or "N of M sittings left" when a limit is set; the student's
+  sittings. Held: "Submitted 28 October · Results on 30 October, 6:00 pm
+  · Your score, report and answers come out then", Practise again opening
+  with the results. Every sitting used: the score and See your report. A
+  closed mock: the score, the report and the review, no new sitting.
+- **Paid without Premium Prep**: "Mock exams come with Premium Prep.";
+  Open now and Coming up as grey lines, "With Premium Prep"; Choose a
+  package once, at the bottom, to the in-app Packages page (Sam,
+  2026-10-13); Past mocks with their scores if they sat any. Start is
+  refused today with "Mock exams aren't included in your package." (02.10).
+- **Free, trial and ended, between exam periods**: one card — "Mock exams
+  come with Premium Prep", "Timed papers like the real exam, opened
+  around each exam period" — and Choose a package; an ended student who
+  sat mocks also sees Past mocks (the review locked, 03 F2).
+- Paid with Premium Prep: open (02.10). No name, date, count or time is
+  written into the page: each is read from the mock.
 
 ### Quiz builder
 - The page: 04, The Quiz Builder (the old five-step wizard's look, Sam
@@ -164,7 +197,9 @@ opens it (00, The menu).
 
 ### The sitting — start screen, sitting, review
 - The start screen alone; Start or Resume; a resumed exam's minutes
-  left; per-mode "Don't show this again" (04).
+  left; per-mode "Don't show this again" (04). With a sitting limit set
+  it always shows, with "This uses 1 of your N sittings" and no "Don't
+  show this again" (04.10, Sam, 2026-10-13).
 - Hide / Show timer; Sequential's Next stays off until answered, no
   Previous; the review moves freely. Submitting with flags: "You still
   have N flagged questions" — Go back and review / Submit anyway; with
@@ -181,11 +216,16 @@ opens it (00, The menu).
 - Ended: the summary open; the question list locked — "Choose a package
   to review your answers". The percentile on the trial paper's report
   (05).
+- Held results (04.12): the pop-up says "Submitted. Your results come
+  out on …" and the report waits for the date. After a review period
+  (04.13): the summary open, the question list locked — "The review of
+  this mock closed on …".
 
 ### Learning history
 - Every sitting under its course's name; a Report link on finished
   ones; mode chips from the mode table; the true totals and topic
-  accuracy (05 Q12).
+  accuracy (05 Q12). A sitting whose results are held shows "Results on
+  …" in place of its score (04.12).
 - **Check**: for a student with no live course the names show as codes
   and the course filter is empty; the stats bar, Source and Sort count
   only the loaded pages; no Mock option in Source, and a mock shows the
@@ -292,7 +332,12 @@ opens it (00, The menu).
 ### Practice papers and Mock exams
 - A paper: "First sitting in" (a dropdown, Free Navigation already
   picked) and the other ways allowed after it (04.5). A mock: mode ticks
-  under Study and Exam (refused with none). The modes as
+  under Study and Exam (refused with none), and "First sitting in" as a
+  paper (04.11). Both: Sittings allowed, Results (Immediately / On a
+  date and time), Review open for N days (04.10, 04.12, 04.13). The mock
+  form refuses a live mock holding a draft question, saying how many
+  (04.16), and warns when its questions are edited after students have
+  sat it (04.17). The modes as
   chips; an "Allows …" filter; the "Open in trial" tick (03); a Preview
   button (04 Q20); the mock list "Showing 50 of N"; the paper picker
   hides held-back questions and marks one already in the paper "In a
