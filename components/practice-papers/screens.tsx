@@ -186,7 +186,7 @@ function NextCard({ paper, access }: { paper: PaperView; access: CourseView['acc
 }
 
 // ── 3 · a paper's own page ──────────────────────────────────────────────
-function waysOf(paper: PaperView): Way[] {
+export function waysOf(paper: PaperView): Way[] {
   const order = [paper.first_mode, ...paper.allowed_modes.filter((m) => m !== paper.first_mode)];
   return order.map((mode) => {
     const going = paper.sittings.find((a) => a.status === 'in_progress' && a.mode === mode);
@@ -198,7 +198,7 @@ function waysOf(paper: PaperView): Way[] {
   });
 }
 
-function Sitting({ a }: { a: AttemptWithProgress }) {
+export function Sitting({ a }: { a: AttemptWithProgress }) {
   const done = a.status === 'completed';
   return (
     <AppLink href={done ? reportHref(a.attempt_id) : sessionHref(a.attempt_id)} className="pp-row">

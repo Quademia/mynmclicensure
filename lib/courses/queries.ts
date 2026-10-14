@@ -77,7 +77,8 @@ export type CoursePageData = {
   /** The student's other courses, for the tabs. */
   tabs: { course_id: string; title: string }[];
   ended: PracticePapers['ended'];
-  mocksLine: { text: string; open: boolean };
+  /** The row's link: the course's open mock's own page, else the Mock exams page (04.15). */
+  mocksLine: { text: string; open: boolean; href: string };
   builderLine: { text: string; open: boolean };
   news: Announcement[];
 };
@@ -105,17 +106,18 @@ export async function loadCoursePage(gate: AuthGateResult, courseId: string): Pr
   }
 
   // The mocks' row: included in the package, or a locked line.
-  let mocksLine: CoursePageData['mocksLine'] = { text: 'With Premium Prep', open: false };
+  const mocksHref = '/student/mock-exams';
+  let mocksLine: CoursePageData['mocksLine'] = { text: 'With Premium Prep', open: false, href: mocksHref };
   if (course.mocksIncluded) {
     const mocks = await getMockQuizzesForCourse(supabase, courseId);
     const now = new Date();
     const open = mocks.find((m) => getQuizAvailability(m, now) === 'ACTIVE');
     const upcoming = mocks.find((m) => getQuizAvailability(m, now) === 'UPCOMING');
     mocksLine = open
-      ? { text: `${open.title} is open`, open: true }
+      ? { text: `${open.title} is open`, open: true, href: `${mocksHref}/${encodeURIComponent(open.quiz_id)}` }
       : upcoming && upcoming.publish_at
-        ? { text: `${upcoming.title} opens ${formatDay(upcoming.publish_at)}`, open: true }
-        : { text: 'No mocks right now', open: true };
+        ? { text: `${upcoming.title} opens ${formatDay(upcoming.publish_at)}`, open: true, href: mocksHref }
+        : { text: 'No mocks right now', open: true, href: mocksHref };
   }
 
   const announcements = await getAnnouncementsForStudent(supabase, profile);

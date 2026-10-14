@@ -154,7 +154,7 @@ export function CourseScreen({ data }: { data: CoursePageData }) {
 
           <div className="card cp-ways">
             <Way href={`/student/practice-papers/${id}`} name="Practice papers" line={papersLine} locked={papersLocked} />
-            <Way href={`/student/mock-exams?course=${id}`} name="Mock exams" line={mocksLine.text} locked={!mocksLine.open} />
+            <Way href={mocksLine.href} name="Mock exams" line={mocksLine.text} locked={!mocksLine.open} />
             <Way href={`/student/quiz-builder?course=${id}`} name="Quiz builder" line={builderLine.text} locked={!builderLine.open} />
           </div>
 

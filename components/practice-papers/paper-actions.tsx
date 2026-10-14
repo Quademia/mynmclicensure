@@ -3,7 +3,8 @@
 // The buttons of Practice Papers that do something (04.7; Sam,
 // 2026-10-12): Start or Resume a sitting, and Practise again — a box with
 // the paper's ways, each with its own button. Everything else on the three
-// screens is server-rendered markup.
+// screens is server-rendered markup. The Mock exams page (04.15) uses the
+// same two, with `kind="mock"`.
 //
 // A Server Action whose request fails rejects, so every call is caught and
 // the button given back (AGENTS.md, Known Workarounds).
@@ -15,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import { retakeAttempt, spawnQuizAttempt } from '@/lib/attempts/actions';
 import { sessionHref } from '@/lib/attempts/links';
 import type { AttemptMode } from '@/lib/attempts/types';
+import type { QuizKind } from '@/lib/quizzes/types';
 import { Dialog } from '@/lib/overlays/shared/dialog';
 import { Toast } from '@/lib/toast/toast';
 
@@ -33,7 +35,7 @@ type Msg = { text: string; tone: 'error' } | null;
 
 const OFFLINE = 'Could not start. Please check your connection and try again.';
 
-function useLaunch() {
+function useLaunch(kind: QuizKind) {
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<Msg>(null);
@@ -45,7 +47,7 @@ function useLaunch() {
       const result =
         way.action === 'retake' && way.originId
           ? await retakeAttempt(way.originId)
-          : await spawnQuizAttempt('fixed', quizId, way.mode);
+          : await spawnQuizAttempt(kind, quizId, way.mode);
       if (!result.ok) {
         setBusy(null);
         setMsg({ text: result.error || 'Could not start. Please try again.', tone: 'error' });
@@ -67,12 +69,14 @@ export function LaunchButton({
   quizId,
   mode,
   label,
+  kind = 'fixed',
 }: {
   quizId: string;
   mode: AttemptMode;
   label: string;
+  kind?: QuizKind;
 }) {
-  const { busy, launch, toast } = useLaunch();
+  const { busy, launch, toast } = useLaunch(kind);
   return (
     <>
       <button
@@ -89,9 +93,9 @@ export function LaunchButton({
 }
 
 /** Practise again: the box with the paper's ways. */
-export function PractiseAgain({ quizId, title, ways }: { quizId: string; title: string; ways: Way[] }) {
+export function PractiseAgain({ quizId, title, ways, kind = 'fixed' }: { quizId: string; title: string; ways: Way[]; kind?: QuizKind }) {
   const [open, setOpen] = useState(false);
-  const { busy, launch, toast } = useLaunch();
+  const { busy, launch, toast } = useLaunch(kind);
   return (
     <>
       <button type="button" className="btn btn-accent btn-lg" onClick={() => setOpen(true)}>

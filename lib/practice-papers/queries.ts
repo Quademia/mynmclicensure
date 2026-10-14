@@ -49,8 +49,8 @@ type QuizRowRead = {
   sittings_allowed: number | null;
 };
 
-/** Per course, the most a live grant lets the student do with papers. */
-async function paperAccessByCourse(userId: string, held: string[]): Promise<Record<string, { papers: PaperAccess; mocks: boolean }>> {
+/** Per course, the most a live grant lets the student do with papers, and whether it opens mocks (also the Mock exams page's). */
+export async function paperAccessByCourse(userId: string, held: string[]): Promise<Record<string, { papers: PaperAccess; mocks: boolean }>> {
   const out: Record<string, { papers: PaperAccess; mocks: boolean }> = {};
   if (!held.length) return out;
   const db = createServiceRoleClient();

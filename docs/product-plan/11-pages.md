@@ -159,15 +159,16 @@ opens it (00, The menu).
   · Your score, report and answers come out then", Practise again opening
   with the results. Every sitting used: the score and See your report. A
   closed mock: the score, the report and the review, no new sitting.
-- **Paid without Premium Prep**: "Mock exams come with Premium Prep.";
-  Open now and Coming up as grey lines, "With Premium Prep"; Choose a
-  package once, at the bottom, to the in-app Packages page (Sam,
-  2026-10-13); Past mocks with their scores if they sat any. Start is
-  refused today with "Mock exams aren't included in your package." (02.10).
-- **Free, trial and ended, between exam periods**: one card — "Mock exams
-  come with Premium Prep", "Timed papers like the real exam, opened
-  around each exam period" — and Choose a package; an ended student who
-  sat mocks also sees Past mocks (the review locked, 03 F2).
+- **Every student without Premium Prep is alike** — free, trial, ended,
+  or paid without it (Sam, 2026-10-14); only the season changes the page.
+  With a mock open or coming: "Mock exams come with Premium Prep."; Open
+  now and Coming up as grey lines, "With Premium Prep"; Choose a package
+  once, at the bottom, to the in-app Packages page (Sam, 2026-10-13).
+  With none: one card — "Mock exams come with Premium Prep", "Timed
+  papers like the real exam, opened around each exam period" — and
+  Choose a package. A student who sat mocks also sees Past mocks with
+  their scores (an ended student's review locked, 03 F2). Start is
+  refused with "Mock exams aren't included in your package." (02.10).
 - Paid with Premium Prep: open (02.10). No name, date, count or time is
   written into the page: each is read from the mock.
 
