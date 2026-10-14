@@ -325,7 +325,7 @@ and "instant runner", which predate the four modes.
 - **Editing a mock's questions after students have sat it warns**:
   "12 students have sat this mock. Their scores stay on the questions
   they had." Their sittings keep their own copy; a lock waits until one
-  is needed (Sam, 2026-10-13). *(to build: 04.17)*
+  is needed (Sam, 2026-10-13). *(parked 2026-10-14: 04.17)*
 - Status (Draft / Active / Archived — the mock's life) and Published
   (a pause: hidden, its questions still held back) both stay; they
   become one at the admin redesign (Sam, 2026-10-13, parked: 04.18).
