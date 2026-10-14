@@ -65,6 +65,8 @@ type Form = {
   title: string;
   modes: AllowedModes;
   firstMode: AttemptMode;
+  /** 04.10: as typed; '' = no limit. */
+  sittingsAllowed: string;
   status: QuizStatus;
   timeLimit: string;
   shuffle: boolean;
@@ -80,6 +82,7 @@ const EMPTY_FORM: Form = {
   // legacy's BOTH, as the table's default (§8 S21)
   modes: ['UNTIMED_LEARNING', 'TIMED_FREE_NAV'],
   firstMode: 'TIMED_FREE_NAV',
+  sittingsAllowed: '',
   status: 'draft',
   timeLimit: '',
   shuffle: false,
@@ -367,6 +370,7 @@ export function QuizManager({
       title: quiz.title,
       modes: orderModes(quiz.allowed_modes),
       firstMode: quiz.first_mode ?? 'TIMED_FREE_NAV',
+      sittingsAllowed: quiz.sittings_allowed ? String(quiz.sittings_allowed) : '',
       status: quiz.status,
       timeLimit: quiz.time_limit_sec ? String(quiz.time_limit_sec) : '',
       shuffle: quiz.shuffle,
@@ -506,6 +510,7 @@ export function QuizManager({
       title: form.title,
       allowedModes: form.modes,
       firstMode: form.firstMode,
+      sittingsAllowed: form.sittingsAllowed,
       status: form.status,
       published: form.published,
       shuffle: form.shuffle,
@@ -737,23 +742,22 @@ export function QuizManager({
                   </div>
                 ))}
               </div>
-              <p className="form-hint">
-                {kind === 'fixed'
-                  ? "Once a student has finished their first sitting, they choose any ticked mode."
-                  : 'Students choose one of the ticked modes when they start.'}
-              </p>
+              <p className="form-hint">Once a student has finished their first sitting, they choose any ticked mode.</p>
             </div>
-            {kind === 'fixed' ? (
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="fieldFirstMode">First sitting in</label>
-                  <select id="fieldFirstMode" value={form.firstMode} onChange={(e) => setField('firstMode', e.target.value as AttemptMode)}>
-                    {form.modes.map((code) => <option key={code} value={code}>{MODES[code].name}</option>)}
-                  </select>
-                  <p className="form-hint">The first sitting of this paper is in this mode, for every student. The other ticked modes open after it.</p>
-                </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="fieldFirstMode">First sitting in</label>
+                <select id="fieldFirstMode" value={form.firstMode} onChange={(e) => setField('firstMode', e.target.value as AttemptMode)}>
+                  {form.modes.map((code) => <option key={code} value={code}>{MODES[code].name}</option>)}
+                </select>
+                <p className="form-hint">The first sitting of this {kind === 'fixed' ? 'paper' : 'mock'} is in this mode, for every student. The other ticked modes open after it.</p>
               </div>
-            ) : null}
+              <div className="form-group">
+                <label htmlFor="fieldSittingsAllowed">Sittings allowed</label>
+                <input id="fieldSittingsAllowed" type="number" min={1} step={1} placeholder="Leave blank = no limit" value={form.sittingsAllowed} onChange={(e) => setField('sittingsAllowed', e.target.value)} />
+                <p className="form-hint">How many times a student may sit it, every mode together. A sitting counts when it starts.</p>
+              </div>
+            </div>
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="fieldStatus">Status</label>
@@ -953,9 +957,8 @@ export function QuizManager({
                     : '—'}
                 </span>
               </div>
-              {kind === 'fixed' ? (
-                <div className="detail-row"><span className="detail-label">First sitting in</span><span className="detail-value">{MODES[form.firstMode].name}</span></div>
-              ) : null}
+              <div className="detail-row"><span className="detail-label">First sitting in</span><span className="detail-value">{MODES[form.firstMode].name}</span></div>
+              <div className="detail-row"><span className="detail-label">Sittings allowed</span><span className="detail-value">{form.sittingsAllowed.trim() || 'No limit'}</span></div>
               <div className="detail-row"><span className="detail-label">Status</span><span className="detail-value"><span className={`badge ${form.status}`}>{form.status}</span></span></div>
               <div className="detail-row"><span className="detail-label">Published</span><span className="detail-value">{form.published ? 'Yes' : 'No'}</span></div>
               <div className="detail-row"><span className="detail-label">Shuffle</span><span className="detail-value">{form.shuffle ? 'Yes — randomised per attempt' : 'No — fixed order'}</span></div>

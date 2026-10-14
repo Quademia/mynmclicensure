@@ -25,6 +25,7 @@
 import { getConfig } from '@/lib/catalogue/queries';
 import { startRefusal } from '@/lib/quizzes/availability';
 import { getQuizById } from '@/lib/quizzes/queries';
+import { QUIZ_TABLES } from '@/lib/quizzes/types';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import type { AuthGateResult } from '@/lib/access';
@@ -52,6 +53,9 @@ export type StartCard = {
   resuming: boolean;
   /** A started exam's seconds left on the server's clock; null otherwise. */
   secondsLeft: number | null;
+  /** A paper's or mock's sitting limit (04.10): this sitting's number among
+   *  the student's sittings of it; null with no limit (or a builder quiz). */
+  sittings: { number: number; allowed: number; noun: 'paper' | 'mock' } | null;
 };
 
 /** The questions a sitting is played or reviewed with. */
@@ -204,7 +208,42 @@ export async function retakeOpen(gate: AuthGateResult, attempt: Attempt): Promis
   if ((source !== 'fixed' && source !== 'mock') || !attempt.quiz_id) return false;
   const quiz = await getQuizById(createServiceRoleClient(), source, attempt.quiz_id);
   if (!quiz) return false;
-  return startRefusal(quiz, attempt.mode) === null;
+  if (startRefusal(quiz, attempt.mode) !== null) return false;
+  // 04.10: within the sittings allowed, and none in progress — the rule
+  // create_attempt holds.
+  if (quiz.sittings_allowed != null) {
+    const { data } = await gate.supabase
+      .from('attempts')
+      .select('status')
+      .eq('user_id', attempt.user_id)
+      .eq('quiz_id', attempt.quiz_id);
+    const rows = (data ?? []) as { status: string }[];
+    if (rows.length >= quiz.sittings_allowed || rows.some((r) => r.status === 'in_progress')) return false;
+  }
+  return true;
+}
+
+// 04.10: the start card's sitting line — the paper's or mock's limit and
+// this sitting's place among the student's sittings of it, oldest first.
+async function sittingsOf(gate: AuthGateResult, attempt: Attempt): Promise<StartCard['sittings']> {
+  if (!attempt.quiz_id) return null;
+  const source = await originSource(gate.supabase, attempt);
+  if (source !== 'fixed' && source !== 'mock') return null;
+  const { data: quiz } = await createServiceRoleClient()
+    .from(QUIZ_TABLES[source])
+    .select('sittings_allowed')
+    .eq('quiz_id', attempt.quiz_id)
+    .maybeSingle();
+  const allowed = (quiz as { sittings_allowed: number | null } | null)?.sittings_allowed ?? null;
+  if (allowed == null) return null;
+  let query = gate.supabase
+    .from('attempts')
+    .select('attempt_id', { count: 'exact', head: true })
+    .eq('user_id', attempt.user_id)
+    .eq('quiz_id', attempt.quiz_id);
+  if (attempt.ts_iso) query = query.lte('ts_iso', attempt.ts_iso);
+  const { count } = await query;
+  return { number: Math.max(1, count ?? 1), allowed, noun: source === 'mock' ? 'mock' : 'paper' };
 }
 
 /**
@@ -253,6 +292,7 @@ export async function loadRunner(
       durationMin: attempt.duration_min,
       resuming: clocked ? started : rows.some((r) => r.chosen !== null || r.flagged),
       secondsLeft,
+      sittings: previewMode ? null : await sittingsOf(gate, attempt),
     },
   };
 }

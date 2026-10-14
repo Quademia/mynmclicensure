@@ -21,6 +21,7 @@ import {
   scoredPaper,
   segments,
   shortName,
+  sittingsLine,
   upNext,
   type CourseView,
   type PaperView,
@@ -224,6 +225,21 @@ export function PaperScreen({ course, paper, ended }: { course: CourseView; pape
   const going = paper.inProgress;
   const done = paper.firstSitting;
   const others = paper.allowed_modes.length > 1;
+  // 04.10: the sittings left, when the admin set a limit.
+  const limitLine = sittingsLine(paper);
+  const limit = limitLine ? <span className="pp-line">{limitLine}</span> : null;
+  const limited = paper.sittings_allowed != null;
+
+  // After the first sitting: Practise again, unless no sitting is left;
+  // with a limit, one sitting at a time, so a sitting going is resumed.
+  let again: React.ReactNode = null;
+  if (paper.availability === 'ACTIVE') {
+    if (limited && going) {
+      again = <LaunchButton quizId={paper.quiz_id} mode={going.mode} label={`Resume ${modeName(going.mode)}`} />;
+    } else if (paper.sittingsLeft !== 0) {
+      again = <PractiseAgain quizId={paper.quiz_id} title={shortName(paper.title)} ways={waysOf(paper)} />;
+    }
+  }
 
   let card: React.ReactNode;
   if (!paper.open) {
@@ -242,11 +258,10 @@ export function PaperScreen({ course, paper, ended }: { course: CourseView; pape
           {done.score_pct != null ? `${Math.round(done.score_pct)}%` : 'Finished'} · {modeName(done.mode)}
         </span>
         <span className="pp-line">{done.ts_iso ? formatDay(done.ts_iso) : ''}</span>
+        {limit}
         <div className="pp-actions">
           <AppLink href={reportHref(done.attempt_id)} className="btn btn-ghost btn-lg">See your report</AppLink>
-          {paper.availability === 'ACTIVE' ? (
-            <PractiseAgain quizId={paper.quiz_id} title={shortName(paper.title)} ways={waysOf(paper)} />
-          ) : null}
+          {again}
         </div>
       </div>
     );
@@ -263,6 +278,7 @@ export function PaperScreen({ course, paper, ended }: { course: CourseView; pape
         <span className="pp-eyebrow">{modeName(going.mode)} · in progress</span>
         <span className="pp-big">{going.answered_count} of {paper.n} answered</span>
         <progress className="pp-progress" max={paper.n} value={going.answered_count} aria-label="Answered so far" />
+        {limit}
         <LaunchButton quizId={paper.quiz_id} mode={going.mode} label="Resume" />
       </div>
     );
@@ -273,6 +289,7 @@ export function PaperScreen({ course, paper, ended }: { course: CourseView; pape
         <span className="pp-big">{modeName(paper.first_mode)}</span>
         <span className="pp-line">{facts}</span>
         <span className="pp-line">{first.card}</span>
+        {limit}
         <LaunchButton quizId={paper.quiz_id} mode={paper.first_mode} label="Start" />
       </div>
     );

@@ -336,6 +336,7 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `notes` | The admin's notes |
 | `created_at`, `updated_at` | When made, last changed |
 | `open_in_trial` | The one paper of its course a trial opens; at most one per course |
+| `sittings_allowed` | How many sittings a student may make of the paper, every mode together; empty = no limit (04.10, built 2026-10-14) |
 
 - `open_in_trial` (03 F4, built 2026-10-04): the database refuses a
   second in a course. Why: the trial opens one paper a course, chosen by
@@ -352,12 +353,17 @@ table by table as each is next changed (AGENTS.md rule 9).
   that sends none keeps the stored one; a new paper takes Free
   Navigation); the admin sets it from "First sitting in" beside the mode
   ticks (2026-10-12).
-- *To build (04.10, 04.12, 04.13) — ticked 2026-10-14 (Sam):* three
-  columns, each empty on every paper today, so nothing changes until an
-  admin sets one.
-  - `sittings_allowed` — a whole number above 0; empty = no limit.
-    `create_attempt` refuses a sitting once the student's sittings of
-    the paper — in progress, completed or abandoned — reach it.
+- `sittings_allowed` (04.10, ticked 2026-10-14, built the same day): a
+  whole number above 0 (a check), empty on every paper when added.
+  `create_attempt` refuses a sitting once the student's sittings of the
+  paper — in progress, completed or abandoned — reach it ("You have used
+  your 2 sittings of this paper."), and, with a limit, while one of them
+  is in progress ("Finish or resume your sitting in progress first." —
+  one sitting at a time, Sam 2026-10-14); a retake counts. `save_quiz`
+  writes it; students read it. Why: papers and mocks carry the same
+  settings (Sam, 2026-10-13).
+- *To build (04.12, 04.13) — ticked 2026-10-14 (Sam):* two columns,
+  each empty on every paper, so nothing changes until an admin sets one.
   - `results_at` — a date and time; empty = Immediately. Until then the
     score, the report, the answers and the explanations of every sitting
     of the paper are held (from Submit when Submit is later); while they
@@ -366,7 +372,7 @@ table by table as each is next changed (AGENTS.md rule 9).
   - `review_days` — a whole number above 0; empty = no limit. The review
     and sittings in the other modes close that many days after a
     student's results came out.
-  - `save_quiz` writes all three; students read them (the card shows
+  - `save_quiz` writes both; students read them (the card shows
     them). The owner's own direct read of the score (`attempts`) and of
     `is_correct` (`attempt_items`) must follow the hold too — how is
     settled in the build's proof.
@@ -399,13 +405,15 @@ table by table as each is next changed (AGENTS.md rule 9).
   (`ALL`, `PAID` or `TRIAL`) — stored, never checked.
 - *To build:* `visibility` removed *(10.17)* — the package's mock yes /
   no is the gate (ticked 2026-10-04).
-- *To build (04.11, 04.10, 04.12, 04.13) — ticked 2026-10-14 (Sam):*
-  `first_mode` as on `quizzes` (Free Navigation on a new mock; a mock
-  today takes Free Navigation where it allows it, else its first exam
-  mode, else its first mode, as 04.5 did for papers), and the same three
-  columns as `quizzes` — `sittings_allowed`, `results_at`,
-  `review_days` — under the same rules, written by `save_quiz`. The
-  close (04.14) as for papers. Why: as on `quizzes`.
+- `first_mode` and `sittings_allowed` (04.11, 04.10, ticked 2026-10-14,
+  built the same day): as on `quizzes` — Free Navigation on a new mock,
+  the two mocks there were taking Free Navigation; `create_attempt`
+  refuses a mock's other modes until a sitting in its first mode is
+  completed ("Finish your first sitting of this mock …"), and holds its
+  limit as a paper's; `save_quiz` writes both; students read both.
+- *To build (04.12, 04.13) — ticked 2026-10-14 (Sam):* `results_at` and
+  `review_days`, as on `quizzes`, under the same rules, written by
+  `save_quiz`. The close (04.14) as for papers. Why: as on `quizzes`.
 - Browser: as for papers.
 
 ### `attempts` — a sitting
@@ -600,7 +608,9 @@ the browser can call only the first two lines.
   `create_attempt` applies the package's limits to a student with a live
   grant for the course — a paper only on all papers or the ticked one, a
   mock only with mocks, builder quizzes within the count (retakes free);
-  the most generous of two grants wins. Without a live grant it allows
+  the most generous of two grants wins. A paper's or mock's first sitting
+  in its `first_mode`, then the other modes; within its `sittings_allowed`,
+  one sitting at a time (04.5, 04.11, 04.10). Without a live grant it allows
   only a builder quiz (or its retake) of published free questions, in a
   course of the student's programme, in a Study mode. A grant whose
   builder count is used up still allows a builder quiz of published

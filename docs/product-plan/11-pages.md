@@ -134,8 +134,8 @@ opens it (00, The menu).
   from the paper.
 - **Sittings, results and review** (04, Sam, 2026-10-13): a paper's card
   says the sittings left when the admin sets a number; held results and
-  a closed review show as on a mock's page (below). *(to build: 04.10,
-  04.12, 04.13)*
+  a closed review show as on a mock's page (below). *(the sittings built
+  2026-10-14, 04.10; to build: 04.12, 04.13)*
 
 ### Mock exams
 - **Redesigned (Sam, 2026-10-13: layout A; 04.15)**, drawn at
@@ -198,8 +198,9 @@ opens it (00, The menu).
 ### The sitting — start screen, sitting, review
 - The start screen alone; Start or Resume; a resumed exam's minutes
   left; per-mode "Don't show this again" (04). With a sitting limit set
-  it always shows, with "This uses 1 of your N sittings" and no "Don't
-  show this again" (04.10, Sam, 2026-10-13).
+  it always shows, with "This is sitting 1 of N for this paper" ("It is
+  your last" on the last) and no "Don't show this again" (04.10, Sam,
+  2026-10-13; built 2026-10-14).
 - Hide / Show timer; Sequential's Next stays off until answered, no
   Previous; the review moves freely. Submitting with flags: "You still
   have N flagged questions" — Go back and review / Submit anyway; with

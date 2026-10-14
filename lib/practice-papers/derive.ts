@@ -26,6 +26,8 @@ export type PaperRow = {
   publish_at: string | null;
   /** The trial paper (03): open to a trial student. */
   in_trial: boolean;
+  /** How many sittings a student may make; null = no limit (04.10). */
+  sittings_allowed: number | null;
 };
 
 export type PaperState = 'done' | 'in_progress' | 'new';
@@ -40,6 +42,9 @@ export type PaperView = PaperRow & {
   inProgress: AttemptWithProgress | null;
   /** Every sitting not abandoned, newest first. */
   sittings: AttemptWithProgress[];
+  /** Sittings left under the paper's limit — every sitting started counts,
+   *  abandoned too, as the database counts them (04.10); null = no limit. */
+  sittingsLeft: number | null;
 };
 
 export type CourseView = {
@@ -78,7 +83,8 @@ export function formatMinutes(min: number): string {
 }
 
 export function paperView(row: PaperRow, access: PaperAccess, attempts: AttemptWithProgress[]): PaperView {
-  const mine = attempts.filter((a) => a.quiz_id === row.quiz_id && a.status !== 'abandoned');
+  const started = attempts.filter((a) => a.quiz_id === row.quiz_id);
+  const mine = started.filter((a) => a.status !== 'abandoned');
   const inProgress = mine.find((a) => a.status === 'in_progress') ?? null; // newest first
   const finished = mine
     .filter((a) => a.status === 'completed' && a.mode === row.first_mode)
@@ -92,7 +98,23 @@ export function paperView(row: PaperRow, access: PaperAccess, attempts: AttemptW
     firstSitting,
     inProgress,
     sittings: mine,
+    sittingsLeft: row.sittings_allowed == null ? null : Math.max(0, row.sittings_allowed - started.length),
   };
+}
+
+/** "You can sit this paper 2 times" (before the first), "1 of 2 sittings
+ *  left", "You have used your 2 sittings of this paper"; null with no limit. */
+export function sittingsLine(p: PaperView, noun: 'paper' | 'mock' = 'paper'): string | null {
+  const allowed = p.sittings_allowed;
+  if (allowed == null || p.sittingsLeft == null) return null;
+  const times = allowed === 1 ? 'once' : `${allowed} times`;
+  if (p.sittingsLeft === allowed) return `You can sit this ${noun} ${times}.`;
+  if (p.sittingsLeft === 0) {
+    return p.inProgress
+      ? `Your last sitting of this ${noun} is in progress.`
+      : `You have used your ${allowed === 1 ? 'sitting' : `${allowed} sittings`} of this ${noun}.`;
+  }
+  return `${p.sittingsLeft} of ${allowed} sittings left.`;
 }
 
 /** A paper a student can start or resume today. */

@@ -71,15 +71,15 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
   stats keep papers and mocks apart and show retakes and abandons
   separately.
 
-### A paper's and a mock's settings *(to build: 04.10–04.14)*
+### A paper's and a mock's settings *(04.10, 04.11 built 2026-10-14; to build: 04.12–04.14)*
 
 Papers and mocks carry the same settings (Sam, 2026-10-13: "they are
 the same settings almost"). Drawn with the Mock exams page at
 https://claude.ai/artifact/5QQCWH9ECauT7k69cUUxC3 (board B).
 
 - **First sitting in** — a mock's first sitting is in its own mode, as
-  a paper's is (04.5): the same dropdown on the mock form. *(to build:
-  04.11)*
+  a paper's is (04.5): the same dropdown on the mock form. *(built
+  2026-10-14; the student's mock page shows it with 04.15)*
 - **Sittings allowed** — how many times a student may sit it; empty is
   no limit, and every paper and mock starts empty. One count for every
   mode together, the first sitting included, so "1" is one sitting only.
@@ -88,12 +88,15 @@ https://claude.ai/artifact/5QQCWH9ECauT7k69cUUxC3 (board B).
   never a second. The database counts, so Start, Practise again and
   Retake (Learning History, the report) are refused alike. The student
   sees it only when it is set: "You can sit this mock 2 times", "1 of 2
-  sittings left"; with none left the score and the report stay and
-  Practise again goes. With a limit set the start screen always shows,
-  with "This uses 1 of your 2 sittings" and no "Don't show this again".
-  A trial's sittings count too. Moodle's "Attempts allowed" works so.
-  Parked: an admin giving one student an extra sitting. *(to build:
-  04.10)*
+  sittings left", "Your last sitting of this mock is in progress"; with
+  none left the score and the report stay, and Practise again and Retake
+  go. With a limit set, one sitting at a time (Sam, 2026-10-14): while a
+  sitting is going the card offers Resume, not Practise again. The start
+  screen always shows, with "This is sitting 1 of 2 for this paper" ("It
+  is your last" on the last) and no "Don't show this again". A trial's
+  sittings count too. Moodle's "Attempts allowed" works so. Parked: an
+  admin giving one student an extra sitting. *(built 2026-10-14 for
+  papers; a mock's page shows it with 04.15)*
 - **Results** — Immediately (the default) or On a date and time (Ghana
   time). On a date holds everything — the score, the report, the
   answers and the explanations — until the date, or until Submit when
@@ -310,9 +313,10 @@ and "instant runner", which predate the four modes.
 - On the paper editor, "First sitting in" (a dropdown, Free Navigation
   already picked) and the other ways allowed after it (ticks) (04.5); on
   the mock editor, mode ticks under Study and Exam and, to build,
-  "First sitting in" as on a paper (04.11). Both editors, to build:
-  Sittings allowed, Results (Immediately / On a date and time) and
-  Review open for N days (04.10, 04.12, 04.13). The "Open in trial"
+  "First sitting in" as on a paper (04.11, built 2026-10-14). Both
+  editors: Sittings allowed beside "First sitting in" (04.10, built
+  2026-10-14); to build, Results (Immediately / On a date and time) and
+  Review open for N days (04.12, 04.13). The "Open in trial"
   tick on a paper (03). The mock list shows 50 at a time.
 - **The mock form refuses a live mock holding a draft question** —
   Active and Published are refused while any of its questions is a

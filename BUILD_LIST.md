@@ -80,8 +80,8 @@ before then, and the old list's history, is in
 - ✅ 04.8 The My courses page — `/student/courses`, a card per course; the menu row plain, its dropdown gone (drawn and ruled 2026-10-12, 11-pages) — built 2026-10-12, walked as paid, trial, ended and free students
 - ✅ 04.9 The course page redesigned — tabs on a computer, Up next, three rows into the stand-alone pages, news; the four states (drawn and ruled 2026-10-12, 11-pages) — built 2026-10-12, walked as paid (computer, 375px), trial, ended and free students; a course with news and an open mock not yet seen (none in dev)
 - ✅ 04.7 Practice Papers redesigned — drawn and ruled 2026-10-12 (04, 11), built the same day: courses → a course → a paper's page with Practise again; walked as an RM paid student (computer, 375px, a failed request); the trial, ended and free states and the locked rows to walk as those students (one link each, Sam)
-- ⬜ 04.10 Sittings allowed — papers and mocks; every sitting started counts; "N of M left"; start screen always shown
-- ⬜ 04.11 A mock's first sitting in its own mode — as a paper's (04.5), the dropdown on the mock form
+- ✅ 04.10 Sittings allowed — papers and mocks; every sitting counts, one at a time; start screen always — 2026-10-14
+- ✅ 04.11 A mock's first sitting in its own mode — the database and the mock form; its page with 04.15 — 2026-10-14
 - ⬜ 04.12 Results on a date — papers and mocks; everything held to the date, by the database
 - ⬜ 04.13 A review period — N days after results, then the review and Practise again lock; papers and mocks
 - ⬜ 04.14 At the close — an untimed sitting finished at the close; the card's Resume follows the sitting's mode

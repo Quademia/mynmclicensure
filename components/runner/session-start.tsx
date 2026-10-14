@@ -15,7 +15,10 @@
 // (Sam: Option 2). "Don't show this again" is remembered per mode in the
 // browser (legacy's keys) and, when set, presses the button by itself
 // (Sam: every mode — it means "I understand this now"). A way to undo it
-// waits for a settings page.
+// waits for a settings page. A paper or mock with a sitting limit (04.10,
+// Sam 2026-10-13) always shows the card, with the sitting's number, and
+// offers no "Don't show this again": it is where the student is told a
+// sitting is spent.
 
 'use client';
 
@@ -43,7 +46,8 @@ export function SessionStart({ card, exit, previewMode }: { card: StartCard; exi
 
   // The mode's "Don't show this again", read from the browser the way
   // AGENTS.md asks (no read in render, no effect setting state).
-  const skipped = useSyncExternalStore(
+  const limited = card.sittings !== null;
+  const storedSkip = useSyncExternalStore(
     subscribeStorage,
     () => {
       try {
@@ -54,6 +58,7 @@ export function SessionStart({ card, exit, previewMode }: { card: StartCard; exi
     },
     () => false,
   );
+  const skipped = storedSkip && !limited;
 
   const [play, setPlay] = useState<SessionPlay | null>(null);
   const [failure, setFailure] = useState<{ title: string; message: string; exit: SessionExit } | null>(null);
@@ -65,7 +70,7 @@ export function SessionStart({ card, exit, previewMode }: { card: StartCard; exi
   async function enter() {
     if (enteringRef.current) return;
     enteringRef.current = true;
-    if (skipNextTime) {
+    if (skipNextTime && !limited) {
       try {
         window.localStorage.setItem(M.skipKey, '1');
       } catch {
@@ -147,15 +152,25 @@ export function SessionStart({ card, exit, previewMode }: { card: StartCard; exi
           ) : (
             <p className="preflight-text">{brief}</p>
           )}
+          {card.sittings ? (
+            <p className="preflight-text">
+              <strong>
+                This is sitting {card.sittings.number} of {card.sittings.allowed} for this {card.sittings.noun}.
+                {card.sittings.number >= card.sittings.allowed ? ' It is your last.' : ''}
+              </strong>
+            </p>
+          ) : null}
           <div className="preflight-actions">
             <button type="button" className="btn btn-primary btn-lg" disabled={pending} onClick={() => void enter()}>
               <Icon name={clocked ? 'target' : 'play'} />
               {buttonWord}
             </button>
             <button type="button" className="btn btn-ghost" disabled={pending} onClick={() => router.push(exit.href)}>Cancel</button>
-            <label className="preflight-skip">
-              <input type="checkbox" checked={skipNextTime} onChange={(e) => setSkipNextTime(e.target.checked)} /> Don&apos;t show this again
-            </label>
+            {limited ? null : (
+              <label className="preflight-skip">
+                <input type="checkbox" checked={skipNextTime} onChange={(e) => setSkipNextTime(e.target.checked)} /> Don&apos;t show this again
+              </label>
+            )}
           </div>
         </div>
       </div>

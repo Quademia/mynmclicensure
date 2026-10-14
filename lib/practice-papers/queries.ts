@@ -46,6 +46,7 @@ type QuizRowRead = {
   publish_at: string | null;
   unpublish_at: string | null;
   open_in_trial: boolean;
+  sittings_allowed: number | null;
 };
 
 /** Per course, the most a live grant lets the student do with papers. */
@@ -110,7 +111,7 @@ export async function loadPracticePapers(supabase: ServerSupabaseClient, profile
   if (shown.length) {
     const { data, error } = await db
       .from('quizzes')
-      .select('quiz_id, course_id, title, n, allowed_modes, first_mode, time_limit_sec, published, status, publish_at, unpublish_at, open_in_trial')
+      .select('quiz_id, course_id, title, n, allowed_modes, first_mode, time_limit_sec, published, status, publish_at, unpublish_at, open_in_trial, sittings_allowed')
       .in('course_id', shown.map((c) => c.course_id))
       .eq('status', 'active')
       .eq('published', true);
@@ -135,6 +136,7 @@ export async function loadPracticePapers(supabase: ServerSupabaseClient, profile
         availability,
         publish_at: q.publish_at,
         in_trial: q.open_in_trial,
+        sittings_allowed: q.sittings_allowed,
       };
       return [paperView(row, kind, attempts)];
     });

@@ -134,12 +134,19 @@ export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
   const allowedModes = orderModes(sent);
   if (allowedModes.length !== new Set(sent).size) return fail('Please choose a valid mode.');
   if (!allowedModes.length) return fail(`Tick at least one mode students can take this ${noun} in.`);
-  // 04.5: a paper's first sitting is in one of its ticked modes (the
-  // table's check holds it too); Free Navigation unless the admin says
-  // otherwise.
+  // 04.5, 04.11: the first sitting of a paper or a mock is in one of its
+  // ticked modes (the table's check holds it too); Free Navigation unless
+  // the admin says otherwise.
   const firstMode = String(input.firstMode || 'TIMED_FREE_NAV');
-  if (input.kind === 'fixed' && !(allowedModes as string[]).includes(firstMode)) {
+  if (!(allowedModes as string[]).includes(firstMode)) {
     return fail('"First sitting in" must be one of the ticked modes. Tick it, or pick another.');
+  }
+  // 04.10: a whole number above 0, or empty for no limit (the table's
+  // check holds it too).
+  const sittingsRaw = String(input.sittingsAllowed ?? '').trim();
+  const sittingsAllowed = sittingsRaw ? Number(sittingsRaw) : null;
+  if (sittingsAllowed !== null && !(Number.isInteger(sittingsAllowed) && sittingsAllowed > 0)) {
+    return fail('"Sittings allowed" is a whole number above 0, or empty for no limit.');
   }
 
   // 08 B6: a fixed quiz is practice, so it cannot hold a question a
@@ -192,9 +199,10 @@ export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
     unpublish_at: input.unpublishAt || null,
     status: input.status,
     notes: input.notes.trim() || null,
+    first_mode: firstMode,
+    sittings_allowed: sittingsAllowed,
     updated_at: now,
   };
-  if (input.kind === 'fixed') payload.first_mode = firstMode;
   if (!input.isEdit) payload.created_at = now;
 
   // `n` is the rows written, set by the function.

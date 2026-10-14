@@ -41,7 +41,7 @@ export type ServiceDb = ReturnType<typeof createServiceRoleClient>;
 
 // Every column but item_ids and notes — what the browser roles may read.
 const CARD_COLUMNS =
-  'quiz_id, course_id, title, n, allowed_modes, shuffle, time_limit_sec, published, publish_at, unpublish_at, status, created_at, updated_at';
+  'quiz_id, course_id, title, n, allowed_modes, first_mode, sittings_allowed, shuffle, time_limit_sec, published, publish_at, unpublish_at, status, created_at, updated_at';
 const MOCK_CARD_COLUMNS = `${CARD_COLUMNS}, visibility`;
 
 // getMockQuizzesForCourse: one course's mock exams, by title, for a
