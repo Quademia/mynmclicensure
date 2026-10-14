@@ -13,10 +13,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { retakeAttempt, spawnQuizAttempt } from '@/lib/attempts/actions';
+import { abandonAttempt, retakeAttempt, spawnQuizAttempt } from '@/lib/attempts/actions';
 import { sessionHref } from '@/lib/attempts/links';
 import type { AttemptMode } from '@/lib/attempts/types';
 import type { QuizKind } from '@/lib/quizzes/types';
+import { useConfirm } from '@/lib/overlays/shared/confirm-dialog';
 import { Dialog } from '@/lib/overlays/shared/dialog';
 import { Toast } from '@/lib/toast/toast';
 
@@ -88,6 +89,61 @@ export function LaunchButton({
         {busy ? 'Starting…' : label}
       </button>
       {toast}
+    </>
+  );
+}
+
+/** Abandon (04.20; Sam, 2026-10-14): the quiet link under a sitting going.
+ *  The sitting ends unscored, its answers kept; with a limit it still uses
+ *  one of the sittings, and the box says so. */
+export function AbandonSitting({
+  attemptId,
+  label = 'Abandon this sitting',
+  sittingsAllowed = null,
+}: {
+  attemptId: string;
+  label?: string;
+  sittingsAllowed?: number | null;
+}) {
+  const router = useRouter();
+  const [confirm, confirmDialog] = useConfirm();
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<Msg>(null);
+
+  async function abandon() {
+    if (busy) return;
+    const ok = await confirm({
+      title: 'Abandon this sitting?',
+      body:
+        "It won't be scored, and you can start a new one." +
+        (sittingsAllowed != null ? ` It still counts as one of your ${sittingsAllowed} sittings.` : ''),
+      confirmLabel: 'Abandon sitting',
+      cancelLabel: 'Keep going',
+      danger: true,
+    });
+    if (!ok) return;
+    setBusy(true);
+    try {
+      const result = await abandonAttempt(attemptId);
+      if (!result.ok) {
+        setBusy(false);
+        setMsg({ text: result.error || 'Could not abandon. Please try again.', tone: 'error' });
+        return;
+      }
+      router.refresh();
+    } catch {
+      setBusy(false);
+      setMsg({ text: 'Could not abandon. Please check your connection and try again.', tone: 'error' });
+    }
+  }
+
+  return (
+    <>
+      <button type="button" className="btn-link danger pp-abandon" disabled={busy} onClick={abandon}>
+        {busy ? 'Abandoning…' : label}
+      </button>
+      {confirmDialog}
+      <Toast message={msg?.text ?? null} tone={msg?.tone} onDismiss={() => setMsg(null)} />
     </>
   );
 }

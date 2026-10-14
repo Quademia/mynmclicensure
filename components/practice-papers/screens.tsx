@@ -28,7 +28,7 @@ import {
 } from '@/lib/practice-papers/derive';
 import type { PracticePapers } from '@/lib/practice-papers/queries';
 import { CourseChip, CourseHeading, CourseTabs } from '@/components/courses/course-header';
-import { LaunchButton, PractiseAgain, type Way } from './paper-actions';
+import { AbandonSitting, LaunchButton, PractiseAgain, type Way } from './paper-actions';
 import '@/styles/practice-papers.css';
 
 const LIST = '/student/practice-papers';
@@ -263,6 +263,13 @@ export function PaperScreen({ course, paper, ended }: { course: CourseView; pape
           <AppLink href={reportHref(done.attempt_id)} className="btn btn-ghost btn-lg">See your report</AppLink>
           {again}
         </div>
+        {going && paper.availability === 'ACTIVE' ? (
+          <AbandonSitting
+            attemptId={going.attempt_id}
+            label={`Abandon the ${modeName(going.mode)} sitting in progress`}
+            sittingsAllowed={paper.sittings_allowed}
+          />
+        ) : null}
       </div>
     );
   } else if (paper.availability !== 'ACTIVE') {
@@ -280,6 +287,7 @@ export function PaperScreen({ course, paper, ended }: { course: CourseView; pape
         <progress className="pp-progress" max={paper.n} value={going.answered_count} aria-label="Answered so far" />
         {limit}
         <LaunchButton quizId={paper.quiz_id} mode={going.mode} label="Resume" />
+        <AbandonSitting attemptId={going.attempt_id} sittingsAllowed={paper.sittings_allowed} />
       </div>
     );
   } else {

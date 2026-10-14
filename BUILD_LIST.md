@@ -90,6 +90,7 @@ before then, and the old list's history, is in
 - ⏸ 04.17 The mock form warns when its questions are edited after students have sat it — parked 2026-10-14 (Sam): scores are safe without it (each sitting keeps its own copy); worth building if standing across students (05 Q13) or more editors arrive; the better place then is the Question Bank edit
 - ⏸ 04.18 Status and Published as one switch — at the admin redesign (Sam, 2026-10-13)
 - ⏸ 04.19 An admin's extra sitting for one student — when a support case asks
+- ✅ 04.20 Abandon back, on the sitting's own page — a quiet link under Resume on a paper's and a mock's card while a sitting is going; the app's confirm box, the sitting still counts toward sittings allowed; no migration — 2026-10-14
 - ⬜ G2 The daily challenge — 5 a day per programme, one course a day in turn, its own mode (storage ticked 10-08)
 - ⬜ Q19 The admin's preview says Preview — on the card and in the sitting
 - ⬜ Q20 Preview this paper — an editor button: questions, answers, rationales, no sitting

@@ -78,6 +78,7 @@ a.pp-row:hover { background: var(--surface-page); text-decoration: none; }
 .pp-big { font-size: 18px; line-height: 24px; font-weight: 700; color: var(--ink); }
 .pp-progress { width: 100%; max-width: 360px; height: 8px; accent-color: var(--brand-teal); }
 .pp-actions { display: flex; flex-wrap: wrap; gap: var(--space-8); }
+.pp-abandon { align-self: flex-start; padding: var(--space-8) 0; }
 
 .pp-package { align-self: flex-start; }
 

@@ -15,7 +15,7 @@ import { reportHref } from '@/lib/attempts/links';
 import type { AttemptMode } from '@/lib/attempts/types';
 import { formatDay, formatMinutes, paperMinutes, sittingsLine, startable } from '@/lib/practice-papers/derive';
 import type { MockExams, MockView } from '@/lib/mock-exams/queries';
-import { LaunchButton, PractiseAgain } from '@/components/practice-papers/paper-actions';
+import { AbandonSitting, LaunchButton, PractiseAgain } from '@/components/practice-papers/paper-actions';
 import { Sitting, waysOf } from '@/components/practice-papers/screens';
 import '@/styles/practice-papers.css';
 
@@ -207,6 +207,13 @@ export function MockScreen({ mock, ended }: { mock: MockView; ended: MockExams['
           <AppLink href={reportHref(done.attempt_id)} className="btn btn-ghost btn-lg">See your report</AppLink>
           {again}
         </div>
+        {going && mock.open && active ? (
+          <AbandonSitting
+            attemptId={going.attempt_id}
+            label={`Abandon the ${modeName(going.mode)} sitting in progress`}
+            sittingsAllowed={mock.sittings_allowed}
+          />
+        ) : null}
       </div>
     );
   } else if (!mock.open && !going) {
@@ -225,6 +232,7 @@ export function MockScreen({ mock, ended }: { mock: MockView; ended: MockExams['
         <progress className="pp-progress" max={mock.n} value={going.answered_count} aria-label="Answered so far" />
         {limit}
         <LaunchButton kind="mock" quizId={mock.quiz_id} mode={going.mode} label="Resume" />
+        <AbandonSitting attemptId={going.attempt_id} sittingsAllowed={mock.sittings_allowed} />
       </div>
     );
   } else if (!active) {

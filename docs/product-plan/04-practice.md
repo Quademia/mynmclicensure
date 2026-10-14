@@ -206,7 +206,7 @@ four-step page built from it, were set aside the same day.
   pages, with a question grid and flags.
 - **A sitting copies its questions when it is made**, so a later bank
   edit never changes it; a retake copies afresh from the live bank in
-  the original order; abandoning keeps the answers.
+  the original order; abandoning keeps the answers. **Abandon** (04.20, Sam, 2026-10-14, back after 04.15 dropped it): a quiet link under Resume on a paper's or mock's page, while a sitting is going, with the app's confirm box ("It won't be scored, and you can start a new one"; with a limit, "It still counts as one of your N sittings"). The sitting ends unscored, answers kept; it does not unlock the other modes, count toward the percentile, or give back a sitting.
 - **Answers save per question**, half a second after the last tap; a
   failed save or Submit shows a toast and gives the button back. Every
   write and all grading run in the database; the browser never supplies

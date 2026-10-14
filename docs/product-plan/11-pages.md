@@ -141,6 +141,7 @@ opens it (00, The menu).
 - **Redesigned (Sam, 2026-10-13: layout A; 04.15)**, drawn at
   https://claude.ai/artifact/5QQCWH9ECauT7k69cUUxC3 (A, A with several
   open, B; C by course declined). One screen, by time; the rules in 04.
+- **Abandon (04.20, 2026-10-14)**: while a sitting is going, a quiet red link under Resume on the card ("Abandon this sitting"), and on a mock's page after a first sitting "Abandon the {mode} sitting in progress"; the same on a paper's page (see 04).
 - **The list**: one card for the mock to start — a sitting in progress
   (answered so far, time left, Resume), else the open mock that closes
   soonest (Start); then plain rows under **Open now** (the soonest to
