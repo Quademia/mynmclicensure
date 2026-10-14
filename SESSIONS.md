@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-14 — test mocks checked, Premium Mock exams and 04.16 walked, 04.17 parked, Abandon back on the sitting's page (04.20)
+  - ↳ a sitting copies its questions so scores are safe · edit warning parked · Abandon was dropped by accident, link under Resume · wording changed · 04.12 to 04.14 next session
+
 - 2026-10-13, into 10-14 — the mocks ruled; Mock exams page drawn by time and built (04.15); sittings allowed and a mock's first sitting (04.10, 04.11); 04.16
   - ↳ papers and mocks share settings · one sitting at a time · results on a date hold all · review period · untimed finished at close · no Premium alike · filter dropped · Abandon on no page · test mocks by cloud
 
