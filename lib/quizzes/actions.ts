@@ -80,8 +80,37 @@ export async function loadPickerItems(courseId: string): Promise<PickerLoad> {
 }
 
 // ── togglePublish ───────────────────────────────────────────────────────
+// 04.16 (Sam, 2026-10-13): a mock goes live — Active and Published — only
+// when every question in it is published. Its questions are written as
+// drafts and published when it goes live; one left behind would show the
+// student Start, then refuse. The words for both doors (the form's save,
+// the list's Published switch).
+function draftRefusal(drafts: number): string {
+  const which = drafts === 1 ? 'One question in this mock is still a draft' : `${drafts} questions in this mock are still drafts`;
+  return `${which}. Publish ${drafts === 1 ? 'it' : 'them'} in the Question Bank before making the mock live (Active and Published), or save it unpublished.`;
+}
+
+async function draftsIn(itemIds: string[]): Promise<number | null> {
+  if (!itemIds.length) return 0;
+  const { count, error } = await createServiceRoleClient()
+    .from('question_bank')
+    .select('item_id', { count: 'exact', head: true })
+    .in('item_id', itemIds)
+    .eq('is_published', false);
+  return error ? null : (count ?? 0);
+}
+
 export async function setQuizPublished(kind: QuizKind, quizId: string, published: boolean): Promise<ActionResult> {
   await requireAdmin();
+  if (kind === 'mock' && published) {
+    const quiz = await getQuizById(createServiceRoleClient(), 'mock', quizId);
+    if (!quiz) return fail('That mock exam no longer exists.');
+    if (quiz.status === 'active') {
+      const drafts = await draftsIn(quiz.item_ids);
+      if (drafts === null) return fail('Could not check the questions. Please try again.');
+      if (drafts > 0) return fail(draftRefusal(drafts));
+    }
+  }
   const { error } = await createServiceRoleClient()
     .from(QUIZ_TABLES[kind])
     .update({ published, updated_at: new Date().toISOString() })
@@ -181,6 +210,12 @@ export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
     const freeIds = (free ?? []).map((r) => (r as { item_id: string }).item_id);
     if (freeIds.length === 1) return fail(`Question ${freeIds[0]} is a free question and cannot be in a ${noun}.`);
     if (freeIds.length > 1) return fail(`Questions ${freeIds.join(', ')} are free questions and cannot be in a ${noun}.`);
+  }
+
+  if (input.kind === 'mock' && input.status === 'active' && input.published) {
+    const drafts = await draftsIn(itemIds);
+    if (drafts === null) return fail('Could not check the questions. Please try again.');
+    if (drafts > 0) return fail(draftRefusal(drafts));
   }
 
   const timeLimitRaw = input.timeLimitSec.trim();

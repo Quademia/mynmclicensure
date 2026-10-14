@@ -974,8 +974,10 @@ export function QuizManager({
             {selectedDrafts.length ? (
               <div className="draft-warning" role="note">
                 {selectedDrafts.length === 1 ? '1 question here is a draft' : `${selectedDrafts.length} questions here are drafts`}:{' '}
-                <span className="mono">{selectedDrafts.map((i) => i.item_id).join(', ')}</span>. This {W.noun} will refuse to start until{' '}
-                {selectedDrafts.length === 1 ? 'it is' : 'they are'} published in the Question Bank, or removed here.
+                <span className="mono">{selectedDrafts.map((i) => i.item_id).join(', ')}</span>.{' '}
+                {kind === 'mock'
+                  ? `This mock exam cannot be made live (Active and Published) until ${selectedDrafts.length === 1 ? 'it is' : 'they are'} published in the Question Bank; it can be saved as a draft or unpublished.`
+                  : `This ${W.noun} will refuse to start until ${selectedDrafts.length === 1 ? 'it is' : 'they are'} published in the Question Bank, or removed here.`}
               </div>
             ) : null}
             {selectedInMock.length ? (
