@@ -321,7 +321,7 @@ and "instant runner", which predate the four modes.
 - **The mock form refuses a live mock holding a draft question** —
   Active and Published are refused while any of its questions is a
   draft, saying how many (Sam, 2026-10-13). A one-step "publish its
-  questions too" can come with the admin redesign. *(to build: 04.16)*
+  questions too" can come with the admin redesign.
 - **Editing a mock's questions after students have sat it warns**:
   "12 students have sat this mock. Their scores stay on the questions
   they had." Their sittings keep their own copy; a lock waits until one

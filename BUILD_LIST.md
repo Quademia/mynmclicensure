@@ -86,7 +86,7 @@ before then, and the old list's history, is in
 - ⬜ 04.13 A review period — N days after results, then the review and Practise again lock; papers and mocks
 - ⬜ 04.14 At the close — an untimed sitting finished at the close; the card's Resume follows the sitting's mode
 - ⬜ 04.15 The Mock exams page redesigned — by time: Open now, Coming up, Past mocks; a mock's own page
-- ⬜ 04.16 The mock form refuses a live mock holding a draft question — says how many
+- ✅ 04.16 The mock form refuses a live mock holding a draft question — says how many — 2026-10-14
 - ⬜ 04.17 The mock form warns when its questions are edited after students have sat it
 - ⏸ 04.18 Status and Published as one switch — at the admin redesign (Sam, 2026-10-13)
 - ⏸ 04.19 An admin's extra sitting for one student — when a support case asks
