@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-13, into 10-14 — the mocks ruled; Mock exams page drawn by time and built (04.15); sittings allowed and a mock's first sitting (04.10, 04.11); 04.16
+  - ↳ papers and mocks share settings · one sitting at a time · results on a date hold all · review period · untimed finished at close · no Premium alike · filter dropped · Abandon on no page · test mocks by cloud
+
 - 2026-10-12 — Practice Papers rebuilt (04.5–04.7); My courses and the course page (04.8, 04.9); a Home menu group; leftover code removed
   - ↳ designed from decisions, not the old page · Practise again box · course page a front door, tabs · Home = Dashboard + My courses · save_quiz names columns · hover underline (09.2) · dead-code audit · mixed line endings
 
