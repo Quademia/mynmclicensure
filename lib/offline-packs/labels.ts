@@ -12,7 +12,6 @@
 // watermark.owner_label.
 
 import type { Allowance, PackLabelMeta } from './types';
-import { OFFLINE_PACKS_PER_COURSE_DEFAULT } from './types';
 
 export const OWNER_NAME_FALLBACK = 'Quademia Student';
 
@@ -92,17 +91,20 @@ export function buildOfflinePackDefaultName(meta: Partial<PackLabelMeta>): strin
 
 // The builder page's allowanceMessageForReason — its words, unchanged.
 export function allowanceMessageForReason(reason: string | null | undefined, allowance: Allowance | null): string {
-  const limit =
-    allowance && allowance.downloads_per_course != null ? Number(allowance.downloads_per_course) : OFFLINE_PACKS_PER_COURSE_DEFAULT;
+  const limit = allowance && allowance.downloads_per_course != null ? Number(allowance.downloads_per_course) : null;
   switch (String(reason || '').trim()) {
     case 'not_subscribed':
       return 'You do not currently have an active eligible subscription for this course.';
+    case 'not_included':
+      return 'Offline packs are not included in your package.';
     case 'renew_required':
       return 'Your course subscription exists but is not currently active. Please renew before downloading offline packs.';
     case 'trial_not_allowed':
       return 'Offline packs are not available on trial access.';
     case 'limit_reached':
-      return `You have already used your ${limit} offline pack allowance for this course in the current subscription period.`;
+      return limit === null
+        ? 'You have used your offline pack allowance for this course.'
+        : `You have already used your ${limit} offline pack allowance for this course in the current subscription period.`;
     case 'allowance_check_failed':
       return 'We could not confirm your allowance right now. Please try again.';
     default:

@@ -13,7 +13,6 @@
 // live row is the truth and these match it.
 
 export const OFFLINE_MAX_QUESTIONS_DEFAULT = 100;
-export const OFFLINE_PACKS_PER_COURSE_DEFAULT = 5;
 
 // legacy renderer QA.OWNER_MARK_EVERY — the watermark strip after every
 // tenth question.
@@ -65,6 +64,7 @@ export type OfflinePackItem = Item & {
 // create step adds and the builder page's own default.
 export type BlockedReason =
   | 'not_subscribed'
+  | 'not_included'
   | 'renew_required'
   | 'trial_not_allowed'
   | 'allowance_check_failed'
@@ -82,9 +82,11 @@ export type Allowance = {
   allowed: boolean;
   blocked_reason: BlockedReason | null;
   course_id: string;
-  downloads_per_course: number;
+  /** 07.1: the package's packs per course; null = unlimited. */
+  downloads_per_course: number | null;
   used_this_period: number;
-  remaining: number;
+  /** null = unlimited */
+  remaining: number | null;
   period_start: string | null;
   is_trial: boolean;
 };
@@ -129,7 +131,7 @@ export type CreatePackInput = {
 };
 
 export type CreatePackResult =
-  | { ok: true; pack_id: string; remaining: number }
+  | { ok: true; pack_id: string; remaining: number | null }
   | { ok: false; reason: BlockedReason; message: string; allowance: Allowance | null };
 
 // ── My Packs (13b) ─────────────────────────────────────────────────────
@@ -141,6 +143,9 @@ export type OfflinePackListRow = Pick<
 > & { course_title: string };
 
 export type OfflinePackPage = { ok: true; total: number; items: OfflinePackListRow[] } | { ok: false; message: string };
+
+// 07.7: Delete — the pack hidden and closed, the allowance not given back.
+export type DeletePackResult = { ok: true } | { ok: false; message: string };
 
 // legacy PAGE_SIZE on my-offline-packs.html
 export const MY_PACKS_PAGE_SIZE = 24;

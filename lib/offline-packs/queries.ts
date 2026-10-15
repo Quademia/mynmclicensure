@@ -11,9 +11,8 @@
 // student in the query.
 
 import type { ServerSupabaseClient } from '@/lib/access';
-import { getConfig } from '@/lib/catalogue/queries';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import type { Allowance, OfflinePack, OfflinePackItem, OfflinePackListRow, OfflinePackPage, PickResult } from './types';
-import { OFFLINE_PACKS_PER_COURSE_DEFAULT } from './types';
 
 // ── the item ids of the student's earlier active packs for the course ──
 // legacy getUsedOfflinePackItemIds; the period start narrows it to the
@@ -104,110 +103,47 @@ function shuffleArray<T>(arr: T[]): T[] {
   return a;
 }
 
-// ── the student's course_access rows for the course ───────────────────
-// legacy getSubscriptionsForOfflineCourse read every receipt and filtered
-// by the product's course list in code; since 02 C2 the rows are the
-// student's own course_access rows for the course (any state), each
-// carrying its receipt and the receipt's product kind for the TRIAL rule.
-type SubRow = {
-  access_id: number;
-  subscription_id: string;
-  start_utc: string | null;
-  expires_utc: string | null;
-  revoked_utc: string | null;
-  subscriptions: { product_id: string; products: { kind: string | null } | null } | null;
-};
-
-async function getSubscriptionsForOfflineCourse(db: ServerSupabaseClient, userId: string, courseId: string): Promise<SubRow[]> {
-  const { data, error } = await db
-    .from('course_access')
-    .select('access_id, subscription_id, start_utc, expires_utc, revoked_utc, subscriptions ( product_id, products ( kind ) )')
-    .eq('user_id', userId)
-    .eq('course_id', String(courseId || '').trim().toUpperCase());
-  if (error) {
-    console.error('getSubscriptionsForOfflineCourse:', error);
-    return [];
-  }
-  return (data ?? []) as unknown as SubRow[];
-}
-
-// Live: unrevoked and inside its window — the same test my_course_access() makes.
-function isActiveSubscriptionNow(sub: SubRow): boolean {
-  if (sub.revoked_utc) return false;
-  const start = sub.start_utc ? new Date(sub.start_utc).getTime() : NaN;
-  const exp = sub.expires_utc ? new Date(sub.expires_utc).getTime() : NaN;
-  if (Number.isNaN(start) || Number.isNaN(exp)) return false;
-  const now = Date.now();
-  return start <= now && exp > now;
-}
-
-function isTrialProduct(sub: SubRow): boolean {
-  return String(sub.subscriptions?.products?.kind || '').trim().toUpperCase() === 'TRIAL';
-}
-
-// ── the allowance (legacy getOfflinePackAllowance) ────────────────────
-// In order: no subscription covers the course → not_subscribed; none
-// active → renew_required; only trials → trial_not_allowed; else count
-// the active packs since the earliest qualifying subscription started
-// against offline_packs_per_course.
-export async function getOfflinePackAllowance(db: ServerSupabaseClient, userId: string, courseId: string): Promise<Allowance> {
+// ── the allowance (07.1) ──────────────────────────────────────────────
+// The package's packs per course, from the database's one rule —
+// pack_allowance(), which create_offline_pack asks too: the course's live
+// grants and the best of them (unlimited if any has no count, else the one
+// with the most left). Every pack made since that grant began counts,
+// deleted ones too (07.7). Service role: the function is server only; the
+// caller has passed the student gate and `userId` is the gate's.
+export async function getOfflinePackAllowance(_db: ServerSupabaseClient, userId: string, courseId: string): Promise<Allowance> {
   const safeCourseId = String(courseId || '').trim().toUpperCase();
-  const cfg = await getConfig(db);
-  const downloadsPerCourse =
-    Number(cfg.offline_packs_per_course) > 0 ? Number(cfg.offline_packs_per_course) : OFFLINE_PACKS_PER_COURSE_DEFAULT;
-
-  const blocked = (reason: Allowance['blocked_reason'], isTrial = false, periodStart: string | null = null): Allowance => ({
+  const blocked = (reason: Allowance['blocked_reason'], limit: number | null = null): Allowance => ({
     success: false,
     allowed: false,
     blocked_reason: reason,
     course_id: safeCourseId,
-    downloads_per_course: downloadsPerCourse,
+    downloads_per_course: limit,
     used_this_period: 0,
     remaining: 0,
-    period_start: periodStart,
-    is_trial: isTrial,
+    period_start: null,
+    is_trial: false,
   });
 
-  const allCourseSubs = await getSubscriptionsForOfflineCourse(db, userId, safeCourseId);
-  if (!allCourseSubs.length) return blocked('not_subscribed');
-
-  const activeCourseSubs = allCourseSubs.filter(isActiveSubscriptionNow);
-  if (!activeCourseSubs.length) return blocked('renew_required');
-
-  const qualifyingSubs = activeCourseSubs.filter((sub) => !isTrialProduct(sub));
-  if (!qualifyingSubs.length) return blocked('trial_not_allowed', true);
-
-  const periodStartIso =
-    qualifyingSubs
-      .map((sub) => String(sub.start_utc || '').trim())
-      .filter(Boolean)
-      .sort()[0] || null;
-
-  let query = db
-    .from('offline_packs')
-    .select('pack_id, created_utc', { count: 'exact' })
-    .eq('user_id', userId)
-    .eq('course_id', safeCourseId)
-    .eq('status', 'active');
-  if (periodStartIso) query = query.gte('created_utc', periodStartIso);
-
-  const { count, error } = await query;
+  type Row = { granted: boolean; allowed: number | null; used: number; packs_left: number | null; since: string | null };
+  const { data, error } = await createServiceRoleClient().rpc('pack_allowance', { p_user_id: userId, p_course_id: safeCourseId });
   if (error) {
     console.error('getOfflinePackAllowance:', error);
-    return blocked('allowance_check_failed', false, periodStartIso);
+    return blocked('allowance_check_failed');
   }
+  const row = ((Array.isArray(data) ? data[0] : data) ?? null) as Row | null;
+  if (!row || !row.granted) return blocked('not_subscribed');
+  if (row.allowed === 0) return blocked('not_included', 0);
 
-  const usedThisPeriod = Number(count || 0);
-  const remaining = Math.max(0, downloadsPerCourse - usedThisPeriod);
+  const remaining = row.packs_left === null ? null : Math.max(0, Number(row.packs_left));
   return {
     success: true,
-    allowed: remaining > 0,
+    allowed: remaining === null || remaining > 0,
     blocked_reason: null,
     course_id: safeCourseId,
-    downloads_per_course: downloadsPerCourse,
-    used_this_period: usedThisPeriod,
+    downloads_per_course: row.allowed === null ? null : Number(row.allowed),
+    used_this_period: Number(row.used || 0),
     remaining,
-    period_start: periodStartIso,
+    period_start: row.since,
     is_trial: false,
   };
 }
@@ -246,7 +182,7 @@ export async function getOfflinePackForRender(db: ServerSupabaseClient, userId: 
     .select(
       'pack_item_id, pack_id, position, item_id, question_type, stem, ' +
         'option_a, option_b, option_c, option_d, option_e, option_f, marks, shuffle_options, ' +
-        'correct, rationale, rationale_img, fb_a, fb_b, fb_c, fb_d, fb_e, fb_f, ' +
+        'correct, ' +
         'subject, maintopic, subtopic, difficulty',
     )
     .eq('pack_id', pack.pack_id)
@@ -279,6 +215,7 @@ export async function listOfflinePacks(db: ServerSupabaseClient, userId: string,
     .from('offline_packs')
     .select('pack_id, course_id, pack_name, display_label, question_count, status, created_utc', { count: 'exact' })
     .eq('user_id', userId)
+    .neq('status', 'deleted')
     .order('created_utc', { ascending: false })
     .range(safeOffset, safeOffset + safeLimit - 1);
   if (error) {

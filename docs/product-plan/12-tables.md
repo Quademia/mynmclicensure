@@ -511,31 +511,31 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `maintopics`, `subtopics`, `difficulties`, `question_types`, `concept_query` | What was picked |
 | `question_count` | How many questions |
 | `watermark` | The owner's name, masked email and label, stamped when made |
-| `status` | `active` (archived and deleted are never set) |
+| `status` | `active` or `deleted` (07.7; archived is never set) |
 | `created_utc`, `updated_utc` | When made, last changed |
 
-- Browser: the owner and an admin read. *Old defaults* (an owner could
-  still write a header row directly; packs are made through the server).
-- *To build (07.7), ticked by Sam 2026-10-15:* **Delete** sets
-  `status` to `deleted` through the server (no new column); a deleted
-  pack leaves My packs and no longer opens or downloads, but its row
-  stays and still counts against the allowance (`create_offline_pack`
-  counts every row since the grant began). Rule 9 on the table with it:
-  the browser keeps the owner's read only. Why: a student may delete a
-  pack without getting the allowance back (Sam, 2026-10-15).
+- Browser: the owner and an admin read; writes through the server only
+  (rule 9, 2026-10-15: the insert and update policies dropped).
+- **Delete** (07.7, ticked and built 2026-10-15): the server sets
+  `status` to `deleted`; a deleted pack leaves My packs and no longer
+  opens, but its row stays and still counts against the allowance. Why: a
+  student may delete a pack without getting the allowance back (Sam).
+- **The allowance** (07.1, built 2026-10-15): `pack_allowance(user,
+  course)`, server only — the course's live grants and the best of them
+  (unlimited if any has no count, else the most left); every pack made
+  since that grant began counts. `create_offline_pack` and the pages ask
+  it; Config's `offline_packs_per_course` is retired.
+- `create_offline_pack` refuses a question outside the Practice and Free
+  pools (06.8).
 
 ### `offline_pack_items` — a pack's questions
-- A copy of each question with its answer, rationale and feedback (the
-  pack prints its answer key), and its `position`.
+- A copy of each question with its options and answer, and its
+  `position` — **no explanation, picture or per-option feedback** (07.6,
+  ticked and built 2026-10-15: those columns dropped, the packs already
+  made lost theirs, `create_offline_pack` no longer copies them). Why: a
+  pack leaves our control — a PDF is forwarded, a phone can be copied
+  (Sam).
 - Browser: the owner reads.
-- *To build (07.6), ticked by Sam 2026-10-15:* **drop
-  `rationale`, `rationale_img` and `fb_a` … `fb_f`**, and
-  `create_offline_pack` stops copying them — a pack holds the question,
-  its options and its answer only. The packs already made lose theirs in
-  the same migration. Why: no explanations in a pack (Sam, 2026-10-15);
-  today the owner's browser can read them through the API though no page
-  shows them, and a pack leaves our control (a PDF is forwarded, a phone
-  can be copied).
 
 ---
 
@@ -627,8 +627,10 @@ table by table as each is next changed (AGENTS.md rule 9).
 - *To build (04 G2) — ticked 2026-10-08:* a setting for the daily
   challenge's number of questions, 5 to start; its time limit uses
   `builder_minutes_per_question` (Sam, 2026-10-08).
-- *To build (07.3), ticked by Sam 2026-10-15:* a setting
-  `offline_checkin_days` — how many days a phone keeps its offline packs
+- `offline_packs_per_course` retired (07.1, 2026-10-15): the package
+  says how many packs per course.
+- `offline_checkin_days` (07.3, ticked 2026-10-15; the row added the same
+  day, read when 07.3 is built) — how many days a phone keeps its offline packs
   open without connecting; 30 to start. Why: a phone signed out while
   offline cannot know it until it connects (Sam, 2026-10-15).
 - Browser: signed-in read; admin write. *Old defaults.*

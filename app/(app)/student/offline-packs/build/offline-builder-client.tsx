@@ -385,7 +385,7 @@ export function OfflineBuilderClient({
     if (!result.ok) {
       const allowance = result.allowance;
       const text =
-        allowance && allowance.success ? `Allowance: ${allowance.remaining} left of ${allowance.downloads_per_course}` : 'Allowance: blocked';
+        allowance && allowance.success ? `Allowance: ${allowance.remaining === null ? 'unlimited' : `${allowance.remaining} left of ${allowance.downloads_per_course}`}` : 'Allowance: blocked';
       setModal({ ...base, allowance, allowanceText: text, error: allowanceMessageForReason(result.reason, allowance), canCreate: false });
       setStatusOverride('Offline pack creation is currently blocked.');
       setBusy(false);
@@ -393,7 +393,7 @@ export function OfflineBuilderClient({
     }
 
     const { allowance, pick } = result;
-    const text = `Allowance: ${allowance.remaining} left of ${allowance.downloads_per_course}`;
+    const text = `Allowance: ${allowance.remaining === null ? 'unlimited' : `${allowance.remaining} left of ${allowance.downloads_per_course}`}`;
     if (!pick.item_ids.length) {
       setModal({ ...base, allowance, allowanceText: text, error: 'No items were selected for this pack.', canCreate: false });
       setStatusOverride('We could not prepare an offline pack from this selection.');

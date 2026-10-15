@@ -9,7 +9,7 @@ Detail and history: `archive/product-plan/06-offline-packs.md` (the old
 app's description) and the built code in `lib/offline-packs/` and
 `app/(app)/offline-pack/`.
 
-## The redesign *(ruled by Sam, 2026-10-15; to build: 07.2–07.7)*
+## The redesign *(ruled by Sam, 2026-10-15; 07.1, 07.6, 07.7 built 2026-10-15; to build: 07.2–07.5, 07.8)*
 
 Designed fresh, not from the old pack (a print-to-PDF page). A pack is a
 set of questions kept **on the student's phone, usable with no
@@ -126,7 +126,7 @@ connection**, and a printable PDF of the same pack.
   0. Built in the database (F4a, 2026-10-04). The pack page still shows
   its count from the old Config setting, which agrees today (5); it
   reads the package instead, and the setting retires, with the page's
-  redesign *(to build: 07.1)*. A pack holds at most the Config limit of
+  redesign *(built 2026-10-15: pack_allowance(), the package's count)*. A pack holds at most the Config limit of
   questions.
 - **A pack is a snapshot**: its questions are copied when it is made, so
   later bank edits never change it. A pack made earlier still opens

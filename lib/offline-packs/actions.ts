@@ -24,6 +24,7 @@ import {
   OFFLINE_MAX_QUESTIONS_DEFAULT,
   type CreatePackInput,
   type CreatePackResult,
+  type DeletePackResult,
   type OfflinePackPage,
   type PrepareResult,
 } from './types';
@@ -89,7 +90,7 @@ export async function createOfflinePack(input: CreatePackInput): Promise<CreateP
   if (!allowance.success) {
     return { ok: false, reason: allowance.blocked_reason || 'not_allowed', message: 'Offline pack access is currently blocked.', allowance };
   }
-  if (allowance.remaining < 1) {
+  if (allowance.remaining !== null && allowance.remaining < 1) {
     return { ok: false, reason: 'limit_reached', message: 'You have reached your offline pack limit for this course.', allowance };
   }
 
@@ -149,7 +150,31 @@ export async function createOfflinePack(input: CreatePackInput): Promise<CreateP
     return { ok: false, reason: 'insert_failed', message: error.message, allowance };
   }
 
-  return { ok: true, pack_id: packId, remaining: Math.max(0, (allowance.remaining || 0) - 1) };
+  return { ok: true, pack_id: packId, remaining: allowance.remaining === null ? null : Math.max(0, allowance.remaining - 1) };
+}
+
+// ── Delete a pack (07.7; Sam, 2026-10-15) ──────────────────────────────
+// The student's own active pack is marked deleted: it leaves My packs and
+// no longer opens, and its row stays, so it still counts against the
+// allowance (pack_allowance counts every pack made). The browser holds no
+// write on offline_packs: the service role, scoped to the gate's student.
+export async function deleteOfflinePack(packId: string): Promise<DeletePackResult> {
+  const { profile } = await requireStudent();
+  const safeId = String(packId || '').trim();
+  if (!safeId) return { ok: false, message: 'Could not delete this pack.' };
+  const { data, error } = await createServiceRoleClient()
+    .from('offline_packs')
+    .update({ status: 'deleted', updated_utc: new Date().toISOString() })
+    .eq('pack_id', safeId)
+    .eq('user_id', profile.user_id)
+    .eq('status', 'active')
+    .select('pack_id');
+  if (error) {
+    console.error('deleteOfflinePack:', error);
+    return { ok: false, message: 'Could not delete this pack. Please try again.' };
+  }
+  if (!data || !data.length) return { ok: false, message: 'This pack could not be found.' };
+  return { ok: true };
 }
 
 // ── My Packs' Load More and Refresh (legacy loadNextPage, 13b) ─────────
