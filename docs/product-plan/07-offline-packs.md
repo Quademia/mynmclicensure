@@ -9,7 +9,7 @@ Detail and history: `archive/product-plan/06-offline-packs.md` (the old
 app's description) and the built code in `lib/offline-packs/` and
 `app/(app)/offline-pack/`.
 
-## The redesign *(ruled by Sam, 2026-10-15; 07.1, 07.2, 07.4, 07.6, 07.7, 07.8 (online) built 2026-10-15; to build: 07.3, 07.5)*
+## The redesign *(ruled by Sam, 2026-10-15; 07.1–07.4 and 07.6–07.8 built 2026-10-15; to build: 07.5)*
 
 Designed fresh, not from the old pack (a print-to-PDF page). A pack is a
 set of questions kept **on the student's phone, usable with no
@@ -25,17 +25,31 @@ connection**, and a printable PDF of the same pack.
   Midwifery"); questions not in the student's earlier packs come first.
   *(07.2, built 2026-10-15: one builder in components/builder, the pack
   door in lib/offline-packs/door; a trial or free student gets the locked
-  card; until 07.8 a made pack opens in the old pack page)*
+  card; a made pack opens on its own page, kept on that phone (07.3))*
 - **Offline, in the app** — the installable app (a PWA): installed once
   to the home screen, it opens the student's packs with no signal.
-  *(07.3)*
+  *(07.3, built 2026-10-15)*
+  - **How** (Sam, 2026-10-15): our own small service worker
+    (`public/sw.js`, Next's own guide), not a library — it keeps only the
+    offline screen (`/offline`, about 750 KB before compression, once a
+    release, on phones holding packs), never every page's code. The packs
+    sit in the phone's own database (IndexedDB). Any page that cannot be
+    reached lands on `/offline`; a page that answers, even with an error,
+    shows as it is. On a production build only.
+  - **The icon opens the Dashboard** (Sam; `/router`); with no signal,
+    the packs. **One quiet install line on My packs** (Sam): Chrome's
+    Install button, or an iPhone's two taps (Share, Add to Home Screen).
   - **Only on devices where the account is signed in**, so within the
     two-device limit (01). When the phone next connects and finds the
     account signed out there — by the student, or bumped by a sign-in
     elsewhere — it clears the packs. **A check-in period**: a phone must
     connect at least every N days (Config, 30 to start, a hint by the
     field) or its packs lock — "Connect once to keep using your packs".
-    Netflix's and Spotify's downloads work so.
+    Netflix's and Spotify's downloads work so. *Built:* every signed-in
+    student page is the check-in (no request of its own); another
+    account's packs leave when a different student checks in; a sign-in
+    that only ran out its week (7 days, 01) keeps them — else every
+    student would download their packs again weekly.
   - No limit on packs per phone; a pack stays after the package ends.
 - **A small offline player of its own** (Sam: B), built from the
   runner's pieces, not the runner — real sittings stay untouched. It
@@ -47,7 +61,9 @@ connection**, and a printable PDF of the same pack.
   and its score. When the sitting is redesigned, this player takes its
   look in the same pass. *(07.4, built online 2026-10-15: components/
   offline-player at /pack-practice/[pack_id]; the ways offered as Practise
-  again's are, each with Start; Leave part-way asks first)*
+  again's are, each with Start; Leave part-way asks first; offline with
+  07.3, the same player on `/offline`, the last score kept on the phone.
+  Not built: a practice in progress kept to continue — not drawn)*
 - **No explanations in a pack** (Sam, as the old app): the question,
   its options and the answer — never the rationale or the per-option
   feedback, on the phone, in the PDF or in the pack's stored rows.
@@ -78,8 +94,8 @@ connection**, and a printable PDF of the same pack.
   record of each download, if leaks start. When built: print one page
   on an ordinary printer to set the pattern's strength.
 - **My packs, one page that knows if it is online** (Sam, 2026-10-15,
-  07.8): online, every pack, each marked *On this phone* or not;
-  offline, only the packs on this phone, with "You're offline. Your
+  07.8; its offline half built with 07.3): online, every pack, each
+  marked *On this phone* or not; offline, only the packs on this phone, with "You're offline. Your
   packs on this phone are ready." Any page opened offline lands here —
   one tap from the icon.
   - **By course**, each heading with its allowance and Build a pack
@@ -95,7 +111,11 @@ connection**, and a printable PDF of the same pack.
     into a practice.
   - **Check-in run out**: the packs listed but not opening — "Connect
     once to keep using your packs." A pack deleted elsewhere leaves this
-    phone when it next connects.
+    phone when it next connects (built: when My packs next opens there).
+  - **The offline bar always says "You're offline"** (built 2026-10-15),
+    with Try again when the phone counts itself connected: the screen
+    shows only when a page could not be reached, and a phone whose data
+    has run out still counts itself connected.
   - **Empty**: "Make a pack to practise offline", Build a pack per
     course. **Locked** (trial, free): "Offline packs come with a
     package", Choose a package; earlier packs still show and open.

@@ -16,6 +16,7 @@ import { StudentSidebar } from '@/components/nav/student/student-sidebar';
 import { displayNameOf } from '@/components/shell/page-header';
 import { getUnreadCountForUser } from '@/lib/messaging/queries';
 import { STUDENT_PHONE_TABS } from '@/lib/nav/student';
+import { PhoneCheckIn } from './phone-check-in';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,6 +41,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
       }}
     >
       {children}
+      <PhoneCheckIn userId={profile.user_id} />
     </AppShell>
   );
 }

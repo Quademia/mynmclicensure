@@ -565,6 +565,18 @@ above sit at the repo root; the audience grouping inside them is kept.
   `visibilitychange` — the app's own handler then runs as a browser would
   make it — and ask Sam for one real phone check on the dev site
   (2026-09-29, 03 Q11).
+- **The offline app runs on a production build only** (07.3,
+  2026-10-15): `public/sw.js` is registered only when `NODE_ENV` is
+  production, so it is walked on `prod-local` (:3001), with "no signal"
+  made by stopping that server. `navigator.onLine` stays true then — as
+  on a phone whose data has run out — so nothing may read it as "the app
+  can be reached". The worker and the phone's packs (IndexedDB) belong to
+  one origin: :3000 and :3001 hold separate copies. After a walk, from a
+  page on :3001, unregister the worker and delete its caches, or the next
+  build's walk opens the old copy whenever a page fails. `public/sw.js` is
+  served as written, so an edit reaches the next walk without a rebuild.
+  On the deployed sites, a walk that lands on `/offline` means the page
+  could not be reached.
 - **A pane tab opened in the background never shows a page behind a
   `loading.tsx`.** The page arrives (200, its content in a hidden
   `S:1` block and the `$RC` swap in the HTML) but React waits for an

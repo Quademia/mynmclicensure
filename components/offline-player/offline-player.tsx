@@ -15,7 +15,10 @@
 // The look is the runner's own (styles/runner.css: the navy header, the
 // question card, the option rows and their badges) plus what a pack's end
 // screen adds (styles/offline-player.css). In 07.3 the same component runs
-// from the phone's copy of the pack, with no signal.
+// from the phone's copy of the pack, with no signal (app/offline): there its
+// way out is onExit, back to the screen's own pack view, since a link would
+// need the network. A finished practice's score is kept with the pack's copy
+// on this phone, if it has one ("Last: 14 of 20").
 
 'use client';
 
@@ -24,18 +27,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { AppLink, LinkPending } from '@/components/shell/link-pending';
 import { isCorrectAnswer } from '@/lib/attempts/scoring';
+import type { PackQuestion, PackWay } from '@/lib/offline-packs/questions';
+import { setLastScore } from '@/lib/offline-packs/phone';
 import { useConfirm } from '@/lib/overlays/shared/confirm-dialog';
 
-export type PlayerWay = 'go' | 'end';
+export type PlayerWay = PackWay;
 
-export type PlayerItem = {
-  id: string;
-  question_type: string;
-  stem: string;
-  options: { letter: string; text: string }[];
-  correct: string;
-  topic: string | null;
-};
+export type PlayerItem = PackQuestion;
 
 type Chosen = Record<string, string | string[]>;
 
@@ -69,16 +67,21 @@ function chosenWords(v: string | string[] | undefined): string {
 }
 
 export function OfflinePlayer({
+  packId,
   title,
   items,
   way,
   exitHref,
+  onExit,
 }: {
+  packId: string;
   title: string;
   items: PlayerItem[];
   way: PlayerWay;
-  /** The pack's own page. */
-  exitHref: string;
+  /** The pack's own page (online). */
+  exitHref?: string;
+  /** Offline: back to the offline screen's pack, with no page change. */
+  onExit?: () => void;
 }) {
   const [index, setIndex] = useState(0);
   const [chosen, setChosen] = useState<Chosen>({});
@@ -118,6 +121,9 @@ export function OfflinePlayer({
   }
 
   function finish() {
+    void setLastScore(packId, right, total).catch(() => {
+      // the phone keeps no packs; the score still shows
+    });
     setFinished(true);
     setReviewing(null);
     window.scrollTo({ top: 0 });
@@ -137,16 +143,24 @@ export function OfflinePlayer({
     window.scrollTo({ top: 0 });
   }
 
+  function exit() {
+    if (onExit) onExit();
+    else if (exitHref) router.push(exitHref);
+  }
+
   async function leave(e: React.MouseEvent) {
-    if (finished || answeredCount === 0) return;
+    if (!onExit && (finished || answeredCount === 0)) return;
     e.preventDefault();
-    const ok = await confirm({
-      title: 'Leave this practice?',
-      body: 'Your answers here will not be kept.',
-      confirmLabel: 'Leave',
-      cancelLabel: 'Keep practising',
-    });
-    if (ok) router.push(exitHref);
+    if (!finished && answeredCount > 0) {
+      const ok = await confirm({
+        title: 'Leave this practice?',
+        body: 'Your answers here will not be kept.',
+        confirmLabel: 'Leave',
+        cancelLabel: 'Keep practising',
+      });
+      if (!ok) return;
+    }
+    exit();
   }
 
   /** One question's card: live, or revealed (as you go after an answer; every question after the end). */
@@ -241,10 +255,16 @@ export function OfflinePlayer({
                 {index + 1} / {total}
               </span>
             ) : null}
-            <Link href={exitHref} className="hbtn hbtn-ghost" onClick={(e) => void leave(e)}>
-              Leave
-              <LinkPending />
-            </Link>
+            {onExit ? (
+              <button type="button" className="hbtn hbtn-ghost" onClick={(e) => void leave(e)}>
+                Leave
+              </button>
+            ) : (
+              <Link href={exitHref ?? '/student/offline-packs'} className="hbtn hbtn-ghost" onClick={(e) => void leave(e)}>
+                Leave
+                <LinkPending />
+              </Link>
+            )}
           </div>
         </div>
         <div className="progress-wrap">
@@ -330,9 +350,15 @@ export function OfflinePlayer({
             </ul>
             <p className="ofp-line">Tap a question to see it with its answer.</p>
             <div className="page-nav">
-              <AppLink href={exitHref} className="btn btn-ghost btn-lg">
-                Back to the pack
-              </AppLink>
+              {onExit ? (
+                <button type="button" className="btn btn-ghost btn-lg" onClick={onExit}>
+                  Back to the pack
+                </button>
+              ) : (
+                <AppLink href={exitHref ?? '/student/offline-packs'} className="btn btn-ghost btn-lg">
+                  Back to the pack
+                </AppLink>
+              )}
               <button type="button" className="btn btn-accent btn-lg" onClick={again}>
                 Practise again
               </button>

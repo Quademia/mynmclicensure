@@ -5,6 +5,7 @@
 
 import type { Metadata } from 'next';
 import { LoginCard } from './login-card';
+import { ClearPhonePacks } from './clear-phone-packs';
 import '@/styles/auth.css';
 
 export const metadata: Metadata = {
@@ -15,6 +16,7 @@ export default function LoginPage() {
   return (
     <div className="qa-page">
       <LoginCard />
+      <ClearPhonePacks />
     </div>
   );
 }

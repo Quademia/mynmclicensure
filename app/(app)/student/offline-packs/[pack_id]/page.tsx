@@ -3,10 +3,12 @@
 // https://claude.ai/artifact/NrEnZUieGVsFmZkZEmjbFm): the pack's name, its
 // course, how many questions, when it was made and what was picked; the way
 // to print it; Delete, with the app's confirm. Practise opens the offline
-// player (07.4) in either way; Save to / Remove from this phone comes with
-// 07.3, and the redesigned PDF with 07.5 — until then the print button
-// opens today's print page. Only the student's own active pack opens; anything else is
-// not found.
+// player (07.4) in either way. On this phone (07.3): the card's mark and the
+// last score on this phone, and under it Save to this phone or Remove from
+// this phone (phone-pack.tsx); ?new=1, from the builder, keeps it on the
+// phone it was made on. The redesigned PDF comes with 07.5 — until then the
+// print button opens today's print page. Only the student's own active pack
+// opens; anything else is not found.
 
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -15,6 +17,7 @@ import { getCourses } from '@/lib/catalogue/queries';
 import { getMyPack } from '@/lib/offline-packs/queries';
 import type { MyPack } from '@/lib/offline-packs/types';
 import { AppLink } from '@/components/shell/link-pending';
+import { PhoneKeep, PhoneMark } from '../phone-pack';
 import { DeletePack } from './delete-pack';
 import { PractisePack } from './practise-pack';
 import '@/styles/practice-papers.css';
@@ -46,9 +49,16 @@ function picked(p: MyPack): string {
   return parts.join(' · ');
 }
 
-export default async function PackPage({ params }: { params: Promise<{ pack_id: string }> }) {
+export default async function PackPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ pack_id: string }>;
+  searchParams: Promise<{ new?: string }>;
+}) {
   const gate = await requireStudent();
   const { pack_id } = await params;
+  const { new: made } = await searchParams;
   const [pack, courses] = await Promise.all([
     getMyPack(gate.supabase, gate.profile.user_id, decodeURIComponent(String(pack_id || ''))),
     getCourses(gate.supabase),
@@ -72,11 +82,14 @@ export default async function PackPage({ params }: { params: Promise<{ pack_id: 
       </div>
 
       <div className="card pp-card">
+        <PhoneMark packId={pack.pack_id} />
         <PractisePack packId={pack.pack_id} title={pack.pack_name || 'this pack'} />
         <AppLink href={`/offline-pack?pack_id=${encodeURIComponent(pack.pack_id)}`} className="btn btn-ghost btn-lg">
           Print or save as PDF
         </AppLink>
       </div>
+
+      <PhoneKeep packId={pack.pack_id} autoSave={made === '1'} />
 
       <DeletePack packId={pack.pack_id} />
     </div>

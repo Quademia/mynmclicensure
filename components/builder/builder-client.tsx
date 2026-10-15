@@ -543,8 +543,8 @@ export function QuizBuilderClient({
       mode: modeNow,
       savedAt: nowMs(),
     });
-    // until the pack's own page (07.8), the pack opens where it did
-    router.push(`/offline-pack?pack_id=${encodeURIComponent(result.pack_id)}`);
+    // the pack's own page (07.8); ?new=1 keeps it on the phone it was made on (07.3)
+    router.push(`/student/offline-packs/${encodeURIComponent(result.pack_id)}?new=1`);
   }
 
   // ── the topic lists ──

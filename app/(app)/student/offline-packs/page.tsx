@@ -9,19 +9,27 @@
 // longer open to packs (an ended package) sit under "Made earlier" and
 // still open. A trial or free student gets the locked card; a student with
 // no pack yet, the one-line way in. No filters, counts or ids (Sam).
-// Offline — the packs on this phone, the last score — comes with 07.3.
 //
-// A Server Component: two reads (the door, the packs) and the course
-// titles the catalogue already holds; nothing waits on the browser.
+// On this phone (07.3): a row kept on this phone says so, with its last
+// score here (phone-pack.tsx, read from the phone); the page tells the
+// phone which packs are still the student's, so one deleted elsewhere
+// leaves it; and a quiet install line (install-line.tsx). Offline, the
+// phone shows its own copy of the packs (app/offline) instead of this page.
+//
+// A Server Component: two reads (the door, the packs), the course titles
+// the catalogue already holds and Config's check-in period; nothing waits
+// on the browser.
 
 import type { Metadata } from 'next';
 import { requireStudent } from '@/lib/access';
-import { getCourses } from '@/lib/catalogue/queries';
+import { getConfig, getCourses } from '@/lib/catalogue/queries';
 import { getPackDoor } from '@/lib/offline-packs/door';
-import { listMyPacks } from '@/lib/offline-packs/queries';
+import { checkinDaysOf, listMyPacks } from '@/lib/offline-packs/queries';
 import type { MyPackRow } from '@/lib/offline-packs/types';
 import { PageHeader } from '@/components/shell/page-header';
 import { AppLink } from '@/components/shell/link-pending';
+import { InstallLine } from './install-line';
+import { PhoneLine, PhonePrune } from './phone-pack';
 import '@/styles/practice-papers.css';
 import '@/styles/student-offline-packs.css';
 
@@ -56,6 +64,7 @@ function PackRows({ packs, titles }: { packs: MyPackRow[]; titles?: Record<strin
                 {titles ? `${titles[p.course_id] ?? p.course_id} · ` : ''}
                 {questions(p.question_count)} · {shortDay(p.created_utc)}
               </span>
+              <PhoneLine packId={p.pack_id} />
             </span>
             <span className="pp-chev" aria-hidden="true">
               ›
@@ -90,10 +99,11 @@ function Allowance({ allowed, left }: { allowed: number | null | undefined; left
 
 export default async function MyPacksPage() {
   const gate = await requireStudent();
-  const [door, packs, courses] = await Promise.all([
+  const [door, packs, courses, config] = await Promise.all([
     getPackDoor(gate),
     listMyPacks(gate.supabase, gate.profile.user_id),
     getCourses(gate.supabase),
+    getConfig(gate.supabase),
   ]);
   const titles: Record<string, string> = Object.fromEntries(courses.map((c) => [c.course_id, c.title]));
   const mine = packs ?? [];
@@ -103,6 +113,11 @@ export default async function MyPacksPage() {
   return (
     <div className="pp-page opk">
       <PageHeader title="My packs" subtitle="Packs of questions to practise anywhere, even with no signal." />
+
+      {door.length || mine.length ? <InstallLine /> : null}
+      {packs !== null ? (
+        <PhonePrune userId={gate.profile.user_id} activeIds={mine.map((p) => p.pack_id)} checkinDays={checkinDaysOf(config)} />
+      ) : null}
 
       {packs === null ? <p className="pp-note">Your packs could not be loaded. Please refresh the page.</p> : null}
 

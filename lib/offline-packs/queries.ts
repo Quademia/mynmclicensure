@@ -12,7 +12,7 @@
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import type { Allowance, MyPack, MyPackRow, OfflinePack, OfflinePackItem, PickResult } from './types';
+import { OFFLINE_CHECKIN_DAYS_DEFAULT, type Allowance, type MyPack, type MyPackRow, type OfflinePack, type OfflinePackItem, type PickResult } from './types';
 
 // ── the item ids of the student's earlier active packs for the course ──
 // legacy getUsedOfflinePackItemIds; the period start narrows it to the
@@ -218,6 +218,12 @@ export async function listMyPacks(db: ServerSupabaseClient, userId: string): Pro
     return null;
   }
   return (data ?? []) as MyPackRow[];
+}
+
+/** Config's offline_checkin_days (07.3): a whole number of days, or the default. */
+export function checkinDaysOf(config: Record<string, unknown>): number {
+  const n = Number(config.offline_checkin_days);
+  return Number.isInteger(n) && n > 0 ? n : OFFLINE_CHECKIN_DAYS_DEFAULT;
 }
 
 /** One of the student's own active packs — its header, no questions; null when not theirs, deleted or gone. */

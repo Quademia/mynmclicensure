@@ -129,6 +129,29 @@ export async function verifySession(userId: string): Promise<boolean> {
 }
 
 /**
+ * Why a gate refused this device, for its offline packs (07.3; Sam,
+ * 2026-10-15: a phone signed out, or bumped by a sign-in elsewhere, clears
+ * them). True when the device's sign-in was ended — its row turned
+ * inactive (a sign-out, or a third device's sign-in), or the row is live
+ * yet the gate refused (the account is gone or switched off). False when
+ * the week simply ran out, or no cookie is left to tell: the student signs
+ * in again on the same phone and keeps the packs, rather than downloading
+ * them all again every week. Read before deactivateCurrentSession.
+ */
+export async function currentSessionEnded(): Promise<boolean> {
+  const jar = await cookies();
+  const sessionId = jar.get(SESSION_COOKIE)?.value;
+  if (!sessionId) return false;
+  const { data } = await createServiceRoleClient()
+    .from('sessions')
+    .select('active, expires_utc')
+    .eq('session_id', sessionId)
+    .maybeSingle();
+  if (!data || !data.active) return true;
+  return new Date(data.expires_utc).getTime() > Date.now();
+}
+
+/**
  * Logout: the row goes inactive, the cookie goes. Never deletes.
  */
 export async function deactivateCurrentSession(): Promise<void> {

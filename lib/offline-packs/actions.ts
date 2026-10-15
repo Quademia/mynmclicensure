@@ -18,16 +18,18 @@ import { getAnswerHistory, getQuizBuilderRows } from '@/lib/attempts/queries';
 import { BUILDER_MIN_QUESTIONS, type KeywordResult, type QuizBuilderLoad } from '@/lib/attempts/types';
 import { knownItemIds, searchConceptItemIds } from '@/lib/bank/queries';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { getConfig } from '@/lib/catalogue/queries';
+import { getConfig, getCourses } from '@/lib/catalogue/queries';
 import { buildOfflineOwnerLabel, buildOfflinePackDefaultName, buildOfflinePackDisplayLabel, maskEmailForOffline, ownerNameOf, safeArray } from './labels';
 import { packDoorFor } from './door';
-import { getOfflinePackAllowance, pickOfflinePackItemIds } from './queries';
+import { checkinDaysOf, getOfflinePackAllowance, getOfflinePackForRender, pickOfflinePackItemIds } from './queries';
+import { toPackQuestions } from './questions';
 import {
   OFFLINE_MAX_QUESTIONS_DEFAULT,
   type CreatePackInput,
   type CreatePackResult,
   type DeletePackResult,
   type MakePackInput,
+  type PhonePackLoad,
 } from './types';
 
 // legacy makeOfflinePackId: 'PACK_' + Date.now() + '_' + makeSecureId('').slice(0, 8)
@@ -208,6 +210,42 @@ export async function createOfflinePack(input: CreatePackInput): Promise<CreateP
   }
 
   return { ok: true, pack_id: packId, remaining: allowance.remaining === null ? null : Math.max(0, allowance.remaining - 1) };
+}
+
+// ── Save to this phone (07.3; Sam, 2026-10-15) ─────────────────────────
+// The pack's questions for the phone's own copy, read as their owner (a
+// pack carries its answers by design; no explanation since 07.6), with the
+// course's name for the offline screen's headings and Config's check-in
+// period. Only the student's own active pack; the phone keeps what comes
+// back (lib/offline-packs/phone).
+export async function getPackForPhone(packId: string): Promise<PhonePackLoad> {
+  const gate = await requireStudent();
+  const [load, courses, config] = await Promise.all([
+    getOfflinePackForRender(gate.supabase, gate.profile.user_id, String(packId || '').trim()),
+    getCourses(gate.supabase),
+    getConfig(gate.supabase),
+  ]);
+  if (!load.ok) {
+    return {
+      ok: false,
+      message: load.code === 'pack_lookup_failed' ? 'Could not load this pack. Please try again.' : 'This pack could not be found.',
+    };
+  }
+  const { pack } = load;
+  return {
+    ok: true,
+    pack: {
+      pack_id: pack.pack_id,
+      user_id: gate.profile.user_id,
+      course_id: pack.course_id,
+      course_title: courses.find((c) => c.course_id === pack.course_id)?.title ?? pack.course_id,
+      pack_name: pack.pack_name || 'Offline pack',
+      question_count: load.items.length,
+      created_utc: pack.created_utc,
+    },
+    questions: toPackQuestions(load.items),
+    checkinDays: checkinDaysOf(config),
+  };
 }
 
 // ── Delete a pack (07.7; Sam, 2026-10-15) ──────────────────────────────

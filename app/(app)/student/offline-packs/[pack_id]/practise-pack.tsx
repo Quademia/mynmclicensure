@@ -9,11 +9,7 @@
 import { useState } from 'react';
 import { AppLink } from '@/components/shell/link-pending';
 import { Dialog } from '@/lib/overlays/shared/dialog';
-
-const WAYS = [
-  { way: 'go', name: 'Answer as you go', blurb: 'See the right answer after each question.' },
-  { way: 'end', name: 'Answers at the end', blurb: 'Answer them all, then see your score and each answer.' },
-] as const;
+import { PACK_WAYS as WAYS } from '@/lib/offline-packs/questions';
 
 export function PractisePack({ packId, title }: { packId: string; title: string }) {
   const [open, setOpen] = useState(false);

@@ -19,6 +19,7 @@ export const OFFLINE_MAX_QUESTIONS_DEFAULT = 100;
 export const OWNER_MARK_EVERY = 10;
 
 import type { Item } from '@/lib/bank/types';
+import type { PackQuestion } from './questions';
 
 export type SelectionMode = 'topics' | 'concept';
 
@@ -149,4 +150,27 @@ export type MyPack = MyPackRow &
 
 // 07.7: Delete — the pack hidden and closed, the allowance not given back.
 export type DeletePackResult = { ok: true } | { ok: false; message: string };
+
+// ── On this phone (07.3) ───────────────────────────────────────────────
+// Config's offline_checkin_days when the row is missing or not a whole
+// number of days: how long a phone keeps its packs open without connecting.
+export const OFFLINE_CHECKIN_DAYS_DEFAULT = 30;
+
+/** Save to this phone: the pack, its questions, and the check-in period. */
+export type PhonePackLoad =
+  | {
+      ok: true;
+      pack: {
+        pack_id: string;
+        user_id: string;
+        course_id: string;
+        course_title: string;
+        pack_name: string;
+        question_count: number;
+        created_utc: string;
+      };
+      questions: PackQuestion[];
+      checkinDays: number;
+    }
+  | { ok: false; message: string };
 

@@ -132,12 +132,13 @@ before then, and the old list's history, is in
 
 - ✅ 07.1 The allowance from the package — pack_allowance(), one rule for the maker and the pages; Config's offline_packs_per_course retired — 2026-10-15
 - ✅ 07.2 The pack builder is the Quiz Builder plus a pack's extras — Count & name, 5 to the pack limit, the allowance line, earlier packs' questions first-unused; the pack door; the old wizard deleted — 2026-10-15
-- ⬜ 07.3 Offline in the app — the installable app (PWA); packs kept on signed-in phones only, cleared when the phone finds itself signed out, a check-in period (Config, 30 days); storage awaits Sam's tick (12)
+- ✅ 07.3 Offline in the app — our own small service worker (public/sw.js) keeping /offline; the packs in the phone's IndexedDB; Save to / Remove from this phone, kept at once on the phone it was made on; the check-in from every signed-in page, locked past Config's 30 days; cleared on Sign out or a bump, kept when the week runs out; the icon opens the Dashboard; the install line — 2026-10-15
+- ⏸ 07.3 A practice in progress kept on the phone to continue — not drawn; the last score is kept (2026-10-15)
 - ✅ 07.4 The offline player — its own small one from the runner's pieces (components/offline-player, /pack-practice/[id]); Practise on the pack's page, the two ways in the app's dialog; marked by the database's rule; no sync — online 2026-10-15, offline with 07.3
 - ⬜ 07.5 The PDF redesigned — drawn first; answers on the last page by default, the watermark
 - ✅ 07.6 No explanations in a pack — the rationale and feedback no longer copied or stored, old packs' dropped — 2026-10-15
 - ✅ 07.7 Delete a pack — the database and the server action (status deleted, still counts; rule 9 on offline_packs) — 2026-10-15; its button with the pack's page (07.8, built the same day)
-- ✅ 07.8 My packs and a pack's own page, online — by course with the five-step bar, Build a pack per course, Made earlier, the locked and empty cards; the pack page with Delete; the menu one row — 2026-10-15. The offline state, On this phone and the last score come with 07.3
+- ✅ 07.8 My packs and a pack's own page, online — by course with the five-step bar, Build a pack per course, Made earlier, the locked and empty cards; the pack page with Delete; the menu one row — 2026-10-15. The offline state, On this phone and the last score built with 07.3 the same day
 
 ## [08 Help and news](docs/product-plan/08-help-and-news.md)
 

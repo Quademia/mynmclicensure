@@ -629,10 +629,10 @@ table by table as each is next changed (AGENTS.md rule 9).
   `builder_minutes_per_question` (Sam, 2026-10-08).
 - `offline_packs_per_course` retired (07.1, 2026-10-15): the package
   says how many packs per course.
-- `offline_checkin_days` (07.3, ticked 2026-10-15; the row added the same
-  day, read when 07.3 is built) — how many days a phone keeps its offline packs
-  open without connecting; 30 to start. Why: a phone signed out while
-  offline cannot know it until it connects (Sam, 2026-10-15).
+- `offline_checkin_days` (07.3, 2026-10-15) — how many days a phone keeps
+  its offline packs open without connecting; 30 to start. My packs and Save
+  to this phone hand it to the phone. Why: a phone signed out while offline
+  cannot know it until it connects (Sam, 2026-10-15).
 - Browser: signed-in read; admin write. *Old defaults.*
 
 ### `migrations` — the record of database changes

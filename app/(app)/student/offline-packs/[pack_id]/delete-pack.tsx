@@ -2,14 +2,16 @@
 // (07.7; Sam, 2026-10-15): a quiet red link at the foot of the pack's page,
 // the app's confirm box saying the allowance is not given back, then back
 // to My packs. A failed request — the server's refusal or a dropped
-// connection — says so and gives the link back. Single-use, so beside its
-// page.
+// connection — says so and gives the link back. A deleted pack leaves this
+// phone at once (07.3); other phones drop it when My packs next opens there.
+// Single-use, so beside its page.
 
 'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { deleteOfflinePack } from '@/lib/offline-packs/actions';
+import { removePhonePack } from '@/lib/offline-packs/phone';
 import { useConfirm } from '@/lib/overlays/shared/confirm-dialog';
 import { Toast } from '@/lib/toast/toast';
 
@@ -41,6 +43,9 @@ export function DeletePack({ packId }: { packId: string }) {
       setBusy(false);
       return;
     }
+    await removePhonePack(packId).catch(() => {
+      // a browser keeping no packs holds none to remove
+    });
     // My packs is read fresh on every visit (force-dynamic); a refresh
     // called here as well cancelled the move and left "Deleting…" showing.
     router.replace('/student/offline-packs');

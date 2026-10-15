@@ -1,0 +1,52 @@
+/* styles/offline.css
+ *
+ * The offline screen (07.3; Sam, 2026-10-15, drawn at
+ * https://claude.ai/artifact/NrEnZUieGVsFmZkZEmjbFm, "My packs · offline"):
+ * the packs on this phone with no signal. It stands outside the app's
+ * chrome — the menu's pages would need the network — so it draws its own
+ * plain top bar with the wordmark, and the grey line saying the phone is
+ * offline. The list, the card and the pack's page are My packs' own
+ * (practice-papers.css, student-offline-packs.css); the player is the
+ * offline player's (runner.css, offline-player.css). Tokens only.
+ */
+
+.off { min-height: 100vh; background: var(--surface-page); }
+
+.off-top {
+  display: flex;
+  align-items: center;
+  height: 56px;
+  padding: 0 var(--space-16);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.off-status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-8) var(--space-10);
+  padding: var(--space-10) var(--space-16);
+  background: var(--badge-neutral-bg);
+  border-bottom: 1px solid var(--border);
+  color: var(--ink-muted);
+  font-size: var(--type-ui-size);
+  line-height: var(--type-meta-line);
+}
+.off-open { display: inline-flex; align-items: center; min-height: 44px; }
+
+.off-main { margin: 0 auto; padding: var(--space-20) var(--space-16) var(--space-32); }
+.off-title { margin: 0; font-size: 28px; line-height: 34px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); }
+
+/* A row is a button here (it opens the pack's view, not a page). */
+.off-row {
+  width: 100%;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.off-row:hover { background: var(--surface-page); }
+.off-lock { flex: none; color: var(--ink-faint); }
+.off .pp-row-locked { justify-content: flex-start; }

@@ -6,13 +6,15 @@
 // sends nothing back. `?way=go` (Answer as you go) or `?way=end` (Answers
 // at the end), chosen on the pack's page. Only the student's own active
 // pack opens; anything else is not found. With 07.3 the same player runs
-// from the phone's copy of the pack, with no signal.
+// from the phone's copy of the pack, with no signal (app/offline), and
+// keeps a finished practice's score with that copy.
 
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { requireStudent } from '@/lib/access';
 import { getOfflinePackForRender } from '@/lib/offline-packs/queries';
-import { OfflinePlayer, type PlayerItem, type PlayerWay } from '@/components/offline-player/offline-player';
+import { toPackQuestions } from '@/lib/offline-packs/questions';
+import { OfflinePlayer, type PlayerWay } from '@/components/offline-player/offline-player';
 import '@/styles/runner.css';
 import '@/styles/offline-player.css';
 
@@ -21,8 +23,6 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = 'force-dynamic';
-
-const LETTERS = ['a', 'b', 'c', 'd', 'e', 'f'] as const;
 
 export default async function PackPracticePage({
   params,
@@ -39,21 +39,12 @@ export default async function PackPracticePage({
   const load = await getOfflinePackForRender(supabase, profile.user_id, packId);
   if (!load.ok) notFound();
 
-  const items: PlayerItem[] = load.items.map((it) => ({
-    id: String(it.pack_item_id),
-    question_type: it.question_type,
-    stem: it.stem,
-    options: LETTERS.flatMap((l) => {
-      const text = it[`option_${l}`];
-      return text ? [{ letter: l, text: String(text) }] : [];
-    }),
-    correct: String(it.correct || ''),
-    topic: it.maintopic || null,
-  }));
+  const items = toPackQuestions(load.items);
   const playerWay: PlayerWay = way === 'end' ? 'end' : 'go';
 
   return (
     <OfflinePlayer
+      packId={load.pack.pack_id}
       title={load.pack.pack_name || 'Offline pack'}
       items={items}
       way={playerWay}

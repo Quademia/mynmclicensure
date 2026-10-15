@@ -83,8 +83,11 @@ export async function middleware(request: NextRequest) {
   return response;
 }
 
+// The offline app's files (07.3) skip it too: the service worker, the
+// app's details and the offline screen need no sign-in, and each would
+// otherwise cost a check with the auth server.
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|sw\\.js$|manifest\\.webmanifest$|offline$|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

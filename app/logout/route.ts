@@ -9,29 +9,35 @@
 // finds a kicked, expired or profile-less session it redirects here to
 // have them cleared (lib/access/internal.ts). Any other GET goes to
 // /router and changes nothing.
+//
+// Offline packs (07.3): a phone signed out here, or bumped by a sign-in
+// elsewhere, lands on /login?packs=clear, and the sign-in page clears the
+// packs kept on it (app/login/clear-phone-packs.tsx). A sign-in that only
+// ran out its week lands on plain /login and keeps them
+// (currentSessionEnded).
 
 import { NextResponse, type NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { deactivateCurrentSession } from '@/lib/auth/sessions';
+import { currentSessionEnded, deactivateCurrentSession } from '@/lib/auth/sessions';
 
-async function signOutAndGo(request: NextRequest): Promise<NextResponse> {
+async function signOutAndGo(request: NextRequest, clearPacks: boolean): Promise<NextResponse> {
   await deactivateCurrentSession();
   const supabase = await createClient();
   await supabase.auth.signOut();
 
   const url = request.nextUrl.clone();
   url.pathname = '/login';
-  url.search = '';
+  url.search = clearPacks ? '?packs=clear' : '';
   return NextResponse.redirect(url, { status: 303 });
 }
 
 export async function POST(request: NextRequest) {
-  return signOutAndGo(request);
+  return signOutAndGo(request, true);
 }
 
 export async function GET(request: NextRequest) {
   if (request.nextUrl.searchParams.get('via') === 'gate') {
-    return signOutAndGo(request);
+    return signOutAndGo(request, await currentSessionEnded());
   }
   const url = request.nextUrl.clone();
   url.pathname = '/router';
