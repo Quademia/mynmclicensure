@@ -9,7 +9,7 @@ Detail and history: `archive/product-plan/06-offline-packs.md` (the old
 app's description) and the built code in `lib/offline-packs/` and
 `app/(app)/offline-pack/`.
 
-## The redesign *(ruled by Sam, 2026-10-15; 07.1, 07.2, 07.6, 07.7, 07.8 (online) built 2026-10-15; to build: 07.3–07.5)*
+## The redesign *(ruled by Sam, 2026-10-15; 07.1, 07.2, 07.4, 07.6, 07.7, 07.8 (online) built 2026-10-15; to build: 07.3, 07.5)*
 
 Designed fresh, not from the old pack (a print-to-PDF page). A pack is a
 set of questions kept **on the student's phone, usable with no
@@ -45,7 +45,9 @@ connection**, and a printable PDF of the same pack.
   the database, from one copy in the code. **Nothing goes back to the
   server** (Sam: no sync) — the phone keeps only a practice in progress
   and its score. When the sitting is redesigned, this player takes its
-  look in the same pass. *(07.4)*
+  look in the same pass. *(07.4, built online 2026-10-15: components/
+  offline-player at /pack-practice/[pack_id]; the ways offered as Practise
+  again's are, each with Start; Leave part-way asks first)*
 - **No explanations in a pack** (Sam, as the old app): the question,
   its options and the answer — never the rationale or the per-option
   feedback, on the phone, in the PDF or in the pack's stored rows.

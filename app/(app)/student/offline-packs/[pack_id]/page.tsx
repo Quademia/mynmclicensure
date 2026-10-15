@@ -2,10 +2,10 @@
 // (07.8; Sam, 2026-10-15, drawn at
 // https://claude.ai/artifact/NrEnZUieGVsFmZkZEmjbFm): the pack's name, its
 // course, how many questions, when it was made and what was picked; the way
-// to print it; Delete, with the app's confirm. Practise comes with the
-// offline player (07.4), Save to / Remove from this phone with 07.3, and
-// the redesigned PDF with 07.5 — until then the main button opens today's
-// print page. Only the student's own active pack opens; anything else is
+// to print it; Delete, with the app's confirm. Practise opens the offline
+// player (07.4) in either way; Save to / Remove from this phone comes with
+// 07.3, and the redesigned PDF with 07.5 — until then the print button
+// opens today's print page. Only the student's own active pack opens; anything else is
 // not found.
 
 import type { Metadata } from 'next';
@@ -16,6 +16,7 @@ import { getMyPack } from '@/lib/offline-packs/queries';
 import type { MyPack } from '@/lib/offline-packs/types';
 import { AppLink } from '@/components/shell/link-pending';
 import { DeletePack } from './delete-pack';
+import { PractisePack } from './practise-pack';
 import '@/styles/practice-papers.css';
 import '@/styles/student-offline-packs.css';
 
@@ -71,10 +72,10 @@ export default async function PackPage({ params }: { params: Promise<{ pack_id: 
       </div>
 
       <div className="card pp-card">
-        <AppLink href={`/offline-pack?pack_id=${encodeURIComponent(pack.pack_id)}`} className="btn btn-primary btn-lg">
+        <PractisePack packId={pack.pack_id} title={pack.pack_name || 'this pack'} />
+        <AppLink href={`/offline-pack?pack_id=${encodeURIComponent(pack.pack_id)}`} className="btn btn-ghost btn-lg">
           Print or save as PDF
         </AppLink>
-        <span className="pp-line">Practising it on your phone, even with no signal, comes next.</span>
       </div>
 
       <DeletePack packId={pack.pack_id} />

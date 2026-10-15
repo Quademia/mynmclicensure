@@ -256,7 +256,8 @@ opens it (00, The menu).
   online and offline; a pack's own page; the builder the Quiz Builder's;
   the offline player; the PDF. What each shows is in 07, drawn at
   https://claude.ai/artifact/NrEnZUieGVsFmZkZEmjbFm. Built 2026-10-15: the
-  builder (07.2), My packs and the pack's page online (07.8).
+  builder (07.2), My packs and the pack's page online (07.8), the player
+  online (07.4).
 - The same in every state: a trial cannot make a pack; one made earlier
   still opens (07).
 - **Check**: the pack's cover prints "Prepared for" twice; it shows the
