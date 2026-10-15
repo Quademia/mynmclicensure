@@ -1,0 +1,59 @@
+/* styles/install-app.css
+ *
+ * How to install the app on your phone (07.3; Sam, 2026-10-15): the quiet
+ * line on the Dashboard and My packs, and the steps in the app's dialog
+ * (components/install-app). The dialog is portalled, so its rules are
+ * unscoped. Tokens only.
+ */
+
+.install-line { display: flex; align-items: center; gap: var(--space-8); min-width: 0; }
+
+/* the words wrap with their › at the end, on one 44px-or-taller tap */
+.install-open {
+  display: block;
+  flex: 0 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  padding: var(--space-12) 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--type-ui-size);
+  font-weight: 600;
+  color: var(--brand-teal-hover);
+  text-align: left;
+  cursor: pointer;
+}
+.install-open:hover { color: var(--brand-navy); }
+
+.install-close {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--ink-faint);
+  cursor: pointer;
+}
+.install-close:hover { color: var(--ink-muted); }
+
+.install-phone { font-weight: 600; color: var(--ink); }
+
+.install-steps {
+  margin: var(--space-12) 0 0;
+  padding-left: var(--space-20);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  font-size: var(--type-field-size);
+  line-height: 1.5;
+  color: var(--ink);
+}

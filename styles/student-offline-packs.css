@@ -32,27 +32,13 @@
 .opk-delete { align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--space-8) 0 0; }
 
 /* On this phone (07.3): the mark on a row and on the pack's card, the
-   last score beside it; Save to / Remove from this phone under the card;
-   the install line under the page's title. The mark is the badge on the
-   pale teal, its words in the teal made for text on that ground. */
+   last score beside it; Save to / Remove from this phone under the card.
+   (The install line is components/install-app's own.) The mark is the
+   badge on the pale teal, its words in the teal made for text on that
+   ground. */
 .opk-phone { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-6); }
 .opk-here { background: var(--brand-teal-pale); border-color: var(--brand-teal-pale); color: var(--brand-teal-hover); }
 .opk-last { font-size: var(--type-meta-size); color: var(--ink-muted); line-height: var(--type-meta-line); }
 .opk-keep { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-4); }
 .opk-keep-btn { display: inline-flex; align-items: center; min-height: 44px; }
 .opk-save { align-self: stretch; }
-.opk-install { margin: 0; }
-/* a 44px tap inside a line of text: the padding grows the tap, the
-   negative margin keeps the line's own height */
-.opk-how { display: inline-block; padding: 15px var(--space-8); margin: -15px calc(-1 * var(--space-8)); vertical-align: baseline; }
-/* How?'s steps, in the app's dialog (the dialog is portalled, so unscoped). */
-.opk-steps {
-  margin: var(--space-12) 0 0;
-  padding-left: var(--space-20);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-8);
-  font-size: var(--type-field-size);
-  line-height: 1.5;
-  color: var(--ink);
-}

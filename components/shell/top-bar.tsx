@@ -9,7 +9,9 @@
 // Announcements (plain until announcements have an unread state, doc 05
 // A2), and the avatar, which opens the account menu: the person's name
 // and email, the audience's links (My Profile, Upgrade / Extend for a
-// student; none for an admin), and Sign out.
+// student; none for an admin), a student's Install the app on a phone
+// (07.3: the steps to add it to the home screen, components/install-app;
+// gone once it is there), and Sign out.
 //
 // Below 768px the envelope and the bell are hidden (shell.css; Sam,
 // 2026-09-26): the bar keeps the hamburger, the wordmark and the avatar,
@@ -31,6 +33,8 @@ import { useShell } from './shell-state';
 import { IconBell, IconClose, IconEnvelope, IconMenu } from './icons';
 import { NameCircle } from './name-circle';
 import { Wordmark } from './wordmark';
+import { InstallAppDialog } from '@/components/install-app/install-app';
+import { useInstallWay } from '@/lib/offline-packs/offline-app';
 
 export type TopBarLink = { label: string; href: string; accent?: boolean };
 
@@ -44,11 +48,16 @@ export type TopBarProps = {
   user: { name: string; email: string; avatarUrl: string | null };
   /** The menu rows between the name and Sign out. */
   menuLinks: TopBarLink[];
+  /** A student's Install the app row (on a phone without the app on its home screen). */
+  installRow?: boolean;
 };
 
-export function TopBar({ product, messagesHref, announcementsHref, unread, user, menuLinks }: TopBarProps) {
+export function TopBar({ product, messagesHref, announcementsHref, unread, user, menuLinks, installRow }: TopBarProps) {
   const { toggle } = useShell();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [installOpen, setInstallOpen] = useState(false);
+  const installWay = useInstallWay();
+  const showInstall = Boolean(installRow) && installWay !== 'none';
   const accountRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
@@ -132,7 +141,19 @@ export function TopBar({ product, messagesHref, announcementsHref, unread, user,
                 {l.label}
               </Link>
             ))}
-            {menuLinks.length > 0 ? <hr /> : null}
+            {showInstall ? (
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setMenuOpen(false);
+                  setInstallOpen(true);
+                }}
+              >
+                Install the app
+              </button>
+            ) : null}
+            {menuLinks.length > 0 || showInstall ? <hr /> : null}
             <form method="post" action="/logout">
               <button type="submit" role="menuitem" className="topbar-menu-out">
                 Sign out
@@ -141,6 +162,7 @@ export function TopBar({ product, messagesHref, announcementsHref, unread, user,
           </div>
         ) : null}
       </div>
+      {installRow ? <InstallAppDialog open={installOpen} onClose={() => setInstallOpen(false)} /> : null}
     </header>
   );
 }

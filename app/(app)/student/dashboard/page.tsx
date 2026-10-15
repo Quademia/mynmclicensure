@@ -7,7 +7,9 @@
 // on the floor the recap and the free practice card) → today's challenge
 // (when 04 G2 lands) → the streak and questions mastered (05 G1a) → the
 // weakest topic → my courses → news → recent sittings; the profile nudge
-// above all while the phone or school is missing. Off the page (Sam,
+// above all while the phone or school is missing, then, on a phone, the
+// line on how to install the app (07.3; components/install-app) until the
+// student closes it or the app is on the home screen. Off the page (Sam,
 // 2026-10-04): the channels card, the Quiz Builder and NMC Procedures
 // cards, the Portal Guide bubble.
 //
@@ -26,6 +28,7 @@ import { getAnnouncementsForStudent, getStudentNoticeStates } from '@/lib/announ
 import { getDashboardNumbers, getStudentReceipts } from '@/lib/dashboard/student/queries';
 import { lastSevenDayLetters, topCardFor } from '@/lib/dashboard/student/status';
 import { AnnouncementsStrip } from '@/components/announcements/announcements-strip';
+import { InstallAppLine } from '@/components/install-app/install-app';
 import { ProfileNudge } from './profile-nudge';
 import { TopCardView } from './top-card';
 import { StreakCard } from './streak-card';
@@ -83,6 +86,7 @@ export default async function StudentDashboardPage() {
       <h1 className="sd-hello">Welcome back{profile.forename ? `, ${profile.forename}` : ''}</h1>
 
       {hasPhone && hasSchool ? null : <ProfileNudge />}
+      <InstallAppLine closeFor={profile.user_id} />
 
       <div className="sd-grid">
         <div className="sd-main">

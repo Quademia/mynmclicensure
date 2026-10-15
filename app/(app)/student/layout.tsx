@@ -30,6 +30,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
       phoneTabs={STUDENT_PHONE_TABS}
       topBar={{
         product: 'MyNMCLicensure',
+        installRow: true,
         messagesHref: '/student/messages',
         announcementsHref: '/student/announcements',
         unread,

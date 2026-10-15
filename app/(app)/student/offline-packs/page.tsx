@@ -13,8 +13,9 @@
 // On this phone (07.3): a row kept on this phone says so, with its last
 // score here (phone-pack.tsx, read from the phone); the page tells the
 // phone which packs are still the student's, so one deleted elsewhere
-// leaves it; and a quiet install line (install-line.tsx). Offline, the
-// phone shows its own copy of the packs (app/offline) instead of this page.
+// leaves it; and the quiet line on how to install the app on the phone
+// (components/install-app). Offline, the phone shows its own copy of the
+// packs (app/offline) instead of this page.
 //
 // A Server Component: two reads (the door, the packs), the course titles
 // the catalogue already holds and Config's check-in period; nothing waits
@@ -28,7 +29,7 @@ import { checkinDaysOf, listMyPacks } from '@/lib/offline-packs/queries';
 import type { MyPackRow } from '@/lib/offline-packs/types';
 import { PageHeader } from '@/components/shell/page-header';
 import { AppLink } from '@/components/shell/link-pending';
-import { InstallLine } from './install-line';
+import { InstallAppLine } from '@/components/install-app/install-app';
 import { PhoneLine, PhonePrune } from './phone-pack';
 import '@/styles/practice-papers.css';
 import '@/styles/student-offline-packs.css';
@@ -114,7 +115,7 @@ export default async function MyPacksPage() {
     <div className="pp-page opk">
       <PageHeader title="My packs" subtitle="Packs of questions to practise anywhere, even with no signal." />
 
-      {door.length || mine.length ? <InstallLine /> : null}
+      {door.length || mine.length ? <InstallAppLine /> : null}
       {packs !== null ? (
         <PhonePrune userId={gate.profile.user_id} activeIds={mine.map((p) => p.pack_id)} checkinDays={checkinDaysOf(config)} />
       ) : null}
