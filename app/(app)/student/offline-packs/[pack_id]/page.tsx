@@ -6,21 +6,23 @@
 // player (07.4) in either way. On this phone (07.3): the card's mark and the
 // last score on this phone, and under it Save to this phone or Remove from
 // this phone (phone-pack.tsx); ?new=1, from the builder, keeps it on the
-// phone it was made on. The redesigned PDF comes with 07.5 — until then the
-// print button opens today's print page. Its way back is its course's packs
-// (C, like Practice Papers), and Delete lands there too. Only the student's
-// own active pack opens; anything else is not found.
+// phone it was made on. Download PDF (07.5) makes the pack's PDF on the
+// phone, the answers where the student chooses (download-pdf.tsx). Its way
+// back is its course's packs (C, like Practice Papers), and Delete lands
+// there too. Only the student's own active pack opens; anything else is not
+// found.
 
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { requireStudent } from '@/lib/access';
 import { getCourses } from '@/lib/catalogue/queries';
 import { getMyPack } from '@/lib/offline-packs/queries';
-import type { MyPack } from '@/lib/offline-packs/types';
+import { pickedWords } from '@/lib/offline-packs/labels';
 import { AppLink } from '@/components/shell/link-pending';
 import { PhoneKeep, PhoneMark } from '../phone-pack';
 import { courseHref } from '../pack-parts';
 import { DeletePack } from './delete-pack';
+import { DownloadPdf } from './download-pdf';
 import { PractisePack } from './practise-pack';
 import '@/styles/practice-papers.css';
 import '@/styles/student-offline-packs.css';
@@ -31,25 +33,10 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-const TYPE_LABEL: Record<string, string> = { MCQ: 'Single answer', SATA: 'Select all that apply', TF: 'True / False' };
-
 function longDay(iso: string): string {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 }
 
-/** What was picked, in a line: the topics (or the keyword), then any difficulty or type. */
-function picked(p: MyPack): string {
-  const what =
-    p.selection_mode === 'concept' && p.concept_query
-      ? `Keyword “${p.concept_query}”${p.maintopics?.length ? ` in ${p.maintopics.join(', ')}` : ''}`
-      : p.maintopics?.length
-        ? p.maintopics.join(', ')
-        : 'All topics';
-  const parts = [what];
-  if (p.difficulties?.length) parts.push(p.difficulties.join(', '));
-  if (p.question_types?.length) parts.push(p.question_types.map((t) => TYPE_LABEL[t] || t).join(', '));
-  return parts.join(' · ');
-}
 
 export default async function PackPage({
   params,
@@ -80,15 +67,13 @@ export default async function PackPage({
         <span className="pp-line">
           {course} · {n} {n === 1 ? 'question' : 'questions'} · made {longDay(pack.created_utc)}
         </span>
-        <span className="pp-line">{picked(pack)}</span>
+        <span className="pp-line">{pickedWords(pack)}</span>
       </div>
 
       <div className="card pp-card">
         <PhoneMark packId={pack.pack_id} />
         <PractisePack packId={pack.pack_id} title={pack.pack_name || 'this pack'} />
-        <AppLink href={`/offline-pack?pack_id=${encodeURIComponent(pack.pack_id)}`} className="btn btn-ghost btn-lg">
-          Print or save as PDF
-        </AppLink>
+        <DownloadPdf packId={pack.pack_id} title={pack.pack_name || 'this pack'} />
       </div>
 
       <PhoneKeep packId={pack.pack_id} autoSave={made === '1'} />

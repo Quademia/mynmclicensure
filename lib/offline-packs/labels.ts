@@ -11,7 +11,7 @@
 // the fallback name renders on the cover and inside the stored
 // watermark.owner_label.
 
-import type { Allowance, PackLabelMeta } from './types';
+import type { Allowance, MyPack, PackLabelMeta } from './types';
 
 export const OWNER_NAME_FALLBACK = 'Quademia Student';
 
@@ -112,10 +112,21 @@ export function allowanceMessageForReason(reason: string | null | undefined, all
   }
 }
 
-// The renderer's date: en-GB, "14 Sept 2026, 21:05" — legacy formatDate.
-export function formatPackDate(value: string | null | undefined): string {
-  if (!value) return '—';
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return '—';
-  return d.toLocaleString('en-GB', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+const TYPE_LABEL: Record<string, string> = { MCQ: 'Single answer', SATA: 'Select all that apply', TF: 'True / False' };
+
+/**
+ * What was picked, in a line (07.8, 07.5): the topics (or the keyword), then
+ * any difficulty or type — the pack's page and the PDF's cover say the same.
+ */
+export function pickedWords(p: Pick<MyPack, 'selection_mode' | 'concept_query' | 'maintopics' | 'difficulties' | 'question_types'>): string {
+  const what =
+    p.selection_mode === 'concept' && p.concept_query
+      ? `Keyword “${p.concept_query}”${p.maintopics?.length ? ` in ${p.maintopics.join(', ')}` : ''}`
+      : p.maintopics?.length
+        ? p.maintopics.join(', ')
+        : 'All topics';
+  const parts = [what];
+  if (p.difficulties?.length) parts.push(p.difficulties.join(', '));
+  if (p.question_types?.length) parts.push(p.question_types.map((t) => TYPE_LABEL[t] || t).join(', '));
+  return parts.join(' · ');
 }

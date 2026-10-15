@@ -19,7 +19,7 @@ import { BUILDER_MIN_QUESTIONS, type KeywordResult, type QuizBuilderLoad } from 
 import { knownItemIds, searchConceptItemIds } from '@/lib/bank/queries';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getConfig, getCourses } from '@/lib/catalogue/queries';
-import { buildOfflineOwnerLabel, buildOfflinePackDefaultName, buildOfflinePackDisplayLabel, maskEmailForOffline, ownerNameOf, safeArray } from './labels';
+import { buildOfflineOwnerLabel, buildOfflinePackDefaultName, buildOfflinePackDisplayLabel, maskEmailForOffline, OWNER_NAME_FALLBACK, ownerNameOf, pickedWords, safeArray } from './labels';
 import { packDoorFor } from './door';
 import { checkinDaysOf, getOfflinePackAllowance, getOfflinePackForRender, pickOfflinePackItemIds } from './queries';
 import { toPackQuestions } from './questions';
@@ -212,11 +212,12 @@ export async function createOfflinePack(input: CreatePackInput): Promise<CreateP
   return { ok: true, pack_id: packId, remaining: allowance.remaining === null ? null : Math.max(0, allowance.remaining - 1) };
 }
 
-// ── Save to this phone (07.3; Sam, 2026-10-15) ─────────────────────────
-// The pack's questions for the phone's own copy, read as their owner (a
+// ── Save to this phone (07.3) and Download PDF (07.5; Sam, 2026-10-15) ──
+// The pack's questions for the phone's own copy or the PDF, read as their owner (a
 // pack carries its answers by design; no explanation since 07.6), with the
-// course's name for the offline screen's headings and Config's check-in
-// period. Only the student's own active pack; the phone keeps what comes
+// course's name for the offline screen's headings, the cover's details
+// (the name and masked email stamped when it was made, what was picked) and
+// Config's check-in period. Only the student's own active pack; the phone keeps what comes
 // back (lib/offline-packs/phone).
 export async function getPackForPhone(packId: string): Promise<PhonePackLoad> {
   const gate = await requireStudent();
@@ -242,6 +243,9 @@ export async function getPackForPhone(packId: string): Promise<PhonePackLoad> {
       pack_name: pack.pack_name || 'Offline pack',
       question_count: load.items.length,
       created_utc: pack.created_utc,
+      owner_name: pack.watermark?.owner_name || ownerNameOf(gate.profile) || OWNER_NAME_FALLBACK,
+      owner_email_mask: pack.watermark?.owner_email_mask || maskEmailForOffline(gate.profile.email),
+      picked: pickedWords(pack),
     },
     questions: toPackQuestions(load.items),
     checkinDays: checkinDaysOf(config),

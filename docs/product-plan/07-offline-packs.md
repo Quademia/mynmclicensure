@@ -1,15 +1,16 @@
 # 07 — Offline packs
 
 A student with a package builds a set of questions from one course to
-study without a connection, and prints it or saves it as a PDF through
-the browser. Packs are for packages only: not in the trial, and a free
-account cannot use the pack maker (Sam, 2026-10-04).
+study without a connection — kept on the phone, practised with no
+signal — and downloads it as a PDF to print. Packs are for packages only:
+not in the trial, and a free account cannot use the pack maker (Sam,
+2026-10-04).
 
 Detail and history: `archive/product-plan/06-offline-packs.md` (the old
-app's description) and the built code in `lib/offline-packs/` and
-`app/(app)/offline-pack/`.
+app's description) and the built code in `lib/offline-packs/`,
+`app/(app)/student/offline-packs/` and `app/offline/`.
 
-## The redesign *(ruled by Sam, 2026-10-15; 07.1–07.4 and 07.6–07.8 built 2026-10-15; to build: 07.5)*
+## The redesign *(ruled by Sam, 2026-10-15; 07.1–07.8 built 2026-10-15)*
 
 Designed fresh, not from the old pack (a print-to-PDF page). A pack is a
 set of questions kept **on the student's phone, usable with no
@@ -81,7 +82,20 @@ connection**, and a printable PDF of the same pack.
 - **The PDF**: the questions and options, the answer letters on the last
   page (or after each question, the student's choice; the last page by
   default), the watermark — its layout redesigned and drawn, not the old
-  one's. *(07.5)*
+  one's. *(07.5, built 2026-10-15)*
+  - **Made on the phone with pdfmake** (Sam, 2026-10-15, over jsPDF —
+    columns measured by hand — and our server — tight limits, never
+    offline): the maker (~330 KB compressed) loads only on Download, its
+    font is Roboto from `public/fonts` (the PDF's built-in fonts cannot
+    print "₂" or "≈", which the bank has). Nothing runs on our server but
+    the one read of the pack.
+  - **Download PDF** on the pack's page opens the app's dialog with the two
+    places for the answers, as Practise asks its two ways; Download makes
+    the file ("Midwifery revision - MyNMCLicensure.pdf").
+  - As drawn: the clean cover; two columns flowing column to column, a
+    question never split (about 9–10 a page with the bank's longer
+    questions); the answers page as a grid, or "Answer: b" under each
+    question. The old print page (`/offline-pack`) is gone.
 - **Delete**: a student may delete a pack; the allowance is not given
   back (a deleted pack still counts). *(07.7)*
 - **Locked for a trial or a free account**: "Offline packs come with a
@@ -101,7 +115,14 @@ connection**, and a printable PDF of the same pack.
   point), pages as pictures (heavy on data). Parked: letters drawn as
   shapes so no app can copy them, if copying becomes a real problem; a
   record of each download, if leaks start. When built: print one page
-  on an ordinary printer to set the pattern's strength.
+  on an ordinary printer to set the pattern's strength. *Built 2026-10-15:
+  the pattern is faint text behind each page in the PDF's own font, at
+  the drawing's strength (`PATTERN_OPACITY` in lib/offline-packs/pdf-doc.ts,
+  for Sam's print test); the footer line; the name, masked email and pack
+  code in the file's details; "no copying", "no editing" locked with a
+  password made fresh for each file and never kept. Not yet: a PDF from
+  the offline screen with no signal (the maker would have to be kept on
+  the phone too) — parked.*
 - **My packs, one page that knows if it is online** (Sam, 2026-10-15,
   07.8; its offline half built with 07.3): online, every pack, each
   marked *On this phone* or not; offline, only the packs on this phone, with "You're offline. Your
@@ -176,14 +197,12 @@ connection**, and a printable PDF of the same pack.
   after a trial or package ends.
 - **A watermark** is stamped when it is made: the owner's name, a masked
   email and the owner's label.
-- **The pack itself**: a cover ("Prepared for"), an overview, the
-  questions with options and topic, a watermark strip with the pack id
-  every tenth question, the answer key at the end, "For personal study
-  use only. Do not share." No sidebar, so printing gives the pack
-  alone.
-- **My packs**: newest first, 24 at a time with Load more; search,
-  course, status and sort; four summary counts; Open for an active
-  pack; Build Similar opens the builder on that course.
+- **The pack itself**: kept on the phone and practised in the offline
+  player (07.3, 07.4), and downloaded as the PDF (07.5) — see the
+  redesign above. *(Until 2026-10-15 a print page: a cover, the questions
+  with a watermark strip every tenth, the answer key; removed with 07.5.)*
+- **My packs**: course cards, a course's packs, a pack's own page (07.8
+  as C) — see the redesign above.
 
 ## Open
 

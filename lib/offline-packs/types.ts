@@ -14,10 +14,6 @@
 
 export const OFFLINE_MAX_QUESTIONS_DEFAULT = 100;
 
-// legacy renderer QA.OWNER_MARK_EVERY — the watermark strip after every
-// tenth question.
-export const OWNER_MARK_EVERY = 10;
-
 import type { Item } from '@/lib/bank/types';
 import type { PackQuestion } from './questions';
 
@@ -156,7 +152,7 @@ export type DeletePackResult = { ok: true } | { ok: false; message: string };
 // number of days: how long a phone keeps its packs open without connecting.
 export const OFFLINE_CHECKIN_DAYS_DEFAULT = 30;
 
-/** Save to this phone: the pack, its questions, and the check-in period. */
+/** Save to this phone and Download PDF: the pack, its questions, and the check-in period. */
 export type PhonePackLoad =
   | {
       ok: true;
@@ -168,6 +164,11 @@ export type PhonePackLoad =
         pack_name: string;
         question_count: number;
         created_utc: string;
+        /** The PDF's cover and marks (07.5): stamped when the pack was made. */
+        owner_name: string;
+        owner_email_mask: string;
+        /** What was picked, in a line (pickedWords). */
+        picked: string;
       };
       questions: PackQuestion[];
       checkinDays: number;

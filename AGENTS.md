@@ -577,6 +577,15 @@ above sit at the repo root; the audience grouping inside them is kept.
   served as written, so an edit reaches the next walk without a rebuild.
   On the deployed sites, a walk that lands on `/offline` means the page
   could not be reached.
+- **The pane cannot show a PDF: it treats one as a download** and puts a
+  save box in front of Sam (2026-10-15). Walk a PDF the app makes by
+  catching its file in the page — override `HTMLAnchorElement.prototype`
+  `click` and `dispatchEvent` for a `download` link to a `blob:` address
+  and keep the address — then draw its pages into the page with pdf.js
+  from cdnjs (`pdf.min.mjs`, `getDocument({ data })`); `getMetadata()`
+  and `getPermissions()` check the file's details and its locked
+  settings. A PDF made in Node (pdfmake's own build, a scratchpad script)
+  is checked the same way from a scratchpad page on a throwaway port.
 - **A pane tab opened in the background never shows a page behind a
   `loading.tsx`.** The page arrives (200, its content in a hidden
   `S:1` block and the `$RC` swap in the HTML) but React waits for an

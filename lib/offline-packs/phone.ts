@@ -39,6 +39,10 @@ export type PhonePack = {
   created_utc: string;
   saved_at: number;
   questions: PackQuestion[];
+  /** The PDF's cover (07.5); absent on a copy saved before it. */
+  owner_name?: string;
+  owner_email_mask?: string;
+  picked?: string;
   /** The last practice on this phone. */
   last: { right: number; total: number; at: number } | null;
 };
