@@ -29,12 +29,12 @@ export const metadata: Metadata = {
   appleWebApp: { capable: true, title: 'MyNMCLicensure', statusBarStyle: 'default' },
 };
 
-// Chrome's offer to install the app (07.3) can come before the page wakes,
-// so a line of script catches it first and keeps it for My packs' install
-// line (lib/offline-packs/offline-app.ts); Chrome's own pop-up is held back
-// so the offer stays one quiet line (Sam, 2026-10-15).
-const INSTALL_CATCHER =
-  "window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__qdInstall=e;});";
+// Chrome's own pop-up offering to install the app (07.3) is held back: on
+// Android it builds a small app through Google, which Sam's phone blocked
+// as unsafe (2026-10-15). My packs says how to add the app to the home
+// screen the phone's normal way instead. The offer can come before the
+// page wakes, so a line of script catches it first.
+const INSTALL_CATCHER = "window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();});";
 
 export default function RootLayout({
   children,

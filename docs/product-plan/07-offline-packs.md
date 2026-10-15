@@ -37,8 +37,13 @@ connection**, and a printable PDF of the same pack.
     reached lands on `/offline`; a page that answers, even with an error,
     shows as it is. On a production build only.
   - **The icon opens the Dashboard** (Sam; `/router`); with no signal,
-    the packs. **One quiet install line on My packs** (Sam): Chrome's
-    Install button, or an iPhone's two taps (Share, Add to Home Screen).
+    the packs. **One quiet line on My packs** (Sam): "Keep the app on your
+    home screen to open your packs with no signal. How?" — How? shows that
+    phone's normal Add to Home screen steps (Android in Chrome, iPhone in
+    Safari); nothing on a computer or once installed. No Install button
+    (Sam, 2026-10-15): on Android it builds a small app through Google,
+    which his phone blocked as unsafe; the home-screen shortcut opens
+    offline just the same. Chrome's own install pop-up is held back.
   - **Only on devices where the account is signed in**, so within the
     two-device limit (01). When the phone next connects and finds the
     account signed out there — by the student, or bumped by a sign-in

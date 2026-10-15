@@ -41,5 +41,18 @@
 .opk-keep { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-4); }
 .opk-keep-btn { display: inline-flex; align-items: center; min-height: 44px; }
 .opk-save { align-self: stretch; }
-.opk-install { margin: 0; display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-8) var(--space-12); }
-.opk-install .btn { min-height: 36px; }
+.opk-install { margin: 0; }
+/* a 44px tap inside a line of text: the padding grows the tap, the
+   negative margin keeps the line's own height */
+.opk-how { display: inline-block; padding: 15px var(--space-8); margin: -15px calc(-1 * var(--space-8)); vertical-align: baseline; }
+/* How?'s steps, in the app's dialog (the dialog is portalled, so unscoped). */
+.opk-steps {
+  margin: var(--space-12) 0 0;
+  padding-left: var(--space-20);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  font-size: var(--type-field-size);
+  line-height: 1.5;
+  color: var(--ink);
+}

@@ -11,11 +11,12 @@
 //     its files). At most once a day, and only on a phone holding packs,
 //     so a student who never saves a pack never pays the data; at once
 //     after a Save.
-//   - the install line's state: Chrome's install offer (the
-//     `beforeinstallprompt` event, caught early by a line of script in the
-//     student layout, since it can fire before the page wakes), whether
-//     the app is already installed, and whether this is an iPhone, which
-//     has no offer — only Share, then Add to Home Screen.
+//   - the install line's state: which phone this is, so its How? shows
+//     that phone's own Add to Home screen steps, and nothing once the app
+//     is on the home screen. Not Chrome's Install offer: on Android it
+//     builds a small app through Google, which phones' safety checks can
+//     block (Sam's phone did, 2026-10-15); a home-screen shortcut opens
+//     offline just the same.
 
 import { useSyncExternalStore } from 'react';
 
@@ -65,78 +66,26 @@ export async function warmOfflineApp(now = false): Promise<void> {
 
 // ── The install line ──────────────────────────────────────────────────
 
-type InstallOffer = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
-
-declare global {
-  interface Window {
-    /** Set by the student layout's early script when Chrome offers to install. */
-    __qdInstall?: InstallOffer | null;
-  }
-}
-
-/** What the install line shows: Chrome's offer, the iPhone's two steps, or nothing. */
-export type InstallWay = 'offer' | 'iphone' | 'none';
-
-const installListeners = new Set<() => void>();
-let listening = false;
-
-function emitInstall() {
-  for (const fn of installListeners) fn();
-}
-
-function listen() {
-  if (listening || typeof window === 'undefined') return;
-  listening = true;
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    window.__qdInstall = e as InstallOffer;
-    emitInstall();
-  });
-  window.addEventListener('appinstalled', () => {
-    window.__qdInstall = null;
-    emitInstall();
-  });
-}
+/** Whose steps the install line shows: an Android phone's, an iPhone's, or none. */
+export type InstallWay = 'android' | 'iphone' | 'none';
 
 function installed(): boolean {
   const nav = navigator as Navigator & { standalone?: boolean };
   return window.matchMedia('(display-mode: standalone)').matches || nav.standalone === true;
 }
 
-function iPhone(): boolean {
-  const ua = navigator.userAgent;
-  return /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
-}
-
 function installWay(): InstallWay {
-  if (typeof window === 'undefined' || installed()) return 'none';
-  if (window.__qdInstall) return 'offer';
-  return iPhone() ? 'iphone' : 'none';
+  if (installed()) return 'none';
+  const ua = navigator.userAgent;
+  if (/iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) return 'iphone';
+  return /Android/.test(ua) ? 'android' : 'none';
 }
 
-function subscribeInstall(fn: () => void): () => void {
-  listen();
-  installListeners.add(fn);
-  return () => {
-    installListeners.delete(fn);
-  };
+// Nothing here changes while a page is open.
+function subscribeInstall(): () => void {
+  return () => {};
 }
 
 export function useInstallWay(): InstallWay {
   return useSyncExternalStore(subscribeInstall, installWay, () => 'none');
-}
-
-/** Chrome's own install box; the line goes once it is installed. */
-export async function installApp(): Promise<void> {
-  const offer = window.__qdInstall;
-  if (!offer) return;
-  await offer.prompt();
-  const choice = await offer.userChoice.catch(() => ({ outcome: 'dismissed' }));
-  if (choice.outcome === 'accepted') window.__qdInstall = null;
-  emitInstall();
-}
-
-/** Started with the student pages, so a later offer is caught too. */
-export function listenForInstall(): void {
-  listen();
 }
