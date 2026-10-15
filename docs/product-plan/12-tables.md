@@ -362,23 +362,24 @@ table by table as each is next changed (AGENTS.md rule 9).
   one sitting at a time, Sam 2026-10-14); a retake counts. `save_quiz`
   writes it; students read it. Why: papers and mocks carry the same
   settings (Sam, 2026-10-13).
-- *To build (04.12, 04.13) — ticked 2026-10-14 (Sam):* two columns,
-  each empty on every paper, so nothing changes until an admin sets one.
-  - `results_at` — a date and time; empty = Immediately. Until then the
-    score, the report, the answers and the explanations of every sitting
-    of the paper are held (from Submit when Submit is later); while they
-    are held, a sitting in a mode other than `first_mode` is refused,
-    and `first_mode` must be an exam mode (a check).
-  - `review_days` — a whole number above 0; empty = no limit. The review
-    and sittings in the other modes close that many days after a
-    student's results came out.
-  - `save_quiz` writes both; students read them (the card shows
-    them). The owner's own direct read of the score (`attempts`) and of
-    `is_correct` (`attempt_items`) must follow the hold too — how is
-    settled in the build's proof.
-  - Why: papers and mocks carry the same settings, and a mock reused
-    across groups needs its answers kept from the next group (Sam,
-    2026-10-13, 04).
+- `results_at` (04.12, ticked 2026-10-14, built 2026-10-15): a date and
+  time; empty = Immediately, as on every paper when added. Until then
+  the score, the report, the answers and the explanations of every
+  sitting of the paper are held (a sitting submitted after the date is
+  not); while they are held, `create_attempt` refuses a sitting in a mode
+  other than `first_mode` (a retake too) and `check_answer` refuses, and
+  `first_mode` must be an exam mode (a check). How many sittings stays
+  `sittings_allowed`'s (Sam, 2026-10-15: no rule of its own). `save_quiz`
+  writes it (empty clears it); students read it. The hold is the
+  database's: see `attempts` and `attempt_items` below, and
+  `student_attempts()`. Why: papers and mocks carry the same settings,
+  and a mock reused across groups needs its answers kept from the next
+  group (Sam, 2026-10-13, 04).
+- *To build (04.13) — ticked 2026-10-14 (Sam):* `review_days` — a whole
+  number above 0; empty = no limit, on every paper. The review and
+  sittings in the other modes close that many days after a student's
+  results came out. `save_quiz` writes it; students read it. Why: as
+  `results_at`.
 - *To build (04.14), no column:* a sitting in an untimed mode still in
   progress when its paper closes is finished at `unpublish_at`, on what
   was answered; a timed one keeps its own clock.
@@ -411,9 +412,10 @@ table by table as each is next changed (AGENTS.md rule 9).
   refuses a mock's other modes until a sitting in its first mode is
   completed ("Finish your first sitting of this mock …"), and holds its
   limit as a paper's; `save_quiz` writes both; students read both.
-- *To build (04.12, 04.13) — ticked 2026-10-14 (Sam):* `results_at` and
-  `review_days`, as on `quizzes`, under the same rules, written by
-  `save_quiz`. The close (04.14) as for papers. Why: as on `quizzes`.
+- `results_at` (04.12, ticked 2026-10-14, built 2026-10-15): as on
+  `quizzes`, under the same rules, written by `save_quiz`.
+- *To build (04.13) — ticked 2026-10-14 (Sam):* `review_days`, as on
+  `quizzes`. The close (04.14) as for papers. Why: as on `quizzes`.
 - Browser: as for papers.
 
 ### `attempts` — a sitting
@@ -439,8 +441,13 @@ table by table as each is next changed (AGENTS.md rule 9).
   server from Start to Submit, closed at its limit); a challenge sitting
   names the day's draw, and one per student per day. Why: the daily
   challenge (Sam, 2026-10-08).
-- Browser: the owner and an admin read; every write through the
-  database's own functions.
+- Browser: the owner and an admin read every column but the three
+  scores (04.12, 2026-10-15); every write through the database's own
+  functions. A student's pages read their sittings, scores included,
+  through `student_attempts()` with the service role: the score empty
+  while the paper's or mock's results are held, with the date and
+  `held`. The admin's pages read the table with the service role and
+  see every score.
 
 ### `attempt_items` — a sitting's questions and answers
 - **A copy of each question** when the sitting is made (type, question,
@@ -453,7 +460,9 @@ table by table as each is next changed (AGENTS.md rule 9).
   `passed_utc` (Sequential: moved past it).
 - Browser: the owner reads the question and their own answers — never
   `correct`, the rationale or the feedback, which reach the student only
-  through Check Answer and the review (the seal).
+  through Check Answer and the review (the seal). A finished sitting
+  whose results are held is not readable by its owner at all until the
+  date (04.12, 2026-10-15: the policy asks `_my_held_attempt_ids()`).
 
 ---
 

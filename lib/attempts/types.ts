@@ -41,6 +41,14 @@ export type Attempt = {
   started_utc: string | null;
   /** finish, expiry (the true deadline) or abandon (03 Q5 writes it) */
   ended_utc: string | null;
+  /**
+   * 04.12, from student_attempts() only (a student's own read): the
+   * paper's or mock's results date, and whether it has yet to come. While
+   * `held`, the three scores come back empty. An admin's read of the
+   * table carries neither.
+   */
+  results_at?: string | null;
+  held?: boolean;
 };
 
 // One row of attempt_items (03 Q4): the question as the bank served it
@@ -216,9 +224,14 @@ export type ActionResult = { ok: true } | { ok: false; error: string };
 
 export type SpawnResult = { ok: true; attemptId: string } | { ok: false; error: string };
 
-/** Finish and expire return the score and, the sitting being over, every question's secret half (Q6). */
+/**
+ * Finish and expire return the score and, the sitting being over, every
+ * question's secret half (Q6) — unless the paper's results are held
+ * (04.12): then the date and what was saved, and neither score nor secret.
+ */
 export type FinishResult =
-  | { ok: true; score: Score; secrets: SecretsMap; /** the stored time taken (03 Q18's pop-up) */ timeTakenS: number | null }
+  | { ok: true; held: false; score: Score; secrets: SecretsMap; /** the stored time taken (03 Q18's pop-up) */ timeTakenS: number | null }
+  | { ok: true; held: true; resultsAt: string; answered: number; total: number; timeTakenS: number | null }
   | { ok: false; error: string };
 
 /** Sequential's move (§8 S21): the position now current, or null when every question is passed. */
@@ -257,6 +270,8 @@ export type AttemptListRow = Pick<
   | 'time_taken_s'
   | 'display_label'
   | 'ts_iso'
+  | 'results_at'
+  | 'held'
 >;
 
 /** The four database-side filters (course, status, mode, a label search). */

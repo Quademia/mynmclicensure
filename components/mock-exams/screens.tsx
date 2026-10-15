@@ -6,17 +6,29 @@
 // Server Components on Practice Papers' stylesheet and the design system's
 // card and buttons; what does something is Practice Papers' own buttons
 // with kind="mock". No size, time, date or count is written here: each is
-// read from the mock.
+// read from the mock. While a mock's results are held (04.12), its date
+// stands where a score would, and no report is linked — as on a paper.
 
 import { AppLink } from '@/components/shell/link-pending';
 import { PageHeader } from '@/components/shell/page-header';
 import { MODES } from '@/lib/attempts/modes';
 import { reportHref } from '@/lib/attempts/links';
 import type { AttemptMode } from '@/lib/attempts/types';
-import { formatDay, formatMinutes, paperMinutes, sittingsLine, startable } from '@/lib/practice-papers/derive';
+import {
+  formatDay,
+  formatMinutes,
+  heldUntil,
+  otherWaysLine,
+  paperMinutes,
+  resultsLine,
+  resumable,
+  scoreWord,
+  sittingsLine,
+  startable,
+} from '@/lib/practice-papers/derive';
 import type { MockExams, MockView } from '@/lib/mock-exams/queries';
 import { AbandonSitting, LaunchButton, PractiseAgain } from '@/components/practice-papers/paper-actions';
-import { Sitting, waysOf } from '@/components/practice-papers/screens';
+import { FirstSittingLines, Sitting, waysOf } from '@/components/practice-papers/screens';
 import '@/styles/practice-papers.css';
 
 const LIST = '/student/mock-exams';
@@ -42,10 +54,11 @@ function factsOf(m: MockView): string {
     : `${m.n} questions`;
 }
 
+/** A row's word for a mock sat: the score, or "Results on 30 Oct" while held (04.12). */
 function score(m: MockView): string | null {
   const done = m.firstSitting ?? m.sittings.find((a) => a.status === 'completed') ?? null;
   if (!done) return null;
-  return done.score_pct != null ? `${Math.round(done.score_pct)}%` : 'Finished';
+  return scoreWord(done) ?? 'Finished';
 }
 
 function ChoosePackage() {
@@ -120,8 +133,9 @@ export function MockListScreen({ data }: { data: MockExams }) {
 
   let card: React.ReactNode = null;
   if (next) {
-    const going = next.inProgress;
+    const going = next.inProgress && resumable(next, next.inProgress) ? next.inProgress : null;
     const until = next.unpublish_at ? `Open until ${formatDay(next.unpublish_at)}` : 'Open now';
+    const held = resultsLine(next);
     card = (
       <div className="card pp-card">
         <span className="pp-eyebrow">{going ? `In progress · ${until}` : until}</span>
@@ -130,14 +144,22 @@ export function MockListScreen({ data }: { data: MockExams }) {
           {next.course_title} · {going ? `${going.answered_count} of ${next.n} answered` : factsOf(next)}
         </span>
         {going ? <progress className="pp-progress" max={next.n} value={going.answered_count} aria-label="Answered so far" /> : null}
+        {held ? <span className="pp-line">{held}</span> : null}
         <LaunchButton kind="mock" quizId={next.quiz_id} mode={going ? going.mode : next.first_mode} label={going ? 'Resume' : 'Start'} />
       </div>
     );
   } else if (mine.length) {
+    // 04.12: when every open mock sat is still held, there is no score or report to point at yet.
+    const sat = mine.filter((m) => m.firstSitting);
+    const allHeld = sat.length > 0 && sat.every((m) => heldUntil(m.firstSitting));
     card = (
       <div className="card pp-card">
         <span className="pp-big">You have sat every open mock</span>
-        <span className="pp-line">Your scores are below. Open a mock to see your report or practise it again.</span>
+        <span className="pp-line">
+          {allHeld
+            ? 'Your results come out on the dates below. Open a mock to practise it again.'
+            : 'Your scores are below. Open a mock to see your report or practise it again.'}
+        </span>
       </div>
     );
   } else if (locked && !open.length && !coming.length) {
@@ -181,32 +203,41 @@ export function MockScreen({ mock, ended }: { mock: MockView; ended: MockExams['
   const limit = limitLine ? <span className="pp-line">{limitLine}</span> : null;
   const limited = mock.sittings_allowed != null;
   const until = mock.unpublish_at ? (active ? ` · open until ${formatDay(mock.unpublish_at)}` : '') : '';
+  // 04.12: while the results are held, their date among the card's lines;
+  // only the first mode is sat, so a sitting going in another waits for
+  // the date (it can still be abandoned).
+  const heldLine = resultsLine(mock);
+  const results = heldLine ? <span className="pp-line">{heldLine}</span> : null;
+  const waysLine = mock.allowed_modes.length > 1 && mock.sittingsLeft !== 0 ? otherWaysLine(mock) : null;
+  const canResume = going ? resumable(mock, going) : false;
 
   // After the first sitting: Practise again while the mock is open and a
   // sitting is left; with a limit, one at a time, so a sitting going is resumed.
   let again: React.ReactNode = null;
   if (mock.open && active) {
     if (limited && going) {
-      again = <LaunchButton kind="mock" quizId={mock.quiz_id} mode={going.mode} label={`Resume ${modeName(going.mode)}`} />;
+      if (canResume) again = <LaunchButton kind="mock" quizId={mock.quiz_id} mode={going.mode} label={`Resume ${modeName(going.mode)}`} />;
     } else if (mock.sittingsLeft !== 0) {
-      again = <PractiseAgain kind="mock" quizId={mock.quiz_id} title={mock.title} ways={waysOf(mock)} />;
+      again = <PractiseAgain kind="mock" quizId={mock.quiz_id} title={mock.title} ways={waysOf(mock)} note={waysLine} />;
     }
   }
 
   let card: React.ReactNode;
   if (done) {
+    const report = heldUntil(done) ? null : (
+      <AppLink href={reportHref(done.attempt_id)} className="btn btn-ghost btn-lg">See your report</AppLink>
+    );
     card = (
       <div className="card pp-card">
         <span className="pp-eyebrow">Your first sitting</span>
-        <span className="pp-big">
-          {done.score_pct != null ? `${Math.round(done.score_pct)}%` : 'Finished'} · {modeName(done.mode)}
-        </span>
-        <span className="pp-line">{done.ts_iso ? formatDay(done.ts_iso) : ''}</span>
+        <FirstSittingLines a={done} />
         {!active ? <span className="pp-line">This mock has closed.</span> : mock.open ? limit : null}
-        <div className="pp-actions">
-          <AppLink href={reportHref(done.attempt_id)} className="btn btn-ghost btn-lg">See your report</AppLink>
-          {again}
-        </div>
+        {report || again ? (
+          <div className="pp-actions">
+            {report}
+            {again}
+          </div>
+        ) : null}
         {going && mock.open && active ? (
           <AbandonSitting
             attemptId={going.attempt_id}
@@ -231,7 +262,8 @@ export function MockScreen({ mock, ended }: { mock: MockView; ended: MockExams['
         <span className="pp-big">{going.answered_count} of {mock.n} answered</span>
         <progress className="pp-progress" max={mock.n} value={going.answered_count} aria-label="Answered so far" />
         {limit}
-        <LaunchButton kind="mock" quizId={mock.quiz_id} mode={going.mode} label="Resume" />
+        {results}
+        {canResume ? <LaunchButton kind="mock" quizId={mock.quiz_id} mode={going.mode} label="Resume" /> : null}
         <AbandonSitting attemptId={going.attempt_id} sittingsAllowed={mock.sittings_allowed} />
       </div>
     );
@@ -242,6 +274,7 @@ export function MockScreen({ mock, ended }: { mock: MockView; ended: MockExams['
         <span className="pp-line">
           {mock.availability === 'UPCOMING' && mock.publish_at ? `Opens ${formatDay(mock.publish_at)}` : 'This mock has closed.'}
         </span>
+        {results}
       </div>
     );
   } else {
@@ -252,6 +285,7 @@ export function MockScreen({ mock, ended }: { mock: MockView; ended: MockExams['
         <span className="pp-line">{factsOf(mock)}{until}</span>
         <span className="pp-line">{first.card}</span>
         {limit}
+        {results}
         <LaunchButton kind="mock" quizId={mock.quiz_id} mode={mock.first_mode} label="Start" />
       </div>
     );
@@ -279,7 +313,9 @@ export function MockScreen({ mock, ended }: { mock: MockView; ended: MockExams['
           </div>
         ) : null}
       </div>
-      {mock.open && active && !done && mock.allowed_modes.length > 1 ? (
+      {mock.open && active && done && waysLine ? (
+        <p className="pp-hint">{waysLine}</p>
+      ) : mock.open && active && !done && mock.allowed_modes.length > 1 ? (
         <p className="pp-hint">More ways to practise this mock open after your first sitting.</p>
       ) : null}
     </div>

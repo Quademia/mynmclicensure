@@ -25,7 +25,8 @@ import { notFound, redirect } from 'next/navigation';
 import { requireStudent } from '@/lib/access';
 import { getCourseById } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
-import { getAttemptById } from '@/lib/attempts/queries';
+import { getOwnAttempt } from '@/lib/attempts/queries';
+import { formatResultsAt, formatResultsDay } from '@/lib/quizzes/results-date';
 import { retakeOpen } from '@/lib/attempts/runner-load';
 import { isFreeSitting } from '@/lib/attempts/free-sitting';
 import { modeOf } from '@/lib/attempts/modes';
@@ -60,10 +61,30 @@ export default async function ReportPage({ params }: { params: Promise<{ attempt
   const { attempt_id } = await params;
   const attemptId = String(attempt_id || '').trim();
 
-  const attempt = attemptId ? await getAttemptById(supabase, attemptId) : null;
+  // Through student_attempts() (04.12): the student's own sitting, its score
+  // empty while the paper's results are held.
+  const attempt = attemptId ? await getOwnAttempt(profile.user_id, attemptId) : null;
   if (!attempt || attempt.user_id !== profile.user_id) notFound();
   if (attempt.status === 'in_progress') redirect(sessionHref(attempt.attempt_id));
   if (attempt.status !== 'completed') redirect(HISTORY_PATH);
+
+  // 04.12: results held — the date, and nothing of the sitting's answers
+  // (the database keeps its rows from this client until then).
+  if (attempt.held && attempt.results_at) {
+    const heldLabel = attempt.display_label || (attempt.quiz_id ? 'Practice Paper' : 'Custom Quiz');
+    return (
+      <div className="srp">
+        <AppLink className="srp-back" href={HISTORY_PATH}>
+          ← Learning History
+        </AppLink>
+        <PageHeader title={heldLabel} />
+        <div className="card srp-notice">
+          <p className="srp-notice-title">Results on {formatResultsDay(attempt.results_at)}</p>
+          <p>Your score, your report and the answers come out on {formatResultsAt(attempt.results_at)}.</p>
+        </div>
+      </div>
+    );
+  }
 
   const [access, course, rows, retakeAllowed, free] = await Promise.all([
     getStudentCourseAccess(supabase, profile.user_id),

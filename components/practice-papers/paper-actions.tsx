@@ -148,8 +148,22 @@ export function AbandonSitting({
   );
 }
 
-/** Practise again: the box with the paper's ways. */
-export function PractiseAgain({ quizId, title, ways, kind = 'fixed' }: { quizId: string; title: string; ways: Way[]; kind?: QuizKind }) {
+/** Practise again: the box with the paper's ways. While the paper's results
+ *  are held (04.12) the caller passes only the first mode's way, and `note`
+ *  says when the others open. */
+export function PractiseAgain({
+  quizId,
+  title,
+  ways,
+  kind = 'fixed',
+  note = null,
+}: {
+  quizId: string;
+  title: string;
+  ways: Way[];
+  kind?: QuizKind;
+  note?: string | null;
+}) {
   const [open, setOpen] = useState(false);
   const { busy, launch, toast } = useLaunch(kind);
   return (
@@ -158,6 +172,7 @@ export function PractiseAgain({ quizId, title, ways, kind = 'fixed' }: { quizId:
         Practise again
       </button>
       <Dialog open={open} onClose={() => (busy ? undefined : setOpen(false))} title={`Practise ${title} again`}>
+        {note ? <p className="dlg-text">{note}</p> : null}
         <ul className="pp-ways">
           {ways.map((w) => (
             <li key={w.mode} className="pp-way">

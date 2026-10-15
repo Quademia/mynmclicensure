@@ -18,7 +18,9 @@
 // waits for a settings page. A paper or mock with a sitting limit (04.10,
 // Sam 2026-10-13) always shows the card, with the sitting's number, and
 // offers no "Don't show this again": it is where the student is told a
-// sitting is spent.
+// sitting is spent. So does one whose results are held (04.12, Sam
+// 2026-10-15), with the date beside the sitting line: it is where the
+// student learns the score will not follow the submit.
 
 'use client';
 
@@ -29,6 +31,7 @@ import { enterSession } from '@/lib/attempts/actions';
 import type { SessionExit } from '@/lib/attempts/links';
 import { modeOf, preflightBrief } from '@/lib/attempts/modes';
 import type { SessionPlay, StartCard } from '@/lib/attempts/runner-load';
+import { formatResultsAt } from '@/lib/quizzes/results-date';
 import { Icon } from '@/components/shell/icons';
 import { QuizRunner } from './quiz-runner';
 import { RunnerError } from './runner-error';
@@ -45,8 +48,9 @@ export function SessionStart({ card, exit, previewMode }: { card: StartCard; exi
   const clocked = M.clock !== 'none';
 
   // The mode's "Don't show this again", read from the browser the way
-  // AGENTS.md asks (no read in render, no effect setting state).
-  const limited = card.sittings !== null;
+  // AGENTS.md asks (no read in render, no effect setting state). A
+  // sitting limit or a results date always shows the card.
+  const alwaysShown = card.sittings !== null || card.resultsAt !== null;
   const storedSkip = useSyncExternalStore(
     subscribeStorage,
     () => {
@@ -58,7 +62,7 @@ export function SessionStart({ card, exit, previewMode }: { card: StartCard; exi
     },
     () => false,
   );
-  const skipped = storedSkip && !limited;
+  const skipped = storedSkip && !alwaysShown;
 
   const [play, setPlay] = useState<SessionPlay | null>(null);
   const [failure, setFailure] = useState<{ title: string; message: string; exit: SessionExit } | null>(null);
@@ -70,7 +74,7 @@ export function SessionStart({ card, exit, previewMode }: { card: StartCard; exi
   async function enter() {
     if (enteringRef.current) return;
     enteringRef.current = true;
-    if (skipNextTime && !limited) {
+    if (skipNextTime && !alwaysShown) {
       try {
         window.localStorage.setItem(M.skipKey, '1');
       } catch {
@@ -117,6 +121,7 @@ export function SessionStart({ card, exit, previewMode }: { card: StartCard; exi
         reviewMode={false}
         previewMode={previewMode}
         exit={exit}
+        heldExit={play.heldExit}
         retakeAllowed={play.retakeAllowed}
       />
     );
@@ -160,13 +165,18 @@ export function SessionStart({ card, exit, previewMode }: { card: StartCard; exi
               </strong>
             </p>
           ) : null}
+          {card.resultsAt ? (
+            <p className="preflight-text">
+              <strong>Results on {formatResultsAt(card.resultsAt)}.</strong>
+            </p>
+          ) : null}
           <div className="preflight-actions">
             <button type="button" className="btn btn-primary btn-lg" disabled={pending} onClick={() => void enter()}>
               <Icon name={clocked ? 'target' : 'play'} />
               {buttonWord}
             </button>
             <button type="button" className="btn btn-ghost" disabled={pending} onClick={() => router.push(exit.href)}>Cancel</button>
-            {limited ? null : (
+            {alwaysShown ? null : (
               <label className="preflight-skip">
                 <input type="checkbox" checked={skipNextTime} onChange={(e) => setSkipNextTime(e.target.checked)} /> Don&apos;t show this again
               </label>

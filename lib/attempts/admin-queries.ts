@@ -7,7 +7,9 @@
 // an "All time" fetch cannot run away — and countAttempts, an exact
 // head count within [from, to). The detail read is lib/attempts/queries'
 // getAttemptById. Each takes the admin gate's client — the ADMIN SELECT
-// policy is the floor — and, as legacy, fails open.
+// policy is the floor — and, as legacy, fails open. Since 04.12 the
+// browser's roles cannot read the score columns, so the window, which
+// shows them, takes the service role behind requireAdmin().
 //
 // One shape change under the standing S4 tick: the student joins on
 // `attempts.user_id` in the same select; legacy fetched the window's
@@ -19,6 +21,7 @@
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import { readAll } from '@/lib/supabase/read-all';
+import type { createServiceRoleClient } from '@/lib/supabase/server';
 import type { AttemptListRow } from './types';
 
 export const ATTEMPTS_WINDOW_CAP = 5000;
@@ -35,7 +38,7 @@ const WINDOW_COLUMNS =
 
 /** Attempts within [fromIso, toIso). Either bound may be null = open. */
 export async function getAttemptsWindow(
-  db: ServerSupabaseClient,
+  db: ReturnType<typeof createServiceRoleClient>,
   fromIso: string | null,
   toIso: string | null,
   cap = ATTEMPTS_WINDOW_CAP,

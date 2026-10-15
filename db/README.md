@@ -75,6 +75,11 @@ in a chat.
   service role calls. Since 03 Q5 the answers are the same rows' answer
   group (no `answers_json`, no `item_ids`), the browser roles hold
   SELECT alone on `attempts`, and grading is `grade_answer()` in SQL.
+  Since 04.12 (2026-10-15) that SELECT leaves out the three score
+  columns: a student's scores reach the pages only through
+  `student_attempts()` (service role), empty while a paper's or mock's
+  `results_at` has yet to come, and a held sitting's `attempt_items` rows
+  are not readable by its owner until then.
 - Storage buckets are global to the project, so they carry the
   `licensure-gh-` prefix and are created by the migration that needs
   them (`insert into storage.buckets`). One so far:

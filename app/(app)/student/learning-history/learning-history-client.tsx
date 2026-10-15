@@ -17,6 +17,12 @@
 // The list renders after hydration behind legacy's "Loading your
 // history…" line so the dates are formatted with the browser's locale,
 // as legacy formatted them.
+//
+// 04.12: a finished sitting whose paper's results are held (the server's
+// `held`, from student_attempts(), the score empty) shows "Results on
+// <date>" in Ghana's time where the score was, and no Review or Report —
+// either would only say "not yet". The stats bar's average and best leave
+// it out; the score sorts put it last, newest first; the total counts it.
 
 'use client';
 
@@ -26,7 +32,8 @@ import { Toast } from '@/lib/toast/toast';
 import { loadHistoryPage, retakeAttempt } from '@/lib/attempts/actions';
 import { reportHref, sessionHref } from '@/lib/attempts/links';
 import { MODES, MODE_ORDER, modeOf } from '@/lib/attempts/modes';
-import type { AttemptListRow, HistoryFilters, HistoryPage } from '@/lib/attempts/types';
+import type { AttemptListRow, HistoryFilters, HistoryPage, SpawnResult } from '@/lib/attempts/types';
+import { formatResultsShort } from '@/lib/quizzes/results-date';
 import { Icon } from '@/components/shell/icons';
 import { KindChip, ATTEMPT_SOURCE_HUE, MODE_ICON } from '@/components/shell/chips';
 import { AppLink } from '@/components/shell/link-pending';
@@ -75,6 +82,15 @@ function formatDuration(secs: number | null): string {
   return `${s}s`;
 }
 
+// 04.12: the results date of a finished sitting still held, else null
+function heldDateOf(a: AttemptListRow): string | null {
+  return a.status === 'completed' && a.held && a.results_at ? a.results_at : null;
+}
+
+function byNewest(a: AttemptListRow, b: AttemptListRow): number {
+  return new Date(b.ts_iso || 0).getTime() - new Date(a.ts_iso || 0).getTime();
+}
+
 export function LearningHistoryClient({ courses, initialCourseId, initialPage }: Props) {
   const router = useRouter();
 
@@ -108,7 +124,16 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
   async function loadAttempts(filters: HistoryFilters, nextPage: number, append: boolean) {
     const id = ++requestId.current;
     setLoading(true);
-    const result = await loadHistoryPage(filters, nextPage);
+    let result: HistoryPage;
+    try {
+      result = await loadHistoryPage(filters, nextPage);
+    } catch {
+      // a dropped request rejects (Known Workarounds): give Load more back
+      if (id !== requestId.current) return;
+      setLoading(false);
+      setMsg({ text: 'Could not load your history. Please check your connection and try again.', tone: 'error' });
+      return;
+    }
     if (id !== requestId.current) return; // a newer request has superseded this one
     setTotal(result.total);
     setAttempts((prev) => (append ? prev.concat(result.attempts) : result.attempts));
@@ -154,7 +179,14 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
   async function handleRetake(a: AttemptListRow) {
     if (retaking) return;
     setRetaking(a.attempt_id);
-    const result = await retakeAttempt(a.attempt_id);
+    let result: SpawnResult;
+    try {
+      result = await retakeAttempt(a.attempt_id);
+    } catch {
+      setRetaking(null);
+      setMsg({ text: 'Could not start the retake. Please check your connection and try again.', tone: 'error' });
+      return;
+    }
     if (!result.ok) {
       setRetaking(null);
       setMsg({ text: `Could not start retake. Please try again. ${result.error || ''}`.trim(), tone: 'error' });
@@ -164,7 +196,8 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
   }
 
   // ── legacy renderStats (over the loaded pages) ──
-  const completedRows = attempts.filter((a) => a.status === 'completed' && (a.score_total || 0) > 0);
+  // a held sitting has no score yet (04.12): out of the average and the best
+  const completedRows = attempts.filter((a) => a.status === 'completed' && !heldDateOf(a) && (a.score_total || 0) > 0);
   const statTotal = total || attempts.length;
   // one pill per mode, named from the mode table (legacy's Instant / Timed)
   const statByMode = MODE_ORDER.map((code) => ({ code, name: MODES[code].name, n: attempts.filter((a) => a.mode === code).length }));
@@ -180,10 +213,17 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
   const filtered = attempts
     .filter((a) => !source || a.source === source)
     .sort((a, b) => {
-      if (sort === 'oldest') return new Date(a.ts_iso || 0).getTime() - new Date(b.ts_iso || 0).getTime();
+      if (sort === 'oldest') return byNewest(b, a);
+      if (sort === 'score_high' || sort === 'score_low') {
+        // 04.12: a held sitting has no score to rank — after every other row, newest first
+        const heldA = heldDateOf(a) !== null;
+        const heldB = heldDateOf(b) !== null;
+        if (heldA !== heldB) return heldA ? 1 : -1;
+        if (heldA) return byNewest(a, b);
+      }
       if (sort === 'score_high') return (Number(b.score_pct) || 0) - (Number(a.score_pct) || 0);
       if (sort === 'score_low') return (Number(a.score_pct) || 0) - (Number(b.score_pct) || 0);
-      return new Date(b.ts_iso || 0).getTime() - new Date(a.ts_iso || 0).getTime();
+      return byNewest(a, b);
     });
 
   const showLoadMore = filtered.length > 0 && attempts.length < total;
@@ -192,6 +232,10 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
   function renderCard(a: AttemptListRow) {
     const isCompleted = a.status === 'completed';
     const isInProgress = a.status === 'in_progress';
+    const resultsAt = heldDateOf(a);
+    // 04.12: while held only the first mode is sat, and that is an exam
+    // mode — a Study sitting's retake waits for the date
+    const retakeWaits = resultsAt !== null && modeOf(a.mode).group !== 'exam';
 
     const dateStr = a.ts_iso ? new Date(a.ts_iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
     const timeStr = a.ts_iso ? new Date(a.ts_iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '';
@@ -200,7 +244,11 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
 
     let scoreMain: string;
     let scoreSub: string;
-    if (isCompleted && (a.score_total || 0) > 0) {
+    if (resultsAt) {
+      // the date in Ghana's time (UTC), never the browser's zone
+      scoreMain = `Results on ${formatResultsShort(resultsAt)}`;
+      scoreSub = formatDuration(a.time_taken_s);
+    } else if (isCompleted && (a.score_total || 0) > 0) {
       scoreMain = `${a.score_raw}/${a.score_total} (${Math.round(a.score_pct || 0)}%)`;
       scoreSub = formatDuration(a.time_taken_s);
     } else if (isInProgress) {
@@ -238,7 +286,7 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
 
         <div className="attempt-side">
           <div className="score-block">
-            <div className={`score-main ${isCompleted ? '' : 'not-done'}`}>{scoreMain}</div>
+            <div className={`score-main ${isCompleted && !resultsAt ? '' : 'not-done'}`}>{scoreMain}</div>
             <div className="score-sub">{scoreSub}</div>
           </div>
           <div className="attempt-actions">
@@ -254,7 +302,8 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
                 <Icon name="play" />Resume
               </button>
             )}
-            {isCompleted ? (
+            {/* 04.12: while held, no Review and no Report — both would only say "not yet" */}
+            {resultsAt ? null : isCompleted ? (
               <AppLink className="act-btn btn-review" href={sessionHref(a.attempt_id)} title="Review your answers">
                 <Icon name="eye" />Review
               </AppLink>
@@ -264,7 +313,7 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
               </button>
             )}
             {/* 03 Q10: the finished sitting's report, beside its review */}
-            {isCompleted ? (
+            {resultsAt ? null : isCompleted ? (
               <AppLink className="act-btn btn-report" href={reportHref(a.attempt_id)} title="See your report">
                 <Icon name="chart" />Report
               </AppLink>
@@ -276,8 +325,8 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
             <button
               type="button"
               className="act-btn btn-retake"
-              disabled={!isCompleted || isRetaking}
-              title={isCompleted ? 'Retake with same questions' : 'Complete this attempt first'}
+              disabled={!isCompleted || isRetaking || retakeWaits}
+              title={retakeWaits ? 'Opens when results come out' : isCompleted ? 'Retake with same questions' : 'Complete this attempt first'}
               onClick={() => handleRetake(a)}
             >
               {isRetaking ? '…Starting' : <><Icon name="refresh" />Retake</>}

@@ -13,7 +13,8 @@
 // for its course includes mocks (02.10) — the rule create_attempt holds.
 // Past mocks: every mock the student sat that is neither open nor coming,
 // whatever its status since (Sam, 2026-10-13), so it is read by the ids of
-// the student's own sittings as well.
+// the student's own sittings as well. Each mock carries its results date
+// (04.12), held or not on the same clock as its availability.
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import type { Profile } from '@/lib/auth/profile';
@@ -27,7 +28,7 @@ import { getQuizAvailability } from '@/lib/quizzes/availability';
 import { orderModes } from '@/lib/attempts/modes';
 import type { AttemptMode } from '@/lib/attempts/types';
 import { slices } from '@/lib/supabase/read-all';
-import { paperView, startable, type PaperRow, type PaperView } from '@/lib/practice-papers/derive';
+import { paperView, resumable, startable, type PaperRow, type PaperView } from '@/lib/practice-papers/derive';
 import { paperAccessByCourse, type PracticePapers } from '@/lib/practice-papers/queries';
 
 export type MockView = PaperView & {
@@ -63,10 +64,11 @@ type MockRowRead = {
   status: string;
   publish_at: string | null;
   unpublish_at: string | null;
+  results_at: string | null;
 };
 
 const MOCK_COLUMNS =
-  'quiz_id, course_id, title, n, allowed_modes, first_mode, sittings_allowed, time_limit_sec, published, status, publish_at, unpublish_at';
+  'quiz_id, course_id, title, n, allowed_modes, first_mode, sittings_allowed, time_limit_sec, published, status, publish_at, unpublish_at, results_at';
 
 function byCloseThenTitle(a: MockView, b: MockView): number {
   const ca = a.unpublish_at ? Date.parse(a.unpublish_at) : Infinity;
@@ -85,7 +87,7 @@ export async function loadMockExams(supabase: ServerSupabaseClient, profile: Pro
     getStudentCourseAccess(supabase, userId),
     getCourses(supabase),
     getStudentReceipts(supabase, userId),
-    getStudentAttempts(supabase, userId),
+    getStudentAttempts(userId),
   ]);
 
   const heldIds = allCourses.filter((c) => access[c.course_id]).map((c) => c.course_id);
@@ -134,10 +136,11 @@ export async function loadMockExams(supabase: ServerSupabaseClient, profile: Pro
       publish_at: q.publish_at,
       in_trial: false,
       sittings_allowed: q.sittings_allowed,
+      results_at: q.results_at,
     };
     const mocks = accessBy[q.course_id]?.mocks ?? false;
     return {
-      ...paperView(row, mocks ? 'all' : 'none', attempts),
+      ...paperView(row, mocks ? 'all' : 'none', attempts, now),
       course_title: titleOf.get(q.course_id) ?? q.course_id,
       unpublish_at: q.unpublish_at,
     };
@@ -152,8 +155,11 @@ export async function loadMockExams(supabase: ServerSupabaseClient, profile: Pro
     .filter((m) => !open.includes(m) && !coming.includes(m) && m.sittings.length > 0)
     .sort((a, b) => latestSat(b) - latestSat(a));
 
+  // 04.12: a sitting going in another mode than the first waits while the results are held.
   const next =
-    open.find((m) => startable(m) && m.inProgress) ?? open.find((m) => startable(m) && m.state === 'new') ?? null;
+    open.find((m) => startable(m) && m.inProgress && resumable(m, m.inProgress)) ??
+    open.find((m) => startable(m) && m.state === 'new') ??
+    null;
 
   const top = topCardFor(receipts);
   const ended =

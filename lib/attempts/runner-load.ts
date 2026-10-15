@@ -30,9 +30,9 @@ import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import type { AuthGateResult } from '@/lib/access';
 import { isFreeSitting } from './free-sitting';
-import { SESSION_EXITS, type SessionExit } from './links';
+import { SESSION_EXITS, quizPageExit, type SessionExit } from './links';
 import { modeOf } from './modes';
-import { getAttemptById, originSource, readAttemptItems } from './queries';
+import { getAttemptById, getOwnAttempt, originSource, readAttemptItems } from './queries';
 import { sealItem, secretOf } from './seal';
 import {
   RUNNER_QUESTIONS_PER_PAGE_DEFAULT,
@@ -56,6 +56,16 @@ export type StartCard = {
   /** A paper's or mock's sitting limit (04.10): this sitting's number among
    *  the student's sittings of it; null with no limit (or a builder quiz). */
   sittings: { number: number; allowed: number; noun: 'paper' | 'mock' } | null;
+  /** 04.12: the paper's or mock's results date while it has yet to come; null otherwise. */
+  resultsAt: string | null;
+};
+
+/** 04.12: a finished sitting whose results are held — what its screen says, and nothing of the questions. */
+export type HeldSitting = {
+  displayLabel: string | null;
+  resultsAt: string;
+  /** When it was submitted (or its time ran out). */
+  endedAt: string | null;
 };
 
 /** The questions a sitting is played or reviewed with. */
@@ -66,6 +76,8 @@ export type SessionPlay = {
   questionsPerPage: number;
   /** 03 Q18: the results pop-up offers Retake — the rule retakeAttempt holds (the quiz open, the mode allowed). */
   retakeAllowed: boolean;
+  /** 04.12: the way back once a held sitting is submitted — its paper's or mock's own page. */
+  heldExit: SessionExit;
 };
 
 type SessionError = { kind: 'error'; title: string; message: string; exit: SessionExit };
@@ -77,6 +89,7 @@ type SessionError = { kind: 'error'; title: string; message: string; exit: Sessi
 export type RunnerLoad =
   | SessionError
   | { kind: 'start'; card: StartCard; previewMode: boolean; exit: SessionExit }
+  | { kind: 'held'; held: HeldSitting; exit: SessionExit }
   | ({ kind: 'review'; previewMode: boolean; exit: SessionExit } & SessionPlay);
 
 /** What Start or Resume gets back (Q17): the questions, or a sitting that has closed meanwhile. */
@@ -91,7 +104,7 @@ export type SessionOpen =
 async function checkSession(
   gate: AuthGateResult,
   params: { attemptId: string; preview: boolean },
-): Promise<SessionError | { kind: 'ok'; attempt: Attempt; exit: SessionExit; previewMode: boolean }> {
+): Promise<SessionError | { kind: 'ok'; attempt: Attempt; exit: SessionExit; heldExit: SessionExit; previewMode: boolean }> {
   const { supabase, profile } = gate;
   // Until the attempt is read, legacy's destination.
   const fallback = SESSION_EXITS.fixed;
@@ -109,7 +122,11 @@ async function checkSession(
   }
 
   // CHECK 3 — Attempt exists
-  let attempt = await getAttemptById(supabase, attemptId);
+  // A student reads their own through student_attempts() (04.12: the score
+  // empty while held); the admin's preview reads the table.
+  let attempt = previewMode
+    ? await getAttemptById(createServiceRoleClient(), attemptId)
+    : await getOwnAttempt(profile.user_id, attemptId);
   if (!attempt) {
     return { kind: 'error', title: 'Quiz Not Found', message: 'This quiz attempt could not be found. It may have been deleted.', exit: fallback };
   }
@@ -120,7 +137,10 @@ async function checkSession(
   }
 
   // The sitting's home, now that it is known to be theirs (03 Q8).
-  const exit = SESSION_EXITS[(await originSource(supabase, attempt)) ?? 'fixed'];
+  const home = (await originSource(attempt, chainReader(gate, attempt))) ?? 'fixed';
+  const exit = SESSION_EXITS[home];
+  // 04.12: a held sitting's way back is its paper's or mock's own page.
+  const heldExit = quizPageExit(home, attempt.quiz_id, attempt.course_id, attempt.display_label);
 
   // CHECK 5 — Course access, or a free sitting: a builder quiz of free
   // questions opens for a student without the course (03, 04.4).
@@ -147,7 +167,7 @@ async function checkSession(
       // Re-read through the service role, not the cookie client: Next
       // memoises an identical fetch within one render, so the same read
       // as CHECK 3 would hand back the stale in-progress row.
-      attempt = (await readAttemptFresh(attemptId)) ?? attempt;
+      attempt = (previewMode ? await readAttemptFresh(attemptId) : await getOwnAttempt(profile.user_id, attemptId)) ?? attempt;
     }
   }
 
@@ -155,11 +175,20 @@ async function checkSession(
   if (attempt.status === 'abandoned') {
     return { kind: 'error', title: 'Attempt Abandoned', message: 'This quiz attempt was abandoned. Please start a new attempt.', exit };
   }
-  return { kind: 'ok', attempt, exit, previewMode };
+  return { kind: 'ok', attempt, exit, heldExit, previewMode };
+}
+
+// originSource's read (04.12): a student's own chain through
+// student_attempts(), the admin's preview of someone else's by the table.
+function chainReader(gate: AuthGateResult, attempt: Attempt): (attemptId: string) => Promise<Attempt | null> {
+  if (gate.profile.user_id === attempt.user_id) return (id) => getOwnAttempt(attempt.user_id, id);
+  return (id) => getAttemptById(createServiceRoleClient(), id);
 }
 
 async function readAttemptFresh(attemptId: string): Promise<Attempt | null> {
-  const { data } = await createServiceRoleClient().from('attempts').select('*').eq('attempt_id', attemptId).maybeSingle();
+  // .limit(1): not the same request as getAttemptById's in CHECK 3, which
+  // Next would hand back memoised (the admin's preview reads both).
+  const { data } = await createServiceRoleClient().from('attempts').select('*').eq('attempt_id', attemptId).limit(1).maybeSingle();
   return (data as Attempt | null) ?? null;
 }
 
@@ -168,19 +197,33 @@ async function readAttemptFresh(attemptId: string): Promise<Attempt | null> {
 // attempt's own rows, not the live bank: read with the service role,
 // which is safe here because checkSession settled ownership (or the
 // caller is an admin in preview).
-async function sessionPlay(gate: AuthGateResult, attempt: Attempt, previewMode: boolean): Promise<SessionError | SessionPlay> {
+async function sessionPlay(
+  gate: AuthGateResult,
+  attempt: Attempt,
+  previewMode: boolean,
+  heldExit: SessionExit,
+): Promise<SessionError | { kind: 'closed' } | SessionPlay> {
   // Since 03 Q5 the runner saves per tap, so runner_autosave_interval_sec
   // is no longer read (the key stays until S13 reviews the registry).
   const config = await getConfig(gate.supabase);
   const questionsPerPage = Number(config.runner_questions_per_page) || RUNNER_QUESTIONS_PER_PAGE_DEFAULT;
 
   const rows = await readAttemptItems(createServiceRoleClient(), attempt.attempt_id);
+  // 04.12: a sitting read as live may have closed while its rows were read
+  // (Submit in another tab at the same moment), and its rows then carry
+  // its grades — which a held paper must not hand out. The status read
+  // after the rows decides: still live, the rows were read before the
+  // close; closed, the page opens it again as its review or its date.
+  if (!previewMode && attempt.status === 'in_progress') {
+    const after = await getOwnAttempt(attempt.user_id, attempt.attempt_id);
+    if (!after || after.status !== 'in_progress') return { kind: 'closed' };
+  }
   if (!rows.length) {
     return {
       kind: 'error',
       title: 'No Questions',
       message: 'The questions for this quiz could not be loaded. Please contact support.',
-      exit: SESSION_EXITS[(await originSource(gate.supabase, attempt)) ?? 'fixed'],
+      exit: SESSION_EXITS[(await originSource(attempt, chainReader(gate, attempt))) ?? 'fixed'],
     };
   }
 
@@ -194,7 +237,7 @@ async function sessionPlay(gate: AuthGateResult, attempt: Attempt, previewMode: 
     if (unsealAll || (feedbackEach && row.graded_utc !== null)) secrets[row.item_id] = secretOf(row);
   }
   const retakeAllowed = previewMode ? false : await retakeOpen(gate, attempt);
-  return { attempt, items, secrets, questionsPerPage, retakeAllowed };
+  return { attempt, items, secrets, questionsPerPage, retakeAllowed, heldExit };
 }
 
 // 03 Q18: would retakeAttempt take this sitting once it is finished? A
@@ -203,7 +246,7 @@ async function sessionPlay(gate: AuthGateResult, attempt: Attempt, previewMode: 
 // check Start and Retake share. The server checks again on the press.
 // The report page (03 Q10) offers Retake by the same rule.
 export async function retakeOpen(gate: AuthGateResult, attempt: Attempt): Promise<boolean> {
-  const source = await originSource(gate.supabase, attempt);
+  const source = await originSource(attempt, chainReader(gate, attempt));
   if (source === 'builder') return true;
   if ((source !== 'fixed' && source !== 'mock') || !attempt.quiz_id) return false;
   const quiz = await getQuizById(createServiceRoleClient(), source, attempt.quiz_id);
@@ -227,7 +270,7 @@ export async function retakeOpen(gate: AuthGateResult, attempt: Attempt): Promis
 // this sitting's place among the student's sittings of it, oldest first.
 async function sittingsOf(gate: AuthGateResult, attempt: Attempt): Promise<StartCard['sittings']> {
   if (!attempt.quiz_id) return null;
-  const source = await originSource(gate.supabase, attempt);
+  const source = await originSource(attempt, chainReader(gate, attempt));
   if (source !== 'fixed' && source !== 'mock') return null;
   const { data: quiz } = await createServiceRoleClient()
     .from(QUIZ_TABLES[source])
@@ -257,12 +300,30 @@ export async function loadRunner(
 ): Promise<RunnerLoad> {
   const checked = await checkSession(gate, params);
   if (checked.kind === 'error') return checked;
-  const { attempt, exit, previewMode } = checked;
+  const { attempt, exit, heldExit, previewMode } = checked;
+
+  // 04.12: a finished sitting whose results are held opens as its date —
+  // no question, no answer, no score reaches the page. The admin's preview
+  // reads the table, which carries no `held`, and opens the review.
+  if (attempt.status === 'completed' && attempt.held && attempt.results_at && !previewMode) {
+    return {
+      kind: 'held',
+      exit: heldExit,
+      held: { displayLabel: attempt.display_label, resultsAt: attempt.results_at, endedAt: attempt.ended_utc },
+    };
+  }
 
   if (attempt.status === 'completed') {
-    const play = await sessionPlay(gate, attempt, previewMode);
-    if ('kind' in play) return play;
+    const play = await sessionPlay(gate, attempt, previewMode, heldExit);
+    if ('kind' in play) return play.kind === 'closed' ? { kind: 'error', title: 'Quiz Not Found', message: 'This quiz attempt could not be found. It may have been deleted.', exit } : play;
     return { kind: 'review', previewMode, exit, ...play };
+  }
+
+  // 04.12: a Learning sitting begun before the admin set a results date
+  // cannot do what Learning does (Check Answer waits for the date), so it
+  // waits too, on the held screen; it opens again on the date.
+  if (!previewMode && attempt.held && attempt.results_at && attempt.mode === 'UNTIMED_LEARNING') {
+    return { kind: 'held', exit: heldExit, held: { displayLabel: attempt.display_label, resultsAt: attempt.results_at, endedAt: null } };
   }
 
   // A live sitting: the card's data only. The count and the progress are
@@ -293,6 +354,7 @@ export async function loadRunner(
       resuming: clocked ? started : rows.some((r) => r.chosen !== null || r.flagged),
       secondsLeft,
       sittings: previewMode ? null : await sittingsOf(gate, attempt),
+      resultsAt: !previewMode && attempt.held && attempt.results_at ? attempt.results_at : null,
     },
   };
 }
@@ -310,7 +372,7 @@ export async function openSession(
   const checked = await checkSession(gate, params);
   if (checked.kind === 'error') return checked;
   let { attempt } = checked;
-  const { previewMode, exit } = checked;
+  const { previewMode, exit, heldExit } = checked;
   if (attempt.status !== 'in_progress') return { kind: 'review' };
 
   if (modeOf(attempt.mode).clock !== 'none' && !previewMode && attempt.started_utc === null) {
@@ -321,10 +383,12 @@ export async function openSession(
     if (error) {
       return { kind: 'error', title: 'Could Not Start Exam', message: 'We could not start your exam properly. Please try again.', exit };
     }
-    attempt = (await readAttemptFresh(attempt.attempt_id)) ?? attempt;
+    attempt = (previewMode ? await readAttemptFresh(attempt.attempt_id) : await getOwnAttempt(attempt.user_id, attempt.attempt_id)) ?? attempt;
+    // finished meanwhile (another tab): the page opens it as it now stands
+    if (attempt.status !== 'in_progress') return { kind: 'review' };
   }
 
-  const play = await sessionPlay(gate, attempt, previewMode);
-  if ('kind' in play) return play;
+  const play = await sessionPlay(gate, attempt, previewMode, heldExit);
+  if ('kind' in play) return play.kind === 'closed' ? { kind: 'review' } : play;
   return { kind: 'play', ...play };
 }

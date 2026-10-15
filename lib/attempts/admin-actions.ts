@@ -10,6 +10,7 @@
 'use server';
 
 import { requireAdmin } from '@/lib/access';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { countAttempts, getAttemptsWindow, type AttemptsWindow } from './admin-queries';
 import { getAttemptById } from './queries';
 import type { AttemptDetail } from './types';
@@ -33,19 +34,22 @@ export async function headlineCountsAction(todayIso: string, weekIso: string, mo
 }
 
 export async function attemptsWindowAction(fromIso: string | null, toIso: string | null): Promise<AttemptsWindow> {
-  const { supabase } = await requireAdmin();
-  return getAttemptsWindow(supabase, iso(fromIso), iso(toIso));
+  await requireAdmin();
+  // The service role (04.12): the browser's roles cannot read the scores.
+  return getAttemptsWindow(createServiceRoleClient(), iso(fromIso), iso(toIso));
 }
 
 // The detail modal: the header plus the count of answered rows (since
 // 03 Q5 the answers are attempt_items rows; the admin reads every row).
+// The service role (04.12), as the window.
 export async function attemptDetailAction(attemptIdIn: string): Promise<AttemptDetail | null> {
-  const { supabase } = await requireAdmin();
+  await requireAdmin();
   const attemptId = String(attemptIdIn || '').trim();
   if (!attemptId) return null;
-  const attempt = await getAttemptById(supabase, attemptId);
+  const svc = createServiceRoleClient();
+  const attempt = await getAttemptById(svc, attemptId);
   if (!attempt) return null;
-  const { count, error } = await supabase
+  const { count, error } = await svc
     .from('attempt_items')
     .select('attempt_item_id', { count: 'exact', head: true })
     .eq('attempt_id', attemptId)

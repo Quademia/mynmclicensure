@@ -43,11 +43,13 @@ import { MODES, MODE_GROUPS, MODE_ORDER, orderModes } from '@/lib/attempts/modes
 import type { AttemptMode, QuizAttemptStats } from '@/lib/attempts/types';
 import {
   QUIZ_STATUSES,
+  type ActionResult,
   type AllowedModes,
   type QuizKind,
   type QuizListRow,
   type QuizStatus,
 } from '@/lib/quizzes/types';
+import { formatResultsAt } from '@/lib/quizzes/results-date';
 import { DIFFICULTIES, type Item } from '@/lib/bank/types';
 import type { Course } from '@/lib/catalogue/types';
 import { Icon } from '@/components/shell/icons';
@@ -67,6 +69,10 @@ type Form = {
   firstMode: AttemptMode;
   /** 04.10: as typed; '' = no limit. */
   sittingsAllowed: string;
+  /** 04.12: results Immediately, or on the date and time below. */
+  results: 'immediately' | 'date';
+  /** 04.12: the datetime-local value, Ghana time (UTC); kept while Immediately is chosen. */
+  resultsAt: string;
   status: QuizStatus;
   timeLimit: string;
   shuffle: boolean;
@@ -83,6 +89,8 @@ const EMPTY_FORM: Form = {
   modes: ['UNTIMED_LEARNING', 'TIMED_FREE_NAV'],
   firstMode: 'TIMED_FREE_NAV',
   sittingsAllowed: '',
+  results: 'immediately',
+  resultsAt: '',
   status: 'draft',
   timeLimit: '',
   shuffle: false,
@@ -157,6 +165,29 @@ function formatSchedule(q: ListRow): string {
   if (q.publish_at && q.unpublish_at) return `${fmt(q.publish_at)} — ${fmt(q.unpublish_at)}`;
   if (q.publish_at) return `From ${fmt(q.publish_at)}`;
   return `Until ${fmt(q.unpublish_at!)}`;
+}
+
+// 04.12: the results date is Ghana time, which is UTC, and is read and
+// written as UTC — never in the browser's zone. Loaded from the row's
+// ISO stamp; written for the review as the student's pages write it.
+function resultsInputValue(iso: string): string {
+  return new Date(iso).toISOString().slice(0, 16);
+}
+
+function resultsIso(value: string): string {
+  return `${value}:00Z`;
+}
+
+// 04.12: asked on Next and again at Save — unticking a mode can move the
+// first sitting after Next. saveQuiz refuses with the same words, and the
+// table's check holds the second.
+function resultsRefusal(form: Form): string | null {
+  if (form.results !== 'date') return null;
+  if (!form.resultsAt) return 'Choose the date and time results come out.';
+  if (MODES[form.firstMode].group !== 'exam') {
+    return 'Results on a date need the first sitting in an exam mode: Free Navigation or Sequential.';
+  }
+  return null;
 }
 
 function quizzesWord(n: number, kind: QuizKind): string {
@@ -371,6 +402,8 @@ export function QuizManager({
       modes: orderModes(quiz.allowed_modes),
       firstMode: quiz.first_mode ?? 'TIMED_FREE_NAV',
       sittingsAllowed: quiz.sittings_allowed ? String(quiz.sittings_allowed) : '',
+      results: quiz.results_at ? 'date' : 'immediately',
+      resultsAt: quiz.results_at ? resultsInputValue(quiz.results_at) : '',
       status: quiz.status,
       timeLimit: quiz.time_limit_sec ? String(quiz.time_limit_sec) : '',
       shuffle: quiz.shuffle,
@@ -414,6 +447,8 @@ export function QuizManager({
     // saveQuiz's own words, asked here too so an empty list is not found
     // only at Save, two panes on (walked 2026-09-28)
     if (!form.modes.length) return err(`Tick at least one mode students can take this ${W.noun} in.`);
+    const resultsWrong = resultsRefusal(form);
+    if (resultsWrong) return err(resultsWrong);
     if (!generatedId) return err(`${W.idLabel} could not be generated. Please re-select the course.`);
 
     if (pickerCourse !== courseId) await fetchPicker(courseId);
@@ -500,26 +535,38 @@ export function QuizManager({
   async function save() {
     if (selected.length === 0) return err(`Cannot save a ${W.noun} with no questions.`);
     if (!generatedId) return err(`${W.idLabel} could not be generated. Please re-select the course.`);
+    const resultsWrong = resultsRefusal(form);
+    if (resultsWrong) return err(resultsWrong);
 
     setSaving(true);
-    const result = await saveQuiz({
-      kind,
-      isEdit,
-      quizId: generatedId,
-      courseId: form.courseId,
-      title: form.title,
-      allowedModes: form.modes,
-      firstMode: form.firstMode,
-      sittingsAllowed: form.sittingsAllowed,
-      status: form.status,
-      published: form.published,
-      shuffle: form.shuffle,
-      timeLimitSec: form.timeLimit,
-      publishAt: form.publishAt,
-      unpublishAt: form.unpublishAt,
-      notes: form.notes,
-      itemIds: selected.map((i) => i.item_id),
-    });
+    // A dropped connection rejects rather than returning { ok: false }
+    // (AGENTS.md); the button comes back either way.
+    let result: ActionResult;
+    try {
+      result = await saveQuiz({
+        kind,
+        isEdit,
+        quizId: generatedId,
+        courseId: form.courseId,
+        title: form.title,
+        allowedModes: form.modes,
+        firstMode: form.firstMode,
+        sittingsAllowed: form.sittingsAllowed,
+        // the raw datetime-local string; saveQuiz marks it UTC
+        resultsAt: form.results === 'date' ? form.resultsAt : '',
+        status: form.status,
+        published: form.published,
+        shuffle: form.shuffle,
+        timeLimitSec: form.timeLimit,
+        publishAt: form.publishAt,
+        unpublishAt: form.unpublishAt,
+        notes: form.notes,
+        itemIds: selected.map((i) => i.item_id),
+      });
+    } catch {
+      setSaving(false);
+      return err(`Could not save this ${W.noun}. Please check your connection and try again.`);
+    }
     setSaving(false);
     if (!result.ok) return err(result.error);
 
@@ -547,6 +594,7 @@ export function QuizManager({
   const timeLimitText = form.timeLimit
     ? `${form.timeLimit} seconds (${Math.round(Number(form.timeLimit) / 60)} min)`
     : 'Auto — 1 min per question';
+  const resultsText = form.results === 'date' && form.resultsAt ? formatResultsAt(resultsIso(form.resultsAt)) : 'Immediately';
 
   // ── the details form's Scheduling section (placed differently per page) ──
   const scheduling = (
@@ -758,6 +806,28 @@ export function QuizManager({
                 <p className="form-hint">How many times a student may sit it, every mode together. A sitting counts when it starts.</p>
               </div>
             </div>
+            {/* 04.12 (Sam, 2026-10-15): until the date, no student sees a
+                score, report or answer from any sitting, and only the first
+                sitting's mode can be sat. The date input as Publish At's. */}
+            <div className="form-row">
+              <div className="form-group">
+                <div className="results-choice" role="radiogroup" aria-labelledby="fieldResultsLabel">
+                  <div id="fieldResultsLabel" className="mode-ticks-label">Results</div>
+                  <label className="check-label">
+                    <input type="radio" name="fieldResults" checked={form.results === 'immediately'} onChange={() => setField('results', 'immediately')} />
+                    Immediately
+                  </label>
+                  <label className="check-label">
+                    <input type="radio" name="fieldResults" checked={form.results === 'date'} onChange={() => setField('results', 'date')} />
+                    On a date and time
+                  </label>
+                </div>
+                {form.results === 'date' ? (
+                  <input id="fieldResultsAt" type="datetime-local" aria-label="Date and time results come out" value={form.resultsAt} onChange={(e) => setField('resultsAt', e.target.value)} />
+                ) : null}
+                <p className="form-hint">To give each student one sitting before results, set Sittings allowed to 1. Set the date at or after the close, so no one sits it after seeing the answers.</p>
+              </div>
+            </div>
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="fieldStatus">Status</label>
@@ -959,6 +1029,7 @@ export function QuizManager({
               </div>
               <div className="detail-row"><span className="detail-label">First sitting in</span><span className="detail-value">{MODES[form.firstMode].name}</span></div>
               <div className="detail-row"><span className="detail-label">Sittings allowed</span><span className="detail-value">{form.sittingsAllowed.trim() || 'No limit'}</span></div>
+              <div className="detail-row"><span className="detail-label">Results</span><span className="detail-value">{resultsText}</span></div>
               <div className="detail-row"><span className="detail-label">Status</span><span className="detail-value"><span className={`badge ${form.status}`}>{form.status}</span></span></div>
               <div className="detail-row"><span className="detail-label">Published</span><span className="detail-value">{form.published ? 'Yes' : 'No'}</span></div>
               <div className="detail-row"><span className="detail-label">Shuffle</span><span className="detail-value">{form.shuffle ? 'Yes — randomised per attempt' : 'No — fixed order'}</span></div>

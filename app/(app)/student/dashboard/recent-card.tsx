@@ -6,11 +6,15 @@
 // "History" opens Learning History, where every sitting is. With no
 // sittings, a line and no button: the top card above always carries the
 // next step, and a paper is no door for a free student (Sam, 2026-10-10).
+// A finished sitting whose paper's results are held (04.12) shows the
+// date where the score was and no Report: the report would only say "not
+// yet", and a tap costs a student on slow data a page.
 
 import { AppLink } from '@/components/shell/link-pending';
 import { Icon } from '@/components/shell/icons';
 import { reportHref, sessionHref } from '@/lib/attempts/links';
 import type { AttemptListRow } from '@/lib/attempts/types';
+import { formatResultsShort } from '@/lib/quizzes/results-date';
 import { fmtNumber } from './format';
 
 function iconOf(source: string) {
@@ -36,8 +40,11 @@ export function RecentCard({ attempts, titleOf }: { attempts: AttemptListRow[]; 
         <ul className="sd-list">
           {attempts.map((a) => {
             const title = a.display_label || `Quiz builder · ${titleOf(a.course_id)}`;
-            const score =
-              a.status === 'completed'
+            // held: student_attempts()'s word, the score empty until the date
+            const resultsAt = a.status === 'completed' && a.held && a.results_at ? a.results_at : null;
+            const score = resultsAt
+              ? `Results on ${formatResultsShort(resultsAt)}`
+              : a.status === 'completed'
                 ? `${Math.round(a.score_pct ?? 0)}%`
                 : a.status === 'in_progress'
                   ? `${fmtNumber(a.n)} questions`
@@ -51,7 +58,7 @@ export function RecentCard({ attempts, titleOf }: { attempts: AttemptListRow[]; 
                   <AppLink href={sessionHref(a.attempt_id)} className="sd-link sd-action">
                     Resume
                   </AppLink>
-                ) : a.status === 'completed' ? (
+                ) : a.status === 'completed' && !resultsAt ? (
                   <AppLink href={reportHref(a.attempt_id)} className="sd-link sd-action">
                     Report
                   </AppLink>

@@ -82,7 +82,7 @@ before then, and the old list's history, is in
 - ✅ 04.7 Practice Papers redesigned — drawn and ruled 2026-10-12 (04, 11), built the same day: courses → a course → a paper's page with Practise again; walked as an RM paid student (computer, 375px, a failed request); the trial, ended and free states and the locked rows to walk as those students (one link each, Sam)
 - ✅ 04.10 Sittings allowed — papers and mocks; every sitting counts, one at a time; start screen always — 2026-10-14
 - ✅ 04.11 A mock's first sitting in its own mode — the database and the mock form; its page with 04.15 — 2026-10-14
-- ⬜ 04.12 Results on a date — papers and mocks; everything held to the date, by the database
+- ✅ 04.12 Results on a date — papers and mocks; everything held to the date, by the database (student_attempts(), the score columns and a held sitting's rows out of the browser's reach); only the first mode while held, the number of sittings the admin's; the admin's Results field and hint; pop-up B and held sitting A — 2026-10-15
 - ⬜ 04.13 A review period — N days after results, then the review and Practise again lock; papers and mocks
 - ⬜ 04.14 At the close — an untimed sitting finished at the close; the card's Resume follows the sitting's mode
 - ⬜ 04.15 The Mock exams page redesigned — by time: Open now, Coming up, Past mocks; a mock's own page
@@ -90,6 +90,7 @@ before then, and the old list's history, is in
 - ⏸ 04.17 The mock form warns when its questions are edited after students have sat it — parked 2026-10-14 (Sam): scores are safe without it (each sitting keeps its own copy); worth building if standing across students (05 Q13) or more editors arrive; the better place then is the Question Bank edit
 - ⏸ 04.18 Status and Published as one switch — at the admin redesign (Sam, 2026-10-13)
 - ⏸ 04.19 An admin's extra sitting for one student — when a support case asks
+- ⬜ 04.21 A paper or mock archived before its results date keeps its questions held back — today archiving releases them to the Quiz Builder (whose Learning mode shows the answers) and to packs, so the next group could see them; found while building 04.12 (2026-10-15), not built
 - ✅ 04.20 Abandon back, on the sitting's own page — a quiet link under Resume on a paper's and a mock's card while a sitting is going; the app's confirm box, the sitting still counts toward sittings allowed; no migration — 2026-10-14
 - ⬜ G2 The daily challenge — 5 a day per programme, one course a day in turn, its own mode (storage ticked 10-08)
 - ⬜ Q19 The admin's preview says Preview — on the card and in the sitting

@@ -45,7 +45,7 @@ export default async function StudentDashboardPage() {
     getStudentCourseAccess(supabase, profile.user_id),
     getCourses(supabase),
     getStudentReceipts(supabase, profile.user_id),
-    getRecentAttempts(supabase, profile.user_id),
+    getRecentAttempts(profile.user_id),
     getAnnouncementsForStudent(supabase, profile),
     getStudentNoticeStates(supabase, profile.user_id),
   ]);

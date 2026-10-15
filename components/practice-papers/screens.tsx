@@ -5,20 +5,27 @@
 // the courses, a course, a paper's own page. Server Components — what
 // does something (Start, Resume, Practise again) is in paper-actions.tsx.
 // No size, time or paper count is written here: each is read from the
-// paper (derive.ts).
+// paper (derive.ts). While a paper's results are held (04.12), its date
+// stands where a score would, and no report is linked.
 
 import { AppLink } from '@/components/shell/link-pending';
 import { PageHeader } from '@/components/shell/page-header';
 import { MODES } from '@/lib/attempts/modes';
 import { reportHref, sessionHref } from '@/lib/attempts/links';
 import type { AttemptMode, AttemptWithProgress } from '@/lib/attempts/types';
+import { formatResultsAt } from '@/lib/quizzes/results-date';
 import {
   courseLine,
   formatDay,
   formatMinutes,
+  heldUntil,
+  otherWaysLine,
   paperMinutes,
+  resultsLine,
+  resumable,
   rowStatus,
   scoredPaper,
+  scoreWord,
   segments,
   shortName,
   sittingsLine,
@@ -108,6 +115,8 @@ export function CoursesScreen({ data }: { data: PracticePapers }) {
 export function CourseScreen({ course, tabs, ended }: { course: CourseView; tabs: { course_id: string; title: string }[]; ended: PracticePapers['ended'] }) {
   const next = upNext(course.papers);
   const scored = next ? null : scoredPaper(course.papers);
+  // 04.12: a held first sitting shows its date, and no report.
+  const scoredHeld = heldUntil(scored?.firstSitting);
   const anyLocked = course.papers.some((p) => !p.open);
   return (
     <div className="pp-page">
@@ -122,7 +131,13 @@ export function CourseScreen({ course, tabs, ended }: { course: CourseView; tabs
       {course.access === 'none' ? <EndedNote ended={ended} /> : null}
 
       {next ? <NextCard paper={next} access={course.access} /> : null}
-      {scored ? (
+      {scored && scoredHeld ? (
+        <div className="card pp-card">
+          <span className="pp-eyebrow">Your score</span>
+          <span className="pp-big">{shortName(scored.title)}</span>
+          <span className="pp-line">Results on {formatResultsAt(scoredHeld)}.</span>
+        </div>
+      ) : scored ? (
         <div className="card pp-card">
           <span className="pp-eyebrow">Your score</span>
           <span className="pp-big">
@@ -169,17 +184,19 @@ export function CourseScreen({ course, tabs, ended }: { course: CourseView; tabs
 }
 
 function NextCard({ paper, access }: { paper: PaperView; access: CourseView['access'] }) {
-  const going = paper.inProgress;
+  const going = paper.inProgress && resumable(paper, paper.inProgress) ? paper.inProgress : null;
   const mode = going ? going.mode : paper.first_mode;
   const eyebrow = access === 'trial' && paper.in_trial ? 'Included in your trial' : 'Up next';
   const fact = going
     ? `${going.answered_count} of ${paper.n} answered`
     : `${paper.n} questions`;
+  const held = resultsLine(paper);
   return (
     <div className="card pp-card">
       <span className="pp-eyebrow">{eyebrow}</span>
       <span className="pp-big">{shortName(paper.title)}</span>
       <span className="pp-line">{fact}</span>
+      {held ? <span className="pp-line">{held}</span> : null}
       <LaunchButton quizId={paper.quiz_id} mode={mode} label={going ? 'Resume' : 'Start'} />
     </div>
   );
@@ -187,7 +204,10 @@ function NextCard({ paper, access }: { paper: PaperView; access: CourseView['acc
 
 // ── 3 · a paper's own page ──────────────────────────────────────────────
 export function waysOf(paper: PaperView): Way[] {
-  const order = [paper.first_mode, ...paper.allowed_modes.filter((m) => m !== paper.first_mode)];
+  // 04.12: while the results are held, only the first sitting's mode.
+  const order = paper.held
+    ? [paper.first_mode]
+    : [paper.first_mode, ...paper.allowed_modes.filter((m) => m !== paper.first_mode)];
   return order.map((mode) => {
     const going = paper.sittings.find((a) => a.status === 'in_progress' && a.mode === mode);
     const finished = paper.sittings.find((a) => a.status === 'completed' && a.mode === mode);
@@ -200,19 +220,59 @@ export function waysOf(paper: PaperView): Way[] {
 
 export function Sitting({ a }: { a: AttemptWithProgress }) {
   const done = a.status === 'completed';
+  const name = (
+    <span className="pp-name">
+      {a.ts_iso ? formatDay(a.ts_iso) : ''} · {modeName(a.mode)}
+    </span>
+  );
+  // 04.12: a finished sitting whose results are held is no link — its
+  // report would only say "not yet", a wasted trip on slow data.
+  if (done && heldUntil(a)) {
+    return (
+      <div className="pp-row">
+        <span className="pp-row-main">
+          {name}
+          <span className="pp-line">Submitted</span>
+        </span>
+        <span className="pp-status">{scoreWord(a)}</span>
+      </div>
+    );
+  }
   return (
     <AppLink href={done ? reportHref(a.attempt_id) : sessionHref(a.attempt_id)} className="pp-row">
       <span className="pp-row-main">
-        <span className="pp-name">
-          {a.ts_iso ? formatDay(a.ts_iso) : ''} · {modeName(a.mode)}
-        </span>
+        {name}
         <span className="pp-line">{done ? 'See your report' : 'In progress'}</span>
       </span>
       <span className="pp-status">
-        {done && a.score_pct != null ? `${Math.round(a.score_pct)}%` : done ? '' : 'Resume'}{' '}
+        {done ? (scoreWord(a) ?? '') : 'Resume'}{' '}
         <span className="pp-chev" aria-hidden="true">›</span>
       </span>
     </AppLink>
+  );
+}
+
+/** A first sitting's two lines on a card: its score and mode, then its day —
+ *  or, while its results are held (04.12), their date where the score was,
+ *  then its day and mode. */
+export function FirstSittingLines({ a }: { a: AttemptWithProgress }) {
+  const held = heldUntil(a);
+  const day = a.ts_iso ? formatDay(a.ts_iso) : '';
+  if (held) {
+    return (
+      <>
+        <span className="pp-big">Results on {formatResultsAt(held)}</span>
+        <span className="pp-line">{day ? `${day} · ` : ''}{modeName(a.mode)}</span>
+      </>
+    );
+  }
+  return (
+    <>
+      <span className="pp-big">
+        {a.score_pct != null ? `${Math.round(a.score_pct)}%` : 'Finished'} · {modeName(a.mode)}
+      </span>
+      <span className="pp-line">{day}</span>
+    </>
   );
 }
 
@@ -229,15 +289,22 @@ export function PaperScreen({ course, paper, ended }: { course: CourseView; pape
   const limitLine = sittingsLine(paper);
   const limit = limitLine ? <span className="pp-line">{limitLine}</span> : null;
   const limited = paper.sittings_allowed != null;
+  // 04.12: while the results are held, their date among the card's lines;
+  // only the first mode is sat, so a sitting going in another waits for
+  // the date (it can still be abandoned).
+  const heldLine = resultsLine(paper);
+  const results = heldLine ? <span className="pp-line">{heldLine}</span> : null;
+  const waysLine = others && paper.sittingsLeft !== 0 ? otherWaysLine(paper) : null;
+  const canResume = going ? resumable(paper, going) : false;
 
   // After the first sitting: Practise again, unless no sitting is left;
   // with a limit, one sitting at a time, so a sitting going is resumed.
   let again: React.ReactNode = null;
   if (paper.availability === 'ACTIVE') {
     if (limited && going) {
-      again = <LaunchButton quizId={paper.quiz_id} mode={going.mode} label={`Resume ${modeName(going.mode)}`} />;
+      if (canResume) again = <LaunchButton quizId={paper.quiz_id} mode={going.mode} label={`Resume ${modeName(going.mode)}`} />;
     } else if (paper.sittingsLeft !== 0) {
-      again = <PractiseAgain quizId={paper.quiz_id} title={shortName(paper.title)} ways={waysOf(paper)} />;
+      again = <PractiseAgain quizId={paper.quiz_id} title={shortName(paper.title)} ways={waysOf(paper)} note={waysLine} />;
     }
   }
 
@@ -251,18 +318,20 @@ export function PaperScreen({ course, paper, ended }: { course: CourseView; pape
       </div>
     );
   } else if (done) {
+    const report = heldUntil(done) ? null : (
+      <AppLink href={reportHref(done.attempt_id)} className="btn btn-ghost btn-lg">See your report</AppLink>
+    );
     card = (
       <div className="card pp-card">
         <span className="pp-eyebrow">Your first sitting</span>
-        <span className="pp-big">
-          {done.score_pct != null ? `${Math.round(done.score_pct)}%` : 'Finished'} · {modeName(done.mode)}
-        </span>
-        <span className="pp-line">{done.ts_iso ? formatDay(done.ts_iso) : ''}</span>
+        <FirstSittingLines a={done} />
         {limit}
-        <div className="pp-actions">
-          <AppLink href={reportHref(done.attempt_id)} className="btn btn-ghost btn-lg">See your report</AppLink>
-          {again}
-        </div>
+        {report || again ? (
+          <div className="pp-actions">
+            {report}
+            {again}
+          </div>
+        ) : null}
         {going && paper.availability === 'ACTIVE' ? (
           <AbandonSitting
             attemptId={going.attempt_id}
@@ -277,6 +346,7 @@ export function PaperScreen({ course, paper, ended }: { course: CourseView; pape
       <div className="card pp-card">
         <span className="pp-eyebrow">{modeName(paper.first_mode)}</span>
         <span className="pp-line">{rowStatus(paper)}</span>
+        {results}
       </div>
     );
   } else if (going) {
@@ -286,7 +356,8 @@ export function PaperScreen({ course, paper, ended }: { course: CourseView; pape
         <span className="pp-big">{going.answered_count} of {paper.n} answered</span>
         <progress className="pp-progress" max={paper.n} value={going.answered_count} aria-label="Answered so far" />
         {limit}
-        <LaunchButton quizId={paper.quiz_id} mode={going.mode} label="Resume" />
+        {results}
+        {canResume ? <LaunchButton quizId={paper.quiz_id} mode={going.mode} label="Resume" /> : null}
         <AbandonSitting attemptId={going.attempt_id} sittingsAllowed={paper.sittings_allowed} />
       </div>
     );
@@ -298,6 +369,7 @@ export function PaperScreen({ course, paper, ended }: { course: CourseView; pape
         <span className="pp-line">{facts}</span>
         <span className="pp-line">{first.card}</span>
         {limit}
+        {results}
         <LaunchButton quizId={paper.quiz_id} mode={paper.first_mode} label="Start" />
       </div>
     );
@@ -325,7 +397,9 @@ export function PaperScreen({ course, paper, ended }: { course: CourseView; pape
           </div>
         ) : null}
       </div>
-      {paper.open && !done && others ? (
+      {paper.open && paper.availability === 'ACTIVE' && done && waysLine ? (
+        <p className="pp-hint">{waysLine}</p>
+      ) : paper.open && !done && others ? (
         <p className="pp-hint">More ways to practise this paper open after your first sitting.</p>
       ) : null}
     </div>

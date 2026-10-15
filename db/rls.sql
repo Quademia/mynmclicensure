@@ -492,6 +492,12 @@ using (user_id = auth_user_id() or auth_user_role() = 'ADMIN');
 -- check_answer, finish_attempt, expire_attempt, abandon_attempt — each
 -- taking the caller's user id and refusing a row that is not theirs or
 -- an attempt not in progress. Grading is grade_answer() in SQL.
+--
+-- 04.12 (20261015100000): the browser's SELECT is a column list without
+-- score_raw, score_total and score_pct. A student's pages read their
+-- sittings, scores included, through student_attempts() with the service
+-- role — the score empty while the paper's results are held; the admin's
+-- pages read the table with the service role.
 create policy attempts_select on attempts for select
 using (attempts.user_id = auth_user_id() or auth_user_role() = 'ADMIN');
 
@@ -508,10 +514,19 @@ using (attempts.user_id = auth_user_id() or auth_user_role() = 'ADMIN');
 -- revoked from the browser roles; the service role calls them) and,
 -- since Q5, save_answers() / check_answer() / finish_attempt() /
 -- expire_attempt() on the answer group.
+--
+-- 04.12 (20261015100000): a finished sitting whose paper's or mock's
+-- results are held is not readable by its owner until the date — its
+-- right and wrong marks stay here. _my_held_attempt_ids() (SECURITY
+-- DEFINER, the caller's own sittings only) reads the date the student's
+-- role cannot read on a closed or unpublished paper.
 create policy attempt_items_select on attempt_items for select
 using (
   auth_user_role() = 'ADMIN'
-  or attempt_id in (select a.attempt_id from attempts a where a.user_id = auth_user_id())
+  or (
+    attempt_id in (select a.attempt_id from attempts a where a.user_id = auth_user_id())
+    and attempt_id not in (select h from _my_held_attempt_ids() h)
+  )
 );
 create policy offline_pack_items_select on offline_pack_items for select
 using (

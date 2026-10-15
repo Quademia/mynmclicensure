@@ -19,9 +19,9 @@
 import { requireAdmin } from '@/lib/access';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getQuizAttemptStats } from '@/lib/attempts/queries';
-import type { QuizAttemptStats } from '@/lib/attempts/types';
+import type { AttemptMode, QuizAttemptStats } from '@/lib/attempts/types';
 import { getItemsByFilters, heldBackIds } from '@/lib/bank/queries';
-import { orderModes } from '@/lib/attempts/modes';
+import { MODES, orderModes } from '@/lib/attempts/modes';
 import { getAllQuizzesPaginated, getQuizById } from './queries';
 import {
   QUIZ_STATUSES,
@@ -139,7 +139,8 @@ export async function setQuizStatus(kind: QuizKind, quizId: string, status: Quiz
 // The page's checks, in legacy's order, then legacy's payload and the
 // picked ids to save_quiz() (03 Q14), which writes both in one step and
 // refuses a repeat or a question not in the quiz's course by name. The
-// two datetime strings go in as they are.
+// two schedule datetime strings go in as they are; the results date goes
+// in marked UTC (04.12).
 export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
   await requireAdmin();
   const noun = NOUN[input.kind];
@@ -176,6 +177,23 @@ export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
   const sittingsAllowed = sittingsRaw ? Number(sittingsRaw) : null;
   if (sittingsAllowed !== null && !(Number.isInteger(sittingsAllowed) && sittingsAllowed > 0)) {
     return fail('"Sittings allowed" is a whole number above 0, or empty for no limit.');
+  }
+  // 04.12 (Sam, 2026-10-15): results on a date, or '' for Immediately.
+  // The form sends the datetime-local string, Ghana time, which is UTC;
+  // it goes to the database marked UTC, so the database never reads it in
+  // a zone of its own. On a date the first sitting is in an exam mode —
+  // the table's check holds it too, in a constraint's words; these are
+  // the form's.
+  const resultsRaw = String(input.resultsAt ?? '').trim();
+  let resultsAt: string | null = null;
+  if (resultsRaw) {
+    const typed = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.exec(resultsRaw);
+    const stamp = typed ? new Date(resultsRaw + (typed[1] ? 'Z' : ':00Z')) : null;
+    if (!stamp || Number.isNaN(stamp.getTime())) return fail('Choose the date and time results come out.');
+    if (MODES[firstMode as AttemptMode].group !== 'exam') {
+      return fail('Results on a date need the first sitting in an exam mode: Free Navigation or Sequential.');
+    }
+    resultsAt = stamp.toISOString();
   }
 
   // 08 B6: a fixed quiz is practice, so it cannot hold a question a
@@ -236,6 +254,7 @@ export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
     notes: input.notes.trim() || null,
     first_mode: firstMode,
     sittings_allowed: sittingsAllowed,
+    results_at: resultsAt,
     updated_at: now,
   };
   if (!input.isEdit) payload.created_at = now;
@@ -255,6 +274,7 @@ export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
 // ── the attempt-stats box on the details step (legacy openEditQuiz) ───
 // Added with slice 5b, once `attempts` existed.
 export async function loadQuizAttemptStats(kind: QuizKind, quizId: string): Promise<QuizAttemptStats> {
-  const { supabase } = await requireAdmin();
-  return getQuizAttemptStats(supabase, kind, quizId);
+  await requireAdmin();
+  // The service role (04.12): the admin sees every score, held or not.
+  return getQuizAttemptStats(createServiceRoleClient(), kind, quizId);
 }

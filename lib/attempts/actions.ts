@@ -36,8 +36,8 @@ import { makeAttemptId } from './ids';
 import { modeOf } from './modes';
 import {
   getAnswerHistory,
-  getAttemptById,
   getBuilderCourseItems,
+  getOwnAttempt,
   getQuizBuilderRows,
   getStudentAttemptsPaginated,
   originSource,
@@ -387,7 +387,8 @@ function scoreOf(data: unknown): { raw: number; total: number; pct: number } | n
 // Submit: every row graded from its final answer, the header summed,
 // completed. timeTakenS is the browser's stopwatch for an instant
 // attempt; an exam's time is the server clock's. The sitting being over,
-// the reply carries every question's secret half for the review (Q6).
+// the reply carries every question's secret half for the review (Q6) —
+// unless its results are held (04.12, closedResult).
 export async function finishAttempt(attemptId: string, timeTakenS: number | null): Promise<FinishResult> {
   const { profile } = await requireStudent();
   const svc = createServiceRoleClient();
@@ -399,16 +400,38 @@ export async function finishAttempt(attemptId: string, timeTakenS: number | null
   if (error) return fail(rpcError(error, 'Could not submit this attempt.'));
   const score = scoreOf(data);
   if (!score) return fail('Could not submit this attempt.');
-  const [rows, stored] = await Promise.all([readAttemptItems(svc, attemptId), storedTimeTaken(svc, attemptId)]);
-  return { ok: true, score, secrets: secretsOf(rows), timeTakenS: stored };
+  return closedResult(svc, profile.user_id, attemptId, score);
 }
 
-// The time the close wrote (03 Q18: the results pop-up shows it) — the
-// server clock's for an exam, the stopwatch's otherwise.
-async function storedTimeTaken(svc: ReturnType<typeof createServiceRoleClient>, attemptId: string): Promise<number | null> {
-  const { data } = await svc.from('attempts').select('time_taken_s').eq('attempt_id', attemptId).maybeSingle();
-  const t = (data as { time_taken_s: number | null } | null)?.time_taken_s;
-  return t === null || t === undefined ? null : Number(t);
+// What a closed sitting's reply carries (04.12). The sitting is read back
+// through student_attempts(), which decides whether its results are held:
+// held, the reply is the date and what was saved — no score, no secret
+// half; otherwise the score, every secret half for the review (Q6) and the
+// time the close wrote (03 Q18: the server clock's for an exam, the
+// stopwatch's otherwise). The read is tried twice — the sitting is closed
+// by now, and a reply of failure would leave the runner live — and a read
+// that fails both times gives nothing away.
+async function closedResult(
+  svc: ReturnType<typeof createServiceRoleClient>,
+  userId: string,
+  attemptId: string,
+  score: { raw: number; total: number; pct: number },
+): Promise<FinishResult> {
+  const [first, rows] = await Promise.all([getOwnAttempt(userId, attemptId), readAttemptItems(svc, attemptId)]);
+  const own = first ?? (await getOwnAttempt(userId, attemptId));
+  if (!own) return fail('Your answers were submitted. Open the sitting again from Learning History.');
+  const timeTakenS = own.time_taken_s === null || own.time_taken_s === undefined ? null : Number(own.time_taken_s);
+  if (own.held && own.results_at) {
+    return {
+      ok: true,
+      held: true,
+      resultsAt: own.results_at,
+      answered: rows.filter((r) => r.chosen !== null && r.chosen !== '').length,
+      total: rows.length,
+      timeTakenS,
+    };
+  }
+  return { ok: true, held: false, score, secrets: secretsOf(rows), timeTakenS };
 }
 
 // The exam's clock ran out: closed at the true deadline. The function
@@ -423,8 +446,7 @@ export async function expireAttempt(attemptId: string): Promise<FinishResult> {
   if (error) return fail(rpcError(error, 'Could not submit this exam.'));
   const score = scoreOf(data);
   if (!score) return fail('Could not submit this exam.');
-  const [rows, timeTakenS] = await Promise.all([readAttemptItems(svc, attemptId), storedTimeTaken(svc, attemptId)]);
-  return { ok: true, score, secrets: secretsOf(rows), timeTakenS };
+  return closedResult(svc, profile.user_id, attemptId, score);
 }
 
 // ── the list pages (5b) ────────────────────────────────────────────────
@@ -509,7 +531,7 @@ export async function spawnQuizAttempt(kind: QuizKind, quizId: string, mode: Att
 export async function retakeAttempt(originAttemptId: string): Promise<SpawnResult> {
   const { supabase, profile } = await requireStudent();
 
-  const origin = await getAttemptById(supabase, originAttemptId);
+  const origin = await getOwnAttempt(profile.user_id, originAttemptId);
   if (!origin) return fail('Could not create retake. Please try again.');
   if (origin.user_id !== profile.user_id) return fail('This quiz attempt does not belong to your account.');
   if (origin.status !== 'completed') return fail('Only a completed attempt can be retaken.');
@@ -521,7 +543,7 @@ export async function retakeAttempt(originAttemptId: string): Promise<SpawnResul
     return fail('You do not have an active subscription for this course.');
   }
 
-  const kind = await quizKindOfAttempt(supabase, origin);
+  const kind = await quizKindOfAttempt(origin);
   if (kind && origin.quiz_id) {
     const quiz = await getQuizById(createServiceRoleClient(), kind, origin.quiz_id);
     if (!quiz) return fail('This quiz is not open right now.');
@@ -549,8 +571,8 @@ export async function retakeAttempt(originAttemptId: string): Promise<SpawnResul
 // Which quiz table an attempt's quiz lives in: where the sitting came
 // from (a retake followed back to its origin — queries.ts, since 03 Q8
 // the runner's Exit reads it too). A builder attempt has no quiz: null.
-async function quizKindOfAttempt(db: Parameters<typeof getAttemptById>[0], attempt: Attempt): Promise<QuizKind | null> {
-  const source = await originSource(db, attempt);
+async function quizKindOfAttempt(attempt: Attempt): Promise<QuizKind | null> {
+  const source = await originSource(attempt, (id) => getOwnAttempt(attempt.user_id, id));
   return source === 'fixed' || source === 'mock' ? source : null;
 }
 
@@ -571,12 +593,12 @@ export async function abandonAttempt(attemptId: string): Promise<ActionResult> {
 // Every filter change and every Load more is one page from here; the
 // first page is read by the page itself.
 export async function loadHistoryPage(filters: HistoryFilters, page: number): Promise<HistoryPage> {
-  const { supabase, profile } = await requireStudent();
+  const { profile } = await requireStudent();
   const safe: HistoryFilters = {
     courseId: String(filters?.courseId || ''),
     status: String(filters?.status || ''),
     mode: String(filters?.mode || ''),
     search: String(filters?.search || '').trim(),
   };
-  return getStudentAttemptsPaginated(supabase, profile.user_id, safe, Math.max(0, Math.floor(Number(page) || 0)));
+  return getStudentAttemptsPaginated(profile.user_id, safe, Math.max(0, Math.floor(Number(page) || 0)));
 }

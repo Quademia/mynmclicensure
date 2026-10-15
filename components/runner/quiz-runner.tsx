@@ -47,6 +47,12 @@
 // item ids and the quoted question (locked or review: opens at once).
 // Legacy's brand string in the header and the watermark read
 // "QAcademy"; the brand is Quademia (AGENTS.md UI convention #5).
+//
+// Results on a date (04.12, Sam 2026-10-15): when the paper's or mock's
+// results are held, the finish reply carries the date and how many were
+// answered — no score, no secret half. The sitting then never enters its
+// review: the runner becomes the held screen a reopen shows
+// (results-held.tsx), with the held pop-up over it.
 
 'use client';
 import { Dialog } from '@/lib/overlays/shared/dialog';
@@ -58,7 +64,8 @@ import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { Toast } from '@/lib/toast/toast';
 import { advanceAttempt, checkAnswer, expireAttempt, finishAttempt, retakeAttempt, saveAnswers } from '@/lib/attempts/actions';
 import { reportHref, sessionHref } from '@/lib/attempts/links';
-import { ResultsPopup, type ResultsSummary } from './results-popup';
+import { ResultsHeldPopup, ResultsPopup, type ResultsSummary } from './results-popup';
+import { ResultsHeld } from './results-held';
 import { Icon } from '@/components/shell/icons';
 import { KindChip, QUESTION_TYPE_HUE } from '@/components/shell/chips';
 import {
@@ -75,7 +82,7 @@ import {
 } from '@/lib/attempts/scoring';
 import type { SessionExit } from '@/lib/attempts/links';
 import { modeOf } from '@/lib/attempts/modes';
-import type { AnswerPatch, Attempt, ChosenMap, FlagMap, Score, SealedItem, SecretsMap } from '@/lib/attempts/types';
+import type { AnswerPatch, Attempt, ChosenMap, FinishResult, FlagMap, Score, SealedItem, SecretsMap } from '@/lib/attempts/types';
 import {
   close as closeClockItem,
   createClock,
@@ -138,6 +145,7 @@ export function QuizRunner({
   reviewMode,
   previewMode,
   exit,
+  heldExit,
   retakeAllowed = false,
   initialQuestion = null,
 }: {
@@ -149,6 +157,8 @@ export function QuizRunner({
   previewMode: boolean;
   /** Where Exit and the buttons after submitting go: the sitting's home. */
   exit: SessionExit;
+  /** 04.12: the way back once a held sitting is submitted — its paper's or mock's own page. */
+  heldExit?: SessionExit;
   /** 03 Q18: the results pop-up offers Retake (the server checks again on the press). */
   retakeAllowed?: boolean;
   /** 03 Q10: a review opened at this question (1-based) — the report's links, `?q=`. */
@@ -193,6 +203,15 @@ export function QuizRunner({
   const [serverTime, setServerTime] = useState<number | null>(null);
   const [retaking, setRetaking] = useState(false);
   const [serverScore, setServerScore] = useState<Score | null>(null);
+  // 04.12: the finish's reply for a sitting whose results are held, and
+  // when it was submitted (the browser's clock, stamped by the handler).
+  const [heldResult, setHeldResult] = useState<{
+    resultsAt: string;
+    answered: number;
+    total: number;
+    timeTakenS: number | null;
+    endedAt: string;
+  } | null>(null);
   const [gridOverlayOpen, setGridOverlayOpen] = useState(false);
   const [desktopGridHidden, setDesktopGridHidden] = useState(false);
   const [exitOpen, setExitOpen] = useState(false);
@@ -618,20 +637,42 @@ export function QuizRunner({
       : sittingSeconds(clockOf(clockRef, items), performance.now());
 
     if (!previewMode) {
-      // every question's last time goes with the last save (Q11)
-      await flushSaves({ withTime: true });
-      const result = autoSubmit ? await expireAttempt(attempt.attempt_id) : await finishAttempt(attempt.attempt_id, timeTakenS);
+      let result: FinishResult;
+      try {
+        // every question's last time goes with the last save (Q11)
+        await flushSaves({ withTime: true });
+        result = autoSubmit ? await expireAttempt(attempt.attempt_id) : await finishAttempt(attempt.attempt_id, timeTakenS);
+      } catch {
+        // a dropped connection rejects rather than replying: the button
+        // (or the auto-submit's next try) comes back
+        finishingRef.current = false;
+        setSaving('');
+        setToast('Could not submit. Please check your connection and try again.');
+        return false;
+      }
       if (!result.ok) {
         finishingRef.current = false;
         setSaving('');
         setToast(`Could not submit: ${result.error} Your answers are saved — please try again.`);
         return false;
       }
-      setServerScore(result.score);
-      setServerTime(result.timeTakenS);
-      // The sitting is over: every question's secret half arrives with
-      // the score, so the review renders without a reload (Q6).
-      setSecrets((s) => ({ ...s, ...result.secrets }));
+      if (result.held) {
+        // 04.12: the results are held — no score and no secret half came,
+        // so there is no review; the held screen and its pop-up instead.
+        setHeldResult({
+          resultsAt: result.resultsAt,
+          answered: result.answered,
+          total: result.total,
+          timeTakenS: result.timeTakenS,
+          endedAt: new Date().toISOString(),
+        });
+      } else {
+        setServerScore(result.score);
+        setServerTime(result.timeTakenS);
+        // The sitting is over: every question's secret half arrives with
+        // the score, so the review renders without a reload (Q6).
+        setSecrets((s) => ({ ...s, ...result.secrets }));
+      }
     } else {
       setServerTime(timeTakenS);
     }
@@ -639,8 +680,9 @@ export function QuizRunner({
     setFinishSent(true);
     setLocked(true);
     setSaving('');
-    // Q18: the results pop-up opens over the review — not on Submit &
-    // Exit, which leaves the page a moment later.
+    // Q18: the results pop-up opens over the review (04.12: the held
+    // pop-up over the held screen) — not on Submit & Exit, which leaves
+    // the page a moment later.
     if (openResults) setResultsOpen(true);
     return true;
   }
@@ -1075,15 +1117,47 @@ export function QuizRunner({
   const timerColor = timerPercent <= 10 ? 'red' : timerPercent <= 20 ? 'amber' : '';
   const timerText = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
 
+  const loader = phase === 'init' || saving ? (
+    <div className="qa-loader">
+      <div className="loader-spinner" />
+      <div className="loader-msg">{saving && saving !== 'submitting' ? saving : 'Loading your quiz…'}</div>
+    </div>
+  ) : null;
+
+  // 04.12: submitted with its results held — the screen a reopen shows, in
+  // place of the questions, and the held pop-up over it. No header: its
+  // score pill, the bar's colour and the question map's marks would each
+  // say what the date has not let out. The loader stays for Submit & Exit.
+  if (heldResult) {
+    return (
+      <ResultsHeld
+        held={{ displayLabel: attempt.display_label, resultsAt: heldResult.resultsAt, endedAt: heldResult.endedAt }}
+        exit={heldExit ?? exit}
+      >
+        {loader}
+        <BodyPortal>
+          <Toast message={toast} onDismiss={dismissToast} />
+          <ResultsHeldPopup
+            open={resultsOpen}
+            summary={{
+              heading: timeUp ? 'Time is up' : M.group === 'study' ? 'Quiz submitted' : 'Exam submitted',
+              resultsAt: heldResult.resultsAt,
+              answered: heldResult.answered,
+              total: heldResult.total,
+              timeTakenS: heldResult.timeTakenS,
+              modeName: M.fullName,
+            }}
+            onClose={() => setResultsOpen(false)}
+            exit={heldExit ?? exit}
+          />
+        </BodyPortal>
+      </ResultsHeld>
+    );
+  }
 
   return (
     <div className="runner">
-      {phase === 'init' || saving ? (
-        <div className="qa-loader">
-          <div className="loader-spinner" />
-          <div className="loader-msg">{saving && saving !== 'submitting' ? saving : 'Loading your quiz…'}</div>
-        </div>
-      ) : null}
+      {loader}
 
       {/* Sticky header */}
       <div className="runner-header" ref={headerRef}>

@@ -135,7 +135,7 @@ opens it (00, The menu).
 - **Sittings, results and review** (04, Sam, 2026-10-13): a paper's card
   says the sittings left when the admin sets a number; held results and
   a closed review show as on a mock's page (below). *(the sittings built
-  2026-10-14, 04.10; to build: 04.12, 04.13)*
+  2026-10-14, 04.10; held results built 2026-10-15, 04.12; to build: 04.13)*
 
 ### Mock exams
 - **Redesigned (Sam, 2026-10-13: layout A; 04.15)**, drawn at
@@ -156,9 +156,11 @@ opens it (00, The menu).
   — Your first sitting (the mode, size, time, closing date), Resume, then
   the score, See your report and Practise again; "You can sit this mock N
   times" or "N of M sittings left" when a limit is set; the student's
-  sittings. Held: "Submitted 28 October · Results on 30 October, 6:00 pm
-  · Your score, report and answers come out then", Practise again opening
-  with the results. Every sitting used: the score and See your report. A
+  sittings. Held (04.12): "Results on Friday 30 October at 6:00 pm" on
+  the card, the sittings showing "Results on 30 Oct" in place of a score
+  and no report link until then; Practise again offers the first
+  sitting's mode only, the others opening with the results (Sam,
+  2026-10-15). Every sitting used: the score and See your report. A
   closed mock: the score, the report and the review, no new sitting.
 - **Every student without Premium Prep is alike** — free, trial, ended,
   or paid without it (Sam, 2026-10-14); only the season changes the page.
@@ -219,8 +221,11 @@ opens it (00, The menu).
 - Ended: the summary open; the question list locked — "Choose a package
   to review your answers". The percentile on the trial paper's report
   (05).
-- Held results (04.12): the pop-up says "Submitted. Your results come
-  out on …" and the report waits for the date. After a review period
+- Held results (04.12, built 2026-10-15): the pop-up ("Exam submitted")
+  says when the results come out, with the mode, the time and how many
+  were answered, and one way back — to the paper's or mock's own page;
+  the sitting opened again, and the report, show the date and nothing
+  else until then. After a review period
   (04.13): the summary open, the question list locked — "The review of
   this mock closed on …".
 

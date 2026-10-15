@@ -38,7 +38,6 @@ export default async function LearningHistoryPage({ searchParams }: { searchPara
   const initialCourseId = urlCourse && enrolled.some((c) => c.course_id === urlCourse) ? urlCourse : '';
 
   const firstPage = await getStudentAttemptsPaginated(
-    supabase,
     profile.user_id,
     { courseId: initialCourseId, status: '', mode: '', search: '' },
     0,

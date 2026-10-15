@@ -111,6 +111,14 @@
 .results-pop-facts { display: grid; grid-template-columns: auto auto; justify-content: center; gap: 4px 12px; font-size: 13px; margin: 0 0 8px; }
 .results-pop-facts dt { color: var(--text-muted); text-align: right; }
 .results-pop-facts dd { margin: 0; color: var(--ink); font-weight: 600; text-align: left; }
+/* 04.12: results held — the clock's pale-teal circle (the held screen's
+   and the held pop-up's, so unscoped), and the pop-up's date in the
+   score's place. Its facts are .results-pop-facts above. */
+.results-held-mark { display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; margin: 0 auto var(--space-16); border-radius: var(--radius-pill); background: var(--brand-teal-pale); color: var(--brand-teal-hover); }
+.results-held-pop { text-align: center; padding-top: var(--space-12); }
+.results-held-pop-lead { font-size: var(--type-meta-size); line-height: var(--type-meta-line); color: var(--ink-muted); }
+.results-held-pop-date { font-size: 20px; font-weight: 700; line-height: 1.3; color: var(--brand-navy); margin: var(--space-4) 0 var(--space-8); text-wrap: balance; }
+.results-held-pop-note { font-size: var(--type-field-size); line-height: 1.5; color: var(--ink-muted); margin: 0 0 var(--space-16); }
 /* the header's score pill: opens the pop-up again on a finished sitting */
 .runner .hbtn-score { font-variant-numeric: tabular-nums; }
 
@@ -268,6 +276,11 @@
 .runner .error-icon { display: flex; justify-content: center; color: var(--danger); margin-bottom: 12px; }
 .runner .error-title { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
 .runner .error-msg { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
+/* 04.12: the held sitting's screen — the error card's calm sibling, the
+   clock's circle (.results-held-mark) where the alarm is */
+.runner .held-screen { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: var(--space-32) var(--space-24); text-align: center; margin: var(--space-32) auto; max-width: 480px; }
+.runner .held-title { font-size: 18px; font-weight: 700; color: var(--brand-navy); margin-bottom: var(--space-8); text-wrap: balance; }
+.runner .held-msg { font-size: var(--type-field-size); color: var(--ink-muted); line-height: 1.5; margin: 0 0 var(--space-20); }
 
 /* ── Review-mode banner ── */
 .runner .review-banner { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #92400e; font-weight: 600; margin-bottom: 16px; text-align: center; }

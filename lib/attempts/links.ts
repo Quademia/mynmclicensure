@@ -41,3 +41,22 @@ export const SESSION_EXITS: Record<SessionHome, SessionExit> = {
   fixed: { href: '/student/practice-papers', label: 'Back to Practice Papers' },
   mock: { href: '/student/mock-exams', label: 'Back to Mock Exams' },
 };
+
+/**
+ * A paper's or a mock's own page, named — the way back from a sitting whose
+ * results are held (04.12, Sam's drawing: "Back to Midwifery Mock 1"),
+ * where the date, the sittings and Practise again are. A builder quiz, or a
+ * sitting with no quiz, goes to its home as every other exit does.
+ */
+export function quizPageExit(home: SessionHome, quizId: string | null, courseId: string, title: string | null): SessionExit {
+  if (home === 'mock' && quizId) {
+    return { href: `/student/mock-exams/${encodeURIComponent(quizId)}`, label: `Back to ${title || 'the mock'}` };
+  }
+  if (home === 'fixed' && quizId) {
+    return {
+      href: `/student/practice-papers/${encodeURIComponent(courseId)}/${encodeURIComponent(quizId)}`,
+      label: `Back to ${title || 'the paper'}`,
+    };
+  }
+  return SESSION_EXITS[home];
+}

@@ -12,13 +12,25 @@
 // D52 (2026-09-26; AGENTS.md rule 10): the reads that can pass the API's
 // 1,000-row cap — a quiz's sittings across students, a student's whole
 // attempt list, a whole course for the builders — go through readAll().
+//
+// 04.12 (2026-10-15): the browser's roles no longer read the three score
+// columns of `attempts`, so a student's own sittings are read through the
+// database's student_attempts() with the service role, after the caller's
+// gate: it returns the row with the score empty while the paper's results
+// are held, the date, and `held` — the one place the hold is decided. The
+// admin's reads (getAttemptById, getQuizAttemptStats) take the service
+// role and see every score.
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import { readAll, slices } from '@/lib/supabase/read-all';
-import type { createServiceRoleClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { HISTORY_PAGE_SIZE, RECENT_ATTEMPTS_LIMIT, type Attempt, type AttemptItem, type AttemptListRow, type AttemptWithProgress, type BuilderItem, type HistoryFilters, type HistoryPage, type QuizAttemptStats } from './types';
 
 type ServiceDb = ReturnType<typeof createServiceRoleClient>;
+
+/** A list row's columns, from student_attempts() (04.12: with the date and held). */
+const LIST_COLUMNS =
+  'attempt_id, user_id, quiz_id, course_id, mode, source, status, n, score_raw, score_total, score_pct, time_taken_s, display_label, ts_iso, results_at, held';
 
 // The attempt's own questions (03 Q4): attempt_items in position order,
 // each row as the bank served it when the attempt was created, the
@@ -45,7 +57,8 @@ export async function readAttemptItems(db: ServiceDb, attemptId: string): Promis
 // exam are separate tables with independent ids — and first sittings
 // (source = the kind), retakes (source = 'retake') and abandons are
 // counted apart. The mean score is over the completed rows, rounded.
-export async function getQuizAttemptStats(db: ServerSupabaseClient, kind: 'fixed' | 'mock', quizId: string): Promise<QuizAttemptStats> {
+// The service role (04.12): the admin sees every score, held or not.
+export async function getQuizAttemptStats(db: ServiceDb, kind: 'fixed' | 'mock', quizId: string): Promise<QuizAttemptStats> {
   const empty: QuizAttemptStats = { total: 0, firstSittings: 0, retakes: 0, abandoned: 0, completed: 0, avgScore: 0 };
   const { data: rows, error } = await readAll<{ source: string; status: string; score_pct: number | null }>((from, to) =>
     db
@@ -73,7 +86,9 @@ export async function getQuizAttemptStats(db: ServerSupabaseClient, kind: 'fixed
   };
 }
 
-export async function getAttemptById(db: ServerSupabaseClient, attemptId: string): Promise<Attempt | null> {
+// Any sitting, whoever's, the score as stored: the admin's reads and the
+// admin's preview, with the service role behind requireAdmin (04.12).
+export async function getAttemptById(db: ServiceDb, attemptId: string): Promise<Attempt | null> {
   const { data, error } = await db.from('attempts').select('*').eq('attempt_id', attemptId).maybeSingle();
   if (error) {
     console.error('getAttemptById:', error);
@@ -82,18 +97,40 @@ export async function getAttemptById(db: ServerSupabaseClient, attemptId: string
   return (data as Attempt | null) ?? null;
 }
 
+// A student's own sitting (04.12): through student_attempts(), so the
+// score is empty while held and a sitting that is not theirs is not found.
+// The caller has passed the student gate; `userId` is the gate's. A POST on
+// purpose: never memoised, so a read after a write (the runner's re-reads)
+// sees the write.
+export async function getOwnAttempt(userId: string, attemptId: string): Promise<Attempt | null> {
+  if (!attemptId) return null;
+  const { data, error } = await createServiceRoleClient().rpc('student_attempts', {
+    p_user_id: userId,
+    p_attempt_ids: [attemptId],
+  });
+  if (error) {
+    console.error('getOwnAttempt:', error);
+    return null;
+  }
+  return ((data as Attempt[] | null) ?? [])[0] ?? null;
+}
+
 /**
  * Where a sitting came from: its own source, or — for a retake, whose
  * source is 'retake' — the source of the sitting it retakes, followed back
- * through origin_attempt_id. Null when the chain breaks. The runner's Exit
+ * through origin_attempt_id with `read` (a student's getOwnAttempt, an
+ * admin's getAttemptById). Null when the chain breaks. The runner's Exit
  * (03 Q8) and the retake's check on its quiz both read it.
  */
-export async function originSource(db: ServerSupabaseClient, attempt: Attempt): Promise<'builder' | 'fixed' | 'mock' | null> {
+export async function originSource(
+  attempt: Attempt,
+  read: (attemptId: string) => Promise<Attempt | null>,
+): Promise<'builder' | 'fixed' | 'mock' | null> {
   let current: Attempt | null = attempt;
   for (let hops = 0; current && hops < 20; hops++) {
     if (current.source === 'builder' || current.source === 'fixed' || current.source === 'mock') return current.source;
     if (current.source !== 'retake' || !current.origin_attempt_id) return null;
-    current = await getAttemptById(db, current.origin_attempt_id);
+    current = await read(current.origin_attempt_id);
   }
   return null;
 }
@@ -101,23 +138,26 @@ export async function originSource(db: ServerSupabaseClient, attempt: Attempt): 
 /** A student's attempts, newest first; one course when asked (the list
  * pages, 5b). Since 03 Q5 each in-progress attempt carries the count of
  * its answered rows for the card's "N of M answered" (legacy counted the
- * answers_json records); a second read, the student's own rows. */
-export async function getStudentAttempts(
-  db: ServerSupabaseClient,
-  userId: string,
-  courseId: string | null = null,
-): Promise<AttemptWithProgress[]> {
-  const build = () => {
-    let query = db.from('attempts').select('*').eq('user_id', userId);
-    if (courseId) query = query.eq('course_id', courseId);
-    return query.order('ts_iso', { ascending: false }).order('attempt_id');
-  };
-  const { data: attempts, error } = await readAll<Attempt>((from, to) => build().range(from, to));
+ * answers_json records); a second read, the student's own rows. Through
+ * student_attempts() (04.12), so a held sitting's score is empty and it
+ * carries `held` and `results_at`. */
+export async function getStudentAttempts(userId: string, courseId: string | null = null): Promise<AttemptWithProgress[]> {
+  const db = createServiceRoleClient();
+  // A GET (the function is stable): retried on a dropped connection, as a
+  // table read is. No null in a GET's arguments — it would arrive as 'null'.
+  const { data: attempts, error } = await readAll<Attempt>((from, to) =>
+    db
+      .rpc('student_attempts', courseId ? { p_user_id: userId, p_course_id: courseId } : { p_user_id: userId }, { get: true })
+      .order('ts_iso', { ascending: false })
+      .order('attempt_id')
+      .range(from, to),
+  );
   if (error) {
     console.error('getStudentAttempts:', error);
     return [];
   }
 
+  // The ids are the student's own, from the read above.
   const open = attempts.filter((a) => a.status === 'in_progress').map((a) => a.attempt_id);
   const counts: Record<string, number> = {};
   for (const ids of slices(open)) {
@@ -230,21 +270,18 @@ export async function getAnswerHistory(db: ServerSupabaseClient, userId: string,
 // exact total for the "Showing N of M" line and the Load more button.
 // Course, status, mode and the label search are the database's; the
 // source filter and the sort order stay in the browser, as legacy.
+// Through student_attempts() (04.12): a held sitting's score is empty.
 export async function getStudentAttemptsPaginated(
-  db: ServerSupabaseClient,
   userId: string,
   filters: HistoryFilters,
   page = 0,
   pageSize = HISTORY_PAGE_SIZE,
 ): Promise<HistoryPage> {
-  let query = db
-    .from('attempts')
-    .select(
-      'attempt_id, user_id, quiz_id, course_id, mode, source, status, n, score_raw, score_total, score_pct, time_taken_s, display_label, ts_iso',
-      { count: 'exact' },
-    )
-    .eq('user_id', userId)
-    .order('ts_iso', { ascending: false });
+  let query = createServiceRoleClient()
+    .rpc('student_attempts', { p_user_id: userId }, { get: true, count: 'exact' })
+    .select(LIST_COLUMNS)
+    .order('ts_iso', { ascending: false })
+    .order('attempt_id');
 
   if (filters.courseId) query = query.eq('course_id', filters.courseId);
   if (filters.status) query = query.eq('status', filters.status);
@@ -264,17 +301,13 @@ export async function getStudentAttemptsPaginated(
 // ── the dashboard's Recent Quiz Attempts (legacy loadRecentAttempts) ────
 // The five newest attempts, whatever their status. Legacy read `*` with
 // `.limit(5)`; the columns are narrowed to the list row's, which is every
-// column the table renders.
-export async function getRecentAttempts(
-  db: ServerSupabaseClient,
-  userId: string,
-  limit = RECENT_ATTEMPTS_LIMIT,
-): Promise<AttemptListRow[]> {
-  const { data, error } = await db
-    .from('attempts')
-    .select('attempt_id, user_id, quiz_id, course_id, mode, source, status, n, score_raw, score_total, score_pct, time_taken_s, display_label, ts_iso')
-    .eq('user_id', userId)
+// column the table renders. Through student_attempts() (04.12).
+export async function getRecentAttempts(userId: string, limit = RECENT_ATTEMPTS_LIMIT): Promise<AttemptListRow[]> {
+  const { data, error } = await createServiceRoleClient()
+    .rpc('student_attempts', { p_user_id: userId }, { get: true })
+    .select(LIST_COLUMNS)
     .order('ts_iso', { ascending: false })
+    .order('attempt_id')
     .limit(limit);
 
   if (error) {

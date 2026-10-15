@@ -71,7 +71,7 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
   stats keep papers and mocks apart and show retakes and abandons
   separately.
 
-### A paper's and a mock's settings *(04.10, 04.11 built 2026-10-14; to build: 04.12–04.14)*
+### A paper's and a mock's settings *(04.10, 04.11 built 2026-10-14; 04.12 built 2026-10-15; to build: 04.13, 04.14)*
 
 Papers and mocks carry the same settings (Sam, 2026-10-13: "they are
 the same settings almost"). Drawn with the Mock exams page at
@@ -103,11 +103,20 @@ https://claude.ai/artifact/5QQCWH9ECauT7k69cUUxC3 (board B).
   that is later. The results pop-up says "Submitted. Your results come
   out on …"; every place a score shows says "Results on …"; questions
   mastered and the weakest topic wait too, or they would give the score
-  away. While results are held Practise again stays shut, and the first
-  sitting must be in an exam mode (the form refuses a Study mode). The
+  away. While results are held, a further sitting is in the first
+  sitting's mode only — Practise again offers that mode alone, and the
+  others open on the date (Sam, 2026-10-15: Learning would show the
+  answers) — and the first sitting must be in an exam mode (the form
+  refuses a Study mode). How many sittings is the admin's, through
+  Sittings allowed: no rule of its own (Sam, 2026-10-15: "if admin wanted
+  to use the feature well, he will allow only one sitting"); the form's
+  hint says so, and that the date is best at or after the close. The
   database holds them, not only the page. Papers normally stay on
-  Immediately; the trial paper has no rule of its own (Sam). *(to build:
-  04.12)*
+  Immediately; the trial paper has no rule of its own (Sam). The two new
+  screens — the pop-up after Submit (with the mode, the time and how many
+  were answered) and a held sitting opened again — were drawn and picked
+  at https://claude.ai/artifact/WAmbBUrhVzsy5scNkfQD1k (pop-up B, held
+  sitting A). *(built 2026-10-15)*
 - **Review period** — "Review open for N days after results"; empty is
   no limit. Counted per student from their own results (from the date
   when results are held), since a mock reused across groups gives each

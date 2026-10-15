@@ -14,13 +14,21 @@
 //
 // On the app's one dialog (DS4), so it is portalled to <body> and its
 // look sits outside `.runner` in styles/runner.css.
+//
+// ResultsHeldPopup is its sibling for a sitting whose results are held
+// (04.12, Sam 2026-10-15: "pop-up B"): the date they come out instead of
+// the score, what is known without the key (the mode, the time, how many
+// were answered), and the way back — no review, no report, no retake.
 
 'use client';
 
 import { Dialog } from '@/lib/overlays/shared/dialog';
 import { formatSeconds } from '@/lib/attempts/report';
+import type { SessionExit } from '@/lib/attempts/links';
+import { formatResultsAt } from '@/lib/quizzes/results-date';
 import { AppLink } from '@/components/shell/link-pending';
 import { Icon } from '@/components/shell/icons';
+import { ResultsHeldMark } from './results-held';
 
 export type ResultsSummary = {
   /** "Quiz complete", "Exam complete", "Time is up". */
@@ -97,6 +105,55 @@ export function ResultsPopup({
             </button>
           ) : null}
           <button type="button" className="btn btn-ghost" onClick={exit.onClick}>{exit.label}</button>
+        </div>
+      </div>
+    </Dialog>
+  );
+}
+
+export type HeldSummary = {
+  /** "Exam submitted", or "Time is up" when the clock closed it. */
+  heading: string;
+  resultsAt: string;
+  answered: number;
+  total: number;
+  timeTakenS: number | null;
+  modeName: string;
+};
+
+export function ResultsHeldPopup({
+  open,
+  summary,
+  onClose,
+  exit,
+}: {
+  open: boolean;
+  summary: HeldSummary;
+  /** Escape, the backdrop: the held screen stays under it. */
+  onClose: () => void;
+  /** The sitting's home — the one button. */
+  exit: SessionExit;
+}) {
+  const s = summary;
+  return (
+    <Dialog open={open} onClose={onClose} title={s.heading}>
+      <div className="results-held-pop">
+        <ResultsHeldMark />
+        <div className="results-held-pop-lead">Your results come out on</div>
+        <div className="results-held-pop-date">{formatResultsAt(s.resultsAt)}</div>
+        <p className="results-held-pop-note">Your score, your report and the answers will be here then.</p>
+
+        <dl className="results-pop-facts">
+          <dt>Mode</dt>
+          <dd>{s.modeName}</dd>
+          <dt>Time</dt>
+          <dd>{formatSeconds(s.timeTakenS)}</dd>
+          <dt>Answered</dt>
+          <dd>{s.answered} of {s.total}</dd>
+        </dl>
+
+        <div className="dlg-actions stack">
+          <AppLink className="btn btn-primary" href={exit.href}>{exit.label}</AppLink>
         </div>
       </div>
     </Dialog>

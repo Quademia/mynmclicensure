@@ -11,7 +11,8 @@
 // come under their own login. The access kind is worked out the way
 // create_attempt works it out (20261012100000_first_mode.sql): a live
 // grant with all papers opens every paper, any other live grant only the
-// trial paper (`open_in_trial`).
+// trial paper (`open_in_trial`). Each paper carries its results date
+// (04.12), held or not on the same clock as its availability.
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import type { Profile } from '@/lib/auth/profile';
@@ -47,6 +48,7 @@ type QuizRowRead = {
   unpublish_at: string | null;
   open_in_trial: boolean;
   sittings_allowed: number | null;
+  results_at: string | null;
 };
 
 /** Per course, the most a live grant lets the student do with papers, and whether it opens mocks (also the Mock exams page's). */
@@ -95,7 +97,7 @@ export async function loadPracticePapers(supabase: ServerSupabaseClient, profile
     getStudentCourseAccess(supabase, userId),
     getCourses(supabase),
     getStudentReceipts(supabase, userId),
-    getStudentAttempts(supabase, userId),
+    getStudentAttempts(userId),
   ]);
 
   const heldIds = allCourses.filter((c) => access[c.course_id]).map((c) => c.course_id);
@@ -111,7 +113,7 @@ export async function loadPracticePapers(supabase: ServerSupabaseClient, profile
   if (shown.length) {
     const { data, error } = await db
       .from('quizzes')
-      .select('quiz_id, course_id, title, n, allowed_modes, first_mode, time_limit_sec, published, status, publish_at, unpublish_at, open_in_trial, sittings_allowed')
+      .select('quiz_id, course_id, title, n, allowed_modes, first_mode, time_limit_sec, published, status, publish_at, unpublish_at, open_in_trial, sittings_allowed, results_at')
       .in('course_id', shown.map((c) => c.course_id))
       .eq('status', 'active')
       .eq('published', true);
@@ -137,8 +139,9 @@ export async function loadPracticePapers(supabase: ServerSupabaseClient, profile
         publish_at: q.publish_at,
         in_trial: q.open_in_trial,
         sittings_allowed: q.sittings_allowed,
+        results_at: q.results_at,
       };
-      return [paperView(row, kind, attempts)];
+      return [paperView(row, kind, attempts, now)];
     });
     return { course_id: c.course_id, title: c.title, access: kind, mocksIncluded: accessBy[c.course_id]?.mocks ?? false, days: access[c.course_id]?.totalDays ?? null, expires: access[c.course_id]?.expires ?? null, papers };
   });

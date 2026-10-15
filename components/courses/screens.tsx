@@ -14,9 +14,10 @@ import { AnnouncementBody } from '@/components/announcements/announcement-body';
 import { LaunchButton } from '@/components/practice-papers/paper-actions';
 import { Icon } from '@/components/shell/icons';
 import { CourseChip, CourseHeading, CourseTabs } from './course-header';
-import { courseLine, formatDay, scoredPaper, shortName } from '@/lib/practice-papers/derive';
+import { courseLine, formatDay, heldUntil, resultsLine, resumable, scoredPaper, shortName } from '@/lib/practice-papers/derive';
 import type { CoursePageData, MyCourses } from '@/lib/courses/queries';
 import { reportHref } from '@/lib/attempts/links';
+import { formatResultsAt } from '@/lib/quizzes/results-date';
 import '@/styles/courses.css';
 
 const PACKAGE_HREF = '/student/upgrade';
@@ -103,7 +104,13 @@ export function CourseScreen({ data }: { data: CoursePageData }) {
   const c = s.course;
   const id = encodeURIComponent(c.course_id);
   const next = s.next;
+  // 04.12: while a paper's results are held, a sitting going in another mode
+  // than the first waits, the card carries the date, and a held score shows
+  // its date and no report.
+  const going = next?.inProgress && resumable(next, next.inProgress) ? next.inProgress : null;
+  const nextHeld = next ? resultsLine(next) : null;
   const scored = next ? null : scoredPaper(c.papers);
+  const scoredHeld = heldUntil(scored?.firstSitting);
   const papersLine = courseLine(c);
   const papersLocked = papersLine === 'Opens with a package';
 
@@ -138,11 +145,18 @@ export function CourseScreen({ data }: { data: CoursePageData }) {
             <div className="card cp-card cp-static">
               <span className="cp-eyebrow">{c.access === 'trial' && next.in_trial ? 'Included in your trial' : 'Up next'}</span>
               <span className="cp-big">{next.title}</span>
-              <span className="cp-line">{next.inProgress ? `${next.inProgress.answered_count} of ${next.n} answered` : `${num(next.n)} questions`}</span>
-              <LaunchButton quizId={next.quiz_id} mode={next.inProgress ? next.inProgress.mode : next.first_mode} label={next.inProgress ? 'Resume' : 'Start'} />
+              <span className="cp-line">{going ? `${going.answered_count} of ${next.n} answered` : `${num(next.n)} questions`}</span>
+              {nextHeld ? <span className="cp-line">{nextHeld}</span> : null}
+              <LaunchButton quizId={next.quiz_id} mode={going ? going.mode : next.first_mode} label={going ? 'Resume' : 'Start'} />
             </div>
           ) : null}
-          {scored && scored.firstSitting ? (
+          {scored && scored.firstSitting && scoredHeld ? (
+            <div className="card cp-card cp-static">
+              <span className="cp-eyebrow">Your score</span>
+              <span className="cp-big">{shortName(scored.title)}</span>
+              <span className="cp-line">Results on {formatResultsAt(scoredHeld)}.</span>
+            </div>
+          ) : scored && scored.firstSitting ? (
             <div className="card cp-card cp-static">
               <span className="cp-eyebrow">Your score</span>
               <span className="cp-big">

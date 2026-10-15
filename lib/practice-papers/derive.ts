@@ -6,9 +6,16 @@
 // of its own beyond what the caller passes in. Nothing here knows a
 // paper's size, its time or how many papers a course has — each is read
 // from the paper (Sam, 2026-10-12: those numbers can change).
+//
+// Results on a date (04.12; Sam, 2026-10-15): while a paper's results are
+// held, a sitting of it shows its date where the score was — "Results on
+// 30 Oct" in a row, the whole date on a card — and no report, and only the
+// first sitting's mode is offered. The date is written only through
+// lib/quizzes/results-date, in Ghana's time.
 
 import type { AttemptMode, AttemptWithProgress } from '@/lib/attempts/types';
 import type { Availability } from '@/lib/quizzes/types';
+import { formatResultsAt, formatResultsShort, resultsHeld } from '@/lib/quizzes/results-date';
 
 /** What a student's courses let them do with papers. `all` a package; `trial` only the trial paper; `none` nothing live. */
 export type PaperAccess = 'all' | 'trial' | 'none';
@@ -28,6 +35,8 @@ export type PaperRow = {
   in_trial: boolean;
   /** How many sittings a student may make; null = no limit (04.10). */
   sittings_allowed: number | null;
+  /** When its results come out; null = Immediately (04.12). */
+  results_at: string | null;
 };
 
 export type PaperState = 'done' | 'in_progress' | 'new';
@@ -35,6 +44,8 @@ export type PaperState = 'done' | 'in_progress' | 'new';
 export type PaperView = PaperRow & {
   /** May this student start it now — the access, not the schedule. */
   open: boolean;
+  /** Its results date has not come (04.12): no score shows, and only the first mode is sat. */
+  held: boolean;
   state: PaperState;
   /** The first sitting finished (completed in the first mode), the earliest. */
   firstSitting: AttemptWithProgress | null;
@@ -82,7 +93,7 @@ export function formatMinutes(min: number): string {
   return [hours, mins].filter(Boolean).join(' ');
 }
 
-export function paperView(row: PaperRow, access: PaperAccess, attempts: AttemptWithProgress[]): PaperView {
+export function paperView(row: PaperRow, access: PaperAccess, attempts: AttemptWithProgress[], now: Date): PaperView {
   const started = attempts.filter((a) => a.quiz_id === row.quiz_id);
   const mine = started.filter((a) => a.status !== 'abandoned');
   const inProgress = mine.find((a) => a.status === 'in_progress') ?? null; // newest first
@@ -94,6 +105,7 @@ export function paperView(row: PaperRow, access: PaperAccess, attempts: AttemptW
   return {
     ...row,
     open,
+    held: resultsHeld(row.results_at, now),
     state: firstSitting ? 'done' : inProgress ? 'in_progress' : 'new',
     firstSitting,
     inProgress,
@@ -117,6 +129,36 @@ export function sittingsLine(p: PaperView, noun: 'paper' | 'mock' = 'paper'): st
   return `${p.sittingsLeft} of ${allowed} sittings left.`;
 }
 
+/** 04.12: the date a sitting's results come out, while they are held; null once they show. */
+export function heldUntil(a: Pick<AttemptWithProgress, 'held' | 'results_at'> | null | undefined): string | null {
+  return a?.held && a.results_at ? a.results_at : null;
+}
+
+/** A finished sitting's word in a row: its score, or "Results on 30 Oct" while held; null with neither. */
+export function scoreWord(a: AttemptWithProgress): string | null {
+  const until = heldUntil(a);
+  if (until) return `Results on ${formatResultsShort(until)}`;
+  return a.score_pct != null ? `${Math.round(a.score_pct)}%` : null;
+}
+
+/** A card's line while the paper's results are held: "Results on Friday 30 October at 6:00 pm."; null otherwise. */
+export function resultsLine(p: PaperView): string | null {
+  return p.held && p.results_at ? `Results on ${formatResultsAt(p.results_at)}.` : null;
+}
+
+/** "The other ways open when results come out on …" — where the page says
+ *  the other ways open after the first sitting; null unless held. */
+export function otherWaysLine(p: PaperView): string | null {
+  return p.held && p.results_at ? `The other ways open when results come out on ${formatResultsAt(p.results_at)}.` : null;
+}
+
+/** While a paper's results are held only its first mode is sat (04.12): a
+ *  sitting going in another mode cannot be resumed until the date — it can
+ *  still be abandoned. */
+export function resumable(p: PaperView, a: AttemptWithProgress): boolean {
+  return !p.held || a.mode === p.first_mode;
+}
+
 /** A paper a student can start or resume today. */
 export function startable(p: PaperView): boolean {
   return p.open && p.availability === 'ACTIVE';
@@ -125,15 +167,22 @@ export function startable(p: PaperView): boolean {
 /** The paper to put first: the one in progress, else the first one not yet done. */
 export function upNext(papers: PaperView[]): PaperView | null {
   return (
-    papers.find((p) => startable(p) && p.inProgress) ??
+    papers.find((p) => startable(p) && p.inProgress && resumable(p, p.inProgress)) ??
     papers.find((p) => startable(p) && p.state !== 'done') ??
     null
   );
 }
 
-/** The paper to show a score for when nothing can be started (an ended trial, a free account). */
+/** The paper to show a score for when nothing can be started (an ended trial, a free account):
+ *  one whose score shows before one whose results are held (04.12). */
 export function scoredPaper(papers: PaperView[]): PaperView | null {
-  return papers.find((p) => p.firstSitting) ?? null;
+  return papers.find((p) => p.firstSitting && !heldUntil(p.firstSitting)) ?? papers.find((p) => p.firstSitting) ?? null;
+}
+
+/** A line pointing at a scored paper's scores ("Your scores are here"), or its "Results on 30 Oct" while held. */
+export function scoresWord(p: PaperView, words: string): string {
+  const until = heldUntil(p.firstSitting);
+  return until ? `Results on ${formatResultsShort(until)}` : words;
 }
 
 export type Segment = 'done' | 'going' | 'todo';
@@ -147,7 +196,8 @@ export function courseLine(course: CourseView): string {
   const open = course.papers.filter(startable);
   if (!course.papers.length) return 'No papers yet';
   if (!open.length) {
-    return course.papers.some((p) => p.firstSitting) ? 'Your scores are here' : 'Opens with a package';
+    const scored = scoredPaper(course.papers);
+    return scored ? scoresWord(scored, 'Your scores are here') : 'Opens with a package';
   }
   const going = open.find((p) => p.inProgress);
   if (going) return `${shortName(going.title)} in progress`;
@@ -159,9 +209,10 @@ export function formatDay(iso: string): string {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', timeZone: 'UTC' });
 }
 
-/** The right-hand word of a paper's row. */
+/** The right-hand word of a paper's row. Done is the first sitting's status,
+ *  not its score: a held one shows its date (04.12). */
 export function rowStatus(p: PaperView): string {
-  if (p.state === 'done' && p.firstSitting?.score_pct != null) return `${Math.round(p.firstSitting.score_pct)}%`;
+  if (p.state === 'done') return (p.firstSitting && scoreWord(p.firstSitting)) ?? 'Finished';
   if (p.state === 'in_progress') return 'In progress';
   if (!p.open) return 'Opens with a package';
   if (p.availability === 'UPCOMING') return p.publish_at ? `Opens ${formatDay(p.publish_at)}` : 'Not yet open';

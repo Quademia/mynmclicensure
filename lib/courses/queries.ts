@@ -16,7 +16,7 @@ import { builderDoorFor } from '@/lib/attempts/builder-door';
 import { getMockQuizzesForCourse } from '@/lib/quizzes/queries';
 import { getQuizAvailability } from '@/lib/quizzes/availability';
 import { loadPracticePapers, type PracticePapers } from '@/lib/practice-papers/queries';
-import { formatDay, scoredPaper, shortName, upNext, type CourseView, type PaperView } from '@/lib/practice-papers/derive';
+import { formatDay, scoredPaper, scoresWord, shortName, upNext, type CourseView, type PaperView } from '@/lib/practice-papers/derive';
 
 export type CourseSummary = {
   course: CourseView;
@@ -41,7 +41,8 @@ export type MyCourses = {
 
 function carryLineOf(course: CourseView, next: PaperView | null): string {
   if (next) return next.inProgress ? `Carry on: ${shortName(next.title)}` : `Start ${shortName(next.title)}`;
-  if (scoredPaper(course.papers)) return 'See your scores';
+  const scored = scoredPaper(course.papers);
+  if (scored) return scoresWord(scored, 'See your scores');
   if (course.papers.length && course.papers.every((p) => p.state === 'done')) return 'All papers done';
   return 'Opens with a package';
 }

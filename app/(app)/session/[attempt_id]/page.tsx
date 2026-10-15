@@ -6,7 +6,9 @@
 // (lib/attempts/runner-load: the checks, in order, with their words)
 // before anything reaches the browser: the error card for a refusal; a
 // finished sitting's review, questions and all; or, for a live sitting,
-// the start card (03 Q17) — its data only, no question. Start or Resume
+// the start card (03 Q17) — its data only, no question. A finished
+// sitting whose results are held (04.12) opens as its date, and nothing of
+// its questions, answers or score reaches the page. Start or Resume
 // on the card asks the server for the questions and mounts the runner,
 // which reads the mode from the attempt and the mode's behaviour from
 // lib/attempts/modes. `?preview=1` is the admin's read-only view of any
@@ -20,6 +22,7 @@ import type { Metadata } from 'next';
 import { requireStudent } from '@/lib/access';
 import { loadRunner } from '@/lib/attempts/runner-load';
 import { QuizRunner } from '@/components/runner/quiz-runner';
+import { ResultsHeld } from '@/components/runner/results-held';
 import { RunnerError } from '@/components/runner/runner-error';
 import { SessionStart } from '@/components/runner/session-start';
 import '@/styles/runner.css';
@@ -48,6 +51,7 @@ export default async function SessionPage({
 
   if (load.kind === 'error') return <RunnerError title={load.title} message={load.message} exit={load.exit} />;
   if (load.kind === 'start') return <SessionStart card={load.card} exit={load.exit} previewMode={load.previewMode} />;
+  if (load.kind === 'held') return <ResultsHeld held={load.held} exit={load.exit} />;
 
   return (
     <QuizRunner
@@ -58,6 +62,7 @@ export default async function SessionPage({
       reviewMode
       previewMode={load.previewMode}
       exit={load.exit}
+      heldExit={load.heldExit}
       retakeAllowed={load.retakeAllowed}
       initialQuestion={Number(sp.q) || null}
     />
