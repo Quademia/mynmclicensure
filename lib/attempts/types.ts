@@ -173,23 +173,8 @@ export const BUILDER_MINUTES_PER_QUESTION_DEFAULT = 1;
 // in the browser on every keystroke, over text that is no longer there.
 export const CONCEPT_SEARCH_DELAY_MS = 300;
 
-// The builder's light row: legacy getBuilderCourseItems selected only
-// what the wizard filters and counts on. Since 08 B2 that is the
-// criteria and nothing else — the stem and the rationale are gone, so
-// no wizard code can filter on question text by accident; the concept
-// keyword goes to the server and comes back as ids.
-export type BuilderItem = {
-  item_id: string;
-  subject: string | null;
-  maintopic: string | null;
-  subtopic: string | null;
-  difficulty: string | null;
-  question_type: string;
-};
-
 // ── the Quiz Builder (04.4; Sam, 2026-10-11) ───────────────────────────
-// The offline pack builder keeps BuilderItem and today's steps until its
-// own redesign; the quiz builder reads these.
+// The Quiz Builder reads these; since 07.2 the pack builder too.
 
 /** A quiz needs at least this many questions (04.1; Sam, 2026-09-30, ruled 2026-10-11). */
 export const BUILDER_MIN_QUESTIONS = 5;
@@ -213,8 +198,11 @@ export type BuilderDoorCourse = {
   /** A trial's builder quizzes: left and in all; null without a count. */
   quizzesLeft: number | null;
   quizzesTotal: number | null;
-  /** The questions this pool holds — published, not held back by a mock. */
+  /** The questions this pool holds — published, in the Practice and Free pools. */
   total: number;
+  /** 07.2, the pack builder's door only: packs left (null = unlimited) and the package's count. */
+  packsLeft?: number | null;
+  packsAllowed?: number | null;
 };
 
 /** The quiz builder's light row: what it counts and filters on, and what the student did with it. */

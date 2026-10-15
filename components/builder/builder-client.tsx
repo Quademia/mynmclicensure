@@ -1,5 +1,11 @@
-// app/(app)/student/quiz-builder/quiz-builder-client.tsx — the Quiz
-// Builder (04.4). Sam, 2026-10-11, later: the old five-step wizard's look
+// components/builder/builder-client.tsx — the Quiz Builder (04.4), and
+// since 07.2 the pack builder too (Sam, 2026-10-15: the pack builder is the
+// Quiz Builder with a pack's extras — step 4 Count & name, no mode; the
+// count to the pack limit; the allowance line; Make pack on the Review
+// step; its own Recent setups). `kind` says which; the door behind each
+// is its own (lib/attempts/builder-door, lib/offline-packs/door).
+//
+// The Quiz Builder (04.4). Sam, 2026-10-11, later: the old five-step wizard's look
 // back, on the new builder's rules — 1 Course & selection mode · 2 Topics
 // or Keyword · 3 Filters · 4 Count & mode · 5 Review & build, the quiz
 // built from the Review step only.
@@ -26,13 +32,14 @@
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { loadQuizBuilderCourse, searchQuizBuilderKeyword, startQuizBuilderQuiz } from '@/lib/attempts/actions';
+import { loadPackBuilderCourse, makeOfflinePack, searchPackBuilderKeyword } from '@/lib/offline-packs/actions';
 import { sessionHref } from '@/lib/attempts/links';
 import { MODES, MODE_GROUPS, MODE_ORDER, modeOf } from '@/lib/attempts/modes';
 import { BUILDER_MIN_QUESTIONS, CONCEPT_SEARCH_DELAY_MS, type AttemptMode, type BuilderDoorCourse, type QuizBuilderItem } from '@/lib/attempts/types';
 import { AppLink } from '@/components/shell/link-pending';
 import { Icon } from '@/components/shell/icons';
 import { Toast } from '@/lib/toast/toast';
-import { Banner } from './builder-parts';
+import { Banner, PackBanner } from './builder-parts';
 
 type Way = 'topics' | 'keyword';
 type Which = 'all' | 'new' | 'wrong';
@@ -44,12 +51,15 @@ const PACKAGES_HREF = '/student/upgrade';
 const NO_CONNECTION_LOAD = 'Could not load the questions. Please check your connection.';
 const NO_CONNECTION_SEARCH = 'Could not search. Please check your connection.';
 const NO_CONNECTION_BUILD = 'Could not build your quiz. Please check your connection and try again.';
+const NO_CONNECTION_MAKE = 'Could not make your pack. Please check your connection and try again.';
 
-function stepNames(way: Way) {
+function stepNames(way: Way, pack: boolean) {
   const what = way === 'keyword' ? 'Keyword' : 'Topics';
+  const count = pack ? 'Count & name' : 'Count & mode';
+  const last = pack ? 'Review & make' : 'Review & build';
   return {
-    long: ['Course & selection mode', what, 'Filters', 'Count & mode', 'Review & build'],
-    short: ['Course & mode', what, 'Filters', 'Count & mode', 'Review & build'],
+    long: ['Course & selection mode', what, 'Filters', count, last],
+    short: ['Course & mode', what, 'Filters', count, last],
   };
 }
 
@@ -94,8 +104,10 @@ type RecentSetup = {
 };
 
 const RECENT_KEY = 'qa_builder_recent_v2';
+// 07.2: the pack builder keeps its own
+const PACK_RECENT_KEY = 'qa_pack_recent_v1';
 const RECENT_MAX = 5;
-const recentKeyOf = (userKey: string) => `${RECENT_KEY}:${userKey}`;
+const recentKeyOf = (base: string, userKey: string) => `${base}:${userKey}`;
 const recentListeners = new Set<() => void>();
 
 function subscribeRecent(onChange: () => void): () => void {
@@ -104,9 +116,9 @@ function subscribeRecent(onChange: () => void): () => void {
     recentListeners.delete(onChange);
   };
 }
-function readRecent(userKey: string): string {
+function readRecent(base: string, userKey: string): string {
   try {
-    return window.localStorage.getItem(recentKeyOf(userKey)) || '';
+    return window.localStorage.getItem(recentKeyOf(base, userKey)) || '';
   } catch {
     return '';
   }
@@ -124,10 +136,10 @@ function parseRecent(raw: string): RecentSetup[] {
   }
 }
 /** The newest first; one per course and selection mode, as the old wizard kept them. */
-function saveRecent(userKey: string, entry: RecentSetup): void {
+function saveRecent(base: string, userKey: string, entry: RecentSetup): void {
   try {
-    const rest = parseRecent(readRecent(userKey)).filter((x) => !(x.courseId === entry.courseId && x.way === entry.way));
-    window.localStorage.setItem(recentKeyOf(userKey), JSON.stringify([entry, ...rest].slice(0, RECENT_MAX)));
+    const rest = parseRecent(readRecent(base, userKey)).filter((x) => !(x.courseId === entry.courseId && x.way === entry.way));
+    window.localStorage.setItem(recentKeyOf(base, userKey), JSON.stringify([entry, ...rest].slice(0, RECENT_MAX)));
   } catch {
     /* storage blocked — Recent setups simply does not show */
   }
@@ -211,6 +223,7 @@ export function QuizBuilderClient({
   initialCourseId,
   initialTopic,
   userKey,
+  kind = 'quiz',
 }: {
   courses: BuilderDoorCourse[];
   maxQuestions: number;
@@ -220,8 +233,12 @@ export function QuizBuilderClient({
   initialTopic: string;
   /** The student's own id — Recent setups are kept per student on a device. */
   userKey: string;
+  /** 07.2: the Quiz Builder, or the pack builder (the same page with a pack's extras). */
+  kind?: 'quiz' | 'pack';
 }) {
   const router = useRouter();
+  const pack = kind === 'pack';
+  const recentBase = pack ? PACK_RECENT_KEY : RECENT_KEY;
 
   // ── what the student chose ──
   const [step, setStep] = useState(() => (initialTopic ? 1 : 0));
@@ -241,6 +258,8 @@ export function QuizBuilderClient({
   const [mode, setMode] = useState<AttemptMode>('UNTIMED_LEARNING');
   const [examNote, setExamNote] = useState(false);
   const [recentOpen, setRecentOpen] = useState(false);
+  // 07.2: the pack's name, as typed; empty takes the suggestion
+  const [packName, setPackName] = useState('');
 
   // ── the course's rows, the keyword's ids, the build ──
   const [items, setItems] = useState<QuizBuilderItem[]>([]);
@@ -256,9 +275,9 @@ export function QuizBuilderClient({
   const free = course?.pool === 'free';
   // Before a course is picked, the status line speaks for the first course that has one.
   const bannerCourse = course ?? courses.find((c) => c.reason !== 'paid') ?? null;
-  const names = stepNames(way);
+  const names = stepNames(way, pack);
 
-  const recentRaw = useSyncExternalStore(subscribeRecent, () => readRecent(userKey), recentOnServer);
+  const recentRaw = useSyncExternalStore(subscribeRecent, () => readRecent(recentBase, userKey), recentOnServer);
   const recent = useMemo(() => parseRecent(recentRaw).filter((r) => courses.some((c) => c.course_id === r.courseId)), [recentRaw, courses]);
 
   // The course's rows follow the pick (a timer, not a synchronous set in
@@ -271,7 +290,7 @@ export function QuizBuilderClient({
       void (async () => {
         let result: Awaited<ReturnType<typeof loadQuizBuilderCourse>>;
         try {
-          result = await loadQuizBuilderCourse(courseId);
+          result = await (pack ? loadPackBuilderCourse : loadQuizBuilderCourse)(courseId);
         } catch {
           result = { ok: false, error: NO_CONNECTION_LOAD };
         }
@@ -285,7 +304,7 @@ export function QuizBuilderClient({
       cancelled = true;
       window.clearTimeout(id);
     };
-  }, [courseId, loadedCourse]);
+  }, [courseId, loadedCourse, pack]);
 
   function retryLoad() {
     setLoadFailed('');
@@ -304,7 +323,7 @@ export function QuizBuilderClient({
       void (async () => {
         let result: Awaited<ReturnType<typeof searchQuizBuilderKeyword>>;
         try {
-          result = await searchQuizBuilderKeyword(courseId, typed);
+          result = await (pack ? searchPackBuilderKeyword : searchQuizBuilderKeyword)(courseId, typed);
         } catch {
           result = { ok: false, error: NO_CONNECTION_SEARCH };
         }
@@ -320,7 +339,7 @@ export function QuizBuilderClient({
       cancelled = true;
       window.clearTimeout(id);
     };
-  }, [way, typed, courseId, loadedCourse, kw, kwFailed]);
+  }, [way, typed, courseId, loadedCourse, kw, kwFailed, pack]);
 
   // ── the pools and every count, from the rows already here ──
   const loading = Boolean(courseId) && loadedCourse !== courseId;
@@ -383,9 +402,14 @@ export function QuizBuilderClient({
   else if (kwError) reason = kwError;
   else if (searching) reason = 'Searching…';
   else if (matching === 0) reason = way === 'keyword' && !kwPool.length ? `No question contains “${typed}”.` : 'No questions match your filters. Untick a filter.';
-  else if (!enough) reason = `Only ${matching} ${matching === 1 ? 'question matches' : 'questions match'}. A quiz needs at least ${MIN} — untick a filter${way === 'keyword' ? ' or try another word' : ''}.`;
+  else if (!enough) reason = `Only ${matching} ${matching === 1 ? 'question matches' : 'questions match'}. A ${pack ? 'pack' : 'quiz'} needs at least ${MIN} — untick a filter${way === 'keyword' ? ' or try another word' : ''}.`;
+  else if (pack && course.packsLeft === 0) reason = 'You have used all your offline packs for this course.';
   const ready = !reason;
-  const status = building ? 'Building your quiz…' : reason || `Ready — ${questions(n)} from a pool of ${matching.toLocaleString('en-GB')}.`;
+  const status = building
+    ? pack
+      ? 'Making your pack…'
+      : 'Building your quiz…'
+    : reason || `Ready — ${questions(n)} from a pool of ${matching.toLocaleString('en-GB')}.`;
 
   // The quiz's name in Learning History — what was chosen; "All topics" never names three.
   const selection =
@@ -395,6 +419,11 @@ export function QuizBuilderClient({
         : shortList(pickedTopics)
       : `“${typed}”${pickedKw.length ? ` in ${shortList(pickedKw)}` : ''}`;
   const quizName = `${course?.title ?? ''} · ${selection} · ${questions(n)}`;
+  // 07.2: a pack's suggested name — what was chosen and how many
+  const packSuggestion = `${selection} · ${questions(n)}`;
+  const packNameNow = packName.trim() || packSuggestion;
+  const packsLeftAfter =
+    course && course.packsLeft !== undefined && course.packsLeft !== null ? Math.max(0, course.packsLeft - 1) : null;
 
   const trialNote =
     course?.reason === 'trial' && course.quizzesLeft
@@ -438,6 +467,10 @@ export function QuizBuilderClient({
 
   async function build() {
     if (!ready || building || !course) return;
+    if (pack) {
+      await makePack();
+      return;
+    }
     setBuilding(true);
     const chosen = shuffle(finalPool)
       .slice(0, n)
@@ -453,7 +486,7 @@ export function QuizBuilderClient({
       setBuilding(false);
       return;
     }
-    saveRecent(userKey, {
+    saveRecent(recentBase, userKey, {
       courseId: course.course_id,
       way,
       useAllTopics,
@@ -468,6 +501,50 @@ export function QuizBuilderClient({
       savedAt: nowMs(),
     });
     router.push(sessionHref(result.attemptId));
+  }
+
+  // 07.2: Make pack — the pool as worked out here, how many and the name;
+  // the server puts questions not in earlier packs first, then makes it.
+  async function makePack() {
+    if (!course) return;
+    setBuilding(true);
+    let result: Awaited<ReturnType<typeof makeOfflinePack>>;
+    try {
+      result = await makeOfflinePack({
+        course_id: course.course_id,
+        pool_ids: finalPool.map((i) => i.item_id),
+        n,
+        pack_name: packNameNow.slice(0, 120),
+        selection_mode: way === 'keyword' ? 'concept' : 'topics',
+        maintopics: way === 'topics' ? (useAllTopics ? [] : pickedTopics) : pickedKw,
+        difficulties: pickedDiffs,
+        question_types: pickedTypes,
+        concept_query: way === 'keyword' ? typed : '',
+      });
+    } catch {
+      result = { ok: false, reason: 'create_failed', message: NO_CONNECTION_MAKE, allowance: null };
+    }
+    if (!result.ok) {
+      setToast(result.message);
+      setBuilding(false);
+      return;
+    }
+    saveRecent(recentBase, userKey, {
+      courseId: course.course_id,
+      way,
+      useAllTopics,
+      topics: pickedTopics,
+      word: typed,
+      kwTopics: pickedKw,
+      which,
+      diffs: pickedDiffs,
+      types: pickedTypes,
+      count: n,
+      mode: modeNow,
+      savedAt: nowMs(),
+    });
+    // until the pack's own page (07.8), the pack opens where it did
+    router.push(`/offline-pack?pack_id=${encodeURIComponent(result.pack_id)}`);
   }
 
   // ── the topic lists ──
@@ -499,7 +576,7 @@ export function QuizBuilderClient({
 
   return (
     <div className="qbld">
-      {bannerCourse ? <Banner course={bannerCourse} /> : null}
+      {pack ? course ? <PackBanner course={course} /> : null : bannerCourse ? <Banner course={bannerCourse} /> : null}
 
       {/* Progress bar */}
       <div className="card prog-block">
@@ -558,12 +635,13 @@ export function QuizBuilderClient({
                       ? new Date(r.savedAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
                       : 'Saved';
                     const what = r.way === 'keyword' ? `Keyword “${r.word}”` : r.useAllTopics || !list(r.topics).length ? 'All topics' : shortList(list(r.topics));
+                    const how = pack ? '' : ` · ${modeOf(r.mode).name}`;
                     return (
                       <div key={`${r.courseId}:${r.way}`} className="recent-item">
                         <div className="recent-main">
                           <div className="recent-title">{courses.find((c) => c.course_id === r.courseId)?.title}</div>
                           <div className="recent-sub">
-                            {what} · {r.count}Q · {modeOf(r.mode).name} · {when}
+                            {what} · {r.count}Q{how} · {when}
                           </div>
                         </div>
                         <button type="button" className="btn btn-ghost btn-sm qbld-small-btn" onClick={() => applyRecent(r)}>
@@ -583,14 +661,19 @@ export function QuizBuilderClient({
               <select id="courseSelect" value={courseId} onChange={(e) => pickCourse(e.target.value)}>
                 <option value="">Select a course…</option>
                 {courses.map((c) => (
-                  <option key={c.course_id} value={c.course_id} disabled={c.total === 0 && c.course_id !== courseId}>
+                  <option key={c.course_id} value={c.course_id} disabled={(c.total === 0 || (pack && c.packsLeft === 0)) && c.course_id !== courseId}>
                     {c.title}
                     {c.pool === 'free' ? (c.total ? ` — ${c.total.toLocaleString('en-GB')} free questions` : ' — no free questions yet') : ''}
+                    {pack && c.packsLeft === 0 ? ' — no packs left' : ''}
                   </option>
                 ))}
               </select>
               <span className="hint">
-                {courses.some((c) => c.pool === 'free') ? 'A course marked “free” builds from its free questions.' : 'Only your active courses are shown.'}
+                {pack
+                  ? 'Your courses whose package includes offline packs.'
+                  : courses.some((c) => c.pool === 'free')
+                    ? 'A course marked “free” builds from its free questions.'
+                    : 'Only your active courses are shown.'}
               </span>
             </div>
             <div className="field">
@@ -809,8 +892,8 @@ export function QuizBuilderClient({
       {/* PANE 3 — count & mode */}
       {step === 3 ? (
         <div className="card pane-card">
-          <h2 className="pane-title">Count &amp; mode</h2>
-          <p className="pane-sub">How many questions, and how do you want to take the quiz?</p>
+          <h2 className="pane-title">{pack ? 'Count & name' : 'Count & mode'}</h2>
+          <p className="pane-sub">{pack ? 'How many questions, and what to call the pack?' : 'How many questions, and how do you want to take the quiz?'}</p>
           <div className="count-display-row">
             <div>
               <div className="count-big">{enough ? n : '—'}</div>
@@ -852,9 +935,17 @@ export function QuizBuilderClient({
           </div>
           <div className="count-hint">
             {enough
-              ? `From ${MIN} to ${cap} questions · Pool: ${matching.toLocaleString('en-GB')} available · Estimated ${minutes} min`
-              : `A quiz needs at least ${MIN} questions · Pool: ${loaded ? matching.toLocaleString('en-GB') : '…'} available`}
+              ? `From ${MIN} to ${cap} questions · Pool: ${matching.toLocaleString('en-GB')} available${pack ? '' : ` · Estimated ${minutes} min`}`
+              : `A ${pack ? 'pack' : 'quiz'} needs at least ${MIN} questions · Pool: ${loaded ? matching.toLocaleString('en-GB') : '…'} available`}
           </div>
+          {pack ? (
+            <div className="field">
+              <label htmlFor="packName">Pack name</label>
+              <input id="packName" type="text" maxLength={120} placeholder={packSuggestion} value={packName} onChange={(e) => setPackName(e.target.value)} />
+              <span className="hint">Leave it empty to use “{packSuggestion}”.</span>
+            </div>
+          ) : (
+          <>
           <span className="mode-label">Mode</span>
           <div className="mode-grid">
             {MODE_GROUPS.map((g) => (
@@ -899,6 +990,8 @@ export function QuizBuilderClient({
             ))}
           </div>
           <div className="mode-hint">{modeDef.clock !== 'none' ? `${modeDef.fullName} will give you ${minutesText(minutes)}.` : `${modeDef.fullName} has no clock.`}</div>
+          </>
+          )}
           <div className="nav-bar">
             <button type="button" className="btn btn-ghost btn-lg" onClick={() => goStep(2)}>
               ← Back
@@ -913,8 +1006,8 @@ export function QuizBuilderClient({
       {/* PANE 4 — review & build */}
       {step === 4 ? (
         <div className="card pane-card">
-          <h2 className="pane-title">Review &amp; build</h2>
-          <p className="pane-sub">Check your setup, then build the quiz.</p>
+          <h2 className="pane-title">{pack ? 'Review & make' : 'Review & build'}</h2>
+          <p className="pane-sub">{pack ? 'Check your setup, then make the pack.' : 'Check your setup, then build the quiz.'}</p>
           <div className="stats-row">
             <div className="stat-card">
               <div className="stat-num">{loaded && !searching ? matching.toLocaleString('en-GB') : '…'}</div>
@@ -924,10 +1017,17 @@ export function QuizBuilderClient({
               <div className="stat-num">{enough ? n : '—'}</div>
               <div className="stat-lbl">Questions selected</div>
             </div>
-            <div className="stat-card">
-              <div className="stat-num">{enough ? `${minutes} min` : '—'}</div>
-              <div className="stat-lbl">Estimated time</div>
-            </div>
+            {pack ? (
+              <div className="stat-card">
+                <div className="stat-num">{packsLeftAfter === null ? 'No limit' : packsLeftAfter}</div>
+                <div className="stat-lbl">Packs left after this</div>
+              </div>
+            ) : (
+              <div className="stat-card">
+                <div className="stat-num">{enough ? `${minutes} min` : '—'}</div>
+                <div className="stat-lbl">Estimated time</div>
+              </div>
+            )}
           </div>
           <div className="summary-grid">
             {(
@@ -937,7 +1037,7 @@ export function QuizBuilderClient({
                 ['Questions', WHICH.find((w) => w.id === which)!.label, 2],
                 ['Difficulty', pickedDiffs.length ? pickedDiffs.join(', ') : 'All', 2],
                 ['Question type', pickedTypes.length ? pickedTypes.map(typeLabel).join(', ') : 'All types', 2],
-                ['Mode', modeDef.fullName, 3],
+                pack ? ['Name', packNameNow, 3] : ['Mode', modeDef.fullName, 3],
               ] as [string, string, number][]
             ).map(([label, value, target]) => (
               <div key={label} className="summary-item">
@@ -960,7 +1060,7 @@ export function QuizBuilderClient({
               ← Back
             </button>
             <button type="button" className="btn btn-accent btn-lg" disabled={!ready || building} onClick={() => void build()}>
-              {building ? 'Building…' : 'Build quiz →'}
+              {building ? (pack ? 'Making…' : 'Building…') : pack ? 'Make pack →' : 'Build quiz →'}
             </button>
           </div>
         </div>

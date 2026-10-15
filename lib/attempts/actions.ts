@@ -24,7 +24,6 @@
 import { requireStudent } from '@/lib/access';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { knownItemIds, searchConceptItemIds } from '@/lib/bank/queries';
-import type { ItemFilterOptions } from '@/lib/bank/types';
 import { getConfig } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import { startRefusal } from '@/lib/quizzes/availability';
@@ -37,7 +36,6 @@ import { makeAttemptId } from './ids';
 import { modeOf } from './modes';
 import {
   getAnswerHistory,
-  getBuilderCourseItems,
   getOwnAttempt,
   getQuizBuilderRows,
   getStudentAttemptsPaginated,
@@ -58,7 +56,6 @@ import {
   type AnswerPatch,
   type AttemptMode,
   type CheckResult,
-  type BuilderItem,
   type FinishResult,
   type HistoryFilters,
   type HistoryPage,
@@ -120,79 +117,14 @@ async function createAttemptRows(args: CreateAttemptArgs): Promise<SpawnResult> 
   return { ok: true, attemptId: args.attemptId };
 }
 
-// ── the builder's course load (legacy handleCourseChange's two reads) ──
-// Shared by the quiz builder and the offline-pack builder.
-//
-// 08 B6 (2026-09-26): a question a draft or active mock names is held
-// back from practice. The mocks' lists are readable by the service role
-// only (03 Q1), so the pool is filtered here and the browser is never
-// told which questions a mock holds — it simply never receives them.
-// The options (topics, subtopics, difficulties, types) are built from
-// the pool that is left, so a topic whose only questions are in a mock
-// is not offered; that replaced legacy's second read of the table.
-export type BuilderCourseLoad =
-  | { ok: true; items: BuilderItem[]; options: ItemFilterOptions }
-  | { ok: false; error: string };
-
 const HELD_BACK_UNREADABLE = 'Could not load the questions for this course. Please try again.';
-
-function optionsFrom(items: BuilderItem[]): ItemFilterOptions {
-  const unique = (values: (string | null)[]) => [...new Set(values.map((v) => String(v || '').trim()).filter(Boolean))].sort();
-  return {
-    subjects: unique(items.map((i) => i.subject)),
-    maintopics: unique(items.map((i) => i.maintopic)),
-    subtopics: unique(items.map((i) => i.subtopic)),
-    difficulties: unique(items.map((i) => i.difficulty)),
-    question_types: unique(items.map((i) => i.question_type)),
-    // the builders filter by none of the batches
-    batch_ids: [],
-  };
-}
-
-export async function loadBuilderCourse(courseId: string): Promise<BuilderCourseLoad> {
-  const { supabase, profile } = await requireStudent();
-
-  const access = await getStudentCourseAccess(supabase, profile.user_id);
-  if (!access[courseId]) return fail('You do not have an active subscription for this course.');
-
-  // 06.8: the Practice and Free pools only, read so
-  const items = await getBuilderCourseItems(supabase, courseId);
-  return { ok: true, items, options: optionsFrom(items) };
-}
-
-// ── the builders' concept keyword (08 B2; D9) ──────────────────────────
-// Both wizards' step 2 offers a free-text keyword, matched until now in
-// the browser against subtopic, main topic, stem and rationale — which
-// is why the course's question text was shipped at all. The same four
-// fields are matched here, in the database, and only the matching item
-// ids come back; the wizard intersects them with the light rows it
-// already holds, so its chips, counts and pool size are unchanged.
-//
-// The service role reads the rationale, so this gate stands in for RLS:
-// requireStudent(), then the same course-access check loadBuilderCourse
-// makes. Shared by the quiz builder and the offline-pack builder.
-export type ConceptSearchResult = { ok: true; itemIds: string[] } | { ok: false; error: string };
-
-export async function searchBuilderConcepts(courseId: string, query: string): Promise<ConceptSearchResult> {
-  const { supabase, profile } = await requireStudent();
-
-  const access = await getStudentCourseAccess(supabase, profile.user_id);
-  if (!access[courseId]) return fail('You do not have an active subscription for this course.');
-
-  const q = String(query || '').trim();
-  if (!q) return { ok: true, itemIds: [] };
-
-  // 06.8: the search returns Practice and Free questions only
-  const ids = await searchConceptItemIds(createServiceRoleClient(), courseId, q);
-  return { ok: true, itemIds: ids };
-}
 
 // ── the Quiz Builder (04.4; Sam, 2026-10-11) ───────────────────────────
 // Three doors, each asking the builder's door (lib/attempts/builder-door)
 // for this course first — the whole bank, the free questions, or nothing
 // — so the page can never ask for more than it was offered. The database
-// holds the same rules at Start (create_attempt). The offline pack
-// builder keeps loadBuilderCourse and searchBuilderConcepts above.
+// holds the same rules at Start (create_attempt). The pack builder has
+// its own three (lib/offline-packs/actions, 07.2).
 
 const NOT_OPEN = 'This course is not open to you in the quiz builder.';
 

@@ -193,7 +193,7 @@ four-step page built from it, were set aside the same day.
   2026-10-11: b).
 - A dropped connection says so and offers Try again; the page never
   freezes.
-- The offline pack builder keeps today's steps until its own redesign.
+- The pack builder is this builder with a pack's extras (07.2, 2026-10-15).
 
 ### Modes
 

@@ -1,4 +1,7 @@
-// app/(app)/student/quiz-builder/builder-parts.tsx
+// components/builder/builder-parts.tsx
+//
+// The status lines above the builder's circles. The pack builder's (07.2):
+// the course's packs left, from the package; none with no limit.
 //
 // The Quiz Builder's status line (04.4; Sam, 2026-10-11: kept above the
 // old wizard's circles) — a trial's quizzes left, a trial's used up, or
@@ -11,6 +14,20 @@ import { AppLink } from '@/components/shell/link-pending';
 import type { BuilderDoorCourse } from '@/lib/attempts/types';
 
 const PACKAGES_HREF = '/student/upgrade';
+
+/** 07.2: the pack builder's line — the course's packs left; none with no limit. */
+export function PackBanner({ course }: { course: BuilderDoorCourse }) {
+  if (course.packsLeft === null || course.packsLeft === undefined) return null;
+  const allowed = course.packsAllowed ?? course.packsLeft;
+  return (
+    <div className={course.packsLeft === 0 ? 'qb-banner qb-banner-warn' : 'qb-banner qb-banner-info'} role="status">
+      <strong>
+        {course.title} · {course.packsLeft} of {allowed} packs left
+      </strong>
+      <span>A pack counts when you make it. Deleting one doesn&apos;t give it back.</span>
+    </div>
+  );
+}
 
 /** The line at the top: a trial's quizzes left, a trial's used up, or free practice. None when paid. */
 export function Banner({ course }: { course: BuilderDoorCourse }) {

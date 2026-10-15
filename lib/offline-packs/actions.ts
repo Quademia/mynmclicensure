@@ -14,10 +14,13 @@
 'use server';
 
 import { requireStudent } from '@/lib/access';
-import { knownItemIds } from '@/lib/bank/queries';
+import { getAnswerHistory, getQuizBuilderRows } from '@/lib/attempts/queries';
+import { BUILDER_MIN_QUESTIONS, type KeywordResult, type QuizBuilderLoad } from '@/lib/attempts/types';
+import { knownItemIds, searchConceptItemIds } from '@/lib/bank/queries';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getConfig } from '@/lib/catalogue/queries';
 import { buildOfflineOwnerLabel, buildOfflinePackDefaultName, buildOfflinePackDisplayLabel, maskEmailForOffline, ownerNameOf, safeArray } from './labels';
+import { packDoorFor } from './door';
 import { getOfflinePackAllowance, listOfflinePacks, pickOfflinePackItemIds } from './queries';
 import {
   MY_PACKS_PAGE_SIZE,
@@ -25,8 +28,8 @@ import {
   type CreatePackInput,
   type CreatePackResult,
   type DeletePackResult,
+  type MakePackInput,
   type OfflinePackPage,
-  type PrepareResult,
 } from './types';
 
 // legacy makeOfflinePackId: 'PACK_' + Date.now() + '_' + makeSecureId('').slice(0, 8)
@@ -40,26 +43,82 @@ function makeOfflinePackId(): string {
   return 'PACK_' + Date.now() + '_' + hex.slice(0, 8);
 }
 
-// ── "Create pack" (legacy openOfflineModal): the allowance, then the pick ──
-export async function prepareOfflinePack(courseId: string, poolItemIds: string[], n: number): Promise<PrepareResult> {
-  const { supabase, profile } = await requireStudent();
-  const safeCourseId = String(courseId || '').trim().toUpperCase();
-  if (!safeCourseId) return { ok: false, reason: 'missing_course_id', allowance: null };
+// ── the pack builder (07.2; Sam, 2026-10-15) ───────────────────────────
+// The Quiz Builder's page with a pack's extras (components/builder). Each
+// action asks the pack door first (lib/offline-packs/door) — a course held
+// now whose package includes packs — so the page can never ask for more
+// than it was offered; the database holds the allowance at the make.
+
+const NOT_OPEN = 'Offline packs are not open for this course.';
+const NO_LOAD = 'Could not load the questions for this course. Please try again.';
+
+/** A course's pool for a pack: its Practice and Free questions' light rows, each marked seen / got wrong. */
+export async function loadPackBuilderCourse(courseId: string): Promise<QuizBuilderLoad> {
+  const gate = await requireStudent();
+  const door = await packDoorFor(gate, String(courseId || ''));
+  if (!door) return { ok: false, error: NOT_OPEN };
+  const [rows, history] = await Promise.all([
+    getQuizBuilderRows(gate.supabase, door.course_id, false),
+    getAnswerHistory(gate.supabase, gate.profile.user_id, door.course_id),
+  ]);
+  if (!rows || !history) return { ok: false, error: NO_LOAD };
+  return { ok: true, items: rows.map((r) => ({ ...r, seen: history.has(r.item_id), wrong: history.get(r.item_id) === true })) };
+}
+
+/** The keyword's matching ids in this course's Practice and Free questions. */
+export async function searchPackBuilderKeyword(courseId: string, word: string): Promise<KeywordResult> {
+  const gate = await requireStudent();
+  const door = await packDoorFor(gate, String(courseId || ''));
+  if (!door) return { ok: false, error: NOT_OPEN };
+  const q = String(word || '').trim().slice(0, 80);
+  if (!q) return { ok: true, itemIds: [] };
+  return { ok: true, itemIds: await searchConceptItemIds(createServiceRoleClient(), door.course_id, q) };
+}
+
+/**
+ * Make pack: the questions matching the student's choices (the pool, as
+ * the page worked it out), how many, and the name. The questions not in
+ * the student's earlier packs come first, at random (pickOfflinePackItemIds);
+ * then the pack is made as before (createOfflinePack: the allowance, every
+ * id this course's, published and in the practice bank, the watermark).
+ */
+export async function makeOfflinePack(input: MakePackInput): Promise<CreatePackResult> {
+  const gate = await requireStudent();
+  const { supabase, profile } = gate;
+  const safeCourseId = String(input?.course_id || '').trim().toUpperCase();
+  const door = await packDoorFor(gate, safeCourseId);
+  if (!door) return { ok: false, reason: 'not_allowed', message: NOT_OPEN, allowance: null };
+  if (door.packsLeft === 0) {
+    return { ok: false, reason: 'limit_reached', message: 'You have used all your offline packs for this course.', allowance: null };
+  }
+
+  const cfg = await getConfig(supabase);
+  const maxQuestions = Number(cfg.offline_max_questions) > 0 ? Number(cfg.offline_max_questions) : OFFLINE_MAX_QUESTIONS_DEFAULT;
+  const pool = safeArray(input.pool_ids);
+  const n = Math.min(maxQuestions, pool.length, Math.max(BUILDER_MIN_QUESTIONS, Math.floor(Number(input.n) || 0)));
+  if (pool.length < BUILDER_MIN_QUESTIONS || n < BUILDER_MIN_QUESTIONS) {
+    return { ok: false, reason: 'no_items_match', message: `A pack needs at least ${BUILDER_MIN_QUESTIONS} questions.`, allowance: null };
+  }
 
   const allowance = await getOfflinePackAllowance(supabase, profile.user_id, safeCourseId);
-  if (!allowance.success) return { ok: false, reason: allowance.blocked_reason || 'allowance_check_failed', allowance };
-  if (!allowance.allowed) return { ok: false, reason: 'limit_reached', allowance };
+  const pick = await pickOfflinePackItemIds(supabase, profile.user_id, safeCourseId, pool, n, allowance.period_start);
+  if (!pick.item_ids.length) {
+    return { ok: false, reason: 'no_items_match', message: 'No questions were selected.', allowance };
+  }
 
-  const pool = Array.isArray(poolItemIds) ? poolItemIds : [];
-  const pick = await pickOfflinePackItemIds(
-    supabase,
-    profile.user_id,
-    safeCourseId,
-    pool,
-    Math.min(Number(n || 0), pool.length),
-    allowance.period_start,
-  );
-  return { ok: true, allowance, pick };
+  return createOfflinePack({
+    course_id: safeCourseId,
+    item_ids: pick.item_ids,
+    pack_name: String(input.pack_name || '').trim(),
+    selection_mode: input.selection_mode === 'concept' ? 'concept' : 'topics',
+    maintopics: safeArray(input.maintopics),
+    subtopics: [],
+    difficulties: safeArray(input.difficulties),
+    question_types: safeArray(input.question_types),
+    concepts: [],
+    concept_query: String(input.concept_query || '').trim(),
+    display_label: '',
+  });
 }
 
 // ── "Create & Download" (legacy createOfflinePack) ─────────────────────

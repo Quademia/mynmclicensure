@@ -9,7 +9,7 @@ Detail and history: `archive/product-plan/06-offline-packs.md` (the old
 app's description) and the built code in `lib/offline-packs/` and
 `app/(app)/offline-pack/`.
 
-## The redesign *(ruled by Sam, 2026-10-15; 07.1, 07.6, 07.7 built 2026-10-15; to build: 07.2–07.5, 07.8)*
+## The redesign *(ruled by Sam, 2026-10-15; 07.1, 07.2, 07.6, 07.7 built 2026-10-15; to build: 07.3–07.5, 07.8)*
 
 Designed fresh, not from the old pack (a print-to-PDF page). A pack is a
 set of questions kept **on the student's phone, usable with no
@@ -23,7 +23,9 @@ connection**, and a printable PDF of the same pack.
   is Count & name (no mode); the count from 5 to the admin's pack limit
   (Config); the status line shows the allowance ("3 of 5 packs left in
   Midwifery"); questions not in the student's earlier packs come first.
-  *(07.2)*
+  *(07.2, built 2026-10-15: one builder in components/builder, the pack
+  door in lib/offline-packs/door; a trial or free student gets the locked
+  card; until 07.8 a made pack opens in the old pack page)*
 - **Offline, in the app** — the installable app (a PWA): installed once
   to the home screen, it opens the student's packs with no signal.
   *(07.3)*

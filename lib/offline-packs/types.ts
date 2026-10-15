@@ -109,11 +109,19 @@ export type PickResult = {
   pool_size: number;
 };
 
-// The builder's "Create pack" click: the allowance check, then the pick
-// (legacy openOfflineModal did both from the browser).
-export type PrepareResult =
-  | { ok: true; allowance: Allowance; pick: PickResult }
-  | { ok: false; reason: BlockedReason; allowance: Allowance | null };
+// The pack builder's Make pack (07.2): the pool the page worked out from
+// the student's choices, how many, the name, and what was chosen.
+export type MakePackInput = {
+  course_id: string;
+  pool_ids: string[];
+  n: number;
+  pack_name: string;
+  selection_mode: SelectionMode;
+  maintopics: string[];
+  difficulties: string[];
+  question_types: string[];
+  concept_query: string;
+};
 
 // legacy createOfflinePack's payload.
 export type CreatePackInput = {

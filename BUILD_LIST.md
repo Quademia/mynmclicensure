@@ -131,7 +131,7 @@ before then, and the old list's history, is in
 ## [07 Offline packs](docs/product-plan/07-offline-packs.md)
 
 - ✅ 07.1 The allowance from the package — pack_allowance(), one rule for the maker and the pages; Config's offline_packs_per_course retired — 2026-10-15
-- ⬜ 07.2 The pack builder is the Quiz Builder plus a pack's extras — Count & name, 5 to the pack limit, the allowance line, earlier packs' questions last (ruled 2026-10-15)
+- ✅ 07.2 The pack builder is the Quiz Builder plus a pack's extras — Count & name, 5 to the pack limit, the allowance line, earlier packs' questions first-unused; the pack door; the old wizard deleted — 2026-10-15
 - ⬜ 07.3 Offline in the app — the installable app (PWA); packs kept on signed-in phones only, cleared when the phone finds itself signed out, a check-in period (Config, 30 days); storage awaits Sam's tick (12)
 - ⬜ 07.4 The offline player — its own small one from the runner's pieces; Answer as you go / Answers at the end; no sync (Sam)
 - ⬜ 07.5 The PDF redesigned — drawn first; answers on the last page by default, the watermark

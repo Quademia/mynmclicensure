@@ -18,7 +18,7 @@ import { getBuilderDoor, withTotals } from '@/lib/attempts/builder-door';
 import { BUILDER_MAX_QUESTIONS_DEFAULT, BUILDER_MINUTES_PER_QUESTION_DEFAULT } from '@/lib/attempts/types';
 import { PageHeader } from '@/components/shell/page-header';
 import { AppLink } from '@/components/shell/link-pending';
-import { QuizBuilderClient } from './quiz-builder-client';
+import { QuizBuilderClient } from '@/components/builder/builder-client';
 import '@/styles/student-quiz-builder.css';
 
 export const metadata: Metadata = {

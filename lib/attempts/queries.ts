@@ -25,7 +25,7 @@ import type { ServerSupabaseClient } from '@/lib/access';
 import { PRACTICE_POOLS } from '@/lib/bank/types';
 import { readAll, slices } from '@/lib/supabase/read-all';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { HISTORY_PAGE_SIZE, RECENT_ATTEMPTS_LIMIT, type Attempt, type AttemptItem, type AttemptListRow, type AttemptWithProgress, type BuilderItem, type HistoryFilters, type HistoryPage, type QuizAttemptStats } from './types';
+import { HISTORY_PAGE_SIZE, RECENT_ATTEMPTS_LIMIT, type Attempt, type AttemptItem, type AttemptListRow, type AttemptWithProgress, type HistoryFilters, type HistoryPage, type QuizAttemptStats } from './types';
 
 type ServiceDb = ReturnType<typeof createServiceRoleClient>;
 
@@ -175,40 +175,6 @@ export async function getStudentAttempts(userId: string, courseId: string | null
     for (const r of rows ?? []) counts[r.attempt_id] = (counts[r.attempt_id] ?? 0) + 1;
   }
   return attempts.map((a) => ({ ...a, answered_count: counts[a.attempt_id] ?? 0 }));
-}
-
-// The builder's whole-course read: the light columns the wizard filters
-// and counts on, by item id. (The SELECT policy through user_has_course()
-// returns nothing for a course the student cannot access.)
-//
-// The stem and the rationale left this list in 08 B2 (2026-09-21; D9):
-// the wizard matched the concept keyword against them in the browser,
-// which meant shipping a whole course's question text to filter on it.
-// The keyword is now searchConceptItemIds() on the server and the
-// browser keeps the criteria columns alone. The rationale is not
-// readable by this client any more in any case.
-//
-// Published rows only (08 B4): the policy already hides a draft from
-// this client; the filter names the scope in the query as well.
-//
-// 08 B7: a whole course, so readAll() — RM_PED_OBS_HRN's 1,080 came back
-// as 1,000, and since B6 the chips are built from these same rows.
-export async function getBuilderCourseItems(db: ServerSupabaseClient, courseId: string): Promise<BuilderItem[]> {
-  const { data, error } = await readAll<BuilderItem>((from, to) =>
-    db
-      .from('question_bank')
-      .select('item_id, subject, maintopic, subtopic, difficulty, question_type')
-      .eq('course_id', courseId)
-      .eq('is_published', true)
-      .in('pool', PRACTICE_POOLS)
-      .order('item_id')
-      .range(from, to),
-  );
-  if (error) {
-    console.error('getBuilderCourseItems:', error);
-    return [];
-  }
-  return data;
 }
 
 // The Quiz Builder's pool (04.4): the light columns it counts and
