@@ -50,6 +50,8 @@ import {
   BLOOM_LEVELS,
   DIFFICULTIES,
   OPTION_LETTERS,
+  POOL_NAMES,
+  QUESTION_POOLS,
   QUESTION_TYPES,
   QUESTION_TYPE_LABELS,
   RATIONALE_IMAGE_MAX_BYTES,
@@ -58,6 +60,7 @@ import {
   type Item,
   type ListEntry,
   type OptionLetter,
+  type QuestionPool,
   type QuestionType,
 } from '@/lib/bank/types';
 import type { Course } from '@/lib/catalogue/types';
@@ -87,7 +90,7 @@ type Form = {
   // ── 08 B4 ──
   bloomLevel: string;
   isPublished: boolean;
-  isFreeSample: boolean;
+  pool: QuestionPool;
   questionRef: string;
   tags: string[];
 };
@@ -118,7 +121,7 @@ const EMPTY_FORM: Form = {
   bloomLevel: '',
   // a new question is a draft (08 B4, draft by default)
   isPublished: false,
-  isFreeSample: false,
+  pool: 'practice',
   questionRef: '',
   tags: [],
 };
@@ -297,8 +300,7 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
     if (fBatch && item.batch_id !== fBatch) return false;
     if (fStatus === 'published' && !item.is_published) return false;
     if (fStatus === 'draft' && item.is_published) return false;
-    if (fFree === 'free' && !item.is_free_sample) return false;
-    if (fFree === 'not-free' && item.is_free_sample) return false;
+    if (fFree && item.pool !== fFree) return false;
     if (fLevel === 'none' && item.bloom_level) return false;
     if (fLevel && fLevel !== 'none' && item.bloom_level !== fLevel) return false;
     if (kw) {
@@ -363,7 +365,7 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
       shuffle: item.shuffle_options !== false,
       bloomLevel: item.bloom_level || '',
       isPublished: item.is_published,
-      isFreeSample: item.is_free_sample,
+      pool: item.pool,
       questionRef: item.question_ref || '',
       tags: item.tags ?? [],
     };
@@ -510,7 +512,7 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
         shuffleOptions: form.shuffle,
         bloomLevel: form.bloomLevel,
         isPublished: form.isPublished,
-        isFreeSample: form.isFreeSample,
+        pool: form.pool,
         questionRef: form.questionRef,
         tags,
       },
@@ -697,11 +699,10 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
           </select>
         </div>
         <div className="filter-group">
-          <label htmlFor="filterFree">Free</label>
+          <label htmlFor="filterFree">Pool</label>
           <select id="filterFree" value={fFree} onChange={(e) => { setFFree(e.target.value); setLimit(PAGE_SIZE); }}>
-            <option value="">All</option>
-            <option value="free">Free only</option>
-            <option value="not-free">Not free</option>
+            <option value="">All pools</option>
+            {QUESTION_POOLS.map((p) => <option key={p} value={p}>{POOL_NAMES[p]}</option>)}
           </select>
         </div>
         <div className="filter-group">
@@ -822,7 +823,7 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
                           ? <ScaleChip step={DIFFICULTY_STEP[item.difficulty]}>{item.difficulty}</ScaleChip>
                           : item.difficulty ? <KindChip>{item.difficulty}</KindChip> : null}
                         {item.bloom_level ? <KindChip>{item.bloom_level}</KindChip> : null}
-                        {item.is_free_sample ? <KindChip>Free</KindChip> : null}
+                        <KindChip>{POOL_NAMES[item.pool] ?? item.pool}</KindChip>
                         {item.marks && Number(item.marks) !== 1 ? <KindChip>{item.marks} marks</KindChip> : null}
                       </div>
                       <div className="q-card-actions">
@@ -899,11 +900,16 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
                 Published — students can see this question
               </label>
               {isNew ? <p className="form-hint">A new question is saved as a draft unless this is ticked.</p> : null}
-              <label className="check-label">
-                <input type="checkbox" checked={form.isFreeSample} onChange={(e) => setField('isFreeSample', e.target.checked)} />
-                Free question
-              </label>
-              <p className="form-hint">Marks it for the free pool, which is not open to students yet. A question in a mock exam cannot be free.</p>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="fieldPool">Pool *</label>
+              <select id="fieldPool" value={form.pool} onChange={(e) => setField('pool', e.target.value as QuestionPool)}>
+                {QUESTION_POOLS.map((p) => <option key={p} value={p}>{POOL_NAMES[p]}</option>)}
+              </select>
+              <p className="form-hint">
+                Practice: the Quiz Builder, offline packs and the daily challenge. Free: the free set, and the Builder too. Paper: practice papers only. Mock: mock exams only. A question a paper or mock holds stays in its pool until it is taken out.
+              </p>
             </div>
 
             <div className="form-group">

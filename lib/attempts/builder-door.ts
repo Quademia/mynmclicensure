@@ -22,9 +22,8 @@
 // counted grant "Trial".
 
 import type { AuthGateResult } from '@/lib/access';
-import { heldBackIds } from '@/lib/bank/queries';
+import { PRACTICE_POOLS } from '@/lib/bank/types';
 import { getCourses } from '@/lib/catalogue/queries';
-import { slices } from '@/lib/supabase/read-all';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import type { BuilderDoorCourse } from './types';
 
@@ -140,13 +139,11 @@ export async function builderDoorFor(gate: AuthGateResult, courseId: string): Pr
 
 /**
  * The question count each course shows in the course list: published,
- * free ones only on the free pool, less any a draft or active mock holds
- * back (08 B6) — the number the course's "All topics" will show once it
- * loads. Counts, not rows (rule 10). A mock's questions are never free, so
- * the free pool needs no hold-back.
+ * in the Practice and Free pools (06.8) — Free alone on the free door —
+ * the number the course's "All topics" will show once it loads. A count,
+ * not rows (rule 10).
  */
 export async function withTotals(gate: AuthGateResult, door: Omit<BuilderDoorCourse, 'total'>[]): Promise<BuilderDoorCourse[]> {
-  const svc = createServiceRoleClient();
   return Promise.all(
     door.map(async (c) => {
       let q = gate.supabase
@@ -154,22 +151,10 @@ export async function withTotals(gate: AuthGateResult, door: Omit<BuilderDoorCou
         .select('item_id', { count: 'exact', head: true })
         .eq('course_id', c.course_id)
         .eq('is_published', true);
-      if (c.pool === 'free') q = q.eq('is_free_sample', true);
-      const [{ count, error }, held] = await Promise.all([q, c.pool === 'all' ? heldBackIds(svc, c.course_id, { papers: true }) : Promise.resolve(new Set<string>())]);
+      q = c.pool === 'free' ? q.eq('pool', 'free') : q.in('pool', PRACTICE_POOLS);
+      const { count, error } = await q;
       if (error) console.error('builder door, total:', c.course_id, error);
-      let heldPublished = 0;
-      if (held && held.size) {
-        for (const ids of slices([...held])) {
-          const r = await svc
-            .from('question_bank')
-            .select('item_id', { count: 'exact', head: true })
-            .eq('course_id', c.course_id)
-            .eq('is_published', true)
-            .in('item_id', ids);
-          heldPublished += r.count ?? 0;
-        }
-      }
-      return { ...c, total: Math.max(0, (count ?? 0) - heldPublished) };
+      return { ...c, total: count ?? 0 };
     }),
   );
 }

@@ -23,7 +23,7 @@
 
 import { requireStudent } from '@/lib/access';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { heldBackIds, knownItemIds, searchConceptItemIds } from '@/lib/bank/queries';
+import { knownItemIds, searchConceptItemIds } from '@/lib/bank/queries';
 import type { ItemFilterOptions } from '@/lib/bank/types';
 import { getConfig } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
@@ -155,12 +155,8 @@ export async function loadBuilderCourse(courseId: string): Promise<BuilderCourse
   const access = await getStudentCourseAccess(supabase, profile.user_id);
   if (!access[courseId]) return fail('You do not have an active subscription for this course.');
 
-  const [all, held] = await Promise.all([
-    getBuilderCourseItems(supabase, courseId),
-    heldBackIds(createServiceRoleClient(), courseId, { papers: true }),
-  ]);
-  if (!held) return fail(HELD_BACK_UNREADABLE);
-  const items = all.filter((i) => !held.has(i.item_id));
+  // 06.8: the Practice and Free pools only, read so
+  const items = await getBuilderCourseItems(supabase, courseId);
   return { ok: true, items, options: optionsFrom(items) };
 }
 
@@ -186,11 +182,9 @@ export async function searchBuilderConcepts(courseId: string, query: string): Pr
   const q = String(query || '').trim();
   if (!q) return { ok: true, itemIds: [] };
 
-  // 08 B6: a held-back question's id never leaves the server either
-  const svc = createServiceRoleClient();
-  const [ids, held] = await Promise.all([searchConceptItemIds(svc, courseId, q), heldBackIds(svc, courseId, { papers: true })]);
-  if (!held) return fail(HELD_BACK_UNREADABLE);
-  return { ok: true, itemIds: ids.filter((id) => !held.has(id)) };
+  // 06.8: the search returns Practice and Free questions only
+  const ids = await searchConceptItemIds(createServiceRoleClient(), courseId, q);
+  return { ok: true, itemIds: ids };
 }
 
 // ── the Quiz Builder (04.4; Sam, 2026-10-11) ───────────────────────────
@@ -202,24 +196,21 @@ export async function searchBuilderConcepts(courseId: string, query: string): Pr
 
 const NOT_OPEN = 'This course is not open to you in the quiz builder.';
 
-/** A course's pool: its questions' light rows, held-back ones gone, each marked seen / got wrong. */
+/** A course's pool: its Practice and Free questions' light rows (Free alone on the free door), each marked seen / got wrong. */
 export async function loadQuizBuilderCourse(courseId: string): Promise<QuizBuilderLoad> {
   const gate = await requireStudent();
   const door = await builderDoorFor(gate, String(courseId || ''));
   if (!door) return fail(NOT_OPEN);
 
-  const [rows, held, history] = await Promise.all([
+  const [rows, history] = await Promise.all([
     getQuizBuilderRows(gate.supabase, door.course_id, door.pool === 'free'),
-    heldBackIds(createServiceRoleClient(), door.course_id, { papers: true }),
     getAnswerHistory(gate.supabase, gate.profile.user_id, door.course_id),
   ]);
-  if (!rows || !held || !history) return fail(HELD_BACK_UNREADABLE);
+  if (!rows || !history) return fail(HELD_BACK_UNREADABLE);
 
   return {
     ok: true,
-    items: rows
-      .filter((r) => !held.has(r.item_id))
-      .map((r) => ({ ...r, seen: history.has(r.item_id), wrong: history.get(r.item_id) === true })),
+    items: rows.map((r) => ({ ...r, seen: history.has(r.item_id), wrong: history.get(r.item_id) === true })),
   };
 }
 
@@ -232,17 +223,15 @@ export async function searchQuizBuilderKeyword(courseId: string, word: string): 
   const q = String(word || '').trim().slice(0, 80);
   if (!q) return { ok: true, itemIds: [] };
 
-  const svc = createServiceRoleClient();
-  const [ids, held] = await Promise.all([searchConceptItemIds(svc, door.course_id, q, door.pool === 'free'), heldBackIds(svc, door.course_id, { papers: true })]);
-  if (!held) return fail(HELD_BACK_UNREADABLE);
-  return { ok: true, itemIds: ids.filter((id) => !held.has(id)) };
+  const ids = await searchConceptItemIds(createServiceRoleClient(), door.course_id, q, door.pool === 'free');
+  return { ok: true, itemIds: ids };
 }
 
 /**
  * Start: the chosen ids (picked and shuffled on the page), the mode and
  * the quiz's name. Checked again here — the course open, the mode open on
  * its pool, 5 to the builder's limit, each id this course's, published,
- * not held back and, on the free pool, free — then the database's own
+ * in the Practice or Free pool and, on the free door, Free — then the database's own
  * rules. Its refusal reaches the student in its own words ("You have used
  * all the Quiz Builder quizzes in your package."), not "could not build".
  */
@@ -262,15 +251,11 @@ export async function startQuizBuilderQuiz(courseId: string, itemIds: string[], 
 
   const safeIds = [...new Set((itemIds || []).map((id) => String(id || '').trim()).filter(Boolean))].slice(0, maxQuestions);
 
-  // The ids must be this course's and published — for a student on the
-  // free pool the cookie client reads the free rows only, so a paid id
-  // drops here too — and not held back by a mock (08 B6).
-  const [known, held] = await Promise.all([
-    knownItemIds(supabase, door.course_id, safeIds),
-    heldBackIds(createServiceRoleClient(), door.course_id, { papers: true }),
-  ]);
-  if (!held) return fail(HELD_BACK_UNREADABLE);
-  const orderedIds = safeIds.filter((id) => known.has(id) && !held.has(id));
+  // The ids must be this course's, published and in the Practice or Free
+  // pool (06.8) — for a student on the free door the cookie client reads
+  // the Free rows only, so a paid id drops here too.
+  const known = await knownItemIds(supabase, door.course_id, safeIds);
+  const orderedIds = safeIds.filter((id) => known.has(id));
   if (orderedIds.length < BUILDER_MIN_QUESTIONS) return fail(`A quiz needs at least ${BUILDER_MIN_QUESTIONS} questions.`);
 
   return createAttemptRows({

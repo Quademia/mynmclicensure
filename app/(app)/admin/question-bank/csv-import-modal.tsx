@@ -22,7 +22,7 @@ import { useRef, useState } from 'react';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { importItems } from '@/lib/bank/actions';
 import { csvTemplate, parseCsv, type CsvParseResult } from '@/lib/bank/csv';
-import type { CourseLists } from '@/lib/bank/types';
+import { POOL_NAMES, QUESTION_POOLS, type CourseLists, type QuestionPool } from '@/lib/bank/types';
 import { Icon } from '@/components/shell/icons';
 
 type Outcome = { successCount: number; failCount: number; errors: string[]; created: number; updated: number };
@@ -45,7 +45,8 @@ export function CsvImportModal({
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [publishNew, setPublishNew] = useState(false);
-  const [freeNew, setFreeNew] = useState(false);
+  // 06.8: the pool the file's new questions go into
+  const [poolNew, setPoolNew] = useState<QuestionPool>('practice');
   const fileRef = useRef<HTMLInputElement>(null);
 
   function downloadTemplate() {
@@ -73,7 +74,7 @@ export function CsvImportModal({
   async function runImport() {
     if (!parsed || !parsed.rows.length) return;
     setPhase('importing');
-    const result = await importItems(courseId, parsed.rows, { publishNew, freeNew });
+    const result = await importItems(courseId, parsed.rows, { publishNew, pool: poolNew });
     if (!result.ok) {
       setError(result.error);
       setPhase('pick');
@@ -118,7 +119,7 @@ export function CsvImportModal({
                   <div className="csv-report-row ok">{outcome.successCount} question{outcome.successCount !== 1 ? 's' : ''} imported successfully.</div>
                   {outcome.successCount ? (
                     <div className="csv-report-row ok">
-                      {outcome.created} new ({publishNew ? 'published' : 'drafts'}{freeNew ? ', free' : ''}) · {outcome.updated} already in the bank, updated with their own settings kept.
+                      {outcome.created} new ({publishNew ? 'published' : 'drafts'}, {POOL_NAMES[poolNew]}) · {outcome.updated} already in the bank, updated with their own settings kept.
                     </div>
                   ) : null}
                   {outcome.failCount ? (
@@ -145,11 +146,13 @@ export function CsvImportModal({
                   Publish the new questions now
                 </label>
                 <label className="csv-choice">
-                  <input type="checkbox" checked={freeNew} disabled={phase !== 'pick'} onChange={(e) => setFreeNew(e.target.checked)} />
-                  Mark the new questions as free
+                  Pool for the new questions{' '}
+                  <select value={poolNew} disabled={phase !== 'pick'} onChange={(e) => setPoolNew(e.target.value as QuestionPool)}>
+                    {QUESTION_POOLS.map((p) => <option key={p} value={p}>{POOL_NAMES[p]}</option>)}
+                  </select>
                 </label>
                 <p className="csv-choice-hint">
-                  Unticked, new questions are saved as drafts. Both choices apply only to questions this file adds — a question already in the bank keeps its own settings. A question in a mock exam cannot be free.
+                  Unticked, new questions are saved as drafts. Both choices apply only to questions this file adds — a question already in the bank keeps its own settings. Paper and Mock questions are only for practice papers and mock exams.
                 </p>
               </div>
             ) : null}

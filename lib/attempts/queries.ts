@@ -22,6 +22,7 @@
 // role and see every score.
 
 import type { ServerSupabaseClient } from '@/lib/access';
+import { PRACTICE_POOLS } from '@/lib/bank/types';
 import { readAll, slices } from '@/lib/supabase/read-all';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { HISTORY_PAGE_SIZE, RECENT_ATTEMPTS_LIMIT, type Attempt, type AttemptItem, type AttemptListRow, type AttemptWithProgress, type BuilderItem, type HistoryFilters, type HistoryPage, type QuizAttemptStats } from './types';
@@ -199,6 +200,7 @@ export async function getBuilderCourseItems(db: ServerSupabaseClient, courseId: 
       .select('item_id, subject, maintopic, subtopic, difficulty, question_type')
       .eq('course_id', courseId)
       .eq('is_published', true)
+      .in('pool', PRACTICE_POOLS)
       .order('item_id')
       .range(from, to),
   );
@@ -222,7 +224,7 @@ export async function getQuizBuilderRows(
   type Row = { item_id: string; maintopic: string | null; difficulty: string | null; question_type: string };
   const { data, error } = await readAll<Row>((from, to) => {
     let q = db.from('question_bank').select('item_id, maintopic, difficulty, question_type').eq('course_id', courseId).eq('is_published', true);
-    if (freeOnly) q = q.eq('is_free_sample', true);
+    q = freeOnly ? q.eq('pool', 'free') : q.in('pool', PRACTICE_POOLS);
     return q.order('item_id').range(from, to);
   });
   if (error) {

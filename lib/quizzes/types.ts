@@ -105,7 +105,7 @@ export type QuizPage = { quizzes: QuizListRow[]; total: number };
 /** The editor's picker: the course's rows, and (08 B6) the ids a draft or
  *  active mock holds back — the fixed-quiz picker does not offer them. */
 export type PickerLoad =
-  | { ok: true; items: Item[]; heldBack: string[] }
+  | { ok: true; items: Item[] }
   | { ok: false; error: string };
 
 // What saveQuiz() takes: the details form plus the picked ids, as legacy's

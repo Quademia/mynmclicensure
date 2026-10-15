@@ -38,7 +38,7 @@
 import type { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { readAll, slices } from '@/lib/supabase/read-all';
 import { QUIZ_ITEM_TABLES, QUIZ_KINDS, QUIZ_TABLES, type QuizKind } from '@/lib/quizzes/types';
-import type { CourseLists, Item, ItemFilterOptions, ItemFilters, ListEntry } from './types';
+import { PRACTICE_POOLS, type CourseLists, type Item, type ItemFilterOptions, type ItemFilters, type ListEntry } from './types';
 
 type Db = Awaited<ReturnType<typeof createClient>>;
 export type ServiceDb = ReturnType<typeof createServiceRoleClient>;
@@ -76,6 +76,7 @@ export async function knownItemIds(db: Db, courseId: string, itemIds: string[]):
     .select('item_id')
     .eq('course_id', courseId)
     .eq('is_published', true)
+    .in('pool', PRACTICE_POOLS)
     .in('item_id', itemIds);
   if (error) {
     console.error('knownItemIds:', error);
@@ -119,6 +120,7 @@ export async function searchConceptItemIds(db: ServiceDb, courseId: string, quer
 export async function getItemsByFilters(db: ServiceDb, courseId: string, filters: ItemFilters = {}): Promise<Item[]> {
   const build = () => {
     let query = db.from('question_bank').select('*').eq('course_id', courseId);
+    if (filters.pool) query = query.eq('pool', filters.pool);
     if (filters.subject) query = query.eq('subject', filters.subject);
     if (filters.maintopic) query = query.eq('maintopic', filters.maintopic);
     if (filters.subtopic) query = query.eq('subtopic', filters.subtopic);
@@ -194,53 +196,6 @@ export async function getItemFilterOptions(
 // behind requireAdmin() — or, for the draws, after requireStudent() and
 // the access check.
 
-/**
- * The questions held back from practice (08 B6): every id named by a
- * mock whose status is draft or active. An archived mock releases its
- * questions; restoring it holds them back again — derived from the mocks'
- * rows, never stored (Sam, 2026-09-26). One definition serves the
- * draws, the fixed-quiz picker and the free tick's refusal. `courseId`
- * narrows to one course's mocks. Null when the rows could not be read —
- * every caller then refuses rather than guesses.
- *
- * 04.6 (Sam, 2026-10-11): with `papers`, the questions a draft or active
- * Practice Paper names are held back too — the builder, the pack maker
- * and the free tick pass it. The fixed-quiz picker and a paper's own
- * save do not: they must still see a paper's questions, and only a
- * mock's keep a question out of a paper.
- */
-export async function heldBackIds(
-  db: ServiceDb,
-  courseId?: string,
-  options: { papers?: boolean } = {},
-): Promise<Set<string> | null> {
-  const kinds: Array<'mock' | 'fixed'> = options.papers ? ['mock', 'fixed'] : ['mock'];
-  const ids = new Set<string>();
-  for (const kind of kinds) {
-    const build = () => {
-      let query = db.from(QUIZ_TABLES[kind]).select('quiz_id').in('status', ['draft', 'active']);
-      if (courseId) query = query.eq('course_id', courseId);
-      return query.order('quiz_id');
-    };
-    const quizzes = await readAll<{ quiz_id: string }>((from, to) => build().range(from, to));
-    if (quizzes.error) {
-      console.error('heldBackIds:', quizzes.error);
-      return null;
-    }
-
-    for (const quizIds of slices(quizzes.data.map((m) => m.quiz_id))) {
-      const { data, error } = await readAll<{ item_id: string }>((from, to) =>
-        db.from(QUIZ_ITEM_TABLES[kind]).select('item_id').in('quiz_id', quizIds).order('quiz_id').order('item_id').range(from, to),
-      );
-      if (error) {
-        console.error('heldBackIds rows:', error);
-        return null;
-      }
-      for (const r of data) ids.add(r.item_id);
-    }
-  }
-  return ids;
-}
 
 /**
  * How many live quizzes — fixed or mock, status active and published —
@@ -421,7 +376,7 @@ export async function courseWordRows(
  */
 export async function freeRowCounts(db: ServiceDb): Promise<Map<string, { free: number; freeDrafts: number }> | null> {
   const { data, error } = await readAll<{ course_id: string; is_published: boolean }>((from, to) =>
-    db.from('question_bank').select('course_id, is_published').eq('is_free_sample', true).order('item_id').range(from, to),
+    db.from('question_bank').select('course_id, is_published').eq('pool', 'free').order('item_id').range(from, to),
   );
   if (error) {
     console.error('freeRowCounts:', error);

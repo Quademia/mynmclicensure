@@ -598,11 +598,14 @@ above sit at the repo root; the audience grouping inside them is kept.
   POST** unless called with `{ get: true }` — and a GET rpc sends a null
   argument as the text `'null'`, so leave it out instead. A read that
   must see a write made earlier in the same render stays a POST (2026-10-15).
-- **A question's "held back" is held in the server's code**, not by a
-  database rule: `heldBackIds` (`lib/bank/queries.ts`) — a draft or active
-  mock's questions always, a draft or active paper's too with
-  `{ papers: true }`. A new place that draws questions for a student
-  (the daily challenge, G2) must call it with `papers: true`.
+- **A question's place is its `pool`** (06.8, 2026-10-15): `practice`,
+  `free`, `paper` or `mock`. A new place that draws questions for a
+  student reads its own pool by name (`PRACTICE_POOLS` in
+  `lib/bank/types.ts` for the Builder and packs; the daily challenge,
+  G2, `practice`), never "the course's published questions". The
+  database refuses a paper or mock listing another pool's question and a
+  builder sitting holding one; nothing is worked out from which papers
+  or mocks list a question.
 
 - **Some files here have mixed line endings** (CRLF and LF together), so a
   scripted multi-line find-and-replace that contains `\n` can match

@@ -125,7 +125,7 @@ before then, and the old list's history, is in
 - ⬜ 06.5 Content: the RPHN disease-control course has no questions while active
 - ⬜ 06.6 Content: the midwifery course short of its set target
 - ⏸ 06.7 A blueprint axis — adopted in principle; waiting on the NMC curricula in print
-- ⬜ 06.8 Pools — every question in one: Practice, Free, Paper or Mock (Sam, 2026-10-15); papers and mocks hold only their own, the Builder and packs read Practice + Free, the challenge Practice; is_free_sample and the held-back logic go; storage awaits Sam's tick (12)
+- ✅ 06.8 Pools — every question in one: Practice, Free, Paper or Mock (Sam); papers and mocks hold only their own, the Builder and packs read Practice + Free, the challenge Practice; is_free_sample and the held-back logic gone; the database holds it — 2026-10-15
 
 ## [07 Offline packs](docs/product-plan/07-offline-packs.md)
 

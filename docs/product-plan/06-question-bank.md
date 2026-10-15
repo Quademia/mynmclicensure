@@ -15,7 +15,7 @@ Detail and history: `archive/product-plan/08-question-bank.md` (B1–B8).
   course; its id is course-prefixed, unique across the bank, and never
   changes (Sam, 2026-09-19).
 - **A student reads a question only in a course they hold** (Sam kept
-  the course gate, 2026-09-19), or a question marked free (03). The
+  the course gate, 2026-09-19), or a question in the Free pool (03). The
   admin reads all.
 - **A student's browser can read only the ten filter columns** — id,
   course, subject, topic, subtopic, difficulty, type, batch, published,
@@ -67,10 +67,10 @@ Detail and history: `archive/product-plan/08-question-bank.md` (B1–B8).
 - **A question any paper or mock uses cannot be deleted**; the refusal
   names them and suggests unpublishing (Sam, 2026-09-27).
 
-### Pools *(to build: 06.8)*
+### Pools *(06.8, built 2026-10-15)*
 
-Ruled by Sam, 2026-10-15, replacing "free is a mark" and "held back"
-below: **every question belongs to one pool**, set by the admin when it
+Ruled by Sam, 2026-10-15, replacing "free is a mark" and "held back":
+**every question belongs to one pool**, set by the admin when it
 is written or imported, and each place that draws from the bank reads
 only its own — so nothing depends on a paper's or mock's state, and
 archiving releases nothing.
@@ -93,21 +93,12 @@ archiving releases nothing.
   (04.21), a question taken off a mock, a mock question not yet added.
   The challenge reads Practice, not a pool of its own: about 365 new
   questions a course a year was not worth it (Sam).
-
-*Until 06.8 is built:*
-
-- **Free is a mark on a question** (Sam, 2026-09-26), not a separate
-  pool; free questions stay in their paid course. The Free pool panel
-  counts them per programme (the counts overlap across programmes).
-- **A question a draft or active mock uses is held back**: the builder,
-  the pack maker, the paper picker and the daily challenge skip it, and
-  it can never be marked free — both the free tick and the mock's save
-  refuse. Archiving the mock releases it (04).
-- **So is a question a draft or active Practice Paper uses** (Sam,
-  2026-10-11): the builder, the pack maker, the free set and the daily
-  challenge skip it, and the free tick and the paper's save refuse;
-  archiving the paper releases it. The bank page marks it "In a paper".
-  *(built 2026-10-12; the "In a paper" mark on the bank page is not)*
+- The admin's page: a Pool choice in the editor (with its hint), a Pool
+  filter, the pool on each card; the importer's pool per file; a paper's
+  and a mock's question picker offer their own pool only. The Free pool
+  panel counts the Free pool per programme.
+- Replaced (history): "free is a mark" (2026-09-26) and "held back while
+  a draft or active mock or paper uses it" (2026-09-26, 2026-10-11).
 
 ### The importer
 
@@ -117,8 +108,8 @@ archiving releases nothing.
   difficulty or level not on its list, naming the word; matching
   ignores case and stores the list's spelling; a blank cell is Not set.
 - Per file the admin chooses "publish now or drafts" and "free or not";
-  the choices reach only the rows the file creates. With 06.8 "free or
-  not" becomes the file's pool — Practice, Free, Paper or Mock.
+  the choices reach only the rows the file creates. Since 06.8 the
+  second choice is the file's pool — Practice, Free, Paper or Mock.
 
 ### Search
 

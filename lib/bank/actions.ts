@@ -41,45 +41,17 @@ import {
   getItemFilterOptions,
   getItemsByFilters,
   liveQuizzesNaming,
-  heldBackIds,
   quizzesNaming,
   taggedRows,
   tagSpellingsInUse,
   type ServiceDb,
 } from './queries';
 import { courseExists } from './queries';
-import {
-  BLOOM_LEVELS,
-  DIFFICULTIES,
-  OPTION_LETTERS,
-  QUESTION_TYPES,
-  RATIONALE_IMAGE_MAX_BYTES,
-  normaliseTags,
-  type ActionResult,
-  type CourseItemsResult,
-  type FreePoolCourse,
-  type FreePoolProgramme,
-  type FreePoolResult,
-  type ImportChoices,
-  type ImportResult,
-  type ListChangeResult,
-  type ListEntry,
-  type ListKind,
-  type ListPanelResult,
-  type PublishResult,
-  type QuestionType,
-  type QuizUseResult,
-  type TagChangeResult,
-  type TagListResult,
-} from './types';
+import { BLOOM_LEVELS, DIFFICULTIES, OPTION_LETTERS, QUESTION_TYPES, RATIONALE_IMAGE_MAX_BYTES, normaliseTags, type ActionResult, type CourseItemsResult, type FreePoolCourse, type FreePoolProgramme, type FreePoolResult, type ImportChoices, type ImportResult, type ListChangeResult, type ListEntry, type ListKind, type ListPanelResult, type PublishResult, type QuestionType, type QuizUseResult, type TagChangeResult, type TagListResult, QUESTION_POOLS, type QuestionPool } from './types';
 
 function fail(error: string): ActionResult {
   return { ok: false, error };
 }
-
-// The free mark's refusal, in one place: the tick and (08 B4's second
-// session) the importer's "import as free" say the same thing.
-const FREE_IN_MOCK = 'This question is in a mock exam or a practice paper and cannot be free.';
 
 // 08 B8: the editor offers no type change on a saved question; this is
 // the server saying so when one arrives anyway.
@@ -142,7 +114,8 @@ export type SaveQuestionInput = {
   // ── 08 B4 ──
   bloomLevel: string;
   isPublished: boolean;
-  isFreeSample: boolean;
+  /** 06.8: the question's pool; the database refuses a change while a paper or mock lists it. */
+  pool: QuestionPool;
   questionRef: string;
   tags: string[];
 };
@@ -204,14 +177,10 @@ export async function saveQuestion(input: SaveQuestionInput, image: FormData | n
     words[col] = entry.name;
   }
 
-  // A mock's questions are never free (08 §3 item 4). A TypeScript check
-  // here and in saveQuiz holds the rule from both sides until 03 Q14's
-  // link table lets SQL hold it.
-  if (input.isFreeSample) {
-    const reserved = await heldBackIds(db, undefined, { papers: true });
-    if (!reserved) return fail('Could not check the mock exams. Please try again.');
-    if (reserved.has(itemId)) return fail(FREE_IN_MOCK);
-  }
+  // 06.8: the pool from the list; the database keeps a question a paper
+  // or mock lists in its pool, and says so in words.
+  const pool = (QUESTION_POOLS as readonly string[]).includes(input.pool) ? input.pool : null;
+  if (!pool) return fail('Please choose a pool.');
 
   // The image first, as legacy: a failed upload stops the save.
   let imgUrl: string | null = input.rationaleImg || null;
@@ -239,7 +208,7 @@ export async function saveQuestion(input: SaveQuestionInput, image: FormData | n
     shuffle_options: input.shuffleOptions,
     bloom_level: bloomLevel || null,
     is_published: Boolean(input.isPublished),
-    is_free_sample: Boolean(input.isFreeSample),
+    pool,
     question_ref: String(input.questionRef || '').trim() || null,
     tags: snapTags(Array.isArray(input.tags) ? input.tags : [], await tagSpellingsInUse(db)),
     updated_by: profile.user_id,
@@ -338,21 +307,17 @@ const IMPORT_BATCH = 50;
 export async function importItems(
   courseIdIn: string,
   rows: CsvRow[],
-  choices: ImportChoices = { publishNew: false, freeNew: false },
+  choices: ImportChoices = { publishNew: false, pool: 'practice' },
 ): Promise<ImportResult> {
   const { supabase, profile } = await requireAdmin();
   const courseId = String(courseIdIn || '').trim().toUpperCase();
   if (!(await courseExists(supabase, courseId))) return { ok: false, error: 'Unknown course.' };
   const publishNew = Boolean(choices?.publishNew);
-  const freeNew = Boolean(choices?.freeNew);
+  // 06.8: the pool the file's new questions go into
+  const poolNew: QuestionPool = (QUESTION_POOLS as readonly string[]).includes(choices?.pool) ? choices.pool : 'practice';
 
   const db = createServiceRoleClient();
-  const [inUse, reserved, lists] = await Promise.all([
-    tagSpellingsInUse(db),
-    freeNew ? heldBackIds(db, undefined, { papers: true }) : Promise.resolve(new Set<string>()),
-    courseLists(db, courseId),
-  ]);
-  if (!reserved) return { ok: false, error: 'Could not check the mock exams. Please try again.' };
+  const [inUse, lists] = await Promise.all([tagSpellingsInUse(db), courseLists(db, courseId)]);
   if (!lists) return { ok: false, error: "Could not read this course's subject and topic lists. Please try again." };
 
   // Every row lands in the one table under the page's course (08 B1).
@@ -392,11 +357,8 @@ export async function importItems(
       errors.push(`${id}: the bank holds it as ${storedType} and the file says ${String(p.question_type)} — a question's type is fixed once saved`);
     } else if (storedType !== undefined) {
       updates.push(p);
-    } else if (freeNew && reserved.has(id)) {
-      failCount++;
-      errors.push(`${id}: ${FREE_IN_MOCK}`);
     } else {
-      creates.push({ ...p, is_published: publishNew, is_free_sample: freeNew });
+      creates.push({ ...p, is_published: publishNew, pool: poolNew });
     }
   }
 

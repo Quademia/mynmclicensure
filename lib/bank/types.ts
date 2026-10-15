@@ -60,8 +60,8 @@ export type Item = {
   bloom_level: string | null;
   /** A new row is a draft; only a published row reaches a student. */
   is_published: boolean;
-  /** The free-pool mark. It gates nothing until 09 F1 builds its doors. */
-  is_free_sample: boolean;
+  /** 06.8: the one pool it belongs to (QUESTION_POOLS). */
+  pool: QuestionPool;
   /** Where the question came from — internal, never shown to a student. */
   question_ref: string | null;
   tags: string[];
@@ -73,8 +73,21 @@ export type Item = {
   updated_by: string | null;
 };
 
-// The filters getItemsByFilters() understands — legacy's exact set.
+// 06.8 (Sam, 2026-10-15): every question belongs to one pool, set by the
+// admin, and each place that draws from the bank reads only its own: the
+// Builder, packs and the daily challenge Practice (the Builder and packs
+// Free too), the free set Free, a practice paper Paper, a mock Mock. The
+// database holds it (a paper's or mock's list refuses another pool; a
+// builder sitting holds only Practice and Free).
+export const QUESTION_POOLS = ['practice', 'free', 'paper', 'mock'] as const;
+export type QuestionPool = (typeof QUESTION_POOLS)[number];
+export const POOL_NAMES: Record<QuestionPool, string> = { practice: 'Practice', free: 'Free', paper: 'Paper', mock: 'Mock' };
+/** What the Builder and packs draw from. */
+export const PRACTICE_POOLS: readonly QuestionPool[] = ['practice', 'free'];
+
+// The filters getItemsByFilters() understands — legacy's set, and the pool.
 export type ItemFilters = {
+  pool?: QuestionPool;
   subject?: string;
   maintopic?: string;
   subtopic?: string;
@@ -144,7 +157,7 @@ export type QuizUseResult = { ok: true; count: number } | { ok: false; error: st
 
 // The import's two choices per file (08 B4), applied to the rows the
 // file CREATES; a row already in the bank keeps its own switches.
-export type ImportChoices = { publishNew: boolean; freeNew: boolean };
+export type ImportChoices = { publishNew: boolean; pool: QuestionPool };
 
 // What importItems() returns (slice 4b): legacy's two counts, plus the
 // batch errors legacy sent to the browser console; since 08 B4 the

@@ -20,7 +20,7 @@ import { requireAdmin } from '@/lib/access';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getQuizAttemptStats } from '@/lib/attempts/queries';
 import type { AttemptMode, QuizAttemptStats } from '@/lib/attempts/types';
-import { getItemsByFilters, heldBackIds } from '@/lib/bank/queries';
+import { getItemsByFilters } from '@/lib/bank/queries';
 import { MODES, orderModes } from '@/lib/attempts/modes';
 import { getAllQuizzesPaginated, getQuizById } from './queries';
 import {
@@ -67,16 +67,13 @@ export async function loadQuiz(kind: QuizKind, quizId: string): Promise<Quiz | n
 // picker shows whole rows, and the admin's own client cannot read the
 // answer half of question_bank any more.
 //
-// 08 B6: with the rows come the ids a draft or active mock holds back
-// from practice. The fixed-quiz picker does not offer them, and marks
-// one a fixed quiz already holds "In a mock"; the mock picker shows
-// every row (a question may sit in several mocks).
-export async function loadPickerItems(courseId: string): Promise<PickerLoad> {
+// 06.8: a paper's picker offers the course's Paper questions, a mock's its
+// Mock questions — the only ones its list can hold (a question may sit in
+// several mocks).
+export async function loadPickerItems(courseId: string, kind: QuizKind): Promise<PickerLoad> {
   await requireAdmin();
-  const svc = createServiceRoleClient();
-  const [items, held] = await Promise.all([getItemsByFilters(svc, courseId, {}), heldBackIds(svc, courseId)]);
-  if (!held) return { ok: false, error: 'Could not check the mock exams. Please try again.' };
-  return { ok: true, items, heldBack: [...held] };
+  const items = await getItemsByFilters(createServiceRoleClient(), courseId, { pool: kind === 'mock' ? 'mock' : 'paper' });
+  return { ok: true, items };
 }
 
 // ── togglePublish ───────────────────────────────────────────────────────
@@ -226,38 +223,22 @@ export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
     return fail("With the review not allowed, Learning can't be offered: it shows each answer. Untick Learning.");
   }
 
-  // 08 B6: a fixed quiz is practice, so it cannot hold a question a
-  // draft or active mock holds back. The picker does not offer one; this
-  // refuses one a tampered request sends, and one the quiz came to hold
-  // when its question later joined a mock (the editor marks it "In a
-  // mock" until it is removed).
-  if (input.kind === 'fixed') {
-    const held = await heldBackIds(createServiceRoleClient(), courseId);
-    if (!held) return fail('Could not check the mock exams. Please try again.');
-    const inMock = itemIds.filter((id) => held.has(id));
-    if (inMock.length === 1) return fail(`Question ${inMock[0]} is in a mock exam and cannot be in a fixed quiz.`);
-    if (inMock.length > 1) return fail(`Questions ${inMock.join(', ')} are in a mock exam and cannot be in a fixed quiz.`);
-  }
-
-  // 08 B4: a mock's questions are never free (08 §3 item 4). The bank's
-  // save refuses the free tick on a question a mock names; this is the
-  // same rule from the other side. Service role: the free mark is
-  // readable by the admin's client, but the rule should not rest on it.
-  // 04.6 (Sam, 2026-10-11): a Practice Paper's questions are held back
-  // like a mock's, so a paper holds no free question either; same check,
-  // the noun changes.
+  // 06.8: a paper holds only Paper questions, a mock only Mock ones. The
+  // database refuses another pool's question too; this names them all.
   {
-    const noun = input.kind === 'mock' ? 'mock exam' : 'practice paper';
-    const { data: free, error: freeError } = await createServiceRoleClient()
+    const want = input.kind === 'mock' ? 'mock' : 'paper';
+    const noun = input.kind === 'mock' ? 'a mock exam' : 'a practice paper';
+    const { data: other, error: otherError } = await createServiceRoleClient()
       .from('question_bank')
       .select('item_id')
       .in('item_id', itemIds)
-      .eq('is_free_sample', true)
+      .neq('pool', want)
       .order('item_id');
-    if (freeError) return fail('Could not check the questions. Please try again.');
-    const freeIds = (free ?? []).map((r) => (r as { item_id: string }).item_id);
-    if (freeIds.length === 1) return fail(`Question ${freeIds[0]} is a free question and cannot be in a ${noun}.`);
-    if (freeIds.length > 1) return fail(`Questions ${freeIds.join(', ')} are free questions and cannot be in a ${noun}.`);
+    if (otherError) return fail('Could not check the questions. Please try again.');
+    const ids = (other ?? []).map((r) => (r as { item_id: string }).item_id);
+    const pool = want === 'mock' ? 'Mock' : 'Paper';
+    if (ids.length === 1) return fail(`Question ${ids[0]} is not in the ${pool} pool, so it cannot be in ${noun}.`);
+    if (ids.length > 1) return fail(`Questions ${ids.join(', ')} are not in the ${pool} pool, so they cannot be in ${noun}.`);
   }
 
   if (input.kind === 'mock' && input.status === 'active' && input.published) {

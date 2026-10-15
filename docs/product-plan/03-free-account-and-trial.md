@@ -14,7 +14,7 @@ Detail and history: `archive/product-plan/09-free-account-and-gamification.md` Â
 ### The free account
 
 - A free account practises without limit on the **free set**: bank
-  questions the admin marks free (06), per programme. It holds no
+  questions the admin puts in the Free pool (06.8), per programme. It holds no
   course access. The free set is not the bank.
 - A free question stays inside its own paid course; a question any
   paper or mock uses can never be free (06; papers: Sam, 2026-10-11).
@@ -31,7 +31,7 @@ Detail and history: `archive/product-plan/09-free-account-and-gamification.md` Â
   as they do for any sitting.
 - **Two doors let the free set in** (12, `question_bank`), built in the
   database (F1, 2026-10-04): any signed-in student may read a question
-  marked free; a student with no package may start a builder quiz (or
+  in the Free pool; a student with no package may start a builder quiz (or
   its retake) whose questions are all published free questions of a
   course of their programme, in a Study mode â€” papers, mocks and the
   Exam modes refused. The app lets a free sitting through: the builder

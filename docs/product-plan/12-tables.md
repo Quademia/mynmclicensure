@@ -284,37 +284,30 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `batch_id` | The import it came in |
 | `question_ref` | Where it came from — internal |
 | `is_published` | Off = a draft no student sees |
-| `is_free_sample` | In the free set |
+| `pool` | The one place it belongs: `practice`, `free`, `paper` or `mock` (06.8) |
 | `version` | Goes up by one on a content change to a published question |
 | `created_at`, `updated_at`, `updated_by` | When made, last changed, by whom |
 
 - Two read rules: the course rule, and the free rule (03 F1, built
-  2026-10-04) — any signed-in student may read a question that is
-  published and marked free, in any course. Why: the free account
-  practises on it.
-- *To build (06.8), Sam's tick: ______ (date ______):*
-  - **Add `pool`** — `practice`, `free`, `paper` or `mock`, one per
-    question, not null, set by the admin (the editor and the importer).
-    Filled once from today's rows: listed by any paper → `paper`, by any
-    mock → `mock`, marked free → `free`, the rest → `practice` (dev: 9,500 /
-    245 / 90 / 3,210, none in two).
-  - **Drop `is_free_sample`** — the Free pool replaces it; the free read
-    rule, `create_attempt`'s free check, the importer, the editor and the
-    bank page's filter read `pool = 'free'`.
-  - **A rule on `quiz_items` and `mock_quiz_items`**: a paper lists only
-    `paper` questions, a mock only `mock` ones; a question a paper or mock
-    lists cannot change pool.
-  - The Builder, packs and the free set read their pools (Builder and
-    packs: `practice` and `free`; the free set: `free`); the daily challenge
-    reads `practice`. `heldBackIds` and the free tick's refusals go.
-  - Prod: the bank is copied from `public.*` at going live; the same fill
-    runs there.
-  - Why: a question's place is its own, not worked out from which papers
-    and mocks list it today — that leaked on archive (04.21) and whenever a
-    list changed (Sam, 2026-10-15).
+  2026-10-04) — any signed-in student may read a published question in
+  the Free pool, in any course. Why: the free account practises on it.
+- `pool` (06.8, ticked by Sam and built 2026-10-15; replaced
+  `is_free_sample`): one per question, default `practice`, set by the
+  admin in the editor and the importer. Filled once from the rows then:
+  listed by a mock → `mock`, by a paper → `paper`, marked free → `free`,
+  the rest `practice` (dev: 245 / 9,500 / 90 / 3,210, none in two). A
+  paper's list (`quiz_items`) takes only `paper` questions and a mock's
+  (`mock_quiz_items`) only `mock` ones, and a question either lists
+  cannot change pool (triggers). The Builder and packs read `practice` and
+  `free`, the free set `free`, the daily challenge `practice`;
+  `create_attempt` refuses a builder sitting holding any other. The
+  history keeps `pool`. Prod: the bank is copied from `public.*` at going
+  live; the same fill runs there. Why: a question's place is its own, not
+  worked out from which papers and mocks list it today — that leaked on
+  archive (04.21) and whenever a list changed (Sam, 2026-10-15).
 - Browser: a student reads only `item_id`, `course_id`, `subject`,
   `maintopic`, `subtopic`, `difficulty`, `question_type`, `batch_id`,
-  `is_published`, `is_free_sample`, of published questions in courses
+  `is_published`, `pool`, of published questions in courses
   they hold or marked free — never the question or its answer; a
   signed-out visitor reads nothing. Writes through the
   server only.
@@ -435,13 +428,9 @@ table by table as each is next changed (AGENTS.md rule 9).
 
 - A question a paper uses cannot be deleted.
 - Browser: nothing.
-- 04.6 (ticked 2026-10-11, built 2026-10-12, no column): a question a
-  draft or active paper uses is held back as a mock's is — derived from
-  the rows, never stored, and held in the server's code as a mock's is
-  (`heldBackIds`), not by a database rule: the builder, the pack maker
-  and the daily challenge skip it, and marking it free or saving a paper
-  with a free question is refused. Why: a paper's questions are met
-  first in the paper (Sam, 2026-10-11).
+- A paper lists only Paper-pool questions (06.8, 2026-10-15) — replacing
+  04.6's "held back while a draft or active paper uses it" (2026-10-11).
+  Why: a paper's questions are met first in the paper (Sam, 2026-10-11).
 
 ### `mock_quizzes`, `mock_quiz_items` — mock exams and their questions
 - The same columns as `quizzes` and `quiz_items`, plus `visibility`

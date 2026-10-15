@@ -33,7 +33,7 @@ export async function isFreeSitting(attempt: Pick<Attempt, 'attempt_id' | 'cours
     .select('item_id', { count: 'exact', head: true })
     .eq('course_id', attempt.course_id)
     .eq('is_published', true)
-    .eq('is_free_sample', true)
+    .eq('pool', 'free')
     .in('item_id', ids);
   if (countError) {
     console.error('isFreeSitting bank:', attempt.attempt_id, countError);

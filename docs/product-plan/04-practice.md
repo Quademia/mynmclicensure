@@ -310,10 +310,9 @@ and "instant runner", which predate the four modes.
 
 ### Mock exams
 
-- **A mock's questions live nowhere else** (Sam, 2026-09-26): while a
-  draft or active mock names a question, the builder, the pack maker,
-  the paper picker and the daily challenge skip it, and it can never be
-  marked free. Archiving a mock releases them.
+- **A mock's questions live nowhere else** (Sam, 2026-09-26): a mock
+  holds only Mock-pool questions, which nothing else draws (06.8,
+  2026-10-15); archiving a mock releases nothing.
 - **Mocks open only when the package says yes** (03 F4) — and **only
   Premium Prep packages say yes** (Sam, 2026-10-04): mocks are seasonal,
   built for the main August/September sitting (02, built 2026-10-04).
@@ -353,7 +352,7 @@ and "instant runner", which predate the four modes.
   they had." Their sittings keep their own copy; a lock waits until one
   is needed (Sam, 2026-10-13). *(parked 2026-10-14: 04.17)*
 - Status (Draft / Active / Archived — the mock's life) and Published
-  (a pause: hidden, its questions still held back) both stay; they
+  (a pause: hidden) both stay; they
   become one at the admin redesign (Sam, 2026-10-13, parked: 04.18).
 - The admin can preview any sitting, read-only. It will say Preview on
   the card and in the sitting, with no "Don't show this again". *(to
