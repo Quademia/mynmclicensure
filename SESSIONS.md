@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-15, night — offline packs finished: offline in the app (07.3), the PDF on the phone (07.5), My packs as course cards (C); how to install the app
+  - ↳ own small service worker · icon opens Dashboard · Install blocked, Add to Home screen steps · week keeps packs · always "offline" · pdfmake, Roboto · pattern kept · View beside Download · Save first · Learning History next
+
 - 2026-10-15, evening — 04.14 at the close; 06.8 pools; mock leftovers; offline packs redesigned (PWA, PDF, own player), slices 1–4 built
   - ↳ empty sitting abandoned · sitting and report parked · one pool per question, challenge reads Practice · free 50 guide · no sync · no explanations in packs · signed-in phones, 30-day check-in · layout A · PDF pattern · 07.3 next
 
