@@ -60,8 +60,32 @@ connection**, and a printable PDF of the same pack.
   still open.
 - **The watermark stays** — the owner's name, a masked email and their
   label — explored in the PDF's drawings.
-- To decide next: what My packs and the offline screen show, and what
-  each tap opens; then the drawings.
+- **My packs, one page that knows if it is online** (Sam, 2026-10-15,
+  07.8): online, every pack, each marked *On this phone* or not;
+  offline, only the packs on this phone, with "You're offline. Your
+  packs on this phone are ready." Any page opened offline lands here —
+  one tap from the icon.
+  - **By course**, each heading with its allowance and Build a pack
+    ("Midwifery · 3 of 5 packs left · Build a pack"); newest first
+    within; offline, no allowance and no Build.
+  - **A row**: the name, its questions and date, *On this phone*, and on
+    this phone only the last practice score ("Last: 14 of 20"). No ids,
+    filters or summary counts.
+  - **A tap opens the pack's own page**: Practise (Answer as you go /
+    Answers at the end), Save to this phone or On this phone · Remove
+    from this phone, Download PDF, Delete pack (the app's confirm: "You
+    won't get this pack back in your allowance"). Two taps from the list
+    into a practice.
+  - **Check-in run out**: the packs listed but not opening — "Connect
+    once to keep using your packs." A pack deleted elsewhere leaves this
+    phone when it next connects.
+  - **Empty**: "Make a pack to practise offline", Build a pack per
+    course. **Locked** (trial, free): "Offline packs come with a
+    package", Choose a package; earlier packs still show and open.
+  - **The menu**: one row, My packs (Build a pack is on the page, under
+    each course); the phone bar's Offline tab opens it.
+- Next: the drawings — My packs (online, offline, empty, locked), a
+  pack's page, the offline player, the PDF.
 
 ## How it works today
 

@@ -516,7 +516,7 @@ table by table as each is next changed (AGENTS.md rule 9).
 
 - Browser: the owner and an admin read. *Old defaults* (an owner could
   still write a header row directly; packs are made through the server).
-- *To build (07.7), Sam's tick: ______ (date ______):* **Delete** sets
+- *To build (07.7), ticked by Sam 2026-10-15:* **Delete** sets
   `status` to `deleted` through the server (no new column); a deleted
   pack leaves My packs and no longer opens or downloads, but its row
   stays and still counts against the allowance (`create_offline_pack`
@@ -528,7 +528,7 @@ table by table as each is next changed (AGENTS.md rule 9).
 - A copy of each question with its answer, rationale and feedback (the
   pack prints its answer key), and its `position`.
 - Browser: the owner reads.
-- *To build (07.6), Sam's tick: ______ (date ______):* **drop
+- *To build (07.6), ticked by Sam 2026-10-15:* **drop
   `rationale`, `rationale_img` and `fb_a` … `fb_f`**, and
   `create_offline_pack` stops copying them — a pack holds the question,
   its options and its answer only. The packs already made lose theirs in
@@ -627,7 +627,7 @@ table by table as each is next changed (AGENTS.md rule 9).
 - *To build (04 G2) — ticked 2026-10-08:* a setting for the daily
   challenge's number of questions, 5 to start; its time limit uses
   `builder_minutes_per_question` (Sam, 2026-10-08).
-- *To build (07.3), Sam's tick: ______ (date ______):* a setting
+- *To build (07.3), ticked by Sam 2026-10-15:* a setting
   `offline_checkin_days` — how many days a phone keeps its offline packs
   open without connecting; 30 to start. Why: a phone signed out while
   offline cannot know it until it connects (Sam, 2026-10-15).

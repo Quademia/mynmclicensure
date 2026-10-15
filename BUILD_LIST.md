@@ -137,7 +137,7 @@ before then, and the old list's history, is in
 - ⬜ 07.5 The PDF redesigned — drawn first; answers on the last page by default, the watermark
 - ⬜ 07.6 No explanations in a pack — the rationale and feedback no longer copied or stored; storage awaits Sam's tick (12)
 - ⬜ 07.7 Delete a pack — the allowance not given back; storage awaits Sam's tick (12)
-- ⬜ 07.8 My packs and the offline screen — what they show and what a tap opens, decided before drawing
+- ⬜ 07.8 My packs and the offline screen — one page online and offline, by course with the allowance, a pack's own page (ruled 2026-10-15); drawings next
 
 ## [08 Help and news](docs/product-plan/08-help-and-news.md)
 

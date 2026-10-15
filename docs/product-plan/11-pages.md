@@ -252,6 +252,9 @@ opens it (00, The menu).
   animals only (05).
 
 ### Offline packs — my packs, build, the pack
+- **Redesigned from 07's ruling (Sam, 2026-10-15)**: My packs one page,
+  online and offline; a pack's own page; the builder the Quiz Builder's;
+  the offline player; the PDF. What each shows is in 07; drawings next.
 - The same in every state: a trial cannot make a pack; one made earlier
   still opens (07).
 - **Check**: the pack's cover prints "Prepared for" twice; it shows the
