@@ -200,6 +200,9 @@ opens it (00, The menu).
   the word (05).
 
 ### The sitting — start screen, sitting, review
+- **Parked (Sam, 2026-10-15):** the sitting and the report are special
+  cases; Sam is considering changing the sitting's screen. Their redesign
+  waits; the practice pages go on without them.
 - The start screen alone; Start or Resume; a resumed exam's minutes
   left; per-mode "Don't show this again" (04). With a sitting limit set
   it always shows, with "This is sitting 1 of N for this paper" ("It is
