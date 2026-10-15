@@ -36,3 +36,9 @@
 .opk-keep { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-4); }
 .opk-keep-btn { display: inline-flex; align-items: center; min-height: 44px; }
 .opk-save { align-self: stretch; }
+
+/* The PDF's dialog (07.5; portalled, so unscoped): each place for the
+   answers stacks its words over View and Download, side by side. */
+.opk-pdf-way { flex-direction: column; align-items: stretch; gap: var(--space-8); }
+.opk-pdf-buttons { display: flex; gap: var(--space-8); }
+.opk-pdf-buttons .btn { flex: 1; min-height: 44px; }

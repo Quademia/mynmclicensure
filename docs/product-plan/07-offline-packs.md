@@ -89,9 +89,14 @@ connection**, and a printable PDF of the same pack.
     font is Roboto from `public/fonts` (the PDF's built-in fonts cannot
     print "₂" or "≈", which the bank has). Nothing runs on our server but
     the one read of the pack.
-  - **Download PDF** on the pack's page opens the app's dialog with the two
-    places for the answers, as Practise asks its two ways; Download makes
-    the file ("Midwifery revision - MyNMCLicensure.pdf").
+  - **View or download PDF** on the pack's page opens the app's dialog
+    with the two places for the answers, as Practise asks its two ways;
+    each has **View** — to read it on screen without downloading, as the
+    old print page let you (Sam, 2026-10-15) — and **Download**, which
+    saves the file ("Midwifery revision - MyNMCLicensure.pdf"). View opens
+    a tab at the tap and shows the PDF there: on screen on an iPhone, a
+    computer or newer Android Chrome; an older Android browser saves it
+    and opens it in the phone's PDF app (Sam tries it on his phone).
   - As drawn: the clean cover; two columns flowing column to column, a
     question never split (about 9–10 a page with the bank's longer
     questions); the answers page as a grid, or "Answer: b" under each

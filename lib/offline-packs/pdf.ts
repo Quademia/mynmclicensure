@@ -1,5 +1,5 @@
-// lib/offline-packs/pdf.ts — Download PDF (07.5; Sam, 2026-10-15: pdfmake,
-// on the phone). Browser only: the PDF is made on the student's phone from
+// lib/offline-packs/pdf.ts — View and Download PDF (07.5; Sam, 2026-10-15:
+// pdfmake, on the phone). Browser only: the PDF is made on the student's phone from
 // the pack's own questions, so nothing runs on our server for it.
 //
 // pdfmake (about 1 MB, 330 KB compressed) is fetched only when a student
@@ -39,8 +39,7 @@ function fileName(packName: string): string {
   return `${safe} - MyNMCLicensure.pdf`;
 }
 
-/** Make the pack's PDF on this phone and hand it to the browser to save. */
-export async function downloadPackPdf(pack: Omit<PackPdf, 'markDataUrl'>): Promise<void> {
+async function makePdf(pack: Omit<PackPdf, 'markDataUrl'>) {
   const [mod, mark] = await Promise.all([import('pdfmake/build/pdfmake'), markDataUrl()]);
   const pdfMake = (mod as { default?: typeof mod.default }).default ?? (mod as unknown as typeof mod.default);
   const fonts = `${window.location.origin}/fonts/`;
@@ -53,5 +52,38 @@ export async function downloadPackPdf(pack: Omit<PackPdf, 'markDataUrl'>): Promi
       bolditalics: `${fonts}Roboto-Medium.ttf`,
     },
   });
-  await pdfMake.createPdf(packPdfDoc({ ...pack, markDataUrl: mark }, ownerPassword())).download(fileName(pack.packName));
+  return pdfMake.createPdf(packPdfDoc({ ...pack, markDataUrl: mark }, ownerPassword()));
+}
+
+/** Make the pack's PDF on this phone and hand it to the browser to save. */
+export async function downloadPackPdf(pack: Omit<PackPdf, 'markDataUrl'>): Promise<void> {
+  await (await makePdf(pack)).download(fileName(pack.packName));
+}
+
+/**
+ * View (Sam, 2026-10-15: to read it without downloading, as the old print
+ * page let you): a tab opened at the tap itself — a phone blocks one opened
+ * seconds later, once the PDF is made — saying it is coming. Null when the
+ * phone blocked it anyway.
+ */
+export function openViewTab(): Window | null {
+  const win = window.open('', '_blank');
+  if (!win) return null;
+  try {
+    win.document.title = 'Making your PDF…';
+    win.document.body.innerHTML = '<p style="font-family:system-ui,sans-serif;padding:24px;color:#4b5563">Making your PDF…</p>';
+  } catch {
+    // the tab still receives the PDF
+  }
+  return win;
+}
+
+/**
+ * Show the pack's PDF in the tab openViewTab opened. iPhones, computers and
+ * newer Android Chrome show it on screen; an older Android browser saves it
+ * and opens it in the phone's PDF app instead.
+ */
+export async function viewPackPdf(pack: Omit<PackPdf, 'markDataUrl'>, win: Window): Promise<void> {
+  const blob = await (await makePdf(pack)).getBlob();
+  win.location.href = URL.createObjectURL(blob);
 }
