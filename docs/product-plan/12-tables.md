@@ -292,6 +292,26 @@ table by table as each is next changed (AGENTS.md rule 9).
   2026-10-04) — any signed-in student may read a question that is
   published and marked free, in any course. Why: the free account
   practises on it.
+- *To build (06.8), Sam's tick: ______ (date ______):*
+  - **Add `pool`** — `practice`, `free`, `paper` or `mock`, one per
+    question, not null, set by the admin (the editor and the importer).
+    Filled once from today's rows: listed by any paper → `paper`, by any
+    mock → `mock`, marked free → `free`, the rest → `practice` (dev: 9,500 /
+    245 / 90 / 3,210, none in two).
+  - **Drop `is_free_sample`** — the Free pool replaces it; the free read
+    rule, `create_attempt`'s free check, the importer, the editor and the
+    bank page's filter read `pool = 'free'`.
+  - **A rule on `quiz_items` and `mock_quiz_items`**: a paper lists only
+    `paper` questions, a mock only `mock` ones; a question a paper or mock
+    lists cannot change pool.
+  - The Builder, packs and the free set read their pools (Builder and
+    packs: `practice` and `free`; the free set: `free`); the daily challenge
+    reads `practice`. `heldBackIds` and the free tick's refusals go.
+  - Prod: the bank is copied from `public.*` at going live; the same fill
+    runs there.
+  - Why: a question's place is its own, not worked out from which papers
+    and mocks list it today — that leaked on archive (04.21) and whenever a
+    list changed (Sam, 2026-10-15).
 - Browser: a student reads only `item_id`, `course_id`, `subject`,
   `maintopic`, `subtopic`, `difficulty`, `question_type`, `batch_id`,
   `is_published`, `is_free_sample`, of published questions in courses

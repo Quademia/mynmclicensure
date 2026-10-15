@@ -67,7 +67,34 @@ Detail and history: `archive/product-plan/08-question-bank.md` (B1–B8).
 - **A question any paper or mock uses cannot be deleted**; the refusal
   names them and suggests unpublishing (Sam, 2026-09-27).
 
-### Free, and held back
+### Pools *(to build: 06.8)*
+
+Ruled by Sam, 2026-10-15, replacing "free is a mark" and "held back"
+below: **every question belongs to one pool**, set by the admin when it
+is written or imported, and each place that draws from the bank reads
+only its own — so nothing depends on a paper's or mock's state, and
+archiving releases nothing.
+
+- **Practice** — the Quiz Builder, offline packs and the daily challenge.
+- **Free** — the free set (03); a paid student's Builder and packs read
+  Free with Practice, so free questions are never lost to them.
+- **Paper** — a practice paper may hold only its course's Paper questions.
+- **Mock** — a mock may hold only its course's Mock questions; one
+  question may sit in several mocks, across years.
+- The database holds it: a paper's or mock's list refuses another pool's
+  question, and the Builder's, the packs', the free set's and the
+  challenge's draws read their pools. Moving a question to another pool
+  (retiring an old mock's questions to Practice) is the admin's own
+  change; a question a paper or mock still lists cannot leave its pool.
+- **Free per course: 50 as the admin's guide** (Sam), not a rule in the
+  code; more as the bank grows. A student usually has three courses.
+- Why: "held back while a draft or active paper or mock lists it" leaked
+  whenever the listing changed — archiving before the results date
+  (04.21), a question taken off a mock, a mock question not yet added.
+  The challenge reads Practice, not a pool of its own: about 365 new
+  questions a course a year was not worth it (Sam).
+
+*Until 06.8 is built:*
 
 - **Free is a mark on a question** (Sam, 2026-09-26), not a separate
   pool; free questions stay in their paid course. The Free pool panel
@@ -90,7 +117,8 @@ Detail and history: `archive/product-plan/08-question-bank.md` (B1–B8).
   difficulty or level not on its list, naming the word; matching
   ignores case and stores the list's spelling; a blank cell is Not set.
 - Per file the admin chooses "publish now or drafts" and "free or not";
-  the choices reach only the rows the file creates.
+  the choices reach only the rows the file creates. With 06.8 "free or
+  not" becomes the file's pool — Practice, Free, Paper or Mock.
 
 ### Search
 

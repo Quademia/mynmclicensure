@@ -90,7 +90,7 @@ before then, and the old list's history, is in
 - ⏸ 04.17 The mock form warns when its questions are edited after students have sat it — parked 2026-10-14 (Sam): scores are safe without it (each sitting keeps its own copy); worth building if standing across students (05 Q13) or more editors arrive; the better place then is the Question Bank edit
 - ⏸ 04.18 Status and Published as one switch — at the admin redesign (Sam, 2026-10-13)
 - ⏸ 04.19 An admin's extra sitting for one student — when a support case asks
-- ⬜ 04.21 A paper or mock archived before its results date keeps its questions held back — today archiving releases them to the Quiz Builder (whose Learning mode shows the answers) and to packs, so the next group could see them; found while building 04.12 (2026-10-15), not built
+- ⏸ 04.21 Replaced by 06.8 (pools, Sam 2026-10-15) — not built on its own. A paper or mock archived before its results date keeps its questions held back — today archiving releases them to the Quiz Builder (whose Learning mode shows the answers) and to packs, so the next group could see them; found while building 04.12 (2026-10-15), not built
 - ✅ 04.20 Abandon back, on the sitting's own page — a quiet link under Resume on a paper's and a mock's card while a sitting is going; the app's confirm box, the sitting still counts toward sittings allowed; no migration — 2026-10-14
 - ⬜ G2 The daily challenge — 5 a day per programme, one course a day in turn, its own mode (storage ticked 10-08)
 - ⬜ Q19 The admin's preview says Preview — on the card and in the sitting
@@ -125,6 +125,7 @@ before then, and the old list's history, is in
 - ⬜ 06.5 Content: the RPHN disease-control course has no questions while active
 - ⬜ 06.6 Content: the midwifery course short of its set target
 - ⏸ 06.7 A blueprint axis — adopted in principle; waiting on the NMC curricula in print
+- ⬜ 06.8 Pools — every question in one: Practice, Free, Paper or Mock (Sam, 2026-10-15); papers and mocks hold only their own, the Builder and packs read Practice + Free, the challenge Practice; is_free_sample and the held-back logic go; storage awaits Sam's tick (12)
 
 ## [07 Offline packs](docs/product-plan/07-offline-packs.md)
 
