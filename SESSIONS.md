@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-15, evening — 04.14 at the close; 06.8 pools; mock leftovers; offline packs redesigned (PWA, PDF, own player), slices 1–4 built
+  - ↳ empty sitting abandoned · sitting and report parked · one pool per question, challenge reads Practice · free 50 guide · no sync · no explanations in packs · signed-in phones, 30-day check-in · layout A · PDF pattern · 07.3 next
+
 - 2026-10-15, later — the review (04.13): settings live, not copied; its own date, then Always / Until / Not allowed; built, walked, committed
   - ↳ snapshot only what a sitting needs · review independent of results · three-way field · only Learning shuts · topic breakdown stays · Learning first sitting refused with Until · 04.14 next
 
