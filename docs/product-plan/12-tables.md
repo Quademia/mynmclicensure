@@ -375,11 +375,28 @@ table by table as each is next changed (AGENTS.md rule 9).
   `student_attempts()`. Why: papers and mocks carry the same settings,
   and a mock reused across groups needs its answers kept from the next
   group (Sam, 2026-10-13, 04).
-- *To build (04.13) — ticked 2026-10-14 (Sam):* `review_days` — a whole
-  number above 0; empty = no limit, on every paper. The review and
-  sittings in the other modes close that many days after a student's
-  results came out. `save_quiz` writes it; students read it. Why: as
-  `results_at`.
+- `review` and `review_closes_at` (04.13, ticked 2026-10-15 in place of
+  `review_days` — ticked 2026-10-14, never built — and built the same
+  day; migration `20261015120000_review`):
+  - `review` — `always` (the default, on every paper when added), `until`
+    or `never`: whether a student may go through a finished sitting's
+    questions with their answers.
+  - `review_closes_at` — a date and time (Ghana time), set with `until`
+    only (a check). One date for every student, independent of
+    `results_at` (Sam: the review closes on its own date, not N days after
+    results); a check refuses it on or before `results_at`, and `never`
+    with Learning among the modes (Learning shows each answer).
+  - While the review is closed (`never`, or `until` and the date has
+    passed): the score and the report's summary, its topic breakdown
+    included, stay; the question-by-question review and the question map
+    close; `create_attempt` refuses Learning and `check_answer` refuses
+    (Sam: only Learning shuts — the other modes show the summary only); a
+    finished sitting's `attempt_items` rows are not readable by its owner.
+    Live, not copied to a sitting (Sam, 2026-10-15): a change reaches
+    sittings already taken, and the form says so.
+  - `save_quiz` writes both; students read both.
+  - Why: papers and mocks carry the same settings, and a mock reused
+    across groups needs its answers kept (Sam, 2026-10-13/15).
 - *To build (04.14), no column:* a sitting in an untimed mode still in
   progress when its paper closes is finished at `unpublish_at`, on what
   was answered; a timed one keeps its own clock.
@@ -414,8 +431,9 @@ table by table as each is next changed (AGENTS.md rule 9).
   limit as a paper's; `save_quiz` writes both; students read both.
 - `results_at` (04.12, ticked 2026-10-14, built 2026-10-15): as on
   `quizzes`, under the same rules, written by `save_quiz`.
-- *To build (04.13) — ticked 2026-10-14 (Sam):* `review_days`, as on
-  `quizzes`. The close (04.14) as for papers. Why: as on `quizzes`.
+- `review` and `review_closes_at` (04.13, ticked and built 2026-10-15):
+  as on `quizzes`, under the same rules. The close (04.14) as for papers.
+  Why: as on `quizzes`.
 - Browser: as for papers.
 
 ### `attempts` — a sitting
@@ -446,7 +464,7 @@ table by table as each is next changed (AGENTS.md rule 9).
   functions. A student's pages read their sittings, scores included,
   through `student_attempts()` with the service role: the score empty
   while the paper's or mock's results are held, with the date and
-  `held`. The admin's pages read the table with the service role and
+  `held`, and the review setting with `review_closed` (04.13). The admin's pages read the table with the service role and
   see every score.
 
 ### `attempt_items` — a sitting's questions and answers
@@ -461,8 +479,10 @@ table by table as each is next changed (AGENTS.md rule 9).
 - Browser: the owner reads the question and their own answers — never
   `correct`, the rationale or the feedback, which reach the student only
   through Check Answer and the review (the seal). A finished sitting
-  whose results are held is not readable by its owner at all until the
-  date (04.12, 2026-10-15: the policy asks `_my_held_attempt_ids()`).
+  whose results are held, or whose review is closed, is not readable by
+  its owner at all (04.12, 04.13, 2026-10-15: the policy asks
+  `_my_sealed_attempt_ids()`); the report reads the rows with the service
+  role for its summary.
 
 ---
 

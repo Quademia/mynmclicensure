@@ -106,7 +106,8 @@ export function CourseScreen({ data }: { data: CoursePageData }) {
   const next = s.next;
   // 04.12: while a paper's results are held, a sitting going in another mode
   // than the first waits, the card carries the date, and a held score shows
-  // its date and no report.
+  // its date and no report. 04.13: the card carries the review's line too
+  // (none while held), and a Learning sitting going waits while it is closed.
   const going = next?.inProgress && resumable(next, next.inProgress) ? next.inProgress : null;
   const nextHeld = next ? resultsLine(next) : null;
   const scored = next ? null : scoredPaper(c.papers);
@@ -147,6 +148,7 @@ export function CourseScreen({ data }: { data: CoursePageData }) {
               <span className="cp-big">{next.title}</span>
               <span className="cp-line">{going ? `${going.answered_count} of ${next.n} answered` : `${num(next.n)} questions`}</span>
               {nextHeld ? <span className="cp-line">{nextHeld}</span> : null}
+              {next.reviewNote ? <span className="cp-line">{next.reviewNote}</span> : null}
               <LaunchButton quizId={next.quiz_id} mode={going ? going.mode : next.first_mode} label={going ? 'Resume' : 'Start'} />
             </div>
           ) : null}

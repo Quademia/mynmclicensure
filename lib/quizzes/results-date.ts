@@ -33,3 +33,42 @@ export function formatResultsDay(iso: string): string {
 export function formatResultsShort(iso: string): string {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
 }
+
+/** "4 November" — the review's closing day in a sentence (04.13). */
+export function formatResultsDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', timeZone: 'UTC' });
+}
+
+// ── the review (04.13; Sam, 2026-10-15) ─────────────────────────────────
+// A paper's or mock's `review`: 'always' (the default), 'until' a date, or
+// 'never'. Its own date, independent of the results date. While it is
+// closed the score and the summary stay; the question-by-question review,
+// the question map and Learning do not. The database holds it
+// (student_attempts().review_closed, the attempt_items policy,
+// create_attempt, check_answer); this is the pages' copy and its words.
+
+export type ReviewSetting = 'always' | 'until' | 'never';
+
+/** Closed: Not allowed, or Until and the date has come. */
+export function reviewClosed(review: string | null | undefined, closesAt: string | null | undefined, now: Date = new Date()): boolean {
+  if (review === 'never') return true;
+  return review === 'until' && !!closesAt && new Date(closesAt).getTime() <= now.getTime();
+}
+
+/** What a closed review says: "… closed on 4 November" or "… are not shown". */
+export function reviewClosedLine(review: string | null | undefined, closesAt: string | null | undefined, noun: string): string {
+  if (review === 'until' && closesAt) return `The review of this ${noun} closed on ${formatResultsDate(closesAt)}.`;
+  return `The answers to this ${noun} are not shown.`;
+}
+
+/** The line a paper's or mock's card carries about its review, or null for Always. */
+export function reviewLine(
+  review: string | null | undefined,
+  closesAt: string | null | undefined,
+  noun: string,
+  now: Date = new Date(),
+): string | null {
+  if (review === 'never' || reviewClosed(review, closesAt, now)) return reviewClosedLine(review, closesAt, noun);
+  if (review === 'until' && closesAt) return `Review open until ${formatResultsAt(closesAt)}.`;
+  return null;
+}

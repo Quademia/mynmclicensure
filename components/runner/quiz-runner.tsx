@@ -65,7 +65,7 @@ import { Toast } from '@/lib/toast/toast';
 import { advanceAttempt, checkAnswer, expireAttempt, finishAttempt, retakeAttempt, saveAnswers } from '@/lib/attempts/actions';
 import { reportHref, sessionHref } from '@/lib/attempts/links';
 import { ResultsHeldPopup, ResultsPopup, type ResultsSummary } from './results-popup';
-import { ResultsHeld } from './results-held';
+import { ResultsHeld, ReviewClosed } from './results-held';
 import { Icon } from '@/components/shell/icons';
 import { KindChip, QUESTION_TYPE_HUE } from '@/components/shell/chips';
 import {
@@ -205,12 +205,16 @@ export function QuizRunner({
   const [serverScore, setServerScore] = useState<Score | null>(null);
   // 04.12: the finish's reply for a sitting whose results are held, and
   // when it was submitted (the browser's clock, stamped by the handler).
+  // 04.13: the finish's reply when the paper's review is closed — the
+  // line, and the counts (no key came, so the runner cannot count them).
+  const [closedResult, setClosedResult] = useState<{ line: string; correct: number; wrong: number; unanswered: number } | null>(null);
   const [heldResult, setHeldResult] = useState<{
     resultsAt: string;
     answered: number;
     total: number;
     timeTakenS: number | null;
     endedAt: string;
+    answers: boolean;
   } | null>(null);
   const [gridOverlayOpen, setGridOverlayOpen] = useState(false);
   const [desktopGridHidden, setDesktopGridHidden] = useState(false);
@@ -665,13 +669,20 @@ export function QuizRunner({
           total: result.total,
           timeTakenS: result.timeTakenS,
           endedAt: new Date().toISOString(),
+          answers: result.answers,
         });
       } else {
         setServerScore(result.score);
         setServerTime(result.timeTakenS);
-        // The sitting is over: every question's secret half arrives with
-        // the score, so the review renders without a reload (Q6).
-        setSecrets((s) => ({ ...s, ...result.secrets }));
+        if (result.reviewClosed) {
+          // 04.13: the review is closed — the score and the counts, no key,
+          // so no review; the closed screen and the results pop-up instead.
+          setClosedResult(result.reviewClosed);
+        } else {
+          // The sitting is over: every question's secret half arrives with
+          // the score, so the review renders without a reload (Q6).
+          setSecrets((s) => ({ ...s, ...result.secrets }));
+        }
       }
     } else {
       setServerTime(timeTakenS);
@@ -1131,7 +1142,7 @@ export function QuizRunner({
   if (heldResult) {
     return (
       <ResultsHeld
-        held={{ displayLabel: attempt.display_label, resultsAt: heldResult.resultsAt, endedAt: heldResult.endedAt }}
+        held={{ displayLabel: attempt.display_label, resultsAt: heldResult.resultsAt, endedAt: heldResult.endedAt, answers: heldResult.answers }}
         exit={heldExit ?? exit}
       >
         {loader}
@@ -1145,6 +1156,7 @@ export function QuizRunner({
               answered: heldResult.answered,
               total: heldResult.total,
               timeTakenS: heldResult.timeTakenS,
+              answers: heldResult.answers,
               modeName: M.fullName,
             }}
             onClose={() => setResultsOpen(false)}
@@ -1152,6 +1164,31 @@ export function QuizRunner({
           />
         </BodyPortal>
       </ResultsHeld>
+    );
+  }
+
+  // 04.13: submitted while the paper's review is closed — the screen a
+  // reopen shows, and the results pop-up over it with no Review answers.
+  if (closedResult) {
+    return (
+      <ReviewClosed
+        closed={{ displayLabel: attempt.display_label, line: closedResult.line, reportHref: previewMode ? null : reportHref(attempt.attempt_id) }}
+        exit={heldExit ?? exit}
+      >
+        {loader}
+        <BodyPortal>
+          <Toast message={toast} onDismiss={dismissToast} />
+          <ResultsPopup
+            open={resultsOpen}
+            summary={{ ...results, correct: closedResult.correct, wrong: closedResult.wrong, unanswered: closedResult.unanswered }}
+            reportHref={previewMode ? null : reportHref(attempt.attempt_id)}
+            onReview={null}
+            onClose={() => setResultsOpen(false)}
+            retake={retakeAllowed && !previewMode ? { onClick: () => void retakeNow(), pending: retaking } : null}
+            exit={{ label: exit.label, onClick: () => { leavingRef.current = true; router.push(exit.href); } }}
+          />
+        </BodyPortal>
+      </ReviewClosed>
     );
   }
 

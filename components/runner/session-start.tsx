@@ -50,7 +50,7 @@ export function SessionStart({ card, exit, previewMode }: { card: StartCard; exi
   // The mode's "Don't show this again", read from the browser the way
   // AGENTS.md asks (no read in render, no effect setting state). A
   // sitting limit or a results date always shows the card.
-  const alwaysShown = card.sittings !== null || card.resultsAt !== null;
+  const alwaysShown = card.sittings !== null || card.resultsAt !== null || card.reviewNote !== null;
   const storedSkip = useSyncExternalStore(
     subscribeStorage,
     () => {
@@ -168,6 +168,11 @@ export function SessionStart({ card, exit, previewMode }: { card: StartCard; exi
           {card.resultsAt ? (
             <p className="preflight-text">
               <strong>Results on {formatResultsAt(card.resultsAt)}.</strong>
+            </p>
+          ) : null}
+          {card.reviewNote ? (
+            <p className="preflight-text">
+              <strong>{card.reviewNote}</strong>
             </p>
           ) : null}
           <div className="preflight-actions">

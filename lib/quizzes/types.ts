@@ -54,6 +54,9 @@ export type Quiz = {
   sittings_allowed?: number | null;
   /** Results held until this date and time; null = Immediately (04.12). */
   results_at?: string | null;
+  /** The review: 'always' (the default), 'until' review_closes_at, or 'never' (04.13). */
+  review?: string | null;
+  review_closes_at?: string | null;
   shuffle: boolean;
   /** null = one minute per question (legacy's fallback, everywhere). */
   time_limit_sec: number | null;
@@ -122,6 +125,10 @@ export type SaveQuizInput = {
   sittingsAllowed: string;
   /** Results on a date, the raw datetime-local string (Ghana time); '' = Immediately (04.12). */
   resultsAt: string;
+  /** The review (04.13): 'always' | 'until' | 'never'. */
+  review: 'always' | 'until' | 'never';
+  /** With 'until', the raw datetime-local string (Ghana time); '' otherwise. */
+  reviewClosesAt: string;
   status: QuizStatus;
   published: boolean;
   shuffle: boolean;

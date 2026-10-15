@@ -28,6 +28,7 @@ import type { ItemFilterOptions } from '@/lib/bank/types';
 import { getConfig } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import { startRefusal } from '@/lib/quizzes/availability';
+import { reviewClosedLine } from '@/lib/quizzes/results-date';
 import { getQuizById } from '@/lib/quizzes/queries';
 import type { QuizKind } from '@/lib/quizzes/types';
 import { builderDoorFor } from './builder-door';
@@ -426,12 +427,35 @@ async function closedResult(
       ok: true,
       held: true,
       resultsAt: own.results_at,
-      answered: rows.filter((r) => r.chosen !== null && r.chosen !== '').length,
+      answers: own.review !== 'never',
+      answered: rows.filter(answered).length,
       total: rows.length,
       timeTakenS,
     };
   }
-  return { ok: true, held: false, score, secrets: secretsOf(rows), timeTakenS };
+  // 04.13: the review closed (or not allowed) — the score, no secret half
+  if (own.review_closed) {
+    const noun = (await quizKindOfAttempt(own)) === 'mock' ? 'mock' : 'paper';
+    return {
+      ok: true,
+      held: false,
+      score,
+      secrets: {},
+      timeTakenS,
+      reviewClosed: {
+        line: reviewClosedLine(own.review, own.review_closes_at, noun),
+        correct: rows.filter((r) => answered(r) && r.is_correct === true).length,
+        wrong: rows.filter((r) => answered(r) && r.is_correct !== true).length,
+        unanswered: rows.filter((r) => !answered(r)).length,
+      },
+    };
+  }
+  return { ok: true, held: false, score, secrets: secretsOf(rows), timeTakenS, reviewClosed: null };
+}
+
+/** A row with an answer saved (the runner's own test). */
+function answered(r: { chosen: string | null }): boolean {
+  return r.chosen !== null && String(r.chosen).trim() !== '';
 }
 
 // The exam's clock ran out: closed at the true deadline. The function

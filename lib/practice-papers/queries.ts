@@ -12,7 +12,8 @@
 // create_attempt works it out (20261012100000_first_mode.sql): a live
 // grant with all papers opens every paper, any other live grant only the
 // trial paper (`open_in_trial`). Each paper carries its results date
-// (04.12), held or not on the same clock as its availability.
+// (04.12), held or not on the same clock as its availability, and its
+// review (04.13), closed or not on that clock too.
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import type { Profile } from '@/lib/auth/profile';
@@ -25,6 +26,7 @@ import { topCardFor } from '@/lib/dashboard/student/status';
 import { getQuizAvailability } from '@/lib/quizzes/availability';
 import { orderModes } from '@/lib/attempts/modes';
 import type { AttemptMode } from '@/lib/attempts/types';
+import type { ReviewSetting } from '@/lib/quizzes/results-date';
 import { slices } from '@/lib/supabase/read-all';
 import { byTitle, paperView, type CourseView, type PaperAccess, type PaperRow } from './derive';
 
@@ -49,6 +51,8 @@ type QuizRowRead = {
   open_in_trial: boolean;
   sittings_allowed: number | null;
   results_at: string | null;
+  review: ReviewSetting;
+  review_closes_at: string | null;
 };
 
 /** Per course, the most a live grant lets the student do with papers, and whether it opens mocks (also the Mock exams page's). */
@@ -113,7 +117,7 @@ export async function loadPracticePapers(supabase: ServerSupabaseClient, profile
   if (shown.length) {
     const { data, error } = await db
       .from('quizzes')
-      .select('quiz_id, course_id, title, n, allowed_modes, first_mode, time_limit_sec, published, status, publish_at, unpublish_at, open_in_trial, sittings_allowed, results_at')
+      .select('quiz_id, course_id, title, n, allowed_modes, first_mode, time_limit_sec, published, status, publish_at, unpublish_at, open_in_trial, sittings_allowed, results_at, review, review_closes_at')
       .in('course_id', shown.map((c) => c.course_id))
       .eq('status', 'active')
       .eq('published', true);
@@ -140,6 +144,8 @@ export async function loadPracticePapers(supabase: ServerSupabaseClient, profile
         in_trial: q.open_in_trial,
         sittings_allowed: q.sittings_allowed,
         results_at: q.results_at,
+        review: q.review,
+        review_closes_at: q.review_closes_at,
       };
       return [paperView(row, kind, attempts, now)];
     });

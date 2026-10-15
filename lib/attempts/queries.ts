@@ -30,7 +30,7 @@ type ServiceDb = ReturnType<typeof createServiceRoleClient>;
 
 /** A list row's columns, from student_attempts() (04.12: with the date and held). */
 const LIST_COLUMNS =
-  'attempt_id, user_id, quiz_id, course_id, mode, source, status, n, score_raw, score_total, score_pct, time_taken_s, display_label, ts_iso, results_at, held';
+  'attempt_id, user_id, quiz_id, course_id, mode, source, status, n, score_raw, score_total, score_pct, time_taken_s, display_label, ts_iso, results_at, held, review, review_closes_at, review_closed';
 
 // The attempt's own questions (03 Q4): attempt_items in position order,
 // each row as the bank served it when the attempt was created, the

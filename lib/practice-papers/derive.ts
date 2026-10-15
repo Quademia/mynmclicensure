@@ -12,10 +12,18 @@
 // 30 Oct" in a row, the whole date on a card — and no report, and only the
 // first sitting's mode is offered. The date is written only through
 // lib/quizzes/results-date, in Ghana's time.
+//
+// The review (04.13; Sam, 2026-10-15): a paper's `review` — Always, Until a
+// date, or Not allowed — read live. While it is closed the score, the
+// summary and the report stay; Learning is not offered (it shows each
+// answer) and a Learning sitting going is not resumed; the other ways stay.
+// The card says "Review open until …" while it is open with a date, and
+// what a closed one says — but nothing while the results are held, whose
+// line is enough.
 
 import type { AttemptMode, AttemptWithProgress } from '@/lib/attempts/types';
 import type { Availability } from '@/lib/quizzes/types';
-import { formatResultsAt, formatResultsShort, resultsHeld } from '@/lib/quizzes/results-date';
+import { formatResultsAt, formatResultsShort, resultsHeld, reviewClosed, reviewLine, type ReviewSetting } from '@/lib/quizzes/results-date';
 
 /** What a student's courses let them do with papers. `all` a package; `trial` only the trial paper; `none` nothing live. */
 export type PaperAccess = 'all' | 'trial' | 'none';
@@ -37,6 +45,9 @@ export type PaperRow = {
   sittings_allowed: number | null;
   /** When its results come out; null = Immediately (04.12). */
   results_at: string | null;
+  /** The review: Always, Until review_closes_at, or Not allowed (04.13). */
+  review: ReviewSetting;
+  review_closes_at: string | null;
 };
 
 export type PaperState = 'done' | 'in_progress' | 'new';
@@ -46,6 +57,12 @@ export type PaperView = PaperRow & {
   open: boolean;
   /** Its results date has not come (04.12): no score shows, and only the first mode is sat. */
   held: boolean;
+  /** Its review is closed (04.13): Learning shuts; the score and the summary stay. */
+  reviewClosed: boolean;
+  /** The card's line about the review (04.13): "Review open until …", or
+   *  what a closed one says; null with Always, and while the results are
+   *  held (their line is enough). */
+  reviewNote: string | null;
   state: PaperState;
   /** The first sitting finished (completed in the first mode), the earliest. */
   firstSitting: AttemptWithProgress | null;
@@ -93,7 +110,13 @@ export function formatMinutes(min: number): string {
   return [hours, mins].filter(Boolean).join(' ');
 }
 
-export function paperView(row: PaperRow, access: PaperAccess, attempts: AttemptWithProgress[], now: Date): PaperView {
+export function paperView(
+  row: PaperRow,
+  access: PaperAccess,
+  attempts: AttemptWithProgress[],
+  now: Date,
+  noun: 'paper' | 'mock' = 'paper',
+): PaperView {
   const started = attempts.filter((a) => a.quiz_id === row.quiz_id);
   const mine = started.filter((a) => a.status !== 'abandoned');
   const inProgress = mine.find((a) => a.status === 'in_progress') ?? null; // newest first
@@ -102,10 +125,13 @@ export function paperView(row: PaperRow, access: PaperAccess, attempts: AttemptW
     .sort((a, b) => Date.parse(a.ts_iso ?? '') - Date.parse(b.ts_iso ?? ''));
   const firstSitting = finished[0] ?? null;
   const open = access === 'all' || (access === 'trial' && row.in_trial);
+  const held = resultsHeld(row.results_at, now);
   return {
     ...row,
     open,
-    held: resultsHeld(row.results_at, now),
+    held,
+    reviewClosed: reviewClosed(row.review, row.review_closes_at, now),
+    reviewNote: held ? null : reviewLine(row.review, row.review_closes_at, noun, now),
     state: firstSitting ? 'done' : inProgress ? 'in_progress' : 'new',
     firstSitting,
     inProgress,
@@ -152,11 +178,25 @@ export function otherWaysLine(p: PaperView): string | null {
   return p.held && p.results_at ? `The other ways open when results come out on ${formatResultsAt(p.results_at)}.` : null;
 }
 
+/** 04.13: Learning, while the paper's review is closed — it shows each
+ *  answer, so it is not offered and not resumed; the other modes stay. */
+export function learningShut(p: Pick<PaperView, 'reviewClosed'>, mode: AttemptMode): boolean {
+  return p.reviewClosed && mode === 'UNTIMED_LEARNING';
+}
+
+/** The ways other than the first mode a student may take now: the paper's
+ *  modes, less Learning while the review is closed (04.13). Empty = the
+ *  paper has no other ways. */
+export function otherModes(p: PaperView): AttemptMode[] {
+  return p.allowed_modes.filter((m) => m !== p.first_mode && !learningShut(p, m));
+}
+
 /** While a paper's results are held only its first mode is sat (04.12): a
  *  sitting going in another mode cannot be resumed until the date — it can
- *  still be abandoned. */
+ *  still be abandoned. Likewise a Learning sitting while the review is
+ *  closed (04.13). */
 export function resumable(p: PaperView, a: AttemptWithProgress): boolean {
-  return !p.held || a.mode === p.first_mode;
+  return (!p.held || a.mode === p.first_mode) && !learningShut(p, a.mode);
 }
 
 /** A paper a student can start or resume today. */

@@ -45,6 +45,7 @@ export function ReportBody({
   anyTopicJudged,
   outcomes,
   slowest,
+  reviewClosed = null,
 }: {
   attemptId: string;
   courseId: string;
@@ -54,6 +55,8 @@ export function ReportBody({
   /** each question's outcome, in the sitting's order */
   outcomes: Outcome[];
   slowest: { number: number; seconds: number }[];
+  /** 04.13: the review is closed — this line in place of the question map. */
+  reviewClosed?: string | null;
 }) {
   const [view, setView] = useState<ViewKey | null>(breakdowns[0]?.key ?? null);
   const [expanded, setExpanded] = useState(false);
@@ -181,68 +184,76 @@ export function ReportBody({
       </section>
 
       {/* Every question */}
-      <section className="card srp-card srp-map-card" aria-labelledby="srp-map-h" ref={mapRef}>
-        <h2 id="srp-map-h" className="srp-h">Every question</h2>
-        <p className="srp-sub">Tap a number to open it in the review.</p>
-        <div className="srp-filters" role="group" aria-label="Show">
-          {(
-            [
-              ['all', `All (${outcomes.length})`],
-              ['wrong', `Wrong (${wrongCount})`],
-              ['unanswered', `Unanswered (${unansweredCount})`],
-            ] as [MapFilter, string][]
-          ).map(([key, text]) => (
-            <button
-              key={key}
-              type="button"
-              aria-pressed={filter === key}
-              className={`srp-filter${filter === key ? ' on' : ''}`}
-              onClick={() => setFilter(key)}
-            >
-              {text}
-            </button>
-          ))}
-        </div>
-        {mapped.length ? (
-          <div className="srp-map">
-            {mapped.map((q) => (
-              <Link
-                key={q.n}
-                prefetch={false}
-                href={sessionQuestionHref(attemptId, q.n)}
-                className={`srp-q ${q.o}`}
-                aria-label={`Question ${q.n}: ${OUTCOME_WORD[q.o]}`}
+      {reviewClosed ? (
+        // 04.13: the review is closed — no question map, no way into the review
+        <section className="card srp-card srp-map-card" aria-labelledby="srp-map-h">
+          <h2 id="srp-map-h" className="srp-h">Every question</h2>
+          <p className="srp-sub">{reviewClosed}</p>
+        </section>
+      ) : (
+        <section className="card srp-card srp-map-card" aria-labelledby="srp-map-h" ref={mapRef}>
+          <h2 id="srp-map-h" className="srp-h">Every question</h2>
+          <p className="srp-sub">Tap a number to open it in the review.</p>
+          <div className="srp-filters" role="group" aria-label="Show">
+            {(
+              [
+                ['all', `All (${outcomes.length})`],
+                ['wrong', `Wrong (${wrongCount})`],
+                ['unanswered', `Unanswered (${unansweredCount})`],
+              ] as [MapFilter, string][]
+            ).map(([key, text]) => (
+              <button
+                key={key}
+                type="button"
+                aria-pressed={filter === key}
+                className={`srp-filter${filter === key ? ' on' : ''}`}
+                onClick={() => setFilter(key)}
               >
-                {q.n}
-                <LinkPending />
-              </Link>
+                {text}
+              </button>
             ))}
           </div>
-        ) : (
-          <p className="srp-empty">{filter === 'wrong' ? 'No wrong answers.' : 'Every question was answered.'}</p>
-        )}
-        <p className="srp-legend">
-          <span className="srp-key correct" aria-hidden="true" />Correct
-          <span className="srp-key wrong" aria-hidden="true" />Wrong
-          <span className="srp-key unanswered" aria-hidden="true" />Unanswered
-        </p>
-        {slowest.length ? (
-          <p className="srp-slowest">
-            <Icon name="timer" />
-            Longest:{' '}
-            {slowest.map((s, i) => (
-              <span key={s.number}>
-                {i ? ' · ' : ''}
-                <Link prefetch={false} href={sessionQuestionHref(attemptId, s.number)}>
-                  Q{s.number}
+          {mapped.length ? (
+            <div className="srp-map">
+              {mapped.map((q) => (
+                <Link
+                  key={q.n}
+                  prefetch={false}
+                  href={sessionQuestionHref(attemptId, q.n)}
+                  className={`srp-q ${q.o}`}
+                  aria-label={`Question ${q.n}: ${OUTCOME_WORD[q.o]}`}
+                >
+                  {q.n}
                   <LinkPending />
-                </Link>{' '}
-                ({formatSeconds(s.seconds)})
-              </span>
-            ))}
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="srp-empty">{filter === 'wrong' ? 'No wrong answers.' : 'Every question was answered.'}</p>
+          )}
+          <p className="srp-legend">
+            <span className="srp-key correct" aria-hidden="true" />Correct
+            <span className="srp-key wrong" aria-hidden="true" />Wrong
+            <span className="srp-key unanswered" aria-hidden="true" />Unanswered
           </p>
-        ) : null}
-      </section>
+          {slowest.length ? (
+            <p className="srp-slowest">
+              <Icon name="timer" />
+              Longest:{' '}
+              {slowest.map((s, i) => (
+                <span key={s.number}>
+                  {i ? ' · ' : ''}
+                  <Link prefetch={false} href={sessionQuestionHref(attemptId, s.number)}>
+                    Q{s.number}
+                    <LinkPending />
+                  </Link>{' '}
+                  ({formatSeconds(s.seconds)})
+                </span>
+              ))}
+            </p>
+          ) : null}
+        </section>
+      )}
     </>
   );
 }

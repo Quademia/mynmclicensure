@@ -20,7 +20,7 @@
 // browser, checked from a script with made-up rows. The page computes
 // everything on the server and hands the client plain numbers.
 
-import type { ServerSupabaseClient } from '@/lib/access';
+import type { createServiceRoleClient } from '@/lib/supabase/server';
 
 /** A topic needs this many questions in the sitting before it is judged or advised on. */
 export const MIN_QUESTIONS_TO_JUDGE = 3;
@@ -49,12 +49,13 @@ export type ReportRow = {
 const REPORT_COLUMNS = 'position, question_type, subject, maintopic, difficulty, chosen, is_correct, time_spent_s';
 
 /**
- * The sitting's rows in order, on the student's own client: the policy
- * lets a student read their own sittings' rows, and every column named is
- * in the browser role's grant. One attempt's rows (AGENTS.md rule 10's
- * exemption). null on an error.
+ * The sitting's rows in order, with the service role after the caller has
+ * read the sitting as the student's own (getOwnAttempt): since 04.13 the
+ * student's own client cannot read a sitting's rows while its review is
+ * closed, and the page still sums them for the summary. One attempt's rows
+ * (AGENTS.md rule 10's exemption). null on an error.
  */
-export async function readReportRows(db: ServerSupabaseClient, attemptId: string): Promise<ReportRow[] | null> {
+export async function readReportRows(db: ReturnType<typeof createServiceRoleClient>, attemptId: string): Promise<ReportRow[] | null> {
   const { data, error } = await db
     .from('attempt_items')
     .select(REPORT_COLUMNS)

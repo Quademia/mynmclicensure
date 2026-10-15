@@ -8,6 +8,8 @@
 // with kind="mock". No size, time, date or count is written here: each is
 // read from the mock. While a mock's results are held (04.12), its date
 // stands where a score would, and no report is linked — as on a paper.
+// While its review is closed (04.13), the score and the report stay, the
+// card says so, and Learning is left out of the ways — as on a paper.
 
 import { AppLink } from '@/components/shell/link-pending';
 import { PageHeader } from '@/components/shell/page-header';
@@ -18,6 +20,7 @@ import {
   formatDay,
   formatMinutes,
   heldUntil,
+  otherModes,
   otherWaysLine,
   paperMinutes,
   resultsLine,
@@ -145,6 +148,7 @@ export function MockListScreen({ data }: { data: MockExams }) {
         </span>
         {going ? <progress className="pp-progress" max={next.n} value={going.answered_count} aria-label="Answered so far" /> : null}
         {held ? <span className="pp-line">{held}</span> : null}
+        {next.reviewNote ? <span className="pp-line">{next.reviewNote}</span> : null}
         <LaunchButton kind="mock" quizId={next.quiz_id} mode={going ? going.mode : next.first_mode} label={going ? 'Resume' : 'Start'} />
       </div>
     );
@@ -208,8 +212,13 @@ export function MockScreen({ mock, ended }: { mock: MockView; ended: MockExams['
   // the date (it can still be abandoned).
   const heldLine = resultsLine(mock);
   const results = heldLine ? <span className="pp-line">{heldLine}</span> : null;
-  const waysLine = mock.allowed_modes.length > 1 && mock.sittingsLeft !== 0 ? otherWaysLine(mock) : null;
+  // 04.13: the review's line beside it — none while the results are held;
+  // while it is closed Learning is no other way (with it the only one, none).
+  const review = mock.reviewNote ? <span className="pp-line">{mock.reviewNote}</span> : null;
+  const others = otherModes(mock).length > 0;
+  const waysLine = others && mock.sittingsLeft !== 0 ? otherWaysLine(mock) : null;
   const canResume = going ? resumable(mock, going) : false;
+  const ways = waysOf(mock);
 
   // After the first sitting: Practise again while the mock is open and a
   // sitting is left; with a limit, one at a time, so a sitting going is resumed.
@@ -217,8 +226,8 @@ export function MockScreen({ mock, ended }: { mock: MockView; ended: MockExams['
   if (mock.open && active) {
     if (limited && going) {
       if (canResume) again = <LaunchButton kind="mock" quizId={mock.quiz_id} mode={going.mode} label={`Resume ${modeName(going.mode)}`} />;
-    } else if (mock.sittingsLeft !== 0) {
-      again = <PractiseAgain kind="mock" quizId={mock.quiz_id} title={mock.title} ways={waysOf(mock)} note={waysLine} />;
+    } else if (mock.sittingsLeft !== 0 && ways.length) {
+      again = <PractiseAgain kind="mock" quizId={mock.quiz_id} title={mock.title} ways={ways} note={waysLine} />;
     }
   }
 
@@ -232,6 +241,7 @@ export function MockScreen({ mock, ended }: { mock: MockView; ended: MockExams['
         <span className="pp-eyebrow">Your first sitting</span>
         <FirstSittingLines a={done} />
         {!active ? <span className="pp-line">This mock has closed.</span> : mock.open ? limit : null}
+        {review}
         {report || again ? (
           <div className="pp-actions">
             {report}
@@ -263,6 +273,7 @@ export function MockScreen({ mock, ended }: { mock: MockView; ended: MockExams['
         <progress className="pp-progress" max={mock.n} value={going.answered_count} aria-label="Answered so far" />
         {limit}
         {results}
+        {review}
         {canResume ? <LaunchButton kind="mock" quizId={mock.quiz_id} mode={going.mode} label="Resume" /> : null}
         <AbandonSitting attemptId={going.attempt_id} sittingsAllowed={mock.sittings_allowed} />
       </div>
@@ -275,6 +286,7 @@ export function MockScreen({ mock, ended }: { mock: MockView; ended: MockExams['
           {mock.availability === 'UPCOMING' && mock.publish_at ? `Opens ${formatDay(mock.publish_at)}` : 'This mock has closed.'}
         </span>
         {results}
+        {review}
       </div>
     );
   } else {
@@ -286,6 +298,7 @@ export function MockScreen({ mock, ended }: { mock: MockView; ended: MockExams['
         <span className="pp-line">{first.card}</span>
         {limit}
         {results}
+        {review}
         <LaunchButton kind="mock" quizId={mock.quiz_id} mode={mock.first_mode} label="Start" />
       </div>
     );
@@ -315,7 +328,7 @@ export function MockScreen({ mock, ended }: { mock: MockView; ended: MockExams['
       </div>
       {mock.open && active && done && waysLine ? (
         <p className="pp-hint">{waysLine}</p>
-      ) : mock.open && active && !done && mock.allowed_modes.length > 1 ? (
+      ) : mock.open && active && !done && others ? (
         <p className="pp-hint">More ways to practise this mock open after your first sitting.</p>
       ) : null}
     </div>

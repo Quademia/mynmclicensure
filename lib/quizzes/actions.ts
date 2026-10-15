@@ -135,12 +135,23 @@ export async function setQuizStatus(kind: QuizKind, quizId: string, status: Quiz
   return { ok: true };
 }
 
+// A datetime-local string ("YYYY-MM-DDTHH:MM", seconds optional) read as
+// Ghana time, which is UTC — the results date (04.12) and the review's
+// close (04.13). null when it is not one.
+function utcStamp(raw: string): Date | null {
+  const typed = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.exec(raw);
+  const stamp = typed ? new Date(raw + (typed[1] ? 'Z' : ':00Z')) : null;
+  return stamp && !Number.isNaN(stamp.getTime()) ? stamp : null;
+}
+
+const REVIEWS: readonly string[] = ['always', 'until', 'never'];
+
 // ── saveQuiz ────────────────────────────────────────────────────────────
 // The page's checks, in legacy's order, then legacy's payload and the
 // picked ids to save_quiz() (03 Q14), which writes both in one step and
 // refuses a repeat or a question not in the quiz's course by name. The
-// two schedule datetime strings go in as they are; the results date goes
-// in marked UTC (04.12).
+// two schedule datetime strings go in as they are; the results date and
+// the review's close go in marked UTC (04.12, 04.13).
 export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
   await requireAdmin();
   const noun = NOUN[input.kind];
@@ -187,13 +198,32 @@ export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
   const resultsRaw = String(input.resultsAt ?? '').trim();
   let resultsAt: string | null = null;
   if (resultsRaw) {
-    const typed = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.exec(resultsRaw);
-    const stamp = typed ? new Date(resultsRaw + (typed[1] ? 'Z' : ':00Z')) : null;
-    if (!stamp || Number.isNaN(stamp.getTime())) return fail('Choose the date and time results come out.');
+    const stamp = utcStamp(resultsRaw);
+    if (!stamp) return fail('Choose the date and time results come out.');
     if (MODES[firstMode as AttemptMode].group !== 'exam') {
       return fail('Results on a date need the first sitting in an exam mode: Free Navigation or Sequential.');
     }
     resultsAt = stamp.toISOString();
+  }
+  // 04.13 (Sam, 2026-10-15): the review Always, Until a date (marked UTC,
+  // as the results date), or Not allowed. The form's words, asked again
+  // here; the table's check holds all three. A request with no review is
+  // refused rather than read as Always, which would show answers an admin
+  // had closed.
+  const review = String(input.review ?? '');
+  if (!REVIEWS.includes(review)) return fail('Please choose a valid Review setting.');
+  let reviewClosesAt: string | null = null;
+  if (review === 'until') {
+    const stamp = utcStamp(String(input.reviewClosesAt ?? '').trim());
+    if (!stamp) return fail('Choose the date and time the review closes.');
+    if (resultsAt && stamp.getTime() <= new Date(resultsAt).getTime()) {
+      return fail('The review must close after the results come out. To never show the answers, choose Not allowed.');
+    }
+    reviewClosesAt = stamp.toISOString();
+  }
+  if (review === 'until' && firstMode === 'UNTIMED_LEARNING') return fail("With a review that closes, the first sitting can't be Learning: it shows each answer, and no one could start the paper after the close.");
+  if (review === 'never' && (allowedModes as string[]).includes('UNTIMED_LEARNING')) {
+    return fail("With the review not allowed, Learning can't be offered: it shows each answer. Untick Learning.");
   }
 
   // 08 B6: a fixed quiz is practice, so it cannot hold a question a
@@ -255,6 +285,8 @@ export async function saveQuiz(input: SaveQuizInput): Promise<ActionResult> {
     first_mode: firstMode,
     sittings_allowed: sittingsAllowed,
     results_at: resultsAt,
+    review,
+    review_closes_at: reviewClosesAt,
     updated_at: now,
   };
   if (!input.isEdit) payload.created_at = now;

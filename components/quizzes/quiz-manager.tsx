@@ -49,7 +49,7 @@ import {
   type QuizListRow,
   type QuizStatus,
 } from '@/lib/quizzes/types';
-import { formatResultsAt } from '@/lib/quizzes/results-date';
+import { formatResultsAt, type ReviewSetting } from '@/lib/quizzes/results-date';
 import { DIFFICULTIES, type Item } from '@/lib/bank/types';
 import type { Course } from '@/lib/catalogue/types';
 import { Icon } from '@/components/shell/icons';
@@ -73,6 +73,10 @@ type Form = {
   results: 'immediately' | 'date';
   /** 04.12: the datetime-local value, Ghana time (UTC); kept while Immediately is chosen. */
   resultsAt: string;
+  /** 04.13: the review Always, Until the date and time below, or Not allowed. */
+  review: ReviewSetting;
+  /** 04.13: the datetime-local value, Ghana time (UTC); kept while Until is not chosen. */
+  reviewClosesAt: string;
   status: QuizStatus;
   timeLimit: string;
   shuffle: boolean;
@@ -91,6 +95,8 @@ const EMPTY_FORM: Form = {
   sittingsAllowed: '',
   results: 'immediately',
   resultsAt: '',
+  review: 'always',
+  reviewClosesAt: '',
   status: 'draft',
   timeLimit: '',
   shuffle: false,
@@ -188,6 +194,41 @@ function resultsRefusal(form: Form): string | null {
     return 'Results on a date need the first sitting in an exam mode: Free Navigation or Sequential.';
   }
   return null;
+}
+
+// 04.13: a datetime-local value as a moment, read as UTC like the results
+// date — the review's close is compared with the results date and the close.
+function inputTime(value: string): number {
+  return new Date(resultsIso(value.slice(0, 16))).getTime();
+}
+
+// 04.13 (Sam, 2026-10-15): asked where the Results refusals are, on Next
+// and again at Save. saveQuiz refuses with the same words, and the
+// table's check holds all three.
+function reviewRefusal(form: Form): string | null {
+  if (form.review === 'until') {
+    if (!form.reviewClosesAt) return 'Choose the date and time the review closes.';
+    if (form.results === 'date' && form.resultsAt && inputTime(form.reviewClosesAt) <= inputTime(form.resultsAt)) {
+      return 'The review must close after the results come out. To never show the answers, choose Not allowed.';
+    }
+  }
+  if (form.review === 'until' && form.firstMode === 'UNTIMED_LEARNING') {
+    return "With a review that closes, the first sitting can't be Learning: it shows each answer, and no one could start the paper after the close.";
+  }
+  if (form.review === 'never' && form.modes.includes('UNTIMED_LEARNING')) {
+    return "With the review not allowed, Learning can't be offered: it shows each answer. Untick Learning.";
+  }
+  return null;
+}
+
+// 04.13: a warning on the review step, not a refusal — a paper or mock may
+// stay open after its review closes, but whoever sits it then never sees
+// the answers. With no close date set, the same is true.
+function reviewWarning(form: Form): string | null {
+  if (form.review !== 'until' || !form.reviewClosesAt) return null;
+  // no close at all: someone may sit it after the review closes
+  if (form.unpublishAt && inputTime(form.unpublishAt) <= inputTime(form.reviewClosesAt)) return null;
+  return `Students who sit after ${formatResultsAt(resultsIso(form.reviewClosesAt))} will never see their answers.`;
 }
 
 function quizzesWord(n: number, kind: QuizKind): string {
@@ -404,6 +445,9 @@ export function QuizManager({
       sittingsAllowed: quiz.sittings_allowed ? String(quiz.sittings_allowed) : '',
       results: quiz.results_at ? 'date' : 'immediately',
       resultsAt: quiz.results_at ? resultsInputValue(quiz.results_at) : '',
+      // 04.13: every row before the migration, and any word not one of the three, is Always
+      review: quiz.review === 'until' || quiz.review === 'never' ? quiz.review : 'always',
+      reviewClosesAt: quiz.review_closes_at ? resultsInputValue(quiz.review_closes_at) : '',
       status: quiz.status,
       timeLimit: quiz.time_limit_sec ? String(quiz.time_limit_sec) : '',
       shuffle: quiz.shuffle,
@@ -449,6 +493,8 @@ export function QuizManager({
     if (!form.modes.length) return err(`Tick at least one mode students can take this ${W.noun} in.`);
     const resultsWrong = resultsRefusal(form);
     if (resultsWrong) return err(resultsWrong);
+    const reviewWrong = reviewRefusal(form);
+    if (reviewWrong) return err(reviewWrong);
     if (!generatedId) return err(`${W.idLabel} could not be generated. Please re-select the course.`);
 
     if (pickerCourse !== courseId) await fetchPicker(courseId);
@@ -537,6 +583,8 @@ export function QuizManager({
     if (!generatedId) return err(`${W.idLabel} could not be generated. Please re-select the course.`);
     const resultsWrong = resultsRefusal(form);
     if (resultsWrong) return err(resultsWrong);
+    const reviewWrong = reviewRefusal(form);
+    if (reviewWrong) return err(reviewWrong);
 
     setSaving(true);
     // A dropped connection rejects rather than returning { ok: false }
@@ -554,6 +602,9 @@ export function QuizManager({
         sittingsAllowed: form.sittingsAllowed,
         // the raw datetime-local string; saveQuiz marks it UTC
         resultsAt: form.results === 'date' ? form.resultsAt : '',
+        // 04.13: the same, the date only with Until
+        review: form.review,
+        reviewClosesAt: form.review === 'until' ? form.reviewClosesAt : '',
         status: form.status,
         published: form.published,
         shuffle: form.shuffle,
@@ -595,6 +646,13 @@ export function QuizManager({
     ? `${form.timeLimit} seconds (${Math.round(Number(form.timeLimit) / 60)} min)`
     : 'Auto — 1 min per question';
   const resultsText = form.results === 'date' && form.resultsAt ? formatResultsAt(resultsIso(form.resultsAt)) : 'Immediately';
+  const reviewText =
+    form.review === 'never'
+      ? 'Not allowed'
+      : form.review === 'until' && form.reviewClosesAt
+        ? `Until ${formatResultsAt(resultsIso(form.reviewClosesAt))}`
+        : 'Always';
+  const reviewWarned = reviewWarning(form);
 
   // ── the details form's Scheduling section (placed differently per page) ──
   const scheduling = (
@@ -828,6 +886,33 @@ export function QuizManager({
                 <p className="form-hint">To give each student one sitting before results, set Sittings allowed to 1. Set the date at or after the close, so no one sits it after seeing the answers.</p>
               </div>
             </div>
+            {/* 04.13 (Sam, 2026-10-15): while the review is closed a student
+                keeps the score and the summary, not the answers, and
+                Learning does not open. Read live, so a change reaches
+                sittings already taken. The date input as Results'. */}
+            <div className="form-row">
+              <div className="form-group">
+                <div className="results-choice" role="radiogroup" aria-labelledby="fieldReviewLabel">
+                  <div id="fieldReviewLabel" className="mode-ticks-label">Review</div>
+                  <label className="check-label">
+                    <input type="radio" name="fieldReview" checked={form.review === 'always'} onChange={() => setField('review', 'always')} />
+                    Always
+                  </label>
+                  <label className="check-label">
+                    <input type="radio" name="fieldReview" checked={form.review === 'until'} onChange={() => setField('review', 'until')} />
+                    Until a date and time
+                  </label>
+                  <label className="check-label">
+                    <input type="radio" name="fieldReview" checked={form.review === 'never'} onChange={() => setField('review', 'never')} />
+                    Not allowed
+                  </label>
+                </div>
+                {form.review === 'until' ? (
+                  <input id="fieldReviewClosesAt" type="datetime-local" aria-label="Date and time the review closes" value={form.reviewClosesAt} onChange={(e) => setField('reviewClosesAt', e.target.value)} />
+                ) : null}
+                <p className="form-hint">Changes to Results and Review apply to every sitting, including ones already taken.</p>
+              </div>
+            </div>
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="fieldStatus">Status</label>
@@ -1030,6 +1115,10 @@ export function QuizManager({
               <div className="detail-row"><span className="detail-label">First sitting in</span><span className="detail-value">{MODES[form.firstMode].name}</span></div>
               <div className="detail-row"><span className="detail-label">Sittings allowed</span><span className="detail-value">{form.sittingsAllowed.trim() || 'No limit'}</span></div>
               <div className="detail-row"><span className="detail-label">Results</span><span className="detail-value">{resultsText}</span></div>
+              <div className="detail-row"><span className="detail-label">Review</span><span className="detail-value">{reviewText}</span></div>
+              {reviewWarned ? (
+                <div className="draft-warning review-warning" role="note">{reviewWarned}</div>
+              ) : null}
               <div className="detail-row"><span className="detail-label">Status</span><span className="detail-value"><span className={`badge ${form.status}`}>{form.status}</span></span></div>
               <div className="detail-row"><span className="detail-label">Published</span><span className="detail-value">{form.published ? 'Yes' : 'No'}</span></div>
               <div className="detail-row"><span className="detail-label">Shuffle</span><span className="detail-value">{form.shuffle ? 'Yes — randomised per attempt' : 'No — fixed order'}</span></div>

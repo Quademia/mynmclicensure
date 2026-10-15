@@ -135,7 +135,7 @@ opens it (00, The menu).
 - **Sittings, results and review** (04, Sam, 2026-10-13): a paper's card
   says the sittings left when the admin sets a number; held results and
   a closed review show as on a mock's page (below). *(the sittings built
-  2026-10-14, 04.10; held results built 2026-10-15, 04.12; to build: 04.13)*
+  2026-10-14, 04.10; held results and the review built 2026-10-15, 04.12, 04.13)*
 
 ### Mock exams
 - **Redesigned (Sam, 2026-10-13: layout A; 04.15)**, drawn at
@@ -225,9 +225,11 @@ opens it (00, The menu).
   says when the results come out, with the mode, the time and how many
   were answered, and one way back — to the paper's or mock's own page;
   the sitting opened again, and the report, show the date and nothing
-  else until then. After a review period
-  (04.13): the summary open, the question list locked — "The review of
-  this mock closed on …".
+  else until then. With the review closed (04.13, built 2026-10-15): the
+  summary open, "Every question" says "The review of this mock closed on
+  …" in place of the map, no Review answers; the sitting opened again
+  shows a lock, the line, See your report and the way back; the start
+  screen of a later sitting says it shows the score and report only.
 
 ### Learning history
 - Every sitting under its course's name; a Report link on finished
@@ -342,7 +344,8 @@ opens it (00, The menu).
   picked) and the other ways allowed after it (04.5). A mock: mode ticks
   under Study and Exam (refused with none), and "First sitting in" as a
   paper (04.11). Both: Sittings allowed, Results (Immediately / On a
-  date and time), Review open for N days (04.10, 04.12, 04.13). The mock
+  date and time), Review (Always / Until a date and time / Not allowed)
+  (04.10, 04.12, 04.13). The mock
   form refuses a live mock holding a draft question, saying how many
   (04.16), and warns when its questions are edited after students have
   sat it (04.17). The modes as

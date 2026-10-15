@@ -23,6 +23,11 @@
 // <date>" in Ghana's time where the score was, and no Review or Report —
 // either would only say "not yet". The stats bar's average and best leave
 // it out; the score sorts put it last, newest first; the total counts it.
+//
+// 04.13: a finished sitting whose paper's review is closed (the server's
+// `review_closed`) keeps its score and its Report — the summary — and loses
+// Review, which opens the question-by-question review. A Learning sitting's
+// Retake is shut with it (the start rule refuses Learning while closed).
 
 'use client';
 
@@ -236,6 +241,9 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
     // 04.12: while held only the first mode is sat, and that is an exam
     // mode — a Study sitting's retake waits for the date
     const retakeWaits = resultsAt !== null && modeOf(a.mode).group !== 'exam';
+    // 04.13: the review closed — no question-by-question review, and no Learning
+    const reviewShut = isCompleted && a.review_closed === true;
+    const learningShut = reviewShut && a.mode === 'UNTIMED_LEARNING';
 
     const dateStr = a.ts_iso ? new Date(a.ts_iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
     const timeStr = a.ts_iso ? new Date(a.ts_iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '';
@@ -302,8 +310,9 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
                 <Icon name="play" />Resume
               </button>
             )}
-            {/* 04.12: while held, no Review and no Report — both would only say "not yet" */}
-            {resultsAt ? null : isCompleted ? (
+            {/* 04.12: while held, no Review and no Report — both would only say "not yet";
+                04.13: with the review closed, no Review (the Report stays) */}
+            {resultsAt || reviewShut ? null : isCompleted ? (
               <AppLink className="act-btn btn-review" href={sessionHref(a.attempt_id)} title="Review your answers">
                 <Icon name="eye" />Review
               </AppLink>
@@ -325,8 +334,16 @@ export function LearningHistoryClient({ courses, initialCourseId, initialPage }:
             <button
               type="button"
               className="act-btn btn-retake"
-              disabled={!isCompleted || isRetaking || retakeWaits}
-              title={retakeWaits ? 'Opens when results come out' : isCompleted ? 'Retake with same questions' : 'Complete this attempt first'}
+              disabled={!isCompleted || isRetaking || retakeWaits || learningShut}
+              title={
+                retakeWaits
+                  ? 'Opens when results come out'
+                  : learningShut
+                    ? 'Learning closed with the review'
+                    : isCompleted
+                      ? 'Retake with same questions'
+                      : 'Complete this attempt first'
+              }
               onClick={() => handleRetake(a)}
             >
               {isRetaking ? '…Starting' : <><Icon name="refresh" />Retake</>}

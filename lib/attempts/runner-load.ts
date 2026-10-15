@@ -30,7 +30,8 @@ import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import type { AuthGateResult } from '@/lib/access';
 import { isFreeSitting } from './free-sitting';
-import { SESSION_EXITS, quizPageExit, type SessionExit } from './links';
+import { SESSION_EXITS, quizPageExit, reportHref, type SessionExit } from './links';
+import { reviewClosedLine } from '@/lib/quizzes/results-date';
 import { modeOf } from './modes';
 import { getAttemptById, getOwnAttempt, originSource, readAttemptItems } from './queries';
 import { sealItem, secretOf } from './seal';
@@ -58,6 +59,8 @@ export type StartCard = {
   sittings: { number: number; allowed: number; noun: 'paper' | 'mock' } | null;
   /** 04.12: the paper's or mock's results date while it has yet to come; null otherwise. */
   resultsAt: string | null;
+  /** 04.13: the closed review's line — this sitting shows its score and summary, not its answers; null otherwise. */
+  reviewNote: string | null;
 };
 
 /** 04.12: a finished sitting whose results are held — what its screen says, and nothing of the questions. */
@@ -66,6 +69,15 @@ export type HeldSitting = {
   resultsAt: string;
   /** When it was submitted (or its time ran out). */
   endedAt: string | null;
+  /** 04.13: false when the review is Not allowed — the date brings the score and report only. */
+  answers: boolean;
+};
+
+/** 04.13: a sitting of a paper whose review is closed — the line it says, and the report (its summary) when finished. */
+export type ClosedSitting = {
+  displayLabel: string | null;
+  line: string;
+  reportHref: string | null;
 };
 
 /** The questions a sitting is played or reviewed with. */
@@ -90,6 +102,7 @@ export type RunnerLoad =
   | SessionError
   | { kind: 'start'; card: StartCard; previewMode: boolean; exit: SessionExit }
   | { kind: 'held'; held: HeldSitting; exit: SessionExit }
+  | { kind: 'review-closed'; closed: ClosedSitting; exit: SessionExit }
   | ({ kind: 'review'; previewMode: boolean; exit: SessionExit } & SessionPlay);
 
 /** What Start or Resume gets back (Q17): the questions, or a sitting that has closed meanwhile. */
@@ -104,7 +117,9 @@ export type SessionOpen =
 async function checkSession(
   gate: AuthGateResult,
   params: { attemptId: string; preview: boolean },
-): Promise<SessionError | { kind: 'ok'; attempt: Attempt; exit: SessionExit; heldExit: SessionExit; previewMode: boolean }> {
+): Promise<
+  SessionError | { kind: 'ok'; attempt: Attempt; exit: SessionExit; heldExit: SessionExit; noun: 'paper' | 'mock'; previewMode: boolean }
+> {
   const { supabase, profile } = gate;
   // Until the attempt is read, legacy's destination.
   const fallback = SESSION_EXITS.fixed;
@@ -175,7 +190,7 @@ async function checkSession(
   if (attempt.status === 'abandoned') {
     return { kind: 'error', title: 'Attempt Abandoned', message: 'This quiz attempt was abandoned. Please start a new attempt.', exit };
   }
-  return { kind: 'ok', attempt, exit, heldExit, previewMode };
+  return { kind: 'ok', attempt, exit, heldExit, noun: home === 'mock' ? 'mock' : 'paper', previewMode };
 }
 
 // originSource's read (04.12): a student's own chain through
@@ -300,7 +315,7 @@ export async function loadRunner(
 ): Promise<RunnerLoad> {
   const checked = await checkSession(gate, params);
   if (checked.kind === 'error') return checked;
-  const { attempt, exit, heldExit, previewMode } = checked;
+  const { attempt, exit, heldExit, noun, previewMode } = checked;
 
   // 04.12: a finished sitting whose results are held opens as its date —
   // no question, no answer, no score reaches the page. The admin's preview
@@ -309,7 +324,27 @@ export async function loadRunner(
     return {
       kind: 'held',
       exit: heldExit,
-      held: { displayLabel: attempt.display_label, resultsAt: attempt.results_at, endedAt: attempt.ended_utc },
+      held: {
+        displayLabel: attempt.display_label,
+        resultsAt: attempt.results_at,
+        endedAt: attempt.ended_utc,
+        answers: attempt.review !== 'never',
+      },
+    };
+  }
+
+  // 04.13: a finished sitting of a paper whose review is closed (or not
+  // allowed) opens as that line and its report, the summary — no question
+  // or answer reaches the page. The admin's preview opens the review.
+  if (attempt.status === 'completed' && attempt.review_closed && !previewMode) {
+    return {
+      kind: 'review-closed',
+      exit: heldExit,
+      closed: {
+        displayLabel: attempt.display_label,
+        line: reviewClosedLine(attempt.review, attempt.review_closes_at, noun),
+        reportHref: reportHref(attempt.attempt_id),
+      },
     };
   }
 
@@ -323,7 +358,17 @@ export async function loadRunner(
   // cannot do what Learning does (Check Answer waits for the date), so it
   // waits too, on the held screen; it opens again on the date.
   if (!previewMode && attempt.held && attempt.results_at && attempt.mode === 'UNTIMED_LEARNING') {
-    return { kind: 'held', exit: heldExit, held: { displayLabel: attempt.display_label, resultsAt: attempt.results_at, endedAt: null } };
+    return { kind: 'held', exit: heldExit, held: { displayLabel: attempt.display_label, resultsAt: attempt.results_at, endedAt: null, answers: attempt.review !== 'never' } };
+  }
+
+  // 04.13: likewise a Learning sitting going when the review closed — it
+  // cannot do what Learning does (Check Answer is refused).
+  if (!previewMode && attempt.review_closed && attempt.mode === 'UNTIMED_LEARNING') {
+    return {
+      kind: 'review-closed',
+      exit: heldExit,
+      closed: { displayLabel: attempt.display_label, line: reviewClosedLine(attempt.review, attempt.review_closes_at, noun), reportHref: null },
+    };
   }
 
   // A live sitting: the card's data only. The count and the progress are
@@ -355,6 +400,10 @@ export async function loadRunner(
       secondsLeft,
       sittings: previewMode ? null : await sittingsOf(gate, attempt),
       resultsAt: !previewMode && attempt.held && attempt.results_at ? attempt.results_at : null,
+      reviewNote:
+        !previewMode && attempt.review_closed
+          ? `${reviewClosedLine(attempt.review, attempt.review_closes_at, noun)} This sitting shows your score and report, not the answers.`
+          : null,
     },
   };
 }

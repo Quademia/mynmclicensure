@@ -25,8 +25,9 @@ import { notFound, redirect } from 'next/navigation';
 import { requireStudent } from '@/lib/access';
 import { getCourseById } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
-import { getOwnAttempt } from '@/lib/attempts/queries';
-import { formatResultsAt, formatResultsDay } from '@/lib/quizzes/results-date';
+import { getOwnAttempt, originSource } from '@/lib/attempts/queries';
+import { createServiceRoleClient } from '@/lib/supabase/server';
+import { formatResultsAt, formatResultsDay, reviewClosedLine } from '@/lib/quizzes/results-date';
 import { retakeOpen } from '@/lib/attempts/runner-load';
 import { isFreeSitting } from '@/lib/attempts/free-sitting';
 import { modeOf } from '@/lib/attempts/modes';
@@ -80,7 +81,10 @@ export default async function ReportPage({ params }: { params: Promise<{ attempt
         <PageHeader title={heldLabel} />
         <div className="card srp-notice">
           <p className="srp-notice-title">Results on {formatResultsDay(attempt.results_at)}</p>
-          <p>Your score, your report and the answers come out on {formatResultsAt(attempt.results_at)}.</p>
+          <p>
+            {attempt.review === 'never' ? 'Your score and your report' : 'Your score, your report and the answers'} come out on{' '}
+            {formatResultsAt(attempt.results_at)}.
+          </p>
         </div>
       </div>
     );
@@ -89,7 +93,10 @@ export default async function ReportPage({ params }: { params: Promise<{ attempt
   const [access, course, rows, retakeAllowed, free] = await Promise.all([
     getStudentCourseAccess(supabase, profile.user_id),
     getCourseById(supabase, attempt.course_id),
-    readReportRows(supabase, attempt.attempt_id),
+    // the service role (04.13): while the review is closed the student's own
+    // client cannot read the rows; the sitting is theirs (read above), and
+    // only the sums below reach the page
+    readReportRows(createServiceRoleClient(), attempt.attempt_id),
     retakeOpen(gate, attempt),
     isFreeSitting(attempt),
   ]);
@@ -128,6 +135,16 @@ export default async function ReportPage({ params }: { params: Promise<{ attempt
       </div>
     );
   }
+
+  // 04.13: the review closed (or not allowed) — the summary stays; the
+  // review, the question map and its numbers do not reach the page
+  const closedLine = attempt.review_closed
+    ? reviewClosedLine(
+        attempt.review,
+        attempt.review_closes_at,
+        (await originSource(attempt, (id) => getOwnAttempt(profile.user_id, id))) === 'mock' ? 'mock' : 'paper',
+      )
+    : null;
 
   const M = modeOf(attempt.mode);
   const when = attempt.ts_iso
@@ -176,10 +193,12 @@ export default async function ReportPage({ params }: { params: Promise<{ attempt
           </dl>
         ) : null}
         <div className="srp-actions">
-          <AppLink className="btn btn-primary" href={sessionHref(attempt.attempt_id)}>
-            <Icon name="book-open" />
-            Review answers
-          </AppLink>
+          {closedLine ? null : (
+            <AppLink className="btn btn-primary" href={sessionHref(attempt.attempt_id)}>
+              <Icon name="book-open" />
+              Review answers
+            </AppLink>
+          )}
           {retakeAllowed ? <RetakeButton attemptId={attempt.attempt_id} /> : null}
         </div>
       </section>
@@ -190,8 +209,9 @@ export default async function ReportPage({ params }: { params: Promise<{ attempt
         breakdowns={offeredBreakdowns(rows)}
         fixTopics={fixTopics(rows)}
         anyTopicJudged={anyTopicJudged(rows)}
-        outcomes={rows.map(outcomeOf)}
-        slowest={time?.slowest ?? []}
+        outcomes={closedLine ? [] : rows.map(outcomeOf)}
+        slowest={closedLine ? [] : time?.slowest ?? []}
+        reviewClosed={closedLine}
       />
     </div>
   );

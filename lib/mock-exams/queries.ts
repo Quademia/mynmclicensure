@@ -14,7 +14,8 @@
 // Past mocks: every mock the student sat that is neither open nor coming,
 // whatever its status since (Sam, 2026-10-13), so it is read by the ids of
 // the student's own sittings as well. Each mock carries its results date
-// (04.12), held or not on the same clock as its availability.
+// (04.12), held or not on the same clock as its availability, and its
+// review (04.13), closed or not on that clock too.
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import type { Profile } from '@/lib/auth/profile';
@@ -27,6 +28,7 @@ import { topCardFor } from '@/lib/dashboard/student/status';
 import { getQuizAvailability } from '@/lib/quizzes/availability';
 import { orderModes } from '@/lib/attempts/modes';
 import type { AttemptMode } from '@/lib/attempts/types';
+import type { ReviewSetting } from '@/lib/quizzes/results-date';
 import { slices } from '@/lib/supabase/read-all';
 import { paperView, resumable, startable, type PaperRow, type PaperView } from '@/lib/practice-papers/derive';
 import { paperAccessByCourse, type PracticePapers } from '@/lib/practice-papers/queries';
@@ -65,10 +67,12 @@ type MockRowRead = {
   publish_at: string | null;
   unpublish_at: string | null;
   results_at: string | null;
+  review: ReviewSetting;
+  review_closes_at: string | null;
 };
 
 const MOCK_COLUMNS =
-  'quiz_id, course_id, title, n, allowed_modes, first_mode, sittings_allowed, time_limit_sec, published, status, publish_at, unpublish_at, results_at';
+  'quiz_id, course_id, title, n, allowed_modes, first_mode, sittings_allowed, time_limit_sec, published, status, publish_at, unpublish_at, results_at, review, review_closes_at';
 
 function byCloseThenTitle(a: MockView, b: MockView): number {
   const ca = a.unpublish_at ? Date.parse(a.unpublish_at) : Infinity;
@@ -137,10 +141,12 @@ export async function loadMockExams(supabase: ServerSupabaseClient, profile: Pro
       in_trial: false,
       sittings_allowed: q.sittings_allowed,
       results_at: q.results_at,
+      review: q.review,
+      review_closes_at: q.review_closes_at,
     };
     const mocks = accessBy[q.course_id]?.mocks ?? false;
     return {
-      ...paperView(row, mocks ? 'all' : 'none', attempts, now),
+      ...paperView(row, mocks ? 'all' : 'none', attempts, now, 'mock'),
       course_title: titleOf.get(q.course_id) ?? q.course_id,
       unpublish_at: q.unpublish_at,
     };

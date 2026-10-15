@@ -150,7 +150,8 @@ export function AbandonSitting({
 
 /** Practise again: the box with the paper's ways. While the paper's results
  *  are held (04.12) the caller passes only the first mode's way, and `note`
- *  says when the others open. */
+ *  says when the others open. While its review is closed (04.13) the caller
+ *  leaves Learning out, and passes no box when no way is left. */
 export function PractiseAgain({
   quizId,
   title,

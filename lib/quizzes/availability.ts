@@ -14,7 +14,7 @@
 //   5. all clear            → ACTIVE
 
 import type { AttemptMode } from '@/lib/attempts/types';
-import { resultsHeld } from './results-date';
+import { resultsHeld, reviewClosed } from './results-date';
 import type { Availability, Quiz } from './types';
 
 type Scheduled = Pick<Quiz, 'status' | 'published' | 'publish_at' | 'unpublish_at'>;
@@ -35,7 +35,7 @@ export function getQuizAvailability(quiz: Scheduled, now: Date = new Date()): Av
 // results are held (04.12) only the first sitting's mode is offered —
 // create_attempt refuses the same, naming the paper or the mock.
 export function startRefusal(
-  quiz: Scheduled & Pick<Quiz, 'allowed_modes' | 'first_mode' | 'results_at'>,
+  quiz: Scheduled & Pick<Quiz, 'allowed_modes' | 'first_mode' | 'results_at' | 'review' | 'review_closes_at'>,
   mode: AttemptMode,
   now: Date = new Date(),
 ): string | null {
@@ -44,6 +44,11 @@ export function startRefusal(
   if (!(quiz.allowed_modes ?? []).includes(mode)) return 'This mode is not available for this quiz.';
   if (resultsHeld(quiz.results_at, now) && quiz.first_mode && mode !== quiz.first_mode) {
     return 'Until its results are out, this can only be sat in its first mode.';
+  }
+  // 04.13: while the review is closed Learning shuts — it shows each
+  // answer; the other modes show the summary only (Sam, 2026-10-15)
+  if (mode === 'UNTIMED_LEARNING' && reviewClosed(quiz.review, quiz.review_closes_at, now)) {
+    return 'The answers to this are not shown any more, so Learning is not open.';
   }
   return null;
 }

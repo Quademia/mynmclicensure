@@ -83,7 +83,7 @@ before then, and the old list's history, is in
 - ✅ 04.10 Sittings allowed — papers and mocks; every sitting counts, one at a time; start screen always — 2026-10-14
 - ✅ 04.11 A mock's first sitting in its own mode — the database and the mock form; its page with 04.15 — 2026-10-14
 - ✅ 04.12 Results on a date — papers and mocks; everything held to the date, by the database (student_attempts(), the score columns and a held sitting's rows out of the browser's reach); only the first mode while held, the number of sittings the admin's; the admin's Results field and hint; pop-up B and held sitting A — 2026-10-15
-- ⬜ 04.13 A review period — N days after results, then the review and Practise again lock; papers and mocks
+- ✅ 04.13 The review — Always / Until a date / Not allowed (Sam, in place of N days): its own date, independent of results; while closed the score and summary stay, the question review and map close, only Learning shuts; the database holds it; the form's refusals and warning — 2026-10-15
 - ⬜ 04.14 At the close — an untimed sitting finished at the close; the card's Resume follows the sitting's mode
 - ⬜ 04.15 The Mock exams page redesigned — by time: Open now, Coming up, Past mocks; a mock's own page
 - ✅ 04.16 The mock form refuses a live mock holding a draft question — says how many — 2026-10-14

@@ -22,7 +22,7 @@ import type { Metadata } from 'next';
 import { requireStudent } from '@/lib/access';
 import { loadRunner } from '@/lib/attempts/runner-load';
 import { QuizRunner } from '@/components/runner/quiz-runner';
-import { ResultsHeld } from '@/components/runner/results-held';
+import { ResultsHeld, ReviewClosed } from '@/components/runner/results-held';
 import { RunnerError } from '@/components/runner/runner-error';
 import { SessionStart } from '@/components/runner/session-start';
 import '@/styles/runner.css';
@@ -52,6 +52,7 @@ export default async function SessionPage({
   if (load.kind === 'error') return <RunnerError title={load.title} message={load.message} exit={load.exit} />;
   if (load.kind === 'start') return <SessionStart card={load.card} exit={load.exit} previewMode={load.previewMode} />;
   if (load.kind === 'held') return <ResultsHeld held={load.held} exit={load.exit} />;
+  if (load.kind === 'review-closed') return <ReviewClosed closed={load.closed} exit={load.exit} />;
 
   return (
     <QuizRunner

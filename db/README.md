@@ -79,7 +79,8 @@ in a chat.
   columns: a student's scores reach the pages only through
   `student_attempts()` (service role), empty while a paper's or mock's
   `results_at` has yet to come, and a held sitting's `attempt_items` rows
-  are not readable by its owner until then.
+  are not readable by its owner until then — nor, since 04.13, a sitting's
+  rows while its paper's `review` is closed.
 - Storage buckets are global to the project, so they carry the
   `licensure-gh-` prefix and are created by the migration that needs
   them (`insert into storage.buckets`). One so far:

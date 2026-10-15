@@ -71,7 +71,7 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
   stats keep papers and mocks apart and show retakes and abandons
   separately.
 
-### A paper's and a mock's settings *(04.10, 04.11 built 2026-10-14; 04.12 built 2026-10-15; to build: 04.13, 04.14)*
+### A paper's and a mock's settings *(04.10, 04.11 built 2026-10-14; 04.12, 04.13 built 2026-10-15; to build: 04.14)*
 
 Papers and mocks carry the same settings (Sam, 2026-10-13: "they are
 the same settings almost"). Drawn with the Mock exams page at
@@ -117,15 +117,25 @@ https://claude.ai/artifact/5QQCWH9ECauT7k69cUUxC3 (board B).
   were answered) and a held sitting opened again — were drawn and picked
   at https://claude.ai/artifact/WAmbBUrhVzsy5scNkfQD1k (pop-up B, held
   sitting A). *(built 2026-10-15)*
-- **Review period** — "Review open for N days after results"; empty is
-  no limit. Counted per student from their own results (from the date
-  when results are held), since a mock reused across groups gives each
-  student their results at a different time. After it the score, the
-  report's summary and the sittings stay; the question-by-question
-  review and the question map's way into it lock — "The review of this
-  mock closed on 20 November" — and Practise again closes with it (a
-  Learning sitting would hand the review back). The server holds it; it
-  is F2's lock (03) with a date. *(to build: 04.13)*
+- **Review** — Always (the default), Until a date and time, or Not
+  allowed (Sam, 2026-10-15, replacing "open for N days after results"):
+  its own date, one for every student, independent of the results date —
+  before the results date nothing is reviewed anyway (04.12); after the
+  review's close nothing is, whatever the mode. Not allowed: the score
+  and the summary only, ever. While closed the score, the report's
+  summary (its topic breakdown and what to fix next included) and the
+  sittings stay; the question-by-question review and the question map
+  close — "The review of this mock closed on 4 November." / "The answers
+  to this mock are not shown." — and only Learning shuts among the ways
+  to practise (Sam: the other modes show the summary only); a sitting
+  finished then shows its score and counts, no Review answers. While
+  open with a date the card says "Review open until …". The form refuses
+  Until with no date, a close on or before the results date ("choose Not
+  allowed"), Not allowed with Learning ticked, and Until with a Learning
+  first sitting; it warns when students could sit after the close. The
+  settings are live, not copied to a sitting (Sam): the form says
+  changes reach sittings already taken. The database holds it. *(built
+  2026-10-15)*
 - **When a paper or mock closes** — no new sitting starts. A timed
   sitting started before the close runs to the end of its own clock; an
   untimed one is finished at the close, scored on what was answered, the
@@ -324,8 +334,9 @@ and "instant runner", which predate the four modes.
   the mock editor, mode ticks under Study and Exam and, to build,
   "First sitting in" as on a paper (04.11, built 2026-10-14). Both
   editors: Sittings allowed beside "First sitting in" (04.10, built
-  2026-10-14); to build, Results (Immediately / On a date and time) and
-  Review open for N days (04.12, 04.13). The "Open in trial"
+  2026-10-14); Results (Immediately / On a date and time) and Review
+  (Always / Until a date and time / Not allowed) (04.12, 04.13, built
+  2026-10-15). The "Open in trial"
   tick on a paper (03). The mock list shows 50 at a time.
 - **The mock form refuses a live mock holding a draft question** —
   Active and Published are refused while any of its questions is a

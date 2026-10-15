@@ -57,7 +57,8 @@ export function ResultsPopup({
   summary: ResultsSummary;
   /** The sitting's report page; null in the admin's preview (the report is the student's own). */
   reportHref: string | null;
-  onReview: () => void;
+  /** null: the review is closed (04.13) — no Review answers. */
+  onReview: (() => void) | null;
   onClose: () => void;
   /** Shown only where a retake is allowed. */
   retake: { onClick: () => void; pending: boolean } | null;
@@ -96,9 +97,11 @@ export function ResultsPopup({
               <Icon name="chart" />See your report
             </AppLink>
           ) : null}
-          <button type="button" className={reportHref ? 'btn btn-ghost' : 'btn btn-primary'} onClick={onReview}>
-            <Icon name="book-open" />Review answers
-          </button>
+          {onReview ? (
+            <button type="button" className={reportHref ? 'btn btn-ghost' : 'btn btn-primary'} onClick={onReview}>
+              <Icon name="book-open" />Review answers
+            </button>
+          ) : null}
           {retake ? (
             <button type="button" className="btn btn-ghost" disabled={retake.pending} onClick={retake.onClick}>
               <Icon name="refresh" />{retake.pending ? 'Starting…' : 'Retake'}
@@ -119,6 +122,8 @@ export type HeldSummary = {
   total: number;
   timeTakenS: number | null;
   modeName: string;
+  /** 04.13: false when the review is Not allowed. */
+  answers: boolean;
 };
 
 export function ResultsHeldPopup({
@@ -141,7 +146,9 @@ export function ResultsHeldPopup({
         <ResultsHeldMark />
         <div className="results-held-pop-lead">Your results come out on</div>
         <div className="results-held-pop-date">{formatResultsAt(s.resultsAt)}</div>
-        <p className="results-held-pop-note">Your score, your report and the answers will be here then.</p>
+        <p className="results-held-pop-note">
+          {s.answers ? 'Your score, your report and the answers will be here then.' : 'Your score and your report will be here then.'}
+        </p>
 
         <dl className="results-pop-facts">
           <dt>Mode</dt>

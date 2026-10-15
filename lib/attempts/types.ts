@@ -49,6 +49,14 @@ export type Attempt = {
    */
   results_at?: string | null;
   held?: boolean;
+  /**
+   * 04.13, from student_attempts() only: the paper's or mock's review
+   * setting ('always' | 'until' | 'never'), its closing date, and whether
+   * it is closed now — then the score and summary stay, the answers do not.
+   */
+  review?: string | null;
+  review_closes_at?: string | null;
+  review_closed?: boolean;
 };
 
 // One row of attempt_items (03 Q4): the question as the bank served it
@@ -230,8 +238,29 @@ export type SpawnResult = { ok: true; attemptId: string } | { ok: false; error: 
  * (04.12): then the date and what was saved, and neither score nor secret.
  */
 export type FinishResult =
-  | { ok: true; held: false; score: Score; secrets: SecretsMap; /** the stored time taken (03 Q18's pop-up) */ timeTakenS: number | null }
-  | { ok: true; held: true; resultsAt: string; answered: number; total: number; timeTakenS: number | null }
+  | {
+      ok: true;
+      held: false;
+      score: Score;
+      secrets: SecretsMap;
+      /** the stored time taken (03 Q18's pop-up) */
+      timeTakenS: number | null;
+      /**
+       * 04.13: the paper's review is closed — the score and the counts (the
+       * runner cannot count without the key), no secret half, and the line.
+       */
+      reviewClosed: { line: string; correct: number; wrong: number; unanswered: number } | null;
+    }
+  | {
+      ok: true;
+      held: true;
+      resultsAt: string;
+      answered: number;
+      total: number;
+      timeTakenS: number | null;
+      /** 04.13: false when the paper's review is Not allowed — the answers never come. */
+      answers: boolean;
+    }
   | { ok: false; error: string };
 
 /** Sequential's move (§8 S21): the position now current, or null when every question is passed. */
@@ -272,6 +301,9 @@ export type AttemptListRow = Pick<
   | 'ts_iso'
   | 'results_at'
   | 'held'
+  | 'review'
+  | 'review_closes_at'
+  | 'review_closed'
 >;
 
 /** The four database-side filters (course, status, mode, a label search). */

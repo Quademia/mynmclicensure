@@ -17,9 +17,10 @@
 
 import type { ReactNode } from 'react';
 import type { SessionExit } from '@/lib/attempts/links';
-import type { HeldSitting } from '@/lib/attempts/runner-load';
+import type { ClosedSitting, HeldSitting } from '@/lib/attempts/runner-load';
 import { formatResultsAt, formatResultsDay } from '@/lib/quizzes/results-date';
 import { AppLink } from '@/components/shell/link-pending';
+import { Icon } from '@/components/shell/icons';
 
 /** The pale-teal circle with a clock: the held screen's mark, and the held pop-up's. */
 export function ResultsHeldMark() {
@@ -43,6 +44,38 @@ export function ResultsHeldMark() {
   );
 }
 
+/**
+ * 04.13: a sitting of a paper or mock whose review is closed (or not
+ * allowed). The same calm card: a lock where the clock is, the line the
+ * review says ("The review of this mock closed on 4 November."), the
+ * report — its summary stays — and the way back. Nothing of the questions.
+ */
+export function ReviewClosed({ closed, exit, children }: { closed: ClosedSitting; exit: SessionExit; children?: ReactNode }) {
+  return (
+    <div className="runner">
+      {children}
+      <div className="runner-wrap">
+        <div className="held-screen">
+          <div className="results-held-mark">
+            <Icon name="lock" size={28} />
+          </div>
+          <div className="held-title">{closed.displayLabel || 'This sitting'}</div>
+          <p className="held-msg">
+            {closed.line}
+            {closed.reportHref ? ' Your score and your report are kept.' : ''}
+          </p>
+          <div className="held-actions">
+            {closed.reportHref ? (
+              <AppLink className="btn btn-primary" href={closed.reportHref}>See your report</AppLink>
+            ) : null}
+            <AppLink className={closed.reportHref ? 'btn btn-ghost' : 'btn btn-primary'} href={exit.href}>{exit.label}</AppLink>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ResultsHeld({ held, exit, children }: { held: HeldSitting; exit: SessionExit; children?: ReactNode }) {
   // the submitted sentence only when the end is known
   const submitted = held.endedAt
@@ -56,7 +89,9 @@ export function ResultsHeld({ held, exit, children }: { held: HeldSitting; exit:
           <ResultsHeldMark />
           <div className="held-title">Results on {formatResultsDay(held.resultsAt)}</div>
           <p className="held-msg">
-            {submitted}Your score, your report and the answers come out on {formatResultsAt(held.resultsAt)}.
+            {submitted}
+            {held.answers ? 'Your score, your report and the answers' : 'Your score and your report'} come out on{' '}
+            {formatResultsAt(held.resultsAt)}.
           </p>
           <AppLink className="btn btn-primary" href={exit.href}>{exit.label}</AppLink>
         </div>
