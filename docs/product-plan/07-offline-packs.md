@@ -84,8 +84,11 @@ connection**, and a printable PDF of the same pack.
     package", Choose a package; earlier packs still show and open.
   - **The menu**: one row, My packs (Build a pack is on the page, under
     each course); the phone bar's Offline tab opens it.
-- Next: the drawings — My packs (online, offline, empty, locked), a
-  pack's page, the offline player, the PDF.
+- Drawn at phone size at https://claude.ai/artifact/NrEnZUieGVsFmZkZEmjbFm
+  (2026-10-15): My packs online A (sections) and B (course cards),
+  offline, empty, locked; a pack's page; Practise's choice; the offline
+  player both ways; the PDF's cover, a questions page, the answers page.
+  Sam to pick and mark up.
 
 ## How it works today
 
