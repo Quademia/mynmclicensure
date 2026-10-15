@@ -49,8 +49,8 @@ const LINE = '#e5e7eb';
 const TINT = '#f9fafb';
 
 /**
- * The pattern's strength. Sam: print one page on an ordinary printer and set
- * it from that; 0.08 is the drawing's.
+ * The pattern's strength: the drawing's, kept after Sam printed a page on an
+ * ordinary printer (2026-10-15).
  */
 export const PATTERN_OPACITY = 0.08;
 

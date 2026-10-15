@@ -117,8 +117,8 @@ connection**, and a printable PDF of the same pack.
   record of each download, if leaks start. When built: print one page
   on an ordinary printer to set the pattern's strength. *Built 2026-10-15:
   the pattern is faint text behind each page in the PDF's own font, at
-  the drawing's strength (`PATTERN_OPACITY` in lib/offline-packs/pdf-doc.ts,
-  for Sam's print test); the footer line; the name, masked email and pack
+  the drawing's strength (`PATTERN_OPACITY` 0.08 in
+  lib/offline-packs/pdf-doc.ts; Sam printed a page and kept it); the footer line; the name, masked email and pack
   code in the file's details; "no copying", "no editing" locked with a
   password made fresh for each file and never kept. Not yet: a PDF from
   the offline screen with no signal (the maker would have to be kept on
