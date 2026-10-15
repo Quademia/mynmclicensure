@@ -31,7 +31,7 @@ import {
 } from '@/lib/practice-papers/derive';
 import type { MockExams, MockView } from '@/lib/mock-exams/queries';
 import { AbandonSitting, LaunchButton, PractiseAgain } from '@/components/practice-papers/paper-actions';
-import { FirstSittingLines, Sitting, waysOf } from '@/components/practice-papers/screens';
+import { ClosedGoing, FirstSittingLines, Sitting, waysOf } from '@/components/practice-papers/screens';
 import '@/styles/practice-papers.css';
 
 const LIST = '/student/mock-exams';
@@ -219,6 +219,8 @@ export function MockScreen({ mock, ended }: { mock: MockView; ended: MockExams['
   const waysLine = others && mock.sittingsLeft !== 0 ? otherWaysLine(mock) : null;
   const canResume = going ? resumable(mock, going) : false;
   const ways = waysOf(mock);
+  // 04.14: a sitting still going after the mock closed
+  const closedGoing = going && mock.availability === 'CLOSED' ? going : null;
 
   // After the first sitting: Practise again while the mock is open and a
   // sitting is left; with a limit, one at a time, so a sitting going is resumed.
@@ -240,7 +242,7 @@ export function MockScreen({ mock, ended }: { mock: MockView; ended: MockExams['
       <div className="card pp-card">
         <span className="pp-eyebrow">Your first sitting</span>
         <FirstSittingLines a={done} />
-        {!active ? <span className="pp-line">This mock has closed.</span> : mock.open ? limit : null}
+        {closedGoing ? null : !active ? <span className="pp-line">This mock has closed.</span> : mock.open ? limit : null}
         {review}
         {report || again ? (
           <div className="pp-actions">
@@ -255,6 +257,7 @@ export function MockScreen({ mock, ended }: { mock: MockView; ended: MockExams['
             sittingsAllowed={mock.sittings_allowed}
           />
         ) : null}
+        {closedGoing ? <ClosedGoing going={closedGoing} noun="mock" /> : null}
       </div>
     );
   } else if (!mock.open && !going) {
@@ -274,8 +277,14 @@ export function MockScreen({ mock, ended }: { mock: MockView; ended: MockExams['
         {limit}
         {results}
         {review}
-        {canResume ? <LaunchButton kind="mock" quizId={mock.quiz_id} mode={going.mode} label="Resume" /> : null}
-        <AbandonSitting attemptId={going.attempt_id} sittingsAllowed={mock.sittings_allowed} />
+        {closedGoing ? (
+          <ClosedGoing going={closedGoing} noun="mock" />
+        ) : (
+          <>
+            {canResume ? <LaunchButton kind="mock" quizId={mock.quiz_id} mode={going.mode} label="Resume" /> : null}
+            <AbandonSitting attemptId={going.attempt_id} sittingsAllowed={mock.sittings_allowed} />
+          </>
+        )}
       </div>
     );
   } else if (!active) {

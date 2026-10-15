@@ -17,6 +17,7 @@ import { reportHref, sessionHref } from '@/lib/attempts/links';
 import type { AttemptMode, AttemptWithProgress } from '@/lib/attempts/types';
 import { formatResultsAt } from '@/lib/quizzes/results-date';
 import {
+  closedGoingWay,
   courseLine,
   formatDay,
   formatMinutes,
@@ -222,6 +223,19 @@ export function waysOf(paper: PaperView): Way[] {
   });
 }
 
+/** 04.14: a sitting going after the close — the line, and a link straight to it. */
+export function ClosedGoing({ going, noun }: { going: AttemptWithProgress; noun: 'paper' | 'mock' }) {
+  const way = closedGoingWay(going, noun);
+  return (
+    <>
+      {way.line ? <span className="pp-line">{way.line}</span> : null}
+      {way.label ? (
+        <AppLink href={sessionHref(going.attempt_id)} className="btn btn-lg btn-accent">{way.label}</AppLink>
+      ) : null}
+    </>
+  );
+}
+
 export function Sitting({ a }: { a: AttemptWithProgress }) {
   const done = a.status === 'completed';
   const name = (
@@ -305,6 +319,8 @@ export function PaperScreen({ course, paper, ended }: { course: CourseView; pape
   const waysLine = others && paper.sittingsLeft !== 0 ? otherWaysLine(paper) : null;
   const canResume = going ? resumable(paper, going) : false;
   const ways = waysOf(paper);
+  // 04.14: a sitting still going after the paper closed
+  const closedGoing = going && paper.availability === 'CLOSED' ? going : null;
 
   // After the first sitting: Practise again, unless no sitting is left;
   // with a limit, one sitting at a time, so a sitting going is resumed.
@@ -349,9 +365,10 @@ export function PaperScreen({ course, paper, ended }: { course: CourseView; pape
             sittingsAllowed={paper.sittings_allowed}
           />
         ) : null}
+        {closedGoing ? <ClosedGoing going={closedGoing} noun="paper" /> : null}
       </div>
     );
-  } else if (paper.availability !== 'ACTIVE') {
+  } else if (paper.availability !== 'ACTIVE' && !closedGoing) {
     card = (
       <div className="card pp-card">
         <span className="pp-eyebrow">{modeName(paper.first_mode)}</span>
@@ -369,8 +386,14 @@ export function PaperScreen({ course, paper, ended }: { course: CourseView; pape
         {limit}
         {results}
         {review}
-        {canResume ? <LaunchButton quizId={paper.quiz_id} mode={going.mode} label="Resume" /> : null}
-        <AbandonSitting attemptId={going.attempt_id} sittingsAllowed={paper.sittings_allowed} />
+        {closedGoing ? (
+          <ClosedGoing going={closedGoing} noun="paper" />
+        ) : (
+          <>
+            {canResume ? <LaunchButton quizId={paper.quiz_id} mode={going.mode} label="Resume" /> : null}
+            <AbandonSitting attemptId={going.attempt_id} sittingsAllowed={paper.sittings_allowed} />
+          </>
+        )}
       </div>
     );
   } else {

@@ -72,3 +72,32 @@ export function reviewLine(
   if (review === 'until' && closesAt) return `Review open until ${formatResultsAt(closesAt)}.`;
   return null;
 }
+
+// ── the close (04.14; Sam, 2026-10-13/15) ───────────────────────────────
+// After a paper or mock closes no sitting starts. A timed sitting whose
+// clock is running keeps it to the end; any other sitting going is due —
+// finished at the close on what was answered, or Abandoned with no answer —
+// the next time it is opened (expire_attempt) or an answer is saved (the
+// database refuses with "This paper has closed."). The pages' copy.
+
+/** A sitting going whose paper has closed and which has no clock running. */
+export function closeDue(
+  a: { status: string; mode: string; started_utc: string | null; closes_at?: string | null },
+  now: Date = new Date(),
+): boolean {
+  if (a.status !== 'in_progress' || !a.closes_at) return false;
+  if (new Date(a.closes_at).getTime() >= now.getTime()) return false;
+  return !(a.mode.startsWith('TIMED_') && a.started_utc);
+}
+
+/** The database's refusal of a save, a check, Submit or Start past the close. */
+export function isCloseRefusal(message: string | null | undefined): boolean {
+  return /^This (paper|mock) has closed\.$/.test(String(message ?? '').trim());
+}
+
+/** The line a sitting finished (or abandoned) at the close carries. */
+export function closedSittingLine(noun: string, closesAt: string, scored: boolean): string {
+  return scored
+    ? `This ${noun} closed on ${formatResultsAt(closesAt)}, so your sitting was finished on what you had answered.`
+    : `This ${noun} closed on ${formatResultsAt(closesAt)} before any question was answered, so this sitting was not scored.`;
+}

@@ -57,6 +57,12 @@ export type Attempt = {
   review?: string | null;
   review_closes_at?: string | null;
   review_closed?: boolean;
+  /**
+   * 04.14, from student_attempts() only: the paper's or mock's close
+   * (unpublish_at). A sitting going past it with no clock running is
+   * finished there (closeDue, lib/quizzes/results-date).
+   */
+  closes_at?: string | null;
 };
 
 // One row of attempt_items (03 Q4): the question as the bank served it

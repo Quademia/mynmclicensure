@@ -31,7 +31,7 @@ import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import type { AuthGateResult } from '@/lib/access';
 import { isFreeSitting } from './free-sitting';
 import { SESSION_EXITS, quizPageExit, reportHref, type SessionExit } from './links';
-import { reviewClosedLine } from '@/lib/quizzes/results-date';
+import { closeDue, closedSittingLine, reviewClosedLine } from '@/lib/quizzes/results-date';
 import { modeOf } from './modes';
 import { getAttemptById, getOwnAttempt, originSource, readAttemptItems } from './queries';
 import { sealItem, secretOf } from './seal';
@@ -101,9 +101,9 @@ type SessionError = { kind: 'error'; title: string; message: string; exit: Sessi
 export type RunnerLoad =
   | SessionError
   | { kind: 'start'; card: StartCard; previewMode: boolean; exit: SessionExit }
-  | { kind: 'held'; held: HeldSitting; exit: SessionExit }
-  | { kind: 'review-closed'; closed: ClosedSitting; exit: SessionExit }
-  | ({ kind: 'review'; previewMode: boolean; exit: SessionExit } & SessionPlay);
+  | { kind: 'held'; held: HeldSitting; exit: SessionExit; closeNote?: string | null }
+  | { kind: 'review-closed'; closed: ClosedSitting; exit: SessionExit; closeNote?: string | null }
+  | ({ kind: 'review'; previewMode: boolean; exit: SessionExit; closeNote?: string | null } & SessionPlay);
 
 /** What Start or Resume gets back (Q17): the questions, or a sitting that has closed meanwhile. */
 export type SessionOpen =
@@ -118,7 +118,17 @@ async function checkSession(
   gate: AuthGateResult,
   params: { attemptId: string; preview: boolean },
 ): Promise<
-  SessionError | { kind: 'ok'; attempt: Attempt; exit: SessionExit; heldExit: SessionExit; noun: 'paper' | 'mock'; previewMode: boolean }
+  | SessionError
+  | {
+      kind: 'ok';
+      attempt: Attempt;
+      exit: SessionExit;
+      heldExit: SessionExit;
+      noun: 'paper' | 'mock';
+      previewMode: boolean;
+      /** 04.14: this open finished the sitting at its paper's close — the line it says. */
+      closeNote: string | null;
+    }
 > {
   const { supabase, profile } = gate;
   // Until the attempt is read, legacy's destination.
@@ -186,11 +196,36 @@ async function checkSession(
     }
   }
 
-  // CHECK 7 — Attempt status: abandoned is the card.
+  // 04.14 — a sitting going whose paper or mock has closed, with no clock
+  // running (an untimed mode, or an exam never started), is finished at
+  // the close on this open — scored on what was answered, or Abandoned with
+  // no answer (Sam, 2026-10-15). The database decides again; the page then
+  // opens it as it now stands, with the line saying why.
+  const noun = home === 'mock' ? 'mock' : 'paper';
+  let closeNote: string | null = null;
+  if (!previewMode && attempt.closes_at && closeDue(attempt)) {
+    const closesAt = attempt.closes_at;
+    const { error } = await createServiceRoleClient().rpc('expire_attempt', {
+      p_attempt_id: attempt.attempt_id,
+      p_user_id: attempt.user_id,
+    });
+    if (error) console.error('expire_attempt (close):', error);
+    const after = await getOwnAttempt(profile.user_id, attemptId);
+    if (after) {
+      attempt = after;
+      if (after.status !== 'in_progress') closeNote = closedSittingLine(noun, closesAt, after.status === 'completed');
+    }
+  }
+
+  // CHECK 7 — Attempt status: abandoned is the card (04.14: abandoned at
+  // the close, the close's line).
+  if (attempt.status === 'abandoned' && closeNote) {
+    return { kind: 'error', title: noun === 'mock' ? 'Mock Closed' : 'Paper Closed', message: closeNote, exit: heldExit };
+  }
   if (attempt.status === 'abandoned') {
     return { kind: 'error', title: 'Attempt Abandoned', message: 'This quiz attempt was abandoned. Please start a new attempt.', exit };
   }
-  return { kind: 'ok', attempt, exit, heldExit, noun: home === 'mock' ? 'mock' : 'paper', previewMode };
+  return { kind: 'ok', attempt, exit, heldExit, noun, previewMode, closeNote };
 }
 
 // originSource's read (04.12): a student's own chain through
@@ -315,7 +350,7 @@ export async function loadRunner(
 ): Promise<RunnerLoad> {
   const checked = await checkSession(gate, params);
   if (checked.kind === 'error') return checked;
-  const { attempt, exit, heldExit, noun, previewMode } = checked;
+  const { attempt, exit, heldExit, noun, previewMode, closeNote } = checked;
 
   // 04.12: a finished sitting whose results are held opens as its date —
   // no question, no answer, no score reaches the page. The admin's preview
@@ -324,6 +359,7 @@ export async function loadRunner(
     return {
       kind: 'held',
       exit: heldExit,
+      closeNote,
       held: {
         displayLabel: attempt.display_label,
         resultsAt: attempt.results_at,
@@ -340,6 +376,7 @@ export async function loadRunner(
     return {
       kind: 'review-closed',
       exit: heldExit,
+      closeNote,
       closed: {
         displayLabel: attempt.display_label,
         line: reviewClosedLine(attempt.review, attempt.review_closes_at, noun),
@@ -351,7 +388,7 @@ export async function loadRunner(
   if (attempt.status === 'completed') {
     const play = await sessionPlay(gate, attempt, previewMode, heldExit);
     if ('kind' in play) return play.kind === 'closed' ? { kind: 'error', title: 'Quiz Not Found', message: 'This quiz attempt could not be found. It may have been deleted.', exit } : play;
-    return { kind: 'review', previewMode, exit, ...play };
+    return { kind: 'review', previewMode, exit, closeNote, ...play };
   }
 
   // 04.12: a Learning sitting begun before the admin set a results date

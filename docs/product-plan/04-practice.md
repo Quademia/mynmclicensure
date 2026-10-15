@@ -71,7 +71,7 @@ and `archive/product-plan/09-free-account-and-gamification.md` (G2).
   stats keep papers and mocks apart and show retakes and abandons
   separately.
 
-### A paper's and a mock's settings *(04.10, 04.11 built 2026-10-14; 04.12, 04.13 built 2026-10-15; to build: 04.14)*
+### A paper's and a mock's settings *(04.10, 04.11 built 2026-10-14; 04.12, 04.13, 04.14 built 2026-10-15)*
 
 Papers and mocks carry the same settings (Sam, 2026-10-13: "they are
 the same settings almost"). Drawn with the Mock exams page at
@@ -139,9 +139,15 @@ https://claude.ai/artifact/5QQCWH9ECauT7k69cUUxC3 (board B).
 - **When a paper or mock closes** — no new sitting starts. A timed
   sitting started before the close runs to the end of its own clock; an
   untimed one is finished at the close, scored on what was answered, the
-  next time it is opened or an answer is saved. The card's Resume
-  follows the same rule (today it refuses after the close, while Resume
-  in Learning History works). *(to build: 04.14)*
+  next time it is opened or an answer is saved; with no answer saved it
+  is Abandoned at the close instead — not scored, still a sitting — and an
+  exam whose Start was never pressed cannot start after the close (Sam,
+  2026-10-15). The card's Resume follows the same rule, straight to the
+  sitting: Resume while an exam's own clock runs ("Your sitting runs to
+  the end of its time."), See your score otherwise ("This paper closed on
+  20 October, so this sitting is finished on what you answered."), the
+  line alone when nothing was answered. The sitting opened, or the next
+  tap in an open one, finishes it and shows the line. *(built 2026-10-15)*
 - **What a student keeps of a closed paper or mock they sat**: the
   score, the report, the review (inside its period) and the sittings —
   no new sitting. A student whose package ended keeps the score and the

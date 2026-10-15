@@ -245,6 +245,31 @@ export function courseLine(course: CourseView): string {
   return next ? `Next: ${shortName(next.title)}` : 'All done';
 }
 
+/** 04.14: a sitting going after its paper or mock closed — the card's line
+ *  and its one way in, straight to the sitting. An exam whose own clock
+ *  still runs is resumed; any other is finished at the close when opened
+ *  ("See your score"); with nothing answered it will be Abandoned, so the
+ *  line alone. */
+export function closedGoingWay(
+  a: AttemptWithProgress,
+  noun: 'paper' | 'mock',
+  now: Date = new Date(),
+): { line: string | null; label: string | null } {
+  if (a.mode.startsWith('TIMED_') && a.started_utc) {
+    const end = new Date(a.started_utc).getTime() + (a.duration_min ?? 0) * 60_000;
+    if (end > now.getTime()) return { line: `This ${noun} has closed. Your sitting runs to the end of its time.`, label: 'Resume' };
+    return { line: null, label: 'See your score' };
+  }
+  const day = a.closes_at ? ` on ${formatDay(a.closes_at)}` : '';
+  if (!a.answered_count) {
+    return { line: `This ${noun} closed${day} before you answered any question, so this sitting won't be scored.`, label: null };
+  }
+  return {
+    line: `This ${noun} closed${day}, so this sitting is finished on what you answered.`,
+    label: a.held ? 'See your sitting' : 'See your score',
+  };
+}
+
 export function formatDay(iso: string): string {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', timeZone: 'UTC' });
 }

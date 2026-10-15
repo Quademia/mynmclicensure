@@ -51,8 +51,8 @@ export default async function SessionPage({
 
   if (load.kind === 'error') return <RunnerError title={load.title} message={load.message} exit={load.exit} />;
   if (load.kind === 'start') return <SessionStart card={load.card} exit={load.exit} previewMode={load.previewMode} />;
-  if (load.kind === 'held') return <ResultsHeld held={load.held} exit={load.exit} />;
-  if (load.kind === 'review-closed') return <ReviewClosed closed={load.closed} exit={load.exit} />;
+  if (load.kind === 'held') return <ResultsHeld held={load.held} exit={load.exit} note={load.closeNote} />;
+  if (load.kind === 'review-closed') return <ReviewClosed closed={load.closed} exit={load.exit} note={load.closeNote} />;
 
   return (
     <QuizRunner
@@ -66,6 +66,7 @@ export default async function SessionPage({
       heldExit={load.heldExit}
       retakeAllowed={load.retakeAllowed}
       initialQuestion={Number(sp.q) || null}
+      closeNote={load.closeNote ?? null}
     />
   );
 }

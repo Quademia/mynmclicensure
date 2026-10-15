@@ -82,6 +82,7 @@ import {
 } from '@/lib/attempts/scoring';
 import type { SessionExit } from '@/lib/attempts/links';
 import { modeOf } from '@/lib/attempts/modes';
+import { isCloseRefusal } from '@/lib/quizzes/results-date';
 import type { AnswerPatch, Attempt, ChosenMap, FinishResult, FlagMap, Score, SealedItem, SecretsMap } from '@/lib/attempts/types';
 import {
   close as closeClockItem,
@@ -148,6 +149,7 @@ export function QuizRunner({
   heldExit,
   retakeAllowed = false,
   initialQuestion = null,
+  closeNote = null,
 }: {
   attempt: Attempt;
   items: SealedItem[];
@@ -163,6 +165,8 @@ export function QuizRunner({
   retakeAllowed?: boolean;
   /** 03 Q10: a review opened at this question (1-based) — the report's links, `?q=`. */
   initialQuestion?: number | null;
+  /** 04.14: this open finished the sitting at its paper's close — the line saying so. */
+  closeNote?: string | null;
 }) {
   const router = useRouter();
   // The mode's row (03 Q8): the runner asks it, never the code.
@@ -222,6 +226,19 @@ export function QuizRunner({
   const [imgOverlay, setImgOverlay] = useState('');
   const [saving, setSaving] = useState<string>('');
   const [toast, setToast] = useState<string | null>(null);
+
+  // 04.14: the paper or mock closed while the sitting was open. The
+  // database refuses the save, the check or Submit ("This paper has
+  // closed."); the session page, opened again, finishes the sitting at the
+  // close on what was answered and shows it as it now stands, with the line.
+  const closingRef = useRef(false);
+  const onClosed = useCallback((message: string) => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+    setLocked(true);
+    setToast(message);
+    router.refresh();
+  }, [router]);
   // 03 Q9: the questions whose Check Answer is on its way to the server.
   const [checking, setChecking] = useState<FlagMap>({});
   // Sequential: the questions the student has moved past (the rows'
@@ -372,13 +389,17 @@ export function QuizRunner({
     if (!sending.length) return true;
     const result = await saveAnswers(attempt.attempt_id, sending);
     if (!result.ok) {
+      if (isCloseRefusal(result.error)) {
+        onClosed(result.error);
+        return false;
+      }
       console.warn('saveAnswers failed:', result.error);
       for (const r of rows) if (!pendingRef.current.has(r.item_id)) pendingRef.current.set(r.item_id, r);
     } else if (times.length) {
       markSent(clockOf(clockRef, items), times);
     }
     return result.ok;
-  }, [previewMode, reviewMode, attempt.attempt_id, items]);
+  }, [previewMode, reviewMode, attempt.attempt_id, items, onClosed]);
 
   function queueSave(patch: AnswerPatch, immediate = false) {
     if (previewMode || locked || reviewMode) return;
@@ -546,6 +567,7 @@ export function QuizRunner({
       void checkAnswer(item.attempt_item_id, letter)
         .then((r) => {
           if (r.ok) setSecrets((s) => ({ ...s, [item.item_id]: r.secret }));
+          else if (isCloseRefusal(r.error)) onClosed(r.error);
           else {
             queueSave({ item_id: item.item_id, chosen: letter });
             setToast(`Could not check this answer: ${r.error}`);
@@ -573,6 +595,7 @@ export function QuizRunner({
     void checkAnswer(item.attempt_item_id, chosen, true)
       .then((r) => {
         if (r.ok) setSecrets((s) => ({ ...s, [item.item_id]: r.secret }));
+        else if (isCloseRefusal(r.error)) onClosed(r.error);
         else {
           queueSave({ item_id: item.item_id, chosen: chosenToStored(chosen), sata_checked: true });
           setToast(`Could not check this answer: ${r.error}`);
@@ -652,6 +675,11 @@ export function QuizRunner({
         finishingRef.current = false;
         setSaving('');
         setToast('Could not submit. Please check your connection and try again.');
+        return false;
+      }
+      if (!result.ok && isCloseRefusal(result.error)) {
+        setSaving('');
+        onClosed(result.error);
         return false;
       }
       if (!result.ok) {
@@ -1268,6 +1296,7 @@ export function QuizRunner({
         <div className="runner-wrap">
           {reviewMode ?<div className="review-banner">{W.reviewBanner}</div> : null}
           {timeUp ? <div className="timeup-banner">Time is up! Your exam has been automatically submitted.</div> : null}
+          {closeNote ? <div className="timeup-banner">{closeNote}</div> : null}
 
           {phase === 'quiz' && desktopGridHidden ? (
             <button type="button" className="show-grid-btn" onClick={() => setDesktopGridHidden(false)}><Icon name="grid" />Show Grid</button>

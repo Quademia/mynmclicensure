@@ -397,9 +397,14 @@ table by table as each is next changed (AGENTS.md rule 9).
   - `save_quiz` writes both; students read both.
   - Why: papers and mocks carry the same settings, and a mock reused
     across groups needs its answers kept (Sam, 2026-10-13/15).
-- *To build (04.14), no column:* a sitting in an untimed mode still in
-  progress when its paper closes is finished at `unpublish_at`, on what
-  was answered; a timed one keeps its own clock.
+- The close (04.14, built 2026-10-15, no column): a sitting still in
+  progress when its paper's `unpublish_at` passes, with no clock running
+  (an untimed mode, or an exam never started), is finished at the close on
+  what was answered — or Abandoned there with no answer (Sam) — when it is
+  next opened (`expire_attempt`); `save_answers`, `check_answer`,
+  `finish_attempt` and `start_timed_attempt` refuse it ("This paper has
+  closed."). A timed sitting already running keeps its own clock.
+  `student_attempts()` returns `closes_at`.
 
 ### `quiz_items` — a paper's questions
 | Column | Holds |
@@ -432,7 +437,8 @@ table by table as each is next changed (AGENTS.md rule 9).
 - `results_at` (04.12, ticked 2026-10-14, built 2026-10-15): as on
   `quizzes`, under the same rules, written by `save_quiz`.
 - `review` and `review_closes_at` (04.13, ticked and built 2026-10-15):
-  as on `quizzes`, under the same rules. The close (04.14) as for papers.
+  as on `quizzes`, under the same rules. The close (04.14, built
+  2026-10-15) as for papers.
   Why: as on `quizzes`.
 - Browser: as for papers.
 

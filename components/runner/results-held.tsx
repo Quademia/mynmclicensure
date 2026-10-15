@@ -50,7 +50,7 @@ export function ResultsHeldMark() {
  * review says ("The review of this mock closed on 4 November."), the
  * report — its summary stays — and the way back. Nothing of the questions.
  */
-export function ReviewClosed({ closed, exit, children }: { closed: ClosedSitting; exit: SessionExit; children?: ReactNode }) {
+export function ReviewClosed({ closed, exit, note, children }: { closed: ClosedSitting; exit: SessionExit; note?: string | null; children?: ReactNode }) {
   return (
     <div className="runner">
       {children}
@@ -60,6 +60,7 @@ export function ReviewClosed({ closed, exit, children }: { closed: ClosedSitting
             <Icon name="lock" size={28} />
           </div>
           <div className="held-title">{closed.displayLabel || 'This sitting'}</div>
+          {note ? <p className="held-msg">{note}</p> : null}
           <p className="held-msg">
             {closed.line}
             {closed.reportHref ? ' Your score and your report are kept.' : ''}
@@ -76,7 +77,8 @@ export function ReviewClosed({ closed, exit, children }: { closed: ClosedSitting
   );
 }
 
-export function ResultsHeld({ held, exit, children }: { held: HeldSitting; exit: SessionExit; children?: ReactNode }) {
+// 04.14: `note` — the sitting was finished just now at its paper's close.
+export function ResultsHeld({ held, exit, note, children }: { held: HeldSitting; exit: SessionExit; note?: string | null; children?: ReactNode }) {
   // the submitted sentence only when the end is known
   const submitted = held.endedAt
     ? `You submitted ${held.displayLabel || 'this sitting'} on ${formatResultsDay(held.endedAt)}. `
@@ -88,6 +90,7 @@ export function ResultsHeld({ held, exit, children }: { held: HeldSitting; exit:
         <div className="held-screen">
           <ResultsHeldMark />
           <div className="held-title">Results on {formatResultsDay(held.resultsAt)}</div>
+          {note ? <p className="held-msg">{note}</p> : null}
           <p className="held-msg">
             {submitted}
             {held.answers ? 'Your score, your report and the answers' : 'Your score and your report'} come out on{' '}
