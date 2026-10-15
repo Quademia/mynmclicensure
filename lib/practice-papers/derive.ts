@@ -23,7 +23,7 @@
 
 import type { AttemptMode, AttemptWithProgress } from '@/lib/attempts/types';
 import type { Availability } from '@/lib/quizzes/types';
-import { formatResultsAt, formatResultsShort, resultsHeld, reviewClosed, reviewLine, type ReviewSetting } from '@/lib/quizzes/results-date';
+import { closeDue, formatResultsAt, formatResultsShort, resultsHeld, reviewClosed, reviewLine, type ReviewSetting } from '@/lib/quizzes/results-date';
 
 /** What a student's courses let them do with papers. `all` a package; `trial` only the trial paper; `none` nothing live. */
 export type PaperAccess = 'all' | 'trial' | 'none';
@@ -278,7 +278,8 @@ export function formatDay(iso: string): string {
  *  not its score: a held one shows its date (04.12). */
 export function rowStatus(p: PaperView): string {
   if (p.state === 'done') return (p.firstSitting && scoreWord(p.firstSitting)) ?? 'Finished';
-  if (p.state === 'in_progress') return 'In progress';
+  // 04.14: a sitting due to be finished at the paper's close is not going on
+  if (p.state === 'in_progress') return p.inProgress && closeDue(p.inProgress) ? 'Closed' : 'In progress';
   if (!p.open) return 'Opens with a package';
   if (p.availability === 'UPCOMING') return p.publish_at ? `Opens ${formatDay(p.publish_at)}` : 'Not yet open';
   if (p.availability === 'CLOSED') return 'Closed';

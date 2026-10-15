@@ -433,10 +433,9 @@ table by table as each is next changed (AGENTS.md rule 9).
   Why: a paper's questions are met first in the paper (Sam, 2026-10-11).
 
 ### `mock_quizzes`, `mock_quiz_items` — mock exams and their questions
-- The same columns as `quizzes` and `quiz_items`, plus `visibility`
-  (`ALL`, `PAID` or `TRIAL`) — stored, never checked.
-- *To build:* `visibility` removed *(10.17)* — the package's mock yes /
-  no is the gate (ticked 2026-10-04).
+- The same columns as `quizzes` and `quiz_items`. `visibility` (`ALL`,
+  `PAID` or `TRIAL`, stored, never checked) was dropped (10.17, ticked
+  2026-10-04, built 2026-10-15) — the package's mock yes / no is the gate.
 - `first_mode` and `sittings_allowed` (04.11, 04.10, ticked 2026-10-14,
   built the same day): as on `quizzes` — Free Navigation on a new mock,
   the two mocks there were taking Free Navigation; `create_attempt`

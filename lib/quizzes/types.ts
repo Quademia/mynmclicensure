@@ -1,8 +1,8 @@
 // lib/quizzes/types.ts
 //
 // Fixed quizzes and mock exams as the app reads them (slice 5a): one row
-// shape for both tables (db/schema.sql) — mock_quizzes adds `visibility`,
-// which legacy stored and never set or checked, so it is optional here.
+// shape for both tables (db/schema.sql); mock_quizzes' unused `visibility`
+// was dropped (10.17, 2026-10-15).
 // Column names are the legacy ones. The constant lists are the legacy
 // admin pages' <select> options, in their order. Constants live here,
 // not in actions.ts — a 'use server' module exports only async functions
@@ -36,9 +36,6 @@ export type AllowedModes = AttemptMode[];
 export const QUIZ_STATUSES = ['draft', 'active', 'archived'] as const;
 export type QuizStatus = (typeof QUIZ_STATUSES)[number];
 
-export const MOCK_VISIBILITIES = ['ALL', 'PAID', 'TRIAL'] as const;
-export type MockVisibility = (typeof MOCK_VISIBILITIES)[number];
-
 export type Quiz = {
   quiz_id: string;
   course_id: string;
@@ -67,8 +64,6 @@ export type Quiz = {
   notes: string | null;
   created_at: string | null;
   updated_at: string | null;
-  /** mock_quizzes only. */
-  visibility?: MockVisibility;
 };
 
 // What a student's page may hold of a quiz (Q1, 2026-09-19): every

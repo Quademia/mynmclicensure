@@ -327,8 +327,8 @@ and "instant runner", which predate the four modes.
   that closes soonest — then plain rows under Open now (the soonest to
   close first), Coming up and Past mocks; a row opens the mock's own
   page, built as a paper's. Not by course (board C): one tap more, and
-  between exam periods every course would say the same. *(to build:
-  04.15)*
+  between exam periods every course would say the same. *(built
+  2026-10-13; walked whole 2026-10-15: Coming up, Past mocks, desktop)*
 - Q3, the premium exam experience, is ruled in part (2026-10-13): the
   settings above and the page. The rest is in Open.
 

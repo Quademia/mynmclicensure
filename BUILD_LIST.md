@@ -85,7 +85,8 @@ before then, and the old list's history, is in
 - ✅ 04.12 Results on a date — papers and mocks; everything held to the date, by the database (student_attempts(), the score columns and a held sitting's rows out of the browser's reach); only the first mode while held, the number of sittings the admin's; the admin's Results field and hint; pop-up B and held sitting A — 2026-10-15
 - ✅ 04.13 The review — Always / Until a date / Not allowed (Sam, in place of N days): its own date, independent of results; while closed the score and summary stay, the question review and map close, only Learning shuts; the database holds it; the form's refusals and warning — 2026-10-15
 - ✅ 04.14 At the close — a sitting going with no clock running is finished at the close on what was answered (Abandoned with no answer, Sam); an exam never started cannot start; the card's Resume / See your score straight to the sitting; the database refuses saves past the close — 2026-10-15
-- ⬜ 04.15 The Mock exams page redesigned — by time: Open now, Coming up, Past mocks; a mock's own page
+- ✅ 04.15 The Mock exams page redesigned — by time: Open now, Coming up, Past mocks; a mock's own page — built 2026-10-13, walked whole 2026-10-15 (the no-Premium grey lines still Sam's to see)
+- ✅ 04.22 (unplanned) After the close: a closed paper's page drops "More ways … after your first sitting", its row says Closed for a sitting due at the close; the Abandon link a 44px tap — 2026-10-15
 - ✅ 04.16 The mock form refuses a live mock holding a draft question — says how many — 2026-10-14
 - ⏸ 04.17 The mock form warns when its questions are edited after students have sat it — parked 2026-10-14 (Sam): scores are safe without it (each sitting keeps its own copy); worth building if standing across students (05 Q13) or more editors arrive; the better place then is the Question Bank edit
 - ⏸ 04.18 Status and Published as one switch — at the admin redesign (Sam, 2026-10-13)
@@ -179,7 +180,7 @@ before then, and the old list's history, is in
 - ⬜ 10.14 Speed: two lists name their columns instead of reading every sitting column
 - ⬜ 10.15 Scale: indexes on sittings by date, and by student and date
 - ⬜ 10.16 Storage hygiene: ~14 columns and one settings row with no reader or writer — one at a time
-- ⬜ 10.17 Storage hygiene: the mock's unused visibility column removed
+- ✅ 10.17 Storage hygiene: the mock's unused visibility column removed — 2026-10-15
 - ⬜ 10.18 `db/schema.sql` and `db/rls.sql` brought up to date
 - ⬜ 10.19 A check on prod whether sharing the project slows it
 - ⏸ 10.20 The app's own offline page and a "You're offline" banner — Sam: later (09-29)

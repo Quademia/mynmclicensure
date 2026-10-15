@@ -435,7 +435,7 @@ export function PaperScreen({ course, paper, ended }: { course: CourseView; pape
       </div>
       {paper.open && paper.availability === 'ACTIVE' && done && waysLine ? (
         <p className="pp-hint">{waysLine}</p>
-      ) : paper.open && !done && others ? (
+      ) : paper.open && paper.availability === 'ACTIVE' && !done && others ? (
         <p className="pp-hint">More ways to practise this paper open after your first sitting.</p>
       ) : null}
     </div>

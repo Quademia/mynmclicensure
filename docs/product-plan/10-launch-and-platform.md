@@ -116,7 +116,7 @@ read that can grow past 1,000 rows reads in batches (AGENTS.md rule 10).
 - About 14 columns and one settings row with no reader or writer —
   reviewed one at a time (Sam, 2026-09-18). *(to build)*
 - The mock's `visibility` — stored, never checked; the package's mock
-  yes / no is the gate (03 F4). *(to build)*
+  yes / no is the gate (03 F4). *(dropped 2026-10-15)*
 
 ## Storage
 
