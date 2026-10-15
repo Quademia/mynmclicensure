@@ -64,10 +64,15 @@ connection**, and a printable PDF of the same pack.
   background — "QUADEMIA · MyNMCLicensure", the student's name, the date
   made and a short pack code, repeated on slanted rows — and the footer
   line with the same code; the student's account in the file's details.
-  A pack's own set of questions already traces a leak to it. Not done:
-  a password or "no printing" (bypassed in seconds; printing is the
-  point), pages as pictures (heavy on data). Parked: a record of each
-  download, if leaks start.
+  A pack's own set of questions already traces a leak to it. The cover
+  stays clean (no pattern; it holds no questions). The file's **"no
+  copying" setting** is set (Sam: stops the easy copy-paste; some apps
+  ignore it, and a phone reads text from a photo anyway). Not done: a
+  password or "no printing" (bypassed in seconds; printing is the
+  point), pages as pictures (heavy on data). Parked: letters drawn as
+  shapes so no app can copy them, if copying becomes a real problem; a
+  record of each download, if leaks start. When built: print one page
+  on an ordinary printer to set the pattern's strength.
 - **My packs, one page that knows if it is online** (Sam, 2026-10-15,
   07.8): online, every pack, each marked *On this phone* or not;
   offline, only the packs on this phone, with "You're offline. Your
