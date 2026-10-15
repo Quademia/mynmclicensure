@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-10-12. Rules for **any** assistant working in this
+Last updated: 2026-10-15. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What the app is
@@ -583,6 +583,21 @@ above sit at the repo root; the audience grouping inside them is kept.
   that out-ranks any class saying `text-decoration: none`. A row or card
   that is a link sets it off on its own `:hover` too; the app-wide fix is
   09.2 (Sam's yes pending). Check by hovering, not by reading the CSS.
+- **A student's scores come only from `student_attempts()`** (04.12,
+  2026-10-15). The browser's roles cannot read `attempts.score_raw`,
+  `score_total` or `score_pct`, so a `select('*')` on `attempts` through a
+  cookie client fails outright ("permission denied", and our reads fail
+  open to an empty list). A student's sittings are read with
+  `getStudentAttempts` / `getOwnAttempt` / the history's and the
+  dashboard's readers, which call the function with the service role and
+  get the score empty while the paper's results are held; an admin's read
+  the table with the service role. Any new server path that reads a
+  sitting's rows or score with the service role (which skips RLS) must
+  ask `held` first — the database's lock covers only the browser.
+- **Next memoises an identical GET within one render; an `.rpc()` is a
+  POST** unless called with `{ get: true }` — and a GET rpc sends a null
+  argument as the text `'null'`, so leave it out instead. A read that
+  must see a write made earlier in the same render stays a POST (2026-10-15).
 - **A question's "held back" is held in the server's code**, not by a
   database rule: `heldBackIds` (`lib/bank/queries.ts`) — a draft or active
   mock's questions always, a draft or active paper's too with

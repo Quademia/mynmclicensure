@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-15 — results on a date (04.12): no one-sitting rule, the admin's Sittings allowed; two screens drawn; held by the database; reviewed, walked, merged
+  - ↳ settings are building blocks · first mode only while held · hint by the field · pop-up B, held sitting A · student_attempts() · scores off the browser · Resume/Submit race · 04.21 archive leak · 04.13 next
+
 - 2026-10-14 — test mocks checked, Premium Mock exams and 04.16 walked, 04.17 parked, Abandon back on the sitting's page (04.20)
   - ↳ a sitting copies its questions so scores are safe · edit warning parked · Abandon was dropped by accident, link under Resume · wording changed · 04.12 to 04.14 next session
 
