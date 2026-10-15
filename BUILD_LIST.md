@@ -136,8 +136,8 @@ before then, and the old list's history, is in
 - ⬜ 07.4 The offline player — its own small one from the runner's pieces; Answer as you go / Answers at the end; no sync (Sam)
 - ⬜ 07.5 The PDF redesigned — drawn first; answers on the last page by default, the watermark
 - ✅ 07.6 No explanations in a pack — the rationale and feedback no longer copied or stored, old packs' dropped — 2026-10-15
-- ✅ 07.7 Delete a pack — the database and the server action (status deleted, still counts; rule 9 on offline_packs) — 2026-10-15; its button comes with the pack's page (07.8)
-- ⬜ 07.8 My packs and the offline screen — one page online and offline, by course with the allowance, a pack's own page (ruled 2026-10-15); drawings next
+- ✅ 07.7 Delete a pack — the database and the server action (status deleted, still counts; rule 9 on offline_packs) — 2026-10-15; its button with the pack's page (07.8, built the same day)
+- ✅ 07.8 My packs and a pack's own page, online — by course with the five-step bar, Build a pack per course, Made earlier, the locked and empty cards; the pack page with Delete; the menu one row — 2026-10-15. The offline state, On this phone and the last score come with 07.3
 
 ## [08 Help and news](docs/product-plan/08-help-and-news.md)
 

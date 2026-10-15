@@ -9,7 +9,7 @@ Detail and history: `archive/product-plan/06-offline-packs.md` (the old
 app's description) and the built code in `lib/offline-packs/` and
 `app/(app)/offline-pack/`.
 
-## The redesign *(ruled by Sam, 2026-10-15; 07.1, 07.2, 07.6, 07.7 built 2026-10-15; to build: 07.3–07.5, 07.8)*
+## The redesign *(ruled by Sam, 2026-10-15; 07.1, 07.2, 07.6, 07.7, 07.8 (online) built 2026-10-15; to build: 07.3–07.5)*
 
 Designed fresh, not from the old pack (a print-to-PDF page). A pack is a
 set of questions kept **on the student's phone, usable with no

@@ -51,10 +51,9 @@ export const STUDENT_PHONE_TABS: PhoneTab[] = [
     key: 'offline',
     label: 'Offline',
     icon: 'download',
-    pages: [
-      { label: 'My packs', href: `${S}/offline-packs`, exact: true },
-      { label: 'Build', href: `${S}/offline-packs/build` },
-    ],
+    // one page since 07.8 (Sam, 2026-10-15): Build a pack is on My packs, per course;
+    // the builder and a pack's page sit under it
+    pages: [{ label: 'My packs', href: `${S}/offline-packs` }],
   },
 ];
 
@@ -73,7 +72,6 @@ export const STUDENT_NAV: NavItem[] = [
 
   { key: 'h-offline', label: 'Study offline', heading: true },
   { key: 'offline-packs', label: 'My packs', icon: 'download', href: `${S}/offline-packs` },
-  { key: 'offline-build', label: 'Build a pack', icon: 'package', href: `${S}/offline-packs/build` },
 
   { key: 'h-help', label: 'Help and news', heading: true },
   { key: 'announcements', label: 'Announcements', icon: 'megaphone', href: `${S}/announcements` },

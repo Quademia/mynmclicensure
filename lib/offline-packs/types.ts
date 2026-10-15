@@ -142,18 +142,11 @@ export type CreatePackResult =
   | { ok: true; pack_id: string; remaining: number | null }
   | { ok: false; reason: BlockedReason; message: string; allowance: Allowance | null };
 
-// ── My Packs (13b) ─────────────────────────────────────────────────────
-// legacy listOfflinePacks' rows: the card's columns plus the course
-// title joined from `courses` (the id when the course is gone).
-export type OfflinePackListRow = Pick<
-  OfflinePack,
-  'pack_id' | 'course_id' | 'pack_name' | 'display_label' | 'question_count' | 'status' | 'created_utc'
-> & { course_title: string };
-
-export type OfflinePackPage = { ok: true; total: number; items: OfflinePackListRow[] } | { ok: false; message: string };
+// ── My packs and a pack's page (07.8) ──────────────────────────────────
+export type MyPackRow = Pick<OfflinePack, 'pack_id' | 'course_id' | 'pack_name' | 'question_count' | 'created_utc'>;
+export type MyPack = MyPackRow &
+  Pick<OfflinePack, 'selection_mode' | 'maintopics' | 'difficulties' | 'question_types' | 'concept_query'>;
 
 // 07.7: Delete — the pack hidden and closed, the allowance not given back.
 export type DeletePackResult = { ok: true } | { ok: false; message: string };
 
-// legacy PAGE_SIZE on my-offline-packs.html
-export const MY_PACKS_PAGE_SIZE = 24;

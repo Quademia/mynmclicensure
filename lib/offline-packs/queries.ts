@@ -12,7 +12,7 @@
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import type { Allowance, OfflinePack, OfflinePackItem, OfflinePackListRow, OfflinePackPage, PickResult } from './types';
+import type { Allowance, MyPack, MyPackRow, OfflinePack, OfflinePackItem, PickResult } from './types';
 
 // ── the item ids of the student's earlier active packs for the course ──
 // legacy getUsedOfflinePackItemIds; the period start narrows it to the
@@ -202,43 +202,36 @@ export async function getOfflinePackForRender(db: ServerSupabaseClient, userId: 
   return { ok: true, pack, items };
 }
 
-// ── My Packs' read (legacy listOfflinePacks) ───────────────────────────
-// The student's packs, every status, newest first, one page of `limit`
-// from `offset`, with the exact total; the course titles joined by a
-// second read, the id standing in when a course is gone. The card's
-// columns only (7a's precedent) — legacy selected `*`.
-export async function listOfflinePacks(db: ServerSupabaseClient, userId: string, limit: number, offset: number): Promise<OfflinePackPage> {
-  const safeLimit = Math.max(1, Math.min(Number(limit || 100), 200));
-  const safeOffset = Math.max(0, Number(offset || 0));
-
-  const { data, error, count } = await db
+// ── My packs and a pack's page (07.8; Sam, 2026-10-15) ────────────────
+// Every pack of the student's but the deleted ones, newest first — one
+// student's own rows (rule 10's exemption), read as the owner and named in
+// the query (RLS is the floor). The page groups them by course.
+export async function listMyPacks(db: ServerSupabaseClient, userId: string): Promise<MyPackRow[] | null> {
+  const { data, error } = await db
     .from('offline_packs')
-    .select('pack_id, course_id, pack_name, display_label, question_count, status, created_utc', { count: 'exact' })
+    .select('pack_id, course_id, pack_name, question_count, created_utc')
     .eq('user_id', userId)
-    .neq('status', 'deleted')
-    .order('created_utc', { ascending: false })
-    .range(safeOffset, safeOffset + safeLimit - 1);
+    .eq('status', 'active')
+    .order('created_utc', { ascending: false });
   if (error) {
-    console.error('listOfflinePacks:', error);
-    return { ok: false, message: error.message };
+    console.error('listMyPacks:', error);
+    return null;
   }
+  return (data ?? []) as MyPackRow[];
+}
 
-  type Row = Omit<OfflinePackListRow, 'course_title'>;
-  const rows = (data ?? []) as Row[];
-  const courseIds = [...new Set(rows.map((r) => String(r.course_id || '').trim()).filter(Boolean))];
-
-  const titles: Record<string, string> = {};
-  if (courseIds.length) {
-    const { data: courses } = await db.from('courses').select('course_id, title').in('course_id', courseIds);
-    for (const c of (courses ?? []) as { course_id: string; title: string }[]) {
-      titles[String(c.course_id || '').trim().toUpperCase()] = String(c.title || '').trim();
-    }
+/** One of the student's own active packs — its header, no questions; null when not theirs, deleted or gone. */
+export async function getMyPack(db: ServerSupabaseClient, userId: string, packId: string): Promise<MyPack | null> {
+  const { data, error } = await db
+    .from('offline_packs')
+    .select('pack_id, course_id, pack_name, question_count, created_utc, selection_mode, maintopics, difficulties, question_types, concept_query')
+    .eq('user_id', userId)
+    .eq('pack_id', String(packId || '').trim())
+    .eq('status', 'active')
+    .maybeSingle();
+  if (error) {
+    console.error('getMyPack:', error);
+    return null;
   }
-
-  const items: OfflinePackListRow[] = rows.map((row) => {
-    const cid = String(row.course_id || '').trim().toUpperCase();
-    return { ...row, course_title: titles[cid] || cid };
-  });
-
-  return { ok: true, total: Number(count ?? items.length), items };
+  return (data as MyPack | null) ?? null;
 }

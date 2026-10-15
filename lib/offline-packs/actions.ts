@@ -21,15 +21,13 @@ import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getConfig } from '@/lib/catalogue/queries';
 import { buildOfflineOwnerLabel, buildOfflinePackDefaultName, buildOfflinePackDisplayLabel, maskEmailForOffline, ownerNameOf, safeArray } from './labels';
 import { packDoorFor } from './door';
-import { getOfflinePackAllowance, listOfflinePacks, pickOfflinePackItemIds } from './queries';
+import { getOfflinePackAllowance, pickOfflinePackItemIds } from './queries';
 import {
-  MY_PACKS_PAGE_SIZE,
   OFFLINE_MAX_QUESTIONS_DEFAULT,
   type CreatePackInput,
   type CreatePackResult,
   type DeletePackResult,
   type MakePackInput,
-  type OfflinePackPage,
 } from './types';
 
 // legacy makeOfflinePackId: 'PACK_' + Date.now() + '_' + makeSecureId('').slice(0, 8)
@@ -234,10 +232,4 @@ export async function deleteOfflinePack(packId: string): Promise<DeletePackResul
   }
   if (!data || !data.length) return { ok: false, message: 'This pack could not be found.' };
   return { ok: true };
-}
-
-// ── My Packs' Load More and Refresh (legacy loadNextPage, 13b) ─────────
-export async function loadOfflinePacksPage(offset: number): Promise<OfflinePackPage> {
-  const { supabase, profile } = await requireStudent();
-  return listOfflinePacks(supabase, profile.user_id, MY_PACKS_PAGE_SIZE, Math.max(0, Math.floor(Number(offset) || 0)));
 }

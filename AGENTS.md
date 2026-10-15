@@ -333,6 +333,10 @@ above sit at the repo root; the audience grouping inside them is kept.
 - **A `<form action={fn}>` resets its fields after the action returns**
   (React 19). When the fields must survive — a submit that only opens a
   confirm step — use a plain `onSubmit` + `new FormData(form)`.
+- **`router.refresh()` called right after `router.replace()` (or `push`)
+  cancels the move**: the page stays put, its button stuck on "Deleting…"
+  (the pack's Delete, 2026-10-15). To leave a page after an action, move
+  only; the target is `force-dynamic` and reads fresh.
 - **A Server Component cannot clear cookies.** A gate that must sign
   someone out redirects to `/logout?via=gate` (a Route Handler); a
   `signOut()` in the component is silently swallowed and the auth
