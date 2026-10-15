@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-15, later — the review (04.13): settings live, not copied; its own date, then Always / Until / Not allowed; built, walked, committed
+  - ↳ snapshot only what a sitting needs · review independent of results · three-way field · only Learning shuts · topic breakdown stays · Learning first sitting refused with Until · 04.14 next
+
 - 2026-10-15 — results on a date (04.12): no one-sitting rule, the admin's Sittings allowed; two screens drawn; held by the database; reviewed, walked, merged
   - ↳ settings are building blocks · first mode only while held · hint by the field · pop-up B, held sitting A · student_attempts() · scores off the browser · Resume/Submit race · 04.21 archive leak · 04.13 next
 
