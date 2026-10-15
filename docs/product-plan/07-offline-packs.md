@@ -59,9 +59,10 @@ connection**, and a printable PDF of the same pack.
   package", with Choose a package; packs made earlier under a package
   still open.
 - **The watermark stays** — the owner's name, a masked email and their
-  label. **The PDF's marks** (Sam, 2026-10-15): on every page a faint
-  diagonal mark across the middle — "QUADEMIA · MyNMCLicensure", the
-  student's name, the date made and a short pack code — and the footer
+  label. **The PDF's marks** (Sam, 2026-10-15): on every question and
+  answer page a faint small pattern from top to bottom, like a page
+  background — "QUADEMIA · MyNMCLicensure", the student's name, the date
+  made and a short pack code, repeated on slanted rows — and the footer
   line with the same code; the student's account in the file's details.
   A pack's own set of questions already traces a leak to it. Not done:
   a password or "no printing" (bypassed in seconds; printing is the
