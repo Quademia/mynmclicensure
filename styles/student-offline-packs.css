@@ -1,29 +1,23 @@
 /* styles/student-offline-packs.css
  *
- * My packs and a pack's own page (07.8; Sam, 2026-10-15: layout A, with
- * B's five-step bar — https://claude.ai/artifact/NrEnZUieGVsFmZkZEmjbFm).
- * The rows, the card and the page column are Practice Papers' own
- * (practice-papers.css: .pp-page, .pp-list, .pp-row, .pp-card); this sheet
- * holds only what a pack adds — a course's heading with its allowance bar
- * and Build a pack. Tokens only.
+ * My packs, a course's packs and a pack's own page (07.8; Sam, 2026-10-15:
+ * C, like Practice Papers — https://claude.ai/artifact/NrEnZUieGVsFmZkZEmjbFm).
+ * The course cards, the rows, the card and the page column are Practice
+ * Papers' own (courses.css .cp-card; practice-papers.css .pp-page, .pp-bar,
+ * .pp-list, .pp-row, .pp-card); this sheet holds only what a pack adds — the
+ * allowance bar's navy, a section's heading, the pack's page and its On this
+ * phone mark. Tokens only.
  */
 
 .opk-course { display: flex; flex-direction: column; gap: var(--space-8); }
-
-.opk-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-12);
-}
-.opk-head-main { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
+/* the install line sits close under the title, as part of its header */
+.opk > .install-line { margin-top: calc(-1 * var(--space-20)); }
 .opk-title { margin: 0; font-size: var(--type-body-strong-size); font-weight: 600; color: var(--ink); line-height: var(--type-field-line); }
-.opk-build { flex-shrink: 0; min-height: 44px; }
 
-/* The package's packs: one segment each, the made ones filled. */
-.opk-allowance { display: flex; align-items: center; gap: var(--space-8); }
-.opk-bar { display: flex; gap: 3px; }
-.opk-seg { width: 18px; height: 6px; border-radius: 3px; background: var(--scale-bar-off); }
+/* The package's packs on Practice Papers' bar (.pp-bar .pp-seg): one
+   segment each, the made ones the product's navy, the rest the scale's
+   off step. */
+.opk-seg { background: var(--scale-bar-off); }
 .opk-seg-made { background: var(--brand-navy); }
 
 /* A pack's own page. */

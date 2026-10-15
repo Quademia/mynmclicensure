@@ -7,8 +7,9 @@
 // last score on this phone, and under it Save to this phone or Remove from
 // this phone (phone-pack.tsx); ?new=1, from the builder, keeps it on the
 // phone it was made on. The redesigned PDF comes with 07.5 — until then the
-// print button opens today's print page. Only the student's own active pack
-// opens; anything else is not found.
+// print button opens today's print page. Its way back is its course's packs
+// (C, like Practice Papers), and Delete lands there too. Only the student's
+// own active pack opens; anything else is not found.
 
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -18,6 +19,7 @@ import { getMyPack } from '@/lib/offline-packs/queries';
 import type { MyPack } from '@/lib/offline-packs/types';
 import { AppLink } from '@/components/shell/link-pending';
 import { PhoneKeep, PhoneMark } from '../phone-pack';
+import { courseHref } from '../pack-parts';
 import { DeletePack } from './delete-pack';
 import { PractisePack } from './practise-pack';
 import '@/styles/practice-papers.css';
@@ -69,8 +71,8 @@ export default async function PackPage({
 
   return (
     <div className="pp-page opk">
-      <AppLink href="/student/offline-packs" className="btn-link pp-back">
-        ‹ My packs
+      <AppLink href={courseHref(pack.course_id)} className="btn-link pp-back">
+        ‹ {course}
       </AppLink>
 
       <div className="opk-pack-facts">
@@ -91,7 +93,7 @@ export default async function PackPage({
 
       <PhoneKeep packId={pack.pack_id} autoSave={made === '1'} />
 
-      <DeletePack packId={pack.pack_id} />
+      <DeletePack packId={pack.pack_id} backHref={courseHref(pack.course_id)} />
     </div>
   );
 }

@@ -107,16 +107,24 @@ connection**, and a printable PDF of the same pack.
   marked *On this phone* or not; offline, only the packs on this phone, with "You're offline. Your
   packs on this phone are ready." Any page opened offline lands here —
   one tap from the icon.
-  - **By course**, each heading with its allowance and Build a pack
-    ("Midwifery · 3 of 5 packs left · Build a pack"); newest first
-    within; offline, no allowance and no Build.
+  - **By course, as Practice Papers** (Sam, 2026-10-15: C, in place of
+    A): online, one card per course — its name, the allowance bar ("2 made
+    · 3 left") and a foot line that only tells ("2 packs · newest: …", or
+    "Build a pack"); the whole card is one tap, opening that **course's
+    packs** (‹ My packs, the bar, Build a pack across the page, then Your
+    packs, newest first). A course whose package has ended keeps its card,
+    "Made with an earlier package", no Build. Why: the first page stays
+    three calm cards however many packs are made, and it works as Practice
+    Papers does; the cost, one more tap online — offline stays a flat list
+    by course, with no allowance and no Build.
   - **A row**: the name, its questions and date, *On this phone*, and on
     this phone only the last practice score ("Last: 14 of 20"). No ids,
     filters or summary counts.
   - **A tap opens the pack's own page**: Practise (Answer as you go /
     Answers at the end), Save to this phone or On this phone · Remove
     from this phone, Download PDF, Delete pack (the app's confirm: "You
-    won't get this pack back in your allowance"). Two taps from the list
+    won't get this pack back in your allowance"); its way back, and
+    Delete, lead to its course's packs. Two taps from the course's list
     into a practice.
   - **Check-in run out**: the packs listed but not opening — "Connect
     once to keep using your packs." A pack deleted elsewhere leaves this
@@ -128,14 +136,16 @@ connection**, and a printable PDF of the same pack.
   - **Empty**: "Make a pack to practise offline", Build a pack per
     course. **Locked** (trial, free): "Offline packs come with a
     package", Choose a package; earlier packs still show and open.
-  - **The menu**: one row, My packs (Build a pack is on the page, under
-    each course); the phone bar's Offline tab opens it.
+  - **The menu**: one row, My packs (Build a pack is on each course's
+    packs); the phone bar's Offline tab opens it.
 - Drawn at phone size at https://claude.ai/artifact/NrEnZUieGVsFmZkZEmjbFm
   (2026-10-15): My packs online A (sections) and B (course cards),
   offline, empty, locked; a pack's page; Practise's choice; the offline
   player both ways; the PDF's cover, a questions page, the answers page.
   **Picked (Sam, 2026-10-15): layout A**, each course heading carrying
-  B's five-step bar of packs made ("2 made · 3 left"). **The PDF: two
+  B's five-step bar of packs made ("2 made · 3 left") — **then C the same
+  evening** (drawn beside A and B: course cards like Practice Papers, and
+  a course's packs), built in A's place. **The PDF: two
   columns, about ten questions a page** (the old one printed four), a
   question never split across a column or page.
 
