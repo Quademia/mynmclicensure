@@ -5,12 +5,11 @@
 // (lib/offline-packs/phone), never from the server.
 //
 //   - PhoneLine: a row's "On this phone · Last: 14 of 20" (My packs).
-//   - PhoneMark: the pack page's "On this phone · Last practice: 14 of 20",
-//     above Practise.
-//   - PhoneKeep: under the pack page's card — Save to this phone, or
-//     Remove from this phone with "It stays in My packs; save it here again
-//     any time." The phone a pack was made on keeps it at once (the
-//     builder lands here with ?new=1).
+//   - PackMain: the pack page card's main button — Save to this phone until
+//     the pack is saved, then "On this phone · Last practice: 14 of 20" and
+//     Practise (Sam, 2026-10-15).
+//   - PackRemove: under the card, once saved — Remove from this phone, with
+//     "It stays in My packs; save it here again any time."
 //   - PhonePrune: My packs tells the phone which packs are still the
 //     student's (a pack deleted elsewhere leaves) and the check-in period.
 //
@@ -49,20 +48,15 @@ export function PhoneLine({ packId }: { packId: string }) {
   );
 }
 
-export function PhoneMark({ packId }: { packId: string }) {
-  const { pack } = usePhonePack(packId);
-  if (!pack) return null;
-  return (
-    <span className="opk-phone">
-      <span className="badge opk-here">On this phone</span>
-      <span className="pp-line">{lastWords(pack, 'Last practice')}</span>
-    </span>
-  );
-}
-
 const NO_SAVE = 'Could not save this pack to this phone. Please check your connection.';
 
-export function PhoneKeep({ packId, autoSave }: { packId: string; autoSave: boolean }) {
+/** A pack's own page, in its card (07.3, 07.8; Sam, 2026-10-15): while the
+ * pack is not on this phone the main button is Save to this phone — packs
+ * are for practising with no signal, and Practise first let a student think
+ * one was ready when it was not; once saved, the mark and Practise. A
+ * browser that keeps no packs shows Practise as before. The phone a pack was
+ * made on keeps it at once (the builder lands here with ?new=1). */
+export function PackMain({ packId, autoSave, practise }: { packId: string; autoSave: boolean; practise: React.ReactNode }) {
   const { ready, pack, unavailable } = usePhonePack(packId);
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState<{ text: string; tone: 'error' | 'success' } | null>(null);
@@ -86,17 +80,6 @@ export function PhoneKeep({ packId, autoSave }: { packId: string; autoSave: bool
     }
   }
 
-  async function remove() {
-    setBusy(true);
-    try {
-      await removePhonePack(packId);
-    } catch {
-      setToast({ text: 'Could not remove this pack from this phone.', tone: 'error' });
-    } finally {
-      setBusy(false);
-    }
-  }
-
   // The phone it was made on keeps it: once, when the phone has answered
   // and does not hold it yet.
   useEffect(() => {
@@ -107,28 +90,64 @@ export function PhoneKeep({ packId, autoSave }: { packId: string; autoSave: bool
     // eslint-disable-next-line react-hooks/exhaustive-deps -- once, on the phone's first answer
   }, [autoSave, ready, unavailable, pack]);
 
+  const toastNode = <Toast message={toast?.text ?? null} tone={toast?.tone} onDismiss={() => setToast(null)} />;
   if (!ready) return null;
+  if (unavailable) {
+    return (
+      <>
+        {practise}
+        <span className="pp-line">This browser cannot keep packs. Open My packs in Chrome or Safari on your phone to save them there.</span>
+      </>
+    );
+  }
+  if (pack) {
+    return (
+      <>
+        <span className="opk-phone">
+          <span className="badge opk-here">On this phone</span>
+          <span className="pp-line">{lastWords(pack, 'Last practice')}</span>
+        </span>
+        {practise}
+        {toastNode}
+      </>
+    );
+  }
+  return (
+    <>
+      <button type="button" className="btn btn-accent btn-lg" disabled={busy} onClick={() => void save(false)}>
+        {busy ? 'Saving…' : 'Save to this phone'}
+      </button>
+      <span className="pp-line">So you can practise with no signal.</span>
+      {toastNode}
+    </>
+  );
+}
 
+/** Under the pack page's card, once the pack is on this phone: Remove from this phone. */
+export function PackRemove({ packId }: { packId: string }) {
+  const { pack } = usePhonePack(packId);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function remove() {
+    setBusy(true);
+    try {
+      await removePhonePack(packId);
+    } catch {
+      setError('Could not remove this pack from this phone.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!pack) return <Toast message={error} tone="error" onDismiss={() => setError(null)} />;
   return (
     <div className="opk-keep">
-      {unavailable ? (
-        <span className="pp-line">This browser cannot keep packs. Open My packs in Chrome or Safari on your phone to save them there.</span>
-      ) : pack ? (
-        <>
-          <button type="button" className="btn-link opk-keep-btn" disabled={busy} onClick={() => void remove()}>
-            {busy ? 'Removing…' : 'Remove from this phone'}
-          </button>
-          <span className="pp-line">It stays in My packs; save it here again any time.</span>
-        </>
-      ) : (
-        <>
-          <button type="button" className="btn btn-ghost btn-lg opk-save" disabled={busy} onClick={() => void save(false)}>
-            {busy ? 'Saving…' : 'Save to this phone'}
-          </button>
-          <span className="pp-line">Keep it on this phone to practise with no signal.</span>
-        </>
-      )}
-      <Toast message={toast?.text ?? null} tone={toast?.tone} onDismiss={() => setToast(null)} />
+      <button type="button" className="btn-link opk-keep-btn" disabled={busy} onClick={() => void remove()}>
+        {busy ? 'Removing…' : 'Remove from this phone'}
+      </button>
+      <span className="pp-line">It stays in My packs; save it here again any time.</span>
+      <Toast message={error} tone="error" onDismiss={() => setError(null)} />
     </div>
   );
 }

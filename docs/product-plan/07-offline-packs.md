@@ -151,7 +151,12 @@ connection**, and a printable PDF of the same pack.
     from this phone, Download PDF, Delete pack (the app's confirm: "You
     won't get this pack back in your allowance"); its way back, and
     Delete, lead to its course's packs. Two taps from the course's list
-    into a practice.
+    into a practice. **Until the pack is on this phone its main button is
+    Save to this phone** ("So you can practise with no signal"), in
+    Practise's place; once saved, *On this phone* with the last score and
+    Practise, Remove from this phone under the card (Sam, 2026-10-15:
+    Practise first let a student think a pack was ready for no signal when
+    it was not). A browser that keeps no packs shows Practise as before.
   - **Check-in run out**: the packs listed but not opening — "Connect
     once to keep using your packs." A pack deleted elsewhere leaves this
     phone when it next connects (built: when My packs next opens there).

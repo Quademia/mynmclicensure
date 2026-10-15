@@ -140,7 +140,7 @@ before then, and the old list's history, is in
 - ✅ 07.5 The pattern's strength — Sam printed a page on an ordinary printer and kept it as drawn (PATTERN_OPACITY 0.08) — 2026-10-15
 - ✅ 07.6 No explanations in a pack — the rationale and feedback no longer copied or stored, old packs' dropped — 2026-10-15
 - ✅ 07.7 Delete a pack — the database and the server action (status deleted, still counts; rule 9 on offline_packs) — 2026-10-15; its button with the pack's page (07.8, built the same day)
-- ✅ 07.8 My packs and a pack's own page, online — by course with the five-step bar, Build a pack per course, Made earlier, the locked and empty cards; the pack page with Delete; the menu one row — 2026-10-15. The offline state, On this phone and the last score built with 07.3 the same day. Redrawn as C the same evening (Sam): course cards like Practice Papers, a tap opening the course's packs (course/[course_id]); the pack page and Delete lead back there
+- ✅ 07.8 My packs and a pack's own page, online — by course with the five-step bar, Build a pack per course, Made earlier, the locked and empty cards; the pack page with Delete; the menu one row — 2026-10-15. The offline state, On this phone and the last score built with 07.3 the same day. Redrawn as C the same evening (Sam): course cards like Practice Papers, a tap opening the course's packs (course/[course_id]); the pack page and Delete lead back there; the pack page's main button Save to this phone until it is saved, then Practise (Sam)
 
 ## [08 Help and news](docs/product-plan/08-help-and-news.md)
 

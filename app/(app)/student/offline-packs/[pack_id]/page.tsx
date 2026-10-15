@@ -3,10 +3,11 @@
 // https://claude.ai/artifact/NrEnZUieGVsFmZkZEmjbFm): the pack's name, its
 // course, how many questions, when it was made and what was picked; the way
 // to print it; Delete, with the app's confirm. Practise opens the offline
-// player (07.4) in either way. On this phone (07.3): the card's mark and the
-// last score on this phone, and under it Save to this phone or Remove from
-// this phone (phone-pack.tsx); ?new=1, from the builder, keeps it on the
-// phone it was made on. Download PDF (07.5) makes the pack's PDF on the
+// player (07.4) in either way. On this phone (07.3; Sam, 2026-10-15): until
+// the pack is on this phone the card's main button is Save to this phone,
+// then the mark, the last score here and Practise, with Remove from this
+// phone under the card (phone-pack.tsx); ?new=1, from the builder, keeps it
+// on the phone it was made on. Download PDF (07.5) makes the pack's PDF on the
 // phone, the answers where the student chooses (download-pdf.tsx). Its way
 // back is its course's packs (C, like Practice Papers), and Delete lands
 // there too. Only the student's own active pack opens; anything else is not
@@ -19,7 +20,7 @@ import { getCourses } from '@/lib/catalogue/queries';
 import { getMyPack } from '@/lib/offline-packs/queries';
 import { pickedWords } from '@/lib/offline-packs/labels';
 import { AppLink } from '@/components/shell/link-pending';
-import { PhoneKeep, PhoneMark } from '../phone-pack';
+import { PackMain, PackRemove } from '../phone-pack';
 import { courseHref } from '../pack-parts';
 import { DeletePack } from './delete-pack';
 import { DownloadPdf } from './download-pdf';
@@ -71,12 +72,15 @@ export default async function PackPage({
       </div>
 
       <div className="card pp-card">
-        <PhoneMark packId={pack.pack_id} />
-        <PractisePack packId={pack.pack_id} title={pack.pack_name || 'this pack'} />
+        <PackMain
+          packId={pack.pack_id}
+          autoSave={made === '1'}
+          practise={<PractisePack packId={pack.pack_id} title={pack.pack_name || 'this pack'} />}
+        />
         <DownloadPdf packId={pack.pack_id} title={pack.pack_name || 'this pack'} />
       </div>
 
-      <PhoneKeep packId={pack.pack_id} autoSave={made === '1'} />
+      <PackRemove packId={pack.pack_id} />
 
       <DeletePack packId={pack.pack_id} backHref={courseHref(pack.course_id)} />
     </div>

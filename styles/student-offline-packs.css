@@ -26,7 +26,7 @@
 .opk-delete { align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--space-8) 0 0; }
 
 /* On this phone (07.3): the mark on a row and on the pack's card, the
-   last score beside it; Save to / Remove from this phone under the card.
+   last score beside it; Remove from this phone under the card.
    (The install line is components/install-app's own.) The mark is the
    badge on the pale teal, its words in the teal made for text on that
    ground. */
@@ -35,7 +35,6 @@
 .opk-last { font-size: var(--type-meta-size); color: var(--ink-muted); line-height: var(--type-meta-line); }
 .opk-keep { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-4); }
 .opk-keep-btn { display: inline-flex; align-items: center; min-height: 44px; }
-.opk-save { align-self: stretch; }
 
 /* The PDF's dialog (07.5; portalled, so unscoped): each place for the
    answers stacks its words over View and Download, side by side. */
