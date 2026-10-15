@@ -59,7 +59,14 @@ connection**, and a printable PDF of the same pack.
   package", with Choose a package; packs made earlier under a package
   still open.
 - **The watermark stays** — the owner's name, a masked email and their
-  label — explored in the PDF's drawings.
+  label. **The PDF's marks** (Sam, 2026-10-15): on every page a faint
+  diagonal mark across the middle — "QUADEMIA · MyNMCLicensure", the
+  student's name, the date made and a short pack code — and the footer
+  line with the same code; the student's account in the file's details.
+  A pack's own set of questions already traces a leak to it. Not done:
+  a password or "no printing" (bypassed in seconds; printing is the
+  point), pages as pictures (heavy on data). Parked: a record of each
+  download, if leaks start.
 - **My packs, one page that knows if it is online** (Sam, 2026-10-15,
   07.8): online, every pack, each marked *On this phone* or not;
   offline, only the packs on this phone, with "You're offline. Your
