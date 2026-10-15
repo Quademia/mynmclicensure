@@ -88,7 +88,10 @@ connection**, and a printable PDF of the same pack.
   (2026-10-15): My packs online A (sections) and B (course cards),
   offline, empty, locked; a pack's page; Practise's choice; the offline
   player both ways; the PDF's cover, a questions page, the answers page.
-  Sam to pick and mark up.
+  **Picked (Sam, 2026-10-15): layout A**, each course heading carrying
+  B's five-step bar of packs made ("2 made · 3 left"). **The PDF: two
+  columns, about ten questions a page** (the old one printed four), a
+  question never split across a column or page.
 
 ## How it works today
 
