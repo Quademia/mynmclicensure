@@ -294,5 +294,36 @@
   .runner .ctrl-label { display: none; }
 }
 
-/* Send feedback (slice 12a) — legacy .btn-sm-link */
+/* legacy .btn-sm-link */
 .runner .btn-sm-link { background: none; border: none; font-size: 12px; font-weight: 600; color: var(--accent); cursor: pointer; font-family: inherit; text-decoration: underline; padding: 0; }
+
+/* Report an issue (06.2, Sam 2026-10-17): the link beside Flag, its icon
+   a speech bubble holding "!", a whole tap's height; then its box, which
+   is portalled out of .runner, so unscoped. */
+.runner .btn-report {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-6);
+  min-height: 44px;
+  font-size: var(--type-ui-size);
+  color: var(--brand-teal-hover);
+  text-decoration: none;
+}
+.runner .btn-report:hover { color: var(--brand-navy); }
+.rpt-select { min-height: 44px; }
+.rpt-note { resize: vertical; min-height: 72px; line-height: 1.5; }
+.rpt-ask {
+  margin: var(--space-16) 0 0;
+  padding: var(--space-10) var(--space-12);
+  border-radius: var(--radius);
+  background: var(--brand-teal-pale);
+  color: var(--brand-teal-hover);
+  font-size: var(--type-ui-size);
+  line-height: 1.5;
+}
+.rpt-error {
+  margin: var(--space-12) 0 0;
+  font-size: var(--type-ui-size);
+  line-height: 1.5;
+  color: var(--badge-danger-ink);
+}

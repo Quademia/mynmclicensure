@@ -254,7 +254,7 @@ export function MessagesClient({
         question_id: deepLink.item_id,
         attempt_id: deepLink.attempt_id,
         subject: deepLink.item_id ? 'Question feedback' : null,
-        ref_text: deepLink.ref,
+        ref_text: deepLink.item_id ? deepLink.ref : null,
       });
       if (!result.ok) {
         setMsg({ text: 'Could not create conversation.', tone: 'error' });
@@ -262,6 +262,9 @@ export function MessagesClient({
       }
       const list = await loadThreads();
       await openThread(result.thread_id, list);
+      // The sitting's "I don't understand the answer" (06.2): the question
+      // quoted in the draft, for the student to finish and send.
+      if (!deepLink.item_id && deepLink.ref) setCompose(deepLink.ref.slice(0, MESSAGE_MAX_LEN));
       if (!result.created) showReuseBanner();
       window.history.replaceState({}, '', '/student/messages');
     }, 0);

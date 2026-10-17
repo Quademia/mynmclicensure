@@ -155,7 +155,14 @@ function quizzesWillRefuse(n: number): string {
   return `${n} ${n === 1 ? 'quiz' : 'quizzes'} will refuse to start until this question is published again.`;
 }
 
-export function QuestionBankClient({ courses }: { courses: Course[] }) {
+export function QuestionBankClient({
+  courses,
+  open = null,
+}: {
+  courses: Course[];
+  /** Arrived from Question reports: this course picked, this question's editor opened (06.2). */
+  open?: { course: string; item: string | null } | null;
+}) {
   const [msg, setMsg] = useState<Msg>(null);
   const dismiss = useCallback(() => setMsg(null), []);
 
@@ -281,6 +288,25 @@ export function QuestionBankClient({ courses }: { courses: Course[] }) {
     }
     await fetchCourse(id);
   }
+
+  // Question reports' "Open in the bank" (06.2): once, for the address the
+  // page arrived with — the course loaded, the question's editor opened,
+  // the address cleared so a reload starts plain.
+  useEffect(() => {
+    if (!open) return;
+    const id = window.setTimeout(async () => {
+      setCourseId(open.course);
+      resetFilters();
+      const fresh = await fetchCourse(open.course);
+      const row = open.item ? fresh.find((i) => i.item_id === open.item) : null;
+      if (row) openEdit(row);
+      else if (open.item) setMsg({ text: `Question ${open.item} is not in this course any more.`, tone: 'error' });
+      window.history.replaceState({}, '', '/admin/question-bank');
+    }, 0);
+    return () => window.clearTimeout(id);
+    // Runs once, for the address the page arrived with.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // legacy clearFilters(): resets the course too.
   function clearFilters() {

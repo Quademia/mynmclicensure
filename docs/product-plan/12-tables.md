@@ -318,6 +318,29 @@ table by table as each is next changed (AGENTS.md rule 9).
   copy kept when it was deleted).
 - Browser: nothing.
 
+### `question_reports` — students' reports of a mistake in a question
+| Column | Holds |
+|---|---|
+| `report_id` | The report |
+| `item_id`, `course_id` | The question (→ `question_bank`) and its course |
+| `attempt_id` | The sitting it was sent from (→ `attempts`; emptied if the sitting goes) |
+| `user_id` | The student (→ `users`) |
+| `reason` | One of six words: `answer_wrong`, `unclear`, `typo`, `picture`, `explanation`, `other` |
+| `note` | The student's words, at most 1,000 characters; required for `other` |
+| `chosen` | The student's answer then, as `attempt_items.chosen` (a letter, or a comma list); empty if not answered |
+| `status` | `new`, `fixed` or `dismissed` (no "reviewed": no button set it — Sam, 2026-10-17) |
+| `created_at` | When sent |
+| `closed_by`, `closed_at` | The admin who marked it fixed or dismissed, and when — set with the close, empty while new |
+
+- Built 2026-10-17 (06.2, ticked by Sam that day). **One open report per
+  student per question** (a unique index on the `new` ones). Written by
+  `report_question()`, which checks the question is in the student's own
+  sitting and still in the bank; closed by `close_question_reports()`,
+  every open report of one question at once; read by the admin's page
+  through `question_report_groups()`, one row per question. All three
+  server only. No copy of the question's text.
+- Browser: nothing.
+
 ### `bank_subjects`, `bank_topics` — each course's two lists
 | Column | Holds |
 |---|---|
@@ -652,26 +675,6 @@ table by table as each is next changed (AGENTS.md rule 9).
 - **The numbers that have had a trial** — *ticked 2026-10-04 (03 F4b)*:
   the database refuses a second trial for a number on it. No browser
   access. (No table of SMS codes — the SMS company checks the code.)
-- **Question reports** (06.2) — *ticked 2026-10-17*: a table
-  `question_reports`, one row per report.
-
-  | Column | Holds |
-  |---|---|
-  | `report_id` | The report |
-  | `item_id`, `course_id` | The question (→ `question_bank`) and its course |
-  | `attempt_id` | The sitting it was sent from (→ `attempts`) |
-  | `user_id` | The student (→ `users`) |
-  | `reason` | One of six words: `answer_wrong`, `unclear`, `typo`, `picture`, `explanation`, `other` |
-  | `note` | The student's words, at most 1,000 characters; required for `other` |
-  | `chosen` | The student's answer then, as `attempt_items.chosen` (a letter, or a comma list); empty if not answered |
-  | `status` | `new`, `fixed` or `dismissed` (`reviewed` dropped: no button set it — Sam, 2026-10-17) |
-  | `created_at` | When sent |
-  | `closed_by`, `closed_at` | The admin who marked it fixed or dismissed, and when |
-
-  **One open report per student per question** (a unique index on the
-  `new` ones). Written only through the server, behind a check that the
-  question is in the student's own sitting; the admin page reads it with
-  the service role. Browser: nothing. No copy of the question's text.
 - **The email outbox** (10.2) — needs Sam's tick at the build.
 - **The badges already shown** (05 G3) — needs Sam's tick at the build.
 - **The daily challenge's draw** — *ticked 2026-10-08 (04 G2)*: one

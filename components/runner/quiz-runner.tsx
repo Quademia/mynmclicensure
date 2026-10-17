@@ -40,11 +40,10 @@
 // type has no `correct`, so nothing here can read the key off a
 // question; a timed exam's page source carries none.
 //
-// "Send feedback" under each question (slice 12a): builds legacy's
-// reference text — the stem, the options as shown and the student's
-// current answer, never the correct one — saves progress, then opens
-// the messages page in a new tab with the course, attempt, quiz and
-// item ids and the quoted question (locked or review: opens at once).
+// "Report an issue" under each question (06.2, Sam 2026-10-17; in place
+// of slice 12a's "Send feedback", which opened a message thread per
+// question): a box in the sitting, report-issue.tsx — never in the
+// admin's preview, which has no sitting to report from.
 // Legacy's brand string in the header and the watermark read
 // "QAcademy"; the brand is Quademia (AGENTS.md UI convention #5).
 //
@@ -66,6 +65,7 @@ import { advanceAttempt, checkAnswer, expireAttempt, finishAttempt, retakeAttemp
 import { reportHref, sessionHref } from '@/lib/attempts/links';
 import { ResultsHeldPopup, ResultsPopup, type ResultsSummary } from './results-popup';
 import { ResultsHeld, ReviewClosed } from './results-held';
+import { ReportIssueDialog } from './report-issue';
 import { Icon } from '@/components/shell/icons';
 import { KindChip, QUESTION_TYPE_HUE } from '@/components/shell/chips';
 import {
@@ -261,6 +261,12 @@ export function QuizRunner({
   const [clocksShown, setClocksShown] = useState(!hasClock);
   const [liveTimes, setLiveTimes] = useState<{ sitting: number; byItem: Record<string, number> }>({ sitting: 0, byItem: {} });
   const dismissToast = useCallback(() => setToast(null), []);
+  // Report an issue (06.2): the question whose box is open, the questions
+  // reported in this sitting (their dates), and the thank-you toast.
+  const [reportFor, setReportFor] = useState<{ item: SealedItem; globalIdx: number; chosen: string | string[] | null } | null>(null);
+  const [reportedAt, setReportedAt] = useState<Record<string, string>>({});
+  const [thanks, setThanks] = useState<string | null>(null);
+  const dismissThanks = useCallback(() => setThanks(null), []);
   const startedAtRef = useRef<number | null>(null);
   const finishingRef = useRef(false);
   const lastAutoSubmitRef = useRef(0);
@@ -1002,9 +1008,11 @@ export function QuizRunner({
                 <Icon name="flag" />{flags[item.item_id] ? 'Unflag' : 'Flag'}
               </button>
             )}
-            <button type="button" className="btn-sm-link" onClick={() => sendFeedback(item, globalIdx, opts, chosenRaw)}>
-              Send feedback
-            </button>
+            {previewMode ? null : (
+              <button type="button" className="btn-sm-link btn-report" onClick={() => setReportFor({ item, globalIdx, chosen: chosenRaw ?? null })}>
+                <Icon name="report" />Report an issue
+              </button>
+            )}
           </div>
           <div className="watermark">Quademia</div>
         </div>
@@ -1012,56 +1020,16 @@ export function QuizRunner({
     );
   }
 
-  // ── Send feedback (legacy buildFriendlyRefText + the button) ──
-  function buildFeedbackRef(item: SealedItem, globalIdx: number, opts: OptionView[], chosenRaw: ChosenMap[string] | undefined): string {
-    const lines: string[] = [];
-    lines.push(`Quademia — Question feedback (${M.fullName})`);
-    lines.push(`Course: ${attempt.display_label || attempt.course_id || ''}`);
-    lines.push(`Question: ${globalIdx + 1} of ${items.length}`);
-    const topic = [item.maintopic, item.subtopic].filter(Boolean).join(' › ');
-    if (topic) lines.push(`Topic: ${topic}`);
-    lines.push('');
-    lines.push('Question:');
-    lines.push((item.stem || '').slice(0, 900));
-    lines.push('');
-    lines.push('Options (as shown):');
-    const labels = 'ABCDEFGH';
-    opts.forEach((opt, i) => {
-      lines.push(`${labels[i]}. ${(opt.text || '').slice(0, 360)}`);
-    });
-    lines.push('');
-    if (chosenRaw) {
-      if (Array.isArray(chosenRaw)) {
-        const picks = chosenRaw.map((letter) => {
-          const match = opts.find((o) => o.letter === letter);
-          return match ? match.text.slice(0, 120) : letter.toUpperCase();
-        });
-        lines.push(`My answer: ${picks.join(', ')}`);
-      } else {
-        const match = opts.find((o) => o.letter === chosenRaw);
-        const idx = match ? opts.indexOf(match) : -1;
-        const label = idx >= 0 ? labels[idx] : chosenRaw.toUpperCase();
-        lines.push(`My answer: ${label} - ${match ? match.text.slice(0, 120) : ''}`);
-      }
-    } else {
-      lines.push('My answer: (not answered yet)');
-    }
-    return lines.join('\n');
-  }
-
-  function sendFeedback(item: SealedItem, globalIdx: number, opts: OptionView[], chosenRaw: ChosenMap[string] | undefined) {
-    const ref = buildFeedbackRef(item, globalIdx, opts, chosenRaw);
-    const url =
-      `/student/messages?course_id=${encodeURIComponent(attempt.course_id)}` +
-      `&attempt_id=${encodeURIComponent(attempt.attempt_id)}` +
-      `&quiz_id=${encodeURIComponent(attempt.quiz_id || '')}` +
-      `&item_id=${encodeURIComponent(item.item_id)}` +
-      `&ref=${encodeURIComponent(ref)}`;
-    if (locked || reviewMode) {
-      window.open(url, '_blank');
-    } else {
-      void saveProgress().then(() => window.open(url, '_blank'));
-    }
+  // ── Report an issue (06.2) ──
+  // "I don't understand the answer" opens Messages on the course's thread
+  // with this in the draft: the sitting, the question's number and the
+  // start of its stem — never an option or the answer.
+  function askHref(item: SealedItem, globalIdx: number): string {
+    const stem = (item.stem || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const quote =
+      `About question ${globalIdx + 1} of ${items.length} in ${attempt.display_label || 'my sitting'}:\n` +
+      `"${stem.length > 200 ? `${stem.slice(0, 200)}…` : stem}"\n\n`;
+    return `/student/messages?course_id=${encodeURIComponent(attempt.course_id)}&ref=${encodeURIComponent(quote)}`;
   }
 
   const pageStart = safePage * perPage;
@@ -1376,7 +1344,24 @@ export function QuizRunner({
 
       <BodyPortal>
         <Toast message={toast} onDismiss={dismissToast} />
+        <Toast message={thanks} tone="success" onDismiss={dismissThanks} />
         {confirmDialog}
+        {reportFor ? (
+          <ReportIssueDialog
+            open
+            onClose={() => setReportFor(null)}
+            attemptId={attempt.attempt_id}
+            itemId={reportFor.item.item_id}
+            chosen={reportFor.chosen}
+            messagesHref={askHref(reportFor.item, reportFor.globalIdx)}
+            alreadyAt={reportedAt[reportFor.item.item_id] ?? null}
+            onSent={() => {
+              setReportedAt((m) => ({ ...m, [reportFor.item.item_id]: new Date().toISOString() }));
+              setThanks("Thanks, we'll look at it.");
+            }}
+            onAlready={(at) => setReportedAt((m) => ({ ...m, [reportFor.item.item_id]: at }))}
+          />
+        ) : null}
         <div className="runner-overlay">
           {gridOverlayOpen ? (
             <div className="overlay-backdrop" onClick={(e) => { if (e.target === e.currentTarget) setGridOverlayOpen(false); }}>

@@ -4,9 +4,9 @@
 // The server half: the gate, then what legacy's boot loaded — the
 // active courses (the thread labels and the course reference card)
 // and the student's threads with their latest message — plus the deep
-// link the course page ("Message us", a course id) and the runners
-// ("Send feedback", the item, quiz and attempt ids and the quoted
-// question) put in the address, handed to the client half, which is
+// link the course page ("Message us", a course id) and the sitting's
+// "I don't understand the answer" (a course id and the question quoted,
+// for the draft; 06.2) put in the address, handed to the client half, which is
 // the page's script. The client opens or reuses the thread for a deep
 // link and then clears the address, as legacy did.
 

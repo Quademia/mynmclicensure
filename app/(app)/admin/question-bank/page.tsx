@@ -19,9 +19,15 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-export default async function AdminQuestionBankPage() {
+type Search = Promise<{ course?: string; item?: string }>;
+
+// ?course=…&item=… (the Question reports page's "Open in the bank", 06.2):
+// the course picked and that question's editor opened on arrival.
+export default async function AdminQuestionBankPage({ searchParams }: { searchParams: Search }) {
   const { supabase } = await requireAdmin();
-  const courses = await getAllCourses(supabase);
+  const [courses, params] = await Promise.all([getAllCourses(supabase), searchParams]);
+  const openCourse = String(params.course || '').trim();
+  const openItem = String(params.item || '').trim();
 
   return (
     <>
@@ -29,7 +35,10 @@ export default async function AdminQuestionBankPage() {
         title="Question Bank"
         subtitle="Browse, edit and manage questions across all courses"
       />
-      <QuestionBankClient courses={courses} />
+      <QuestionBankClient
+        courses={courses}
+        open={openCourse && courses.some((c) => c.course_id === openCourse) ? { course: openCourse, item: openItem || null } : null}
+      />
     </>
   );
 }

@@ -66,7 +66,9 @@ export type IconName =
   | 'upload'
   | 'x'
   // the row menu's button (09.10, 2026-10-17)
-  | 'dots';
+  | 'dots'
+  // Report an issue, a speech bubble holding "!" (06.2; Sam, 2026-10-17)
+  | 'report';
 
 /** The nav row's icon. Every icon name is allowed; see IconName. */
 export type NavIcon = IconName;

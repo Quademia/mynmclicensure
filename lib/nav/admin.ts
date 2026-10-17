@@ -21,6 +21,7 @@ export const ADMIN_NAV: NavItem[] = [
   { key: 'mock-exams', label: 'Mock Exams', icon: 'target', href: `${A}/mock-exams` },
   { key: 'attempts', label: 'Attempts', icon: 'chart', href: `${A}/attempts` },
   { key: 'question-bank', label: 'Question Bank', icon: 'folder', href: `${A}/question-bank` },
+  { key: 'question-reports', label: 'Question Reports', icon: 'report', href: `${A}/question-reports` },
   { key: 'messages', label: 'Messages', icon: 'message', href: `${A}/messages`, badge: 'messages' },
   { key: 'config', label: 'Config', icon: 'settings', href: `${A}/config` },
 ];
