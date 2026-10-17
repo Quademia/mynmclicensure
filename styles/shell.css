@@ -287,25 +287,24 @@
   margin-left: 0;
 }
 
-/* --- The page title, 3b (Sam, 2026-10-17, 09.11) ---
- * A grey line across the page; on it, under the title only, a teal line
- * exactly as wide as the words (the row is flex, so the title shrinks to
- * them; long titles wrap and the teal spans the widest line). The
- * subtitle always sits below the line. The 3px and the -2px that seat
- * the teal on the grey are the drawing's, not tokens. */
+/* --- The page title (Sam, 2026-10-17, 09.11; drawn as 4b) ---
+ * One 2px line across the page under the title: teal at the start,
+ * turning grey over a fixed 240px whatever the screen or the title's
+ * length, grey to the end. The subtitle always sits below the line.
+ * Where border-image is not drawn, the line is plain grey. */
 .page-header {
   margin-bottom: var(--space-24);
 }
 
 .page-header-row {
   display: flex;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid var(--border);
+  border-image: linear-gradient(to right, var(--brand-teal), var(--border) 240px) 1;
 }
 
 .page-header-title {
-  margin: 0 0 -2px;
+  margin: 0;
   padding-bottom: var(--space-12);
-  border-bottom: 3px solid var(--brand-teal);
   min-width: 0;
   overflow-wrap: break-word;
   font-size: var(--type-page-title-size);

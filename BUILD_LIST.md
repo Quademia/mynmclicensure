@@ -167,7 +167,7 @@ before then, and the old list's history, is in
 - ⬜ 09.3 A content width limit above 1440px
 - ⬜ 09.4 Dark mode — after the above
 - ⬜ 09.5 The old token names retired once no page uses them
-- ✅ 09.11 The page title, 3b — teal as wide as the words on a grey line; subtitles below; tabs lineless — 2026-10-17
+- ✅ 09.11 The page title — one line, teal fading to grey over 240px; subtitles below; tabs lineless — 2026-10-17
 - ✅ 09.10 A row menu (three dots) — what a row allows, closed items in grey; on Learning History — 2026-10-17
 - ✅ 09.6 The phone's bottom bar and sub-tab row — four fixed tabs, a row per group, the drawer kept — 2026-10-04
 - ✅ 09.7 The student menu in its groups — a heading per group, every row visible, the phone's names — 2026-10-04

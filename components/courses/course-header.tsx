@@ -3,7 +3,7 @@
 // The course's header, shared by the course page and the Practice Papers
 // pages inside a course (Sam, 2026-10-12): the row of tabs across the top —
 // a way back and the student's courses, the current one in navy, the teal
-// line being the title's (3b, 09.11; on a phone only the way back) — then
+// line being the title's (09.11; on a phone only the way back) — then
 // the title with the days-left chip and
 // the end date. "Message us" and the progress card are the course page's
 // own and are passed in as `children`. Server Component.

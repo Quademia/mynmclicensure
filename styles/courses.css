@@ -44,7 +44,7 @@ a.cp-card:hover { box-shadow: var(--shadow-md); text-decoration: none; }
 
 /* The course page. The tabs are words with no line of their own: the
    current course is navy, and the page's one teal line is the title's
-   (3b; Sam, 2026-10-17, 09.11 — two teal lines stacked otherwise). */
+   (Sam, 2026-10-17, 09.11 — two teal lines stacked otherwise). */
 .cp-tabs { display: flex; align-items: center; gap: var(--space-8); flex-wrap: wrap; }
 .cp-tab-back { padding: var(--space-10) var(--space-12) var(--space-10) 0; font-size: var(--type-ui-size); font-weight: 600; color: var(--brand-teal-hover); }
 .cp-tab {

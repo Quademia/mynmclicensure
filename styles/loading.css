@@ -18,10 +18,9 @@
   white-space: nowrap;
 }
 
-/* the page title and subtitle, spaced as .page-header (shell.css, 3b):
-   the title's shape on the grey line, as tall as the real row (its line,
-   then 12px — 10px on a phone — and the teal's 1px below the grey), the
-   subtitle's below it */
+/* the page title and subtitle, spaced as .page-header (shell.css, 09.11):
+   the title's shape above a grey line, as tall as the real row (its line,
+   then 12px — 10px on a phone — and the 2px line), the subtitle's below */
 .pl-head { margin-bottom: var(--space-24); }
 .pl-head-row { border-bottom: 1px solid var(--border); padding: 3px 0 16px; }
 .pl-title { width: 40%; max-width: 260px; height: 28px; }

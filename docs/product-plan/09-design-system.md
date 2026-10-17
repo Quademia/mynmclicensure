@@ -39,11 +39,13 @@ Detail and history: `archive/product-plan/10-design-system.md`.
   filling by weight in three bars (Sam: navy). Retake and the modes stay
   grey. Kind and scale colours are set in `components/shell/chips.tsx`.
 - **Card** — one `.card`; one product card for both selling pages.
-- **Page title** — 3b (Sam, 2026-10-17; 09.11), `PageHeader`: navy, 28px
-  on a computer and 22px on a phone, on a grey line across the page with
-  a teal line as wide as the words; a title on two lines has the teal
-  across the row (Sam: kept, no script measuring the words). A subtitle,
-  count or sentence, always below the line. Course tabs above a title
+- **Page title** — (Sam, 2026-10-17; 09.11), `PageHeader`: navy, 28px
+  on a computer and 22px on a phone, over one 2px line across the page,
+  teal at the start turning grey over a fixed 240px — the same for every
+  title, short or on two lines (drawn as 4b; 3b, a teal line as wide as
+  the words on a grey line, was built first and replaced the same day: a
+  two-line title's teal ran across the row). A subtitle, count or
+  sentence, always below the line. Course tabs above a title
   (the course page, a course in Practice Papers) carry no line, the
   current course navy: one teal line a page. Not on it yet: the
   dashboard's greeting, the portal guide's hero, Packages, the offline
