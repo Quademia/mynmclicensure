@@ -127,7 +127,7 @@ archiving releases nothing.
 - **Paged fifty at a time, filtered by the database**, in place of
   loading the whole course. *(to build: B3)*
 
-### Question reports *(to build: 06.2)*
+### Question reports *(built 2026-10-17: 06.2)*
 
 Ruled by Sam, 2026-09-18, and in full 2026-10-17 — planned with the
 support desk (08.2) and built with it, the two kept apart: a mistake in

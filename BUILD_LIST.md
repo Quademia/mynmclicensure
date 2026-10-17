@@ -123,7 +123,7 @@ before then, and the old list's history, is in
 
 - ⬜ B3 The admin's bank page paged — fifty at a time, filtered by the database
 - ⬜ 06.1 The History panel — a question's past versions; restore as a save
-- ⬜ 06.2 Question reports — "Report an issue" box in the sitting, an admin page by question; built with 08.2
+- ✅ 06.2 Question reports — "Report an issue" in the sitting; an admin list by question, Open · Closed — 2026-10-17
 - ⏸ 06.9 A thumbs-up on a question, so praise has its own place — decided once students use the app (10-17)
 - ⬜ 06.3 Content: subjects and topics tidied in the panel — merges, doubles, Not set
 - ⬜ 06.4 Content: `RM_MID_PHILLI-S1-42` answers "a & c" on a single-answer question (Sam, 09-27)
