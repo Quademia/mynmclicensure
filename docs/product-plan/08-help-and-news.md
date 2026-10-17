@@ -44,12 +44,29 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
 
 ### Messages — the support desk *(to build: 08.2)*
 
-Ruled by Sam, 2026-09-18.
+Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
+2026-10-17.
 
 - **A support tool, not a chat**: threads between one student and
-  Quademia, either **general** or about a **course**. The course page's
-  "Message us" opens a draft tagged with the course. A general or
-  course thread reuses the open one.
+  Quademia, each with **one of five labels** in place of "general or a
+  course" (Sam, 2026-10-17: B) — *Payment or package · My account ·
+  Something isn't working · A course* (and which) *· Something else*. A
+  thread reuses the open one of its label (a course's, that course's).
+  **No subject line**: a thread reads as its label or its course; lists
+  show the start of its last message.
+- **"Message us" can sit on any page and opens a pop-up box there**,
+  the label already picked by the place — a course page: that course;
+  Packages and the end of a package: Payment or package; Profile and the
+  too-many-devices notice: My account; an error screen: Something isn't
+  working; the sitting's "I don't understand the answer": the course,
+  the question quoted. A text box, Send, then a toast — "Sent. We'll
+  reply in Messages" — and the student stays where they were (one
+  request, on weak data). From Messages itself, or the help page, the
+  student picks the label first. **Replies are read in Messages**, with
+  the thread's whole history. *(the links on other pages: 08.4, as each
+  page is touched)*
+- Messages needs a signed-in student, so one who cannot sign in cannot
+  reach it — the sign-in page gets its own way out (01.10).
 - **Writes through the server only; a message is fixed once sent**;
   2,000 characters at most.
 - A thread is open or closed; a reply to a closed thread reopens it
@@ -57,21 +74,24 @@ Ruled by Sam, 2026-09-18.
 - Read stamps on the thread drive one unread rule; **the unread badge
   counts open threads in one query**. Replies and closes reach an open
   page live.
-- **The admin inbox**: one feed (name, context, last message), filters
-  by unread and context, search by name or email, reply, close and
+- **The admin inbox**: one feed (name, label, last message), filters
+  by unread and label, search by name or email, reply, close and
   reopen, New Thread to one student; **paged**.
-- A student's send is a door of the app's limiter (10).
+- A student's send is a door of the app's limiter (10.8); **no limit of
+  its own until then** (Sam, 2026-10-17) — only a signed-in student
+  sends, through the server, 2,000 characters at most.
 - The unread count shows on the top bar's envelope on a computer; on a
   phone on the drawer's Messages row, with a teal dot on the hamburger.
   Quademia's side of a thread shows the logo.
 - Feedback on a question leaves messaging for **question reports** (06),
-  planned with this and built with it (Sam, 2026-10-17): the question
-  threads go when "Report an issue" arrives, and its "I don't understand
-  the answer" opens the course's thread here with the question quoted.
-- **The build, in order** (2026-10-17): the storage of both; Report an
-  issue and the admin's Question reports page; Messages through the
-  server on both sides, Bulk Send and the question threads gone; the
-  student page redesigned, drawn first; the admin inbox paged, on
+  planned with this and built with it (Sam, 2026-10-17): "Report an
+  issue" is built (06.2); **the old question threads are deleted** with
+  their messages when the question type goes (Sam, 2026-10-17 — dev's
+  three are sample data; any on prod go too).
+- **The build, in order** (2026-10-17): question reports end to end
+  (done, 06.2); Messages through the server on both sides — the storage,
+  the labels, the pop-up box, Bulk Send and the question threads gone;
+  the student page redesigned, drawn first; the admin inbox paged, on
   today's look.
 
 ### Help pages and groups

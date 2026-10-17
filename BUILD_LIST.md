@@ -41,6 +41,7 @@ before then, and the old list's history, is in
 - ⬜ 01.6 Last sign-in — written at sign-in, shown in the drawer, a dormant filter on Users
 - ⬜ 01.7 One Quademia account — "sign in to add this product"; "complete your profile"
 - ⏸ 01.8 Email confirmation at sign-up — parked under the port's rule, which has ended; to re-rule
+- ⬜ 01.10 "Can't sign in?" on the sign-in page — WhatsApp or email; Messages needs a sign-in (10-17)
 - ✅ 01.9 (unplanned) A sign-out ends only its own device, not all; a password reset still ends all — 2026-10-17
 
 ## [02 Packages and payments](docs/product-plan/02-packages-and-payments.md)
@@ -153,7 +154,8 @@ before then, and the old list's history, is in
 - ⬜ 08.1 Course news to everyone who has held the course, revoked grants apart (Sam, 10-04)
 - ⬜ A4 A real quiz-link picker in the announcement editor
 - ⬜ A3 The body stored once, no extra line break per edit, the dead read removed — later
-- ⬜ 08.2 The support desk (tables ✅) — general and course threads, server writes, a paged inbox, Bulk Send out
+- ⬜ 08.2 The support desk (tables ✅) — five labels, a pop-up box, server writes, a paged inbox, Bulk Send out
+- ⬜ 08.4 "Message us" on other pages, each picking its label — as each page is touched (after 08.2)
 - ⬜ 08.3 NMC procedures — the manual links into a table the admin manages
 - ⬜ 17 The premium channel — one per programme, all year; link codes; the bot admits and removes members
 

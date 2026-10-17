@@ -619,6 +619,12 @@ table by table as each is next changed (AGENTS.md rule 9).
   the other side); the six leftover columns dropped; checks on the
   status, context and sender words; live updates on close; writes
   through the server only.
+- *To build — ticked 2026-10-17 (08, the labels):* `context_type` holds
+  one of five words — `payment`, `account`, `technical`, `course`,
+  `other` — with `course_id` set exactly when it is `course`; `subject`
+  dropped. Old rows: `question` threads deleted with their messages (Sam),
+  `general` becomes `other`. A student's open thread is one per label
+  (per course for `course`): a unique index on the open ones.
 - Browser: the student reads and writes their own threads; an admin all.
   *Old defaults* — a student can today rewrite a thread's status.
 

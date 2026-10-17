@@ -116,6 +116,10 @@ Detail and history: `archive/product-plan/04-access-control.md`,
   allows for it. To re-rule.
 - **The sign-in check's round trips** — six before a protected page
   shows (D28); the fix is in code, waiting only on Sam's word.
+- **A way out for a student who cannot sign in** (01.10, found
+  2026-10-17 with 08's labels): Messages needs a sign-in, so the sign-in
+  page needs its own "Can't sign in?" line — WhatsApp or email, which
+  and its words Sam's.
 - **A phone number format check** on register, checkout and profile —
   any 9 digits are taken today (10-03, unruled); the trial's verified
   number already uses one form (03).
