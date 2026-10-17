@@ -25,6 +25,20 @@ import type { AttemptMode, AttemptWithProgress } from '@/lib/attempts/types';
 import type { Availability } from '@/lib/quizzes/types';
 import { closeDue, formatResultsAt, formatResultsShort, resultsHeld, reviewClosed, reviewLine, type ReviewSetting } from '@/lib/quizzes/results-date';
 
+/**
+ * The courses a student's pages list — My courses, Practice Papers, and
+ * Messages' course picker (08.2): the ones they hold, else their
+ * programme's (Sam, 2026-10-11; 2026-10-17 for the picker).
+ */
+export function studentCourseList<C extends { course_id: string; program_scope?: string[] | null }>(
+  all: C[],
+  held: Record<string, unknown>,
+  programId: string | null,
+): C[] {
+  const mine = all.filter((c) => held[c.course_id]);
+  return mine.length ? mine : all.filter((c) => Boolean(programId) && (c.program_scope ?? []).includes(programId as string));
+}
+
 /** What a student's courses let them do with papers. `all` a package; `trial` only the trial paper; `none` nothing live. */
 export type PaperAccess = 'all' | 'trial' | 'none';
 

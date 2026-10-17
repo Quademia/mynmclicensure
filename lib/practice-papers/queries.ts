@@ -28,7 +28,7 @@ import { orderModes } from '@/lib/attempts/modes';
 import type { AttemptMode } from '@/lib/attempts/types';
 import type { ReviewSetting } from '@/lib/quizzes/results-date';
 import { slices } from '@/lib/supabase/read-all';
-import { byTitle, paperView, type CourseView, type PaperAccess, type PaperRow } from './derive';
+import { byTitle, paperView, studentCourseList, type CourseView, type PaperAccess, type PaperRow } from './derive';
 
 export type PracticePapers = {
   courses: CourseView[];
@@ -106,9 +106,7 @@ export async function loadPracticePapers(supabase: ServerSupabaseClient, profile
 
   const heldIds = allCourses.filter((c) => access[c.course_id]).map((c) => c.course_id);
   // Nothing held: the programme's own courses, so the papers still show, locked (Sam, 2026-10-11).
-  const shown = heldIds.length
-    ? allCourses.filter((c) => access[c.course_id])
-    : allCourses.filter((c) => profile.program_id && (c.program_scope ?? []).includes(profile.program_id));
+  const shown = studentCourseList(allCourses, access, profile.program_id ?? null);
 
   const accessBy = await paperAccessByCourse(userId, heldIds);
 

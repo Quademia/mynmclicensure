@@ -98,11 +98,15 @@ function linkify(s: string): React.ReactNode[] {
 export function MessagesClient({
   student,
   courses,
+  pickerCourses,
   initialThreads,
 }: {
   /** The signed-in student, for their name circle (DS7): photo, else initials. */
   student: { name: string; avatarUrl: string | null };
+  /** Every active course, for the threads' names. */
   courses: CourseBit[];
+  /** "+ New"'s course picker: the student's My courses list. */
+  pickerCourses: CourseBit[];
   initialThreads: StudentThread[];
 }) {
   const router = useRouter();
@@ -390,7 +394,7 @@ export function MessagesClient({
                       <label htmlFor="newThreadCourse">Which course?</label>
                       <select id="newThreadCourse" value={newCourse} onChange={(e) => setNewCourse(e.target.value)}>
                         <option value="" disabled>Choose a course</option>
-                        {courses.map((c) => (
+                        {pickerCourses.map((c) => (
                           <option key={c.course_id} value={c.course_id}>{c.title}</option>
                         ))}
                       </select>
