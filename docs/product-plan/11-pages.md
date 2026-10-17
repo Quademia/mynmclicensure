@@ -92,6 +92,9 @@ opens it (00, The menu).
   page: each is read from the student's own data and the course.
 - The course page's mocks row opens the course's open mock's own page
   when there is one, else the Mock exams page (2026-10-13, with 04.15).
+- Parked (Sam, 2026-10-17): a card of the course's strongest topics and
+  topics to work on (05.6) — drawn too busy; drawn again after Learning
+  History.
 
 ### Practice papers
 - **Redesigned (Sam, 2026-10-12; 04.7)**, drawn at
@@ -235,11 +238,19 @@ opens it (00, The menu).
   screen of a later sitting says it shows the score and report only.
 
 ### Learning history
-- Every sitting under its course's name; a Report link on finished
-  ones; mode chips from the mode table; the true totals and topic
-  accuracy (05 Q12). A sitting whose results are held shows "Results on
-  …" in place of its score (04.12).
-- **Check**: for a student with no live course the names show as codes
+- **Redesigned (Sam, 2026-10-17; 05.5)**, drawn in the chat; the rules
+  are in 05. Top to bottom: the title; the course chips; the figures
+  (sittings, average, best, the count by kind); a row per sitting —
+  one tap to its report or Resume, three dots for what else it allows;
+  Load more. Phone first; on a computer the same list in the page's
+  column.
+- Free: their free sittings like any other (03). Trial: as paid.
+  Ended: every sitting stays, See your report open, Review answers and
+  Retake locked in the menu with "Choose a package"; an unfinished
+  sitting still finishes (03). Held: "Results on …" in place of the
+  score (04.12).
+- No count, name or date is written into the page.
+- **Check** (today's page, for the build to fix): for a student with no live course the names show as codes
   and the course filter is empty; the stats bar, Source and Sort count
   only the loaded pages; no Mock option in Source, and a mock shows the
   raw word "mock".

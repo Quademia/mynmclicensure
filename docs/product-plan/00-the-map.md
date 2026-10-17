@@ -80,11 +80,11 @@ Full Access stays the admin's grant (02).
 | | Daily challenge — *new* | A set number of questions a day (5 to start), one course in turn; opened from the dashboard's top card, no menu item (04 G2) |
 | | The sitting | Answering questions, in four modes |
 | | Report | One sitting's debrief: what to fix next |
-| Progress | Learning history | Every past sitting: resume, review, retake |
+| Progress | Learning history | Every past sitting, by course: open its report, resume, review, retake; the figures by kind (05) |
 | | Streak and questions mastered — *new* | A card on the dashboard, not a page (05 G1a) |
 | | Leaderboard — *new* | My school, my programme, schools — each board one programme's; a "your rank" line on the challenge card opens it (05 G1b) |
 | | Badges — *later* | Milestones, once there are real numbers (05 G3) |
-| | Progress across sittings — *later* | Topic accuracy over time — not ruled (05 Q12) |
+| | A course's topics — *later* | Strongest and to work on, on the course page, not a page of its own (05.6, parked; Sam, 2026-10-17) |
 | Study offline | My packs | The packs the student has made |
 | | Build a pack | Questions picked to study without data |
 | | The pack | The pack itself, to save or print |

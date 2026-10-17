@@ -108,7 +108,9 @@ before then, and the old list's history, is in
 
 - ✅ G1a The streak and questions mastered — the dashboard's streak card, with 05.4 — 2026-10-10
 - ✅ 05.4 The dashboard redesigned — D2a, D2b; six states walked, the words approved — 2026-10-10
-- ⬜ Q12 Progress across sittings — true totals, topic accuracy over time, a nudge, a trend
+- ⬜ 05.5 Learning History redesigned — course chips, the figures, one tap to the report, a dots menu by state
+- ⬜ Q12 The history's figures — sittings, average, best, a count by kind, by the database; storage tick first
+- ⏸ 05.6 A course's topics on its course page — strongest and to work on; too busy as drawn (10-17); after 05.5
 - ⬜ Q13 Readiness and standing — the percentile first on the trial paper; a band; how others did
 - ⬜ G1b The leaderboard — from G2; three views; usernames and Noto animals; its storage tick first
 - ⬜ G3 Badges — milestones on mastered and the streak, in place of tiers; after G1a
@@ -164,6 +166,7 @@ before then, and the old list's history, is in
 - ⬜ 09.3 A content width limit above 1440px
 - ⬜ 09.4 Dark mode — after the above
 - ⬜ 09.5 The old token names retired once no page uses them
+- ⬜ 09.10 A row menu (three dots) — what a row allows, closed items in grey; first on Learning History (Sam, 10-17)
 - ✅ 09.6 The phone's bottom bar and sub-tab row — four fixed tabs, a row per group, the drawer kept — 2026-10-04
 - ✅ 09.7 The student menu in its groups — a heading per group, every row visible, the phone's names — 2026-10-04
 - ✅ 09.9 The menu's Home group — Dashboard and My courses under Home; the phone's first tab Home with Dashboard · Courses (Sam, 2026-10-12)

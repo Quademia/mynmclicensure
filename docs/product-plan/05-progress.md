@@ -13,19 +13,45 @@ and `archive/product-plan/03-quiz-system.md` (Q10–Q13).
 
 ### Learning history
 
-- Every sitting, each under its course's name, with Resume / Review /
-  Retake and a Report link on finished ones (04). Filters for course,
-  mode, status, search, source and sort; Load more; a stats bar (total,
-  by mode, average, best).
-- **The figures are true totals over the whole history**, not over the
-  loaded pages. *(to build: Q12)*
-- **Accuracy by subject and topic over the whole history**, a nudge
-  from the weakest area to the Quiz Builder, and a score trend — on
-  Learning History and the dashboard. Queries only: each saved answer
-  already carries its subject, topic, difficulty, type, marks,
-  correctness and time. This is what makes the help page's and the home
-  page's promise true ("identify topics you repeatedly miss", "monitor
-  improvement over time"). *(to build: Q12)*
+Redesigned (Sam, 2026-10-17), drawn in the chat. A plain list of every
+sitting: where a student finds one and opens it, not a report. How
+they are doing across a course belongs on the course page (below,
+parked). *(to build: 05.5)*
+
+- **A row per sitting**, newest first: its name (two lines at most),
+  the course in full, the mode (the one mode table, 04), the date; on
+  the right one thing — the score, Resume, "Results on …" (04.12) or
+  Abandoned. Twenty at a time, Load more.
+- **A tap on the row** opens the sitting's report (which holds Review
+  answers and Retake), or the sitting itself for Resume; an abandoned
+  row opens nothing.
+- **Three dots on each row** open a menu of what the sitting allows
+  now: unfinished — Resume, Abandon this sitting (the confirm box,
+  04.20); finished — See your report, Review answers, Retake; results
+  held — the date, and Retake where a further sitting is allowed;
+  abandoned — Retake where allowed. **What is closed is told in grey,
+  not hidden**: "Review closed on …" (04.13), "No sittings left"
+  (04.10); for an ended student, Review answers and Retake with a lock,
+  "Choose a package" (03). The menu is a new shared piece (09.10).
+- **Course chips** — All and each of the student's courses, wrapping,
+  never scrolling sideways — are the only filter. Search, mode, status,
+  source and sort go (any can come back if students ask).
+- **The figures**, above the list, following the chip, **true totals
+  over the whole history**, not over the loaded rows: sittings, the
+  average and the best (finished sittings; a held one from its date),
+  and a count by kind — practice papers, mocks, quiz builder, free
+  practice (a builder quiz of free questions only). A retake counts as
+  its original's kind. The count by mode goes. *(to build: Q12)*
+- Offline pack practice is not listed (07: no sync).
+- **A course's topics on its course page** — its strongest topics and
+  its topics to work on (each with Practise), over the course's whole
+  history, perhaps a score trend; no page of its own (Sam,
+  2026-10-17). Drawn and found too busy; parked until after Learning
+  History. Queries only: each saved answer already carries its subject,
+  topic, difficulty, type, marks, correctness and time. This is what
+  makes the help page's and the home page's promise true ("identify
+  topics you repeatedly miss", "monitor improvement over time").
+  *(parked: 05.6)*
 - Paper cards show attempts and the best score per mode; the dashboard
   shows the last five sittings.
 
@@ -121,8 +147,10 @@ Settled by Sam, 2026-10-04.
 
 ## Storage
 
-- Q12, Q13 — none (Q12 leans on an index on a student's sittings by
-  date, on the speed list in 10).
+- Q12 — a read-only function counting the history's figures, and an
+  index on a student's sittings by date (on the speed list in 10):
+  written on `attempts` and the functions in 12, ticked 2026-10-17.
+- Q13 — none.
 - G1a — none.
 - G1b — two columns on `users`, the username and the animal: needs
   Sam's tick before the build.
@@ -131,8 +159,9 @@ Settled by Sam, 2026-10-04.
 
 ## Open
 
-- **Q12's shape** — which pages, the minimums (a candidate from
-  2026-09-24, not ruled).
+- **A course's topics (05.6)** — drawn again smaller, after Learning
+  History: how many, the minimums (the dashboard's are 20 answers and
+  5 in a topic), whether a trend.
 - **Q13** — the minimum before "how everyone did" shows (MyNclex uses
   30); the readiness band's signals and words.
 - The username word lists — adjectives and animals; Sam sees them
