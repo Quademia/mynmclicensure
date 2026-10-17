@@ -246,8 +246,8 @@ four-step page built from it, were set aside the same day.
   is the sum of its questions; an exam's comes from the server clock.
   Study shows a stopwatch and a question clock under one Hide / Show
   per sitting (not remembered); an exam's countdown is never hidden.
-- **Report this question** in the sitting, in place of Send feedback
-  (06). *(to build)*
+- **Report an issue** in the sitting, in place of Send feedback
+  (06). *(to build: 06.2)*
 
 ### Results and the report
 

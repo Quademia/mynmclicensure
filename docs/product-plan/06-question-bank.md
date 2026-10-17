@@ -127,12 +127,39 @@ archiving releases nothing.
 - **Paged fifty at a time, filtered by the database**, in place of
   loading the whole course. *(to build: B3)*
 
-### Question reports *(to build)*
+### Question reports *(to build: 06.2)*
 
-- **Report this question** replaces the "Send feedback" message threads
-  (Sam, 2026-09-18): a reason from a list, the student's own answer
-  attached, a status — new, reviewed, fixed, dismissed — and an admin
-  page grouped by question with Mark fixed.
+Ruled by Sam, 2026-09-18, and in full 2026-10-17 — planned with the
+support desk (08.2) and built with it, the two kept apart: a mistake in
+a question goes here, a conversation goes to Messages. Only questions
+are reported: one question is seen by many students and fixed once.
+
+- **"Report an issue"** under each question, beside Flag, with a speech
+  bubble holding "!" (in place of "Send feedback"; not "Feedback", which
+  the sitting already uses for the explanations, nor "Flag").
+- **A tap opens a box inside the sitting** — the app's dialog, no new
+  tab, the sitting stays; in a timed exam the clock runs on. The box,
+  "Report an issue with this question" (drawn as B, the smallest), a
+  reason chosen from a dropdown — The answer is wrong ·
+  The question is unclear · A spelling mistake or typo · The picture is
+  missing or wrong · The explanation is wrong · I don't understand the
+  answer · Something else (a note required) — an optional note, Send.
+  **"I don't understand the answer" sends no report**: it opens Messages
+  with the course and the question quoted.
+- Wherever a question shows — answering, review, a timed exam — for
+  every student, free, trial, paid or ended. **One open report per
+  student per question**; a second tap says "You've already reported
+  this question". The student hears nothing back: a toast, "Thanks,
+  we'll look at it".
+- A report keeps the question, its course, the sitting, the reason, the
+  note, the student's answer, a status — new, fixed, dismissed
+  ("reviewed" dropped, no button set it) — and who closed it and when
+  (the table ticked 2026-10-17, 12).
+- **The admin's Question reports page**: a row per question — how many
+  reports, their reasons, the newest date, a link to the question in
+  the bank's editor; Mark fixed or Dismiss closes all its open reports.
+- Parked: a thumbs-up on a question ("Was this question helpful?"), so
+  praise has its own place; decided once students use the app (06.9).
 
 ### Not taken
 

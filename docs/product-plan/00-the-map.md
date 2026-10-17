@@ -97,7 +97,7 @@ Full Access stays the admin's grant (02).
 | Account | Profile | Details and photo; the username and animal for the boards (*new*, 05) |
 | | Packages | Buy or extend a package (today "Upgrade") |
 
-In the sitting: **Report this question** — *new*, in place of Send
+In the sitting: **Report an issue** — *new*, in place of Send
 feedback (06).
 
 ### Visitor

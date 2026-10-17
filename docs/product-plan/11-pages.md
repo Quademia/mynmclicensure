@@ -217,7 +217,7 @@ opens it (00, The menu).
   have N flagged questions" — Go back and review / Submit anyway; with
   blanks: "You have N unanswered questions" — Go back / Submit anyway.
   No leave-page warning after Save & Resume Later or Submit & Exit.
-- Report this question (06). The admin's preview says Preview (04 Q19).
+- Report an issue (06). The admin's preview says Preview (04 Q19).
 - Ended: an unfinished sitting finishes; the review is locked; Retake
   kept with a lock — "Choose a package to retake" (03).
 - **Check**: a resumed exam's brief still opens with "The clock starts

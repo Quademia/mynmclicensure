@@ -64,7 +64,15 @@ Ruled by Sam, 2026-09-18.
 - The unread count shows on the top bar's envelope on a computer; on a
   phone on the drawer's Messages row, with a teal dot on the hamburger.
   Quademia's side of a thread shows the logo.
-- Feedback on a question leaves messaging for **question reports** (06).
+- Feedback on a question leaves messaging for **question reports** (06),
+  planned with this and built with it (Sam, 2026-10-17): the question
+  threads go when "Report an issue" arrives, and its "I don't understand
+  the answer" opens the course's thread here with the question quoted.
+- **The build, in order** (2026-10-17): the storage of both; Report an
+  issue and the admin's Question reports page; Messages through the
+  server on both sides, Bulk Send and the question threads gone; the
+  student page redesigned, drawn first; the admin inbox paged, on
+  today's look.
 
 ### Help pages and groups
 
