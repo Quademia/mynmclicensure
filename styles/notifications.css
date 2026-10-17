@@ -36,6 +36,7 @@
 }
 
 .nsw { padding: var(--space-12) var(--space-16); display: flex; align-items: center; gap: var(--space-12); margin-bottom: var(--space-16); }
+.nsw-note { margin-bottom: var(--space-16); }
 .nsw-switch {
   position: relative;
   flex: none;

@@ -15,3 +15,6 @@ export type SaveDeviceResult = { ok: true; kinds: NoticeKind[] } | { ok: false; 
 
 /** "Not now" hides the ask on that phone this long (Sam, 2026-10-17). */
 export const ASK_LATER_DAYS = 7;
+
+/** While the browser's Allow is open — Edge often shows it only as a bell in the address bar (walked 2026-10-17). */
+export const WAITING_WORDS = "Waiting for your browser's Allow. If no box appeared, look for a bell at the end of the address bar.";

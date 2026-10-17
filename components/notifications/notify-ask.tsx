@@ -15,6 +15,7 @@
 
 import { useState } from 'react';
 import { InstallAppDialog } from '@/components/install-app/install-app';
+import { WAITING_WORDS } from '@/lib/notifications/types';
 import { IconBell } from '@/components/shell/icons';
 import { askLater, turnOn, type AskShape } from '@/lib/notifications/client';
 import '@/styles/notifications.css';
@@ -68,7 +69,14 @@ export function NotifyAsk({
         </span>
         <div className="nask-words">
           <p className="nask-title">{iphone ? 'Want a notification when we reply?' : 'Get a notification when we reply'}</p>
-          <p className="nask-sub">{error ?? (iphone ? 'On iPhone, add the app to your Home Screen first.' : 'On this phone, even when the app is closed.')}</p>
+          <p className="nask-sub">
+            {error ??
+              (iphone
+                ? 'On iPhone, add the app to your Home Screen first.'
+                : phase === 'working'
+                  ? WAITING_WORDS
+                  : 'On this phone, even when the app is closed.')}
+          </p>
         </div>
       </div>
       <div className="nask-actions">
