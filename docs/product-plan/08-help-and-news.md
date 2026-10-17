@@ -88,8 +88,8 @@ Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
   those **waiting for a reply** (an open conversation whose last message
   is theirs) first, the longest waiting at the top, timed from their
   first unanswered message (writing again does not move them down) —
-  each with what waits and the start of it; twenty a page. Filters: a search that reaches
-  **every** student (to write to one who never wrote), "Waiting for a
+  each with what waits and the start of it; twenty a page. Filters: a
+  search that reaches **every** student (to write to one who never wrote), "Waiting for a
   reply / All", and the label. A tap opens **that student's Messages as
   they see them** — the same view — with one line about them (programme
   and school, the live package and its days, the last paid payment, how
@@ -116,6 +116,39 @@ Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
   (done 2026-10-17); the student page redesigned, drawn first (done
   2026-10-17, below); the admin's Messages by student (done 2026-10-17,
   in place of "the inbox paged, on today's look").
+- **Telling each side of a new message** *(to build: 08.5, its own
+  session; Sam, 2026-10-17)*. The live chat stays as built — an open
+  conversation updates by itself — but most replies come later, with
+  nobody in the chat, so each side is told when it is not there:
+  - **In the app**: the badge recounts on every page change and when
+    the app comes back to the screen, one small request. Today it counts
+    only when a page loads in full — moving between pages keeps the top
+    bar and the sidebar as they were.
+  - **The app closed: phone notifications, both sides** — the student
+    when Quademia replies ("Quademia · Payment or package" and the
+    reply's first line; a tap opens the conversation), Quademia's
+    devices when a student writes. Free per message (Google, Apple and
+    Mozilla deliver them). The pieces: a key pair per environment, the
+    private one a Cloudflare secret Sam adds; a table of the devices
+    that allowed it, a dead one removed when its service says so;
+    `public/sw.js` gains the notification and the tap, and is
+    registered on the admin's pages too; sent after the reply returns,
+    so Send does not wait, by a library that runs on Cloudflare (the
+    common one is written for Node).
+  - **The ask**: after a student's send, "Notify me when Quademia
+    replies" — a browser asks only after a tap, and a Block cannot be
+    asked again. Reach: Android's Chrome after Allow, even closed or
+    not installed; an iPhone only once the app is on the Home Screen
+    (iOS 16.4 or later); a computer while the browser is open. Tested on
+    Sam's phone against licensure-dev — the helper runs on a deployed
+    build only, and the pane shows no notifications.
+  - **Email only as a fallback, later**: for a student with no device
+    allowed, so a reply reaches them once and never by both (Sam: an
+    email saying "you have a message, sign in" repeats the badge); a
+    switch in the admin's settings. Parked: SMS (once Arkesel is in,
+    03), WhatsApp (Meta's approval, a charge per message).
+  - To settle in its session, drawn first: the rules and where the ask
+    appears.
 
 ### Help pages and groups
 

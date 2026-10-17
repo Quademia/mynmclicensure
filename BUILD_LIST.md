@@ -156,6 +156,7 @@ before then, and the old list's history, is in
 - ⬜ A3 The body stored once, no extra line break per edit, the dead read removed — later
 - ✅ 08.2 The support desk — server only, five labels, Message us box, both pages; admin by student — 2026-10-17
 - ⬜ 08.4 "Message us" on other pages, each picking its label — as each page is touched (after 08.2)
+- ⬜ 08.5 Telling of a new message — the badge recounts on page change and return; phone notifications both sides; email a later fallback (10-17)
 - ⬜ 08.3 NMC procedures — the manual links into a table the admin manages
 - ⬜ 17 The premium channel — one per programme, all year; link codes; the bot admits and removes members
 
