@@ -74,7 +74,7 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
     await logLoginSuccess(serviceDb, { ...base, userId: profile?.user_id ?? null });
 
     if (!profile) {
-      await supabase.auth.signOut();
+      await supabase.auth.signOut({ scope: 'local' });
       return { ok: false, error: 'No account found for this email. Please register first.' };
     }
 
@@ -120,7 +120,7 @@ export async function completeExternalLoginAction(input: {
 
     if (!profile) {
       await logLoginFail(serviceDb, base, 'NO_ACCOUNT');
-      await supabase.auth.signOut();
+      await supabase.auth.signOut({ scope: 'local' });
       return {
         ok: false,
         error:

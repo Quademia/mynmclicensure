@@ -116,7 +116,7 @@ export async function registerAction(formData: FormData): Promise<RegisterResult
   if (profileError) {
     console.error('[register] profile insert failed:', profileError.message);
     await rollbackAuthUser(data.user.id);
-    await supabase.auth.signOut();
+    await supabase.auth.signOut({ scope: 'local' });
     return {
       ok: false,
       error: 'Account created but profile setup failed. Please contact support.',
@@ -131,7 +131,7 @@ export async function registerAction(formData: FormData): Promise<RegisterResult
 
   // Sign out so the student arrives at /login with a clean state, as
   // legacy did.
-  await supabase.auth.signOut();
+  await supabase.auth.signOut({ scope: 'local' });
 
   return { ok: true, email };
 }

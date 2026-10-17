@@ -23,7 +23,11 @@ import { currentSessionEnded, deactivateCurrentSession } from '@/lib/auth/sessio
 async function signOutAndGo(request: NextRequest, clearPacks: boolean): Promise<NextResponse> {
   await deactivateCurrentSession();
   const supabase = await createClient();
-  await supabase.auth.signOut();
+  // This device only (2026-10-17): the default, 'global', ended every
+  // device the student was signed in on — a phone bumped by a sign-in
+  // elsewhere then signed the new phone out too, and Sign out on one
+  // device signed out the other.
+  await supabase.auth.signOut({ scope: 'local' });
 
   const url = request.nextUrl.clone();
   url.pathname = '/login';

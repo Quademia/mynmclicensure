@@ -44,6 +44,9 @@ export async function completeResetAction(formData: FormData): Promise<ResetResu
     await markResetUsed(createServiceRoleClient(), user.email);
   }
 
-  await supabase.auth.signOut();
+  // Every device, on purpose (2026-10-17): a reset is often because the
+  // password may be known to someone else, so their sign-ins end too. The
+  // other sign-outs end only the device they run on.
+  await supabase.auth.signOut({ scope: 'global' });
   return { ok: true };
 }

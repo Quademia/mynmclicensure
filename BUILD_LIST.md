@@ -41,6 +41,7 @@ before then, and the old list's history, is in
 - ⬜ 01.6 Last sign-in — written at sign-in, shown in the drawer, a dormant filter on Users
 - ⬜ 01.7 One Quademia account — "sign in to add this product"; "complete your profile"
 - ⏸ 01.8 Email confirmation at sign-up — parked under the port's rule, which has ended; to re-rule
+- ✅ 01.9 (unplanned) A sign-out ends only its own device — Sign out and the gate were global; a reset still ends all — 2026-10-17
 
 ## [02 Packages and payments](docs/product-plan/02-packages-and-payments.md)
 
