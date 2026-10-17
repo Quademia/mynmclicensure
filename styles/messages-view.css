@@ -8,9 +8,14 @@
  * .badge. A bubble sits right when it is the viewing side's own (mine),
  * left when it is the other side's (theirs). On a computer the list and the
  * conversation sit side by side, the conversation a fixed-height panel
- * whose feed scrolls; on a phone they take turns (.smsg-open shows the
- * conversation), and the compose bar sits above the bottom bar (56px and
- * the phone's safe area, styles/phone-tabs.css).
+ * scrolls inside; on a phone they take turns (.smsg-open shows the
+ * conversation). Either way the view fills the space left on the screen
+ * (Sam, 2026-10-17): the view measures where it starts (--smsg-top) and
+ * the visible height (--smsg-vh, shorter while a phone's keyboard is up)
+ * and its height is the difference, less the gap at the foot — on a phone
+ * also the bottom bar (56px and the safe area, styles/phone-tabs.css).
+ * Only the messages scroll, between the conversation's title and the
+ * compose bar; on a computer the list scrolls in its own column.
  */
 
 .smsg-page { max-width: 1040px; }
@@ -19,12 +24,14 @@
 .smsg-grid {
   display: grid;
   grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   gap: var(--space-16);
-  align-items: start;
+  height: calc(var(--smsg-vh, 100dvh) - var(--smsg-top, 170px) - var(--space-32));
+  min-height: 360px;
 }
 
 /* ── the list: the labels, the courses, earlier conversations ── */
-.smsg-list { display: flex; flex-direction: column; gap: var(--space-8); }
+.smsg-list { display: flex; flex-direction: column; gap: var(--space-8); min-height: 0; overflow-y: auto; padding-right: var(--space-4); }
 .smsg-head {
   margin: var(--space-8) 0 0;
   font-size: var(--type-meta-size);
@@ -72,12 +79,9 @@
 
 /* ── the conversation ── */
 .smsg-convo {
-  position: sticky;
-  top: calc(56px + var(--space-16));
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 170px);
-  min-height: 460px;
+  min-height: 0;
   padding: 0;
   overflow: hidden;
 }
@@ -101,6 +105,7 @@
 
 .smsg-feed {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
@@ -169,17 +174,15 @@
 /* ── a phone: the list and the conversation take turns ── */
 @media (max-width: 768px) {
   .smsg-grid { grid-template-columns: minmax(0, 1fr); }
+  /* the list is the page: it grows and the page scrolls as any other */
+  .smsg:not(.smsg-open) .smsg-grid { height: auto; min-height: 0; }
+  .smsg:not(.smsg-open) .smsg-list { overflow: visible; padding-right: 0; }
   .smsg:not(.smsg-open) .smsg-convo { display: none; }
-  .smsg-open .smsg-list { display: none; }
-  /* the conversation reaches down to the bottom bar, so a short one still
-     has its compose bar at the foot of the screen: the page's top (the bar
-     and the title, 128px) and the bottom bar with its gap (72px) */
-  .smsg-convo { position: static; height: auto; min-height: calc(100dvh - 200px - env(safe-area-inset-bottom)); overflow: visible; }
-  .smsg-back { display: inline-flex; align-items: center; }
-  .smsg-feed { overflow: visible; min-height: 240px; }
-  .smsg-compose {
-    position: sticky;
-    bottom: calc(56px + env(safe-area-inset-bottom));
-    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  /* a conversation fills the screen down to the bottom bar */
+  .smsg-open .smsg-grid {
+    height: calc(var(--smsg-vh, 100dvh) - var(--smsg-top, 128px) - 56px - env(safe-area-inset-bottom) - var(--space-16));
+    min-height: 280px;
   }
+  .smsg-open .smsg-list { display: none; }
+  .smsg-back { display: inline-flex; align-items: center; }
 }

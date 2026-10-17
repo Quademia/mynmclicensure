@@ -17,7 +17,12 @@
 //
 // On a phone the list and the conversation take turns, and the phone's
 // back button returns to the list (a history entry, no server trip); on a
-// computer they sit side by side. The actions come in as props — the
+// computer they sit side by side. Either way the view fills the space
+// left on the screen below the page's own top (Sam, 2026-10-17): only the
+// messages scroll, between the conversation's title and the compose bar,
+// and on a computer the list scrolls in its own column. The space is
+// measured here — the top of the view and the visible height, which a
+// phone's keyboard shrinks — and handed to the stylesheet. The actions come in as props — the
 // student's or the admin's Server Actions — so this file holds no rule of
 // either side.
 
@@ -136,6 +141,7 @@ export function MessagesView({
   const composeRef = useRef<HTMLTextAreaElement | null>(null);
   const activeRef = useRef<string | null>(null);
   const channelRef = useRef<{ unsubscribe: () => void } | null>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
 
   const rows = [...data.labels, ...data.courses, ...data.earlier];
   const active = activeKey ? rows.find((r) => r.key === activeKey) ?? null : null;
@@ -151,6 +157,13 @@ export function MessagesView({
       if (el) el.scrollTop = el.scrollHeight;
     }, 0);
   }, []);
+
+  // The newest message in view once the messages are drawn (a scroll set
+  // before the render lands short, as it did on a phone).
+  useEffect(() => {
+    const el = feedRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [messages, activeKey]);
 
   // ── the live feed on the open conversation ──
   const unsubscribe = useCallback(() => {
@@ -198,7 +211,10 @@ export function MessagesView({
   // ── open and close ──
   async function open(row: MessagesRow) {
     if (activeRef.current === row.key) return;
-    if (isPhone() && !activeRef.current) window.history.pushState({ smsg: row.key }, '');
+    if (isPhone() && !activeRef.current) {
+      window.history.pushState({ smsg: row.key }, '');
+      window.scrollTo(0, 0); // the conversation fills the screen from the page's top
+    }
     activeRef.current = row.key;
     setActiveKey(row.key);
     setMessages([]);
@@ -237,6 +253,29 @@ export function MessagesView({
     if (window.history.state?.smsg) window.history.back();
     else closeConvo();
   }
+
+  // The space left: where the view starts on the page, and how tall the
+  // visible screen is (a phone's keyboard makes it shorter).
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const fit = () => {
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      const vh = window.visualViewport?.height ?? window.innerHeight;
+      el.style.setProperty('--smsg-top', `${Math.round(top)}px`);
+      el.style.setProperty('--smsg-vh', `${Math.round(vh)}px`);
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    window.visualViewport?.addEventListener('resize', fit);
+    const ro = typeof ResizeObserver !== 'undefined' && el.parentElement ? new ResizeObserver(fit) : null;
+    if (ro && el.parentElement) ro.observe(el.parentElement);
+    return () => {
+      window.removeEventListener('resize', fit);
+      window.visualViewport?.removeEventListener('resize', fit);
+      ro?.disconnect();
+    };
+  }, []);
 
   // The phone's back button returns to the list.
   useEffect(() => {
@@ -349,7 +388,7 @@ export function MessagesView({
   const about = active ? (active.label === 'course' ? active.title : active.title.toLowerCase()) : '';
 
   return (
-    <div className={`smsg${active ? ' smsg-open' : ''}`}>
+    <div ref={rootRef} className={`smsg${active ? ' smsg-open' : ''}`}>
       <Toast message={note?.text ?? null} tone={note?.tone} onDismiss={dismiss} />
 
       <div className="smsg-grid">
