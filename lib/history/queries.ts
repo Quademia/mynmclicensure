@@ -50,7 +50,7 @@ const RULE_COLUMNS =
  * The courses the student has sat something in, with their titles, in
  * title order — the dropdown's list. Read from the student's own sittings,
  * so a course held once and ended, or a free student's course, is listed
- * and its name.
+ * with its name.
  */
 export async function getHistoryCourses(userId: string): Promise<HistoryCourse[]> {
   const db = createServiceRoleClient();
