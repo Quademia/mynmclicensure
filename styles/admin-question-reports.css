@@ -11,6 +11,23 @@
 .aqr .page-header { margin-bottom: 0; }
 .aqr-empty { padding: var(--space-24); color: var(--ink-muted); font-size: var(--type-body-size); line-height: var(--type-body-line); }
 
+/* ── Open · Closed: words like the course page's tabs, the current one
+ *    navy, no line of their own — the title's is the page's one teal line ── */
+.aqr-tabs { display: flex; gap: var(--space-8); margin-top: calc(-1 * var(--space-8)); }
+.aqr-tab {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-12);
+  font-size: var(--type-ui-size);
+  font-weight: 600;
+  color: var(--ink-muted);
+  text-decoration: none;
+}
+.aqr-tab:first-child { padding-left: 0; }
+a.aqr-tab:hover { color: var(--brand-navy); text-decoration: none; }
+.aqr-tab-on { color: var(--brand-navy); }
+
 /* ── the list ── */
 .aqr-list { list-style: none; margin: 0; padding: 0; overflow: hidden; }
 .aqr-list > li + li { border-top: 1px solid var(--border); }
@@ -69,6 +86,7 @@
   padding: var(--space-12) var(--space-16) var(--space-16);
   border-top: 1px solid var(--border);
 }
+.aqr-closed { margin: 0; font-size: var(--type-ui-size); font-weight: 600; color: var(--brand-teal-hover); }
 .aqr-stem { margin: 0; font-size: var(--type-body-size); line-height: var(--type-body-line); font-weight: 600; color: var(--ink); }
 
 .aqr-options, .aqr-reports { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-6); }

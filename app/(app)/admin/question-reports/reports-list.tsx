@@ -6,7 +6,8 @@
 // student's report with their own answer, and Open in the bank, Dismiss,
 // Mark fixed — the last two close every open report of the question (one
 // confirm box each), and the page then reads again. The student hears
-// nothing back. <details> does the opening: no script, and the keyboard
+// nothing back. On the Closed tab the same lines, read only: who closed
+// the question and when, in place of its reasons and the two buttons. <details> does the opening: no script, and the keyboard
 // and screen readers know it.
 
 'use client';
@@ -17,7 +18,7 @@ import { AppLink } from '@/components/shell/link-pending';
 import { useConfirm } from '@/lib/overlays/shared/confirm-dialog';
 import { Toast } from '@/lib/toast/toast';
 import { closeQuestionReports } from '@/lib/question-reports/actions';
-import { REPORT_REASONS, reasonLabel, type ReportGroup } from '@/lib/question-reports/types';
+import { REPORT_REASONS, reasonLabel, type ReportGroup, type ReportView } from '@/lib/question-reports/types';
 
 /** "17 Oct" or "17 Oct 2026", in Ghana's time (UTC) — the same on the server and the browser. */
 function day(at: string, withYear = false): string {
@@ -42,7 +43,13 @@ function reasonsLine(reasons: Record<string, number>): string {
     .join(', ');
 }
 
-export function ReportsList({ groups }: { groups: ReportGroup[] }) {
+/** 'Fixed by Samuel' — a closed line's who. */
+function closedBy(g: ReportGroup): string {
+  return `${g.status === 'fixed' ? 'Fixed' : 'Dismissed'} by ${g.closed_by_name || 'an admin'}`;
+}
+
+export function ReportsList({ groups, view }: { groups: ReportGroup[]; view: ReportView }) {
+  const closed = view === 'closed';
   const router = useRouter();
   const [confirm, confirmDialog] = useConfirm();
   const [busy, setBusy] = useState<string | null>(null);
@@ -79,23 +86,24 @@ export function ReportsList({ groups }: { groups: ReportGroup[] }) {
           const key = new Set((g.correct || '').split(',').map((l) => l.trim().toLowerCase()).filter(Boolean));
           const stem = plain(g.stem);
           return (
-            <li key={g.item_id}>
+            <li key={`${g.item_id}:${g.closed_at ?? 'open'}`}>
               <details className="aqr-row">
                 <summary>
-                  <span className={g.reports > 1 ? 'aqr-count aqr-count-many' : 'aqr-count'} aria-label={`${g.reports} report${g.reports === 1 ? '' : 's'}`}>
+                  <span className={g.reports > 1 && !closed ? 'aqr-count aqr-count-many' : 'aqr-count'} aria-label={`${g.reports} report${g.reports === 1 ? '' : 's'}`}>
                     {g.reports}
                   </span>
                   <span className="aqr-line">
                     <span className="aqr-stem-one">{stem || '(no question text)'}</span>
-                    <span className="aqr-meta">{g.course_title || g.course_id} · {reasonsLine(g.reasons)}</span>
+                    <span className="aqr-meta">{g.course_title || g.course_id} · {closed ? closedBy(g) : reasonsLine(g.reasons)}</span>
                   </span>
-                  <span className="aqr-day">{day(g.newest)}</span>
+                  <span className="aqr-day">{day(closed && g.closed_at ? g.closed_at : g.newest)}</span>
                 </summary>
 
                 <div className="aqr-open">
                   <p className="aqr-meta">
                     {g.course_title || g.course_id} · {g.item_id} · {g.reports} report{g.reports === 1 ? '' : 's'}
                   </p>
+                  {closed && g.closed_at ? <p className="aqr-closed">{closedBy(g)} on {day(g.closed_at, true)}</p> : null}
                   <p className="aqr-stem">{stem || '(no question text)'}</p>
                   <ul className="aqr-options" aria-label="Options">
                     {g.options.map((o) => (
@@ -127,12 +135,16 @@ export function ReportsList({ groups }: { groups: ReportGroup[] }) {
                     >
                       Open in the bank
                     </AppLink>
-                    <button type="button" className="btn btn-ghost" disabled={busy === g.item_id} onClick={() => close(g, 'dismissed')}>
-                      Dismiss
-                    </button>
-                    <button type="button" className="btn btn-primary" disabled={busy === g.item_id} onClick={() => close(g, 'fixed')}>
-                      {busy === g.item_id ? 'Closing…' : 'Mark fixed'}
-                    </button>
+                    {closed ? null : (
+                      <>
+                        <button type="button" className="btn btn-ghost" disabled={busy === g.item_id} onClick={() => close(g, 'dismissed')}>
+                          Dismiss
+                        </button>
+                        <button type="button" className="btn btn-primary" disabled={busy === g.item_id} onClick={() => close(g, 'fixed')}>
+                          {busy === g.item_id ? 'Closing…' : 'Mark fixed'}
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               </details>

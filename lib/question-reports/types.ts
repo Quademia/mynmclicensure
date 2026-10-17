@@ -56,6 +56,13 @@ export type ReportGroup = {
   reasons: Record<string, number>;
   newest: string;
   lines: ReportLine[];
+  /** `new` on the Open tab; `fixed` or `dismissed` on Closed, with when and by whom. */
+  status: 'new' | 'fixed' | 'dismissed';
+  closed_at: string | null;
+  closed_by_name: string | null;
 };
+
+/** The page's two tabs (Sam, 2026-10-17): what is waiting, and what was done. */
+export type ReportView = 'open' | 'closed';
 
 export const REPORT_GROUPS_PER_PAGE = 20;

@@ -337,9 +337,11 @@ table by table as each is next changed (AGENTS.md rule 9).
   `report_question()`, which checks the question is in the student's own
   sitting and still in the bank; closed by `close_question_reports()`,
   every open report of one question at once; read by the admin's page
-  through `question_report_groups()`, one row per question with its
-  options and answer, most reports first. All three server only. No copy
-  of the question's text.
+  through `question_report_groups()`, with its options and answer: on
+  the Open tab one row per question, most reports first; on Closed one
+  row per close (a question's reports closed together), newest first,
+  with who closed them. All three server only. No copy of the question's
+  text.
 - Browser: nothing.
 
 ### `bank_subjects`, `bank_topics` — each course's two lists

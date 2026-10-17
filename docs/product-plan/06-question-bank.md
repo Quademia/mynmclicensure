@@ -162,6 +162,10 @@ are reported: one question is seen by many students and fixed once.
   question: its options with the bank's answer marked, each student's
   report with their own answer, Open in the bank, Dismiss and Mark fixed
   — the last two close all its open reports. Twenty questions a page.
+  **Two tabs, Open · Closed** (Sam, 2026-10-17): Closed is read only —
+  each close a line, newest first, "Fixed by …" or "Dismissed by …" and
+  the date, opening onto the question and the reports it closed. No
+  Reopen for now: a student can report the question again.
 - Parked: a thumbs-up on a question ("Was this question helpful?"), so
   praise has its own place; decided once students use the app (06.9).
 
