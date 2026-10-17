@@ -397,9 +397,10 @@ opens it (00, The menu).
 - **Check**: each edit adds a line break between paragraphs (08 A3).
 
 ### Messages
-- **Check**: the open conversation vanishes when a filter hides its
-  thread; live updates still mark new messages read; no way back on a
-  phone; its own button classes.
+- **Redesigned (Sam, 2026-10-17; 08.2 step 4)**: the students who have
+  written, waiting for a reply first; a tap opens the student's Messages
+  as they see them, with one line about them and Next waiting. The rules
+  are in 08.
 
 ### Attempts
 - **Check**: the note that numbers cover at most 5,000 sittings (05).

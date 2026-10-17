@@ -1,16 +1,20 @@
-/* styles/student-messages.css
+/* styles/messages-view.css
  *
- * The student's Messages (08.2 step 3; Sam, 2026-10-17: drawn as B), scoped
- * under `.smsg`. Tokens only; the list and the conversation are .card, the
- * Send button the shared family, the Closed chip a .badge. On a computer
- * the list and the conversation sit side by side, the conversation a
- * fixed-height panel whose feed scrolls; on a phone they take turns
- * (.smsg-open shows the conversation), and the compose bar sits above the
- * bottom bar (56px and the phone's safe area, styles/phone-tabs.css).
+ * A student's Messages (08.2; Sam, 2026-10-17: drawn as B), the one view
+ * both sides use — the student's page and the admin's view of a student
+ * (components/messages/messages-view.tsx) — scoped under .smsg; the
+ * pages' own wrappers are .smsg-page. Tokens only; the list and the
+ * conversation are .card, the buttons the shared family, the Closed chip a
+ * .badge. A bubble sits right when it is the viewing side's own (mine),
+ * left when it is the other side's (theirs). On a computer the list and the
+ * conversation sit side by side, the conversation a fixed-height panel
+ * whose feed scrolls; on a phone they take turns (.smsg-open shows the
+ * conversation), and the compose bar sits above the bottom bar (56px and
+ * the phone's safe area, styles/phone-tabs.css).
  */
 
-.smsg { max-width: 1040px; }
-.smsg .page-header { margin-bottom: var(--space-16); }
+.smsg-page { max-width: 1040px; }
+.smsg-page .page-header { margin-bottom: var(--space-16); }
 
 .smsg-grid {
   display: grid;
@@ -91,6 +95,7 @@
   color: var(--brand-teal-hover);
   cursor: pointer;
 }
+.smsg-convo-top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); }
 .smsg-convo-title { margin: 0; font-size: var(--type-body-size); line-height: var(--type-body-line); font-weight: 700; color: var(--brand-navy); }
 .smsg-closed { margin: var(--space-4) 0 0; font-size: var(--type-meta-size); line-height: var(--type-meta-line); color: var(--ink-muted); }
 
@@ -116,10 +121,10 @@
 .smsg-line { margin: var(--space-4) 0; text-align: center; font-size: var(--type-meta-size); font-style: italic; color: var(--ink-muted); }
 
 .smsg-run { display: flex; align-items: flex-end; gap: var(--space-8); }
-.smsg-run-student { flex-direction: row-reverse; }
+.smsg-run-mine { flex-direction: row-reverse; }
 .smsg-run-who { flex: none; }
 .smsg-run-items { display: flex; flex-direction: column; gap: var(--space-4); max-width: 78%; }
-.smsg-run-student .smsg-run-items { align-items: flex-end; }
+.smsg-run-mine .smsg-run-items { align-items: flex-end; }
 .smsg-bubble {
   padding: var(--space-8) var(--space-12);
   border-radius: var(--radius-lg);
@@ -128,9 +133,9 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
-.smsg-run-admin .smsg-bubble { background: var(--surface-page); border: 1px solid var(--border); color: var(--ink); border-bottom-left-radius: var(--space-4); }
-.smsg-run-student .smsg-bubble { background: var(--brand-teal); color: var(--surface); border-bottom-right-radius: var(--space-4); }
-.smsg-run-student .smsg-bubble a { color: var(--surface); }
+.smsg-run-theirs .smsg-bubble { background: var(--surface-page); border: 1px solid var(--border); color: var(--ink); border-bottom-left-radius: var(--space-4); }
+.smsg-run-mine .smsg-bubble { background: var(--brand-teal); color: var(--surface); border-bottom-right-radius: var(--space-4); }
+.smsg-run-mine .smsg-bubble a { color: var(--surface); }
 .smsg-bubble.is-sending { opacity: 0.7; }
 .smsg-time { font-size: var(--type-meta-size); color: var(--ink-muted); }
 

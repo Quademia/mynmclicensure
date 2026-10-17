@@ -1,19 +1,25 @@
-// app/(app)/student/messages/messages-client.tsx — the student's Messages
-// (08.2 step 3; Sam, 2026-10-17: drawn as B, each course its own row).
+// components/messages/messages-view.tsx — a student's Messages, the one
+// piece both sides use (08.2; Sam, 2026-10-17: drawn as B, each course its
+// own row): the student on their own page, and Quademia on the admin's
+// view of that student — the same rows, the same conversation.
 //
-// The list is the five labels' four plain ones, then "Your courses", then
-// "Earlier conversations" — each row its newest conversation (a Closed
-// chip when closed, a dot when Quademia's reply is unread) or "Start a
+// The list is the four plain labels, then the courses, then earlier
+// conversations — each row its newest conversation (a Closed chip when
+// closed, a dot when the other side's message is unread) or "Start a
 // message ›". A tap opens the conversation: its messages and the read
 // stamp in one trip; an empty row opens straight onto the compose box,
 // and nothing is made until Send, which makes the thread and writes the
 // message in one trip. A closed conversation still takes a reply, which
-// reopens it with the line "Reopened by a reply.". Replies and a close
-// reach an open conversation live (not critical if the feed fails).
+// reopens it with the line "Reopened by a reply.". The other side's
+// messages and a close reach an open conversation live (not critical if
+// the feed fails). Quademia's side adds Close and Reopen, and opens the
+// waiting conversation at once.
 //
 // On a phone the list and the conversation take turns, and the phone's
-// back button returns to the list (a history entry, no server trip); on
-// a computer they sit side by side.
+// back button returns to the list (a history entry, no server trip); on a
+// computer they sit side by side. The actions come in as props — the
+// student's or the admin's Server Actions — so this file holds no rule of
+// either side.
 
 'use client';
 
@@ -21,13 +27,13 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Toast } from '@/lib/toast/toast';
 import { NameCircle } from '@/components/shell/name-circle';
-import { PageHeader } from '@/components/shell/page-header';
 import { createClient } from '@/lib/supabase/client';
-import { openThreadAction, sendByLabelAction, sendMessageAction } from '@/lib/messaging/actions';
-import type { MessagesPageData, MessagesRow } from '@/lib/messaging/student-page';
-import { MESSAGE_MAX_LEN, type Message } from '@/lib/messaging/types';
+import type { MessagesPageData, MessagesRow } from '@/lib/messaging/page-data';
+import { MESSAGE_MAX_LEN, type ActionResult, type Message, type OpenThreadResult, type SendMessageResult } from '@/lib/messaging/types';
+import '@/styles/messages-view.css';
 
 type Note = { text: string; tone: 'error' | 'success' } | null;
+type Side = 'student' | 'admin';
 
 // The clock, read outside render (react-hooks/purity).
 function stampNow(set: (n: number) => void) {
@@ -77,7 +83,7 @@ function Row({ row, on, onOpen }: { row: MessagesRow; on: boolean; onOpen: (row:
   return (
     <li>
       <button type="button" className={`smsg-row${on ? ' is-on' : ''}${row.unread ? ' is-unread' : ''}`} onClick={() => onOpen(row)}>
-        <span className="smsg-dot" aria-label={row.unread ? 'Unread reply' : undefined} />
+        <span className="smsg-dot" aria-label={row.unread ? 'Unread' : undefined} />
         <span className="smsg-row-main">
           <span className="smsg-row-title">
             {row.title}
@@ -91,21 +97,38 @@ function Row({ row, on, onOpen }: { row: MessagesRow; on: boolean; onOpen: (row:
   );
 }
 
-export function MessagesClient({
+export function MessagesView({
+  side,
   student,
   initial,
+  initialKey = null,
+  openThread,
+  sendToThread,
+  sendByLabel,
+  closeThread,
+  reopenThread,
 }: {
-  /** The signed-in student, for their name circle: photo, else initials. */
+  side: Side;
+  /** The student whose Messages these are: their name circle on their messages. */
   student: { name: string; avatarUrl: string | null };
   initial: MessagesPageData;
+  /** A row to open at once (Quademia's side: the waiting conversation). */
+  initialKey?: string | null;
+  openThread: (threadId: string) => Promise<OpenThreadResult>;
+  sendToThread: (threadId: string, body: string) => Promise<SendMessageResult>;
+  sendByLabel: (label: string, courseId: string | null, body: string) => Promise<SendMessageResult>;
+  closeThread?: (threadId: string) => Promise<ActionResult>;
+  reopenThread?: (threadId: string) => Promise<ActionResult>;
 }) {
   const router = useRouter();
+  const mine = side; // whose messages sit on the right
   const [data, setData] = useState<MessagesPageData>(initial);
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [compose, setCompose] = useState('');
   const [sending, setSending] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [now, setNow] = useState(0);
   const [note, setNote] = useState<Note>(null);
   const dismiss = useCallback(() => setNote(null), []);
@@ -146,19 +169,19 @@ export function MessagesClient({
     try {
       const supabase = createClient();
       const channel = supabase
-        .channel('smsg-' + threadId)
+        .channel(`smsg-${side}-${threadId}`)
         .on('postgres_changes', { event: 'INSERT', schema: 'licensure_gh', table: 'messages', filter: `thread_id=eq.${threadId}` }, async (payload) => {
           const m = payload.new as Partial<Message>;
-          if (!m || m.sender_role === 'student' || activeRef.current !== key) return;
+          if (!m || m.sender_role === mine || activeRef.current !== key) return;
           try {
-            const r = await openThreadAction(threadId);
+            const r = await openThread(threadId);
             if (!r.ok || activeRef.current !== key) return;
             setMessages(r.messages);
             stampNow(setNow);
             toBottom();
-            if (m.sender_role === 'admin' && m.body_text) patchRow(key, { preview: m.body_text.replace(/\s+/g, ' ').trim(), when: 'Just now', unread: false });
+            if (m.sender_role !== 'system' && m.body_text) patchRow(key, { preview: m.body_text.replace(/\s+/g, ' ').trim(), when: 'Just now', unread: false, waiting: side === 'admin' });
           } catch {
-            /* the reply shows on the next open */
+            /* it shows on the next open */
           }
         })
         .on('postgres_changes', { event: 'UPDATE', schema: 'licensure_gh', table: 'messages_threads', filter: `thread_id=eq.${threadId}` }, (payload) => {
@@ -188,7 +211,7 @@ export function MessagesClient({
     }
     setLoading(true);
     try {
-      const r = await openThreadAction(row.threadId);
+      const r = await openThread(row.threadId);
       if (activeRef.current !== row.key) return;
       setLoading(false);
       if (!r.ok) return setNote({ text: r.error, tone: 'error' });
@@ -224,6 +247,19 @@ export function MessagesClient({
     return () => window.removeEventListener('popstate', onPop);
   }, [closeConvo]);
 
+  // Quademia's side opens the waiting conversation at once (on a computer;
+  // on a phone the list shows first, as the student's does).
+  useEffect(() => {
+    if (!initialKey) return;
+    const id = window.setTimeout(() => {
+      const row = [...initial.labels, ...initial.courses, ...initial.earlier].find((r) => r.key === initialKey);
+      if (row && !isPhone()) void open(row);
+    }, 0);
+    return () => window.clearTimeout(id);
+    // Runs once, for the page the admin arrived on.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // ── send ──
   async function send(e?: React.FormEvent) {
     e?.preventDefault();
@@ -233,7 +269,7 @@ export function MessagesClient({
     if (text.length > MESSAGE_MAX_LEN) return;
     setSending(true);
     const tempId = 'temp-' + messages.length;
-    setMessages((cur) => [...cur, { message_id: tempId, thread_id: row.threadId ?? '', sender_id: 'me', sender_role: 'student', body_text: text, created_at: new Date().toISOString() }]);
+    setMessages((cur) => [...cur, { message_id: tempId, thread_id: row.threadId ?? '', sender_id: 'me', sender_role: mine, body_text: text, created_at: new Date().toISOString() }]);
     setCompose('');
     toBottom();
     const undo = (error: string) => {
@@ -242,13 +278,13 @@ export function MessagesClient({
       setNote({ text: error, tone: 'error' });
     };
     try {
-      const r = row.threadId ? await sendMessageAction(row.threadId, text) : await sendByLabelAction(row.label, row.courseId, text);
+      const r = row.threadId ? await sendToThread(row.threadId, text) : await sendByLabel(row.label, row.courseId, text);
       if (!r.ok) {
         undo(r.error);
       } else {
-        patchRow(row.key, { threadId: r.thread_id, status: 'open', preview: `You: ${text.replace(/\s+/g, ' ')}`, when: 'Just now', unread: false });
+        patchRow(row.key, { threadId: r.thread_id, status: 'open', preview: `You: ${text.replace(/\s+/g, ' ')}`, when: 'Just now', unread: false, waiting: side === 'student' });
         if (r.reopened) {
-          const again = await openThreadAction(r.thread_id);
+          const again = await openThread(r.thread_id);
           if (again.ok && activeRef.current === row.key) setMessages(again.messages);
         } else {
           setMessages((cur) => cur.map((m) => (m.message_id === tempId ? { ...m, message_id: r.message_id, thread_id: r.thread_id, created_at: r.at ?? m.created_at } : m)));
@@ -257,13 +293,32 @@ export function MessagesClient({
         toBottom();
       }
     } catch {
-      undo('Could not send your message. Please check your connection and try again.');
+      undo('Could not send the message. Please check your connection and try again.');
     }
     setSending(false);
   }
 
-  // ── the conversation's feed: days, then runs of one side, the reopen line on its own ──
-  type Run = { side: 'student' | 'admin'; items: Message[] };
+  // ── Quademia's Close and Reopen ──
+  async function setStatus(to: 'open' | 'closed') {
+    const row = active;
+    const fn = to === 'closed' ? closeThread : reopenThread;
+    if (!row?.threadId || !fn || busy) return;
+    setBusy(true);
+    try {
+      const r = await fn(row.threadId);
+      if (!r.ok) setNote({ text: r.error, tone: 'error' });
+      else {
+        patchRow(row.key, { status: to, waiting: to === 'closed' ? false : row.waiting });
+        setNote({ text: to === 'closed' ? 'Conversation closed.' : 'Conversation reopened.', tone: 'success' });
+      }
+    } catch {
+      setNote({ text: 'Could not change the conversation. Please check your connection and try again.', tone: 'error' });
+    }
+    setBusy(false);
+  }
+
+  // ── the feed: days, then runs of one side, the reopen line on its own ──
+  type Run = { mine: boolean; role: 'student' | 'admin'; items: Message[] };
   const blocks: ({ kind: 'day'; label: string } | { kind: 'line'; m: Message } | { kind: 'run'; run: Run })[] = [];
   let lastDay = '';
   let run: Run | null = null;
@@ -281,31 +336,31 @@ export function MessagesClient({
       blocks.push({ kind: 'line', m });
       continue;
     }
-    const side: Run['side'] = m.sender_role === 'student' ? 'student' : 'admin';
-    if (!run || run.side !== side) {
+    const role: Run['role'] = m.sender_role === 'student' ? 'student' : 'admin';
+    if (!run || run.role !== role) {
       if (run) blocks.push({ kind: 'run', run });
-      run = { side, items: [] };
+      run = { mine: role === mine, role, items: [] };
     }
     run.items.push(m);
   }
   if (run) blocks.push({ kind: 'run', run });
 
   const near = compose.length > MESSAGE_MAX_LEN * 0.9;
+  const about = active ? (active.label === 'course' ? active.title : active.title.toLowerCase()) : '';
 
   return (
     <div className={`smsg${active ? ' smsg-open' : ''}`}>
       <Toast message={note?.text ?? null} tone={note?.tone} onDismiss={dismiss} />
-      <PageHeader title="Messages" />
 
       <div className="smsg-grid">
-        <section className="smsg-list" aria-label="Your conversations">
-          <h2 className="smsg-head">What do you need help with?</h2>
+        <section className="smsg-list" aria-label="Conversations">
+          <h2 className="smsg-head">{side === 'student' ? 'What do you need help with?' : 'About'}</h2>
           <ul className="card smsg-rows">
             {data.labels.map((r) => <Row key={r.key} row={r} on={r.key === activeKey} onOpen={open} />)}
           </ul>
           {data.courses.length ? (
             <>
-              <h2 className="smsg-head">Your courses</h2>
+              <h2 className="smsg-head">{side === 'student' ? 'Your courses' : 'Their courses'}</h2>
               <ul className="card smsg-rows">
                 {data.courses.map((r) => <Row key={r.key} row={r} on={r.key === activeKey} onOpen={open} />)}
               </ul>
@@ -323,12 +378,21 @@ export function MessagesClient({
 
         <section className="card smsg-convo" aria-label="Conversation">
           {!active ? (
-            <p className="smsg-pick">Choose what your message is about, or open a conversation.</p>
+            <p className="smsg-pick">{side === 'student' ? 'Choose what your message is about, or open a conversation.' : 'Open a conversation, or start one under a label.'}</p>
           ) : (
             <>
               <div className="smsg-convo-head">
-                <button type="button" className="smsg-back" onClick={back}>‹ Messages</button>
-                <h2 className="smsg-convo-title">{active.title}</h2>
+                <button type="button" className="smsg-back" onClick={back}>‹ {side === 'student' ? 'Messages' : 'Their messages'}</button>
+                <div className="smsg-convo-top">
+                  <h2 className="smsg-convo-title">{active.title}</h2>
+                  {side === 'admin' && active.threadId ? (
+                    active.status === 'closed' ? (
+                      <button type="button" className="btn btn-ghost btn-sm" disabled={busy} onClick={() => void setStatus('open')}>Reopen</button>
+                    ) : (
+                      <button type="button" className="btn btn-ghost btn-sm" disabled={busy} onClick={() => void setStatus('closed')}>Close</button>
+                    )
+                  ) : null}
+                </div>
                 {active.status === 'closed' ? <p className="smsg-closed">This conversation was closed. A reply reopens it.</p> : null}
               </div>
 
@@ -336,7 +400,9 @@ export function MessagesClient({
                 {loading ? (
                   <p className="smsg-empty">Loading…</p>
                 ) : messages.length === 0 ? (
-                  <p className="smsg-empty">Start a message about {active.label === 'course' ? active.title : active.title.toLowerCase()}. We reply here.</p>
+                  <p className="smsg-empty">
+                    {side === 'student' ? `Start a message about ${about}. We reply here.` : `Start a message to ${student.name} about ${about}. They read it in Messages.`}
+                  </p>
                 ) : (
                   blocks.map((b, i) =>
                     b.kind === 'day' ? (
@@ -344,8 +410,12 @@ export function MessagesClient({
                     ) : b.kind === 'line' ? (
                       <p key={b.m.message_id} className="smsg-line">{b.m.body_text}</p>
                     ) : (
-                      <div key={`r${i}`} className={`smsg-run smsg-run-${b.run.side}`}>
-                        {b.run.side === 'admin' ? <NameCircle who="quademia" size="xs" className="smsg-run-who" /> : <NameCircle name={student.name} avatarUrl={student.avatarUrl} size="xs" className="smsg-run-who" />}
+                      <div key={`r${i}`} className={`smsg-run ${b.run.mine ? 'smsg-run-mine' : 'smsg-run-theirs'}`}>
+                        {b.run.role === 'admin' ? (
+                          <NameCircle who="quademia" size="xs" className="smsg-run-who" />
+                        ) : (
+                          <NameCircle name={student.name} avatarUrl={student.avatarUrl} size="xs" className="smsg-run-who" />
+                        )}
                         <div className="smsg-run-items">
                           {b.run.items.map((m) => (
                             <div key={m.message_id} className={`smsg-bubble${m.message_id.startsWith('temp-') ? ' is-sending' : ''}`}>{linkify(m.body_text)}</div>
@@ -362,7 +432,7 @@ export function MessagesClient({
                 <textarea
                   ref={composeRef}
                   className="smsg-input"
-                  placeholder={active.status === 'closed' ? 'Reply to reopen…' : 'Type a message…'}
+                  placeholder={active.status === 'closed' ? 'Reply to reopen…' : side === 'student' ? 'Type a message…' : 'Type a reply…'}
                   rows={1}
                   maxLength={MESSAGE_MAX_LEN}
                   value={compose}

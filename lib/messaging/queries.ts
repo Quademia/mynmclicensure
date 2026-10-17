@@ -17,7 +17,8 @@ import { readAll } from '@/lib/supabase/read-all';
 import { MESSAGE_COLUMNS, THREAD_COLUMNS, unreadFor, type LatestMessage, type Message, type StudentThread, type Thread } from './types';
 
 // ── getStudentThreads ──────────────────────────────────────────────────
-export async function getStudentThreads(db: ServerSupabaseClient, userId: string): Promise<StudentThread[]> {
+/** side: whose unread it is — the student's own page, or Quademia's view of the student. */
+export async function getStudentThreads(db: ServerSupabaseClient, userId: string, side: 'student' | 'admin' = 'student'): Promise<StudentThread[]> {
   const { data, error } = await db
     .from('messages_threads')
     .select(THREAD_COLUMNS)
@@ -47,7 +48,7 @@ export async function getStudentThreads(db: ServerSupabaseClient, userId: string
   for (const m of msgs ?? []) {
     if (!latest[m.thread_id]) latest[m.thread_id] = m;
   }
-  return threads.map((t) => ({ ...t, latest: latest[t.thread_id] ?? null, unread: unreadFor(t, 'student') }));
+  return threads.map((t) => ({ ...t, latest: latest[t.thread_id] ?? null, unread: unreadFor(t, side) }));
 }
 
 // ── getThreadMessages ──────────────────────────────────────────────────

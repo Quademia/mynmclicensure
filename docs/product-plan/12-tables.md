@@ -629,6 +629,9 @@ table by table as each is next changed (AGENTS.md rule 9).
   `msg_admin_send`, `msg_admin_start` (New Thread), `msg_set_status`,
   `msg_mark_read`, and the badges `msg_unread_count` and
   `msg_admin_unread_count`; ids are made there (`THR_`/`MSG_` + 16 hex).
+  The admin's list of students is `msg_admin_students()` (built
+  2026-10-17, 08.2 step 4): one row per student, grouped and paged in the
+  database, waiting first; an index on the waiting threads serves it.
 - Browser: SELECT only — the student their own threads, an admin all.
 
 ### `messages` — the messages

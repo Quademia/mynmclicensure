@@ -42,7 +42,7 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
 - **No Bulk Send**: announcements are the broadcast, with the same
   targeting; New Thread reaches one student (Sam, 2026-09-18).
 
-### Messages — the support desk *(to build: 08.2 — step 4, the inbox paged; steps 2 and 3 built 2026-10-17)*
+### Messages — the support desk *(built 2026-10-17: 08.2)*
 
 Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
 2026-10-17.
@@ -83,9 +83,19 @@ Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
 - Read stamps on the thread drive one unread rule; **the unread badge
   counts open threads in one query**. Replies and closes reach an open
   page live.
-- **The admin inbox**: one feed (name, label, last message), filters
-  by unread and label, search by name or email, reply, close and
-  reopen, New Thread to one student; **paged**.
+- **The admin's Messages, by student** (Sam, 2026-10-17, in place of the
+  inbox of every conversation): a list of the students who have written —
+  those **waiting for a reply** (an open conversation whose last message
+  is theirs) first, the longest waiting at the top — each with what waits
+  and the start of it; twenty a page. Filters: a search that reaches
+  **every** student (to write to one who never wrote), "Waiting for a
+  reply / All", and the label. A tap opens **that student's Messages as
+  they see them** — the same view — with one line about them (programme
+  and school, the live package and its days, the last paid payment, how
+  many are unfinished), the waiting conversation open at once, Close and
+  Reopen, and **Next waiting ›** to the next student. "Start a message"
+  under any label writes to the student; New Thread and the old filters
+  went. Parked: a programme filter, a course filter.
 - A student's send is a door of the app's limiter (10.8); **no limit of
   its own until then** (Sam, 2026-10-17) — only a signed-in student
   sends, through the server, 2,000 characters at most.
@@ -101,7 +111,8 @@ Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
   (done, 06.2); Messages through the server on both sides — the storage,
   the labels, the pop-up box, Bulk Send and the question threads gone
   (done 2026-10-17); the student page redesigned, drawn first (done
-  2026-10-17, below); the admin inbox paged, on today's look.
+  2026-10-17, below); the admin's Messages by student (done 2026-10-17,
+  in place of "the inbox paged, on today's look").
 
 ### Help pages and groups
 

@@ -5,7 +5,7 @@
 // (msg_unread_count), and the open threads whose last message is a
 // student's, unread by Quademia (msg_admin_unread_count). Server only —
 // the service role — and called by the two layouts after their gates.
-// Kept apart from queries.ts and admin-queries.ts, which the pages'
+// Kept apart from queries.ts, which the pages'
 // browser halves import for their types: a server-only import there
 // breaks the browser's build.
 
