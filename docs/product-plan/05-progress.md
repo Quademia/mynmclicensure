@@ -33,10 +33,12 @@ parked). *(to build: 05.5)*
   not hidden**: "Review closed on …" (04.13), "No sittings left"
   (04.10); for an ended student, Review answers and Retake with a lock,
   "Choose a package" (03). The menu is a new shared piece (09.10).
-- **Course chips** — All and each of the student's courses, wrapping,
-  never scrolling sideways — are the only filter. Search, mode, status,
-  source and sort go (any can come back if students ask).
-- **The figures**, above the list, following the chip, **true totals
+- **A course dropdown** — "All courses" chosen to start, then each
+  course the student has sat something in — is the only filter (Sam,
+  2026-10-17: in place of chips, which took five lines on a phone with
+  long course names). Search, mode, status, source and sort go (any can
+  come back if students ask).
+- **The figures**, above the list, following the dropdown, **true totals
   over the whole history**, not over the loaded rows: sittings, the
   average and the best (finished sittings; a held one from its date),
   and a count by kind — practice papers, mocks, quiz builder, free

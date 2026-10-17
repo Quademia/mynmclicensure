@@ -2,20 +2,24 @@
 // redesigned (05.5, 05 Q12; Sam, 2026-10-17; 05-progress.md and
 // 11-pages.md "Learning history").
 //
-// A plain list of every sitting: the course chips (the courses the student
-// has sat something in), the figures over the whole history or the chosen
-// course (student_history_figures), and the first twenty rows, newest
-// first, each worded on the server (lib/history). A chip is a link
-// (?course=), so the figures and the list come back together and the way
-// back works; Load more is the list's own.
+// A plain list of every sitting: the course dropdown (the courses the
+// student has sat something in; Sam, 2026-10-17, in place of chips), the
+// figures over the whole history or the chosen course
+// (student_history_figures), and the first twenty rows, newest first, each
+// worded on the server (lib/history). The dropdown moves to ?course=, so
+// the figures and the list come back together and the way back works; a
+// course the student has no sitting in goes back to all. Load more is the
+// list's own.
 
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { requireStudent } from '@/lib/access';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import { getHistoryChunk, getHistoryCourses, getHistoryFigures } from '@/lib/history/queries';
 import type { HistoryFigures } from '@/lib/history/types';
 import { PageHeader } from '@/components/shell/page-header';
 import { AppLink } from '@/components/shell/link-pending';
+import { CourseSelect } from './course-select';
 import { HistoryList } from './history-list';
 import { renderStamp } from './stamp';
 import '@/styles/student-learning-history.css';
@@ -39,19 +43,13 @@ export default async function LearningHistoryPage({ searchParams }: { searchPara
     getHistoryFigures(profile.user_id, courseId),
     access.then((a) => getHistoryChunk(profile.user_id, a, courseId, 0)),
   ]);
+  if (courseId && !courses.some((c) => c.course_id === courseId)) redirect(HISTORY_PATH);
 
   return (
     <div className="lh">
       <PageHeader title="Learning History" />
 
-      {courses.length > 1 ? (
-        <nav className="lh-chips" aria-label="Courses">
-          <Chip href={HISTORY_PATH} on={!courseId} label="All" />
-          {courses.map((c) => (
-            <Chip key={c.course_id} href={`${HISTORY_PATH}?course=${encodeURIComponent(c.course_id)}`} on={c.course_id === courseId} label={c.title} />
-          ))}
-        </nav>
-      ) : null}
+      {courses.length > 1 ? <CourseSelect key={courseId} courses={courses} courseId={courseId} /> : null}
 
       {figures.sittings > 0 ? <Figures f={figures} /> : null}
 
@@ -67,21 +65,6 @@ export default async function LearningHistoryPage({ searchParams }: { searchPara
         </div>
       )}
     </div>
-  );
-}
-
-function Chip({ href, on, label }: { href: string; on: boolean; label: string }) {
-  if (on) {
-    return (
-      <span className="lh-chip on" aria-current="page">
-        {label}
-      </span>
-    );
-  }
-  return (
-    <AppLink href={href} className="lh-chip">
-      {label}
-    </AppLink>
   );
 }
 

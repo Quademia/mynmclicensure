@@ -239,7 +239,8 @@ opens it (00, The menu).
 
 ### Learning history
 - **Redesigned (Sam, 2026-10-17; 05.5)**, drawn in the chat; the rules
-  are in 05. Top to bottom: the title; the course chips; the figures
+  are in 05. Top to bottom: the title; the course dropdown ("All
+  courses" first); the figures
   (sittings, average, best, the count by kind); a row per sitting —
   one tap to its report or Resume, three dots for what else it allows;
   Load more. Phone first; on a computer the same list in the page's

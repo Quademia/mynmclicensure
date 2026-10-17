@@ -45,11 +45,11 @@ type QuizRules = Pick<
 const RULE_COLUMNS =
   'quiz_id, status, published, publish_at, unpublish_at, allowed_modes, first_mode, sittings_allowed, results_at, review, review_closes_at';
 
-// ── the course chips ─────────────────────────────────────────────────────
+// ── the course dropdown ──────────────────────────────────────────────────
 /**
  * The courses the student has sat something in, with their titles, in
- * title order — the chips. Read from the student's own sittings, so a
- * course held once and ended, or a free student's course, has its chip
+ * title order — the dropdown's list. Read from the student's own sittings,
+ * so a course held once and ended, or a free student's course, is listed
  * and its name.
  */
 export async function getHistoryCourses(userId: string): Promise<HistoryCourse[]> {

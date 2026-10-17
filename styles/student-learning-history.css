@@ -1,6 +1,6 @@
 /* styles/student-learning-history.css
  *
- * Learning History, redesigned (05.5; Sam, 2026-10-17): the course chips,
+ * Learning History, redesigned (05.5; Sam, 2026-10-17): the course dropdown,
  * the figures, the list of sittings and Load more, scoped under `.lh`.
  * Tokens only. The card is .card; the row menu's own rules are
  * components.css's (.row-menu, 09.10). One narrow column, the same on a
@@ -10,23 +10,28 @@
 .lh { display: flex; flex-direction: column; gap: var(--space-16); max-width: 760px; }
 .lh .page-header { margin-bottom: 0; }
 
-/* ── The course chips: they wrap, never scroll sideways (AGENTS.md) ── */
-.lh-chips { display: flex; flex-wrap: wrap; gap: var(--space-8); }
-.lh-chip {
-  display: inline-flex;
-  align-items: center;
-  min-height: 36px;
-  padding: var(--space-6) var(--space-12);
+/* ── The course dropdown (Sam, 2026-10-17, in place of chips): one line
+ *    however many courses; the Quiz Builder's course box on tokens (the
+ *    app's one form field is 09.1) ── */
+.lh-course { display: flex; flex-direction: column; gap: var(--space-6); margin: 0; }
+.lh-course label { font-size: var(--type-meta-size); line-height: var(--type-meta-line); font-weight: 600; color: var(--ink); }
+.lh-course-row { display: flex; align-items: center; gap: var(--space-12); }
+.lh-course select {
+  flex: 1;
+  min-width: 0;
+  max-width: 420px;
+  min-height: 44px;
+  padding: var(--space-8) var(--space-12);
   border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius);
   background: var(--surface);
   color: var(--ink);
-  font-size: var(--type-ui-size);
-  line-height: var(--type-ui-line);
-  text-decoration: none;
+  font-family: inherit;
+  font-size: var(--type-field-size);
+  line-height: var(--type-field-line);
 }
-a.lh-chip:hover { border-color: var(--ink-faint); text-decoration: none; }
-.lh-chip.on { background: var(--brand-navy); border-color: var(--brand-navy); color: var(--surface); font-weight: 600; }
+.lh-course select:focus { outline: none; border-color: var(--brand-navy); }
+.lh-course-wait { flex: none; font-size: var(--type-meta-size); color: var(--ink-muted); }
 
 /* ── The figures ── */
 .lh-figures {
@@ -98,4 +103,6 @@ a.lh-row-main:hover { background: var(--surface-page); text-decoration: none; }
 @media (max-width: 768px) {
   .lh-row-main { padding-left: var(--space-12); }
   .lh-figure-row dd { font-size: 18px; line-height: 24px; }
+  /* a phone does not zoom into a 16px box (the builder's rule) */
+  .lh-course select { font-size: 16px; max-width: none; }
 }
