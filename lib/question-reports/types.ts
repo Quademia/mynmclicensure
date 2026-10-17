@@ -42,12 +42,15 @@ export type ReportLine = {
   name: string | null;
 };
 
-/** One question with open reports. */
+/** One question with open reports: the whole question, so a report can be judged on the page. */
 export type ReportGroup = {
   item_id: string;
   course_id: string;
   course_title: string | null;
+  question_type: string | null;
   stem: string | null;
+  /** The options in the bank's order, empty ones left out; `letter` is the bank's (a–f). */
+  options: { letter: string; text: string }[];
   correct: string | null;
   reports: number;
   reasons: Record<string, number>;

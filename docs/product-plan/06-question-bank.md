@@ -155,9 +155,13 @@ are reported: one question is seen by many students and fixed once.
   note, the student's answer, a status — new, fixed, dismissed
   ("reviewed" dropped, no button set it) — and who closed it and when
   (the table ticked 2026-10-17, 12).
-- **The admin's Question reports page**: a row per question — how many
-  reports, their reasons, the newest date, a link to the question in
-  the bank's editor; Mark fixed or Dismiss closes all its open reports.
+- **The admin's Question reports page** (drawn as B with C's detail,
+  Sam, 2026-10-17): a quiet list, **most reports first**, a line per
+  question — the count, the start of the question, its course and
+  reasons, the newest date. A tap opens the line in place onto the whole
+  question: its options with the bank's answer marked, each student's
+  report with their own answer, Open in the bank, Dismiss and Mark fixed
+  — the last two close all its open reports. Twenty questions a page.
 - Parked: a thumbs-up on a question ("Was this question helpful?"), so
   praise has its own place; decided once students use the app (06.9).
 

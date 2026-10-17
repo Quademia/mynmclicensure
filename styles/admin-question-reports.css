@@ -1,49 +1,102 @@
 /* styles/admin-question-reports.css
  *
- * The admin's Question reports page (06.2; Sam, 2026-10-17), scoped under
- * `.aqr`. Tokens only; the card is .card, the buttons the shared family,
- * the reasons .badge. One column; on a phone the actions stack full-width.
+ * The admin's Question reports page (06.2; Sam, 2026-10-17: drawn as B with
+ * C's detail), scoped under `.aqr`. Tokens only; the list is one .card,
+ * the buttons the shared family. A quiet list of lines, most reports
+ * first; a line opens in place (<details>) onto the whole question. The
+ * same on a phone, where the actions stack full-width.
  */
 
 .aqr { display: flex; flex-direction: column; gap: var(--space-16); max-width: 860px; }
 .aqr .page-header { margin-bottom: 0; }
 .aqr-empty { padding: var(--space-24); color: var(--ink-muted); font-size: var(--type-body-size); line-height: var(--type-body-line); }
 
-.aqr-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-12); }
-.aqr-card { padding: var(--space-16) var(--space-24); display: flex; flex-direction: column; gap: var(--space-8); }
-.aqr-meta { margin: 0; font-size: var(--type-meta-size); line-height: var(--type-meta-line); color: var(--ink-muted); }
-.aqr-meta b { color: var(--ink); }
-.aqr-stem {
-  margin: 0;
-  font-size: var(--type-body-size);
-  line-height: var(--type-body-line);
-  color: var(--ink);
-}
+/* ── the list ── */
+.aqr-list { list-style: none; margin: 0; padding: 0; overflow: hidden; }
+.aqr-list > li + li { border-top: 1px solid var(--border); }
 
-.aqr-reasons { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-6); }
-
-.aqr-lines summary {
-  cursor: pointer;
-  min-height: 32px;
+.aqr-row > summary {
+  list-style: none;
   display: flex;
   align-items: center;
-  font-size: var(--type-ui-size);
-  font-weight: 600;
-  color: var(--brand-teal-hover);
+  gap: var(--space-12);
+  min-height: 56px;
+  padding: var(--space-10) var(--space-16);
+  cursor: pointer;
 }
-.aqr-lines ul { list-style: none; margin: var(--space-8) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-10); }
-.aqr-lines li { padding: var(--space-10) var(--space-12); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-page); }
-.aqr-line-head { margin: 0; font-size: var(--type-ui-size); line-height: 1.5; color: var(--ink-muted); }
-.aqr-line-head b { color: var(--ink); }
-.aqr-note { margin: var(--space-4) 0; font-size: var(--type-ui-size); line-height: 1.5; color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; }
+.aqr-row > summary::-webkit-details-marker { display: none; }
+.aqr-row > summary:hover { background: var(--surface-page); }
+.aqr-row[open] > summary { background: var(--brand-teal-pale); }
+.aqr-row > summary:focus-visible { outline: 2px solid var(--brand-teal); outline-offset: -2px; }
+
+.aqr-count {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--type-ui-size);
+  font-weight: 700;
+  background: var(--badge-neutral-bg);
+  color: var(--badge-neutral-ink);
+}
+.aqr-count-many { background: var(--badge-warning-bg); color: var(--badge-warning-ink); }
+
+.aqr-line { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.aqr-stem-one {
+  font-size: var(--type-ui-size);
+  line-height: 1.45;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.aqr-meta { margin: 0; font-size: var(--type-meta-size); line-height: var(--type-meta-line); color: var(--ink-muted); }
+.aqr-meta b { color: var(--ink); }
+.aqr-line .aqr-meta { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.aqr-day { flex: none; font-size: var(--type-meta-size); color: var(--ink-muted); }
+.aqr-day::after { content: ' ›'; }
+.aqr-row[open] .aqr-day::after { content: ' ⌄'; }
+
+/* ── a line opened: the whole question, its reports, the actions ── */
+.aqr-open {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+  padding: var(--space-12) var(--space-16) var(--space-16);
+  border-top: 1px solid var(--border);
+}
+.aqr-stem { margin: 0; font-size: var(--type-body-size); line-height: var(--type-body-line); font-weight: 600; color: var(--ink); }
+
+.aqr-options, .aqr-reports { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-6); }
+.aqr-option {
+  display: flex;
+  gap: var(--space-10);
+  padding: var(--space-8) var(--space-12);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: var(--type-ui-size);
+  line-height: 1.45;
+  color: var(--ink);
+}
+.aqr-option-key { border-color: var(--brand-teal); background: var(--brand-teal-pale); color: var(--brand-teal-hover); }
+.aqr-key { font-weight: 600; }
+
+.aqr-reports li { padding: var(--space-8) var(--space-12); border-radius: var(--radius); background: var(--surface-page); border: 1px solid var(--border); }
+.aqr-note { margin: var(--space-4) 0 0; font-size: var(--type-ui-size); line-height: 1.5; color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; }
 
 .aqr-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space-8); margin-top: var(--space-4); }
 
+/* ── pages ── */
 .aqr-pager { display: flex; align-items: center; justify-content: space-between; gap: var(--space-12); }
 .aqr-pager-at { font-size: var(--type-ui-size); color: var(--ink-muted); }
 
 @media (max-width: 768px) {
-  .aqr-card { padding: var(--space-16); }
+  .aqr-row > summary { padding: var(--space-10) var(--space-12); }
+  .aqr-open { padding: var(--space-12); }
   .aqr-actions { flex-direction: column; }
   .aqr-actions .btn { width: 100%; }
 }
