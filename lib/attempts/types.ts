@@ -243,7 +243,14 @@ export type FinishResult =
        * 04.13: the paper's review is closed — the score and the counts (the
        * runner cannot count without the key), no secret half, and the line.
        */
-      reviewClosed: { line: string; correct: number; wrong: number; unanswered: number } | null;
+      reviewClosed: {
+        line: string;
+        correct: number;
+        wrong: number;
+        unanswered: number;
+        /** 03 F2: the student's access has ended — the way to a package. */
+        packageHref?: string | null;
+      } | null;
     }
   | {
       ok: true;
@@ -303,6 +310,15 @@ export type AttemptListRow = Pick<
 export type HistoryPage = { attempts: AttemptListRow[]; total: number };
 
 export const HISTORY_PAGE_SIZE = 20;
+
+/**
+ * 03 F2 (Sam, 2026-10-03/04): after the trial or a package ends, a
+ * finished sitting keeps its score and its report's summary; its
+ * answer-by-answer review is locked with one way to open it. A free
+ * sitting stays open; an unfinished one can still be finished.
+ */
+export const ENDED_REVIEW_LINE = 'Your access to this course has ended. Choose a package to review your answers.';
+export const PACKAGES_HREF = '/student/upgrade';
 
 /** The dashboard's Recent Quiz Attempts table (legacy's `.limit(5)`). */
 export const RECENT_ATTEMPTS_LIMIT = 5;

@@ -67,7 +67,7 @@ before then, and the old list's history, is in
 
 - ✅ F1 The free set's two doors in the database — the read rule, free builder quizzes in Study modes — 2026-10-04
 - ✅ F2 The free account, the floor — the builder on the free set, the dashboard's free line — 2026-10-11
-- ⬜ F2 After the trial — locked, not gone; the summary open, the review locked; Retake locked
+- ✅ F2 After the trial — locked, not gone; the summary open, the review locked; Retake locked — 2026-10-17
 - ⬜ F3 The home page and its copy — free questions, forever; the trial and packages the way in
 - ✅ F4a The trial's limits in the database — on packages and receipts, the trial paper, 14 days — 2026-10-04
 - ⬜ F4b The trial's SMS half — the verified number, one trial per number; needs an SMS account (tables ✅)

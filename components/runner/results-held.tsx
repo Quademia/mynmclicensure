@@ -69,6 +69,10 @@ export function ReviewClosed({ closed, exit, note, children }: { closed: ClosedS
             {closed.reportHref ? (
               <AppLink className="btn btn-primary" href={closed.reportHref}>See your report</AppLink>
             ) : null}
+            {/* 03 F2: the access has ended — the one way to open the review */}
+            {closed.packageHref ? (
+              <AppLink className="btn btn-accent" href={closed.packageHref}>Choose a package</AppLink>
+            ) : null}
             <AppLink className={closed.reportHref ? 'btn btn-ghost' : 'btn btn-primary'} href={exit.href}>{exit.label}</AppLink>
           </div>
         </div>

@@ -36,6 +36,8 @@ import { modeOf } from './modes';
 import { getAttemptById, getOwnAttempt, originSource, readAttemptItems } from './queries';
 import { sealItem, secretOf } from './seal';
 import {
+  ENDED_REVIEW_LINE,
+  PACKAGES_HREF,
   RUNNER_QUESTIONS_PER_PAGE_DEFAULT,
   type Attempt,
   type AttemptMode,
@@ -78,6 +80,8 @@ export type ClosedSitting = {
   displayLabel: string | null;
   line: string;
   reportHref: string | null;
+  /** 03 F2: the student's access has ended — the way to a package. */
+  packageHref?: string | null;
 };
 
 /** The questions a sitting is played or reviewed with. */
@@ -128,6 +132,8 @@ async function checkSession(
       previewMode: boolean;
       /** 04.14: this open finished the sitting at its paper's close — the line it says. */
       closeNote: string | null;
+      /** 03 F2: no live access to the course and not a free sitting. */
+      locked: boolean;
     }
 > {
   const { supabase, profile } = gate;
@@ -168,12 +174,15 @@ async function checkSession(
   const heldExit = quizPageExit(home, attempt.quiz_id, attempt.course_id, attempt.display_label);
 
   // CHECK 5 — Course access, or a free sitting: a builder quiz of free
-  // questions opens for a student without the course (03, 04.4).
+  // questions opens for a student without the course (03, 04.4). Without
+  // either (03 F2: the trial or the package has ended) the sitting is
+  // `locked`, not refused: one left unfinished can still be finished,
+  // Check Answer included; a finished one opens as its lock and its report
+  // (loadRunner), and its Retake goes (sessionPlay).
+  let locked = false;
   if (!previewMode) {
     const access = await getStudentCourseAccess(supabase, profile.user_id);
-    if (!access[attempt.course_id] && !(await isFreeSitting(attempt))) {
-      return { kind: 'error', title: 'No Course Access', message: 'You do not have an active subscription for this course.', exit };
-    }
+    locked = !access[attempt.course_id] && !(await isFreeSitting(attempt));
   }
 
   // 03 Q5 — an exam left open past its deadline is closed on this open,
@@ -225,7 +234,7 @@ async function checkSession(
   if (attempt.status === 'abandoned') {
     return { kind: 'error', title: 'Attempt Abandoned', message: 'This quiz attempt was abandoned. Please start a new attempt.', exit };
   }
-  return { kind: 'ok', attempt, exit, heldExit, noun, previewMode, closeNote };
+  return { kind: 'ok', attempt, exit, heldExit, noun, previewMode, closeNote, locked };
 }
 
 // originSource's read (04.12): a student's own chain through
@@ -252,6 +261,8 @@ async function sessionPlay(
   attempt: Attempt,
   previewMode: boolean,
   heldExit: SessionExit,
+  /** 03 F2: the student's access has ended — no Retake. */
+  locked: boolean,
 ): Promise<SessionError | { kind: 'closed' } | SessionPlay> {
   // Since 03 Q5 the runner saves per tap, so runner_autosave_interval_sec
   // is no longer read (the key stays until S13 reviews the registry).
@@ -286,7 +297,7 @@ async function sessionPlay(
   for (const row of rows) {
     if (unsealAll || (feedbackEach && row.graded_utc !== null)) secrets[row.item_id] = secretOf(row);
   }
-  const retakeAllowed = previewMode ? false : await retakeOpen(gate, attempt);
+  const retakeAllowed = previewMode || locked ? false : await retakeOpen(gate, attempt);
   return { attempt, items, secrets, questionsPerPage, retakeAllowed, heldExit };
 }
 
@@ -350,7 +361,7 @@ export async function loadRunner(
 ): Promise<RunnerLoad> {
   const checked = await checkSession(gate, params);
   if (checked.kind === 'error') return checked;
-  const { attempt, exit, heldExit, noun, previewMode, closeNote } = checked;
+  const { attempt, exit, heldExit, noun, previewMode, closeNote, locked } = checked;
 
   // 04.12: a finished sitting whose results are held opens as its date —
   // no question, no answer, no score reaches the page. The admin's preview
@@ -385,8 +396,25 @@ export async function loadRunner(
     };
   }
 
+  // 03 F2: the student's access has ended — a finished sitting opens as
+  // the lock, its report (the summary stays) and the way to a package; no
+  // question or answer reaches the page.
+  if (attempt.status === 'completed' && locked) {
+    return {
+      kind: 'review-closed',
+      exit: heldExit,
+      closeNote,
+      closed: {
+        displayLabel: attempt.display_label,
+        line: ENDED_REVIEW_LINE,
+        reportHref: reportHref(attempt.attempt_id),
+        packageHref: PACKAGES_HREF,
+      },
+    };
+  }
+
   if (attempt.status === 'completed') {
-    const play = await sessionPlay(gate, attempt, previewMode, heldExit);
+    const play = await sessionPlay(gate, attempt, previewMode, heldExit, locked);
     if ('kind' in play) return play.kind === 'closed' ? { kind: 'error', title: 'Quiz Not Found', message: 'This quiz attempt could not be found. It may have been deleted.', exit } : play;
     return { kind: 'review', previewMode, exit, closeNote, ...play };
   }
@@ -458,7 +486,7 @@ export async function openSession(
   const checked = await checkSession(gate, params);
   if (checked.kind === 'error') return checked;
   let { attempt } = checked;
-  const { previewMode, exit, heldExit } = checked;
+  const { previewMode, exit, heldExit, locked } = checked;
   if (attempt.status !== 'in_progress') return { kind: 'review' };
 
   if (modeOf(attempt.mode).clock !== 'none' && !previewMode && attempt.started_utc === null) {
@@ -474,7 +502,7 @@ export async function openSession(
     if (attempt.status !== 'in_progress') return { kind: 'review' };
   }
 
-  const play = await sessionPlay(gate, attempt, previewMode, heldExit);
+  const play = await sessionPlay(gate, attempt, previewMode, heldExit, locked);
   if ('kind' in play) return play.kind === 'closed' ? { kind: 'review' } : play;
   return { kind: 'play', ...play };
 }

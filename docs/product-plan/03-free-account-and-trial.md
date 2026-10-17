@@ -96,7 +96,7 @@ show the locks *(F2, 11)*.
 - The welcome trial product (`WELCOME_TRIAL`) is unchanged and not
   granted by registering.
 
-### After the trial — locked, not gone *(to build: F2)*
+### After the trial — locked, not gone *(F2, built 2026-10-17: the report, the sitting, Learning History)*
 
 - What the student did stays theirs; what needs a package shows with a
   lock and one way to open it: **Choose a package**.

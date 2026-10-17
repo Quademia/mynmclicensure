@@ -8,8 +8,9 @@
 // day in Ghana's time, the one thing on the right, where a tap goes, and
 // the three dots' lines. The lines follow the rules already built — held
 // results (04.12), the review closed (04.13), sittings allowed (04.10),
-// the start rules (startRefusal) — and a sitting the student can no
-// longer open without a package shows its lines locked (03). The rules
+// the start rules (startRefusal) — and, once the student's access to the
+// course has ended, Review answers and Retake locked while the report
+// stays open (03 F2). The rules
 // are read for the whole page at once — the papers and mocks, the
 // student's sittings of them, the free test for builder quizzes outside
 // a live course, the course titles — so a page costs the same few reads
@@ -238,8 +239,8 @@ function wordRow(a: AttemptListRow, f: RowFacts): HistoryRow {
   const status = a.status;
   const held = status === 'completed' && a.held === true && Boolean(a.results_at);
   // What the student may open without a package: everything while the
-  // course is live, a free sitting always (03, F1). The report refuses
-  // the rest today (the review's check), so the row says so first.
+  // course is live, a free sitting always (03, F1). Otherwise (03 F2) the
+  // score and the report's summary stay; Review answers and Retake lock.
   const opens = f.live || f.free;
 
   let right: HistoryRight;
@@ -257,20 +258,18 @@ function wordRow(a: AttemptListRow, f: RowFacts): HistoryRow {
   if (status === 'completed') {
     if (held) {
       right = { kind: 'held', text: `Results ${formatResultsShort(a.results_at as string)}` };
-      href = opens ? reportHref(a.attempt_id) : null;
+      href = reportHref(a.attempt_id);
       menu.push({ kind: 'note', text: `Results on ${formatResultsAt(a.results_at as string)}`, icon: 'hourglass' });
     } else {
       right = { kind: 'score', pct: Math.round(Number(a.score_pct) || 0) };
-      if (opens) {
-        href = reportHref(a.attempt_id);
-        menu.push({ kind: 'report', href });
-        if (a.review_closed) {
-          menu.push({ kind: 'note', text: reviewClosedNote(a.review, a.review_closes_at), icon: 'lock' });
-        } else {
-          menu.push({ kind: 'review', href: sessionHref(a.attempt_id) });
-        }
+      href = reportHref(a.attempt_id);
+      menu.push({ kind: 'report', href });
+      if (a.review_closed) {
+        menu.push({ kind: 'note', text: reviewClosedNote(a.review, a.review_closes_at), icon: 'lock' });
+      } else if (!opens) {
+        menu.push({ kind: 'locked', label: 'Review answers' });
       } else {
-        menu.push({ kind: 'locked', label: 'See your report' }, { kind: 'locked', label: 'Review answers' });
+        menu.push({ kind: 'review', href: sessionHref(a.attempt_id) });
       }
     }
   } else {

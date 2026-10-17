@@ -15,10 +15,12 @@
 // KB — and hands the client plain numbers; the client half only switches
 // views and filters, with no request.
 //
-// The gates are the review's: the student's own sitting (anyone else's
-// is not found), the course still open to them (legacy's words), and
+// The gates: the student's own sitting (anyone else's is not found), and
 // finished — an unfinished sitting goes back to the quiz, an abandoned
-// one to the history.
+// one to the history. A student whose access to the course has ended
+// (03 F2, Sam 2026-10-03/04) keeps the summary; the answer-by-answer
+// review and Retake are locked, with one way to a package. A free sitting
+// stays open.
 
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
@@ -32,6 +34,7 @@ import { retakeOpen } from '@/lib/attempts/runner-load';
 import { isFreeSitting } from '@/lib/attempts/free-sitting';
 import { modeOf } from '@/lib/attempts/modes';
 import { sessionHref } from '@/lib/attempts/links';
+import { ENDED_REVIEW_LINE, PACKAGES_HREF } from '@/lib/attempts/types';
 import {
   anyTopicJudged,
   fixTopics,
@@ -108,21 +111,9 @@ export default async function ReportPage({ params }: { params: Promise<{ attempt
     </AppLink>
   );
 
-  // The review's CHECK 5, in its words: the report's links (the review,
-  // the builder) would refuse, so the page does too — a free sitting
-  // apart, whose review and builder stay open (03, 04.4).
-  if (!access[attempt.course_id] && !free) {
-    return (
-      <div className="srp">
-        {back}
-        <PageHeader title={label} />
-        <div className="card srp-notice">
-          <p className="srp-notice-title">No Course Access</p>
-          <p>You do not have an active subscription for this course.</p>
-        </div>
-      </div>
-    );
-  }
+  // 03 F2: the access has ended — the summary stays, the review and Retake
+  // lock (a free sitting apart, whose review and builder stay open; 04.4).
+  const locked = !access[attempt.course_id] && !free;
   if (!rows || !rows.length) {
     return (
       <div className="srp">
@@ -138,13 +129,16 @@ export default async function ReportPage({ params }: { params: Promise<{ attempt
 
   // 04.13: the review closed (or not allowed) — the summary stays; the
   // review, the question map and its numbers do not reach the page
-  const closedLine = attempt.review_closed
+  const reviewLine = attempt.review_closed
     ? reviewClosedLine(
         attempt.review,
         attempt.review_closes_at,
         (await originSource(attempt, (id) => getOwnAttempt(profile.user_id, id))) === 'mock' ? 'mock' : 'paper',
       )
     : null;
+  // Either shuts the review the same way; the closed review's own line
+  // first (a package would not open it), then the access ended (03 F2).
+  const closedLine = reviewLine ?? (locked ? ENDED_REVIEW_LINE : null);
 
   const M = modeOf(attempt.mode);
   const when = attempt.ts_iso
@@ -199,7 +193,13 @@ export default async function ReportPage({ params }: { params: Promise<{ attempt
               Review answers
             </AppLink>
           )}
-          {retakeAllowed ? <RetakeButton attemptId={attempt.attempt_id} /> : null}
+          {retakeAllowed && !locked ? <RetakeButton attemptId={attempt.attempt_id} /> : null}
+          {/* 03 F2: the one way to open the review again */}
+          {locked && !reviewLine ? (
+            <AppLink className="btn btn-accent" href={PACKAGES_HREF}>
+              Choose a package
+            </AppLink>
+          ) : null}
         </div>
       </section>
 

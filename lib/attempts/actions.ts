@@ -21,7 +21,7 @@
 
 'use server';
 
-import { requireStudent } from '@/lib/access';
+import { requireStudent, type ServerSupabaseClient } from '@/lib/access';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { knownItemIds, searchConceptItemIds } from '@/lib/bank/queries';
 import { getConfig } from '@/lib/catalogue/queries';
@@ -49,6 +49,8 @@ import {
   BUILDER_MAX_QUESTIONS_DEFAULT,
   BUILDER_MIN_QUESTIONS,
   BUILDER_MINUTES_PER_QUESTION_DEFAULT,
+  ENDED_REVIEW_LINE,
+  PACKAGES_HREF,
   TIME_SPENT_MAX_S,
   type ActionResult,
   type AdvanceResult,
@@ -305,7 +307,7 @@ function scoreOf(data: unknown): { raw: number; total: number; pct: number } | n
 // the reply carries every question's secret half for the review (Q6) —
 // unless its results are held (04.12, closedResult).
 export async function finishAttempt(attemptId: string, timeTakenS: number | null): Promise<FinishResult> {
-  const { profile } = await requireStudent();
+  const { supabase, profile } = await requireStudent();
   const svc = createServiceRoleClient();
   const { data, error } = await svc.rpc('finish_attempt', {
     p_attempt_id: attemptId,
@@ -315,7 +317,7 @@ export async function finishAttempt(attemptId: string, timeTakenS: number | null
   if (error) return fail(rpcError(error, 'Could not submit this attempt.'));
   const score = scoreOf(data);
   if (!score) return fail('Could not submit this attempt.');
-  return closedResult(svc, profile.user_id, attemptId, score);
+  return closedResult(svc, supabase, profile.user_id, attemptId, score);
 }
 
 // What a closed sitting's reply carries (04.12). The sitting is read back
@@ -323,11 +325,14 @@ export async function finishAttempt(attemptId: string, timeTakenS: number | null
 // held, the reply is the date and what was saved — no score, no secret
 // half; otherwise the score, every secret half for the review (Q6) and the
 // time the close wrote (03 Q18: the server clock's for an exam, the
-// stopwatch's otherwise). The read is tried twice — the sitting is closed
+// stopwatch's otherwise) — but with the review closed (04.13), or the
+// student's access ended (03 F2), the score and the counts and no secret
+// half. The read is tried twice — the sitting is closed
 // by now, and a reply of failure would leave the runner live — and a read
 // that fails both times gives nothing away.
 async function closedResult(
   svc: ReturnType<typeof createServiceRoleClient>,
+  supabase: ServerSupabaseClient,
   userId: string,
   attemptId: string,
   score: { raw: number; total: number; pct: number },
@@ -364,6 +369,26 @@ async function closedResult(
       },
     };
   }
+  // 03 F2: the student's access has ended — the score and the counts, no
+  // secret half, the lock's line and the way to a package (a free sitting
+  // stays open)
+  const access = await getStudentCourseAccess(supabase, userId);
+  if (!access[own.course_id] && !(await isFreeSitting(own))) {
+    return {
+      ok: true,
+      held: false,
+      score,
+      secrets: {},
+      timeTakenS,
+      reviewClosed: {
+        line: ENDED_REVIEW_LINE,
+        correct: rows.filter((r) => answered(r) && r.is_correct === true).length,
+        wrong: rows.filter((r) => answered(r) && r.is_correct !== true).length,
+        unanswered: rows.filter((r) => !answered(r)).length,
+        packageHref: PACKAGES_HREF,
+      },
+    };
+  }
   return { ok: true, held: false, score, secrets: secretsOf(rows), timeTakenS, reviewClosed: null };
 }
 
@@ -375,7 +400,7 @@ function answered(r: { chosen: string | null }): boolean {
 // The exam's clock ran out: closed at the true deadline. The function
 // refuses while the server's clock says time is left.
 export async function expireAttempt(attemptId: string): Promise<FinishResult> {
-  const { profile } = await requireStudent();
+  const { supabase, profile } = await requireStudent();
   const svc = createServiceRoleClient();
   const { data, error } = await svc.rpc('expire_attempt', {
     p_attempt_id: attemptId,
@@ -384,7 +409,7 @@ export async function expireAttempt(attemptId: string): Promise<FinishResult> {
   if (error) return fail(rpcError(error, 'Could not submit this exam.'));
   const score = scoreOf(data);
   if (!score) return fail('Could not submit this exam.');
-  return closedResult(svc, profile.user_id, attemptId, score);
+  return closedResult(svc, supabase, profile.user_id, attemptId, score);
 }
 
 // ── the list pages (5b) ────────────────────────────────────────────────

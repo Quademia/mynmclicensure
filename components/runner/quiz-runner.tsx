@@ -211,7 +211,14 @@ export function QuizRunner({
   // when it was submitted (the browser's clock, stamped by the handler).
   // 04.13: the finish's reply when the paper's review is closed — the
   // line, and the counts (no key came, so the runner cannot count them).
-  const [closedResult, setClosedResult] = useState<{ line: string; correct: number; wrong: number; unanswered: number } | null>(null);
+  const [closedResult, setClosedResult] = useState<{
+    line: string;
+    correct: number;
+    wrong: number;
+    unanswered: number;
+    /** 03 F2: the access has ended — the way to a package. */
+    packageHref?: string | null;
+  } | null>(null);
   const [heldResult, setHeldResult] = useState<{
     resultsAt: string;
     answered: number;
@@ -1200,7 +1207,12 @@ export function QuizRunner({
   if (closedResult) {
     return (
       <ReviewClosed
-        closed={{ displayLabel: attempt.display_label, line: closedResult.line, reportHref: previewMode ? null : reportHref(attempt.attempt_id) }}
+        closed={{
+          displayLabel: attempt.display_label,
+          line: closedResult.line,
+          reportHref: previewMode ? null : reportHref(attempt.attempt_id),
+          packageHref: closedResult.packageHref ?? null,
+        }}
         exit={heldExit ?? exit}
       >
         {loader}
