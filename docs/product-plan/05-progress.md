@@ -16,7 +16,7 @@ and `archive/product-plan/03-quiz-system.md` (Q10–Q13).
 Redesigned (Sam, 2026-10-17), drawn in the chat. A plain list of every
 sitting: where a student finds one and opens it, not a report. How
 they are doing across a course belongs on the course page (below,
-parked). *(to build: 05.5)*
+parked). *(built 2026-10-17: 05.5)*
 
 - **A row per sitting**, newest first: its name (two lines at most),
   the course in full, the mode (the one mode table, 04), the date; on
@@ -43,7 +43,7 @@ parked). *(to build: 05.5)*
   average and the best (finished sittings; a held one from its date),
   and a count by kind — practice papers, mocks, quiz builder, free
   practice (a builder quiz of free questions only). A retake counts as
-  its original's kind. The count by mode goes. *(to build: Q12)*
+  its original's kind. The count by mode goes. *(built 2026-10-17: Q12)*
 - Offline pack practice is not listed (07: no sync).
 - **A course's topics on its course page** — its strongest topics and
   its topics to work on (each with Practise), over the course's whole

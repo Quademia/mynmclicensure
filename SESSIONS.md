@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-17 — Learning History redesigned (05.5): a list by course, figures by the database (Q12), a dots menu; the global sign-out fixed (01.9); F2 built
+  - ↳ no progress page, topics parked on the course page (05.6) · strongest topics too · dropdown over chips · one tap to the report · closed told in grey · signOut local, reset global · Submit hides answers when ended · 05.6 next
+
 - 2026-10-15, night — offline packs finished: offline in the app (07.3), the PDF on the phone (07.5), My packs as course cards (C); how to install the app
   - ↳ own small service worker · icon opens Dashboard · Install blocked, Add to Home screen steps · week keeps packs · always "offline" · pdfmake, Roboto · pattern kept · View beside Download · Save first · Learning History next
 

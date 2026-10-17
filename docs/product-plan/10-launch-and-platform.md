@@ -91,7 +91,8 @@ announcements start empty.
 
 Built: a tap is never silent (2026-09-28) — the pressed link, the
 loading placeholder, the student's links staying inside the app; every
-read that can grow past 1,000 rows reads in batches (AGENTS.md rule 10).
+read that can grow past 1,000 rows reads in batches (AGENTS.md rule 10);
+a student's sittings indexed by date (05 Q12, 2026-10-17).
 
 *(to build)*
 
@@ -101,7 +102,6 @@ read that can grow past 1,000 rows reads in batches (AGENTS.md rule 10).
 - The student layout's three reads hold up every student page.
 - Two lists read every column of a student's sittings — name the
   columns.
-- No index on sittings by date, or by student and date.
 - The admin Attempts page reads at most 5,000 sittings — numbers past
   that are the newest 5,000's (05 moves it to database queries).
 

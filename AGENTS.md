@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-10-15. Rules for **any** assistant working in this
+Last updated: 2026-10-17. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What the app is
@@ -341,6 +341,13 @@ above sit at the repo root; the audience grouping inside them is kept.
   someone out redirects to `/logout?via=gate` (a Route Handler); a
   `signOut()` in the component is silently swallowed and the auth
   cookie bounces the browser straight back.
+- **`supabase.auth.signOut()` is global by default** — it ends every
+  device the student is signed in on. A device bumped by the two-device
+  limit, signed out by the gate, then signed the student's new phone out
+  too (2026-10-17, 01.9). Every sign-out passes `{ scope: 'local' }`; only
+  the password reset ends every device, on purpose. Walk anything about
+  two devices with both on `localhost`, or after the merge: a phone on the
+  dev site runs `main`'s code, and its old sign-out spoiled the first walk.
 - **The middleware's "signed-in user leaves /login" bounce is GET-only.**
   A Server Action posted to /login (finishing a Google or magic-link
   return) arrives WITH a user and must reach the action.

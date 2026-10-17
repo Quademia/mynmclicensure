@@ -102,3 +102,7 @@ Written on the tables in `12-tables.md`, all ticked 2026-09-18:
 - The Sheets era's bot script (`Telegram_By_Worker-DEV`, not in this
   repo) — Sam to find it; read before 17 is planned.
 - The Telegram group's keys list (free text holding junk) is under 10.
+- The portal guide's Learning History card promises "identify topics you
+  repeatedly miss" and "monitor improvement over time": since 05.5
+  (2026-10-17) that is each sitting's report and, later, the course
+  page's topics (05.6) — Sam's words, with the help page's redesign.

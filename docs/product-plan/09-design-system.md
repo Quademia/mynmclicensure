@@ -39,6 +39,9 @@ Detail and history: `archive/product-plan/10-design-system.md`.
   filling by weight in three bars (Sam: navy). Retake and the modes stay
   grey. Kind and scale colours are set in `components/shell/chips.tsx`.
 - **Card** — one `.card`; one product card for both selling pages.
+- **Row menu** — three dots at a row's end opening what that row allows
+  now; what is closed is told in grey, a locked line adds Choose a
+  package (`components/shell/row-menu.tsx`; 09.10, Sam, 2026-10-17).
 - **Name circle** — the photo, else initials on the teal-navy blend;
   the logo where Quademia speaks.
 - **Icons** — a 16px Lucide outline set in `components/shell/icons.tsx`;
