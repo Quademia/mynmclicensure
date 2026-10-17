@@ -473,12 +473,9 @@ table by table as each is next changed (AGENTS.md rule 9).
   server from Start to Submit, closed at its limit); a challenge sitting
   names the day's draw, and one per student per day. Why: the daily
   challenge (Sam, 2026-10-08).
-- *To build (05 Q12, 05.5) — ticked 2026-10-17:* an index on a
-  student's sittings by date (`user_id`, `ts_iso` newest first). Why:
-  Learning History lists a student's sittings newest first, twenty at a
-  time, and its figures read them all; today the only index on the
-  student is on `user_id` alone (10, Speed and scale). No column
-  changes.
+- Indexed by student and date, newest first (`user_id`, `ts_iso`):
+  the order Learning History lists a student's sittings in, twenty at a
+  time, and its figures read them (05 Q12; ticked and built 2026-10-17).
 - Browser: the owner and an admin read every column but the three
   scores (04.12, 2026-10-15); every write through the database's own
   functions. A student's pages read their sittings, scores included,
@@ -698,17 +695,16 @@ the browser can call only the first two lines.
   in the topic), questions met of each course's published bank, the
   latest unfinished sitting, and a recap inside a window the page passes
   (05.4, G1a; built 2026-10-04).
-- **The history's figures** (server only, reads only) — *to build (05
-  Q12) — ticked 2026-10-17:* `student_history_figures(student, course
-  or all)` — one row: the sittings (every status), the average and the
-  best score of finished sittings (read through `student_attempts()`,
-  so a held one is left out until its date), and the count by kind —
-  practice papers, mocks, quiz builder, free practice (a builder quiz
-  all of whose questions are in the Free pool, judged by today's pool).
-  A retake counts as its original's kind: its paper or mock when it has
-  one, else the builder. Why: the true totals over the whole history
-  (05), counted by the database in one trip rather than rows counted in
-  the app. No table changes; the browser's roles cannot call it.
+- **The history's figures** (server only, reads only):
+  `student_history_figures(student, course or all)` — one row: the
+  sittings (every status), the average and the best score of finished
+  sittings (read through `student_attempts()`, so a held one is left
+  out until its date), and the count by kind — practice papers, mocks,
+  quiz builder, free practice (a builder quiz all of whose questions are
+  published questions of its course in the Free pool, judged by today's
+  pool). A retake counts as its original's kind: its paper or mock when
+  it has one, else the builder. The true totals over the whole history
+  (05), counted in one trip (05 Q12; ticked and built 2026-10-17).
 - **Packs and the bank** (server only): `create_offline_pack` (the same
   live-grant check, and packs per course since the grant began within
   its limit), `search_question_bank_ids`, `save_quiz`.
