@@ -631,7 +631,10 @@ table by table as each is next changed (AGENTS.md rule 9).
   `msg_admin_unread_count`; ids are made there (`THR_`/`MSG_` + 16 hex).
   The admin's list of students is `msg_admin_students()` (built
   2026-10-17, 08.2 step 4): one row per student, grouped and paged in the
-  database, waiting first; an index on the waiting threads serves it.
+  database, waiting first; an index on the waiting threads serves it. A
+  wait is timed from the student's first message after Quademia's last
+  reply in that conversation, so writing again does not move them down
+  (Sam, 2026-10-17; `20261017210000_admin_messages_wait.sql`).
 - Browser: SELECT only — the student their own threads, an admin all.
 
 ### `messages` — the messages

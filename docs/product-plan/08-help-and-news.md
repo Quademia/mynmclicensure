@@ -86,8 +86,9 @@ Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
 - **The admin's Messages, by student** (Sam, 2026-10-17, in place of the
   inbox of every conversation): a list of the students who have written —
   those **waiting for a reply** (an open conversation whose last message
-  is theirs) first, the longest waiting at the top — each with what waits
-  and the start of it; twenty a page. Filters: a search that reaches
+  is theirs) first, the longest waiting at the top, timed from their
+  first unanswered message (writing again does not move them down) —
+  each with what waits and the start of it; twenty a page. Filters: a search that reaches
   **every** student (to write to one who never wrote), "Waiting for a
   reply / All", and the label. A tap opens **that student's Messages as
   they see them** — the same view — with one line about them (programme
