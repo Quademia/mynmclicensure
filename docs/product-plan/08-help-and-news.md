@@ -137,10 +137,15 @@ Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
     a table outside our schema and pays only at thousands of students at
     once (08.6).
   - **The app closed: phone notifications, both sides** *(to build:
-    08.5b)* — the student
-    when Quademia replies ("Quademia · Payment or package" and the
-    reply's first line; a tap opens the conversation), Quademia's
-    devices when a student writes. Free per message (Google, Apple and
+    08.5b)* — the student when Quademia replies, Quademia's devices when
+    a student writes; a tap opens the conversation. **What it says**
+    (Sam, 2026-10-17, drawn: wording a): the title and line are ours,
+    the label only — never the message's text, since phones are shared:
+    "Quademia replied" / "Payment or package" for a student, "Ama Owusu
+    wrote" / "Payment or package" for an admin. The phone's own line
+    above names the app — "MyNMCLicensure" with the painted Q once it is
+    on the Home Screen, the browser and address before. One buzz per
+    conversation: a new reply replaces the earlier one. Free per message (Google, Apple and
     Mozilla deliver them). The pieces: a key pair per environment, the
     private one a Cloudflare secret Sam adds; a table of the devices
     that allowed it, a dead one removed when its service says so;
@@ -153,20 +158,36 @@ Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
     can follow, each Sam's call (few and important: the browser's Allow
     covers the whole app, and a Block loses replies too); a sign-out or
     a bump deletes a device, a week running out does not.
-  - **The ask**: after a student's send, "Notify me when Quademia
-    replies" — a browser asks only after a tap, and a Block cannot be
-    asked again. Reach: Android's Chrome after Allow, even closed or
-    not installed; an iPhone only once the app is on the Home Screen
-    (iOS 16.4 or later); a computer while the browser is open. Tested on
-    Sam's phone against licensure-dev — the helper runs on a deployed
-    build only, and the pane shows no notifications.
+  - **The ask** (Sam, 2026-10-17, drawn): a card under the student's
+    message right after they send — "Get a notification when we reply ·
+    On this phone, even when the app is closed", **Not now** and **Turn
+    on**; Turn on, then the phone's own Allow (two taps, once); the card
+    then one grey line, "Notifications on for this phone", and not shown
+    on that phone again. **Not now** hides it on that phone for 7 days,
+    then it comes back after a send — there is no other switch for a
+    student (the phone's settings turn it off). A Block: once, "Notifications
+    are blocked on this phone. You can allow them in your phone's
+    settings." An iPhone not on the Home Screen: "Want a notification
+    when we reply? On iPhone, add the app to your Home Screen first",
+    **Show me how** opening the install steps (07.3). **The admin's
+    switch**: "Notify this device when a student writes", at the top of
+    the admin's Messages, per device (it is the device's row). A browser
+    asks only after a tap, and a Block cannot be asked again. Reach:
+    Android's Chrome after Allow, even closed or not installed; an iPhone
+    only once the app is on the Home Screen (iOS 16.4 or later); a
+    computer while the browser is open. Tested on Sam's computer against
+    a production build first, then his phone against licensure-dev — the
+    helper runs on a production build only, and the pane shows no
+    notifications.
   - **Email only as a fallback, later**: for a student with no device
     allowed, so a reply reaches them once and never by both (Sam: an
     email saying "you have a message, sign in" repeats the badge); a
     switch in the admin's settings. Parked: SMS (once Arkesel is in,
-    03), WhatsApp (Meta's approval, a charge per message).
-  - To settle before 08.5b is built, drawn first: the rules and where
-    the ask appears.
+    03; it needs no data, a charge per message),
+    WhatsApp (Meta's approval, a charge per message). Weighed and set
+    aside 2026-10-17: a hosted service (OneSignal — a heavy script on
+    every page, its own service worker, a plan not ours), a Telegram bot
+    (reaches only students who use Telegram and link it).
 
 ### Help pages and groups
 
