@@ -402,6 +402,14 @@ function inner(name: IconName) {
           <path d="m6 6 12 12" />
         </>
       );
+    case 'dots':
+      return (
+        <>
+          <circle cx="12" cy="5" r="1" />
+          <circle cx="12" cy="12" r="1" />
+          <circle cx="12" cy="19" r="1" />
+        </>
+      );
     case 'play':
       return (
         <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />

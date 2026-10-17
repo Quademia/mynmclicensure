@@ -594,3 +594,66 @@
 }
 .pubfoot a { color: var(--ink-on-navy); text-decoration: none; font-size: var(--type-meta-size); }
 .pubfoot a:hover { color: var(--surface); }
+
+/* ── The row menu (09.10; Sam, 2026-10-17) ─────────────────────────
+ * Three dots at a row's end and what that row allows now
+ * (components/shell/row-menu.tsx). The account menu's look: the
+ * surface, its border and shadow, 44px lines. A note or a locked line is
+ * told in grey, never tapped; a danger line (Abandon) in the danger ink.
+ * Absolute, not fixed: it opens from its dots inside the row.
+ */
+.row-menu { position: relative; flex: none; }
+.row-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+.row-menu-btn:hover,
+.row-menu-btn.pressed { background: var(--surface-page); color: var(--ink); }
+.row-menu-list {
+  position: absolute;
+  top: calc(100% + var(--space-4));
+  right: 0;
+  z-index: 50;
+  min-width: 220px;
+  max-width: min(300px, calc(100vw - 32px));
+  padding: var(--space-6) 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+}
+.row-menu-list.up { top: auto; bottom: calc(100% + var(--space-4)); }
+.row-menu-line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-10);
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-8) var(--space-16);
+  font-family: inherit;
+  font-size: var(--type-ui-size);
+  line-height: var(--type-meta-line);
+  font-weight: 600;
+  color: var(--ink);
+  text-align: left;
+  text-decoration: none;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.row-menu-line svg { flex: none; color: var(--ink-muted); }
+a.row-menu-line:hover,
+button.row-menu-line:hover { background: var(--surface-page); text-decoration: none; }
+.row-menu-line.danger,
+.row-menu-line.danger svg { color: var(--badge-danger-ink); }
+.row-menu-off { font-weight: 400; color: var(--ink-muted); cursor: default; }
+.row-menu-off svg { color: var(--ink-faint); }
+.row-menu-accent { border-top: 1px solid var(--border); margin-top: var(--space-4); color: var(--brand-teal-hover); }

@@ -38,7 +38,6 @@ import {
   getAnswerHistory,
   getOwnAttempt,
   getQuizBuilderRows,
-  getStudentAttemptsPaginated,
   originSource,
   readAttemptItems,
 } from './queries';
@@ -57,8 +56,6 @@ import {
   type AttemptMode,
   type CheckResult,
   type FinishResult,
-  type HistoryFilters,
-  type HistoryPage,
   type KeywordResult,
   type QuizBuilderLoad,
   type SpawnResult,
@@ -528,18 +525,4 @@ export async function abandonAttempt(attemptId: string): Promise<ActionResult> {
   });
   if (error) return fail(rpcError(error, 'This attempt is no longer in progress.'));
   return { ok: true };
-}
-
-// ── the learning history page (7a) ─────────────────────────────────────
-// Every filter change and every Load more is one page from here; the
-// first page is read by the page itself.
-export async function loadHistoryPage(filters: HistoryFilters, page: number): Promise<HistoryPage> {
-  const { profile } = await requireStudent();
-  const safe: HistoryFilters = {
-    courseId: String(filters?.courseId || ''),
-    status: String(filters?.status || ''),
-    mode: String(filters?.mode || ''),
-    search: String(filters?.search || '').trim(),
-  };
-  return getStudentAttemptsPaginated(profile.user_id, safe, Math.max(0, Math.floor(Number(page) || 0)));
 }

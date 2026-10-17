@@ -1,105 +1,101 @@
 /* styles/student-learning-history.css
  *
- * The student Learning History page (slice 7a). Transcribed from the
- * legacy page's inline <style> block (student/learning-history.html),
- * scoped under `.slh`. The .top-nav block every page carried is in
- * shell.css already; the .card wrapper is shell.css's. The legacy
- * alert() on a failed retake is a toast (UI convention #1).
- *
- * Legacy's own breakpoint (640px: the card stacks, the score and the
- * buttons move under the title) is kept; the toolbar stacks at the
- * repo's 768px (UI convention #3).
+ * Learning History, redesigned (05.5; Sam, 2026-10-17): the course chips,
+ * the figures, the list of sittings and Load more, scoped under `.lh`.
+ * Tokens only. The card is .card; the row menu's own rules are
+ * components.css's (.row-menu, 09.10). One narrow column, the same on a
+ * phone and a computer; below 768px the page's gutters are the shell's.
  */
 
-/* ── Stats bar ── */
-.slh .stats-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
-.slh .stat-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--white); font-size: 13px; color: var(--text); }
-.slh .stat-pill strong { font-weight: 700; color: var(--primary); }
+.lh { display: flex; flex-direction: column; gap: var(--space-16); max-width: 760px; }
+.lh .page-header { margin-bottom: 0; }
 
-/* ── Course filter chip ── */
-.slh .filter-chip-bar { display: none; align-items: center; gap: 10px; margin-bottom: 16px; font-size: 13px; color: var(--text-muted); }
-.slh .filter-chip-bar.show { display: flex; }
-.slh .filter-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--primary-light); border: 1px solid var(--accent); color: var(--primary); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 999px; }
-.slh .filter-chip-clear { background: none; border: none; cursor: pointer; color: var(--accent); font-size: 14px; line-height: 1; padding: 0; font-weight: 700; font-family: inherit; }
-.slh .filter-chip-clear:hover { color: var(--danger); }
-
-/* ── Toolbar ── */
-.slh .toolbar { display: flex; align-items: flex-end; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
-.slh .toolbar-field { display: flex; flex-direction: column; gap: 4px; }
-.slh .toolbar-field label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
-.slh .filter-select, .slh .filter-input { padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; font-family: inherit; background: var(--white); color: var(--text); min-width: 130px; }
-.slh .filter-select:focus, .slh .filter-input:focus { outline: none; border-color: var(--primary); }
-.slh .filter-input { min-width: 180px; }
-.slh .result-count { font-size: 13px; color: var(--text-muted); margin-left: auto; align-self: center; padding-bottom: 2px; }
-
-/* ── Attempt cards ── */
-.slh .list-card { padding: 16px; }
-.slh .attempt-list { display: flex; flex-direction: column; gap: 10px; }
-.slh .attempt-card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; display: grid; grid-template-columns: minmax(0, 1.8fr) minmax(0, 1.2fr); column-gap: 14px; row-gap: 4px; transition: box-shadow 0.15s; }
-.slh .attempt-card:hover { box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07); }
-
-/* Left side */
-.slh .attempt-main { display: flex; flex-direction: column; gap: 4px; }
-.slh .attempt-meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--text-muted); }
-.slh .attempt-meta .date { font-weight: 600; color: var(--text); }
-.slh .attempt-meta .course-name { font-weight: 600; color: var(--primary); }
-.slh .attempt-title { font-size: 14px; font-weight: 600; color: var(--text); margin-top: 2px; }
-.slh .chips-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
-/* Badges: shape from the shared family in styles/components.css (DS8
-   sweep, 2026-09-22). This surface had already worked out the triple
-   idea by itself — every chip here carries a ground, a border and an
-   ink — which is why its contrast was the best in the app before any
-   of this. The three STATUS chips move onto the tokens; the mode and
-   source chips are categories and keep their hues. */
-.slh .badge { border-color: var(--border); color: var(--ink); background: var(--surface-page); }
-.slh .badge.status-completed { background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink); }
-.slh .badge.status-in_progress { background: var(--badge-warning-bg); border-color: var(--badge-warning-border); color: var(--badge-warning-ink); }
-.slh .badge.status-abandoned { background: var(--badge-neutral-bg); border-color: var(--badge-neutral-border); color: var(--badge-neutral-ink); }
-
-
-/* Right side */
-.slh .attempt-side { display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; gap: 8px; }
-.slh .score-block { text-align: right; }
-.slh .score-main { font-size: 15px; font-weight: 700; color: var(--primary); }
-.slh .score-main.not-done { color: var(--text-muted); font-weight: 500; font-size: 13px; }
-.slh .score-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-
-/* Action buttons */
-.slh .attempt-actions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
-.slh .act-btn { display: inline-flex; align-items: center; gap: 5px; border: none; border-radius: 999px; padding: 5px 12px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
-.slh .act-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-/* Resume and Review are links when they apply (2026-09-28): no underline */
-.slh a.act-btn:hover { text-decoration: none; }
-.slh .btn-resume { background: var(--primary); color: #fff; }
-.slh .btn-resume:not(:disabled):hover { opacity: 0.85; }
-.slh .btn-review { background: #eef3f2; color: #25413d; }
-.slh .btn-review:not(:disabled):hover { background: #dde8e5; }
-/* 03 Q10: the report, on the tokens (a teal outline beside Review's fill) */
-.slh .btn-report { background: var(--surface); color: var(--brand-teal-hover); border: 1px solid var(--brand-teal); }
-.slh .btn-report:not(:disabled):hover { background: var(--brand-teal-pale); }
-.slh .btn-retake { background: #f9fafb; color: #374151; border: 1px solid #e5e7eb; }
-.slh .btn-retake:not(:disabled):hover { background: #f3f4f6; }
-
-/* ── Load more ── */
-.slh .load-more-wrap { text-align: center; margin-top: 14px; display: none; }
-.slh .load-more-wrap.show { display: block; }
-.slh .load-more-btn { background: #f5f9f8; border: 1px solid var(--border); border-radius: 999px; padding: 8px 24px; font-size: 13px; font-weight: 600; color: var(--text); cursor: pointer; font-family: inherit; }
-.slh .load-more-btn:hover { background: #eef3f2; }
-.slh .load-more-btn:disabled { opacity: 0.5; cursor: default; }
-
-/* ── Empty state ── */
-.slh .empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 14px; }
-.slh .empty-state .empty-icon { display: flex; justify-content: center; color: var(--text-muted); margin-bottom: 12px; }
-
-/* ── Responsive ── */
-@media (max-width: 768px) {
-  .slh .toolbar { flex-direction: column; align-items: stretch; }
-  .slh .filter-select, .slh .filter-input { min-width: 0; width: 100%; }
-  .slh .result-count { margin-left: 0; align-self: flex-start; }
+/* ── The course chips: they wrap, never scroll sideways (AGENTS.md) ── */
+.lh-chips { display: flex; flex-wrap: wrap; gap: var(--space-8); }
+.lh-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: var(--space-6) var(--space-12);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--type-ui-size);
+  line-height: var(--type-ui-line);
+  text-decoration: none;
 }
-@media (max-width: 640px) {
-  .slh .attempt-card { grid-template-columns: 1fr; }
-  .slh .attempt-side { align-items: flex-start; flex-direction: row; flex-wrap: wrap; margin-top: 8px; }
-  .slh .score-block { text-align: left; }
-  .slh .attempt-actions { justify-content: flex-start; }
+a.lh-chip:hover { border-color: var(--ink-faint); text-decoration: none; }
+.lh-chip.on { background: var(--brand-navy); border-color: var(--brand-navy); color: var(--surface); font-weight: 600; }
+
+/* ── The figures ── */
+.lh-figures {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-12) var(--space-16);
+  border-radius: var(--radius);
+  background: var(--surface-page);
+  border: 1px solid var(--border);
+}
+.lh-figure-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-8); margin: 0; }
+.lh-figure-row dt { font-size: var(--type-meta-size); line-height: var(--type-meta-line); color: var(--ink-muted); }
+.lh-figure-row dd { margin: 0; font-size: 20px; line-height: 28px; font-weight: 700; color: var(--ink); }
+.lh-kinds { margin: 0; font-size: var(--type-ui-size); line-height: var(--type-meta-line); color: var(--ink-muted); }
+
+/* ── The list: rows, not cards; the card does not clip, so a row's menu
+ *    can open past its edge ── */
+.lh-list { padding: 0; overflow: visible; }
+.lh-row { display: flex; align-items: center; gap: var(--space-4); padding-right: var(--space-6); }
+.lh-row + .lh-row { border-top: 1px solid var(--border); }
+.lh-row-main {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  flex: 1;
+  min-width: 0;
+  min-height: 64px;
+  padding: var(--space-12) var(--space-8) var(--space-12) var(--space-16);
+  color: var(--ink);
+  text-decoration: none;
+}
+a.lh-row-main:hover { background: var(--surface-page); text-decoration: none; }
+.lh-row-text { display: flex; flex-direction: column; gap: var(--space-2); flex: 1; min-width: 0; }
+.lh-name {
+  font-size: var(--type-body-strong-size);
+  line-height: var(--type-field-line);
+  font-weight: var(--type-body-strong-weight);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.lh-meta { font-size: var(--type-meta-size); line-height: var(--type-meta-line); color: var(--ink-muted); }
+.lh-right { flex: none; display: flex; align-items: center; }
+.lh-score { font-size: var(--type-body-strong-size); font-weight: 700; color: var(--ink); }
+.lh-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-8);
+  border-radius: var(--radius-pill);
+  background: var(--badge-neutral-bg);
+  color: var(--badge-neutral-ink);
+  font-size: var(--type-meta-size);
+  line-height: var(--type-meta-line);
+  white-space: nowrap;
+}
+.lh-word { font-size: var(--type-meta-size); color: var(--ink-muted); white-space: nowrap; }
+.lh-resume { pointer-events: none; }
+
+.lh-more { display: flex; justify-content: center; }
+
+/* ── No sittings yet ── */
+.lh-empty { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-8); }
+.lh-empty-title { margin: 0; font-size: var(--type-card-title-size); line-height: var(--type-card-title-line); font-weight: var(--type-card-title-weight); color: var(--ink); }
+.lh-empty-text { margin: 0 0 var(--space-8); font-size: var(--type-ui-size); line-height: var(--type-meta-line); color: var(--ink-muted); }
+
+@media (max-width: 768px) {
+  .lh-row-main { padding-left: var(--space-12); }
+  .lh-figure-row dd { font-size: 18px; line-height: 24px; }
 }

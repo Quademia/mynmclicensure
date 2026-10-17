@@ -64,7 +64,9 @@ export type IconName =
   | 'pointer'
   | 'play'
   | 'upload'
-  | 'x';
+  | 'x'
+  // the row menu's button (09.10, 2026-10-17)
+  | 'dots';
 
 /** The nav row's icon. Every icon name is allowed; see IconName. */
 export type NavIcon = IconName;
