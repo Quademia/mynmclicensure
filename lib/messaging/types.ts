@@ -74,8 +74,11 @@ export function unreadFor(t: Pick<Thread, 'last_sender_role' | 'last_message_at'
   return t.last_sender_role === other && (!read || new Date(read).getTime() < new Date(t.last_message_at).getTime());
 }
 
-export type OpenThreadResult = { ok: true; thread_id: string; created: boolean } | { ok: false; error: string };
-export type SendMessageResult = { ok: true; thread_id: string; message_id: string; created: boolean } | { ok: false; error: string };
+/** A thread opened from Messages: its row and its messages (the read stamp set on the way). */
+export type OpenThreadResult = { ok: true; thread: Thread; messages: Message[] } | { ok: false; error: string };
+export type SendMessageResult =
+  | { ok: true; thread_id: string; message_id: string; created: boolean; reopened?: boolean; at?: string | null }
+  | { ok: false; error: string };
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
 /** The database's refusals, in the app's words. */

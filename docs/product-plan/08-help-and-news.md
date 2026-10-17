@@ -42,7 +42,7 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
 - **No Bulk Send**: announcements are the broadcast, with the same
   targeting; New Thread reaches one student (Sam, 2026-09-18).
 
-### Messages — the support desk *(to build: 08.2 — steps 3 and 4; step 2 built 2026-10-17)*
+### Messages — the support desk *(to build: 08.2 — step 4, the inbox paged; steps 2 and 3 built 2026-10-17)*
 
 Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
 2026-10-17.
@@ -65,6 +65,15 @@ Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
   student picks the label first. **Replies are read in Messages**, with
   the thread's whole history. *(the links on other pages: 08.4, as each
   page is touched)*
+- **The student's Messages page** (Sam, 2026-10-17: drawn as B): the
+  labels are the list — Payment or package, My account, Something isn't
+  working, Something else — then "Your courses", each course of the My
+  courses list its own row, then "Earlier conversations". A row shows its
+  newest conversation (Closed when closed, a dot when a reply is unread)
+  or "Start a message ›"; a tap opens it, or an empty one, and nothing is
+  made until Send. One request to open, one to send. On a phone the list
+  and the conversation take turns and the back button returns to the
+  list; on a computer they sit side by side.
 - Messages needs a signed-in student, so one who cannot sign in cannot
   reach it — the sign-in page gets its own way out (01.10).
 - **Writes through the server only; a message is fixed once sent**;
@@ -91,8 +100,8 @@ Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
 - **The build, in order** (2026-10-17): question reports end to end
   (done, 06.2); Messages through the server on both sides — the storage,
   the labels, the pop-up box, Bulk Send and the question threads gone
-  (done 2026-10-17); the student page redesigned, drawn first; the admin inbox paged, on
-  today's look.
+  (done 2026-10-17); the student page redesigned, drawn first (done
+  2026-10-17, below); the admin inbox paged, on today's look.
 
 ### Help pages and groups
 

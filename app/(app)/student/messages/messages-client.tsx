@@ -1,21 +1,19 @@
-// app/(app)/student/messages/messages-client.tsx
+// app/(app)/student/messages/messages-client.tsx — the student's Messages
+// (08.2 step 3; Sam, 2026-10-17: drawn as B, each course its own row).
 //
-// The student's Messages (slice 12a's page on 08.2's rules; Sam,
-// 2026-09-18 and 2026-10-17 — its redesign is step 3): the inbox (each
-// thread by its label or course, the latest preview, the relative time,
-// the Closed chip, the unread dot when Quademia's last reply is unread),
-// the conversation pane (the label, the course card for a course thread,
-// date dividers and grouped bubbles with the avatar on the last of a
-// group, links made clickable, the line "Reopened by a reply." between
-// them), the compose bar (2,000 characters, the count past 90%, Enter to
-// send, Shift+Enter for a new line, an optimistic bubble), and "+ New"
-// with its "What is your message about?" — one of the five labels, and
-// the course for "A course" — which opens the label's open thread or a
-// new one. A closed thread still takes a reply, which reopens it. Every
-// write is a Server Action into the database's msg_* functions; the
-// realtime feed on the open thread brings a reply or a close without a
-// refresh (not critical if it fails). After every change the sidebar's
-// badge follows through a route refresh.
+// The list is the five labels' four plain ones, then "Your courses", then
+// "Earlier conversations" — each row its newest conversation (a Closed
+// chip when closed, a dot when Quademia's reply is unread) or "Start a
+// message ›". A tap opens the conversation: its messages and the read
+// stamp in one trip; an empty row opens straight onto the compose box,
+// and nothing is made until Send, which makes the thread and writes the
+// message in one trip. A closed conversation still takes a reply, which
+// reopens it with the line "Reopened by a reply.". Replies and a close
+// reach an open conversation live (not critical if the feed fails).
+//
+// On a phone the list and the conversation take turns, and the phone's
+// back button returns to the list (a history entry, no server trip); on
+// a computer they sit side by side.
 
 'use client';
 
@@ -25,52 +23,37 @@ import { Toast } from '@/lib/toast/toast';
 import { NameCircle } from '@/components/shell/name-circle';
 import { PageHeader } from '@/components/shell/page-header';
 import { createClient } from '@/lib/supabase/client';
-import { listStudentThreadsAction, markThreadReadAction, openLabelThreadAction, sendMessageAction, threadMessagesAction } from '@/lib/messaging/actions';
-import { labelWords, MESSAGE_LABELS, MESSAGE_MAX_LEN, type Message, type StudentThread } from '@/lib/messaging/types';
+import { openThreadAction, sendByLabelAction, sendMessageAction } from '@/lib/messaging/actions';
+import type { MessagesPageData, MessagesRow } from '@/lib/messaging/student-page';
+import { MESSAGE_MAX_LEN, type Message } from '@/lib/messaging/types';
 
-type Msg = { text: string; tone: 'error' | 'success' } | null;
+type Note = { text: string; tone: 'error' | 'success' } | null;
 
-// The clock, read outside render (react-hooks/purity): the relative times
-// and date labels are computed from the last load.
+// The clock, read outside render (react-hooks/purity).
 function stampNow(set: (n: number) => void) {
   set(Date.now());
 }
-type CourseBit = { course_id: string; title: string };
 
-// ── format helpers (legacy) ──
-function truncate(s: string | null | undefined, n: number): string {
-  if (!s) return '';
-  const clean = s.replace(/\s+/g, ' ').trim();
-  return clean.length <= n ? clean : clean.slice(0, n - 1) + '…';
+function isPhone(): boolean {
+  return typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
 }
-function formatTime(iso: string | null, now: number): string {
-  if (!iso) return '';
-  const d = new Date(iso);
-  const diffMin = Math.floor((now - d.getTime()) / 60000);
-  if (diffMin < 1) return 'Just now';
-  if (diffMin < 60) return diffMin + 'm ago';
-  const diffH = Math.floor(diffMin / 60);
-  if (diffH < 24) return diffH + 'h ago';
-  const diffD = Math.floor(diffH / 24);
-  if (diffD < 7) return diffD + 'd ago';
-  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-}
-function formatTimeShort(iso: string): string {
-  return new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-}
-function formatDateLabel(iso: string, now: number): string {
+
+function dayLabel(iso: string, now: number): string {
   const d = new Date(iso);
   const n = new Date(now);
-  const today = new Date(n.getFullYear(), n.getMonth(), n.getDate()).getTime();
-  const msgDay = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
-  const diff = Math.floor((today - msgDay) / 86400000);
+  const today = Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate());
+  const that = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  const diff = Math.round((today - that) / 86400000);
   if (diff === 0) return 'Today';
   if (diff === 1) return 'Yesterday';
-  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: d.getFullYear() !== n.getFullYear() ? 'numeric' : undefined });
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: d.getUTCFullYear() !== n.getUTCFullYear() ? 'numeric' : undefined, timeZone: 'UTC' });
 }
 
-// legacy linkify: the text stays text; only http(s) addresses become
-// links, trailing punctuation left outside.
+function clock(iso: string): string {
+  return new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
+}
+
+// Text stays text; only http(s) addresses become links, trailing punctuation left outside.
 function linkify(s: string): React.ReactNode[] {
   const out: React.ReactNode[] = [];
   const re = /(https?:\/\/[^\s<]+)/g;
@@ -82,439 +65,326 @@ function linkify(s: string): React.ReactNode[] {
     const url = m[1];
     const tail = url.match(/^(.*?)([.,!?)\]]*)$/);
     const link = tail ? tail[1] : url;
-    const rest = tail ? tail[2] : '';
-    out.push(
-      <a key={k++} href={link} target="_blank" rel="noopener noreferrer">
-        {link}
-      </a>,
-    );
-    if (rest) out.push(rest);
+    out.push(<a key={k++} href={link} target="_blank" rel="noopener noreferrer">{link}</a>);
+    if (tail?.[2]) out.push(tail[2]);
     last = m.index + url.length;
   }
   if (last < s.length) out.push(s.slice(last));
   return out;
 }
 
+function Row({ row, on, onOpen }: { row: MessagesRow; on: boolean; onOpen: (row: MessagesRow) => void }) {
+  return (
+    <li>
+      <button type="button" className={`smsg-row${on ? ' is-on' : ''}${row.unread ? ' is-unread' : ''}`} onClick={() => onOpen(row)}>
+        <span className="smsg-dot" aria-label={row.unread ? 'Unread reply' : undefined} />
+        <span className="smsg-row-main">
+          <span className="smsg-row-title">
+            {row.title}
+            {row.status === 'closed' ? <span className="badge badge-neutral smsg-chip">Closed</span> : null}
+          </span>
+          <span className={row.preview ? 'smsg-row-sub' : 'smsg-row-sub smsg-row-start'}>{row.preview ?? 'Start a message ›'}</span>
+        </span>
+        {row.when ? <span className="smsg-row-when">{row.when}</span> : null}
+      </button>
+    </li>
+  );
+}
+
 export function MessagesClient({
   student,
-  courses,
-  pickerCourses,
-  initialThreads,
+  initial,
 }: {
-  /** The signed-in student, for their name circle (DS7): photo, else initials. */
+  /** The signed-in student, for their name circle: photo, else initials. */
   student: { name: string; avatarUrl: string | null };
-  /** Every active course, for the threads' names. */
-  courses: CourseBit[];
-  /** "+ New"'s course picker: the student's My courses list. */
-  pickerCourses: CourseBit[];
-  initialThreads: StudentThread[];
+  initial: MessagesPageData;
 }) {
   const router = useRouter();
-  const courseTitles: Record<string, string> = {};
-  for (const c of courses) courseTitles[c.course_id] = c.title;
-
-  const [msg, setMsg] = useState<Msg>(null);
-  const dismiss = useCallback(() => setMsg(null), []);
-
-  const [threads, setThreads] = useState<StudentThread[]>(initialThreads);
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [data, setData] = useState<MessagesPageData>(initial);
+  const [activeKey, setActiveKey] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [now, setNow] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [compose, setCompose] = useState('');
   const [sending, setSending] = useState(false);
-  const [newForm, setNewForm] = useState(false);
-  const [newLabel, setNewLabel] = useState('');
-  const [newCourse, setNewCourse] = useState('');
-  const [starting, setStarting] = useState(false);
-  const [reuseBanner, setReuseBanner] = useState(false);
-  const reuseTimer = useRef<number | null>(null);
+  const [now, setNow] = useState(0);
+  const [note, setNote] = useState<Note>(null);
+  const dismiss = useCallback(() => setNote(null), []);
+  const feedRef = useRef<HTMLDivElement | null>(null);
   const composeRef = useRef<HTMLTextAreaElement | null>(null);
-  const messagesRef = useRef<HTMLDivElement | null>(null);
   const activeRef = useRef<string | null>(null);
   const channelRef = useRef<{ unsubscribe: () => void } | null>(null);
 
-  const active = activeId ? threads.find((t) => t.thread_id === activeId) ?? null : null;
+  const rows = [...data.labels, ...data.courses, ...data.earlier];
+  const active = activeKey ? rows.find((r) => r.key === activeKey) ?? null : null;
 
-  function threadLabel(t: StudentThread | null): string {
-    if (!t) return 'Conversation';
-    if (t.context_type === 'course' && t.course_id) return courseTitles[t.course_id] || t.course_id;
-    return labelWords(t.context_type);
-  }
-
-  async function loadThreads() {
-    const list = await listStudentThreadsAction();
-    setThreads(list);
-    stampNow(setNow);
-    router.refresh(); // the sidebar's badge
-    return list;
-  }
-
-  const scrollToBottom = useCallback(() => {
-    const el = messagesRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
+  const patchRow = useCallback((key: string, patch: Partial<MessagesRow>) => {
+    const apply = (list: MessagesRow[]) => list.map((r) => (r.key === key ? { ...r, ...patch } : r));
+    setData((d) => ({ labels: apply(d.labels), courses: apply(d.courses), earlier: apply(d.earlier) }));
   }, []);
 
-  // ── realtime on the open thread: a reply, the reopen line, a close ──
-  const teardownRealtime = useCallback(() => {
-    if (channelRef.current) {
-      try {
-        channelRef.current.unsubscribe();
-      } catch {
-        /* not critical */
-      }
-      channelRef.current = null;
+  const toBottom = useCallback(() => {
+    window.setTimeout(() => {
+      const el = feedRef.current;
+      if (el) el.scrollTop = el.scrollHeight;
+    }, 0);
+  }, []);
+
+  // ── the live feed on the open conversation ──
+  const unsubscribe = useCallback(() => {
+    if (!channelRef.current) return;
+    try {
+      channelRef.current.unsubscribe();
+    } catch {
+      /* not critical */
     }
+    channelRef.current = null;
   }, []);
+  useEffect(() => unsubscribe, [unsubscribe]);
 
-  function setupRealtime(threadId: string) {
-    teardownRealtime();
+  function subscribe(key: string, threadId: string) {
+    unsubscribe();
     try {
       const supabase = createClient();
       const channel = supabase
-        .channel('msg-' + threadId)
-        .on(
-          'postgres_changes',
-          { event: 'INSERT', schema: 'licensure_gh', table: 'messages', filter: `thread_id=eq.${threadId}` },
-          async (payload) => {
-            const newMsg = payload.new as Partial<Message>;
-            if (newMsg && newMsg.sender_role !== 'student' && activeRef.current === threadId) {
-              setMessages(await threadMessagesAction(threadId));
-              stampNow(setNow);
-              window.setTimeout(scrollToBottom, 0);
-              await markThreadReadAction(threadId);
-              await loadThreads();
-            }
-          },
-        )
-        .on(
-          'postgres_changes',
-          { event: 'UPDATE', schema: 'licensure_gh', table: 'messages_threads', filter: `thread_id=eq.${threadId}` },
-          (payload) => {
-            const row = payload.new as Partial<StudentThread>;
-            if (row && row.status) setThreads((cur) => cur.map((t) => (t.thread_id === threadId ? { ...t, status: row.status! } : t)));
-          },
-        )
+        .channel('smsg-' + threadId)
+        .on('postgres_changes', { event: 'INSERT', schema: 'licensure_gh', table: 'messages', filter: `thread_id=eq.${threadId}` }, async (payload) => {
+          const m = payload.new as Partial<Message>;
+          if (!m || m.sender_role === 'student' || activeRef.current !== key) return;
+          try {
+            const r = await openThreadAction(threadId);
+            if (!r.ok || activeRef.current !== key) return;
+            setMessages(r.messages);
+            stampNow(setNow);
+            toBottom();
+            if (m.sender_role === 'admin' && m.body_text) patchRow(key, { preview: m.body_text.replace(/\s+/g, ' ').trim(), when: 'Just now', unread: false });
+          } catch {
+            /* the reply shows on the next open */
+          }
+        })
+        .on('postgres_changes', { event: 'UPDATE', schema: 'licensure_gh', table: 'messages_threads', filter: `thread_id=eq.${threadId}` }, (payload) => {
+          const t = payload.new as { status?: 'open' | 'closed' };
+          if (t?.status) patchRow(key, { status: t.status });
+        })
         .subscribe();
       channelRef.current = { unsubscribe: () => supabase.removeChannel(channel) };
     } catch {
-      /* realtime not critical */
+      /* the live feed is not critical */
     }
   }
 
-  // ── open / close (legacy openThread / closeConvo) ──
-  async function openThread(threadId: string) {
-    setActiveId(threadId);
-    activeRef.current = threadId;
-    setNewForm(false);
-    hideReuseBanner();
-
-    const msgs = await threadMessagesAction(threadId);
-    setMessages(msgs);
-    stampNow(setNow);
-    window.setTimeout(() => {
-      scrollToBottom();
-      composeRef.current?.focus();
-    }, 0);
-
-    await markThreadReadAction(threadId);
-    setThreads((cur) => cur.map((t) => (t.thread_id === threadId ? { ...t, unread: false } : t)));
-    router.refresh();
-    setupRealtime(threadId);
-  }
-
-  function closeConvo() {
-    setActiveId(null);
-    activeRef.current = null;
+  // ── open and close ──
+  async function open(row: MessagesRow) {
+    if (activeRef.current === row.key) return;
+    if (isPhone() && !activeRef.current) window.history.pushState({ smsg: row.key }, '');
+    activeRef.current = row.key;
+    setActiveKey(row.key);
     setMessages([]);
-    teardownRealtime();
+    setCompose('');
+    stampNow(setNow);
+    unsubscribe();
+    if (!row.threadId) {
+      window.setTimeout(() => composeRef.current?.focus(), 0);
+      return;
+    }
+    setLoading(true);
+    try {
+      const r = await openThreadAction(row.threadId);
+      if (activeRef.current !== row.key) return;
+      setLoading(false);
+      if (!r.ok) return setNote({ text: r.error, tone: 'error' });
+      setMessages(r.messages);
+      patchRow(row.key, { status: r.thread.status, unread: false });
+      toBottom();
+      subscribe(row.key, row.threadId);
+      if (row.unread) router.refresh(); // the sidebar's badge
+    } catch {
+      if (activeRef.current === row.key) setLoading(false);
+      setNote({ text: 'Could not open the conversation. Please check your connection and try again.', tone: 'error' });
+    }
   }
 
-  useEffect(() => teardownRealtime, [teardownRealtime]);
+  const closeConvo = useCallback(() => {
+    activeRef.current = null;
+    setActiveKey(null);
+    setMessages([]);
+    unsubscribe();
+  }, [unsubscribe]);
 
-  // The relative times need the clock, read once after mount.
+  function back() {
+    if (window.history.state?.smsg) window.history.back();
+    else closeConvo();
+  }
+
+  // The phone's back button returns to the list.
   useEffect(() => {
-    const id = window.setTimeout(() => stampNow(setNow), 0);
-    return () => window.clearTimeout(id);
-  }, []);
+    function onPop() {
+      if (!window.history.state?.smsg && activeRef.current) closeConvo();
+    }
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [closeConvo]);
 
-  // ── send (legacy handleSend) ──
-  async function handleSend() {
+  // ── send ──
+  async function send(e?: React.FormEvent) {
+    e?.preventDefault();
+    const row = active;
     const text = compose.trim();
-    if (!text || !activeId || sending) return;
+    if (!row || !text || sending) return;
     if (text.length > MESSAGE_MAX_LEN) return;
     setSending(true);
-
-    const tempId = 'temp-' + Date.now();
-    const optimistic: Message = {
-      message_id: tempId,
-      thread_id: activeId,
-      sender_id: 'me',
-      sender_role: 'student',
-      body_text: text,
-      created_at: new Date().toISOString(),
-    };
-    setMessages((cur) => [...cur, optimistic]);
+    const tempId = 'temp-' + messages.length;
+    setMessages((cur) => [...cur, { message_id: tempId, thread_id: row.threadId ?? '', sender_id: 'me', sender_role: 'student', body_text: text, created_at: new Date().toISOString() }]);
     setCompose('');
-    window.setTimeout(scrollToBottom, 0);
-
-    try {
-      const result = await sendMessageAction(activeId, text);
-      if (result.ok) {
-        setMessages(await threadMessagesAction(activeId));
-        window.setTimeout(scrollToBottom, 0);
-        await loadThreads();
-      } else {
-        setMessages((cur) => cur.filter((m) => m.message_id !== tempId));
-        setCompose(text);
-        setMsg({ text: result.error, tone: 'error' });
-      }
-    } catch {
+    toBottom();
+    const undo = (error: string) => {
       setMessages((cur) => cur.filter((m) => m.message_id !== tempId));
       setCompose(text);
-      setMsg({ text: 'Could not send your message. Please check your connection and try again.', tone: 'error' });
+      setNote({ text: error, tone: 'error' });
+    };
+    try {
+      const r = row.threadId ? await sendMessageAction(row.threadId, text) : await sendByLabelAction(row.label, row.courseId, text);
+      if (!r.ok) {
+        undo(r.error);
+      } else {
+        patchRow(row.key, { threadId: r.thread_id, status: 'open', preview: `You: ${text.replace(/\s+/g, ' ')}`, when: 'Just now', unread: false });
+        if (r.reopened) {
+          const again = await openThreadAction(r.thread_id);
+          if (again.ok && activeRef.current === row.key) setMessages(again.messages);
+        } else {
+          setMessages((cur) => cur.map((m) => (m.message_id === tempId ? { ...m, message_id: r.message_id, thread_id: r.thread_id, created_at: r.at ?? m.created_at } : m)));
+        }
+        if (!row.threadId) subscribe(row.key, r.thread_id);
+        toBottom();
+      }
+    } catch {
+      undo('Could not send your message. Please check your connection and try again.');
     }
     setSending(false);
   }
 
-  function onComposeKey(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      void handleSend();
-    }
-  }
-
-  function autoResize(el: HTMLTextAreaElement) {
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-  }
-
-  // ── "+ New": the label (and the course), then its open thread or a new one ──
-  function openNewForm() {
-    setNewLabel('');
-    setNewCourse('');
-    setNewForm(true);
-  }
-
-  async function confirmNewThread() {
-    if (!newLabel || (newLabel === 'course' && !newCourse) || starting) return;
-    setStarting(true);
-    try {
-      const result = await openLabelThreadAction(newLabel, newLabel === 'course' ? newCourse : null);
-      setStarting(false);
-      if (!result.ok) {
-        setMsg({ text: result.error, tone: 'error' });
-        return;
-      }
-      setNewForm(false);
-      await loadThreads();
-      await openThread(result.thread_id);
-      if (!result.created) showReuseBanner();
-    } catch {
-      setStarting(false);
-      setMsg({ text: 'Could not open the conversation. Please check your connection and try again.', tone: 'error' });
-    }
-  }
-
-  function showReuseBanner() {
-    setReuseBanner(true);
-    if (reuseTimer.current) window.clearTimeout(reuseTimer.current);
-    reuseTimer.current = window.setTimeout(() => setReuseBanner(false), 6000);
-  }
-  function hideReuseBanner() {
-    setReuseBanner(false);
-    if (reuseTimer.current) window.clearTimeout(reuseTimer.current);
-  }
-
-  // ── derived ──
-  const isClosed = active?.status === 'closed';
-  const composeLen = compose.length;
-  const charClass = composeLen > MESSAGE_MAX_LEN ? 'over' : composeLen > MESSAGE_MAX_LEN * 0.9 ? 'warn' : '';
-  const newReady = Boolean(newLabel) && (newLabel !== 'course' || Boolean(newCourse));
-
-  // Grouped bubbles with date dividers (legacy renderMessages); the
-  // reopen line sits between them on its own.
-  type Group = { sender: 'student' | 'admin'; items: Message[] };
-  const blocks: ({ kind: 'date'; label: string } | { kind: 'system'; m: Message } | { kind: 'group'; group: Group })[] = [];
-  let lastDate = '';
-  let current: Group | null = null;
+  // ── the conversation's feed: days, then runs of one side, the reopen line on its own ──
+  type Run = { side: 'student' | 'admin'; items: Message[] };
+  const blocks: ({ kind: 'day'; label: string } | { kind: 'line'; m: Message } | { kind: 'run'; run: Run })[] = [];
+  let lastDay = '';
+  let run: Run | null = null;
   for (const m of messages) {
-    const label = formatDateLabel(m.created_at, now);
-    if (label !== lastDate) {
-      if (current) blocks.push({ kind: 'group', group: current });
-      current = null;
-      blocks.push({ kind: 'date', label });
-      lastDate = label;
+    const day = dayLabel(m.created_at, now);
+    if (day !== lastDay) {
+      if (run) blocks.push({ kind: 'run', run });
+      run = null;
+      blocks.push({ kind: 'day', label: day });
+      lastDay = day;
     }
     if (m.sender_role === 'system') {
-      if (current) blocks.push({ kind: 'group', group: current });
-      current = null;
-      blocks.push({ kind: 'system', m });
+      if (run) blocks.push({ kind: 'run', run });
+      run = null;
+      blocks.push({ kind: 'line', m });
       continue;
     }
-    const sender: 'student' | 'admin' = m.sender_role === 'student' ? 'student' : 'admin';
-    if (!current || current.sender !== sender) {
-      if (current) blocks.push({ kind: 'group', group: current });
-      current = { sender, items: [] };
+    const side: Run['side'] = m.sender_role === 'student' ? 'student' : 'admin';
+    if (!run || run.side !== side) {
+      if (run) blocks.push({ kind: 'run', run });
+      run = { side, items: [] };
     }
-    current.items.push(m);
+    run.items.push(m);
   }
-  if (current) blocks.push({ kind: 'group', group: current });
+  if (run) blocks.push({ kind: 'run', run });
 
-  const refCard =
-    active && active.context_type === 'course' && active.course_id ? (
-      <div className="ref-card"><strong>Course:</strong> {courseTitles[active.course_id] || active.course_id}</div>
-    ) : null;
+  const near = compose.length > MESSAGE_MAX_LEN * 0.9;
 
   return (
-    <div className="smsg">
-      <Toast message={msg?.text ?? null} tone={msg?.tone} onDismiss={dismiss} />
+    <div className={`smsg${active ? ' smsg-open' : ''}`}>
+      <Toast message={note?.text ?? null} tone={note?.tone} onDismiss={dismiss} />
+      <PageHeader title="Messages" />
 
-      <div className="msg-container">
-        <PageHeader title="Messages" />
+      <div className="smsg-grid">
+        <section className="smsg-list" aria-label="Your conversations">
+          <h2 className="smsg-head">What do you need help with?</h2>
+          <ul className="card smsg-rows">
+            {data.labels.map((r) => <Row key={r.key} row={r} on={r.key === activeKey} onOpen={open} />)}
+          </ul>
+          {data.courses.length ? (
+            <>
+              <h2 className="smsg-head">Your courses</h2>
+              <ul className="card smsg-rows">
+                {data.courses.map((r) => <Row key={r.key} row={r} on={r.key === activeKey} onOpen={open} />)}
+              </ul>
+            </>
+          ) : null}
+          {data.earlier.length ? (
+            <>
+              <h2 className="smsg-head">Earlier conversations</h2>
+              <ul className="card smsg-rows">
+                {data.earlier.map((r) => <Row key={r.key} row={r} on={r.key === activeKey} onOpen={open} />)}
+              </ul>
+            </>
+          ) : null}
+        </section>
 
-        <div className={`msg-split${activeId ? ' convo-open' : ''}`}>
-          {/* Thread list */}
-          <div className="thread-list">
-            <div className="thread-list-header">
-              <h2>Inbox</h2>
-              <button type="button" className="btn-new-msg" onClick={openNewForm}>+ New</button>
-            </div>
-            <div className="thread-items">
-              {newForm ? (
-                <div className="new-thread-form">
-                  <label htmlFor="newThreadLabel">What is your message about?</label>
-                  <select id="newThreadLabel" value={newLabel} autoFocus onChange={(e) => setNewLabel(e.target.value)}>
-                    <option value="" disabled>Choose one</option>
-                    {MESSAGE_LABELS.map((l) => (
-                      <option key={l.value} value={l.value}>{l.label}</option>
-                    ))}
-                  </select>
-                  {newLabel === 'course' ? (
-                    <>
-                      <label htmlFor="newThreadCourse">Which course?</label>
-                      <select id="newThreadCourse" value={newCourse} onChange={(e) => setNewCourse(e.target.value)}>
-                        <option value="" disabled>Choose a course</option>
-                        {pickerCourses.map((c) => (
-                          <option key={c.course_id} value={c.course_id}>{c.title}</option>
-                        ))}
-                      </select>
-                    </>
-                  ) : null}
-                  <div className="form-actions">
-                    <button type="button" className="btn-start" disabled={!newReady || starting} onClick={() => void confirmNewThread()}>
-                      {starting ? 'Opening…' : 'Start'}
-                    </button>
-                    <button type="button" className="btn-cancel" onClick={() => setNewForm(false)}>Cancel</button>
-                  </div>
-                </div>
-              ) : null}
-
-              {threads.length === 0 && !newForm ? (
-                <div className="thread-empty">
-                  <h3>No messages yet</h3>
-                  <p>If you need help or want to send feedback, start a conversation.</p>
-                  <button type="button" className="btn-new-msg" onClick={openNewForm}>Start a message</button>
-                </div>
-              ) : (
-                threads.map((t) => {
-                  const latest = t.latest;
-                  return (
-                    <div
-                      key={t.thread_id}
-                      className={`thread-item${t.thread_id === activeId ? ' active' : ''}${t.unread ? ' unread' : ''}`}
-                      onClick={() => void openThread(t.thread_id)}
-                    >
-                      <div className="t-subject">{threadLabel(t)}</div>
-                      <div className="t-preview">{latest ? truncate(latest.body_text, 60) : 'No messages'}</div>
-                      <div className="t-meta">
-                        {t.unread ? <span className="unread-dot" /> : null}
-                        <span>{latest ? formatTime(latest.created_at, now) : ''}</span>
-                        {t.status === 'closed' ? <span className="badge closed">Closed</span> : null}
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </div>
-
-          {/* Conversation pane */}
-          <div className="convo-pane">
-            {!active ? (
-              <div className="convo-empty">
-                <div className="empty-icon">&#9993;</div>
-                <div><strong>Select a conversation</strong></div>
-                <div>or click <strong>+ New</strong> to start one</div>
+        <section className="card smsg-convo" aria-label="Conversation">
+          {!active ? (
+            <p className="smsg-pick">Choose what your message is about, or open a conversation.</p>
+          ) : (
+            <>
+              <div className="smsg-convo-head">
+                <button type="button" className="smsg-back" onClick={back}>‹ Messages</button>
+                <h2 className="smsg-convo-title">{active.title}</h2>
+                {active.status === 'closed' ? <p className="smsg-closed">This conversation was closed. A reply reopens it.</p> : null}
               </div>
-            ) : (
-              <div className="convo-active">
-                <div className="convo-header">
-                  <button type="button" className="back-btn" onClick={closeConvo}>&#8592;</button>
-                  <h3>{threadLabel(active)}</h3>
-                </div>
 
-                {reuseBanner ? (
-                  <div className="reuse-banner">
-                    <span>You already have an open conversation about this — we&apos;ve opened it for you.</span>
-                    <button type="button" className="close-banner" title="Dismiss" onClick={hideReuseBanner}>&times;</button>
-                  </div>
-                ) : null}
-
-                {refCard ? <div className="ref-wrap">{refCard}</div> : null}
-
-                <div className="convo-messages" ref={messagesRef}>
-                  {messages.length === 0 ? (
-                    <div className="no-messages">No messages yet. Send a message below.</div>
-                  ) : (
-                    blocks.map((b, i) =>
-                      b.kind === 'date' ? (
-                        <div key={`d${i}`} className="date-divider"><span>{b.label}</span></div>
-                      ) : b.kind === 'system' ? (
-                        <div key={b.m.message_id} className="date-divider msg-system"><span>{b.m.body_text}</span></div>
-                      ) : (
-                        <div key={`g${i}`} className={`msg-group ${b.group.sender}`}>
-                          {b.group.items.map((m) => (
-                            <div key={m.message_id} className="msg-row">
-                              {b.group.sender === 'student' ? (
-                                <NameCircle name={student.name} avatarUrl={student.avatarUrl} size="sm" className="msg-avatar" />
-                              ) : (
-                                <NameCircle who="quademia" size="sm" className="msg-avatar" />
-                              )}
-                              <div className={`bubble ${b.group.sender}`} style={m.message_id.startsWith('temp-') ? { opacity: 0.7 } : undefined}>
-                                {linkify(m.body_text)}
-                              </div>
-                            </div>
+              <div className="smsg-feed" ref={feedRef}>
+                {loading ? (
+                  <p className="smsg-empty">Loading…</p>
+                ) : messages.length === 0 ? (
+                  <p className="smsg-empty">Start a message about {active.label === 'course' ? active.title : active.title.toLowerCase()}. We reply here.</p>
+                ) : (
+                  blocks.map((b, i) =>
+                    b.kind === 'day' ? (
+                      <p key={`d${i}`} className="smsg-day"><span>{b.label}</span></p>
+                    ) : b.kind === 'line' ? (
+                      <p key={b.m.message_id} className="smsg-line">{b.m.body_text}</p>
+                    ) : (
+                      <div key={`r${i}`} className={`smsg-run smsg-run-${b.run.side}`}>
+                        {b.run.side === 'admin' ? <NameCircle who="quademia" size="xs" className="smsg-run-who" /> : <NameCircle name={student.name} avatarUrl={student.avatarUrl} size="xs" className="smsg-run-who" />}
+                        <div className="smsg-run-items">
+                          {b.run.items.map((m) => (
+                            <div key={m.message_id} className={`smsg-bubble${m.message_id.startsWith('temp-') ? ' is-sending' : ''}`}>{linkify(m.body_text)}</div>
                           ))}
-                          <div className="msg-time">{formatTimeShort(b.group.items[b.group.items.length - 1].created_at)}</div>
+                          <span className="smsg-time">{clock(b.run.items[b.run.items.length - 1].created_at)}</span>
                         </div>
-                      ),
-                    )
-                  )}
-                </div>
-
-                {isClosed ? <div className="closed-banner">This conversation was closed. A reply reopens it.</div> : null}
-                <div className="compose-bar">
-                  <textarea
-                    ref={composeRef}
-                    placeholder={isClosed ? 'Reply to reopen…' : 'Type a message...'}
-                    rows={1}
-                    maxLength={MESSAGE_MAX_LEN}
-                    value={compose}
-                    onChange={(e) => {
-                      setCompose(e.target.value);
-                      autoResize(e.target);
-                    }}
-                    onKeyDown={onComposeKey}
-                  />
-                  <span className={`char-count ${charClass}`}>{composeLen > MESSAGE_MAX_LEN * 0.9 ? `${composeLen}/${MESSAGE_MAX_LEN}` : ''}</span>
-                  <button type="button" className="btn-send" disabled={sending || composeLen === 0 || composeLen > MESSAGE_MAX_LEN} onClick={() => void handleSend()}>
-                    Send
-                  </button>
-                </div>
+                      </div>
+                    ),
+                  )
+                )}
               </div>
-            )}
-          </div>
-        </div>
+
+              <form className="smsg-compose" method="post" onSubmit={send}>
+                <textarea
+                  ref={composeRef}
+                  className="smsg-input"
+                  placeholder={active.status === 'closed' ? 'Reply to reopen…' : 'Type a message…'}
+                  rows={1}
+                  maxLength={MESSAGE_MAX_LEN}
+                  value={compose}
+                  aria-label="Your message"
+                  onChange={(e) => {
+                    setCompose(e.target.value);
+                    e.target.style.height = 'auto';
+                    e.target.style.height = Math.min(e.target.scrollHeight, 140) + 'px';
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey && !isPhone()) {
+                      e.preventDefault();
+                      void send();
+                    }
+                  }}
+                />
+                <button type="submit" className="btn btn-primary" disabled={sending || !compose.trim()}>{sending ? 'Sending…' : 'Send'}</button>
+                {near ? <span className="smsg-count">{compose.length.toLocaleString('en-GB')} / {MESSAGE_MAX_LEN.toLocaleString('en-GB')}</span> : null}
+              </form>
+            </>
+          )}
+        </section>
       </div>
     </div>
   );

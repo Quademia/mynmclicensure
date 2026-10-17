@@ -154,7 +154,7 @@ before then, and the old list's history, is in
 - ⬜ 08.1 Course news to everyone who has held the course, revoked grants apart (Sam, 10-04)
 - ⬜ A4 A real quiz-link picker in the announcement editor
 - ⬜ A3 The body stored once, no extra line break per edit, the dead read removed — later
-- ⬜ 08.2 The support desk — step 2 built 10-17 (server, labels, pop-up); the student page and the paged inbox to come
+- ⬜ 08.2 The support desk — steps 2–3 built 10-17 (server, labels, pop-up, the student page); the paged inbox to come
 - ⬜ 08.4 "Message us" on other pages, each picking its label — as each page is touched (after 08.2)
 - ⬜ 08.3 NMC procedures — the manual links into a table the admin manages
 - ⬜ 17 The premium channel — one per programme, all year; link codes; the bot admits and removes members

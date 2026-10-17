@@ -282,7 +282,17 @@ opens it (00, The menu).
 ### Announcements
 - Tabs, cards, Mark as read, Dismiss (08).
 
-### Messages, portal guide, NMC procedures
+### Messages
+- **Redesigned (Sam, 2026-10-17; 08.2 step 3, drawn as B)**: the labels are
+  the list, then "Your courses" (the My courses list, a row each), then
+  "Earlier conversations"; each row its newest conversation or "Start a
+  message ›"; the conversation beside the list on a computer, in its place
+  on a phone. The rules are in 08.
+- The same in every state: free, trial, paid and ended students all write
+  and read here; the course rows follow My courses (held, else the
+  programme's).
+
+### Portal guide, NMC procedures
 - The same in every state.
 - The help page's "Study and Exam modes" wording — not yet approved
   (04).
