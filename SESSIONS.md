@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-17, evening — the page title as one fading line (09.11); question reports (06.2); Messages rebuilt — five labels, a Message us box, both pages (08.2)
+  - ↳ 4b fade over 240px, tabs lineless · Report an issue, reason dropdown, Closed tab · question threads deleted · admin by student, Sam's idea · inside scroll · wait from first unanswered · 08.5 push first, email fallback · cloud A then B
+
 - 2026-10-17 — Learning History redesigned (05.5): a list by course, figures by the database (Q12), a dots menu; the global sign-out fixed (01.9); F2 built
   - ↳ no progress page, topics parked on the course page (05.6) · strongest topics too · dropdown over chips · one tap to the report · closed told in grey · signOut local, reset global · Submit hides answers when ended · 05.6 next
 

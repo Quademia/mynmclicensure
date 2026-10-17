@@ -271,6 +271,14 @@ above sit at the repo root; the audience grouping inside them is kept.
 - **A `'use server'` module may export only async functions.** A
   constant or a type re-export from one breaks the build silently in
   dev. Constants live in a `types.ts` beside it.
+- **A client component never imports a module that reaches the server**
+  — `next/headers`, the service role — not even for its types: the
+  page's build fails ("next/headers" in a client component). A server
+  read that a browser half's module would carry lives in its own file
+  (`lib/messaging/badges.ts`, 2026-10-17); the types sit in `types.ts`.
+- **A shared layout does not redraw on a move between its pages**: what
+  it reads — the Messages badge — stays as first drawn until a full load
+  or `router.refresh()` (08.5, 2026-10-17).
 - **`page.tsx` / `layout.tsx` export only the default and route
   config.** A stray named export fails the prod build; dev misses it.
 - **Every overlay is portalled to `<body>`.** A `container-type` or
