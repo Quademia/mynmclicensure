@@ -13,7 +13,7 @@
 //     again), and what it is sent is kept for the sitting;
 //   askAfterSend — whether a student's send shows the ask: not when it
 //     cannot work, when blocked, when already on, or within 7 days of Not
-//     now on this phone.
+//     now on this device.
 //
 // What is kept, keyed by the person (AGENTS.md: phones are shared): the
 // kinds this device is sent, for the sitting (sessionStorage); the end of

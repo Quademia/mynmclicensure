@@ -2,9 +2,10 @@
 // sent message (08.5b; Sam, 2026-10-17, drawn). Shown when a send has just
 // gone and the ask can work (lib/notifications/client askAfterSend):
 //   card — "Get a notification when we reply", Not now and Turn on; Turn
-//     on, then the phone's own Allow (two taps, once); then one grey line,
-//     "Notifications on for this phone.", and not shown on that phone
-//     again. A Block is told once, in grey.
+//     on, then the browser's own Allow (two taps, once); then one grey
+//     line, "Notifications on for this device." (Sam: a phone, a tablet or
+//     a computer), and not shown on that device again. A Block is told
+//     once, in grey.
 //   iphone — an iPhone not yet on the Home Screen: "Show me how" opens the
 //     install steps (07.3), since an iPhone shows notifications only from
 //     there.
@@ -37,9 +38,9 @@ export function NotifyAsk({
   const [error, setError] = useState<string | null>(null);
   const [howOpen, setHowOpen] = useState(false);
 
-  if (phase === 'on') return <p className="nask-line">Notifications on for this phone.</p>;
+  if (phase === 'on') return <p className="nask-line">Notifications on for this device.</p>;
   if (phase === 'blocked') {
-    return <p className="nask-line">Notifications are blocked on this phone. You can allow them in your phone&apos;s settings.</p>;
+    return <p className="nask-line">Notifications are blocked on this device. You can allow them in your browser or device settings.</p>;
   }
 
   function later() {
@@ -75,7 +76,7 @@ export function NotifyAsk({
                 ? 'On iPhone, add the app to your Home Screen first.'
                 : phase === 'working'
                   ? WAITING_WORDS
-                  : 'On this phone, even when the app is closed.')}
+                  : 'On this device, even when the app is closed.')}
           </p>
         </div>
       </div>

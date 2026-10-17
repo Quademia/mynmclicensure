@@ -63,7 +63,7 @@ export function AdminNotifySwitch({ userId, publicKey }: { userId: string; publi
     <div className="card nsw">
       <div className="nask-words">
         <p className="nask-title" id="nsw-label">Notify this device when a student writes</p>
-        <p className="nask-sub">{asking ? WAITING_WORDS : 'This phone or computer only.'}</p>
+        <p className="nask-sub">{asking ? WAITING_WORDS : 'This device only.'}</p>
       </div>
       <button
         type="button"

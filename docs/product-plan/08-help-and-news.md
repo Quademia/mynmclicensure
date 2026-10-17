@@ -160,13 +160,15 @@ Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
     a bump deletes a device, a week running out does not.
   - **The ask** (Sam, 2026-10-17, drawn): a card under the student's
     message right after they send — "Get a notification when we reply ·
-    On this phone, even when the app is closed", **Not now** and **Turn
-    on**; Turn on, then the phone's own Allow (two taps, once); the card
-    then one grey line, "Notifications on for this phone", and not shown
-    on that phone again. **Not now** hides it on that phone for 7 days,
-    then it comes back after a send — there is no other switch for a
-    student (the phone's settings turn it off). A Block: once, "Notifications
-    are blocked on this phone. You can allow them in your phone's
+    On this device, even when the app is closed", **Not now** and **Turn
+    on**; Turn on, then the browser's own Allow (two taps, once); the card
+    then one grey line, "Notifications on for this device", and not shown
+    on that device again. The words say **device**, never phone — a
+    student may be on a phone, a tablet or a computer (Sam, 2026-10-18).
+    **Not now** hides it on that device for 7 days, then it comes back
+    after a send — there is no other switch for a student (the browser's
+    or device's settings turn it off). A Block: once, "Notifications are
+    blocked on this device. You can allow them in your browser or device
     settings." An iPhone not on the Home Screen: "Want a notification
     when we reply? On iPhone, add the app to your Home Screen first",
     **Show me how** opening the install steps (07.3). **The admin's
