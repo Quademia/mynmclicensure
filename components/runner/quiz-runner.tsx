@@ -66,6 +66,7 @@ import { reportHref, sessionHref } from '@/lib/attempts/links';
 import { ResultsHeldPopup, ResultsPopup, type ResultsSummary } from './results-popup';
 import { ResultsHeld, ReviewClosed } from './results-held';
 import { ReportIssueDialog } from './report-issue';
+import { MessageUsDialog } from '@/components/messages/message-us';
 import { Icon } from '@/components/shell/icons';
 import { KindChip, QUESTION_TYPE_HUE } from '@/components/shell/chips';
 import {
@@ -266,6 +267,8 @@ export function QuizRunner({
   const [reportFor, setReportFor] = useState<{ item: SealedItem; globalIdx: number; chosen: string | string[] | null } | null>(null);
   const [reportedAt, setReportedAt] = useState<Record<string, string>>({});
   const [thanks, setThanks] = useState<string | null>(null);
+  // The Message us box the report box hands over to, with its draft.
+  const [askFor, setAskFor] = useState<{ itemId: string; draft: string } | null>(null);
   const dismissThanks = useCallback(() => setThanks(null), []);
   const startedAtRef = useRef<number | null>(null);
   const finishingRef = useRef(false);
@@ -1021,15 +1024,15 @@ export function QuizRunner({
   }
 
   // ── Report an issue (06.2) ──
-  // "I don't understand the answer" opens Messages on the course's thread
-  // with this in the draft: the sitting, the question's number and the
-  // start of its stem — never an option or the answer.
-  function askHref(item: SealedItem, globalIdx: number): string {
+  // "I don't understand the answer" opens the Message us box (08.2) on the
+  // course's thread with this in the draft: the sitting, the question's
+  // number and the start of its stem — never an option or the answer.
+  function askDraft(item: SealedItem, globalIdx: number): string {
     const stem = (item.stem || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
     const quote =
       `About question ${globalIdx + 1} of ${items.length} in ${attempt.display_label || 'my sitting'}:\n` +
       `"${stem.length > 200 ? `${stem.slice(0, 200)}…` : stem}"\n\n`;
-    return `/student/messages?course_id=${encodeURIComponent(attempt.course_id)}&ref=${encodeURIComponent(quote)}`;
+    return quote;
   }
 
   const pageStart = safePage * perPage;
@@ -1353,13 +1356,24 @@ export function QuizRunner({
             attemptId={attempt.attempt_id}
             itemId={reportFor.item.item_id}
             chosen={reportFor.chosen}
-            messagesHref={askHref(reportFor.item, reportFor.globalIdx)}
+            onAsk={() => setAskFor({ itemId: reportFor.item.item_id, draft: askDraft(reportFor.item, reportFor.globalIdx) })}
             alreadyAt={reportedAt[reportFor.item.item_id] ?? null}
             onSent={() => {
               setReportedAt((m) => ({ ...m, [reportFor.item.item_id]: new Date().toISOString() }));
               setThanks("Thanks, we'll look at it.");
             }}
             onAlready={(at) => setReportedAt((m) => ({ ...m, [reportFor.item.item_id]: at }))}
+          />
+        ) : null}
+        {askFor ? (
+          <MessageUsDialog
+            key={askFor.itemId}
+            open
+            onClose={() => setAskFor(null)}
+            label="course"
+            courseId={attempt.course_id}
+            draft={askFor.draft}
+            onSent={() => setThanks("Sent. We'll reply in Messages.")}
           />
         ) : null}
         <div className="runner-overlay">

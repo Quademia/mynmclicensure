@@ -1,8 +1,8 @@
 // app/(app)/admin/layout.tsx
 //
 // The admin chrome: the gate, then the shell with the admin sidebar.
-// The Messages badge is legacy getUnreadCountForAdmin — the distinct
-// threads holding a message not yet read by admin (slice 12b).
+// The Messages badge: open threads whose last message is the student's,
+// unread by Quademia — one count in the database (08.2).
 
 import { requireAdmin } from '@/lib/access';
 import { AppShell } from '@/components/shell/app-shell';
@@ -13,8 +13,8 @@ import { getUnreadCountForAdmin } from '@/lib/messaging/admin-queries';
 export const dynamic = 'force-dynamic';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { supabase, profile } = await requireAdmin();
-  const unread = await getUnreadCountForAdmin(supabase);
+  const { profile } = await requireAdmin();
+  const unread = await getUnreadCountForAdmin();
 
   // The same A3 bar as the student's (10-design-system.md DS5): the same
   // wordmark — which side you are on is the sidebar's label, "Admin

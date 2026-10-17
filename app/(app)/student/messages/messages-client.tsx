@@ -1,24 +1,21 @@
 // app/(app)/student/messages/messages-client.tsx
 //
-// The script block of legacy student/messages.html (slice 12a): the
-// inbox (each thread with its label, latest preview, relative time,
-// the context and Closed chips, the unread dot when the latest message
-// is an unread admin reply), the conversation pane (the label and
-// context chip, the pinned reference card for a course or question
-// thread, date dividers and grouped bubbles with the avatar on the
-// last of a group, links made clickable, the closed banner with "Start
-// a new conversation"), the compose bar (800 characters, the count
-// past 90%, Enter to send, Shift+Enter for a new line, an optimistic
-// bubble), "+ New" with its "What's this about?" form and the reuse
-// banner, the deep link from the course page or a runner opening or
-// reusing the thread and then clearing the address, and the realtime
-// feed on the open thread for an admin reply (not critical if it
-// fails, as legacy). After every change the sidebar's badge follows
-// through a route refresh.
-//
-// Changed on the way: the page's bottom-right toast is the shared one
-// (UI convention #1); the realtime subscription names this product's
-// schema; the reference text's first line reads Quademia (#5).
+// The student's Messages (slice 12a's page on 08.2's rules; Sam,
+// 2026-09-18 and 2026-10-17 — its redesign is step 3): the inbox (each
+// thread by its label or course, the latest preview, the relative time,
+// the Closed chip, the unread dot when Quademia's last reply is unread),
+// the conversation pane (the label, the course card for a course thread,
+// date dividers and grouped bubbles with the avatar on the last of a
+// group, links made clickable, the line "Reopened by a reply." between
+// them), the compose bar (2,000 characters, the count past 90%, Enter to
+// send, Shift+Enter for a new line, an optimistic bubble), and "+ New"
+// with its "What is your message about?" — one of the five labels, and
+// the course for "A course" — which opens the label's open thread or a
+// new one. A closed thread still takes a reply, which reopens it. Every
+// write is a Server Action into the database's msg_* functions; the
+// realtime feed on the open thread brings a reply or a close without a
+// refresh (not critical if it fails). After every change the sidebar's
+// badge follows through a route refresh.
 
 'use client';
 
@@ -28,10 +25,16 @@ import { Toast } from '@/lib/toast/toast';
 import { NameCircle } from '@/components/shell/name-circle';
 import { PageHeader } from '@/components/shell/page-header';
 import { createClient } from '@/lib/supabase/client';
-import { ensureThreadAction, listStudentThreadsAction, markThreadReadAction, sendMessageAction, threadMessagesAction } from '@/lib/messaging/actions';
-import { MESSAGE_MAX_LEN, type Message, type StudentThread, type ThreadDeepLink } from '@/lib/messaging/types';
+import { listStudentThreadsAction, markThreadReadAction, openLabelThreadAction, sendMessageAction, threadMessagesAction } from '@/lib/messaging/actions';
+import { labelWords, MESSAGE_LABELS, MESSAGE_MAX_LEN, type Message, type StudentThread } from '@/lib/messaging/types';
 
 type Msg = { text: string; tone: 'error' | 'success' } | null;
+
+// The clock, read outside render (react-hooks/purity): the relative times
+// and date labels are computed from the last load.
+function stampNow(set: (n: number) => void) {
+  set(Date.now());
+}
 type CourseBit = { course_id: string; title: string };
 
 // ── format helpers (legacy) ──
@@ -92,37 +95,15 @@ function linkify(s: string): React.ReactNode[] {
   return out;
 }
 
-// legacy formatRefText: the quoted question, line by line.
-function RefText({ raw }: { raw: string }) {
-  const lines = raw.split('\n').map((l) => l.trim()).filter(Boolean);
-  return (
-    <>
-      {lines.map((line, i) => {
-        if (line.startsWith('Quademia') || line.startsWith('QAcademy')) return <div key={i} className="ref-head">{line}</div>;
-        if (line === 'Question:' || line === 'Options (as shown):') return <div key={i} className="ref-section">{line}</div>;
-        if (/^(Course|Question|Topic):/.test(line)) {
-          const [label, ...rest] = line.split(':');
-          return <div key={i}><strong>{label}:</strong> {rest.join(':').trim()}</div>;
-        }
-        if (/^[A-H]\.\s/.test(line)) return <div key={i} className="ref-option">{line}</div>;
-        if (line.startsWith('My answer:')) return <div key={i} className="ref-answer"><strong>My answer:</strong> {line.replace('My answer:', '').trim()}</div>;
-        return <div key={i} className="ref-line">{line}</div>;
-      })}
-    </>
-  );
-}
-
 export function MessagesClient({
   student,
   courses,
   initialThreads,
-  deepLink,
 }: {
   /** The signed-in student, for their name circle (DS7): photo, else initials. */
   student: { name: string; avatarUrl: string | null };
   courses: CourseBit[];
   initialThreads: StudentThread[];
-  deepLink: ThreadDeepLink;
 }) {
   const router = useRouter();
   const courseTitles: Record<string, string> = {};
@@ -138,7 +119,9 @@ export function MessagesClient({
   const [compose, setCompose] = useState('');
   const [sending, setSending] = useState(false);
   const [newForm, setNewForm] = useState(false);
-  const [newSubject, setNewSubject] = useState('');
+  const [newLabel, setNewLabel] = useState('');
+  const [newCourse, setNewCourse] = useState('');
+  const [starting, setStarting] = useState(false);
   const [reuseBanner, setReuseBanner] = useState(false);
   const reuseTimer = useRef<number | null>(null);
   const composeRef = useRef<HTMLTextAreaElement | null>(null);
@@ -150,16 +133,14 @@ export function MessagesClient({
 
   function threadLabel(t: StudentThread | null): string {
     if (!t) return 'Conversation';
-    if (t.subject) return t.subject;
     if (t.context_type === 'course' && t.course_id) return courseTitles[t.course_id] || t.course_id;
-    if (t.context_type === 'question') return 'Question feedback';
-    return 'General';
+    return labelWords(t.context_type);
   }
 
   async function loadThreads() {
     const list = await listStudentThreadsAction();
     setThreads(list);
-    setNow(Date.now());
+    stampNow(setNow);
     router.refresh(); // the sidebar's badge
     return list;
   }
@@ -169,7 +150,7 @@ export function MessagesClient({
     if (el) el.scrollTop = el.scrollHeight;
   }, []);
 
-  // ── realtime on the open thread (legacy setupRealtime) ──
+  // ── realtime on the open thread: a reply, the reopen line, a close ──
   const teardownRealtime = useCallback(() => {
     if (channelRef.current) {
       try {
@@ -192,13 +173,21 @@ export function MessagesClient({
           { event: 'INSERT', schema: 'licensure_gh', table: 'messages', filter: `thread_id=eq.${threadId}` },
           async (payload) => {
             const newMsg = payload.new as Partial<Message>;
-            if (newMsg && newMsg.sender_role === 'admin' && activeRef.current === threadId) {
+            if (newMsg && newMsg.sender_role !== 'student' && activeRef.current === threadId) {
               setMessages(await threadMessagesAction(threadId));
-              setNow(Date.now());
+              stampNow(setNow);
               window.setTimeout(scrollToBottom, 0);
               await markThreadReadAction(threadId);
               await loadThreads();
             }
+          },
+        )
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'licensure_gh', table: 'messages_threads', filter: `thread_id=eq.${threadId}` },
+          (payload) => {
+            const row = payload.new as Partial<StudentThread>;
+            if (row && row.status) setThreads((cur) => cur.map((t) => (t.thread_id === threadId ? { ...t, status: row.status! } : t)));
           },
         )
         .subscribe();
@@ -209,26 +198,22 @@ export function MessagesClient({
   }
 
   // ── open / close (legacy openThread / closeConvo) ──
-  async function openThread(threadId: string, list?: StudentThread[]) {
+  async function openThread(threadId: string) {
     setActiveId(threadId);
     activeRef.current = threadId;
     setNewForm(false);
     hideReuseBanner();
-    const source = list ?? threads;
-    const thread = source.find((t) => t.thread_id === threadId);
 
     const msgs = await threadMessagesAction(threadId);
     setMessages(msgs);
-    setNow(Date.now());
+    stampNow(setNow);
     window.setTimeout(() => {
       scrollToBottom();
       composeRef.current?.focus();
     }, 0);
 
     await markThreadReadAction(threadId);
-    if (thread?.latest) {
-      setThreads((cur) => cur.map((t) => (t.thread_id === threadId && t.latest ? { ...t, latest: { ...t.latest, read_by_user: true } } : t)));
-    }
+    setThreads((cur) => cur.map((t) => (t.thread_id === threadId ? { ...t, unread: false } : t)));
     router.refresh();
     setupRealtime(threadId);
   }
@@ -242,35 +227,10 @@ export function MessagesClient({
 
   useEffect(() => teardownRealtime, [teardownRealtime]);
 
-  // ── the deep link (legacy handleDeepLink), once, after mount ──
+  // The relative times need the clock, read once after mount.
   useEffect(() => {
-    const id = window.setTimeout(async () => {
-      setNow(Date.now());
-      if (!deepLink.course_id && !deepLink.item_id) return;
-      const contextType = deepLink.item_id ? 'question' : 'course';
-      const result = await ensureThreadAction(contextType, {
-        course_id: deepLink.course_id,
-        quiz_id: deepLink.quiz_id,
-        question_id: deepLink.item_id,
-        attempt_id: deepLink.attempt_id,
-        subject: deepLink.item_id ? 'Question feedback' : null,
-        ref_text: deepLink.item_id ? deepLink.ref : null,
-      });
-      if (!result.ok) {
-        setMsg({ text: 'Could not create conversation.', tone: 'error' });
-        return;
-      }
-      const list = await loadThreads();
-      await openThread(result.thread_id, list);
-      // The sitting's "I don't understand the answer" (06.2): the question
-      // quoted in the draft, for the student to finish and send.
-      if (!deepLink.item_id && deepLink.ref) setCompose(deepLink.ref.slice(0, MESSAGE_MAX_LEN));
-      if (!result.created) showReuseBanner();
-      window.history.replaceState({}, '', '/student/messages');
-    }, 0);
+    const id = window.setTimeout(() => stampNow(setNow), 0);
     return () => window.clearTimeout(id);
-    // Runs once, for the address the page arrived with, as the legacy boot did.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ── send (legacy handleSend) ──
@@ -287,22 +247,27 @@ export function MessagesClient({
       sender_id: 'me',
       sender_role: 'student',
       body_text: text,
-      read_by_user: true,
-      read_by_admin: false,
       created_at: new Date().toISOString(),
     };
     setMessages((cur) => [...cur, optimistic]);
     setCompose('');
     window.setTimeout(scrollToBottom, 0);
 
-    const result = await sendMessageAction(activeId, text);
-    if (result.ok) {
-      setMessages(await threadMessagesAction(activeId));
-      window.setTimeout(scrollToBottom, 0);
-      await loadThreads();
-    } else {
+    try {
+      const result = await sendMessageAction(activeId, text);
+      if (result.ok) {
+        setMessages(await threadMessagesAction(activeId));
+        window.setTimeout(scrollToBottom, 0);
+        await loadThreads();
+      } else {
+        setMessages((cur) => cur.filter((m) => m.message_id !== tempId));
+        setCompose(text);
+        setMsg({ text: result.error, tone: 'error' });
+      }
+    } catch {
       setMessages((cur) => cur.filter((m) => m.message_id !== tempId));
-      setMsg({ text: 'Could not send message.', tone: 'error' });
+      setCompose(text);
+      setMsg({ text: 'Could not send your message. Please check your connection and try again.', tone: 'error' });
     }
     setSending(false);
   }
@@ -319,19 +284,31 @@ export function MessagesClient({
     el.style.height = Math.min(el.scrollHeight, 120) + 'px';
   }
 
-  // ── "+ New" (legacy startNewThread / confirmNewThread) ──
+  // ── "+ New": the label (and the course), then its open thread or a new one ──
+  function openNewForm() {
+    setNewLabel('');
+    setNewCourse('');
+    setNewForm(true);
+  }
+
   async function confirmNewThread() {
-    const subject = newSubject.trim() || null;
-    setNewForm(false);
-    setNewSubject('');
-    const result = await ensureThreadAction('general', { subject });
-    if (!result.ok) {
-      setMsg({ text: 'Could not create conversation.', tone: 'error' });
-      return;
+    if (!newLabel || (newLabel === 'course' && !newCourse) || starting) return;
+    setStarting(true);
+    try {
+      const result = await openLabelThreadAction(newLabel, newLabel === 'course' ? newCourse : null);
+      setStarting(false);
+      if (!result.ok) {
+        setMsg({ text: result.error, tone: 'error' });
+        return;
+      }
+      setNewForm(false);
+      await loadThreads();
+      await openThread(result.thread_id);
+      if (!result.created) showReuseBanner();
+    } catch {
+      setStarting(false);
+      setMsg({ text: 'Could not open the conversation. Please check your connection and try again.', tone: 'error' });
     }
-    const list = await loadThreads();
-    await openThread(result.thread_id, list);
-    if (!result.created) showReuseBanner();
   }
 
   function showReuseBanner() {
@@ -348,21 +325,29 @@ export function MessagesClient({
   const isClosed = active?.status === 'closed';
   const composeLen = compose.length;
   const charClass = composeLen > MESSAGE_MAX_LEN ? 'over' : composeLen > MESSAGE_MAX_LEN * 0.9 ? 'warn' : '';
+  const newReady = Boolean(newLabel) && (newLabel !== 'course' || Boolean(newCourse));
 
-  // Grouped bubbles with date dividers (legacy renderMessages).
+  // Grouped bubbles with date dividers (legacy renderMessages); the
+  // reopen line sits between them on its own.
   type Group = { sender: 'student' | 'admin'; items: Message[] };
-  const blocks: ({ kind: 'date'; label: string } | { kind: 'group'; group: Group })[] = [];
+  const blocks: ({ kind: 'date'; label: string } | { kind: 'system'; m: Message } | { kind: 'group'; group: Group })[] = [];
   let lastDate = '';
   let current: Group | null = null;
   for (const m of messages) {
     const label = formatDateLabel(m.created_at, now);
-    const sender: 'student' | 'admin' = m.sender_role === 'student' ? 'student' : 'admin';
     if (label !== lastDate) {
       if (current) blocks.push({ kind: 'group', group: current });
       current = null;
       blocks.push({ kind: 'date', label });
       lastDate = label;
     }
+    if (m.sender_role === 'system') {
+      if (current) blocks.push({ kind: 'group', group: current });
+      current = null;
+      blocks.push({ kind: 'system', m });
+      continue;
+    }
+    const sender: 'student' | 'admin' = m.sender_role === 'student' ? 'student' : 'admin';
     if (!current || current.sender !== sender) {
       if (current) blocks.push({ kind: 'group', group: current });
       current = { sender, items: [] };
@@ -371,20 +356,10 @@ export function MessagesClient({
   }
   if (current) blocks.push({ kind: 'group', group: current });
 
-  const refCard = active
-    ? active.context_type === 'question'
-      ? (
-          <div className="ref-card">
-            {active.ref_text ? <RefText raw={active.ref_text} /> : active.course_id ? <><strong>Course:</strong> {courseTitles[active.course_id] || active.course_id}</> : null}
-            <div className="ref-hint">Type your feedback below. Please mention what part (stem or option) you&apos;re referring to.</div>
-          </div>
-        )
-      : active.context_type === 'course' && active.course_id
-        ? (
-            <div className="ref-card"><strong>Course:</strong> {courseTitles[active.course_id] || active.course_id}</div>
-          )
-        : null
-    : null;
+  const refCard =
+    active && active.context_type === 'course' && active.course_id ? (
+      <div className="ref-card"><strong>Course:</strong> {courseTitles[active.course_id] || active.course_id}</div>
+    ) : null;
 
   return (
     <div className="smsg">
@@ -398,28 +373,33 @@ export function MessagesClient({
           <div className="thread-list">
             <div className="thread-list-header">
               <h2>Inbox</h2>
-              <button type="button" className="btn-new-msg" onClick={() => setNewForm(true)}>+ New</button>
+              <button type="button" className="btn-new-msg" onClick={openNewForm}>+ New</button>
             </div>
             <div className="thread-items">
               {newForm ? (
                 <div className="new-thread-form">
-                  <label htmlFor="newThreadSubject">What&apos;s this about?</label>
-                  <input
-                    id="newThreadSubject"
-                    type="text"
-                    placeholder="e.g. Help with dosage calculations"
-                    maxLength={80}
-                    autoComplete="off"
-                    autoFocus
-                    value={newSubject}
-                    onChange={(e) => setNewSubject(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && newSubject.trim()) void confirmNewThread();
-                      if (e.key === 'Escape') setNewForm(false);
-                    }}
-                  />
+                  <label htmlFor="newThreadLabel">What is your message about?</label>
+                  <select id="newThreadLabel" value={newLabel} autoFocus onChange={(e) => setNewLabel(e.target.value)}>
+                    <option value="" disabled>Choose one</option>
+                    {MESSAGE_LABELS.map((l) => (
+                      <option key={l.value} value={l.value}>{l.label}</option>
+                    ))}
+                  </select>
+                  {newLabel === 'course' ? (
+                    <>
+                      <label htmlFor="newThreadCourse">Which course?</label>
+                      <select id="newThreadCourse" value={newCourse} onChange={(e) => setNewCourse(e.target.value)}>
+                        <option value="" disabled>Choose a course</option>
+                        {courses.map((c) => (
+                          <option key={c.course_id} value={c.course_id}>{c.title}</option>
+                        ))}
+                      </select>
+                    </>
+                  ) : null}
                   <div className="form-actions">
-                    <button type="button" className="btn-start" disabled={!newSubject.trim()} onClick={() => void confirmNewThread()}>Start</button>
+                    <button type="button" className="btn-start" disabled={!newReady || starting} onClick={() => void confirmNewThread()}>
+                      {starting ? 'Opening…' : 'Start'}
+                    </button>
                     <button type="button" className="btn-cancel" onClick={() => setNewForm(false)}>Cancel</button>
                   </div>
                 </div>
@@ -429,24 +409,22 @@ export function MessagesClient({
                 <div className="thread-empty">
                   <h3>No messages yet</h3>
                   <p>If you need help or want to send feedback, start a conversation.</p>
-                  <button type="button" className="btn-new-msg" onClick={() => setNewForm(true)}>Start a message</button>
+                  <button type="button" className="btn-new-msg" onClick={openNewForm}>Start a message</button>
                 </div>
               ) : (
                 threads.map((t) => {
                   const latest = t.latest;
-                  const hasUnread = Boolean(latest && !latest.read_by_user && latest.sender_role === 'admin');
                   return (
                     <div
                       key={t.thread_id}
-                      className={`thread-item${t.thread_id === activeId ? ' active' : ''}${hasUnread ? ' unread' : ''}`}
+                      className={`thread-item${t.thread_id === activeId ? ' active' : ''}${t.unread ? ' unread' : ''}`}
                       onClick={() => void openThread(t.thread_id)}
                     >
                       <div className="t-subject">{threadLabel(t)}</div>
                       <div className="t-preview">{latest ? truncate(latest.body_text, 60) : 'No messages'}</div>
                       <div className="t-meta">
-                        {hasUnread ? <span className="unread-dot" /> : null}
+                        {t.unread ? <span className="unread-dot" /> : null}
                         <span>{latest ? formatTime(latest.created_at, now) : ''}</span>
-                        {t.context_type !== 'general' ? <span className="context-chip">{t.context_type}</span> : null}
                         {t.status === 'closed' ? <span className="badge closed">Closed</span> : null}
                       </div>
                     </div>
@@ -469,12 +447,11 @@ export function MessagesClient({
                 <div className="convo-header">
                   <button type="button" className="back-btn" onClick={closeConvo}>&#8592;</button>
                   <h3>{threadLabel(active)}</h3>
-                  {active.context_type !== 'general' ? <span className="context-chip">{active.context_type}</span> : null}
                 </div>
 
                 {reuseBanner ? (
                   <div className="reuse-banner">
-                    <span>You already have an open conversation — we&apos;ve opened it for you.</span>
+                    <span>You already have an open conversation about this — we&apos;ve opened it for you.</span>
                     <button type="button" className="close-banner" title="Dismiss" onClick={hideReuseBanner}>&times;</button>
                   </div>
                 ) : null}
@@ -488,6 +465,8 @@ export function MessagesClient({
                     blocks.map((b, i) =>
                       b.kind === 'date' ? (
                         <div key={`d${i}`} className="date-divider"><span>{b.label}</span></div>
+                      ) : b.kind === 'system' ? (
+                        <div key={b.m.message_id} className="date-divider msg-system"><span>{b.m.body_text}</span></div>
                       ) : (
                         <div key={`g${i}`} className={`msg-group ${b.group.sender}`}>
                           {b.group.items.map((m) => (
@@ -509,31 +488,25 @@ export function MessagesClient({
                   )}
                 </div>
 
-                {isClosed ? (
-                  <>
-                    <div className="closed-banner">This conversation has been closed by support.</div>
-                    <div className="closed-action"><button type="button" onClick={() => setNewForm(true)}>Start a new conversation</button></div>
-                  </>
-                ) : (
-                  <div className="compose-bar">
-                    <textarea
-                      ref={composeRef}
-                      placeholder="Type a message..."
-                      rows={1}
-                      maxLength={MESSAGE_MAX_LEN}
-                      value={compose}
-                      onChange={(e) => {
-                        setCompose(e.target.value);
-                        autoResize(e.target);
-                      }}
-                      onKeyDown={onComposeKey}
-                    />
-                    <span className={`char-count ${charClass}`}>{composeLen ? `${composeLen}/${MESSAGE_MAX_LEN}` : ''}</span>
-                    <button type="button" className="btn-send" disabled={sending || composeLen === 0 || composeLen > MESSAGE_MAX_LEN} onClick={() => void handleSend()}>
-                      Send
-                    </button>
-                  </div>
-                )}
+                {isClosed ? <div className="closed-banner">This conversation was closed. A reply reopens it.</div> : null}
+                <div className="compose-bar">
+                  <textarea
+                    ref={composeRef}
+                    placeholder={isClosed ? 'Reply to reopen…' : 'Type a message...'}
+                    rows={1}
+                    maxLength={MESSAGE_MAX_LEN}
+                    value={compose}
+                    onChange={(e) => {
+                      setCompose(e.target.value);
+                      autoResize(e.target);
+                    }}
+                    onKeyDown={onComposeKey}
+                  />
+                  <span className={`char-count ${charClass}`}>{composeLen > MESSAGE_MAX_LEN * 0.9 ? `${composeLen}/${MESSAGE_MAX_LEN}` : ''}</span>
+                  <button type="button" className="btn-send" disabled={sending || composeLen === 0 || composeLen > MESSAGE_MAX_LEN} onClick={() => void handleSend()}>
+                    Send
+                  </button>
+                </div>
               </div>
             )}
           </div>

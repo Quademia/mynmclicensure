@@ -42,7 +42,7 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
 - **No Bulk Send**: announcements are the broadcast, with the same
   targeting; New Thread reaches one student (Sam, 2026-09-18).
 
-### Messages — the support desk *(to build: 08.2)*
+### Messages — the support desk *(to build: 08.2 — steps 3 and 4; step 2 built 2026-10-17)*
 
 Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
 2026-10-17.
@@ -90,8 +90,8 @@ Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
   three are sample data; any on prod go too).
 - **The build, in order** (2026-10-17): question reports end to end
   (done, 06.2); Messages through the server on both sides — the storage,
-  the labels, the pop-up box, Bulk Send and the question threads gone;
-  the student page redesigned, drawn first; the admin inbox paged, on
+  the labels, the pop-up box, Bulk Send and the question threads gone
+  (done 2026-10-17); the student page redesigned, drawn first; the admin inbox paged, on
   today's look.
 
 ### Help pages and groups

@@ -1,0 +1,26 @@
+/* styles/message-us.css
+ *
+ * The "Message us" box (08.2; Sam, 2026-10-17), on the app's dialog
+ * (.dlg, components.css). Portalled to <body>, so unscoped (.mu-…).
+ * Tokens only.
+ */
+
+.mu-about {
+  margin: 0;
+  padding: var(--space-8) var(--space-12);
+  border-radius: var(--radius);
+  background: var(--brand-teal-pale);
+  color: var(--brand-teal-hover);
+  font-size: var(--type-ui-size);
+  line-height: 1.5;
+}
+.mu-about b { font-weight: 600; }
+.mu-text { resize: vertical; min-height: 120px; line-height: 1.5; }
+.mu-count { margin: var(--space-4) 0 0; text-align: right; font-size: var(--type-meta-size); color: var(--ink-muted); }
+.mu-note { margin: var(--space-8) 0 0; font-size: var(--type-meta-size); line-height: var(--type-meta-line); color: var(--ink-muted); }
+.mu-error {
+  margin: var(--space-10) 0 0;
+  font-size: var(--type-ui-size);
+  line-height: 1.5;
+  color: var(--badge-danger-ink);
+}

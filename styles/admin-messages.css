@@ -42,7 +42,6 @@
 .amsg .thread-item .t-programme { font-weight: 400; font-size: 11px; color: var(--text-muted); }
 .amsg .thread-item .t-label { font-size: 12px; color: var(--text-muted); margin-bottom: 2px; }
 .amsg .thread-item .t-preview { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.amsg .thread-item .t-preview.t-ref { font-style: italic; color: var(--primary); }
 .amsg .thread-item .t-meta { font-size: 11px; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 6px; }
 .amsg .unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); display: inline-block; flex-shrink: 0; }
 .amsg .context-chip { font-size: 10px; padding: 1px 6px; border-radius: 4px; background: var(--primary-light, #edf6f5); color: var(--primary); font-weight: 600; text-transform: uppercase; }
@@ -82,23 +81,18 @@
 .amsg .feed-time { font-size: 10px; color: var(--text-muted); }
 .amsg .feed-body { font-size: 13px; line-height: 1.5; color: var(--text); padding-left: 34px; white-space: pre-wrap; word-wrap: break-word; }
 .amsg .feed-body a { color: var(--primary); text-decoration: underline; font-weight: 600; word-break: break-all; }
+/* the line "Reopened by a reply." in the feed */
+.amsg .feed-system { margin: var(--space-8) 0; text-align: center; font-size: var(--type-meta-size); font-style: italic; color: var(--ink-muted); }
 .amsg .feed-msg.is-admin { border-left: 3px solid var(--accent); padding-left: 12px; margin-left: 0; }
 
 /* ── Reference card ── */
 .amsg .ref-wrap { margin: 12px 16px 0; flex-shrink: 0; }
 .amsg .ref-card { font-size: 12px; color: var(--text-muted); background: var(--primary-light, #edf6f5); padding: 10px 14px; border-radius: 10px; margin: 0 0 8px 0; line-height: 1.5; }
 .amsg .ref-card strong { color: var(--primary); }
-.amsg .ref-id { margin-bottom: 4px; }
-.amsg .ref-id code { font-size: 11px; background: rgba(0, 0, 0, 0.05); padding: 1px 4px; border-radius: 3px; }
-.amsg .ref-head { font-weight: 700; color: var(--primary); margin-bottom: 4px; }
-.amsg .ref-section { margin-top: 8px; font-weight: 600; color: var(--primary); }
-.amsg .ref-option { padding-left: 12px; font-size: 11.5px; }
-.amsg .ref-answer { margin-top: 8px; font-weight: 600; }
-.amsg .ref-line { padding-left: 4px; }
-.amsg .ref-hint { margin-top: 8px; font-size: 11px; color: var(--text-muted); font-style: italic; }
 
 /* ── Closed, compose ── */
-.amsg .closed-banner { padding: 10px 16px; background: #fef2f2; border-top: 1px solid #fecaca; color: #c0392b; font-size: 12px; font-weight: 600; text-align: center; flex-shrink: 0; }
+/* a closed thread still takes a reply, which reopens it (08.2) — a note, not a warning */
+.amsg .closed-banner { padding: var(--space-8) var(--space-16); background: var(--surface-page); border-top: 1px solid var(--border); color: var(--ink-muted); font-size: var(--type-meta-size); text-align: center; }
 .amsg .compose-bar { padding: 12px 16px; border-top: 1px solid var(--border, #e2e8f0); display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0; background: var(--white); }
 .amsg .compose-bar textarea { flex: 1; resize: none; border: 1px solid var(--border, #e2e8f0); border-radius: 10px; padding: 10px 14px; font-size: 13px; font-family: inherit; min-height: 40px; max-height: 120px; line-height: 1.4; }
 .amsg .compose-bar textarea:focus { outline: none; border-color: var(--primary); }
@@ -120,10 +114,8 @@
 .amsg-overlay .form-group input, .amsg-overlay .form-group select, .amsg-overlay .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: inherit; color: var(--text); background: var(--white); box-sizing: border-box; }
 .amsg-overlay .form-group textarea { min-height: 100px; resize: vertical; }
 .amsg-overlay .form-group input:focus, .amsg-overlay .form-group select:focus, .amsg-overlay .form-group textarea:focus { outline: none; border-color: var(--primary); }
-.amsg-overlay .form-group-end { display: flex; align-items: flex-end; }
 .amsg-overlay .form-hint { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
 .amsg-overlay .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.amsg-overlay .preview-count { font-size: 13px; color: var(--primary); font-weight: 600; padding: 8px 12px; background: var(--primary-light); border-radius: 8px; text-align: center; margin-bottom: 12px; }
 .amsg-overlay .student-search-results { max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; margin-top: 6px; }
 .amsg-overlay .student-result { padding: 8px 12px; cursor: pointer; font-size: 13px; border-bottom: 1px solid var(--border); transition: background 0.12s; }
 .amsg-overlay .student-result.muted { cursor: default; color: var(--text-muted); }
@@ -134,8 +126,6 @@
 .amsg-overlay .selected-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--primary-light); border-radius: 6px; font-size: 13px; font-weight: 600; color: var(--primary); }
 .amsg-overlay .selected-pill .pill-clear { cursor: pointer; opacity: 0.6; font-size: 16px; }
 .amsg-overlay .selected-pill .pill-clear:hover { opacity: 1; }
-.amsg-overlay .confirm-box { padding: 14px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; margin-bottom: 14px; text-align: center; }
-.amsg-overlay .confirm-box strong { color: var(--warning); }
 
 /* ── Multi-select pill picker ── */
 .amsg-overlay .ms-picker { position: relative; }

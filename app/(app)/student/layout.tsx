@@ -5,8 +5,8 @@
 // (lib/access/internal.ts), so a page calling requireStudent() again
 // costs nothing.
 //
-// The Messages badge is legacy getUnreadCountForUser — the
-// student's open threads holding a message not yet read (slice 12a);
+// The Messages badge: the student's open threads whose last message is
+// an unread reply — one count in the database (08.2, msg_unread_count);
 // under A3 the same count sits on the top bar's envelope, so a closed
 // sidebar cannot hide a reply (10-design-system.md DS5).
 
@@ -21,8 +21,8 @@ import { PhoneCheckIn } from './phone-check-in';
 export const dynamic = 'force-dynamic';
 
 export default async function StudentLayout({ children }: { children: React.ReactNode }) {
-  const { supabase, profile } = await requireStudent();
-  const unread = await getUnreadCountForUser(supabase, profile.user_id);
+  const { profile } = await requireStudent();
+  const unread = await getUnreadCountForUser(profile.user_id);
 
   return (
     <AppShell

@@ -60,7 +60,9 @@ a.cp-tab:hover { color: var(--brand-navy); text-decoration: none; }
 .cp-head { display: flex; flex-direction: column; gap: var(--space-10); }
 .cp-head .page-header { margin-bottom: 0; }
 .cp-head-line { display: flex; align-items: center; gap: var(--space-12); flex-wrap: wrap; }
-.cp-message { margin-left: auto; display: inline-flex; align-items: center; gap: var(--space-6); font-size: var(--type-ui-size); font-weight: 600; color: var(--brand-teal-hover); }
+/* "Message us about this course": a button opening the Message us box (08.2) */
+.cp-message { margin-left: auto; display: inline-flex; align-items: center; gap: var(--space-6); min-height: 44px; padding: 0; border: 0; background: none; font: inherit; font-size: var(--type-ui-size); font-weight: 600; color: var(--brand-teal-hover); cursor: pointer; }
+.cp-message:hover { color: var(--brand-navy); }
 
 .cp-grid2 { display: flex; flex-direction: column; gap: var(--space-20); }
 .cp-main { display: flex; flex-direction: column; gap: var(--space-16); min-width: 0; }

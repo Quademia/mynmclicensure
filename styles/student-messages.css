@@ -4,8 +4,8 @@
  * page's inline <style> block (student/messages.html), scoped under
  * `.smsg`. The .page-header block is shell.css's. The legacy .toast is
  * the shared one (UI convention #1). The reference card's inline styles
- * are classes here (.ref-head, .ref-section, .ref-option, .ref-answer,
- * .ref-line, .ref-hint). Legacy's own 768px breakpoint: the split
+ * are classes here (.ref-card for a course thread; the question
+ * thread's classes went with it, 08.2). Legacy's own 768px breakpoint: the split
  * stacks, the open conversation hides the list and shows the back arrow.
  */
 
@@ -29,7 +29,6 @@
 .smsg .thread-item .t-preview { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .smsg .thread-item .t-meta { font-size: 11px; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 6px; }
 .smsg .unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); display: inline-block; flex-shrink: 0; }
-.smsg .context-chip { font-size: 10px; padding: 1px 6px; border-radius: 4px; background: var(--primary-light, #edf6f5); color: var(--primary); font-weight: 600; text-transform: uppercase; }
 /* Badges: shape from the shared family in styles/components.css (DS8
    sweep, 2026-09-22). A closed thread is a state, so it takes 6px and
    the danger triple; only this surface's very small size stays. */
@@ -59,12 +58,6 @@
 .smsg .ref-wrap { margin: 12px 16px 0; flex-shrink: 0; }
 .smsg .ref-card { font-size: 12px; color: var(--text-muted); background: var(--primary-light, #edf6f5); padding: 10px 14px; border-radius: 10px; margin: 0 0 8px 0; line-height: 1.5; }
 .smsg .ref-card strong { color: var(--primary); }
-.smsg .ref-head { font-weight: 700; color: var(--primary); margin-bottom: 4px; }
-.smsg .ref-section { margin-top: 8px; font-weight: 600; color: var(--primary); }
-.smsg .ref-option { padding-left: 12px; font-size: 11.5px; }
-.smsg .ref-answer { margin-top: 8px; font-weight: 600; }
-.smsg .ref-line { padding-left: 4px; }
-.smsg .ref-hint { margin-top: 8px; font-size: 11px; color: var(--text-muted); font-style: italic; }
 
 /* ── Bubbles ── */
 .smsg .msg-group { display: flex; flex-direction: column; gap: 2px; margin-bottom: 4px; }
@@ -87,10 +80,10 @@
 .smsg .msg-group.student .msg-time { text-align: right; }
 
 /* ── Closed, compose ── */
-.smsg .closed-banner { padding: 10px 16px; background: #fef2f2; border-top: 1px solid #fecaca; color: #c0392b; font-size: 12px; font-weight: 600; text-align: center; flex-shrink: 0; }
-.smsg .closed-action { text-align: center; padding: 0 16px 12px; background: #fef2f2; }
-.smsg .closed-action button { font-size: 12px; color: var(--accent); background: none; border: none; cursor: pointer; font-weight: 600; text-decoration: underline; font-family: inherit; }
-.smsg .closed-action button:hover { opacity: 0.8; }
+/* a closed thread still takes a reply, which reopens it (08.2) — a note, not a warning */
+.smsg .closed-banner { padding: var(--space-8) var(--space-16); background: var(--surface-page); border-top: 1px solid var(--border); color: var(--ink-muted); font-size: var(--type-meta-size); text-align: center; }
+/* the line "Reopened by a reply." between the bubbles */
+.smsg .msg-system span { font-weight: 400; font-style: italic; }
 .smsg .compose-bar { padding: 12px 16px; border-top: 1px solid var(--border, #e2e8f0); display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0; background: var(--white); }
 .smsg .compose-bar textarea { flex: 1; resize: none; border: 1px solid var(--border, #e2e8f0); border-radius: 10px; padding: 10px 14px; font-size: 13px; font-family: inherit; min-height: 40px; max-height: 120px; line-height: 1.4; }
 .smsg .compose-bar textarea:focus { outline: none; border-color: var(--accent); }
@@ -107,8 +100,8 @@
 @keyframes smsg-fade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 .smsg .new-thread-form { padding: 14px 16px; border-bottom: 1px solid var(--border, #e2e8f0); background: var(--primary-light, #edf6f5); display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
 .smsg .new-thread-form label { font-size: 12px; font-weight: 600; color: var(--primary); }
-.smsg .new-thread-form input { border: 1px solid var(--border, #e2e8f0); border-radius: 8px; padding: 8px 12px; font-size: 13px; font-family: inherit; }
-.smsg .new-thread-form input:focus { outline: none; border-color: var(--accent); }
+.smsg .new-thread-form input, .smsg .new-thread-form select { border: 1px solid var(--border, #e2e8f0); border-radius: 8px; padding: 8px 12px; font-size: 13px; font-family: inherit; }
+.smsg .new-thread-form input:focus, .smsg .new-thread-form select:focus { outline: none; border-color: var(--accent); }
 .smsg .new-thread-form .form-actions { display: flex; gap: 8px; }
 .smsg .new-thread-form .btn-start { padding: 6px 16px; border-radius: 6px; background: var(--accent); color: #fff; border: none; cursor: pointer; font-size: 12px; font-weight: 600; font-family: inherit; }
 .smsg .new-thread-form .btn-start:disabled { opacity: 0.5; cursor: not-allowed; }

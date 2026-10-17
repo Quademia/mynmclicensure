@@ -608,41 +608,42 @@ table by table as each is next changed (AGENTS.md rule 9).
 | Column | Holds |
 |---|---|
 | `thread_id`, `user_id` | The thread and the student |
-| `status` | Open or closed |
-| `context_type`, `course_id`, `subject` | `general` or `course` (old rows: `question`); its subject line |
-| `last_message_at`, `last_sender_role` | The latest message, and who sent it |
+| `status` | `open` or `closed` |
+| `context_type`, `course_id` | The label — `payment`, `account`, `technical`, `course`, `other` — and the course, set exactly for `course` |
+| `last_message_at`, `last_sender_role` | The latest message, and whose (`student` or `admin`) |
+| `student_read_at`, `admin_read_at` | When each side last read it: unread = the other side's message after it |
 | `created_at` | When opened |
-| `admin_id`, `quiz_id`, `question_id`, `attempt_id`, `bulk_batch_id`, `ref_text` | Left from Bulk Send and question feedback |
 
-- *To build — ticked 2026-09-18 (08, the support desk):*
-  `student_read_at` and `admin_read_at` (unread = a later message from
-  the other side); the six leftover columns dropped; checks on the
-  status, context and sender words; live updates on close; writes
-  through the server only.
-- *To build — ticked 2026-10-17 (08, the labels):* `context_type` holds
-  one of five words — `payment`, `account`, `technical`, `course`,
-  `other` — with `course_id` set exactly when it is `course`; `subject`
-  dropped. Old rows: `question` threads deleted with their messages (Sam),
-  `general` becomes `other`. A student's open thread is one per label
-  (per course for `course`): a unique index on the open ones.
-- Browser: the student reads and writes their own threads; an admin all.
-  *Old defaults* — a student can today rewrite a thread's status.
+- Built 2026-10-17 (08.2, ticked 2026-09-18 and 2026-10-17): the read
+  stamps (filled from the old flags), the five labels (old `general`
+  threads became `other`; the `question` threads were deleted with their
+  messages, Sam), the leftover columns dropped (`subject`, `admin_id`,
+  `quiz_id`, `question_id`, `attempt_id`, `bulk_batch_id`, `ref_text`),
+  checks on the words, and the table in the live feed so a close reaches
+  an open page. A new message goes to the newest open thread of its label
+  (a course's: that course) or a new one — not a unique index: a reply
+  into an older closed thread reopens it even when its label has another
+  open thread.
+- Every write is a server-only function: `msg_student_send` (into the
+  student's own thread, or by label — the "Message us" box's one trip),
+  `msg_admin_send`, `msg_admin_start` (New Thread), `msg_set_status`,
+  `msg_mark_read`, and the badges `msg_unread_count` and
+  `msg_admin_unread_count`; ids are made there (`THR_`/`MSG_` + 16 hex).
+- Browser: SELECT only — the student their own threads, an admin all.
 
 ### `messages` — the messages
 | Column | Holds |
 |---|---|
 | `message_id`, `thread_id` | The message and its thread |
-| `sender_id`, `sender_role` | Who sent it |
-| `body_text` | The text |
-| `read_by_user`, `read_by_admin` | Read flags |
+| `sender_id`, `sender_role` | Who sent it: `student`, `admin`, or `system` for the line "Reopened by a reply." |
+| `body_text` | The text, at most 2,000 characters (new messages; old rows unchecked) |
 | `created_at` | When sent |
 
-- *To build — ticked 2026-09-18 (08):* the read flags go (the thread's
-  stamps replace them); at most 2,000 characters; no changes once sent;
-  a `system` sender for the line "reopened by a reply"; writes through
-  the server only.
-- Browser: the thread's student and an admin read and write. *Old
-  defaults* — a student can today edit an admin's reply.
+- Built 2026-10-17 (08.2): the read flags dropped (the thread's stamps
+  replace them); a message cannot be changed once written (a trigger);
+  written only by the functions above — a reply into a closed thread
+  writes the reopen line first.
+- Browser: SELECT only — the thread's student and an admin.
 
 ---
 

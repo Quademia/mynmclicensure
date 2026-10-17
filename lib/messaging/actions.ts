@@ -1,155 +1,101 @@
 // lib/messaging/actions.ts
 //
-// The student side's Server Actions (slice 12a), each behind
-// requireStudent() and writing as the signed-in student — the own-row
-// policies are the floor. Transcribed from legacy
-// js/mynmclicensure-api.js:
-//   ensureThread — reuse an OPEN thread of the same context (general:
-//     the student's; course: the student's for that course), a question
-//     thread is always new; else insert one;
-//   sendMessage — insert the message (read by its own side), then stamp
-//     the thread's last_message_at, last_sender_role and reopen it;
-//   markThreadRead — every unread message on the thread, for the
-//     student's side.
-// Plus the page's reloads: the thread list and one thread's messages.
-//
-// The admin side (reply, close, reopen, New Thread, Bulk Send) is 12b.
+// The student side's Server Actions (08.2; Sam, 2026-09-18 and
+// 2026-10-17), each behind requireStudent(). Every write goes through the
+// database's msg_* functions with the service role, naming the signed-in
+// student: the browser holds no write on either table.
+//   openLabelThreadAction — the newest open thread of a label (a course's:
+//     that course), made when there is none (Messages' "+ New");
+//   sendMessageAction — a message into a thread of the student's own; a
+//     closed one is reopened with the line "Reopened by a reply.";
+//   sendByLabelAction — the "Message us" box: the label's thread found or
+//     made and the message written, in one trip;
+//   markThreadReadAction — the student's read stamp on the thread.
+// Plus the page's reloads: the thread list and one thread's messages,
+// read through the student's own sign-in (the policies decide whose rows).
 
 'use server';
 
 import { requireStudent } from '@/lib/access';
-import { nowIso } from '@/lib/subscriptions/dates';
-import { makeMessageId, makeThreadId } from './ids';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getStudentThread, getStudentThreads, getThreadMessages } from './queries';
 import {
-  CONTEXT_TYPES,
-  MESSAGE_MAX_LEN,
+  isMessageLabel,
+  MESSAGE_REFUSALS,
   type ActionResult,
-  type ContextType,
-  type EnsureThreadResult,
   type Message,
+  type OpenThreadResult,
   type SendMessageResult,
   type StudentThread,
 } from './types';
 
-export type EnsureThreadOpts = {
-  course_id?: string | null;
-  quiz_id?: string | null;
-  question_id?: string | null;
-  attempt_id?: string | null;
-  subject?: string | null;
-  ref_text?: string | null;
-};
+type Reply = { ok?: boolean; code?: string; thread_id?: string; message_id?: string; created?: boolean };
 
-function clean(v: unknown, max = 4000): string | null {
-  const s = String(v ?? '').trim();
-  return s ? s.slice(0, max) : null;
+function refusal(code: string | undefined, fallback: string): string {
+  return MESSAGE_REFUSALS[code ?? ''] ?? fallback;
 }
 
-export async function ensureThreadAction(contextTypeIn: string, opts: EnsureThreadOpts = {}): Promise<EnsureThreadResult> {
-  const { supabase, profile } = await requireStudent();
+function sendReply(data: unknown, error: unknown): SendMessageResult {
+  if (error) return { ok: false, error: 'Could not send your message. Please try again.' };
+  const r = (data ?? {}) as Reply;
+  if (!r.ok || !r.thread_id || !r.message_id) return { ok: false, error: refusal(r.code, 'Could not send your message. Please try again.') };
+  return { ok: true, thread_id: r.thread_id, message_id: r.message_id, created: Boolean(r.created) };
+}
 
-  const ct = String(contextTypeIn || 'general').toLowerCase();
-  const contextType: ContextType = (CONTEXT_TYPES as readonly string[]).includes(ct) ? (ct as ContextType) : 'general';
-  const courseId = clean(opts.course_id, 80);
-
-  // Reuse an open thread (general / course only).
-  if (contextType !== 'question') {
-    let query = supabase
-      .from('messages_threads')
-      .select('thread_id')
-      .eq('user_id', profile.user_id)
-      .eq('status', 'open')
-      .eq('context_type', contextType);
-    if (contextType === 'course' && courseId) query = query.eq('course_id', courseId);
-
-    const { data: existing, error: findError } = await query.order('last_message_at', { ascending: false }).limit(1).maybeSingle();
-    if (findError) {
-      console.error('ensureThreadAction - find:', findError);
-      return { ok: false, error: findError.message };
-    }
-    if (existing) return { ok: true, thread_id: existing.thread_id as string, created: false };
-  }
-
-  const threadId = makeThreadId();
-  const now = nowIso();
-  const { error } = await supabase.from('messages_threads').insert({
-    thread_id: threadId,
-    user_id: profile.user_id,
-    admin_id: 'admin1',
-    status: 'open',
-    context_type: contextType,
-    subject: clean(opts.subject, 200),
-    course_id: courseId,
-    quiz_id: clean(opts.quiz_id, 80),
-    question_id: clean(opts.question_id, 80),
-    attempt_id: clean(opts.attempt_id, 80),
-    bulk_batch_id: null,
-    ref_text: clean(opts.ref_text, 6000),
-    created_at: now,
-    last_message_at: now,
-    last_sender_role: 'student',
+export async function openLabelThreadAction(label: string, courseId: string | null): Promise<OpenThreadResult> {
+  const { profile } = await requireStudent();
+  if (!isMessageLabel(label)) return { ok: false, error: refusal('bad_label', 'Choose what your message is about.') };
+  const { data, error } = await createServiceRoleClient().rpc('msg_thread_for', {
+    p_user_id: profile.user_id,
+    p_label: label,
+    p_course_id: label === 'course' ? courseId : null,
+    p_by: 'student',
   });
-  if (error) {
-    console.error('ensureThreadAction - insert:', error);
-    return { ok: false, error: error.message };
-  }
-  return { ok: true, thread_id: threadId, created: true };
+  if (error) return { ok: false, error: 'Could not open the conversation. Please try again.' };
+  const r = (data ?? {}) as Reply;
+  if (!r.ok || !r.thread_id) return { ok: false, error: refusal(r.code, 'Could not open the conversation. Please try again.') };
+  return { ok: true, thread_id: r.thread_id, created: Boolean(r.created) };
 }
 
-export async function sendMessageAction(threadIdIn: string, bodyIn: string): Promise<SendMessageResult> {
-  const { supabase, profile } = await requireStudent();
-
+export async function sendMessageAction(threadIdIn: string, body: string): Promise<SendMessageResult> {
+  const { profile } = await requireStudent();
   const threadId = String(threadIdIn || '').trim();
-  const body = String(bodyIn || '').trim();
-  if (!threadId) return { ok: false, error: 'Thread is required' };
-  if (!body) return { ok: false, error: 'Message cannot be empty.' };
-  if (body.length > MESSAGE_MAX_LEN) return { ok: false, error: `Message is over ${MESSAGE_MAX_LEN} characters.` };
-
-  // The student's own thread only (the policy is the floor; the read
-  // names the scope).
-  const thread = await getStudentThread(supabase, profile.user_id, threadId);
-  if (!thread) return { ok: false, error: 'Conversation not found.' };
-
-  const messageId = makeMessageId();
-  const now = nowIso();
-  const { error } = await supabase.from('messages').insert({
-    message_id: messageId,
-    thread_id: threadId,
-    sender_id: profile.user_id,
-    sender_role: 'student',
-    body_text: body,
-    created_at: now,
-    read_by_user: true,
-    read_by_admin: false,
+  if (!threadId) return { ok: false, error: refusal('no_thread', 'This conversation could not be found.') };
+  const { data, error } = await createServiceRoleClient().rpc('msg_student_send', {
+    p_user_id: profile.user_id,
+    p_thread_id: threadId,
+    p_label: null,
+    p_course_id: null,
+    p_body: String(body ?? ''),
   });
-  if (error) {
-    console.error('sendMessageAction:', error);
-    return { ok: false, error: error.message };
-  }
+  return sendReply(data, error);
+}
 
-  const { error: stampError } = await supabase
-    .from('messages_threads')
-    .update({ last_message_at: now, last_sender_role: 'student', status: 'open' })
-    .eq('thread_id', threadId)
-    .eq('user_id', profile.user_id);
-  if (stampError) console.error('sendMessageAction - stamp:', stampError);
-
-  return { ok: true, message_id: messageId };
+export async function sendByLabelAction(label: string, courseId: string | null, body: string): Promise<SendMessageResult> {
+  const { profile } = await requireStudent();
+  if (!isMessageLabel(label)) return { ok: false, error: refusal('bad_label', 'Choose what your message is about.') };
+  const { data, error } = await createServiceRoleClient().rpc('msg_student_send', {
+    p_user_id: profile.user_id,
+    p_thread_id: null,
+    p_label: label,
+    p_course_id: label === 'course' ? courseId : null,
+    p_body: String(body ?? ''),
+  });
+  return sendReply(data, error);
 }
 
 export async function markThreadReadAction(threadIdIn: string): Promise<ActionResult> {
-  const { supabase, profile } = await requireStudent();
+  const { profile } = await requireStudent();
   const threadId = String(threadIdIn || '').trim();
   if (!threadId) return { ok: false, error: 'Thread is required' };
-
-  const thread = await getStudentThread(supabase, profile.user_id, threadId);
-  if (!thread) return { ok: false, error: 'Conversation not found.' };
-
-  const { error } = await supabase.from('messages').update({ read_by_user: true }).eq('thread_id', threadId).eq('read_by_user', false);
+  const { error } = await createServiceRoleClient().rpc('msg_mark_read', {
+    p_thread_id: threadId,
+    p_side: 'student',
+    p_user_id: profile.user_id,
+  });
   if (error) {
     console.error('markThreadReadAction:', error);
-    return { ok: false, error: error.message };
+    return { ok: false, error: 'Could not mark the conversation read.' };
   }
   return { ok: true };
 }

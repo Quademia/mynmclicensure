@@ -4,8 +4,8 @@
 // B): the app's dialog, a reason from a dropdown, an optional note — a
 // note required for Something else — and Send. The sitting stays where it
 // is; in a timed exam its clock runs on. "I don't understand the answer"
-// sends no report: it opens Messages in a new tab with the question
-// quoted. A second report on the same question while the first is open
+// sends no report: it hands over to the "Message us" box (08.2), the
+// question quoted in its draft, the sitting staying where it is. A second report on the same question while the first is open
 // is refused by the database, and the box then says so — as it does at
 // once for a question already reported in this sitting.
 //
@@ -31,7 +31,7 @@ export function ReportIssueDialog({
   attemptId,
   itemId,
   chosen,
-  messagesHref,
+  onAsk,
   alreadyAt,
   onSent,
   onAlready,
@@ -41,8 +41,8 @@ export function ReportIssueDialog({
   attemptId: string;
   itemId: string;
   chosen: string | string[] | null;
-  /** Messages, the course's thread, with the question quoted in the draft. */
-  messagesHref: string;
+  /** "I don't understand the answer": the caller opens the Message us box. */
+  onAsk: () => void;
   /** When this question was reported earlier in the sitting (or refused as already). */
   alreadyAt: string | null;
   onSent: () => void;
@@ -66,8 +66,8 @@ export function ReportIssueDialog({
     if (sending) return;
     if (!reason) return setError('Choose a reason.');
     if (reason === DONT_UNDERSTAND) {
-      window.open(messagesHref, '_blank');
-      return close();
+      close();
+      return onAsk();
     }
     if (reason === 'other' && !note.trim()) return setError('Tell us what the issue is.');
     setError(null);
@@ -122,7 +122,7 @@ export function ReportIssueDialog({
           </select>
         </label>
         {asking ? (
-          <p className="rpt-ask">Ask us in Messages: we&apos;ll open it in a new tab with this question quoted. Your sitting stays here.</p>
+          <p className="rpt-ask">Ask us: a message box opens with this question quoted, and your sitting stays here. We reply in Messages.</p>
         ) : (
           <label className="dlg-field">
             {reason === 'other' ? "What's the issue?" : 'Anything to add? (optional)'}

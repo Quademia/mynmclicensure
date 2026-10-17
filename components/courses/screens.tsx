@@ -12,7 +12,7 @@ import { AppLink } from '@/components/shell/link-pending';
 import { PageHeader } from '@/components/shell/page-header';
 import { AnnouncementBody } from '@/components/announcements/announcement-body';
 import { LaunchButton } from '@/components/practice-papers/paper-actions';
-import { Icon } from '@/components/shell/icons';
+import { MessageUsButton } from '@/components/messages/message-us';
 import { CourseChip, CourseHeading, CourseTabs } from './course-header';
 import { courseLine, formatDay, heldUntil, resultsLine, resumable, scoredPaper, shortName } from '@/lib/practice-papers/derive';
 import type { CoursePageData, MyCourses } from '@/lib/courses/queries';
@@ -126,9 +126,9 @@ export function CourseScreen({ data }: { data: CoursePageData }) {
       />
 
       <CourseHeading title={c.title} access={c.access} days={s.days} expires={s.expires} ended={ended}>
-        <AppLink href={`/student/messages?course_id=${id}`} className="cp-message">
-          <Icon name="message" />Message us about this course
-        </AppLink>
+        <MessageUsButton label="course" courseId={c.course_id} courseTitle={c.title} className="cp-message">
+          Message us about this course
+        </MessageUsButton>
       </CourseHeading>
 
       {c.access === 'none' ? <EndedNote ended={ended} /> : null}

@@ -1,28 +1,22 @@
 // app/(app)/admin/messages/messages-client.tsx
 //
-// The script block of legacy admin/messages.html (slice 12b): the
-// filters bar (a student search debounced 300 ms, type and status on
-// the server; "unread only" in the browser), the thread list (the
-// student's name and programme, the label, the quoted question for a
-// question thread, the preview, the relative time, the context and
-// Closed chips, the unread dot), the conversation pane (the student's
-// name, the context chip, Close thread / Reopen, the reference card —
-// with the question id for a question thread — the flat feed with date
-// dividers, "You (Admin)" on the admin's own lines, links made
-// clickable, the closed banner, the compose bar with Enter to send),
-// the realtime feed on the open thread for a student's message, the
-// New Thread dialog (student search or a pasted id, the student's
-// courses as a picker, general or course context, subject, the unused
-// "Ref text" field legacy showed, the message, "Send (N threads)"),
-// and the Bulk Send dialog (five multi-select pickers, Preview count,
-// the count line, the confirmation line, general or course context
-// with the thread course, subject, message, "Send to all"). After a
-// change the list reloads and the sidebar's badge follows through a
-// route refresh.
-//
-// Changed on the way: the page's toast is the shared one (UI
-// convention #1); the two dialogs are portalled to <body>; the
-// realtime subscription names this product's schema.
+// The admin's Messages (slice 12b's page on 08.2's rules; Sam, 2026-09-18
+// and 2026-10-17 — the inbox paged is step 4): the filters bar (a student
+// search debounced 300 ms, label and status on the server; "unread only"
+// in the browser), the thread list (the student's name and programme, the
+// thread's label or course, the preview, the relative time, the Closed
+// chip, the unread dot), the conversation pane (the student's name, the
+// label, Close thread / Reopen, the course card, the flat feed with date
+// dividers, "You (Admin)" on Quademia's lines, the line "Reopened by a
+// reply.", links made clickable, the compose bar with Enter to send — a
+// closed thread still takes a reply, which reopens it), the realtime feed
+// on the open thread for a student's message, and the New Thread dialog
+// (student search or a pasted id, one of the five labels, the student's
+// courses as a picker for "A course", the message, "Send (N threads)").
+// Every write is a Server Action into the database's msg_* functions.
+// Bulk Send went (Sam, 2026-09-18: announcements are the broadcast).
+// After a change the list reloads and the sidebar's badge follows through
+// a route refresh.
 
 'use client';
 
@@ -36,17 +30,15 @@ import {
   adminMarkThreadReadAction,
   adminSendMessageAction,
   adminThreadMessagesAction,
-  bulkSendAction,
   closeThreadAction,
   listAdminThreadsAction,
   newThreadAction,
-  previewRecipientsAction,
   reopenThreadAction,
   searchStudentsForMessagingAction,
   studentCoursesAction,
 } from '@/lib/messaging/admin-actions';
-import { EMPTY_ADMIN_FILTERS, type AdminThread, type AdminThreadFilters, type RecipientScope, type StudentHit, type ThreadUser } from '@/lib/messaging/admin-queries';
-import type { Message } from '@/lib/messaging/types';
+import { EMPTY_ADMIN_FILTERS, type AdminThread, type AdminThreadFilters, type StudentHit, type ThreadUser } from '@/lib/messaging/admin-queries';
+import { labelWords, MESSAGE_LABELS, MESSAGE_MAX_LEN, type Message } from '@/lib/messaging/types';
 
 type Msg = { text: string; tone: 'error' | 'success' } | null;
 
@@ -117,25 +109,6 @@ function linkify(s: string): React.ReactNode[] {
   if (last < s.length) out.push(s.slice(last));
   return out;
 }
-function RefText({ raw }: { raw: string }) {
-  const lines = raw.split('\n').map((l) => l.trim()).filter(Boolean);
-  return (
-    <>
-      {lines.map((line, i) => {
-        if (line.startsWith('Quademia') || line.startsWith('QAcademy')) return <div key={i} className="ref-head">{line}</div>;
-        if (line === 'Question:' || line === 'Options (as shown):') return <div key={i} className="ref-section">{line}</div>;
-        if (/^(Course|Question|Topic):/.test(line)) {
-          const [label, ...rest] = line.split(':');
-          return <div key={i}><strong>{label}:</strong> {rest.join(':').trim()}</div>;
-        }
-        if (/^[A-H]\.\s/.test(line)) return <div key={i} className="ref-option">{line}</div>;
-        if (line.startsWith('My answer:')) return <div key={i} className="ref-answer"><strong>My answer:</strong> {line.replace('My answer:', '').trim()}</div>;
-        return <div key={i} className="ref-line">{line}</div>;
-      })}
-    </>
-  );
-}
-
 // ── the multi-select pill picker (legacy msInit) ──
 function MultiPicker({ items, selected, placeholder, onChange }: { items: PickItem[]; selected: string[]; placeholder: string; onChange: (next: string[]) => void }) {
   const [open, setOpen] = useState(false);
@@ -177,15 +150,9 @@ function MultiPicker({ items, selected, placeholder, onChange }: { items: PickIt
 
 export function AdminMessagesClient({
   courses,
-  programs,
-  levels,
-  cohorts,
   initialThreads,
 }: {
   courses: CourseBit[];
-  programs: string[];
-  levels: string[];
-  cohorts: string[];
   initialThreads: AdminThread[];
 }) {
   const router = useRouter();
@@ -249,10 +216,8 @@ export function AdminMessagesClient({
 
   function threadLabel(t: AdminThread | null): string {
     if (!t) return 'Conversation';
-    if (t.subject) return t.subject;
     if (t.context_type === 'course' && t.course_id) return courseTitles[t.course_id] || t.course_id;
-    if (t.context_type === 'question') return 'Question feedback';
-    return 'General';
+    return labelWords(t.context_type);
   }
 
   const scrollToBottom = useCallback(() => {
@@ -322,14 +287,18 @@ export function AdminMessagesClient({
     const text = compose.trim();
     if (!text || !activeId || sending) return;
     setSending(true);
-    const result = await adminSendMessageAction(activeId, text);
-    if (result.ok) {
-      setCompose('');
-      setMessages(await adminThreadMessagesAction(activeId));
-      window.setTimeout(scrollToBottom, 0);
-      await loadThreads();
-    } else {
-      setMsg({ text: 'Could not send message.', tone: 'error' });
+    try {
+      const result = await adminSendMessageAction(activeId, text);
+      if (result.ok) {
+        setCompose('');
+        setMessages(await adminThreadMessagesAction(activeId));
+        window.setTimeout(scrollToBottom, 0);
+        await loadThreads();
+      } else {
+        setMsg({ text: result.error, tone: 'error' });
+      }
+    } catch {
+      setMsg({ text: 'Could not send the reply. Please check your connection and try again.', tone: 'error' });
     }
     setSending(false);
   }
@@ -364,12 +333,10 @@ export function AdminMessagesClient({
   const [ntSelected, setNtSelected] = useState<StudentHit | null>(null);
   const [ntManualId, setNtManualId] = useState('');
   const ntManualTimer = useRef<number | null>(null);
-  const [ntContext, setNtContext] = useState<'general' | 'course'>('general');
+  const [ntLabel, setNtLabel] = useState('');
   const [ntCourseItems, setNtCourseItems] = useState<PickItem[]>([]);
   const [ntCourseHint, setNtCourseHint] = useState('Select a student first to load their courses.');
   const [ntCourses, setNtCourses] = useState<string[]>([]);
-  const [ntSubject, setNtSubject] = useState('');
-  const [ntRefText, setNtRefText] = useState('');
   const [ntBody, setNtBody] = useState('');
   const [ntSending, setNtSending] = useState(false);
 
@@ -379,12 +346,10 @@ export function AdminMessagesClient({
     setNtResults(null);
     setNtSelected(null);
     setNtManualId('');
-    setNtContext('general');
+    setNtLabel('');
     setNtCourseItems([]);
     setNtCourses([]);
     setNtCourseHint('Select a student first to load their courses.');
-    setNtSubject('');
-    setNtRefText('');
     setNtBody('');
   }
 
@@ -426,8 +391,8 @@ export function AdminMessagesClient({
   }
 
   const ntUserId = ntSelected?.user_id || ntManualId.trim();
-  const ntReady = Boolean(ntUserId) && Boolean(ntBody.trim()) && (ntContext !== 'course' || ntCourses.length > 0);
-  const ntSendLabel = ntSending ? 'Sending...' : ntContext === 'course' && ntCourses.length > 1 ? `Send (${ntCourses.length} threads)` : 'Send';
+  const ntReady = Boolean(ntUserId) && Boolean(ntLabel) && Boolean(ntBody.trim()) && (ntLabel !== 'course' || ntCourses.length > 0);
+  const ntSendLabel = ntSending ? 'Sending...' : ntLabel === 'course' && ntCourses.length > 1 ? `Send (${ntCourses.length} threads)` : 'Send';
 
   async function handleNewThread() {
     if (!ntUserId) return;
@@ -435,12 +400,19 @@ export function AdminMessagesClient({
       setMsg({ text: 'Message cannot be empty.', tone: 'error' });
       return;
     }
-    if (ntContext === 'course' && !ntCourses.length) {
+    if (ntLabel === 'course' && !ntCourses.length) {
       setMsg({ text: 'Select at least one course.', tone: 'error' });
       return;
     }
     setNtSending(true);
-    const result = await newThreadAction({ userId: ntUserId, contextType: ntContext, courseIds: ntCourses, subject: ntSubject.trim(), body: ntBody.trim() });
+    let result: Awaited<ReturnType<typeof newThreadAction>>;
+    try {
+      result = await newThreadAction({ userId: ntUserId, label: ntLabel, courseIds: ntCourses, body: ntBody.trim() });
+    } catch {
+      setNtSending(false);
+      setMsg({ text: 'Could not start the conversation. Please check your connection and try again.', tone: 'error' });
+      return;
+    }
     setNtSending(false);
     if (!result.ok) {
       setMsg({ text: result.error, tone: 'error' });
@@ -450,87 +422,6 @@ export function AdminMessagesClient({
     setMsg({ text: result.threadCount > 1 ? `${result.threadCount} threads created.` : 'Thread created.', tone: 'success' });
     await loadThreads();
     await openThread(result.lastThreadId);
-  }
-
-  // ── the Bulk Send dialog ──
-  const [bulkOpen, setBulkOpen] = useState(false);
-  const [bkProgrammes, setBkProgrammes] = useState<string[]>([]);
-  const [bkLevels, setBkLevels] = useState<string[]>([]);
-  const [bkCohorts, setBkCohorts] = useState<string[]>([]);
-  const [bkKinds, setBkKinds] = useState<string[]>([]);
-  const [bkCourseScopes, setBkCourseScopes] = useState<string[]>([]);
-  const [bkPreview, setBkPreview] = useState<number | null>(null);
-  const [bkContext, setBkContext] = useState<'general' | 'course'>('general');
-  const [bkCourse, setBkCourse] = useState('');
-  const [bkSubject, setBkSubject] = useState('');
-  const [bkBody, setBkBody] = useState('');
-  const [bkSending, setBkSending] = useState(false);
-
-  function openBulk() {
-    setBulkOpen(true);
-    setBkProgrammes([]);
-    setBkLevels([]);
-    setBkCohorts([]);
-    setBkKinds([]);
-    setBkCourseScopes([]);
-    setBkPreview(null);
-    setBkContext('general');
-    setBkCourse('');
-    setBkSubject('');
-    setBkBody('');
-  }
-
-  function bulkScope(): RecipientScope {
-    const scope: RecipientScope = {};
-    if (bkProgrammes.length) scope.program_ids = bkProgrammes;
-    if (bkLevels.length) scope.level_ids = bkLevels;
-    if (bkCohorts.length) scope.cohort_ids = bkCohorts;
-    if (bkKinds.length) scope.subscription_kinds = bkKinds;
-    if (bkCourseScopes.length) scope.course_ids = bkCourseScopes;
-    return scope;
-  }
-
-  // Any picker change clears the preview, as legacy did.
-  function pick(setter: (v: string[]) => void) {
-    return (v: string[]) => {
-      setter(v);
-      setBkPreview(null);
-    };
-  }
-
-  async function previewRecipients() {
-    setBkPreview(await previewRecipientsAction(bulkScope()));
-  }
-
-  async function handleBulkSend() {
-    if (!bkBody.trim()) {
-      setMsg({ text: 'Message cannot be empty.', tone: 'error' });
-      return;
-    }
-    if (bkPreview === null) {
-      setMsg({ text: 'Preview first: click "Preview count" to see how many students will receive this.', tone: 'error' });
-      return;
-    }
-    if (bkPreview === 0) {
-      setMsg({ text: 'No recipients match your filters.', tone: 'error' });
-      return;
-    }
-    setBkSending(true);
-    const result = await bulkSendAction({
-      subject: bkSubject.trim(),
-      body: bkBody.trim(),
-      scope: bulkScope(),
-      contextType: bkContext,
-      courseId: bkContext === 'course' ? bkCourse || null : null,
-    });
-    setBkSending(false);
-    if (!result.ok) {
-      setMsg({ text: result.error || 'Could not send.', tone: 'error' });
-      return;
-    }
-    setMsg({ text: `Message sent to ${result.count} student${result.count !== 1 ? 's' : ''}.`, tone: 'success' });
-    setBulkOpen(false);
-    await loadThreads();
   }
 
   // ── derived for the pane ──
@@ -555,17 +446,16 @@ export function AdminMessagesClient({
           <h1>Messages</h1>
           <div className="header-actions">
             <button type="button" className="btn-action accent" onClick={openNewThread}>+ New Thread</button>
-            <button type="button" className="btn-action" onClick={openBulk}>Bulk Send</button>
           </div>
         </div>
 
         <div className="filters-bar">
-          <input type="text" id="filterSearch" placeholder="Search name, email, or question text..." value={searchText} onChange={(e) => onSearchChange(e.target.value)} />
+          <input type="text" id="filterSearch" placeholder="Search name or email..." value={searchText} onChange={(e) => onSearchChange(e.target.value)} />
           <select id="filterContext" value={filters.contextType} onChange={(e) => applyFilter({ contextType: e.target.value })}>
-            <option value="">All types</option>
-            <option value="general">General</option>
-            <option value="course">Course</option>
-            <option value="question">Question</option>
+            <option value="">All labels</option>
+            {MESSAGE_LABELS.map((l) => (
+              <option key={l.value} value={l.value}>{l.label}</option>
+            ))}
           </select>
           <select id="filterStatus" value={filters.status} onChange={(e) => applyFilter({ status: e.target.value })}>
             <option value="">All status</option>
@@ -597,11 +487,9 @@ export function AdminMessagesClient({
                         {programme ? <span className="t-programme">{programme}</span> : null}
                       </div>
                       <div className="t-label">{threadLabel(t)}</div>
-                      {t.context_type === 'question' && t.ref_text ? <div className="t-preview t-ref">{truncate(t.ref_text, 50)}</div> : null}
                       <div className="t-preview">{t.latest ? truncate(t.latest.body_text, 55) : 'No messages'}</div>
                       <div className="t-meta">
                         <span>{t.latest ? formatTime(t.latest.created_at, now) : ''}</span>
-                        {t.context_type !== 'general' ? <span className="context-chip">{t.context_type}</span> : null}
                         {t.status === 'closed' ? <span className="badge closed">Closed</span> : null}
                       </div>
                     </div>
@@ -624,7 +512,7 @@ export function AdminMessagesClient({
                   <div className="convo-header-left">
                     <button type="button" className="back-btn" onClick={closeConvo}>&#8592;</button>
                     <h3>{activeName || 'Conversation'}</h3>
-                    {active.context_type !== 'general' ? <span className="context-chip">{active.context_type}</span> : null}
+                    <span className="context-chip">{threadLabel(active)}</span>
                   </div>
                   <div className="convo-actions">
                     {active.status === 'open' ? (
@@ -635,15 +523,7 @@ export function AdminMessagesClient({
                   </div>
                 </div>
 
-                {active.context_type === 'question' ? (
-                  <div className="ref-wrap">
-                    <div className="ref-card">
-                      {active.question_id ? <div className="ref-id"><strong>ID:</strong> <code>{active.question_id}</code></div> : null}
-                      {active.ref_text ? <RefText raw={active.ref_text} /> : active.course_id ? <><strong>Course:</strong> {courseTitles[active.course_id] || active.course_id}</> : null}
-                      <div className="ref-hint">Reply with a fix or explanation. Mention what part is wrong (stem or option) and what should change.</div>
-                    </div>
-                  </div>
-                ) : active.context_type === 'course' && active.course_id ? (
+                {active.context_type === 'course' && active.course_id ? (
                   <div className="ref-wrap"><div className="ref-card"><strong>Course:</strong> {courseTitles[active.course_id] || active.course_id}</div></div>
                 ) : null}
 
@@ -655,6 +535,9 @@ export function AdminMessagesClient({
                       <div key={b.label + b.items[0].message_id}>
                         <div className="date-divider"><span>{b.label}</span></div>
                         {b.items.map((m) => {
+                          if (m.sender_role === 'system') {
+                            return <div key={m.message_id} className="feed-system">{m.body_text}</div>;
+                          }
                           const isAdmin = m.sender_role === 'admin';
                           return (
                             <div key={m.message_id} className={`feed-msg${isAdmin ? ' is-admin' : ''}`}>
@@ -676,14 +559,13 @@ export function AdminMessagesClient({
                   )}
                 </div>
 
-                {active.status === 'closed' ? (
-                  <div className="closed-banner">This thread is closed.</div>
-                ) : (
-                  <div className="compose-bar">
+                {active.status === 'closed' ? <div className="closed-banner">This thread is closed. A reply reopens it.</div> : null}
+                <div className="compose-bar">
                     <textarea
                       ref={composeRef}
                       placeholder="Type a reply..."
                       rows={1}
+                      maxLength={MESSAGE_MAX_LEN}
                       value={compose}
                       onChange={(e) => {
                         setCompose(e.target.value);
@@ -699,7 +581,6 @@ export function AdminMessagesClient({
                     />
                     <button type="button" className="btn-send" disabled={sending || !compose.trim()} onClick={() => void handleSend()}>Send</button>
                   </div>
-                )}
               </div>
             )}
           </div>
@@ -750,13 +631,15 @@ export function AdminMessagesClient({
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="ntContext">Thread context</label>
-                    <select id="ntContext" value={ntContext} onChange={(e) => setNtContext(e.target.value as 'general' | 'course')}>
-                      <option value="general">General</option>
-                      <option value="course">Course</option>
+                    <label htmlFor="ntLabel">About</label>
+                    <select id="ntLabel" value={ntLabel} onChange={(e) => setNtLabel(e.target.value)}>
+                      <option value="" disabled>Choose one</option>
+                      {MESSAGE_LABELS.map((l) => (
+                        <option key={l.value} value={l.value}>{l.label}</option>
+                      ))}
                     </select>
                   </div>
-                  {ntContext === 'course' ? (
+                  {ntLabel === 'course' ? (
                     <div className="form-group">
                       <label>Course</label>
                       <MultiPicker items={ntCourseItems} selected={ntCourses} placeholder={ntCourseItems.length ? 'Select courses' : 'No courses'} onChange={setNtCourses} />
@@ -764,19 +647,9 @@ export function AdminMessagesClient({
                     </div>
                   ) : null}
                 </div>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="ntSubject">Subject (optional)</label>
-                    <input id="ntSubject" type="text" placeholder="Short title..." value={ntSubject} onChange={(e) => setNtSubject(e.target.value)} />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="ntRefText">Ref text (optional)</label>
-                    <input id="ntRefText" type="text" placeholder="Optional reference..." value={ntRefText} onChange={(e) => setNtRefText(e.target.value)} />
-                  </div>
-                </div>
                 <div className="form-group">
                   <label htmlFor="ntBody">Message</label>
-                  <textarea id="ntBody" placeholder="Type your message..." value={ntBody} onChange={(e) => setNtBody(e.target.value)} />
+                  <textarea id="ntBody" placeholder="Type your message..." maxLength={MESSAGE_MAX_LEN} value={ntBody} onChange={(e) => setNtBody(e.target.value)} />
                 </div>
               </div>
               <div className="modal-footer">
@@ -786,66 +659,6 @@ export function AdminMessagesClient({
             </div>
           </div>
 
-          {/* Bulk Send */}
-          <div className={`modal-overlay${bulkOpen ? ' open' : ''}`}>
-            <div className="modal" role="dialog" aria-modal="true" aria-labelledby="bulkTitle">
-              <div className="modal-header">
-                <h2 id="bulkTitle">Bulk Send Message</h2>
-                <button type="button" className="modal-close" onClick={() => setBulkOpen(false)}>&times;</button>
-              </div>
-              <div className="modal-body">
-                <div className="form-row">
-                  <div className="form-group"><label>Programme</label><MultiPicker items={programs.map((p) => ({ value: p, label: p }))} selected={bkProgrammes} placeholder="All programmes" onChange={pick(setBkProgrammes)} /></div>
-                  <div className="form-group"><label>Level</label><MultiPicker items={levels.map((l) => ({ value: l, label: l }))} selected={bkLevels} placeholder="All levels" onChange={pick(setBkLevels)} /></div>
-                </div>
-                <div className="form-row">
-                  <div className="form-group"><label>Cohort</label><MultiPicker items={cohorts.map((c) => ({ value: c, label: c }))} selected={bkCohorts} placeholder="All cohorts" onChange={pick(setBkCohorts)} /></div>
-                  <div className="form-group"><label>Subscription Kind</label><MultiPicker items={[{ value: 'PAID', label: 'Paid' }, { value: 'TRIAL', label: 'Trial' }, { value: 'FREE', label: 'Free' }]} selected={bkKinds} placeholder="All kinds" onChange={pick(setBkKinds)} /></div>
-                </div>
-                <div className="form-row">
-                  <div className="form-group"><label>Course entitlement</label><MultiPicker items={courses.map((c) => ({ value: c.course_id, label: c.title }))} selected={bkCourseScopes} placeholder="All courses" onChange={pick(setBkCourseScopes)} /></div>
-                  <div className="form-group form-group-end"><button type="button" className="btn-sm" onClick={() => void previewRecipients()}>Preview count</button></div>
-                </div>
-                {bkPreview !== null ? <div className="preview-count">{bkPreview} recipient{bkPreview !== 1 ? 's' : ''} will receive this message</div> : null}
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="bulkContext">Thread context</label>
-                    <select id="bulkContext" value={bkContext} onChange={(e) => setBkContext(e.target.value as 'general' | 'course')}>
-                      <option value="general">General</option>
-                      <option value="course">Course</option>
-                    </select>
-                  </div>
-                  {bkContext === 'course' ? (
-                    <div className="form-group">
-                      <label htmlFor="bulkCourse">Thread course</label>
-                      <select id="bulkCourse" value={bkCourse} onChange={(e) => setBkCourse(e.target.value)}>
-                        <option value="">Select course</option>
-                        {courses.map((c) => (
-                          <option key={c.course_id} value={c.course_id}>{c.title}</option>
-                        ))}
-                      </select>
-                    </div>
-                  ) : null}
-                </div>
-                <div className="form-group">
-                  <label htmlFor="bulkSubject">Subject (optional)</label>
-                  <input id="bulkSubject" type="text" placeholder="e.g. Exam schedule update" value={bkSubject} onChange={(e) => setBkSubject(e.target.value)} />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="bulkBody">Message</label>
-                  <textarea id="bulkBody" placeholder="Type your message..." value={bkBody} onChange={(e) => setBkBody(e.target.value)} />
-                </div>
-                {bkPreview !== null && bkPreview > 0 ? (
-                  <div className="confirm-box"><strong>Are you sure?</strong> This will send to <span>{bkPreview}</span> students.</div>
-                ) : null}
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn-sm" onClick={() => setBulkOpen(false)}>Cancel</button>
-                <button type="button" className="btn-action" disabled={bkSending} onClick={() => void handleBulkSend()}>{bkSending ? 'Sending...' : 'Send to all'}</button>
-              </div>
-            </div>
-          </div>
         </div>
       </BodyPortal>
     </div>

@@ -1,45 +1,44 @@
 // lib/messaging/queries.ts
 //
-// The student side's reads (slice 12a), transcribed one for one from
-// legacy js/mynmclicensure-api.js: getStudentThreads (every thread,
-// newest activity first, each with its latest message for the
-// preview), getThreadMessages (oldest first), getUnreadCountForUser
-// (open threads with at least one message the student has not read —
-// the sidebar's badge). Each takes the caller's per-request client —
-// the student's own-row policies are the floor — and, as legacy, fails
-// open: an error is logged and an empty result returned.
+// The student side's reads (08.2): every thread, newest activity first,
+// each with its latest message for the preview and whether Quademia's
+// last reply is unread (the thread's read stamps); one thread's messages,
+// oldest first; and the badge — one count in the database
+// (msg_unread_count). The thread and message reads take the caller's
+// per-request client, so the student's own-row policies are the floor,
+// name their columns, and fail open: an error is logged and an empty
+// result returned.
 //
 // RLS is the floor, not the filter (AGENTS.md): every read names the
-// student.
-//
-// D52 (2026-09-26; AGENTS.md rule 10): the list's preview read takes
-// every message of every thread the student holds, which a long-standing
-// student can take past the API's 1,000-row cap — readAll().
+// student. D52 (rule 10): the list's preview read takes every message of
+// every thread the student holds — readAll().
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import { readAll } from '@/lib/supabase/read-all';
-import type { LatestMessage, Message, StudentThread, Thread } from './types';
+import { createServiceRoleClient } from '@/lib/supabase/server';
+import { MESSAGE_COLUMNS, THREAD_COLUMNS, unreadFor, type LatestMessage, type Message, type StudentThread, type Thread } from './types';
 
 // ── getStudentThreads ──────────────────────────────────────────────────
 export async function getStudentThreads(db: ServerSupabaseClient, userId: string): Promise<StudentThread[]> {
   const { data, error } = await db
     .from('messages_threads')
-    .select('*')
+    .select(THREAD_COLUMNS)
     .eq('user_id', userId)
     .order('last_message_at', { ascending: false });
   if (error) {
     console.error('getStudentThreads:', error);
     return [];
   }
-  const threads = (data ?? []) as Thread[];
+  const threads = (data ?? []) as unknown as Thread[];
   if (!threads.length) return [];
 
   const ids = threads.map((t) => t.thread_id);
   const { data: msgs, error: msgError } = await readAll<LatestMessage>((from, to) =>
     db
       .from('messages')
-      .select('thread_id, body_text, sender_role, created_at, read_by_user, read_by_admin')
+      .select('thread_id, body_text, sender_role, created_at')
       .in('thread_id', ids)
+      .neq('sender_role', 'system')
       .order('created_at', { ascending: false })
       .order('message_id')
       .range(from, to),
@@ -50,47 +49,40 @@ export async function getStudentThreads(db: ServerSupabaseClient, userId: string
   for (const m of msgs ?? []) {
     if (!latest[m.thread_id]) latest[m.thread_id] = m;
   }
-  return threads.map((t) => ({ ...t, latest: latest[t.thread_id] ?? null }));
+  return threads.map((t) => ({ ...t, latest: latest[t.thread_id] ?? null, unread: unreadFor(t, 'student') }));
 }
 
 // ── getThreadMessages ──────────────────────────────────────────────────
 export async function getThreadMessages(db: ServerSupabaseClient, threadId: string): Promise<Message[]> {
-  const { data, error } = await db.from('messages').select('*').eq('thread_id', threadId).order('created_at', { ascending: true });
+  const { data, error } = await db
+    .from('messages')
+    .select(MESSAGE_COLUMNS)
+    .eq('thread_id', threadId)
+    .order('created_at', { ascending: true })
+    .order('message_id');
   if (error) {
     console.error('getThreadMessages:', error);
     return [];
   }
-  return (data ?? []) as Message[];
+  return (data ?? []) as unknown as Message[];
 }
 
-// ── getUnreadCountForUser (the student sidebar's badge) ────────────────
-// Legacy: the student's OPEN threads, then the distinct ones holding a
-// message not yet read by the student — the sender is not checked, so a
-// thread the student just wrote to counts until the page marks it (the
-// page itself counts only unread admin replies; both carried).
-export async function getUnreadCountForUser(db: ServerSupabaseClient, userId: string): Promise<number> {
-  const { data: threads, error } = await db.from('messages_threads').select('thread_id').eq('user_id', userId).eq('status', 'open');
+// ── the student's badge: open threads with an unread reply ─────────────
+export async function getUnreadCountForUser(userId: string): Promise<number> {
+  const { data, error } = await createServiceRoleClient().rpc('msg_unread_count', { p_user_id: userId });
   if (error) {
     console.error('getUnreadCountForUser:', error);
     return 0;
   }
-  const ids = (threads ?? []).map((t) => t.thread_id as string);
-  if (!ids.length) return 0;
-
-  const { data: unread, error: unreadError } = await db.from('messages').select('thread_id').in('thread_id', ids).eq('read_by_user', false);
-  if (unreadError) {
-    console.error('getUnreadCountForUser - messages:', unreadError);
-    return 0;
-  }
-  return new Set((unread ?? []).map((m) => m.thread_id as string)).size;
+  return Number(data) || 0;
 }
 
 // ── one thread, the student's own ──────────────────────────────────────
 export async function getStudentThread(db: ServerSupabaseClient, userId: string, threadId: string): Promise<Thread | null> {
-  const { data, error } = await db.from('messages_threads').select('*').eq('user_id', userId).eq('thread_id', threadId).maybeSingle();
+  const { data, error } = await db.from('messages_threads').select(THREAD_COLUMNS).eq('user_id', userId).eq('thread_id', threadId).maybeSingle();
   if (error) {
     console.error('getStudentThread:', error);
     return null;
   }
-  return (data as Thread | null) ?? null;
+  return (data as unknown as Thread | null) ?? null;
 }
