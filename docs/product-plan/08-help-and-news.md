@@ -96,7 +96,9 @@ Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
   many are unfinished), the waiting conversation open at once, Close and
   Reopen, and **Next waiting ›** to the next student. "Start a message"
   under any label writes to the student; New Thread and the old filters
-  went. Parked: a programme filter, a course filter.
+  went. Parked: a programme filter, a course filter, an "Answered" view,
+  "Payment not finished", the package state (Sam, 2026-10-17: the list
+  is fine as it is).
 - A student's send is a door of the app's limiter (10.8); **no limit of
   its own until then** (Sam, 2026-10-17) — only a signed-in student
   sends, through the server, 2,000 characters at most.
