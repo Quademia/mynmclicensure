@@ -216,12 +216,13 @@ export async function loadAdminStudentPage(db: ServerSupabaseClient, userId: str
   const titles = new Map(allCourses.map((c) => [c.course_id, c.title]));
   const data = buildRows(threads, titles, studentCourseList(allCourses, held, u.program_id), 'admin');
   const all = [...data.labels, ...data.courses, ...data.earlier];
-  // the waiting conversation opens at once — the longest-waiting
-  const waiting = all.filter((r) => r.waiting).sort((a, b) => threadAt(threads, a.threadId) - threadAt(threads, b.threadId));
+  // the waiting conversation opens at once — the longest-waiting, timed from
+  // the student's first unanswered message, as the students list is
+  const waiting = all.filter((r) => r.waiting).sort((a, b) => waitingSince(threads, a.threadId) - waitingSince(threads, b.threadId));
   return { line, data, waitingKey: waiting[0]?.key ?? null };
 }
 
-function threadAt(threads: StudentThread[], id: string | null): number {
+function waitingSince(threads: StudentThread[], id: string | null): number {
   const t = id ? threads.find((x) => x.thread_id === id) : null;
-  return t ? new Date(t.last_message_at).getTime() : Number.MAX_SAFE_INTEGER;
+  return t ? new Date(t.firstUnanswered ?? t.last_message_at).getTime() : Number.MAX_SAFE_INTEGER;
 }

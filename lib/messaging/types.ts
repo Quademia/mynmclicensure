@@ -65,7 +65,12 @@ export const MESSAGE_COLUMNS = 'message_id, thread_id, sender_id, sender_role, b
 /** The preview a list shows under each thread. */
 export type LatestMessage = Pick<Message, 'thread_id' | 'body_text' | 'sender_role' | 'created_at'>;
 
-export type StudentThread = Thread & { latest: LatestMessage | null; unread: boolean };
+export type StudentThread = Thread & {
+  latest: LatestMessage | null;
+  unread: boolean;
+  /** The student's first message after Quademia's last reply (their first, with no reply) — when a wait began. */
+  firstUnanswered: string | null;
+};
 
 /** Unread for one side: the thread's last message is the other side's, after this side last read it. */
 export function unreadFor(t: Pick<Thread, 'last_sender_role' | 'last_message_at' | 'student_read_at' | 'admin_read_at'>, side: 'student' | 'admin'): boolean {

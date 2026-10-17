@@ -44,11 +44,24 @@ export async function getStudentThreads(db: ServerSupabaseClient, userId: string
   );
   if (msgError) console.error('getStudentThreads - latest:', msgError);
 
+  // newest first: a thread's first message is its latest, and the last of the
+  // student's before Quademia's latest reply is where a wait began (the rule
+  // msg_admin_students() times the admin's list by)
   const latest: Record<string, LatestMessage> = {};
+  const firstUnanswered: Record<string, string> = {};
+  const answered = new Set<string>();
   for (const m of msgs ?? []) {
     if (!latest[m.thread_id]) latest[m.thread_id] = m;
+    if (answered.has(m.thread_id)) continue;
+    if (m.sender_role === 'admin') answered.add(m.thread_id);
+    else if (m.sender_role === 'student') firstUnanswered[m.thread_id] = m.created_at;
   }
-  return threads.map((t) => ({ ...t, latest: latest[t.thread_id] ?? null, unread: unreadFor(t, side) }));
+  return threads.map((t) => ({
+    ...t,
+    latest: latest[t.thread_id] ?? null,
+    unread: unreadFor(t, side),
+    firstUnanswered: firstUnanswered[t.thread_id] ?? null,
+  }));
 }
 
 // ── getThreadMessages ──────────────────────────────────────────────────
