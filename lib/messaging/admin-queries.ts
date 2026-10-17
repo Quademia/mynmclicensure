@@ -4,8 +4,7 @@
 // resolved to ids first, then the threads with status and label filtered
 // on the server, newest activity first, each with its latest message and
 // whether the student's last message is unread — the thread's read
-// stamps), getUnreadCountForAdmin (the sidebar's badge — one count in the
-// database, msg_admin_unread_count), searchStudentsForMessaging (the New
+// stamps), searchStudentsForMessaging (the New
 // Thread dialog's search, twenty at a time on the server) and the
 // student's entitled courses (the dialog's course picker). Each read takes
 // the admin gate's client — the ADMIN policies are the floor — names its
@@ -18,7 +17,6 @@
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import { readAll, slices } from '@/lib/supabase/read-all';
-import { createServiceRoleClient } from '@/lib/supabase/server';
 import { nowIso } from '@/lib/subscriptions/dates';
 import { THREAD_COLUMNS, unreadFor, type LatestMessage, type Thread } from './types';
 
@@ -91,16 +89,6 @@ export async function getAdminThreads(db: ServerSupabaseClient, filters: AdminTh
     }
   }
   return threads.map((t) => ({ ...t, latest: latest[t.thread_id] ?? null, unread: unreadFor(t, 'admin') }));
-}
-
-// ── getUnreadCountForAdmin (the admin sidebar's badge) ─────────────────
-export async function getUnreadCountForAdmin(): Promise<number> {
-  const { data, error } = await createServiceRoleClient().rpc('msg_admin_unread_count');
-  if (error) {
-    console.error('getUnreadCountForAdmin:', error);
-    return 0;
-  }
-  return Number(data) || 0;
 }
 
 // ── searchStudentsForMessaging (the New Thread dialog) ─────────────────

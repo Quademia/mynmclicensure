@@ -14,7 +14,7 @@ import { requireStudent } from '@/lib/access';
 import { AppShell } from '@/components/shell/app-shell';
 import { StudentSidebar } from '@/components/nav/student/student-sidebar';
 import { displayNameOf } from '@/components/shell/page-header';
-import { getUnreadCountForUser } from '@/lib/messaging/queries';
+import { getUnreadCountForUser } from '@/lib/messaging/badges';
 import { STUDENT_PHONE_TABS } from '@/lib/nav/student';
 import { PhoneCheckIn } from './phone-check-in';
 

@@ -3,8 +3,7 @@
 // The student side's reads (08.2): every thread, newest activity first,
 // each with its latest message for the preview and whether Quademia's
 // last reply is unread (the thread's read stamps); one thread's messages,
-// oldest first; and the badge — one count in the database
-// (msg_unread_count). The thread and message reads take the caller's
+// oldest first (the badge is badges.ts). Both take the caller's
 // per-request client, so the student's own-row policies are the floor,
 // name their columns, and fail open: an error is logged and an empty
 // result returned.
@@ -15,7 +14,6 @@
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import { readAll } from '@/lib/supabase/read-all';
-import { createServiceRoleClient } from '@/lib/supabase/server';
 import { MESSAGE_COLUMNS, THREAD_COLUMNS, unreadFor, type LatestMessage, type Message, type StudentThread, type Thread } from './types';
 
 // ── getStudentThreads ──────────────────────────────────────────────────
@@ -65,16 +63,6 @@ export async function getThreadMessages(db: ServerSupabaseClient, threadId: stri
     return [];
   }
   return (data ?? []) as unknown as Message[];
-}
-
-// ── the student's badge: open threads with an unread reply ─────────────
-export async function getUnreadCountForUser(userId: string): Promise<number> {
-  const { data, error } = await createServiceRoleClient().rpc('msg_unread_count', { p_user_id: userId });
-  if (error) {
-    console.error('getUnreadCountForUser:', error);
-    return 0;
-  }
-  return Number(data) || 0;
 }
 
 // ── one thread, the student's own ──────────────────────────────────────

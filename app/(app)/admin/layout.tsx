@@ -8,7 +8,7 @@ import { requireAdmin } from '@/lib/access';
 import { AppShell } from '@/components/shell/app-shell';
 import { AdminSidebar } from '@/components/nav/admin/admin-sidebar';
 import { displayNameOf } from '@/components/shell/page-header';
-import { getUnreadCountForAdmin } from '@/lib/messaging/admin-queries';
+import { getUnreadCountForAdmin } from '@/lib/messaging/badges';
 
 export const dynamic = 'force-dynamic';
 
