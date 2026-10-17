@@ -651,6 +651,33 @@ table by table as each is next changed (AGENTS.md rule 9).
   writes the reopen line first.
 - Browser: SELECT only — the thread's student and an admin.
 
+### `notification_devices` — the phones and computers that said yes to notifications
+| Column | Holds |
+|---|---|
+| `device_id` | The row |
+| `user_id` | Whose device (→ `users`) |
+| `session_id` | The sign-in it was allowed under (→ `sessions`) |
+| `endpoint` | The device's delivery address at its maker's post office (Google, Apple, Mozilla); one row per address |
+| `key_p256dh`, `key_auth` | The browser's two keys that seal each envelope |
+| `kinds` | What it is sent: `reply` (a student), `student_message` (an admin); a later kind is added to the check, each Sam's call |
+| `created_at` | When it said yes |
+| `last_sent_at` | When a notice was last handed to its post office |
+
+- Built 2026-10-17 (08.5b, ticked by Sam that day;
+  `20261017230000_notification_devices.sql`). No message text, phone
+  number or place. A sign-out or a bump by the two-device limit deletes
+  the device's row as the sign-in ends (a trigger on `sessions`); the
+  week running out keeps it, and the next sign-in of the **same** person
+  on that phone takes it over (`notify_device_relink`) — another person
+  must say yes themselves. One person per address: a new person's yes
+  moves the row to them with only their kind (`notify_device_save`, which
+  checks the sign-in is theirs and live). The admin's switch off drops
+  the kind, the row going with its last (`notify_device_drop_kind`). A
+  notice goes to `notify_targets()` — a student's own devices, or every
+  admin's — never a deactivated account's; an address the post office
+  calls gone (404, 410) is deleted. All four functions server only.
+- Browser: nothing.
+
 ---
 
 ## Platform — 10
@@ -698,24 +725,6 @@ table by table as each is next changed (AGENTS.md rule 9).
   questions in order, and any voided — made by the first student to
   open that day's challenge and fixed after. Read only through the
   database's own functions; no browser access.
-- **`notification_devices` — the phones and computers that said yes to
-  notifications** — *ticked 2026-10-17 (08.5b)*: `device_id`; `user_id`
-  (→ `users`); `session_id`, the sign-in it was allowed under (→
-  `sessions`); `endpoint`, the device's delivery address at its maker's
-  post office (Google, Apple, Mozilla), one row per address;
-  `key_p256dh`, `key_auth`, the browser's two keys that seal each
-  envelope; `kinds`, a list of words — `reply` for a student,
-  `student_message` for an admin, later kinds added; `created_at`;
-  `last_sent_at`. No message text, phone number or place. The rules: a
-  sign-out or a bump by the two-device limit deletes the device's row,
-  in the database, as the sign-in ends; the week running out keeps it,
-  and the next sign-in on that phone takes the row over without asking
-  again; one person per address (a new person's yes moves the row); an
-  address the post office calls dead is deleted; a deactivated account
-  is sent nothing. Why: the server must hold each device's address and
-  keys to send while the app is closed, and the table is not tied to
-  Messages, so later kinds (announcements, …) use it too. No browser
-  access.
 
 ## The database's own functions
 
@@ -769,6 +778,9 @@ the browser can call only the first two lines.
   topic or subtopic ("malar" finds malaria, "iron" not environment),
   published questions only, and with the third argument the free ones
   only — both builders' keyword (04.4; ticked and built 2026-10-11).
+- **Notifications** (server only; 08.5b, built 2026-10-17):
+  `notify_device_save`, `notify_device_relink`, `notify_device_drop_kind`,
+  `notify_targets` — see `notification_devices`.
 - **Sign-in and payments** (server only): `check_login_rate_limit`,
   `check_reset_rate_limit`, `check_payment_rate_limit`,
   `log_auth_event`, `log_reset_request`, `mark_reset_used`.

@@ -12,6 +12,8 @@
 //     the label's newest open thread, or a new one, and the message (bound
 //     to the student on the page);
 //   closeThreadAction / reopenThreadAction.
+// A reply or a started message tells the student's devices that said yes
+// (08.5b), after the answer has gone back, so Send never waits for it.
 //
 // Bulk Send went (Sam, 2026-09-18: announcements are the broadcast); the
 // old inbox's list, search and New Thread dialog went with the students
@@ -19,7 +21,9 @@
 
 'use server';
 
+import { after } from 'next/server';
 import { requireAdmin } from '@/lib/access';
+import { notifyReply } from '@/lib/notifications/send';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getThreadMessages } from './queries';
 import { isMessageLabel, MESSAGE_REFUSALS, THREAD_COLUMNS, type ActionResult, type OpenThreadResult, type SendMessageResult, type Thread } from './types';
@@ -34,6 +38,8 @@ function sendReply(data: unknown, error: unknown, fallback: string): SendMessage
   if (error) return fail(fallback);
   const r = (data ?? {}) as Reply;
   if (!r.ok || !r.thread_id || !r.message_id) return fail(MESSAGE_REFUSALS[r.code ?? ''] ?? fallback);
+  const threadId = r.thread_id;
+  after(() => notifyReply(threadId));
   return { ok: true, thread_id: r.thread_id, message_id: r.message_id, created: Boolean(r.created), reopened: Boolean(r.reopened), at: r.at ?? null };
 }
 

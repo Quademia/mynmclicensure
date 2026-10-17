@@ -13,7 +13,9 @@
 // reopens it with the line "Reopened by a reply.". The other side's
 // messages and a close reach an open conversation live (not critical if
 // the feed fails). Quademia's side adds Close and Reopen, and opens the
-// waiting conversation at once.
+// waiting conversation at once. On the student's own page a send can show
+// the notifications' ask under it (08.5b); a notification's tap opens its
+// conversation at once, on a phone too.
 //
 // On a phone the list and the conversation take turns, and the phone's
 // back button returns to the list (a history entry, no server trip); on a
@@ -31,6 +33,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Toast } from '@/lib/toast/toast';
 import { NameCircle } from '@/components/shell/name-circle';
+import { NotifyAsk } from '@/components/notifications/notify-ask';
+import { askAfterSend, type AskShape } from '@/lib/notifications/client';
 import { createClient } from '@/lib/supabase/client';
 import type { MessagesPageData, MessagesRow } from '@/lib/messaging/page-data';
 import { MESSAGE_MAX_LEN, type ActionResult, type Message, type OpenThreadResult, type SendMessageResult } from '@/lib/messaging/types';
@@ -106,6 +110,8 @@ export function MessagesView({
   student,
   initial,
   initialKey = null,
+  openOnPhone = false,
+  notify = null,
   openThread,
   sendToThread,
   sendByLabel,
@@ -116,8 +122,12 @@ export function MessagesView({
   /** The student whose Messages these are: their name circle on their messages. */
   student: { name: string; avatarUrl: string | null };
   initial: MessagesPageData;
-  /** A row to open at once (Quademia's side: the waiting conversation). */
+  /** A row to open at once (Quademia's side: the waiting conversation; either side: a notification's). */
   initialKey?: string | null;
+  /** Open it on a phone too — a notification's tap means that conversation (08.5b). */
+  openOnPhone?: boolean;
+  /** The student's own page: who they are and the notifications' public key, for the ask after a send (08.5b). */
+  notify?: { userId: string; publicKey: string | null } | null;
   openThread: (threadId: string) => Promise<OpenThreadResult>;
   sendToThread: (threadId: string, body: string) => Promise<SendMessageResult>;
   sendByLabel: (label: string, courseId: string | null, body: string) => Promise<SendMessageResult>;
@@ -134,6 +144,7 @@ export function MessagesView({
   const [busy, setBusy] = useState(false);
   const [now, setNow] = useState(0);
   const [note, setNote] = useState<Note>(null);
+  const [ask, setAsk] = useState<AskShape>(null);
   const dismiss = useCallback(() => setNote(null), []);
   const feedRef = useRef<HTMLDivElement | null>(null);
   const composeRef = useRef<HTMLTextAreaElement | null>(null);
@@ -217,6 +228,7 @@ export function MessagesView({
     setActiveKey(row.key);
     setMessages([]);
     setCompose('');
+    setAsk(null);
     stampNow(setNow);
     unsubscribe();
     if (!row.threadId) {
@@ -243,6 +255,7 @@ export function MessagesView({
     activeRef.current = null;
     setActiveKey(null);
     setMessages([]);
+    setAsk(null);
     unsubscribe();
   }, [unsubscribe]);
 
@@ -284,12 +297,13 @@ export function MessagesView({
   }, [closeConvo]);
 
   // Quademia's side opens the waiting conversation at once (on a computer;
-  // on a phone the list shows first, as the student's does).
+  // on a phone the list shows first, as the student's does). A
+  // notification's tap opens its conversation on a phone too.
   useEffect(() => {
     if (!initialKey) return;
     const id = window.setTimeout(() => {
       const row = [...initial.labels, ...initial.courses, ...initial.earlier].find((r) => r.key === initialKey);
-      if (row && !isPhone()) void open(row);
+      if (row && (openOnPhone || !isPhone())) void open(row);
     }, 0);
     return () => window.clearTimeout(id);
     // Runs once, for the page the admin arrived on.
@@ -326,6 +340,8 @@ export function MessagesView({
           setMessages((cur) => cur.map((m) => (m.message_id === tempId ? { ...m, message_id: r.message_id, thread_id: r.thread_id, created_at: r.at ?? m.created_at } : m)));
         }
         if (!row.threadId) subscribe(row.key, r.thread_id);
+        // the ask under the sent message, where it can work and is wanted (08.5b)
+        if (notify) setAsk(askAfterSend(notify.userId, notify.publicKey));
         toBottom();
       }
     } catch {
@@ -462,6 +478,9 @@ export function MessagesView({
                     ),
                   )
                 )}
+                {ask && notify?.publicKey ? (
+                  <NotifyAsk shape={ask} userId={notify.userId} publicKey={notify.publicKey} onClose={() => setAsk(null)} />
+                ) : null}
               </div>
 
               <form className="smsg-compose" method="post" onSubmit={send}>

@@ -1,0 +1,17 @@
+// lib/notifications/types.ts — phone notifications (08.5b; Sam,
+// 2026-10-17). The shared words, kept out of the 'use server' module
+// (AGENTS.md: such a module exports only async functions).
+
+/** What a device is sent: a student their replies, an admin's device the students' messages. Later kinds are Sam's call, one at a time. */
+export type NoticeKind = 'reply' | 'student_message';
+
+/** What the service worker shows: the title and line are ours, the label only — never the message's text (Sam: phones are shared). */
+export type Notice = { title: string; body: string; url: string; tag: string };
+
+/** The device's address and keys, as the browser's PushSubscription.toJSON() gives them. */
+export type DeviceSubscription = { endpoint: string; keys: { p256dh: string; auth: string } };
+
+export type SaveDeviceResult = { ok: true; kinds: NoticeKind[] } | { ok: false; error: string };
+
+/** "Not now" hides the ask on that phone this long (Sam, 2026-10-17). */
+export const ASK_LATER_DAYS = 7;

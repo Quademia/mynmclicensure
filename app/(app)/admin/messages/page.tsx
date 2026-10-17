@@ -4,13 +4,16 @@
 // each opening onto that student's Messages as they see them
 // (./[user_id]). Search reaches every student, so one who never wrote can
 // be found and written to; "Waiting for a reply / All" and the label
-// narrow the list. Twenty a page, grouped and paged in the database.
+// narrow the list. Twenty a page, grouped and paged in the database. At
+// the top, "Notify this device when a student writes" (08.5b), per device.
 
 import type { Metadata } from 'next';
 import { requireAdmin } from '@/lib/access';
+import { AdminNotifySwitch } from '@/components/notifications/admin-notify-switch';
 import { AppLink } from '@/components/shell/link-pending';
 import { PageHeader } from '@/components/shell/page-header';
 import { filtersFrom, getStudentsList, STUDENTS_PER_PAGE, type StudentsFilters } from '@/lib/messaging/admin-students';
+import { vapidPublicKey } from '@/lib/notifications/keys';
 import { StudentsFiltersBar } from './students-filters';
 import '@/styles/admin-messages.css';
 
@@ -33,7 +36,7 @@ function hrefFor(f: StudentsFilters, page: number): string {
 }
 
 export default async function AdminMessagesPage({ searchParams }: { searchParams: Search }) {
-  await requireAdmin();
+  const { profile } = await requireAdmin();
   const f = filtersFrom(await searchParams);
   const result = await getStudentsList(f);
   const pages = result.ok ? Math.max(1, Math.ceil(result.total / STUDENTS_PER_PAGE)) : 1;
@@ -49,6 +52,7 @@ export default async function AdminMessagesPage({ searchParams }: { searchParams
   return (
     <div className="amsg">
       <PageHeader title="Messages" subtitle={subtitle} />
+      <AdminNotifySwitch userId={profile.user_id} publicKey={vapidPublicKey()} />
       <StudentsFiltersBar q={f.q} view={f.view} label={f.label} />
 
       {!result.ok ? (

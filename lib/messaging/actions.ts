@@ -12,10 +12,14 @@
 //   sendByLabelAction — a message by label (a course's: that course): the
 //     label's newest open thread, or a new one made with the message —
 //     Messages' "Start a message" and the "Message us" box.
+// A sent message tells Quademia's devices that switched it on (08.5b),
+// after the answer has gone back, so Send never waits for it.
 
 'use server';
 
+import { after } from 'next/server';
 import { requireStudent } from '@/lib/access';
+import { notifyStudentMessage } from '@/lib/notifications/send';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getStudentThread, getThreadMessages } from './queries';
 import { isMessageLabel, MESSAGE_REFUSALS, type OpenThreadResult, type SendMessageResult } from './types';
@@ -30,6 +34,8 @@ function sendReply(data: unknown, error: unknown): SendMessageResult {
   if (error) return { ok: false, error: 'Could not send your message. Please try again.' };
   const r = (data ?? {}) as Reply;
   if (!r.ok || !r.thread_id || !r.message_id) return { ok: false, error: refusal(r.code, 'Could not send your message. Please try again.') };
+  const threadId = r.thread_id;
+  after(() => notifyStudentMessage(threadId));
   return {
     ok: true,
     thread_id: r.thread_id,

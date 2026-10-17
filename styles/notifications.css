@@ -1,0 +1,65 @@
+/* styles/notifications.css
+ *
+ * Phone notifications (08.5b; Sam, 2026-10-17, drawn): the ask under a
+ * student's sent message (.nask, components/notifications/notify-ask.tsx),
+ * its one grey line after (.nask-line), and the admin's per-device switch
+ * on Messages (.nsw, admin-notify-switch.tsx). Tokens only; the box is
+ * .card, the buttons the shared family. The design system has no switch,
+ * so .nsw-switch is drawn here (a shared one offered, 09).
+ */
+
+.nask { padding: var(--space-12); display: flex; flex-direction: column; gap: var(--space-10); }
+.nask-row { display: flex; gap: var(--space-10); align-items: flex-start; }
+.nask-icon { color: var(--ink-muted); display: inline-flex; flex: none; padding-top: 2px; }
+.nask-icon svg { width: 18px; height: 18px; }
+.nask-words { flex: 1; min-width: 0; }
+.nask-title {
+  margin: 0;
+  font-size: var(--type-body-strong-size);
+  line-height: var(--type-body-strong-line);
+  font-weight: var(--type-body-strong-weight);
+  color: var(--ink);
+}
+.nask-sub {
+  margin: var(--space-2) 0 0;
+  font-size: var(--type-meta-size);
+  line-height: var(--type-meta-line);
+  color: var(--ink-muted);
+}
+.nask-actions { display: flex; gap: var(--space-8); justify-content: flex-end; }
+.nask-actions .btn { min-height: 36px; }
+.nask-line {
+  margin: 0;
+  font-size: var(--type-meta-size);
+  line-height: var(--type-meta-line);
+  color: var(--ink-muted);
+}
+
+.nsw { padding: var(--space-12) var(--space-16); display: flex; align-items: center; gap: var(--space-12); margin-bottom: var(--space-16); }
+.nsw-switch {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--border);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.nsw-switch.on { background: var(--brand-teal); }
+.nsw-switch:disabled { cursor: progress; opacity: 0.7; }
+.nsw-switch:focus-visible { outline: 2px solid var(--brand-navy); outline-offset: 2px; }
+.nsw-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s;
+}
+.nsw-switch.on .nsw-knob { transform: translateX(18px); }

@@ -5,7 +5,9 @@
 // many are unfinished — and "Next waiting ›" to the longest-waiting other
 // student; then the student's labels, courses and earlier conversations,
 // the waiting one open at once, with Close and Reopen. "Start a message"
-// under any label writes to the student as Quademia.
+// under any label writes to the student as Quademia. A notification's tap
+// arrives as ?thread=… and opens that conversation instead, on a phone too
+// (08.5b).
 
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -26,6 +28,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 type Params = Promise<{ user_id: string }>;
+type Search = Promise<{ thread?: string }>;
 
 const PAYMENT_WORDS: Record<string, string> = {
   ACTIVATED: 'activated',
@@ -49,12 +52,13 @@ function oneLine(l: AdminStudentLine): string[] {
   return bits;
 }
 
-export default async function AdminStudentMessagesPage({ params }: { params: Params }) {
+export default async function AdminStudentMessagesPage({ params, searchParams }: { params: Params; searchParams: Search }) {
   const { supabase } = await requireAdmin();
   const userId = decodeURIComponent(String((await params).user_id || '').trim());
-  const [page, next] = await Promise.all([loadAdminStudentPage(supabase, userId), nextWaitingStudent(userId)]);
+  const [page, next, { thread }] = await Promise.all([loadAdminStudentPage(supabase, userId), nextWaitingStudent(userId), searchParams]);
   if (!page) notFound();
   const { line, data, waitingKey } = page;
+  const tapped = thread ? [...data.labels, ...data.courses, ...data.earlier].find((r) => r.threadId === thread)?.key ?? null : null;
 
   return (
     <div className="smsg-page amsg-student">
@@ -71,7 +75,8 @@ export default async function AdminStudentMessagesPage({ params }: { params: Par
         side="admin"
         student={{ name: line.name, avatarUrl: line.avatarUrl }}
         initial={data}
-        initialKey={waitingKey}
+        initialKey={tapped ?? waitingKey}
+        openOnPhone={Boolean(tapped)}
         openThread={adminOpenThreadAction}
         sendToThread={adminSendMessageAction}
         sendByLabel={adminStartForAction.bind(null, line.user_id)}

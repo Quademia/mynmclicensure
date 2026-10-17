@@ -74,7 +74,8 @@ function installed(): boolean {
   return window.matchMedia('(display-mode: standalone)').matches || nav.standalone === true;
 }
 
-function installWay(): InstallWay {
+/** Read in a handler or a store's snapshot, never during render (also the notifications' ask, 08.5b). */
+export function installWay(): InstallWay {
   if (installed()) return 'none';
   const ua = navigator.userAgent;
   if (/iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) return 'iphone';

@@ -15,6 +15,7 @@ import { requireStudent } from '@/lib/access';
 import { AppShell } from '@/components/shell/app-shell';
 import { StudentSidebar } from '@/components/nav/student/student-sidebar';
 import { displayNameOf } from '@/components/shell/page-header';
+import { NotifyRelink } from '@/components/notifications/notify-relink';
 import { getUnreadCountForUser } from '@/lib/messaging/badges';
 import { STUDENT_PHONE_TABS } from '@/lib/nav/student';
 import { PhoneCheckIn } from './phone-check-in';
@@ -44,6 +45,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
     >
       {children}
       <PhoneCheckIn userId={profile.user_id} />
+      <NotifyRelink userId={profile.user_id} />
     </AppShell>
   );
 }

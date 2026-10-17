@@ -9,6 +9,7 @@ import { requireAdmin } from '@/lib/access';
 import { AppShell } from '@/components/shell/app-shell';
 import { AdminSidebar } from '@/components/nav/admin/admin-sidebar';
 import { displayNameOf } from '@/components/shell/page-header';
+import { NotifyRelink } from '@/components/notifications/notify-relink';
 import { getUnreadCountForAdmin } from '@/lib/messaging/badges';
 
 export const dynamic = 'force-dynamic';
@@ -35,6 +36,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       }}
     >
       {children}
+      <NotifyRelink userId={profile.user_id} />
     </AppShell>
   );
 }

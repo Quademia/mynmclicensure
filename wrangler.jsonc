@@ -51,7 +51,15 @@
     // licensure-dev-app and licensure-prod-app. As MyNclex sends today
     // (Sam, 2026-09-16); every Quademia product moves to the agreed
     // hello@mail.quademia.com together.
-    "EMAIL_FROM": "MyNMCLicensure <noreply@quademia.com>"
+    "EMAIL_FROM": "MyNMCLicensure <noreply@quademia.com>",
+    // Phone notifications (08.5b): the public half of this Worker's VAPID
+    // key pair. Not a secret — every browser that says yes receives it —
+    // and read server-side at runtime (handed to the page), so not a
+    // NEXT_PUBLIC_* name. The private half is a Secret,
+    // VAPID_PRIVATE_KEY (`wrangler secret put`). Each environment has its
+    // own pair; prod's is added at the release that carries 08.5b. With
+    // no keys the app offers no notifications and sends none.
+    "VAPID_PUBLIC_KEY": "BJ1dGBfv0hiE0DfIUlo4ZZc_kVcALFL44GTyNl58Ck8jexPEcDausvQN4M37MDA1RA3EVEoyQBRBSAdEYR6XQ-A"
   },
   "env": {
     "prod": {

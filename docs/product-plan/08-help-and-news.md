@@ -136,8 +136,8 @@ Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
     student, the permission checked once) is parked: it needs a rule on
     a table outside our schema and pays only at thousands of students at
     once (08.6).
-  - **The app closed: phone notifications, both sides** *(to build:
-    08.5b)* — the student when Quademia replies, Quademia's devices when
+  - **The app closed: phone notifications, both sides** *(built
+    2026-10-17: 08.5b)* — the student when Quademia replies, Quademia's devices when
     a student writes; a tap opens the conversation. **What it says**
     (Sam, 2026-10-17, drawn: wording a): the title and line are ours,
     the label only — never the message's text, since phones are shared:

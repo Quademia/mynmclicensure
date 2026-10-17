@@ -157,7 +157,7 @@ before then, and the old list's history, is in
 - ✅ 08.2 The support desk — server only, five labels, Message us box, both pages; admin by student — 2026-10-17
 - ⬜ 08.4 "Message us" on other pages, each picking its label — as each page is touched (after 08.2)
 - ✅ 08.5a The badge keeps itself fresh — a live line while the app is open; recounts on return, reconnect — 2026-10-17
-- ⬜ 08.5b Phone notifications both ways — the ask after a send, the label only; ruled, drawn, table ticked (10-17)
+- ✅ 08.5b Phone notifications both ways — the ask after a send, the label only, the admin's switch — 2026-10-17
 - ⏸ 08.6 Supabase Broadcast for the badge's line — a rule outside our schema; only at thousands at once (10-17)
 - ⬜ 08.3 NMC procedures — the manual links into a table the admin manages
 - ⬜ 17 The premium channel — one per programme, all year; link codes; the bot admits and removes members
@@ -173,6 +173,7 @@ before then, and the old list's history, is in
 - ⬜ 09.3 A content width limit above 1440px
 - ⬜ 09.4 Dark mode — after the above
 - ⬜ 09.5 The old token names retired once no page uses them
+- ⬜ 09.12 One switch — the announcements editor and the admin's notifications switch draw their own (10-17)
 - ✅ 09.11 The page title — one line, teal fading to grey over 240px; subtitles below; tabs lineless — 2026-10-17
 - ✅ 09.10 A row menu (three dots) — what a row allows, closed items in grey; on Learning History — 2026-10-17
 - ✅ 09.6 The phone's bottom bar and sub-tab row — four fixed tabs, a row per group, the drawer kept — 2026-10-04

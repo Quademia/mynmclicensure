@@ -10,12 +10,19 @@
  * The packs themselves are not here: the page keeps them in the phone's
  * database (lib/offline-packs/phone.ts).
  *
- * Registered by the student pages on a production build only
+ * Registered by the student and admin pages on a production build only
  * (lib/offline-packs/offline-app.ts). A page asks for a fresh copy of
  * /offline with the message {type: 'warm'} — once a day on a phone holding
  * packs, and at once after a Save — because a release changes its files.
  * The page and its files are swapped together, so the copy on the phone
  * always opens.
+ *
+ * It also shows the app's notifications (08.5b; Sam, 2026-10-17): a notice
+ * arrives sealed from the phone's post office as {title, body, url, tag} —
+ * who and the label only, never the message's text — and is shown with the
+ * painted Q; one per conversation (the tag), a new one replacing the last.
+ * A tap opens the conversation: in an app window already open, else a new
+ * one.
  *
  * Plain JavaScript, served as it is: nothing in the build touches it.
  */
@@ -54,6 +61,46 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'warm') event.waitUntil(warm().catch(() => {}));
+});
+
+self.addEventListener('push', (event) => {
+  let n = {};
+  try {
+    n = event.data ? event.data.json() : {};
+  } catch {
+    n = {};
+  }
+  const tag = typeof n.tag === 'string' && n.tag ? n.tag : undefined;
+  event.waitUntil(
+    self.registration.showNotification(typeof n.title === 'string' && n.title ? n.title : 'Quademia', {
+      body: typeof n.body === 'string' ? n.body : '',
+      icon: '/images/quademia-mark-192.png',
+      tag,
+      renotify: Boolean(tag),
+      data: { url: typeof n.url === 'string' && n.url.startsWith('/') ? n.url : '/router' },
+    }),
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = new URL((event.notification.data && event.notification.data.url) || '/router', self.location.origin).href;
+  event.waitUntil(
+    (async () => {
+      const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      for (const win of wins) {
+        if (new URL(win.url).origin !== self.location.origin) continue;
+        try {
+          await win.focus();
+          if ('navigate' in win) await win.navigate(url);
+          return;
+        } catch {
+          // this window would not take it; a new one below
+        }
+      }
+      await self.clients.openWindow(url);
+    })(),
+  );
 });
 
 self.addEventListener('fetch', (event) => {

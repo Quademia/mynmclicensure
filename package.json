@@ -20,6 +20,7 @@
     "cf:deploy": "npx @opennextjs/cloudflare build -- --webpack && wrangler deploy"
   },
   "dependencies": {
+    "@block65/webcrypto-web-push": "2.0.0",
     "@opennextjs/cloudflare": "1.19.6",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.49.0",

@@ -599,6 +599,18 @@ above sit at the repo root; the audience grouping inside them is kept.
   served as written, so an edit reaches the next walk without a rebuild.
   On the deployed sites, a walk that lands on `/offline` means the page
   could not be reached.
+- **Phone notifications run on a production build only, and never in the
+  pane** (08.5b, 2026-10-17): the ask needs `public/sw.js`, which is
+  registered on production only, and the pane cannot show a notification.
+  Walk them on `prod-local` (:3001) in Sam's own browser (localhost counts
+  as secure), with the VAPID keys in `.env.local`; Sam says yes there,
+  then fire the real sender from a scratchpad — `lib/notifications/send.ts`
+  bundled with esbuild (`--alias:@=.`, `next/headers` aliased to a stub),
+  `.env.local` read without printing it — and read the post office's
+  answer (201 is accepted). On Windows a notice leaves the screen after a
+  few seconds into the notification list (Windows key + N), where its
+  click still works. The deployed sites need `VAPID_PRIVATE_KEY` as a
+  Worker **Secret** (each environment its own pair).
 - **The pane cannot show a PDF: it treats one as a download** and puts a
   save box in front of Sam (2026-10-15). Walk a PDF the app makes by
   catching its file in the page — override `HTMLAnchorElement.prototype`
