@@ -609,8 +609,16 @@ above sit at the repo root; the audience grouping inside them is kept.
   `.env.local` read without printing it — and read the post office's
   answer (201 is accepted). On Windows a notice leaves the screen after a
   few seconds into the notification list (Windows key + N), where its
-  click still works. The deployed sites need `VAPID_PRIVATE_KEY` as a
-  Worker **Secret** (each environment its own pair).
+  click still works. **Edge often shows its Allow only as a bell at the
+  end of the address bar**, and the page waits until it is answered. The
+  deployed sites need `VAPID_PRIVATE_KEY` as a Worker **Secret** (each
+  environment its own pair).
+- **Google sign-in on `localhost:3001` lands on the old site**: Supabase
+  sends a sign-in back only to an address on the shared dev project's
+  Redirect URLs list, else to its Site URL (the legacy site), and :3001 is
+  not listed (2026-10-17). Sign in on :3000 first — the sign-in is per
+  machine name, so :3001 is signed in too — or Sam adds
+  `http://localhost:3001/**` there (a shared setting; 10.6).
 - **The pane cannot show a PDF: it treats one as a download** and puts a
   save box in front of Sam (2026-10-15). Walk a PDF the app makes by
   catching its file in the page — override `HTMLAnchorElement.prototype`
