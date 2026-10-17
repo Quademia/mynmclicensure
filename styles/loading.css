@@ -18,10 +18,18 @@
   white-space: nowrap;
 }
 
-/* the page title and subtitle, spaced as .page-header (shell.css) */
-.pl-head { margin-bottom: 28px; }
-.pl-title { width: 40%; max-width: 260px; height: 22px; }
-.pl-subtitle { width: 60%; max-width: 380px; height: 12px; margin-top: var(--space-10); }
+/* the page title and subtitle, spaced as .page-header (shell.css, 3b):
+   the title's shape on the grey line, as tall as the real row (its line,
+   then 12px — 10px on a phone — and the teal's 1px below the grey), the
+   subtitle's below it */
+.pl-head { margin-bottom: var(--space-24); }
+.pl-head-row { border-bottom: 1px solid var(--border); padding: 3px 0 16px; }
+.pl-title { width: 40%; max-width: 260px; height: 28px; }
+.pl-subtitle { width: 60%; max-width: 380px; height: 12px; margin-top: 16px; }
+@media (max-width: 768px) {
+  .pl-head-row { padding-bottom: 14px; }
+  .pl-title { height: 22px; }
+}
 
 .pl-card {
   background: var(--surface);

@@ -33,7 +33,9 @@ export function PageLoading({ bare = false }: { bare?: boolean }) {
       ) : (
         <div aria-hidden="true">
           <div className="pl-head">
-            <div className="pl-bone pl-title" />
+            <div className="pl-head-row">
+              <div className="pl-bone pl-title" />
+            </div>
             <div className="pl-bone pl-subtitle" />
           </div>
           <div className="pl-card">

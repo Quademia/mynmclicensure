@@ -22,6 +22,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Toast } from '@/lib/toast/toast';
 import { NameCircle } from '@/components/shell/name-circle';
+import { PageHeader } from '@/components/shell/page-header';
 import { saveAcademicDetails, savePersonalDetails } from '@/lib/profile/actions';
 import { PROFILE_IMAGE_MAX_BYTES, PROFILE_LEVELS, type ProfileSubscription, type SchoolOption } from '@/lib/profile/types';
 import { Icon } from '@/components/shell/icons';
@@ -228,10 +229,7 @@ export function ProfileClient({
     <div className="spf">
       <Toast message={msg?.text ?? null} tone={msg?.tone} onDismiss={dismiss} />
       <div className="profile-container">
-        <div className="page-header">
-          <h1>My Profile</h1>
-          <p>Your NMC Licensure account details</p>
-        </div>
+        <PageHeader title="My Profile" subtitle="Your NMC Licensure account details" />
 
         {/* Personal Details */}
         <div className={`panel${personalEditing ? ' editing' : ''}`} ref={personalRef}>

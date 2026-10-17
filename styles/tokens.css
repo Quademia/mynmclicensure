@@ -184,9 +184,12 @@
      54 distinct font sizes and no scale; four values are ~700 of ~800
      uses, so the scale exists and only lacked names. */
 
-  /* The one title at the top of a screen. Phone drops it to 22px. */
+  /* The one title at the top of a screen (PageHeader, 3b — 09.11).
+     Phone drops it to 22px. */
   --type-page-title-size: 28px;
   --type-page-title-line: 34px;
+  --type-page-title-size-phone: 22px;
+  --type-page-title-line-phone: 28px;
   --type-page-title-weight: 700;
   --type-page-title-track: -0.02em;
 

@@ -26,6 +26,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Toast } from '@/lib/toast/toast';
 import { NameCircle } from '@/components/shell/name-circle';
+import { PageHeader } from '@/components/shell/page-header';
 import { createClient } from '@/lib/supabase/client';
 import { ensureThreadAction, listStudentThreadsAction, markThreadReadAction, sendMessageAction, threadMessagesAction } from '@/lib/messaging/actions';
 import { MESSAGE_MAX_LEN, type Message, type StudentThread, type ThreadDeepLink } from '@/lib/messaging/types';
@@ -387,9 +388,7 @@ export function MessagesClient({
       <Toast message={msg?.text ?? null} tone={msg?.tone} onDismiss={dismiss} />
 
       <div className="msg-container">
-        <div className="page-header">
-          <h1>Messages</h1>
-        </div>
+        <PageHeader title="Messages" />
 
         <div className={`msg-split${activeId ? ' convo-open' : ''}`}>
           {/* Thread list */}

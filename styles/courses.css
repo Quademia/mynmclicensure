@@ -42,22 +42,22 @@ a.cp-card:hover { box-shadow: var(--shadow-md); text-decoration: none; }
 
 .cp-package { align-self: flex-start; }
 
-/* The course page. */
-.cp-tabs { display: flex; align-items: center; gap: var(--space-8); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+/* The course page. The tabs are words with no line of their own: the
+   current course is navy, and the page's one teal line is the title's
+   (3b; Sam, 2026-10-17, 09.11 — two teal lines stacked otherwise). */
+.cp-tabs { display: flex; align-items: center; gap: var(--space-8); flex-wrap: wrap; }
 .cp-tab-back { padding: var(--space-10) var(--space-12) var(--space-10) 0; font-size: var(--type-ui-size); font-weight: 600; color: var(--brand-teal-hover); }
 .cp-tab {
   padding: var(--space-10) 14px;
   font-size: var(--type-ui-size);
   font-weight: 600;
   color: var(--ink-muted);
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
   text-decoration: none;
 }
 a.cp-tab:hover { color: var(--brand-navy); text-decoration: none; }
-.cp-tab-on { color: var(--brand-navy); border-bottom-color: var(--brand-teal); }
+.cp-tab-on { color: var(--brand-navy); }
 
-.cp-head { display: flex; flex-direction: column; gap: var(--space-8); }
+.cp-head { display: flex; flex-direction: column; gap: var(--space-10); }
 .cp-head .page-header { margin-bottom: 0; }
 .cp-head-line { display: flex; align-items: center; gap: var(--space-12); flex-wrap: wrap; }
 .cp-message { margin-left: auto; display: inline-flex; align-items: center; gap: var(--space-6); font-size: var(--type-ui-size); font-weight: 600; color: var(--brand-teal-hover); }
@@ -101,6 +101,5 @@ a.cp-way:hover { background: var(--surface-page); text-decoration: none; }
   .cp-grid { grid-template-columns: 1fr; }
   /* a phone has the one link, not the row of courses */
   .cp-tab { display: none; }
-  .cp-tabs { border-bottom: 0; }
   .cp-message { margin-left: 0; }
 }

@@ -66,7 +66,8 @@ opens it (00, The menu).
   scores", the ended note. A card opens its course page.
 - **The course page** (`/student/course/[id]`), top to bottom: on a
   computer a row of tabs — "‹ My courses" and the student's other
-  courses, the current one underlined — and on a phone only "‹ My
+  courses, the current one in navy, no line (the teal is the title's,
+  09.11) — and on a phone only "‹ My
   courses"; the title, the days-left chip with the end date, "Message us
   about this course" (opens a draft about the course, 08); one progress
   card (questions met out of the bank, papers done); **Up next**, one
