@@ -11,6 +11,9 @@
 // closed the desktop sidebar. Reading it here means the first paint is
 // already open or closed, so the page does not jump on load.
 //
+// The Messages badge: the layout's first count, held and kept fresh by
+// <UnreadLive> (08.5a) for the top bar and the menu to read.
+//
 // No footer: no legacy page has one.
 
 import { cookies } from 'next/headers';
@@ -19,17 +22,21 @@ import { TopBar, type TopBarProps } from './top-bar';
 import { MobileDrawer } from './mobile/mobile-drawer';
 import { PhoneSubTabs, PhoneTabBar } from './mobile/phone-tabs';
 import { NAV_COOKIE } from './nav-cookie';
+import { UnreadLive } from './unread-live';
 import type { PhoneTab } from '@/lib/nav/types';
 
 export async function AppShell({
   sidebar,
   topBar,
+  unread,
   phoneTabs,
   children,
 }: {
   /** The menu — a <SidebarNav> inside the audience's wrapper. */
   sidebar: React.ReactNode;
   topBar: TopBarProps;
+  /** The Messages badge: the first count, whose side it is, and the signed-in person. */
+  unread: { initial: number; side: 'student' | 'admin'; userId: string };
   /** The bottom bar on a phone — students only (Sam, 2026-10-04); none for the admin. */
   phoneTabs?: PhoneTab[];
   children: React.ReactNode;
@@ -38,14 +45,16 @@ export async function AppShell({
   const initialDesktopOpen = jar.get(NAV_COOKIE)?.value !== 'closed';
 
   return (
-    <ShellFrame initialDesktopOpen={initialDesktopOpen}>
-      <TopBar {...topBar} />
-      <MobileDrawer>{sidebar}</MobileDrawer>
-      <main className="main-content">
-        {phoneTabs ? <PhoneSubTabs tabs={phoneTabs} /> : null}
-        {children}
-      </main>
-      {phoneTabs ? <PhoneTabBar tabs={phoneTabs} /> : null}
-    </ShellFrame>
+    <UnreadLive initial={unread.initial} side={unread.side} userId={unread.userId}>
+      <ShellFrame initialDesktopOpen={initialDesktopOpen}>
+        <TopBar {...topBar} />
+        <MobileDrawer>{sidebar}</MobileDrawer>
+        <main className="main-content">
+          {phoneTabs ? <PhoneSubTabs tabs={phoneTabs} /> : null}
+          {children}
+        </main>
+        {phoneTabs ? <PhoneTabBar tabs={phoneTabs} /> : null}
+      </ShellFrame>
+    </UnreadLive>
   );
 }

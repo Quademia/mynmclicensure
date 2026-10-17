@@ -8,7 +8,8 @@
 // The Messages badge: the student's open threads whose last message is
 // an unread reply — one count in the database (08.2, msg_unread_count);
 // under A3 the same count sits on the top bar's envelope, so a closed
-// sidebar cannot hide a reply (10-design-system.md DS5).
+// sidebar cannot hide a reply (10-design-system.md DS5). Drawn first
+// here; the shell keeps it fresh (08.5a, components/shell/unread-live).
 
 import { requireStudent } from '@/lib/access';
 import { AppShell } from '@/components/shell/app-shell';
@@ -22,18 +23,18 @@ export const dynamic = 'force-dynamic';
 
 export default async function StudentLayout({ children }: { children: React.ReactNode }) {
   const { profile } = await requireStudent();
-  const unread = await getUnreadCountForUser(profile.user_id);
+  const unread = (await getUnreadCountForUser(profile.user_id)) ?? 0;
 
   return (
     <AppShell
-      sidebar={<StudentSidebar badges={{ messages: unread }} />}
+      sidebar={<StudentSidebar />}
+      unread={{ initial: unread, side: 'student', userId: profile.user_id }}
       phoneTabs={STUDENT_PHONE_TABS}
       topBar={{
         product: 'MyNMCLicensure',
         installRow: true,
         messagesHref: '/student/messages',
         announcementsHref: '/student/announcements',
-        unread,
         user: { name: displayNameOf(profile), email: profile.email, avatarUrl: profile.avatar_url },
         menuLinks: [
           { label: 'My Profile', href: '/student/profile' },

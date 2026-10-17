@@ -32,6 +32,7 @@ import { usePathname } from 'next/navigation';
 import { useShell } from './shell-state';
 import { IconBell, IconClose, IconEnvelope, IconMenu } from './icons';
 import { NameCircle } from './name-circle';
+import { useUnread } from './unread-live';
 import { Wordmark } from './wordmark';
 import { InstallAppDialog } from '@/components/install-app/install-app';
 import { useInstallWay } from '@/lib/offline-packs/offline-app';
@@ -43,8 +44,6 @@ export type TopBarProps = {
   product: string;
   messagesHref: string;
   announcementsHref: string;
-  /** Unread messages — the same count the sidebar's Messages row shows. */
-  unread: number;
   user: { name: string; email: string; avatarUrl: string | null };
   /** The menu rows between the name and Sign out. */
   menuLinks: TopBarLink[];
@@ -52,8 +51,10 @@ export type TopBarProps = {
   installRow?: boolean;
 };
 
-export function TopBar({ product, messagesHref, announcementsHref, unread, user, menuLinks, installRow }: TopBarProps) {
+export function TopBar({ product, messagesHref, announcementsHref, user, menuLinks, installRow }: TopBarProps) {
   const { toggle } = useShell();
+  // unread messages — the same live count the menu's Messages row shows (08.5a)
+  const unread = useUnread();
   const [menuOpen, setMenuOpen] = useState(false);
   const [installOpen, setInstallOpen] = useState(false);
   const installWay = useInstallWay();

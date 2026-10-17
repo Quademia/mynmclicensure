@@ -116,15 +116,28 @@ Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
   (done 2026-10-17); the student page redesigned, drawn first (done
   2026-10-17, below); the admin's Messages by student (done 2026-10-17,
   in place of "the inbox paged, on today's look").
-- **Telling each side of a new message** *(to build: 08.5, its own
-  session; Sam, 2026-10-17)*. The live chat stays as built — an open
-  conversation updates by itself — but most replies come later, with
-  nobody in the chat, so each side is told when it is not there:
-  - **In the app**: the badge recounts on every page change and when
-    the app comes back to the screen, one small request. Today it counts
-    only when a page loads in full — moving between pages keeps the top
-    bar and the sidebar as they were.
-  - **The app closed: phone notifications, both sides** — the student
+- **Telling each side of a new message** *(Sam, 2026-10-17)*. The live
+  chat stays as built — an open conversation updates by itself — but
+  most replies come later, with nobody in the chat, so each side is told
+  when it is not there:
+  - **In the app: the badge keeps itself fresh** *(built 2026-10-17:
+    08.5a)* — on the live chat's own kind of line (Sam, in place of a
+    recount on every page change): while the app is on the screen it
+    listens to the student's own conversations (every conversation for
+    an admin), and a reply, a read — on any of their devices — or a close
+    changes the number at once. The line is cut when the screen locks or
+    the student switches app, and what changed meanwhile never arrives,
+    so the number is also asked again when the app comes back to the
+    screen and when the line reconnects. The count stays the database's
+    one. What it costs: one open line per open app — Supabase counts the
+    busiest moment of the month across the shared project (Free 200,
+    Pro 500 included, then $10 per 1,000); its messages are a handful per
+    conversation change. Supabase's lighter **Broadcast** (a mailbox per
+    student, the permission checked once) is parked: it needs a rule on
+    a table outside our schema and pays only at thousands of students at
+    once (08.6).
+  - **The app closed: phone notifications, both sides** *(to build:
+    08.5b)* — the student
     when Quademia replies ("Quademia · Payment or package" and the
     reply's first line; a tap opens the conversation), Quademia's
     devices when a student writes. Free per message (Google, Apple and
@@ -147,8 +160,8 @@ Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
     email saying "you have a message, sign in" repeats the badge); a
     switch in the admin's settings. Parked: SMS (once Arkesel is in,
     03), WhatsApp (Meta's approval, a charge per message).
-  - To settle in its session, drawn first: the rules and where the ask
-    appears.
+  - To settle before 08.5b is built, drawn first: the rules and where
+    the ask appears.
 
 ### Help pages and groups
 

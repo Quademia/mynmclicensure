@@ -277,8 +277,9 @@ above sit at the repo root; the audience grouping inside them is kept.
   read that a browser half's module would carry lives in its own file
   (`lib/messaging/badges.ts`, 2026-10-17); the types sit in `types.ts`.
 - **A shared layout does not redraw on a move between its pages**: what
-  it reads — the Messages badge — stays as first drawn until a full load
-  or `router.refresh()` (08.5, 2026-10-17).
+  it reads stays as first drawn until a full load or `router.refresh()`.
+  The Messages badge is kept fresh by the shell's own live line instead
+  (`components/shell/unread-live.tsx`, 08.5a, 2026-10-17).
 - **`page.tsx` / `layout.tsx` export only the default and route
   config.** A stray named export fails the prod build; dev misses it.
 - **Every overlay is portalled to `<body>`.** A `container-type` or
@@ -330,6 +331,12 @@ above sit at the repo root; the audience grouping inside them is kept.
   publication** and the client's `schema: 'licensure_gh'` on the
   subscription — a table outside the publication fires nothing, with
   no error. Add it in the migration that creates the table (guarded).
+  **It also needs the signed-in person's token at join time**: a channel
+  joined as a page mounts, before the browser has read the sign-in, joins
+  as a visitor (`anon`), reports SUBSCRIBED, and the table's read rule
+  shows it nothing (the badge's line, 08.5a, 2026-10-17). Read the session
+  and `await supabase.realtime.setAuth(token)` before `subscribe()`;
+  check `realtime.subscription.claims_role` on dev after a join.
 - **A Server Action whose request fails rejects; it does not return
   `{ ok: false }`.** On a dropped connection the `await` throws, so a
   page that checks only `result.ok` stays on "Starting…" or "Loading…"

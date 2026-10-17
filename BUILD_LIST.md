@@ -156,13 +156,15 @@ before then, and the old list's history, is in
 - ⬜ A3 The body stored once, no extra line break per edit, the dead read removed — later
 - ✅ 08.2 The support desk — server only, five labels, Message us box, both pages; admin by student — 2026-10-17
 - ⬜ 08.4 "Message us" on other pages, each picking its label — as each page is touched (after 08.2)
-- ⬜ 08.5 Telling of a new message — the badge recounts on page change and return; phone notifications both sides; email a later fallback (10-17)
+- ✅ 08.5a The badge keeps itself fresh — a live line while the app is open; recounts on return, reconnect — 2026-10-17
+- ⬜ 08.5b Phone notifications both ways — the ask after a send, a devices table, keys; email a later fallback
+- ⏸ 08.6 Supabase Broadcast for the badge's line — a rule outside our schema; only at thousands at once (10-17)
 - ⬜ 08.3 NMC procedures — the manual links into a table the admin manages
 - ⬜ 17 The premium channel — one per programme, all year; link codes; the bot admits and removes members
 
 ## [09 Design system](docs/product-plan/09-design-system.md)
 
-- ⬜ 5 Shell data loaded once and kept fresh — the unread badge, My Courses, name and photo
+- ⬜ 5 Shell data loaded once and kept fresh — My Courses, name and photo (the unread badge: 08.5a)
 - ⬜ DS17 About 15 name chips still on .badge — both builders, Premium Prep, Packages
 - ⬜ DS20 About 20 stylesheets drawing their own white box — onto .card as each is touched
 - ⬜ DS21 The app's drawer opens from the right, like the public menu (Sam, later)

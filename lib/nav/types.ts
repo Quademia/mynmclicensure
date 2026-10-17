@@ -84,7 +84,7 @@ export type NavItem = {
   href?: string;
   /** Opens in a new tab (the WhatsApp / Telegram channel links). */
   external?: boolean;
-  /** The Messages badge slot: the count comes from the layout (slice 12). */
+  /** The Messages badge slot: the count is the shell's live one (slice 12; 08.5a). */
   badge?: 'messages';
   /**
    * In the data, not on screen. The Telegram item waits for slice 17

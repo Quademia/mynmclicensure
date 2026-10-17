@@ -29,7 +29,6 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Toast } from '@/lib/toast/toast';
 import { NameCircle } from '@/components/shell/name-circle';
 import { createClient } from '@/lib/supabase/client';
@@ -125,7 +124,6 @@ export function MessagesView({
   closeThread?: (threadId: string) => Promise<ActionResult>;
   reopenThread?: (threadId: string) => Promise<ActionResult>;
 }) {
-  const router = useRouter();
   const mine = side; // whose messages sit on the right
   const [data, setData] = useState<MessagesPageData>(initial);
   const [activeKey, setActiveKey] = useState<string | null>(null);
@@ -234,8 +232,7 @@ export function MessagesView({
       setMessages(r.messages);
       patchRow(row.key, { status: r.thread.status, unread: false });
       toBottom();
-      subscribe(row.key, row.threadId);
-      if (row.unread) router.refresh(); // the sidebar's badge
+      subscribe(row.key, row.threadId); // the read stamp reaches the badge on its own line (08.5a)
     } catch {
       if (activeRef.current === row.key) setLoading(false);
       setNote({ text: 'Could not open the conversation. Please check your connection and try again.', tone: 'error' });

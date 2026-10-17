@@ -141,7 +141,7 @@ ticked 2026-09-18.
 - About 40 small differences from the old app — likely moot with the
   redesign.
 - The page-by-page sweep the diagnosis left unrun outside the bank.
-- Later, new features: notifications (a new message's: 08.5), search.
+- Later, new features: notifications (a new message's: 08.5b), search.
 - A fact to fix: a push to `production` starts the migration and the
   deploy as two separate jobs with nothing making the deploy wait for
   the migration.
