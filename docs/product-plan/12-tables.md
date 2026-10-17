@@ -698,6 +698,24 @@ table by table as each is next changed (AGENTS.md rule 9).
   questions in order, and any voided — made by the first student to
   open that day's challenge and fixed after. Read only through the
   database's own functions; no browser access.
+- **`notification_devices` — the phones and computers that said yes to
+  notifications** — *ticked 2026-10-17 (08.5b)*: `device_id`; `user_id`
+  (→ `users`); `session_id`, the sign-in it was allowed under (→
+  `sessions`); `endpoint`, the device's delivery address at its maker's
+  post office (Google, Apple, Mozilla), one row per address;
+  `key_p256dh`, `key_auth`, the browser's two keys that seal each
+  envelope; `kinds`, a list of words — `reply` for a student,
+  `student_message` for an admin, later kinds added; `created_at`;
+  `last_sent_at`. No message text, phone number or place. The rules: a
+  sign-out or a bump by the two-device limit deletes the device's row,
+  in the database, as the sign-in ends; the week running out keeps it,
+  and the next sign-in on that phone takes the row over without asking
+  again; one person per address (a new person's yes moves the row); an
+  address the post office calls dead is deleted; a deactivated account
+  is sent nothing. Why: the server must hold each device's address and
+  keys to send while the app is closed, and the table is not tied to
+  Messages, so later kinds (announcements, …) use it too. No browser
+  access.
 
 ## The database's own functions
 

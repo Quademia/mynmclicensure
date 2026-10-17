@@ -147,7 +147,12 @@ Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
     `public/sw.js` gains the notification and the tap, and is
     registered on the admin's pages too; sent after the reply returns,
     so Send does not wait, by a library that runs on Cloudflare (the
-    common one is written for Node).
+    common one is written for Node). **The devices table ticked
+    2026-10-17** (`notification_devices`, 12): built general — each
+    device carries the kinds it is sent, so announcements and the rest
+    can follow, each Sam's call (few and important: the browser's Allow
+    covers the whole app, and a Block loses replies too); a sign-out or
+    a bump deletes a device, a week running out does not.
   - **The ask**: after a student's send, "Notify me when Quademia
     replies" — a browser asks only after a tap, and a Block cannot be
     asked again. Reach: Android's Chrome after Allow, even closed or
