@@ -25,7 +25,7 @@ import type { ServerSupabaseClient } from '@/lib/access';
 import { PRACTICE_POOLS } from '@/lib/bank/types';
 import { readAll, slices } from '@/lib/supabase/read-all';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { HISTORY_PAGE_SIZE, RECENT_ATTEMPTS_LIMIT, type Attempt, type AttemptItem, type AttemptListRow, type AttemptWithProgress, type HistoryFilters, type HistoryPage, type QuizAttemptStats } from './types';
+import { HISTORY_PAGE_SIZE, RECENT_ATTEMPTS_LIMIT, type Attempt, type AttemptItem, type AttemptListRow, type AttemptWithProgress, type HistoryPage, type QuizAttemptStats } from './types';
 
 type ServiceDb = ReturnType<typeof createServiceRoleClient>;
 
@@ -233,32 +233,25 @@ export async function getAnswerHistory(db: ServerSupabaseClient, userId: string,
   return new Map([...latest].map(([id, [, wrong]]) => [id, wrong]));
 }
 
-// getStudentAttemptsPaginated: the learning history page's read (7a) —
-// the card columns only, newest first, one page of `pageSize`, with the
-// exact total for the "Showing N of M" line and the Load more button.
-// Course, status, mode and the label search are the database's; the
-// source filter and the sort order stay in the browser, as legacy.
-// Through student_attempts() (04.12): a held sitting's score is empty.
+// getStudentAttemptsPaginated: Learning History's page of sittings (05.5,
+// 2026-10-17) — the list columns, newest first, one page of `pageSize`,
+// with the exact total for Load more; one course when the dropdown names
+// one, filtered inside student_attempts(). Through student_attempts()
+// (04.12): a held sitting's score is empty.
 export async function getStudentAttemptsPaginated(
   userId: string,
-  filters: HistoryFilters,
+  courseId: string,
   page = 0,
   pageSize = HISTORY_PAGE_SIZE,
 ): Promise<HistoryPage> {
-  let query = createServiceRoleClient()
-    .rpc('student_attempts', { p_user_id: userId }, { get: true, count: 'exact' })
+  // A GET: no null in its arguments (it would arrive as 'null'), so "all
+  // courses" leaves the course out.
+  const { data, count, error } = await createServiceRoleClient()
+    .rpc('student_attempts', courseId ? { p_user_id: userId, p_course_id: courseId } : { p_user_id: userId }, { get: true, count: 'exact' })
     .select(LIST_COLUMNS)
     .order('ts_iso', { ascending: false })
-    .order('attempt_id');
-
-  if (filters.courseId) query = query.eq('course_id', filters.courseId);
-  if (filters.status) query = query.eq('status', filters.status);
-  if (filters.mode) query = query.eq('mode', filters.mode);
-  if (filters.search) query = query.ilike('display_label', `%${filters.search}%`);
-
-  query = query.range(page * pageSize, (page + 1) * pageSize - 1);
-
-  const { data, count, error } = await query;
+    .order('attempt_id')
+    .range(page * pageSize, (page + 1) * pageSize - 1);
   if (error) {
     console.error('getStudentAttemptsPaginated:', error);
     return { attempts: [], total: 0 };

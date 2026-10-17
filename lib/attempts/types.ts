@@ -300,9 +300,6 @@ export type AttemptListRow = Pick<
   | 'review_closed'
 >;
 
-/** The four database-side filters (course, status, mode, a label search). */
-export type HistoryFilters = { courseId: string; status: string; mode: string; search: string };
-
 export type HistoryPage = { attempts: AttemptListRow[]; total: number };
 
 export const HISTORY_PAGE_SIZE = 20;

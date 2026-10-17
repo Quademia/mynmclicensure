@@ -121,7 +121,7 @@ export async function getHistoryChunk(
   courseId: string,
   page: number,
 ): Promise<HistoryChunk> {
-  const { attempts, total } = await getStudentAttemptsPaginated(userId, { courseId, status: '', mode: '', search: '' }, page);
+  const { attempts, total } = await getStudentAttemptsPaginated(userId, courseId, page);
   if (!attempts.length) return { rows: [], total };
 
   const quizIds = [...new Set(attempts.map((a) => a.quiz_id).filter((id): id is string => Boolean(id)))];
