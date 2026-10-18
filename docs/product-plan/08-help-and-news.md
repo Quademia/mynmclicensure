@@ -74,6 +74,14 @@ Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
   made until Send. One request to open, one to send. On a phone the list
   and the conversation take turns and the back button returns to the
   list; on a computer they sit side by side.
+- **A new reply is marked so it cannot be missed** (Sam, 2026-10-18,
+  drawn: B; the dot alone was easy to miss, and a course's row can sit
+  below a phone's screen): the row's preview turns dark and says who wrote
+  ("Quademia: …"; "You: …" for the student's own), the time teal, and a
+  **New reply** badge sits under it; above the list a **New replies** card
+  lists every conversation with something unread, newest first, shown only
+  when there is one — a tap opens it, and once read it leaves the card.
+  The admin's view of a student says **New message** and **New messages**.
 - Messages needs a signed-in student, so one who cannot sign in cannot
   reach it — the sign-in page gets its own way out (01.10).
 - **Writes through the server only; a message is fixed once sent**;

@@ -30,10 +30,12 @@ export type MessagesRow = {
   courseId: string | null;
   threadId: string | null;
   status: 'open' | 'closed' | null;
-  /** The start of the latest message — "You: …" for the viewing side's own. */
+  /** The start of the latest message — "You: …" for the viewing side's own, "Quademia: …" for a reply on the student's page. */
   preview: string | null;
   /** "2h ago", "3d ago", "2 Oct". */
   when: string | null;
+  /** When the latest message was sent, for the New replies card's order (08.2, 2026-10-18). */
+  at: string | null;
   unread: boolean;
   /** The student's last message in an open conversation, not yet answered. */
   waiting: boolean;
@@ -71,7 +73,9 @@ function buildRows(
   const preview = (t: StudentThread): string | null => {
     if (!t.latest) return null;
     const text = t.latest.body_text.replace(/\s+/g, ' ').trim();
-    return t.latest.sender_role === mine ? `You: ${text}` : text;
+    if (t.latest.sender_role === mine) return `You: ${text}`;
+    // on the student's page, who wrote last is said (Sam, 2026-10-18)
+    return side === 'student' ? `Quademia: ${text}` : text;
   };
   const rowOf = (t: StudentThread | null, base: Pick<MessagesRow, 'key' | 'title' | 'label' | 'courseId'>): MessagesRow => ({
     ...base,
@@ -79,6 +83,7 @@ function buildRows(
     status: t?.status ?? null,
     preview: t ? preview(t) : null,
     when: t ? ago(t.latest?.created_at ?? t.last_message_at, now) : null,
+    at: t ? t.latest?.created_at ?? t.last_message_at : null,
     unread: Boolean(t?.unread),
     waiting: Boolean(t && t.status === 'open' && t.last_sender_role === 'student'),
   });

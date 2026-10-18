@@ -155,6 +155,7 @@ before then, and the old list's history, is in
 - ⬜ A4 A real quiz-link picker in the announcement editor
 - ⬜ A3 The body stored once, no extra line break per edit, the dead read removed — later
 - ✅ 08.2 The support desk — server only, five labels, Message us box, both pages; admin by student — 2026-10-17
+- ✅ 08.2 (unplanned) A new reply marked — dark preview, a New reply badge, a New replies card on top — 2026-10-18
 - ⬜ 08.4 "Message us" on other pages, each picking its label — as each page is touched (after 08.2)
 - ✅ 08.5a The badge keeps itself fresh — a live line while the app is open; recounts on return, reconnect — 2026-10-17
 - ✅ 08.5b Phone notifications both ways — the ask after a send, the label only, the admin's switch — 2026-10-17
