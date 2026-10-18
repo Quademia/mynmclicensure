@@ -149,10 +149,10 @@ before then, and the old list's history, is in
 
 ## [08 Help and news](docs/product-plan/08-help-and-news.md)
 
-- ⬜ A1 Announcements' floor — one scoping function, the table admin-only, the level scope a list
-- ⬜ A2 Each notice's marks — seen (by itself), tapped, dismissed; server writes; ✕ dismisses
-- ⬜ 08.1 Course news to everyone who has held the course, revoked grants apart (Sam, 10-04)
-- ⬜ 08.7 The Announcements page redesigned — Messages' layout, the hybrid list, one list, Ask about this
+- ✅ A1 Announcements' floor — one reader in the database, the tables closed to the browser, levels a list — 2026-10-18
+- ✅ A2 Each notice's marks — seen, tapped, dismissed, each dated once; server writes; ✕ dismisses — 2026-10-18
+- ✅ 08.1 Course news to everyone who has held the course, revoked grants apart (Sam, 10-04) — 2026-10-18
+- ⬜ 08.7 The Announcements page redesigned — Messages' layout, the hybrid list, Seen by itself, Ask about this
 - ⬜ 08.8 The dashboard's New from Quademia card, near the top; the Must-see pop-up, once
 - ⬜ 08.9 The number of new notices on the bell (computer) and the menu's row (phone)
 - ⬜ 08.10 One picture per notice — uploaded only, two small sizes made at upload

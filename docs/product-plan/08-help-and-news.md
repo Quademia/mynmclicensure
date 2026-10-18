@@ -21,22 +21,23 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
   students. A student must match every scope that is set.
 - **A course's announcements reach every student who has held the
   course** — live or ended, revoked grants apart; "subscribers only" is
-  the course plus Paid (Sam, 2026-10-04; no storage change). *(to build:
-  08.1, with A1)*
+  the course plus Paid (Sam, 2026-10-04; no storage change). *(built
+  2026-10-18: 08.1)*
 - **The scoping runs in the database** (Sam, 2026-09-18): one function
   returns only what the signed-in student should see, with the student's
-  own marks, one read per page; the table itself is admin-only, and the
-  named-students list never leaves the server. Draft, active, archived
-  (no "scheduled"); start and end dates bound when it shows; pinned
-  first, then priority; archive is the way out, nothing deletes. *(to
-  build: A1)*
+  own marks, one read per page; the table itself is closed to the
+  browser, and the named-students list never leaves the server. Draft,
+  active, archived (no "scheduled"); start and end dates bound when it
+  shows; pinned first, then priority, then newest; archive is the way
+  out, nothing deletes. *(built 2026-10-18: A1)*
 - **Each notice remembers its own marks** for each student — seen,
   tapped, dismissed, each set once, never cleared; writes through the
-  server only. **Seen sets itself** when a notice shows in full — opened
-  on the page, the must-see pop-up, a course page's news — with no Mark
-  as read button; one small message after the page has shown, only when
-  something is new. A tap on a notice's button counts wherever it shows.
-  ✕ dismisses. *(to build: A2)*
+  server only; ✕ dismisses. *(built 2026-10-18: A2 — today's page still
+  marks Seen with its Mark as Read button.)* **Seen sets itself** when a
+  notice shows in full — opened on the page, the must-see pop-up, a
+  course page's news — with no Mark as read button; one small message
+  after the page has shown, only when something is new. A tap on a
+  notice's button counts wherever it shows. *(to build: 08.7)*
 - **No Bulk Send**: announcements are the broadcast, with the same
   targeting; New Thread reaches one student (Sam, 2026-09-18).
 
