@@ -207,6 +207,27 @@
 .ann-overlay .kind-add { margin-bottom: var(--space-8); }
 .ann-overlay .kind-note { margin-top: var(--space-4); }
 
+/* ── The follow-up (08.11) and the reach line (08.12), 2026-10-18 ── */
+.ann .row-actions { display: flex; gap: var(--space-6); }
+.ann-overlay .reach-line { margin-top: var(--space-8); padding-top: var(--space-8); border-top: 1px solid var(--border); }
+.ann-overlay .followup-panel { width: 600px; }
+.ann-overlay .fu-numbers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-8); margin-bottom: var(--space-16); }
+.ann-overlay .fu-number { display: flex; flex-direction: column; gap: 2px; padding: var(--space-10) var(--space-12); border-radius: var(--radius); background: var(--surface-page); border: 1px solid var(--border); }
+.ann-overlay .fu-label { font-size: var(--type-meta-size); color: var(--ink-muted); }
+.ann-overlay .fu-value { font-size: var(--type-page-title-size-phone); line-height: 1.2; font-weight: 700; color: var(--brand-navy); }
+.ann-overlay .fu-sub { font-size: var(--type-micro-size); color: var(--ink-muted); }
+.ann-overlay .fu-tabs { display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-16); margin-bottom: var(--space-8); border-bottom: 1px solid var(--border); }
+.ann-overlay .fu-tab { padding: var(--space-6) 0; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; background: none; font: inherit; font-size: var(--type-ui-size); color: var(--ink-muted); cursor: pointer; }
+.ann-overlay .fu-tab.is-on { border-bottom-color: var(--brand-navy); color: var(--ink); font-weight: 600; }
+.ann-overlay .fu-rows { list-style: none; margin: 0 0 var(--space-12); padding: 0; }
+.ann-overlay .fu-row { display: flex; flex-direction: column; gap: 2px; padding: var(--space-8) 0; border-bottom: 1px solid var(--border); }
+.ann-overlay .fu-name { font-size: var(--type-ui-size); font-weight: 600; color: var(--ink); }
+.ann-overlay .fu-meta { font-size: var(--type-meta-size); color: var(--ink-muted); }
+.ann-overlay .fu-note { font-size: var(--type-ui-size); color: var(--ink-muted); }
+@media (max-width: 768px) {
+  .ann-overlay .fu-numbers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 /* ── Archive dialog (portalled) ── */
 .ann-overlay .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.35); z-index: 200; align-items: center; justify-content: center; padding: 16px; }
 .ann-overlay .modal-overlay.show { display: flex; }

@@ -156,8 +156,8 @@ before then, and the old list's history, is in
 - ✅ 08.8 The dashboard's New from Quademia card, near the top; the Must-see pop-up, once — 2026-10-18
 - ✅ 08.9 The number of new notices on the bell (computer), the menu's row and the menu button's dot — 2026-10-18
 - ✅ 08.10 One picture per notice — uploaded only, two small sizes made in the admin's browser — 2026-10-18
-- ⬜ 08.11 The admin's follow-up — Reaches today, Seen, Tapped, Dismissed; the names behind each
-- ⬜ 08.12 "This will reach N students today" in the editor as the scopes are set
+- ✅ 08.11 The admin's follow-up — Reaches today, Seen, Tapped, Dismissed; the names behind each — 2026-10-18
+- ✅ 08.12 "This will reach N students today" in the editor as the scopes are set — 2026-10-18
 - ✅ 08.13 Kinds — the admin's own list, a name and an icon from a 25-icon grid; the editor's Kind — 2026-10-18
 - ⬜ 08.14 The editor without codes — the tool chosen with Sam; the body stored once (takes in A3)
 - ⬜ 08.15 Announcements to devices — a tick in the editor, sent once when the notice goes live

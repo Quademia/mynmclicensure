@@ -826,6 +826,16 @@ the browser can call only the first two lines and
   `notice_mark(person, notices, mark)` (server only) — seen, tapped or
   dismissed, each set once. `announcement_marks_counts()` (server only) —
   seen, tapped and dismissed per notice, for the admin's page.
+  The rule is written once (08.11, 08.12; built 2026-10-18,
+  `20261018200000_announcement_followup.sql`, server only):
+  `notice_people(person or all)` — the facts the scopes read; 
+  `notice_scope_ok(…)` — the eight scopes against those facts, used by
+  the student's reader and by `announcement_reach_counts()` (each notice's
+  reach today: the active students it matches, whatever its status),
+  `announcement_reach_preview(scopes…)` (the editor's "This will reach N
+  students today") and `announcement_followup(notice)` (everyone reached
+  today and everyone with a mark: name, programme, kind, last sitting,
+  reached, the three dates).
 - **Notifications** (server only; 08.5b, built 2026-10-17):
   `notify_device_save`, `notify_device_relink`, `notify_device_drop_kind`,
   `notify_targets` — see `notification_devices`.

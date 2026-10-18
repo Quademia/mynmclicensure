@@ -35,8 +35,10 @@ import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { archiveAnnouncement, removeAnnouncementPicture, saveAnnouncement, searchStudentsForScope, setAnnouncementPicture } from '@/lib/announcements/actions';
 import { kindIcon, pictureUrl } from '@/lib/announcements/display';
 import { makePicture, type MadePicture } from '@/lib/announcements/picture-maker';
-import { DEFAULT_KIND, type AnnouncementKind } from '@/lib/announcements/types';
+import { DEFAULT_KIND, type AnnouncementKind, type ReachMap } from '@/lib/announcements/types';
+import { previewReach } from '@/lib/announcements/followup-actions';
 import { KindsPanel } from './kinds-panel';
+import { FollowUpPanel } from './followup-panel';
 import { computeDisplayStatus } from '@/lib/announcements/scoping';
 import { htmlToText, newlinesToParagraphs, sanitiseHtml } from '@/lib/announcements/sanitise';
 import { LEVELS, type Announcement, type EngageMap } from '@/lib/announcements/types';
@@ -68,6 +70,7 @@ export function AnnouncementsClient({
   products,
   cohorts,
   kinds,
+  reach,
 }: {
   announcements: Announcement[];
   engage: EngageMap;
@@ -76,6 +79,8 @@ export function AnnouncementsClient({
   products: Product[];
   cohorts: string[];
   kinds: AnnouncementKind[];
+  /** Each notice's reach today (08.11). */
+  reach: ReachMap;
 }) {
   const router = useRouter();
   const [msg, setMsg] = useState<Msg>(null);
@@ -310,6 +315,42 @@ export function AnnouncementsClient({
   const previewHtml = body.trim() ? sanitiseHtml(newlinesToParagraphs(body)) : '';
 
   // ── the live audience sentence (legacy refreshSummary) ──
+  // ── the reach line (08.12): "This will reach N students today", counted
+  // by the database a moment after the scopes stop changing; an answer is
+  // kept with the scopes it was counted for, so a stale one never shows ──
+  const userIds = selectedUsers.map((u) => u.user_id);
+  const scopeKey = JSON.stringify([audience, progs, scopeCourses, levels, subKind, scopeProducts, userIds, cohort]);
+  const [reachCount, setReachCount] = useState<{ key: string; n: number } | null>(null);
+  const reachNow = reachCount && reachCount.key === scopeKey ? reachCount.n : null;
+  useEffect(() => {
+    if (!panelOpen) return;
+    let stopped = false;
+    const [aud, pr, co, lv, sk, pd, us, ch] = JSON.parse(scopeKey) as [string, string[], string[], string[], string, string[], string[], string];
+    const timer = window.setTimeout(() => {
+      previewReach({
+        scope_audience: aud,
+        scope_programs: pr,
+        scope_courses: co,
+        scope_levels: lv,
+        scope_subscription_kind: sk,
+        scope_product_ids: pd,
+        scope_user_ids: us,
+        scope_cohort: ch,
+      })
+        .then((n) => {
+          if (!stopped && n != null) setReachCount({ key: scopeKey, n });
+        })
+        .catch(() => {});
+    }, 400);
+    return () => {
+      stopped = true;
+      window.clearTimeout(timer);
+    };
+  }, [panelOpen, scopeKey]);
+
+  // ── the follow-up (08.11) ──
+  const [followTarget, setFollowTarget] = useState<{ announcement_id: string; title: string; when: string } | null>(null);
+
   const summaryParts: React.ReactNode[] = [];
   summaryParts.push(<strong key="aud">{audience === 'STUDENTS' ? 'students only' : 'all users'}</strong>);
   if (progs.length) {
@@ -512,12 +553,24 @@ export function AnnouncementsClient({
                       <td className="cell-muted">{schedule}</td>
                       <td>
                         <div className="engage-counts">
-                          <span title="Seen"><Icon name="check-circle" size={13} />{ec.seen}</span><span title="Tapped"><Icon name="pointer" size={13} />{ec.tapped}</span><span title="Dismissed"><Icon name="x" size={13} />{ec.dismissed}</span>
+                          <span title={`Seen, of ${reach[a.announcement_id] ?? 0} reached today`}><Icon name="check-circle" size={13} />{ec.seen}/{reach[a.announcement_id] ?? 0}</span><span title="Tapped"><Icon name="pointer" size={13} />{ec.tapped}</span><span title="Dismissed"><Icon name="x" size={13} />{ec.dismissed}</span>
                         </div>
                       </td>
                       <td className="cell-flags">{a.dismissible ? <span>dismissible</span> : null}</td>
                       <td>
-                        <button type="button" className="btn btn-ghost btn-sm" onClick={(e) => { e.stopPropagation(); openPanel(a.announcement_id); }}>Edit</button>
+                        <div className="row-actions">
+                          <button type="button" className="btn btn-ghost btn-sm" onClick={(e) => { e.stopPropagation(); openPanel(a.announcement_id); }}>Edit</button>
+                          <button
+                            type="button"
+                            className="btn btn-ghost btn-sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFollowTarget({ announcement_id: a.announcement_id, title: a.title, when: a.created_at ? `made ${fmtShort(a.created_at)}` : '' });
+                            }}
+                          >
+                            Follow-up
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -531,6 +584,7 @@ export function AnnouncementsClient({
       <BodyPortal>
         <div className="ann-overlay">
           <KindsPanel open={kindsOpen} onClose={() => setKindsOpen(false)} kinds={kinds} usedBy={usedBy} onError={err} onDone={ok} />
+          <FollowUpPanel notice={followTarget} onClose={() => setFollowTarget(null)} />
           {/* Side panel */}
           <div className={`panel-overlay${panelOpen ? ' show' : ''}`} onClick={closePanel} />
           <div className={`side-panel${panelOpen ? ' open' : ''}`}>
@@ -804,6 +858,9 @@ export function AnnouncementsClient({
 
               <div className="audience-summary">
                 This announcement will be shown to {summaryParts.map((part, i) => <span key={i}>{i > 0 ? ', ' : ''}{part}</span>)}.
+                <div className="reach-line">
+                  {reachNow === null ? 'Counting who it reaches…' : <>This will reach <strong>{reachNow} student{reachNow === 1 ? '' : 's'}</strong> today.</>}
+                </div>
               </div>
             </div>
 

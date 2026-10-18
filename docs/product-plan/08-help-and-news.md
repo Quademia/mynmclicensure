@@ -43,8 +43,8 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
 - **No Bulk Send**: announcements are the broadcast, with the same
   targeting; New Thread reaches one student (Sam, 2026-09-18).
 
-**Redesigned (Sam, 2026-10-18; drawn in the chat).** *(08.7, 08.8, 08.9,
-08.10 and 08.13 built 2026-10-18; to build: 08.11, 08.12, 08.14, 08.15)*
+**Redesigned (Sam, 2026-10-18; drawn in the chat).** *(08.7–08.13 built
+2026-10-18; to build: 08.14, 08.15, A4)*
 
 - **The page, like Messages**: the list, and a tap opens the notice —
   beside the list on a computer, the newest opening by itself; in its
@@ -103,7 +103,10 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
 - **The follow-up**: Reaches today · Seen · Tapped · Dismissed, each
   out of who it reaches, and the names behind each number, Not seen yet
   among them (with the last sign-in once 01.6 is built, until then the
-  last sitting). *(08.11)*
+  last sitting). *(built 2026-10-18: 08.11 — a row's Follow-up opens it;
+  the row shows Seen out of the reach; 08.12's reach line in the
+  editor's Targeting. The reach, the line and the student's reader share
+  one rule in the database.)*
 - **Parked**: a reminder to those who have not seen it; which button
   was tapped when a notice has two; a bell panel on a computer; a
   public NMC news page (with 08.3).

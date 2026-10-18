@@ -18,7 +18,7 @@
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import { readAll } from '@/lib/supabase/read-all';
-import type { Announcement, AnnouncementKind, EngageMap, StudentAnnouncement } from './types';
+import type { Announcement, AnnouncementKind, EngageMap, ReachMap, StudentAnnouncement } from './types';
 
 type ServiceClient = ReturnType<typeof import('@/lib/supabase/server').createServiceRoleClient>;
 
@@ -56,6 +56,18 @@ export async function getEngagementCounts(db: ServiceClient): Promise<EngageMap>
     map[row.announcement_id] = { seen: Number(row.seen), tapped: Number(row.tapped), dismissed: Number(row.dismissed) };
   }
   return map;
+}
+
+// Each notice's reach today (08.11): the active students its scopes match,
+// counted in the database, one row a notice.
+export async function getReachCounts(db: ServiceClient): Promise<ReachMap> {
+  type Row = { announcement_id: string; reaches: number | string };
+  const { data, error } = await readAll<Row>((from, to) => db.rpc('announcement_reach_counts').range(from, to));
+  if (error) {
+    console.error('getReachCounts:', error);
+    return {};
+  }
+  return Object.fromEntries(data.map((r) => [r.announcement_id, Number(r.reaches)]));
 }
 
 // legacy: `select cohort from users where cohort is not null`, deduped and sorted

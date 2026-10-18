@@ -81,6 +81,34 @@ export const DEFAULT_KIND = 'News';
 
 export type EngageCounts = { seen: number; tapped: number; dismissed: number };
 export type EngageMap = Record<string, EngageCounts>;
+/** Each notice's reach today: the active students its scopes match (08.11). */
+export type ReachMap = Record<string, number>;
+
+/** One student in a notice's follow-up (08.11): reached today, or marked it. */
+export type FollowUpRow = {
+  user_id: string;
+  name: string;
+  program_id: string | null;
+  sub_kind: string;
+  last_sitting: string | null;
+  reached: boolean;
+  seen_at: string | null;
+  tapped_at: string | null;
+  dismissed_at: string | null;
+};
+export type FollowUpResult = { ok: true; rows: FollowUpRow[] } | { ok: false; error: string };
+
+/** The scopes the editor's reach line counts (08.12). */
+export type ReachScopes = {
+  scope_audience: string;
+  scope_programs: string[];
+  scope_levels: string[];
+  scope_cohort: string;
+  scope_subscription_kind: string;
+  scope_product_ids: string[];
+  scope_user_ids: string[];
+  scope_courses: string[];
+};
 
 // legacy saveAnnouncement's payload
 export type SaveAnnouncementInput = {
