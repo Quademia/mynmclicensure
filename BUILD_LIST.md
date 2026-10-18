@@ -155,7 +155,7 @@ before then, and the old list's history, is in
 - ✅ 08.7 The Announcements page redesigned — Messages' layout, the hybrid list, Seen by itself, Ask about this — 2026-10-18
 - ⬜ 08.8 The dashboard's New from Quademia card, near the top; the Must-see pop-up, once
 - ✅ 08.9 The number of new notices on the bell (computer), the menu's row and the menu button's dot — 2026-10-18
-- ⬜ 08.10 One picture per notice — uploaded only, two small sizes made at upload
+- ✅ 08.10 One picture per notice — uploaded only, two small sizes made in the admin's browser — 2026-10-18
 - ⬜ 08.11 The admin's follow-up — Reaches today, Seen, Tapped, Dismissed; the names behind each
 - ⬜ 08.12 "This will reach N students today" in the editor as the scopes are set
 - ⬜ 08.13 Kinds — the admin's own list, each a name and an icon from a grid; five to start

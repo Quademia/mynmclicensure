@@ -43,8 +43,8 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
 - **No Bulk Send**: announcements are the broadcast, with the same
   targeting; New Thread reaches one student (Sam, 2026-09-18).
 
-**Redesigned (Sam, 2026-10-18; drawn in the chat).** *(08.7 and 08.9
-built 2026-10-18; to build: 08.8, 08.10–08.15)*
+**Redesigned (Sam, 2026-10-18; drawn in the chat).** *(08.7, 08.9 and
+08.10 built 2026-10-18; to build: 08.8, 08.11–08.15)*
 
 - **The page, like Messages**: the list, and a tap opens the notice —
   beside the list on a computer, the newest opening by itself; in its
@@ -69,7 +69,11 @@ built 2026-10-18; to build: 08.8, 08.10–08.15)*
   1200 × 600), the upload box saying so; made at upload into two small
   sizes (about 10 KB for the list, 100 KB for the opened notice, loaded
   only when opened); the words first, the picture after. A video is a
-  button to YouTube. *(08.10)*
+  button to YouTube. *(built 2026-10-18: 08.10 — in today's admin form,
+  moving with 08.14: the admin's browser cuts the 2:1 middle at up to
+  1200 × 600 and the list's middle square, WebP, else JPEG; each picture
+  its own folder, kept a year in a phone's cache; Replace and Remove
+  delete the old files.)*
 - **The ways in**: on a computer the bell with the number of new
   notices; on a phone the menu's Announcements row with its number and
   the menu button's dot (the phone's top bar keeps no bell, 2026-09-26);
