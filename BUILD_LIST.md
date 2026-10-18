@@ -110,6 +110,7 @@ before then, and the old list's history, is in
 
 - ✅ G1a The streak and questions mastered — the dashboard's streak card, with 05.4 — 2026-10-10
 - ✅ 05.4 The dashboard redesigned — D2a, D2b; six states walked, the words approved — 2026-10-10
+- ✅ 05.4 (unplanned) The welcome as both dashboards' title — the shared title row; "Dashboard" and "Admin Dashboard" gone; a line beneath later (Sam) — 2026-10-18
 - ✅ 05.5 Learning History redesigned — a course dropdown, the figures, one tap to the report, dots menu — 2026-10-17
 - ✅ Q12 The history's figures — sittings, average, best, a count by kind, by the database — 2026-10-17
 - ⏸ 05.6 A course's topics on its course page — strongest and to work on; too busy as drawn (10-17); after 05.5

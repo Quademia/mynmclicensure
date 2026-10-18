@@ -361,3 +361,7 @@ Still to tick at their builds: the body stored once (08.14) and the
   (with the item above); and whether a device notice shows the notice's
   title (a notice is not private, unlike a message) or only "News from
   Quademia".
+- **Small things offered on 2026-10-18, not ruled**: a proper pin icon on
+  the admin's rows; the editor's Ask students to confirm looking locked
+  (greyed) while Must-see holds it on — today only its hint says so;
+  "keep it rare **and short**" in the Must-see hint.

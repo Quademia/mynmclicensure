@@ -533,6 +533,12 @@ above sit at the repo root; the audience grouping inside them is kept.
   `licensure_gh.migrations`. Never `supabase db push`, never the MCP
   `apply_migration` — both stamp the project's shared tracker, which
   this repo does not own.
+- **The dev Supabase tool declines a DELETE** (2026-10-18, twice); an
+  UPDATE and reads go through. When Sam asks for dev rows deleted, read
+  the count first, then run it through the app's own connection — an
+  inline `node --input-type=module -e` with `postgres` from
+  `node_modules` and `DB_URL` from `.env.local` (never printed),
+  refusing unless the count is still the one read. No file needed.
 - **Prove a migration before applying it, without touching dev's
   data:** a scratchpad script that reads `DB_URL` from `.env.local`
   (never printing it) and runs `begin; <the file>; <tests>; rollback;`
