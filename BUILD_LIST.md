@@ -158,7 +158,7 @@ before then, and the old list's history, is in
 - ⬜ 08.10 One picture per notice — uploaded only, two small sizes made at upload
 - ⬜ 08.11 The admin's follow-up — Reaches today, Seen, Tapped, Dismissed; the names behind each
 - ⬜ 08.12 "This will reach N students today" in the editor as the scopes are set
-- ⬜ 08.13 Kinds — Exam date, New questions, Offer, Alert, News; an icon each
+- ⬜ 08.13 Kinds — the admin's own list, each a name and an icon from a grid; five to start
 - ⬜ 08.14 The editor without codes — the tool chosen with Sam; the body stored once (takes in A3)
 - ⬜ 08.15 Announcements to devices — a tick in the editor, sent once when the notice goes live
 - ⬜ A4 A button pointing inside the app, picked from a list, in the announcement editor

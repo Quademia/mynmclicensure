@@ -54,8 +54,11 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
   picture across the top, kind · programme · date, the title, the
   words, the button, **Ask about this** (the Message us box, its label
   picked by the notice), Dismiss when allowed. *(08.7)*
-- **Kinds**: Exam date · New questions · Offer · Alert · News, an icon
-  each. *(08.13)*
+- **Kinds are the admin's own list** (Sam: "the examples given may not
+  be enough"): a name and an icon picked from a grid of the app's icons;
+  added, renamed, re-iconed, ordered, retired (never deleted while in
+  use). It starts with Exam date · New questions · Offer · Alert · News;
+  News when none is picked. *(08.13)*
 - **One picture per notice, uploaded** — never a pasted link (Sam: the
   app would copy it in anyway, doing the job twice); wide (2:1, about
   1200 × 600), the upload box saying so; made at upload into two small
@@ -274,14 +277,14 @@ Written on the tables in `12-tables.md`, all ticked 2026-09-18:
 - `messages_threads` and `messages` — the support desk (08.2).
 - `announcements` — read through one function, admin-only, the level
   scope a list (A1).
-- `user_notice_state` — read, clicked, dismissed (A2); read is "seen",
-  set by itself (2026-10-18, no new column).
+- `user_notice_state` — seen, tapped, dismissed (A2; named after the
+  follow-up's words 2026-10-18).
 
-Written 2026-10-18 for the redesign, **waiting for Sam's tick** there:
-`announcements` gains the kind, the picture, Must-see and the devices
-send; the body stored once (with 08.14); the bucket
-`licensure-gh-announcement-images`; `notification_devices` gains the
-`announcement` kind.
+Ticked by Sam 2026-10-18 for the redesign: `announcements` gains the
+kind, the picture, Must-see and the devices send; the new table
+`announcement_kinds`; the bucket `licensure-gh-announcement-images`.
+Still to tick at their builds: the body stored once (08.14) and the
+`announcement` kind on `notification_devices` (08.15).
 
 ## Open
 

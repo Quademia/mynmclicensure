@@ -587,9 +587,10 @@ table by table as each is next changed (AGENTS.md rule 9).
   table itself admin-only; checks on the status and scope words;
   `scope_level` a list. Why: today every signed-in account reads every
   notice, the named-students list included.
-- *Needs Sam's tick before the build (08 redesign, written 2026-10-18):*
-  - `kind` — `exam`, `questions`, `offer`, `alert` or `news` (the
-    default), checked; the icon in the list follows it (08.13).
+- *To build — ticked by Sam 2026-10-18 (08 redesign):*
+  - `kind` — the notice's kind, from the admin's own list in
+    `announcement_kinds` (below), keyed on its name; News when none is
+    picked (08.13).
   - `picture_path` — where the notice's picture sits in a new bucket,
     `licensure-gh-announcement-images` (anyone may read a picture, only
     the server writes): the two sizes made at upload, the list's square
@@ -598,9 +599,27 @@ table by table as each is next changed (AGENTS.md rule 9).
   - `send_to_devices` — yes or no; `sent_at` — when the device notices
     went, so a notice is sent once, when it goes live (08.15).
   - With the new editor (08.14): `body_html` and `body_text` give way to
-    one body, its form chosen with the editor.
+    one body, its form chosen with the editor (its own tick then).
 - Browser today: every signed-in account reads every row; admin write.
   *Old defaults.*
+
+### `announcement_kinds` — the admin's list of kinds *(new)*
+| Column | Holds |
+|---|---|
+| `name` | The kind as students see it — "Exam date"; unique; a notice's `kind` points here |
+| `icon` | One icon from the app's set, picked by the admin from a grid |
+| `position` | The kind's place in the editor's list |
+| `active` | No: retired — no longer offered for a new notice; notices that use it keep it |
+| `created_at` | When added |
+
+- *To build — ticked by Sam 2026-10-18 (08.13; Sam: "the examples given
+  may not be enough"):* the admin adds, renames, re-icons, orders and
+  retires kinds; a rename reaches every notice inside the database (the
+  key is the name, on update cascade, as the bank's topics, 08 B5); a
+  kind in use cannot be deleted, only retired. Starts with Exam date,
+  New questions, Offer, Alert and News. Why: the five may not be enough.
+- Browser: nothing — the student's reader hands each notice its kind's
+  name and icon; the admin's page reads through the server.
 
 ### `user_notice_state` — what each student did with a notice
 | Column | Holds |
@@ -610,12 +629,13 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `state` | One word, overwritten (read, then dismissed, loses the read) |
 | `seen_at`, `updated_at` | When |
 
-- *To build — ticked 2026-09-18 (08 A2):* `read_at`, `clicked_at`,
-  `dismissed_at` — each set once, never cleared — replace `state`,
-  `seen_at`, `updated_at`; `item_id` keyed to the notice; written
-  through the server only. `read_at` is the follow-up's **Seen**, set
-  by itself when a notice shows in full; a Must-see notice pops up while
-  it is empty (Sam, 2026-10-18; no new column).
+- *To build — ticked 2026-09-18 (08 A2), named by Sam 2026-10-18 after
+  the follow-up's words:* `seen_at`, `tapped_at`, `dismissed_at` — each
+  set once, never cleared — replace `state` and `updated_at` (today's
+  `seen_at`, the last touch, gives way to the new one; old rows carried
+  over); `item_id` keyed to the notice; written through the server only.
+  **Seen** sets itself when a notice shows in full; a tap sets Seen too;
+  a Must-see notice pops up while Seen is empty.
 - Browser: the owner reads and writes their own. *Old defaults.*
 
 ### `messages_threads` — conversations
