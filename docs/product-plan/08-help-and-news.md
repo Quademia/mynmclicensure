@@ -75,10 +75,11 @@ Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
   and the conversation take turns and the back button returns to the
   list; on a computer they sit side by side.
 - **A new reply is marked so it cannot be missed** (Sam, 2026-10-18,
-  drawn: A; the dot alone was easy to miss): the row's preview turns dark
-  and says who wrote ("Quademia: …"; "You: …" for the student's own), the
-  time teal, and a **New reply** badge sits under it; the list keeps its
-  order. The admin's view of a student says **New message**. A "New
+  drawn: A; the dot alone was easy to miss): told in one colour, blue —
+  the dot, the preview bold and blue, saying who wrote ("Quademia: …";
+  "You: …" for the student's own), and a blue **New reply** badge under
+  the time, which stays grey; the list keeps its order. Teal on the page
+  means only the open conversation and "Start a message". The admin's view of a student says **New message**. A "New
   replies" card above the list was built and taken out the same night
   (Sam: it did not make sense).
 - Messages needs a signed-in student, so one who cannot sign in cannot
