@@ -202,3 +202,6 @@
   .sann:not(.sann-open) .sann-row.is-on { background: none; }
   .sann:not(.sann-open) .sann-hero.is-on { border-color: var(--border); box-shadow: none; }
 }
+
+/* a notice's button inside the app, pressed until its page arrives (A4) */
+.sann-body a[data-qa='btn'].is-pending { opacity: 0.7; pointer-events: none; }

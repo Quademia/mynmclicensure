@@ -16,6 +16,7 @@ import { requireAdmin } from '@/lib/access';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getAllProducts, getCourses, getPrograms } from '@/lib/catalogue/queries';
 import { getAllAnnouncements, getCohorts, getEngagementCounts, getKinds, getReachCounts } from '@/lib/announcements/queries';
+import { getAllQuizzes } from '@/lib/quizzes/queries';
 import { PageHeader } from '@/components/shell/page-header';
 import { AnnouncementsClient } from './announcements-client';
 import '@/styles/admin-announcements.css';
@@ -29,7 +30,7 @@ export const dynamic = 'force-dynamic';
 export default async function AdminAnnouncementsPage() {
   const { supabase } = await requireAdmin();
   const service = createServiceRoleClient();
-  const [announcements, engage, programs, courses, products, cohorts, kinds, reach] = await Promise.all([
+  const [announcements, engage, programs, courses, products, cohorts, kinds, reach, mockRows] = await Promise.all([
     getAllAnnouncements(service),
     getEngagementCounts(service),
     getPrograms(supabase),
@@ -38,7 +39,10 @@ export default async function AdminAnnouncementsPage() {
     getCohorts(supabase),
     getKinds(service),
     getReachCounts(service),
+    // the mock exams a notice's button may point to (A4)
+    getAllQuizzes(service, 'mock'),
   ]);
+  const mocks = mockRows.map((m) => ({ quiz_id: m.quiz_id, title: m.title, course_id: m.course_id, status: m.status }));
 
   return (
     <>
@@ -53,6 +57,7 @@ export default async function AdminAnnouncementsPage() {
         cohorts={cohorts}
         kinds={kinds}
         reach={reach}
+        mocks={mocks}
       />
     </>
   );

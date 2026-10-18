@@ -37,6 +37,7 @@ import { kindIcon, pictureUrl } from '@/lib/announcements/display';
 import { makePicture, type MadePicture } from '@/lib/announcements/picture-maker';
 import { DEFAULT_KIND, type AnnouncementKind, type ReachMap } from '@/lib/announcements/types';
 import { previewReach } from '@/lib/announcements/followup-actions';
+import { appPageGroups } from '@/lib/announcements/app-pages';
 import { KindsPanel } from './kinds-panel';
 import { FollowUpPanel } from './followup-panel';
 import { computeDisplayStatus } from '@/lib/announcements/scoping';
@@ -71,6 +72,7 @@ export function AnnouncementsClient({
   cohorts,
   kinds,
   reach,
+  mocks,
 }: {
   announcements: Announcement[];
   engage: EngageMap;
@@ -81,6 +83,8 @@ export function AnnouncementsClient({
   kinds: AnnouncementKind[];
   /** Each notice's reach today (08.11). */
   reach: ReachMap;
+  /** The mock exams a button may point to (A4). */
+  mocks: { quiz_id: string; title: string; course_id: string | null; status: string | null }[];
 }) {
   const router = useRouter();
   const [msg, setMsg] = useState<Msg>(null);
@@ -292,19 +296,21 @@ export function AnnouncementsClient({
   // "Insert" dialogs with both fields at once; the labels are the
   // prompts' words. The Quiz Link tool is gone with its alert — the
   // alert said the quiz engine was not built, which stopped being true
-  // in slice 5; a real quiz-link picker is a line under 05-announcements.
+  // in slice 5. A4 (2026-10-18): both dialogs list the app's own pages —
+  // the student's pages, each course, each mock exam — as paths.
   const [linkDialog, setLinkDialog] = useState<'link' | 'button' | null>(null);
+  const appPages = appPageGroups(courses, mocks);
 
   function insertLink({ url, text }: { url: string; text: string }) {
     const ta = bodyRef.current;
     const pos = ta ? ta.selectionStart : body.length;
-    setBody(body.slice(0, pos) + `<a href="${url}">${escapeHtml(text || url)}</a>` + body.slice(pos));
+    setBody(body.slice(0, pos) + `<a href="${escapeHtml(url)}">${escapeHtml(text || url)}</a>` + body.slice(pos));
     setLinkDialog(null);
     ta?.focus();
   }
 
   function insertButton({ url, text }: { url: string; text: string }) {
-    setBody(body + (body ? '\n' : '') + `<a href="${url}" data-qa="btn">${escapeHtml(text || 'Open')}</a>`);
+    setBody(body + (body ? '\n' : '') + `<a href="${escapeHtml(url)}" data-qa="btn">${escapeHtml(text || 'Open')}</a>`);
     setLinkDialog(null);
     bodyRef.current?.focus();
   }
@@ -477,6 +483,7 @@ export function AnnouncementsClient({
         title="Insert link"
         urlLabel="Link URL:"
         textLabel="Link text:"
+        pages={appPages}
         onSubmit={insertLink}
         onCancel={() => setLinkDialog(null)}
       />
@@ -486,6 +493,7 @@ export function AnnouncementsClient({
         urlLabel="Button URL:"
         textLabel="Button label:"
         textDefault="Open"
+        pages={appPages}
         onSubmit={insertButton}
         onCancel={() => setLinkDialog(null)}
       />

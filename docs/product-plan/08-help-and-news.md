@@ -43,8 +43,8 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
 - **No Bulk Send**: announcements are the broadcast, with the same
   targeting; New Thread reaches one student (Sam, 2026-09-18).
 
-**Redesigned (Sam, 2026-10-18; drawn in the chat).** *(08.7–08.13 built
-2026-10-18; to build: 08.14, 08.15, A4)*
+**Redesigned (Sam, 2026-10-18; drawn in the chat).** *(08.7–08.13 and A4
+built 2026-10-18; to build: 08.14, 08.15)*
 
 - **The page, like Messages**: the list, and a tap opens the notice —
   beside the list on a computer, the newest opening by itself; in its
@@ -99,7 +99,13 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
   ends the extra line break per save); the picture, the kind, Must-see,
   **Also send to devices** (08.5b's notices, once, when it goes live); a
   button pointing inside the app picked from a list; **"This will reach
-  N students today"** as the scopes are set. *(08.14, 08.15, A4, 08.12)*
+  N students today"** as the scopes are set. *(the picture, kind,
+  Must-see, the list and the reach built 2026-10-18 in today's form: 08.10,
+  08.13, 08.8, A4 — the Link and Button boxes list the student's pages,
+  each course and its practice papers, each mock with its course; an
+  in-app address is a path and opens inside the app; a link keeps only a
+  web, email or in-app address — and 08.12. To build: the editor without
+  codes 08.14, devices 08.15.)*
 - **The follow-up**: Reaches today · Seen · Tapped · Dismissed, each
   out of who it reaches, and the names behind each number, Not seen yet
   among them (with the last sign-in once 01.6 is built, until then the

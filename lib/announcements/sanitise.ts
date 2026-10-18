@@ -9,8 +9,12 @@
 // the browser's DOM, as legacy did, so they run in client components
 // only. Server code never renders a body; the client sanitises at
 // render, as legacy's pages did, so a stored body is never trusted.
+// Since A4 (2026-10-18) a link keeps only a web, email or in-app address,
+// and an in-app one stays in the tab.
 
-const ALLOWED = ['p', 'br', 'strong', 'em', 'b', 'i', 'ul', 'ol', 'li', 'a', 'code', 'img'];
+import { isAppPath, isSafeHref } from './app-pages';
+
+const ALLOWED =['p', 'br', 'strong', 'em', 'b', 'i', 'ul', 'ol', 'li', 'a', 'code', 'img'];
 
 export function newlinesToParagraphs(text: string): string {
   return text
@@ -41,13 +45,19 @@ export function sanitiseHtml(raw: string): string {
       return;
     }
     if (tag === 'a') {
-      const href = el.getAttribute('href') || '';
+      // Only the web, email and the app's own paths (A4, 2026-10-18): an
+      // address that runs code (javascript:) or anything else is dropped.
+      // A path inside the app stays in the tab; the rest open a new one.
+      const raw = (el.getAttribute('href') || '').trim();
+      const href = isSafeHref(raw) ? raw : '';
       const dataQa = el.getAttribute('data-qa') || '';
       Array.from(el.attributes).forEach((attr) => el.removeAttribute(attr.name));
       if (href) el.setAttribute('href', href);
       if (dataQa) el.setAttribute('data-qa', dataQa);
-      el.setAttribute('target', '_blank');
-      el.setAttribute('rel', 'noopener');
+      if (!isAppPath(href)) {
+        el.setAttribute('target', '_blank');
+        el.setAttribute('rel', 'noopener');
+      }
     }
     if (tag === 'img') {
       const src = el.getAttribute('src') || '';

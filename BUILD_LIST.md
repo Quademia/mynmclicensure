@@ -161,7 +161,7 @@ before then, and the old list's history, is in
 - ✅ 08.13 Kinds — the admin's own list, a name and an icon from a 25-icon grid; the editor's Kind — 2026-10-18
 - ⬜ 08.14 The editor without codes — the tool chosen with Sam; the body stored once (takes in A3)
 - ⬜ 08.15 Announcements to devices — a tick in the editor, sent once when the notice goes live
-- ⬜ A4 A button pointing inside the app, picked from a list, in the announcement editor
+- ✅ A4 A button pointing inside the app, picked from a list — pages, courses, mocks; opens in the app — 2026-10-18
 - ⏸ A3 The body stored once, no extra line break per edit — taken into 08.14 (2026-10-18)
 - ✅ 08.2 The support desk — server only, five labels, Message us box, both pages; admin by student — 2026-10-17
 - ✅ 08.2 (unplanned) A new reply marked in blue — the dot, the bold preview ("Quademia: …"), a New reply badge — 2026-10-18

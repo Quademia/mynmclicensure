@@ -145,3 +145,6 @@ a.sd-list-row:hover .sd-row-title { color: var(--accent); }
 .mustsee-body a:not([data-qa='btn']) { color: var(--brand-teal-hover); text-decoration: underline; }
 .mustsee-body a[data-qa='btn'] { display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--space-4); padding: var(--space-10) var(--space-20); border-radius: var(--radius); background: var(--brand-navy); color: var(--surface); font-size: var(--type-ui-size); font-weight: 600; text-decoration: none; }
 .mustsee-body a[data-qa='btn']:hover { background: var(--brand-navy-dark); }
+
+/* a notice's button inside the app, pressed until its page arrives (A4) */
+.mustsee-body a.is-pending { opacity: 0.7; pointer-events: none; }
