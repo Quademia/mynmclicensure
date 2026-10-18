@@ -109,7 +109,12 @@ built 2026-10-18; to build: 08.14, 08.15)*
     which hides it until the student next opens the app. It stops for
     good on confirming or at the notice's end date. The pop-up no longer
     counts as Seen by appearing alone; opening the notice on the page
-    still does. *(to build: 08.16)*
+    still does.
+  - **Several Must-see notices (Sam: B)**: one after another in the same
+    visit, "1 of 3" at the top — confirming one brings the next at once;
+    Later stops the run until the app is next opened. The order is the
+    list's: pinned, then priority, then newest. A hint by the admin's
+    Must-see switch: keep it rare. *(to build: 08.16)*
 - **The admin's editor**: no codes — what is typed is what students see
   (the tool chosen with Sam at its build; the body stored once, which
   ends the extra line break per save); the picture, the kind, Must-see,
