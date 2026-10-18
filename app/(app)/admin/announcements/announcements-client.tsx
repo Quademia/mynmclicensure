@@ -32,7 +32,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Toast } from '@/lib/toast/toast';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
-import { archiveAnnouncement, saveAnnouncement, searchStudentsForScope } from '@/lib/announcements/actions';
+import { archiveAnnouncement, removeAnnouncementPicture, saveAnnouncement, searchStudentsForScope, setAnnouncementPicture } from '@/lib/announcements/actions';
+import { pictureUrl } from '@/lib/announcements/display';
+import { makePicture, type MadePicture } from '@/lib/announcements/picture-maker';
 import { computeDisplayStatus } from '@/lib/announcements/scoping';
 import { htmlToText, newlinesToParagraphs, sanitiseHtml } from '@/lib/announcements/sanitise';
 import { LEVELS, type Announcement, type EngageMap } from '@/lib/announcements/types';
@@ -118,6 +120,45 @@ export function AnnouncementsClient({
   const [saving, setSaving] = useState(false);
   const bodyRef = useRef<HTMLTextAreaElement | null>(null);
 
+  // ── the picture (08.10): made small here, sent after the notice saves ──
+  type NewPicture = MadePicture & { fullUrl: string; listUrl: string };
+  const [currentPicture, setCurrentPicture] = useState<string | null>(null);
+  const [newPicture, setNewPicture] = useState<NewPicture | null>(null);
+  const [dropPicture, setDropPicture] = useState(false);
+  const [makingPicture, setMakingPicture] = useState(false);
+  const pictureInput = useRef<HTMLInputElement | null>(null);
+
+  function clearNewPicture() {
+    setNewPicture((p) => {
+      if (p) {
+        URL.revokeObjectURL(p.fullUrl);
+        URL.revokeObjectURL(p.listUrl);
+      }
+      return null;
+    });
+  }
+
+  async function choosePicture(file: File | undefined) {
+    if (!file) return;
+    setMakingPicture(true);
+    try {
+      const made = await makePicture(file);
+      clearNewPicture();
+      setNewPicture({ ...made, fullUrl: URL.createObjectURL(made.full), listUrl: URL.createObjectURL(made.list) });
+      setDropPicture(false);
+    } catch (e) {
+      err(e instanceof Error && e.message === 'too big' ? 'That file is too big (over 15 MB).' : 'That file could not be read as a picture. Please choose a JPEG, PNG or WebP picture.');
+    } finally {
+      setMakingPicture(false);
+      if (pictureInput.current) pictureInput.current.value = '';
+    }
+  }
+
+  function removePicture() {
+    clearNewPicture();
+    setDropPicture(true);
+  }
+
   const activeProducts = products.filter((p) => p.status === 'active');
 
   function resetForm() {
@@ -139,10 +180,15 @@ export function AnnouncementsClient({
     setSelectedUsers([]);
     setUserSearch('');
     setUserHits(null);
+    setCurrentPicture(null);
+    clearNewPicture();
+    setDropPicture(false);
   }
 
   function openPanel(id: string | null) {
     setSaving(false);
+    clearNewPicture();
+    setDropPicture(false);
     if (!id) {
       setEditingId('');
       setEditingStatus('');
@@ -154,6 +200,7 @@ export function AnnouncementsClient({
       setEditingStatus(a.status);
       setTitle(a.title || '');
       setBody(a.body_html || a.body_text || '');
+      setCurrentPicture(a.picture_path);
       // §9 #18: a legacy row saved as 'scheduled' shows as draft in the form
       setStatus(a.status === 'active' || a.status === 'archived' ? a.status : 'draft');
       setPriority(String(a.priority != null ? a.priority : 1));
@@ -275,6 +322,17 @@ export function AnnouncementsClient({
   async function save() {
     if (!title.trim()) return err('Title is required.');
     setSaving(true);
+    try {
+      await saveAll();
+    } catch {
+      // a dropped connection rejects (AGENTS.md); the form keeps what was typed
+      err('Could not save. Please check your connection and try again.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function saveAll() {
     const bodyHtml = sanitiseHtml(newlinesToParagraphs(body.trim()));
     const result = await saveAnnouncement({
       announcement_id: editingId || null,
@@ -296,8 +354,32 @@ export function AnnouncementsClient({
       start_at: startAt,
       end_at: endAt,
     });
-    setSaving(false);
     if (!result.ok) return err(result.error);
+
+    // the picture goes once the notice is saved: it needs the notice's id
+    const id = result.announcement_id;
+    if (newPicture) {
+      const form = new FormData();
+      form.set('announcement_id', id);
+      form.set('ext', newPicture.ext);
+      const type = newPicture.ext === 'jpg' ? 'image/jpeg' : 'image/webp';
+      form.set('full', new File([newPicture.full], `full.${newPicture.ext}`, { type }));
+      form.set('list', new File([newPicture.list], `list.${newPicture.ext}`, { type }));
+      const pic = await setAnnouncementPicture(form);
+      if (!pic.ok) {
+        // the notice is saved: keep the panel so the picture can be sent again
+        setEditingId(id);
+        router.refresh();
+        return err(`Saved, but: ${pic.error}`);
+      }
+    } else if (dropPicture && currentPicture) {
+      const gone = await removeAnnouncementPicture(id);
+      if (!gone.ok) {
+        router.refresh();
+        return err(`Saved, but: ${gone.error}`);
+      }
+    }
+
     ok(result.created ? 'Announcement created.' : 'Announcement updated.');
     router.refresh();
     window.setTimeout(closePanel, 1200);
@@ -459,6 +541,46 @@ export function AnnouncementsClient({
                 </div>
                 <textarea id="fieldBody" ref={bodyRef} rows={6} placeholder="Write your announcement body here." value={body} onChange={(e) => setBody(e.target.value)} />
                 <p className="form-hint right" style={{ color: charColor }}>{charCount} character{charCount !== 1 ? 's' : ''}</p>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="fieldPicture">Picture (optional)</label>
+                {newPicture ? (
+                  <div className="pic-previews">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- a local preview of the made picture */}
+                    <img className="pic-full" src={newPicture.fullUrl} alt="The picture as students will see it opened" />
+                    {/* eslint-disable-next-line @next/next/no-img-element -- a local preview of the list's square */}
+                    <img className="pic-list" src={newPicture.listUrl} alt="The list's square" />
+                  </div>
+                ) : currentPicture && !dropPicture ? (
+                  <div className="pic-previews">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- the stored picture, already small */}
+                    <img className="pic-full" src={pictureUrl(currentPicture, 'full') ?? ''} alt="The picture as students see it opened" />
+                    {/* eslint-disable-next-line @next/next/no-img-element -- the stored list square */}
+                    <img className="pic-list" src={pictureUrl(currentPicture, 'list') ?? ''} alt="The list's square" />
+                  </div>
+                ) : null}
+                <input
+                  id="fieldPicture"
+                  ref={pictureInput}
+                  type="file"
+                  accept="image/*"
+                  className="pic-input"
+                  onChange={(e) => void choosePicture(e.target.files?.[0])}
+                />
+                <div className="pic-actions">
+                  <button type="button" className="btn btn-ghost btn-sm" disabled={makingPicture} onClick={() => pictureInput.current?.click()}>
+                    {makingPicture ? 'Making it smaller…' : newPicture || (currentPicture && !dropPicture) ? 'Replace picture' : 'Choose a picture'}
+                  </button>
+                  {newPicture || (currentPicture && !dropPicture) ? (
+                    <button type="button" className="btn-link danger" onClick={removePicture}>Remove</button>
+                  ) : null}
+                </div>
+                <p className="form-hint">
+                  Wide, about 1200 × 600: the middle is kept at that shape, and the list shows its middle square. It is made smaller on this computer before it is sent
+                  {newPicture ? ` (${Math.max(1, Math.round(newPicture.full.size / 1024))} KB and ${Math.max(1, Math.round(newPicture.list.size / 1024))} KB). Saved with the announcement.` : '.'}
+                  {dropPicture && currentPicture ? ' The picture is removed when you save.' : ''}
+                </p>
               </div>
 
               <div className="form-group">

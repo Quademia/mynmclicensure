@@ -100,6 +100,11 @@ export type SaveAnnouncementInput = {
 };
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
+
+// A notice's picture as it reaches the server (08.10): already made small
+// in the admin's browser (picture-maker.ts); these are the ceilings.
+export const PICTURE_FULL_MAX_BYTES = 1024 * 1024; // the bucket's own limit
+export const PICTURE_LIST_MAX_BYTES = 200 * 1024;
 /** A student's mark, with the new number for the bell and the menu row (08.9; null: not read). */
 export type MarkResult = { ok: true; newCount: number | null } | { ok: false; error: string };
 export type SaveResult = { ok: true; announcement_id: string; created: boolean } | { ok: false; error: string };

@@ -61,12 +61,25 @@ export function kindIcon(icon: string | null | undefined): IconName {
   return icon && KIND_ICONS.has(icon as IconName) ? (icon as IconName) : 'megaphone';
 }
 
+/**
+ * Where a picture's file sits in the bucket. `picture_path` names the
+ * opened notice's file (`<notice>/<made>/full.webp` or `.jpg`, 08.10); the
+ * list's square sits beside it as `list.<same>`. A bare folder (the first
+ * test pictures, 2026-10-18) holds `full.webp` and `list.webp`.
+ */
+export function pictureFile(path: string, size: 'list' | 'full'): string {
+  const clean = path.replace(/^\/+|\/+$/g, '');
+  const m = clean.match(/^(.*)\/full\.(webp|jpg)$/);
+  if (m) return `${m[1]}/${size}.${m[2]}`;
+  return `${clean}/${size}.webp`;
+}
+
 /** The picture's address: `list` the row's square, `full` the opened notice's (08.10). */
 export function pictureUrl(path: string | null | undefined, size: 'list' | 'full'): string | null {
   if (!path) return null;
   const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
   if (!base) return null;
-  return `${base}/storage/v1/object/public/${PICTURE_BUCKET}/${path.replace(/^\/+|\/+$/g, '')}/${size}.webp`;
+  return `${base}/storage/v1/object/public/${PICTURE_BUCKET}/${pictureFile(path, size)}`;
 }
 
 /** New: neither seen nor dismissed. */
