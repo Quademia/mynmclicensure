@@ -74,6 +74,7 @@ export function MustSee({
   return (
     <Dialog
       open
+      wide
       onClose={() => chooseLater(userId)}
       title={notice.title}
       media={

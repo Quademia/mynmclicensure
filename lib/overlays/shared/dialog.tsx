@@ -29,6 +29,7 @@ export function Dialog({
   children,
   role = 'dialog',
   media,
+  wide = false,
 }: {
   open: boolean;
   /** Escape, the backdrop, and the caller's Cancel. */
@@ -39,6 +40,9 @@ export function Dialog({
   role?: 'dialog' | 'alertdialog';
   /** A picture across the top, edge to edge, above the title (the Must-see notice, 08.8). */
   media?: React.ReactNode;
+  /** 560px on a computer instead of 420, for reading — a notice, not a
+   * question (the Must-see notice; Sam, 2026-10-18). Phones unchanged. */
+  wide?: boolean;
 }) {
   const ref = useRef<HTMLDialogElement | null>(null);
   const titleId = useId();
@@ -67,7 +71,7 @@ export function Dialog({
     <BodyPortal>
       <dialog
         ref={attach}
-        className="dlg"
+        className={wide ? 'dlg dlg-wide' : 'dlg'}
         role={role}
         aria-labelledby={titleId}
         onKeyDown={(e) => {
