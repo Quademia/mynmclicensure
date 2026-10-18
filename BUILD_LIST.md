@@ -159,7 +159,7 @@ before then, and the old list's history, is in
 - ✅ 08.11 The admin's follow-up — Reaches today, Seen, Tapped, Dismissed; the names behind each — 2026-10-18
 - ✅ 08.12 "This will reach N students today" in the editor as the scopes are set — 2026-10-18
 - ✅ 08.13 Kinds — the admin's own list, a name and an icon from a 25-icon grid; the editor's Kind — 2026-10-18
-- ⬜ 08.16 "I've read this" — an Ask-to-confirm tick; Must-see pops up until confirmed; Read (confirmed)
+- ✅ 08.16 "I've read this" — an Ask-to-confirm tick; Must-see pops up until confirmed, one after another; Read (confirmed) — 2026-10-18
 - ⬜ 08.14 The editor without codes — the tool chosen with Sam; the body stored once (takes in A3)
 - ⬜ 08.15 Announcements to devices — a tick in the editor, sent once when the notice goes live
 - ✅ A4 A button pointing inside the app, picked from a list — pages, courses, mocks; opens in the app — 2026-10-18

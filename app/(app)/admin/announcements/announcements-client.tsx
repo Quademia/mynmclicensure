@@ -128,6 +128,8 @@ export function AnnouncementsClient({
   const [pinned, setPinned] = useState(false);
   const [dismissible, setDismissible] = useState(true);
   const [mustSee, setMustSee] = useState(false);
+  // "I've read this" (08.16); Must-see always asks
+  const [askConfirm, setAskConfirm] = useState(false);
   const [audience, setAudience] = useState('ALL');
   const [subKind, setSubKind] = useState('');
   const [cohort, setCohort] = useState('');
@@ -192,6 +194,7 @@ export function AnnouncementsClient({
     setEndAt('');
     setPinned(false);
     setMustSee(false);
+    setAskConfirm(false);
     setDismissible(true);
     setAudience('ALL');
     setSubKind('');
@@ -233,6 +236,7 @@ export function AnnouncementsClient({
       setPinned(Boolean(a.pinned));
       setDismissible(Boolean(a.dismissible));
       setMustSee(Boolean(a.must_see));
+      setAskConfirm(Boolean(a.ask_confirm));
       setAudience(a.scope_audience || 'ALL');
       setSubKind(a.scope_subscription_kind || '');
       setCohort(a.scope_cohort || '');
@@ -355,7 +359,7 @@ export function AnnouncementsClient({
   }, [panelOpen, scopeKey]);
 
   // ── the follow-up (08.11) ──
-  const [followTarget, setFollowTarget] = useState<{ announcement_id: string; title: string; when: string } | null>(null);
+  const [followTarget, setFollowTarget] = useState<{ announcement_id: string; title: string; when: string; askConfirm: boolean } | null>(null);
 
   const summaryParts: React.ReactNode[] = [];
   summaryParts.push(<strong key="aud">{audience === 'STUDENTS' ? 'students only' : 'all users'}</strong>);
@@ -407,6 +411,7 @@ export function AnnouncementsClient({
       pinned,
       dismissible,
       must_see: mustSee,
+      ask_confirm: askConfirm || mustSee,
       kind,
       scope_audience: audience,
       scope_subscription_kind: subKind,
@@ -561,7 +566,7 @@ export function AnnouncementsClient({
                       <td className="cell-muted">{schedule}</td>
                       <td>
                         <div className="engage-counts">
-                          <span title={`Seen, of ${reach[a.announcement_id] ?? 0} reached today`}><Icon name="check-circle" size={13} />{ec.seen}/{reach[a.announcement_id] ?? 0}</span><span title="Tapped"><Icon name="pointer" size={13} />{ec.tapped}</span><span title="Dismissed"><Icon name="x" size={13} />{ec.dismissed}</span>
+                          <span title={`Seen, of ${reach[a.announcement_id] ?? 0} reached today`}><Icon name="check-circle" size={13} />{ec.seen}/{reach[a.announcement_id] ?? 0}</span><span title="Tapped"><Icon name="pointer" size={13} />{ec.tapped}</span><span title="Dismissed"><Icon name="x" size={13} />{ec.dismissed}</span>{a.ask_confirm ? <span title="Read (confirmed)">Read {ec.confirmed}</span> : null}
                         </div>
                       </td>
                       <td className="cell-flags">{a.dismissible ? <span>dismissible</span> : null}</td>
@@ -573,7 +578,7 @@ export function AnnouncementsClient({
                             className="btn btn-ghost btn-sm"
                             onClick={(e) => {
                               e.stopPropagation();
-                              setFollowTarget({ announcement_id: a.announcement_id, title: a.title, when: a.created_at ? `made ${fmtShort(a.created_at)}` : '' });
+                              setFollowTarget({ announcement_id: a.announcement_id, title: a.title, when: a.created_at ? `made ${fmtShort(a.created_at)}` : '', askConfirm: Boolean(a.ask_confirm) });
                             }}
                           >
                             Follow-up
@@ -729,7 +734,7 @@ export function AnnouncementsClient({
                 <div className="toggle-row">
                   <div>
                     <div className="toggle-label">Pin to top</div>
-                    <div className="toggle-hint">Always appears above others</div>
+                    <div className="toggle-hint">Always appears above others. Only the pinned notice with the highest priority shows big; other pinned ones come first in the list.</div>
                   </div>
                   <label className="toggle-switch">
                     <input type="checkbox" checked={pinned} onChange={(e) => setPinned(e.target.checked)} />
@@ -749,10 +754,24 @@ export function AnnouncementsClient({
                 <div className="toggle-row">
                   <div>
                     <div className="toggle-label">Must-see</div>
-                    <div className="toggle-hint">Also pops up once on each student&apos;s dashboard. Keep it for the rare notice that cannot be missed.</div>
+                    <div className="toggle-hint">Pops up on each student&apos;s dashboard until they press &quot;I&apos;ve read this&quot;. Keep it rare: students learn to close pop-ups.</div>
                   </div>
                   <label className="toggle-switch">
                     <input type="checkbox" checked={mustSee} onChange={(e) => setMustSee(e.target.checked)} />
+                    <span className="toggle-track" />
+                  </label>
+                </div>
+                <div className="toggle-row">
+                  <div>
+                    <div className="toggle-label">Ask students to confirm</div>
+                    <div className="toggle-hint">
+                      {mustSee
+                        ? 'On for every Must-see notice.'
+                        : 'The opened notice shows "I\'ve read this"; the follow-up counts who confirmed. For the notices that matter.'}
+                    </div>
+                  </div>
+                  <label className="toggle-switch">
+                    <input type="checkbox" checked={askConfirm || mustSee} disabled={mustSee} onChange={(e) => setAskConfirm(e.target.checked)} />
                     <span className="toggle-track" />
                   </label>
                 </div>

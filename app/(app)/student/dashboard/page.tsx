@@ -8,7 +8,8 @@
 // (when 04 G2 lands) → the streak and questions mastered (05 G1a) → the
 // weakest topic → my courses → recent sittings; the news moved up (08.8;
 // Sam, 2026-10-18 — C): "New from Quademia" under the welcome, only while
-// something is new, and a Must-see notice popping up once. The profile
+// something is new, and the Must-see notices popping up until confirmed
+// (08.16, one after another). The profile
 // nudge above all while the phone or school is missing, then, on a phone,
 // the line on how to install the app (07.3; components/install-app) until
 // the student closes it or the app is on the home screen. Off the page
@@ -56,10 +57,14 @@ export default async function StudentDashboardPage() {
     // the notices and the student's marks in one read (A1, A2)
     getAnnouncementsForStudent(supabase),
   ]);
-  // what is new; the first new Must-see pops up, the card holds the rest
-  const fresh = announcements.filter(isNew);
-  const mustSee = fresh.find((a) => a.must_see) ?? null;
-  const newsItems = fresh.filter((a) => a !== mustSee).map((a) => ({ ...a, line: firstLine(a) }));
+  // The Must-see notices not yet confirmed pop up, one after another
+  // (08.16); the card holds the other new ones.
+  const mustSee = announcements.filter((a) => a.must_see && !a.confirmed_at && !a.dismissed_at);
+  const popping = new Set(mustSee.map((a) => a.announcement_id));
+  const newsItems = announcements
+    .filter((a) => isNew(a) && !popping.has(a.announcement_id))
+    .map((a) => ({ ...a, line: firstLine(a) }));
+  const mustSeeDates = Object.fromEntries(mustSee.map((a) => [a.announcement_id, longWhen(noticeTime(a))]));
 
   const card = topCardFor(receipts);
   const onFloor = card.kind === 'floor' || card.kind === 'future';
@@ -94,7 +99,7 @@ export default async function StudentDashboardPage() {
       <h1 className="sd-hello">Welcome back{profile.forename ? `, ${profile.forename}` : ''}</h1>
 
       <NewFromQuademia items={newsItems} />
-      {mustSee ? <MustSee notice={mustSee} date={longWhen(noticeTime(mustSee))} /> : null}
+      {mustSee.length ? <MustSee notices={mustSee} dateOf={mustSeeDates} userId={profile.user_id} /> : null}
 
       {hasPhone && hasSchool ? null : <ProfileNudge />}
       <InstallAppLine closeFor={profile.user_id} />

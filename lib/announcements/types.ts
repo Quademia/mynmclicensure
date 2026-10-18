@@ -20,7 +20,7 @@ export const NOTICE_STATES = ['read', 'clicked', 'dismissed'] as const;
 export type NoticeState = (typeof NOTICE_STATES)[number];
 
 // The marks notice_mark() sets (A2, 2026-10-18): each once, never cleared.
-export type NoticeMark = 'seen' | 'tapped' | 'dismissed';
+export type NoticeMark = 'seen' | 'tapped' | 'dismissed' | 'confirmed';
 
 // legacy's fixed level picker
 export const LEVELS = ['L100', 'L200', 'L300', 'L400'] as const;
@@ -41,6 +41,8 @@ export type Announcement = {
   kind: string;
   picture_path: string | null;
   must_see: boolean;
+  /** The opened notice shows "I've read this"; Must-see always asks (08.16). */
+  ask_confirm: boolean;
   send_to_devices: boolean;
   sent_at: string | null;
   scope_programs: string[] | null;
@@ -66,12 +68,15 @@ export type StudentAnnouncement = {
   priority: number;
   dismissible: boolean;
   must_see: boolean;
+  ask_confirm: boolean;
   created_at: string | null;
   start_at: string | null;
   end_at: string | null;
   seen_at: string | null;
   tapped_at: string | null;
   dismissed_at: string | null;
+  /** Read (confirmed): pressed "I've read this" (08.16). */
+  confirmed_at: string | null;
 };
 
 /** One of the admin's kinds (08.13): `announcement_kinds`. */
@@ -79,7 +84,7 @@ export type AnnouncementKind = { name: string; icon: string; position: number; a
 export const KIND_NAME_MAX = 40;
 export const DEFAULT_KIND = 'News';
 
-export type EngageCounts = { seen: number; tapped: number; dismissed: number };
+export type EngageCounts = { seen: number; tapped: number; dismissed: number; confirmed: number };
 export type EngageMap = Record<string, EngageCounts>;
 /** Each notice's reach today: the active students its scopes match (08.11). */
 export type ReachMap = Record<string, number>;
@@ -95,6 +100,7 @@ export type FollowUpRow = {
   seen_at: string | null;
   tapped_at: string | null;
   dismissed_at: string | null;
+  confirmed_at: string | null;
 };
 export type FollowUpResult = { ok: true; rows: FollowUpRow[] } | { ok: false; error: string };
 
@@ -122,6 +128,8 @@ export type SaveAnnouncementInput = {
   dismissible: boolean;
   /** Also pops up once on the dashboard (08.8). */
   must_see: boolean;
+  /** Ask students to confirm (08.16); Must-see implies it. */
+  ask_confirm: boolean;
   /** One of the admin's kinds (08.13). */
   kind: string;
   scope_audience: string;

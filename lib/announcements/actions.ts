@@ -88,6 +88,8 @@ export async function saveAnnouncement(input: SaveAnnouncementInput): Promise<Sa
     pinned: Boolean(input.pinned),
     dismissible: Boolean(input.dismissible),
     must_see: Boolean(input.must_see),
+    // Must-see always asks to confirm (08.16; the database checks it too)
+    ask_confirm: Boolean(input.ask_confirm) || Boolean(input.must_see),
     scope_audience: input.scope_audience === 'STUDENTS' ? 'STUDENTS' : 'ALL',
     scope_subscription_kind: String(input.scope_subscription_kind || '').trim() || null,
     scope_cohort: String(input.scope_cohort || '').trim() || null,
@@ -221,6 +223,25 @@ export async function recordNoticeState(announcementId: string, state: NoticeSta
 // ── student: Seen for several at once (08.7) ────────────────────────────
 // A notice opened on the page, the course page's news, Mark all as read:
 // one trip, and the new number back for the bell and the menu row (08.9).
+export async function confirmNoticeRead(announcementId: string): Promise<MarkResult> {
+  // "I've read this" (08.16): Read (confirmed) and Seen, once; only on a
+  // notice that asks to confirm.
+  const { supabase, profile } = await requireStudent();
+  const id = String(announcementId || '').trim();
+  if (!id) return fail('Missing announcement.');
+  const { data, error } = await createServiceRoleClient().rpc('notice_mark', {
+    p_user_id: profile.user_id,
+    p_ids: [id],
+    p_mark: 'confirmed',
+  });
+  if (error) {
+    console.error('confirmNoticeRead:', error);
+    return fail('Could not save that. Please try again.');
+  }
+  if (!data) return fail('This announcement is no longer available.');
+  return { ok: true, newCount: await getNewNoticeCount(supabase) };
+}
+
 export async function markNoticesSeen(ids: string[]): Promise<MarkResult> {
   const { supabase, profile } = await requireStudent();
   const list = cleanList(ids).slice(0, 500);

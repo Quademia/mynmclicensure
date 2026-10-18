@@ -595,11 +595,12 @@ table by table as each is next changed (AGENTS.md rule 9).
   `announcement_kinds` on its name, on update cascade.
 - With the new editor (08.14): `body_html` and `body_text` give way to
   one body, its form chosen with the editor (its own tick then).
-- *Needs Sam's tick before the build (08.16, written 2026-10-18):*
-  `ask_confirm` — yes or no: the opened notice shows "I've read this";
-  Must-see always asks (`must_see` implies `ask_confirm`, checked).
-  Why: Seen is "shown on screen"; a notice that matters needs the
-  student to say they read it.
+- Built 2026-10-18 (08.16, ticked by Sam that day;
+  `20261018220000_announcement_confirm.sql`): `ask_confirm` — yes or
+  no: the opened notice shows "I've read this"; Must-see always asks
+  (`must_see` implies `ask_confirm`, checked in the database; the
+  notices already Must-see were set to ask). Why: Seen is "shown on
+  screen"; a notice that matters needs the student to say they read it.
 - Browser: nothing — the admin's page reads and writes through the
   server.
 
@@ -637,13 +638,13 @@ table by table as each is next changed (AGENTS.md rule 9).
   date set once, never cleared, by `notice_mark()` only — the student's
   own notices, Dismiss only where it is allowed. The overwritten word
   (`state`) and `updated_at` went; old rows kept their date as Seen, a
-  clicked one as Tapped too, a dismissed one as Dismissed. A Must-see
-  notice pops up while Seen is empty (08.8).
-- *Needs Sam's tick before the build (08.16, written 2026-10-18):*
-  `confirmed_at` — **Read (confirmed)**: when the student pressed "I've
-  read this", set once, never cleared, only on a notice that asks to
-  confirm. A Must-see notice then pops up while `confirmed_at` is empty
-  (Later hides it until the app is next opened), no longer while Seen is.
+  clicked one as Tapped too, a dismissed one as Dismissed.
+- Built 2026-10-18 (08.16, ticked by Sam that day;
+  `20261018220000_announcement_confirm.sql`): `confirmed_at` —
+  **Read (confirmed)**: when the student pressed "I've read this", set
+  once with Seen, never cleared, only on a notice that asks to confirm.
+  A Must-see notice pops up while `confirmed_at` is empty (Later hides
+  it until the app is next opened), no longer while Seen is.
 - Browser: nothing — a student's marks come with their notices.
 
 ### `messages_threads` — conversations
@@ -833,9 +834,10 @@ the browser can call only the first two lines and
   whoever has held one, live or ended, revoked grants apart; with a
   course, only that course's news. `announcements_for_me(course)` — the
   same for the signed-in caller, the one a student's session may call.
-  `notice_mark(person, notices, mark)` (server only) — seen, tapped or
-  dismissed, each set once. `announcement_marks_counts()` (server only) —
-  seen, tapped and dismissed per notice, for the admin's page.
+  `notice_mark(person, notices, mark)` (server only) — seen, tapped,
+  dismissed or confirmed, each set once (confirmed only where the notice
+  asks, 08.16). `announcement_marks_counts()` (server only) — seen,
+  tapped, dismissed and confirmed per notice, for the admin's page.
   The rule is written once (08.11, 08.12; built 2026-10-18,
   `20261018200000_announcement_followup.sql`, server only):
   `notice_people(person or all)` — the facts the scopes read; 
@@ -845,7 +847,7 @@ the browser can call only the first two lines and
   `announcement_reach_preview(scopes…)` (the editor's "This will reach N
   students today") and `announcement_followup(notice)` (everyone reached
   today and everyone with a mark: name, programme, kind, last sitting,
-  reached, the three dates).
+  reached, the four dates).
 - **Notifications** (server only; 08.5b, built 2026-10-17):
   `notify_device_save`, `notify_device_relink`, `notify_device_drop_kind`,
   `notify_targets` — see `notification_devices`.

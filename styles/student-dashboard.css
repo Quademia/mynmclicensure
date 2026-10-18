@@ -148,3 +148,6 @@ a.sd-list-row:hover .sd-row-title { color: var(--accent); }
 
 /* a notice's button inside the app, pressed until its page arrives (A4) */
 .mustsee-body a.is-pending { opacity: 0.7; pointer-events: none; }
+
+/* the Must-see run's place, "1 of 3" (08.16) */
+.mustsee-count { margin-left: auto; font-weight: 600; color: var(--ink); }

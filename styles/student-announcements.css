@@ -205,3 +205,8 @@
 
 /* a notice's button inside the app, pressed until its page arrives (A4) */
 .sann-body a[data-qa='btn'].is-pending { opacity: 0.7; pointer-events: none; }
+
+/* "I've read this" (08.16): on a notice that asks the student to confirm */
+.sann-confirm { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8) var(--space-12); margin-top: var(--space-16); }
+.sann-confirm-hint { font-size: var(--type-meta-size); color: var(--ink-muted); }
+.sann-confirmed { display: flex; align-items: center; gap: var(--space-6); margin: var(--space-16) 0 0; font-size: var(--type-ui-size); color: var(--badge-success-ink); }

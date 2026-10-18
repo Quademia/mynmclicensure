@@ -45,7 +45,7 @@ export async function getKinds(db: ServiceClient): Promise<AnnouncementKind[]> {
 }
 
 export async function getEngagementCounts(db: ServiceClient): Promise<EngageMap> {
-  type Row = { announcement_id: string; seen: number | string; tapped: number | string; dismissed: number | string };
+  type Row = { announcement_id: string; seen: number | string; tapped: number | string; dismissed: number | string; confirmed: number | string };
   const { data, error } = await readAll<Row>((from, to) => db.rpc('announcement_marks_counts').range(from, to));
   if (error) {
     console.error('getEngagementCounts:', error);
@@ -53,7 +53,7 @@ export async function getEngagementCounts(db: ServiceClient): Promise<EngageMap>
   }
   const map: EngageMap = {};
   for (const row of data) {
-    map[row.announcement_id] = { seen: Number(row.seen), tapped: Number(row.tapped), dismissed: Number(row.dismissed) };
+    map[row.announcement_id] = { seen: Number(row.seen), tapped: Number(row.tapped), dismissed: Number(row.dismissed), confirmed: Number(row.confirmed) };
   }
   return map;
 }

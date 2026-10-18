@@ -114,7 +114,12 @@ built 2026-10-18; to build: 08.14, 08.15)*
     visit, "1 of 3" at the top — confirming one brings the next at once;
     Later stops the run until the app is next opened. The order is the
     list's: pinned, then priority, then newest. A hint by the admin's
-    Must-see switch: keep it rare. *(to build: 08.16)*
+    Must-see switch: keep it rare. *(built 2026-10-18: 08.16 — the
+    editor's Ask students to confirm, on and fixed for Must-see; the
+    opened notice's "I've read this" and its line once confirmed; the
+    pop-up's run with Later kept for the visit; Read (confirmed) on the
+    row and in the follow-up, with Confirmed and Not confirmed yet — the
+    panel opens on the second.)*
 - **The admin's editor**: no codes — what is typed is what students see
   (the tool chosen with Sam at its build; the body stored once, which
   ends the extra line break per save); the picture, the kind, Must-see,

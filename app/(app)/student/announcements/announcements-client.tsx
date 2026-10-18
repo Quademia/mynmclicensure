@@ -21,6 +21,9 @@
 //   only when the notice is new; a tap on the notice's button counts
 //   (Tapped). Each mark brings back the new number for the bell and the
 //   menu row (08.9). A failed mark changes nothing on screen.
+// - **"I've read this"** (08.16) on a notice that asks to confirm (every
+//   Must-see does): Read (confirmed), which stops a Must-see's pop-up;
+//   once pressed, the notice says so.
 
 'use client';
 
@@ -32,14 +35,14 @@ import { AnnouncementBody } from '@/components/announcements/announcement-body';
 import { MessageUsDialog } from '@/components/messages/message-us';
 import { Toast } from '@/lib/toast/toast';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
-import { markNoticesSeen, recordNoticeState } from '@/lib/announcements/actions';
+import { confirmNoticeRead, markNoticesSeen, recordNoticeState } from '@/lib/announcements/actions';
 import { isNew, kindIcon, pictureUrl } from '@/lib/announcements/display';
 import type { StudentAnnouncement } from '@/lib/announcements/types';
 
 /** A notice with the words the server worked out for it. */
 export type NoticeItem = StudentAnnouncement & { when: string; date: string; line: string };
 
-type Marks = Record<string, { seen?: true; tapped?: true; dismissed?: true }>;
+type Marks = Record<string, { seen?: true; tapped?: true; dismissed?: true; confirmed?: true }>;
 
 function isComputer(): boolean {
   return typeof window !== 'undefined' && window.matchMedia('(min-width: 769px)').matches;
@@ -57,6 +60,7 @@ export function AnnouncementsClient({ items, openId: askedId }: { items: NoticeI
   const [showDismissed, setShowDismissed] = useState(false);
   const [asking, setAsking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
   const dismissError = useCallback(() => setError(null), []);
   const marking = useRef(new Set<string>());
 
@@ -67,9 +71,10 @@ export function AnnouncementsClient({ items, openId: askedId }: { items: NoticeI
     const at = 'now';
     return {
       ...a,
-      seen_at: a.seen_at || (m.seen || m.tapped ? at : null),
+      seen_at: a.seen_at || (m.seen || m.tapped || m.confirmed ? at : null),
       tapped_at: a.tapped_at || (m.tapped ? at : null),
       dismissed_at: a.dismissed_at || (m.dismissed ? at : null),
+      confirmed_at: a.confirmed_at || (m.confirmed ? at : null),
     };
   });
   const live = all.filter((a) => !a.dismissed_at);
@@ -84,7 +89,7 @@ export function AnnouncementsClient({ items, openId: askedId }: { items: NoticeI
   const shownId = openId ?? newest?.announcement_id ?? null;
   const shown = all.find((a) => a.announcement_id === shownId) ?? null;
 
-  const lay = useCallback((ids: string[], mark: 'seen' | 'tapped' | 'dismissed') => {
+  const lay = useCallback((ids: string[], mark: 'seen' | 'tapped' | 'dismissed' | 'confirmed') => {
     setMarks((prev) => {
       const next = { ...prev };
       for (const id of ids) next[id] = { ...next[id], [mark]: true };
@@ -157,6 +162,21 @@ export function AnnouncementsClient({ items, openId: askedId }: { items: NoticeI
       }
     } catch {
       setError('Could not dismiss it. Please check your connection.');
+    }
+  }
+
+  // "I've read this" (08.16): on a notice that asks to confirm
+  async function confirmRead(id: string) {
+    setConfirming(true);
+    try {
+      const r = await confirmNoticeRead(id);
+      if (!r.ok) return setError(r.error);
+      lay([id], 'confirmed');
+      news.set(r.newCount);
+    } catch {
+      setError('Could not save that. Please check your connection.');
+    } finally {
+      setConfirming(false);
     }
   }
 
@@ -274,6 +294,18 @@ export function AnnouncementsClient({ items, openId: askedId }: { items: NoticeI
                     </p>
                     <h2 className="sann-title">{shown.title}</h2>
                     <AnnouncementBody html={shown.body_html || shown.body_text || ''} className="sann-body" onButtonClick={() => tapped(shown.announcement_id)} />
+                    {shown.ask_confirm ? (
+                      shown.confirmed_at ? (
+                        <p className="sann-confirmed"><Icon name="check-circle" size={14} />You confirmed you read this.</p>
+                      ) : (
+                        <div className="sann-confirm">
+                          <button type="button" className="btn btn-primary" disabled={confirming} onClick={() => void confirmRead(shown.announcement_id)}>
+                            {confirming ? 'Saving…' : "I've read this"}
+                          </button>
+                          <span className="sann-confirm-hint">Quademia asks you to confirm you have read this.</span>
+                        </div>
+                      )
+                    ) : null}
                     <div className="sann-actions">
                       <button type="button" className="btn-link" onClick={() => setAsking(true)}>
                         <Icon name="message" size={14} />Ask about this

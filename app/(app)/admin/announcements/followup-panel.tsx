@@ -7,6 +7,9 @@
 // subscription kind and last sitting (the last sign-in once 01.6 records
 // it). Read in one trip when the panel opens (followup-actions.ts), the
 // counting and the tabs done here. A tab shows its first 100 with Show all.
+// A notice that asks students to confirm (08.16) adds a fifth number, Read
+// (confirmed), and the tabs Confirmed and Not confirmed yet — opening on
+// the second, the one to chase.
 // Only used here.
 
 'use client';
@@ -16,7 +19,7 @@ import { getFollowUp } from '@/lib/announcements/followup-actions';
 import { longWhen } from '@/lib/announcements/display';
 import type { FollowUpRow } from '@/lib/announcements/types';
 
-type Tab = 'unseen' | 'seen' | 'tapped' | 'dismissed';
+type Tab = 'unseen' | 'seen' | 'tapped' | 'dismissed' | 'confirmed' | 'unconfirmed';
 const FIRST = 100;
 const KIND_WORD: Record<string, string> = { PAID: 'Paid', TRIAL: 'Trial', FREE: 'Free' };
 
@@ -29,7 +32,7 @@ export function FollowUpPanel({
   onClose,
 }: {
   /** The notice followed up; null when the panel is closed. */
-  notice: { announcement_id: string; title: string; when: string } | null;
+  notice: { announcement_id: string; title: string; when: string; askConfirm: boolean } | null;
   onClose: () => void;
 }) {
   const open = Boolean(notice);
@@ -43,10 +46,10 @@ export function FollowUpPanel({
   );
 }
 
-function FollowUpBody({ notice, onClose }: { notice: { announcement_id: string; title: string; when: string }; onClose: () => void }) {
+function FollowUpBody({ notice, onClose }: { notice: { announcement_id: string; title: string; when: string; askConfirm: boolean }; onClose: () => void }) {
   const [rows, setRows] = useState<FollowUpRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<Tab>('unseen');
+  const [tab, setTab] = useState<Tab>(notice.askConfirm ? 'unconfirmed' : 'unseen');
   const [all, setAll] = useState(false);
 
   useEffect(() => {
@@ -72,19 +75,25 @@ function FollowUpBody({ notice, onClose }: { notice: { announcement_id: string; 
     seen: list.filter((r) => r.seen_at),
     tapped: list.filter((r) => r.tapped_at),
     dismissed: list.filter((r) => r.dismissed_at),
+    confirmed: list.filter((r) => r.confirmed_at),
+    unconfirmed: list.filter((r) => r.reached && !r.confirmed_at),
   };
   const dateOf: Record<Tab, (r: FollowUpRow) => string | null> = {
     unseen: () => null,
     seen: (r) => r.seen_at,
     tapped: (r) => r.tapped_at,
     dismissed: (r) => r.dismissed_at,
+    confirmed: (r) => r.confirmed_at,
+    unconfirmed: () => null,
   };
   const shown = all ? groups[tab] : groups[tab].slice(0, FIRST);
   const tabs: { key: Tab; label: string }[] = [
     { key: 'seen', label: 'Seen' },
+    ...(notice.askConfirm ? [{ key: 'confirmed' as const, label: 'Confirmed' }] : []),
     { key: 'tapped', label: 'Tapped' },
     { key: 'dismissed', label: 'Dismissed' },
     { key: 'unseen', label: 'Not seen yet' },
+    ...(notice.askConfirm ? [{ key: 'unconfirmed' as const, label: 'Not confirmed yet' }] : []),
   ];
 
   return (
@@ -104,6 +113,9 @@ function FollowUpBody({ notice, onClose }: { notice: { announcement_id: string; 
             <div className="fu-numbers">
               <div className="fu-number"><span className="fu-label">Reaches today</span><span className="fu-value">{reach}</span><span className="fu-sub">students</span></div>
               <div className="fu-number"><span className="fu-label">Seen</span><span className="fu-value">{groups.seen.length}</span><span className="fu-sub">{pct(groups.seen.length, reach)}</span></div>
+              {notice.askConfirm ? (
+                <div className="fu-number"><span className="fu-label">Read (confirmed)</span><span className="fu-value">{groups.confirmed.length}</span><span className="fu-sub">{pct(groups.confirmed.length, reach)}</span></div>
+              ) : null}
               <div className="fu-number"><span className="fu-label">Tapped the button</span><span className="fu-value">{groups.tapped.length}</span><span className="fu-sub">{pct(groups.tapped.length, reach)}</span></div>
               <div className="fu-number"><span className="fu-label">Dismissed</span><span className="fu-value">{groups.dismissed.length}</span><span className="fu-sub">{pct(groups.dismissed.length, reach)}</span></div>
             </div>
@@ -146,7 +158,7 @@ function FollowUpBody({ notice, onClose }: { notice: { announcement_id: string; 
               <button type="button" className="btn btn-ghost btn-sm" onClick={() => setAll(true)}>Show all {groups[tab].length}</button>
             ) : null}
             <p className="form-hint">
-              Reaches today: the students the notice&apos;s targeting matches now, whatever its status. Seen counts a notice opened in full; a student no longer reached keeps the marks they made.
+              Reaches today: the students the notice&apos;s targeting matches now, whatever its status. Seen counts a notice opened in full{notice.askConfirm ? <>; Read (confirmed), the students who pressed &quot;I&apos;ve read this&quot;</> : null}; a student no longer reached keeps the marks they made.
             </p>
           </>
         ) : null}
