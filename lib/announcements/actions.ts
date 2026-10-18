@@ -87,6 +87,7 @@ export async function saveAnnouncement(input: SaveAnnouncementInput): Promise<Sa
     priority: Number.parseInt(String(input.priority), 10) || 1,
     pinned: Boolean(input.pinned),
     dismissible: Boolean(input.dismissible),
+    must_see: Boolean(input.must_see),
     scope_audience: input.scope_audience === 'STUDENTS' ? 'STUDENTS' : 'ALL',
     scope_subscription_kind: String(input.scope_subscription_kind || '').trim() || null,
     scope_cohort: String(input.scope_cohort || '').trim() || null,

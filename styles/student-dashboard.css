@@ -2,51 +2,17 @@
  *
  * The student dashboard, redesigned (D2b; 11-pages.md Dashboard; Sam,
  * 2026-10-04) — app/(app)/student/dashboard/. Tokens only. The page sits
- * under `.sdash.sd`: `.sdash` keeps the news strip's rules below, carried
- * over unchanged (components/announcements/announcements-strip.tsx);
- * `.sd` is the new page's. The legacy page's rules — the subscription
- * bar, the channels card, the course cards, the promo blocks, the attempts
- * table, the Portal Guide bubble — went with it.
+ * under `.sdash.sd`: `.sdash` holds the profile nudge's rules, `.sd` the
+ * page's. The legacy page's rules — the subscription bar, the channels
+ * card, the course cards, the promo blocks, the attempts table, the Portal
+ * Guide bubble — went with the redesign; the old news strip went with 08.8
+ * (2026-10-18): "New from Quademia" under the welcome, and the Must-see
+ * pop-up's words (unscoped: the dialog is portalled), are at the end.
  *
- * One column on a phone in the agreed order; on a computer the news and
- * recent sittings move to a side column. Every forward action is 44px on
- * a phone (the student's touch target, 09).
+ * One column on a phone in the agreed order; on a computer the recent
+ * sittings move to a side column. Every forward action is 44px on a phone
+ * (the student's touch target, 09).
  */
-
-/* ── the news strip (unchanged) ── */
-.sdash .announcements-block { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 24px; overflow: hidden; }
-.sdash .announcements-block-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--bg); }
-.sdash .announcements-block-title { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.04em; }
-.sdash .announcements-block-count { font-size: 12px; color: var(--text-muted); }
-.sdash .announcements-empty { padding: 20px 16px; text-align: center; font-size: 13px; color: var(--text-muted); }
-
-.sdash .announcement-item { border-bottom: 1px solid var(--border); transition: opacity 0.25s; }
-.sdash .announcement-item:last-of-type { border-bottom: none; }
-.sdash .announcement-item.fading { opacity: 0; }
-.sdash .announcement-item.pinned .announcement-item-header { background: var(--primary-light); border-left: 4px solid var(--accent); }
-.sdash .announcement-item-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; cursor: pointer; gap: 12px; transition: background 0.15s; }
-.sdash .announcement-item-header:hover { background: var(--bg); }
-.sdash .announcement-title { font-weight: 600; font-size: 14px; color: var(--text); flex: 1; }
-.sdash .announcement-item-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-.sdash .announcement-expand-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 16px; line-height: 1; padding: 0 2px; transition: transform 0.2s; font-family: inherit; }
-.sdash .announcement-expand-btn.open { transform: rotate(180deg); }
-.sdash .announcement-dismiss { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 18px; line-height: 1; padding: 0; font-family: inherit; }
-.sdash .announcement-dismiss:hover { color: var(--danger); }
-
-.sdash .announcement-item-body { display: none; padding: 0 16px 14px; font-size: 13px; color: var(--text); line-height: 1.65; max-height: 300px; overflow-y: auto; }
-.sdash .announcement-item-body.open { display: block; }
-.sdash .announcement-item-body p { margin: 0 0 8px; }
-.sdash .announcement-item-body p:last-child { margin-bottom: 0; }
-.sdash .announcement-item-body .no-content { color: var(--text-muted); }
-.sdash .announcement-item-body strong { font-weight: 700; }
-.sdash .announcement-item-body em { font-style: italic; }
-.sdash .announcement-item-body a { color: var(--accent); text-decoration: underline; }
-.sdash .announcement-item-body a[data-qa='btn'] { display: inline-block; padding: 8px 18px; background: var(--accent); color: #fff !important; border-radius: var(--radius); text-decoration: none; font-size: 13px; font-weight: 600; margin-top: 8px; transition: background 0.15s; }
-.sdash .announcement-item-body a[data-qa='btn']:hover { background: var(--primary); }
-.sdash .announcement-read-more { font-size: 12px; color: var(--accent); font-weight: 500; margin-top: 8px; display: inline-block; text-decoration: none; }
-.sdash .announcement-read-more:hover { text-decoration: underline; }
-.sdash .announcements-footer { display: block; padding: 10px 16px; font-size: 13px; color: var(--accent); font-weight: 500; text-decoration: none; border-top: 1px solid var(--border); text-align: center; }
-.sdash .announcements-footer:hover { background: var(--bg); text-decoration: none; }
 
 /* ── the profile nudge (on the warning tokens now) ── */
 .sdash .profile-nudge { display: flex; align-items: center; gap: 10px; background: var(--badge-warning-bg); border: 1px solid var(--badge-warning-border); border-radius: var(--radius); padding: 9px 12px; margin-bottom: var(--space-16); }
@@ -69,7 +35,6 @@
 .sd-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-12); }
 .sd-main,
 .sd-side { display: flex; flex-direction: column; gap: var(--space-12); min-width: 0; }
-.sd .announcements-block { margin-bottom: 0; }
 
 @media (min-width: 1024px) {
   .sd-grid { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: var(--space-20); align-items: start; }
@@ -149,3 +114,34 @@ a.sd-list-row:hover .sd-row-title { color: var(--accent); }
   .sd .btn { min-height: 44px; }
   .sd-carry .btn { flex: 1 0 auto; }
 }
+
+/* ── New from Quademia (08.8; Sam, 2026-10-18: C) ──
+   Under the welcome, only while something is new: up to two rows, each a
+   link into the Announcements page; the dot, the square and the blue first
+   line are the Announcements page's own look for new. */
+.sd-news { padding: 0; overflow: hidden; margin-bottom: var(--space-12); }
+.sd-news-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); padding: var(--space-10) var(--space-16); border-bottom: 1px solid var(--border); }
+.sd-news-title { display: inline-flex; align-items: center; gap: var(--space-6); margin: 0; font-size: var(--type-ui-size); font-weight: 700; color: var(--brand-navy); }
+.sd-news-rows { list-style: none; margin: 0; padding: 0; }
+.sd-news-row { display: flex; align-items: center; }
+.sd-news-row + .sd-news-row { border-top: 1px solid var(--border); }
+.sd-news-link { flex: 1; min-width: 0; display: flex; align-items: center; gap: var(--space-10); padding: var(--space-10) var(--space-4) var(--space-10) var(--space-16); color: var(--ink); text-decoration: none; }
+.sd-news-link:hover { background: var(--surface-page); text-decoration: none; }
+.sd-news-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--badge-info-ink); }
+.sd-news-tile { flex: none; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: var(--radius); background: var(--brand-teal-pale); color: var(--brand-teal-hover); }
+.sd-news-tile img { width: 100%; height: 100%; object-fit: cover; }
+.sd-news-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.sd-news-name { font-size: var(--type-ui-size); line-height: 1.4; font-weight: 700; }
+.sd-news-line { font-size: var(--type-meta-size); line-height: var(--type-meta-line); color: var(--badge-info-ink); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sd-news-x { flex: none; width: 44px; height: 44px; margin-right: var(--space-4); border: 0; background: none; font: inherit; font-size: 18px; line-height: 1; color: var(--ink-muted); cursor: pointer; }
+.sd-news-x:hover { color: var(--ink); }
+
+/* ── the Must-see pop-up's words (08.8): the shared dialog, portalled, so
+   unscoped; its picture is the dialog's own .dlg-media ── */
+.mustsee-meta { display: flex; align-items: center; gap: var(--space-6); margin: var(--space-6) 0 var(--space-10); font-size: var(--type-meta-size); color: var(--ink-muted); }
+.mustsee-body { font-size: var(--type-field-size); line-height: 1.55; color: var(--ink); overflow-wrap: anywhere; }
+.mustsee-body p { margin: 0 0 var(--space-10); }
+.mustsee-body p:last-child { margin-bottom: 0; }
+.mustsee-body a:not([data-qa='btn']) { color: var(--brand-teal-hover); text-decoration: underline; }
+.mustsee-body a[data-qa='btn'] { display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--space-4); padding: var(--space-10) var(--space-20); border-radius: var(--radius); background: var(--brand-navy); color: var(--surface); font-size: var(--type-ui-size); font-weight: 600; text-decoration: none; }
+.mustsee-body a[data-qa='btn']:hover { background: var(--brand-navy-dark); }

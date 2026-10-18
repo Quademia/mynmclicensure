@@ -43,8 +43,8 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
 - **No Bulk Send**: announcements are the broadcast, with the same
   targeting; New Thread reaches one student (Sam, 2026-09-18).
 
-**Redesigned (Sam, 2026-10-18; drawn in the chat).** *(08.7, 08.9, 08.10
-and 08.13 built 2026-10-18; to build: 08.8, 08.11, 08.12, 08.14, 08.15)*
+**Redesigned (Sam, 2026-10-18; drawn in the chat).** *(08.7, 08.8, 08.9,
+08.10 and 08.13 built 2026-10-18; to build: 08.11, 08.12, 08.14, 08.15)*
 
 - **The page, like Messages**: the list, and a tap opens the notice —
   beside the list on a computer, the newest opening by itself; in its
@@ -89,7 +89,11 @@ and 08.13 built 2026-10-18; to build: 08.8, 08.11, 08.12, 08.14, 08.15)*
   while something is new — up to two, a tap opens, ✕ dismisses —
   replacing the box at the foot. A notice ticked **Must-see** also pops
   up once, at the student's next dashboard, one at a time, on the
-  shared dialog with its picture. *(08.8)*
+  shared dialog with its picture. *(built 2026-10-18: 08.8 — the card
+  links into the page on each notice and does not mark Seen; the pop-up
+  marks Seen as it shows; the Must-see switch in the admin form's
+  Settings; the shared dialog gained a picture slot and opens itself when
+  it starts open.)*
 - **The admin's editor**: no codes — what is typed is what students see
   (the tool chosen with Sam at its build; the body stored once, which
   ends the extra line break per save); the picture, the kind, Must-see,

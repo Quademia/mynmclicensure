@@ -118,6 +118,7 @@ export function AnnouncementsClient({
   const [endAt, setEndAt] = useState('');
   const [pinned, setPinned] = useState(false);
   const [dismissible, setDismissible] = useState(true);
+  const [mustSee, setMustSee] = useState(false);
   const [audience, setAudience] = useState('ALL');
   const [subKind, setSubKind] = useState('');
   const [cohort, setCohort] = useState('');
@@ -181,6 +182,7 @@ export function AnnouncementsClient({
     setStartAt('');
     setEndAt('');
     setPinned(false);
+    setMustSee(false);
     setDismissible(true);
     setAudience('ALL');
     setSubKind('');
@@ -221,6 +223,7 @@ export function AnnouncementsClient({
       setEndAt(toLocalInput(a.end_at));
       setPinned(Boolean(a.pinned));
       setDismissible(Boolean(a.dismissible));
+      setMustSee(Boolean(a.must_see));
       setAudience(a.scope_audience || 'ALL');
       setSubKind(a.scope_subscription_kind || '');
       setCohort(a.scope_cohort || '');
@@ -356,6 +359,7 @@ export function AnnouncementsClient({
       priority: Number.parseInt(priority, 10) || 1,
       pinned,
       dismissible,
+      must_see: mustSee,
       kind,
       scope_audience: audience,
       scope_subscription_kind: subKind,
@@ -677,6 +681,16 @@ export function AnnouncementsClient({
                   </div>
                   <label className="toggle-switch">
                     <input type="checkbox" checked={dismissible} onChange={(e) => setDismissible(e.target.checked)} />
+                    <span className="toggle-track" />
+                  </label>
+                </div>
+                <div className="toggle-row">
+                  <div>
+                    <div className="toggle-label">Must-see</div>
+                    <div className="toggle-hint">Also pops up once on each student&apos;s dashboard. Keep it for the rare notice that cannot be missed.</div>
+                  </div>
+                  <label className="toggle-switch">
+                    <input type="checkbox" checked={mustSee} onChange={(e) => setMustSee(e.target.checked)} />
                     <span className="toggle-track" />
                   </label>
                 </div>

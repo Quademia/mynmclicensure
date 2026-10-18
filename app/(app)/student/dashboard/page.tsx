@@ -6,12 +6,14 @@
 // (the student's next step — a trial's or a package's days and Carry on;
 // on the floor the recap and the free practice card) → today's challenge
 // (when 04 G2 lands) → the streak and questions mastered (05 G1a) → the
-// weakest topic → my courses → news → recent sittings; the profile nudge
-// above all while the phone or school is missing, then, on a phone, the
-// line on how to install the app (07.3; components/install-app) until the
-// student closes it or the app is on the home screen. Off the page (Sam,
-// 2026-10-04): the channels card, the Quiz Builder and NMC Procedures
-// cards, the Portal Guide bubble.
+// weakest topic → my courses → recent sittings; the news moved up (08.8;
+// Sam, 2026-10-18 — C): "New from Quademia" under the welcome, only while
+// something is new, and a Must-see notice popping up once. The profile
+// nudge above all while the phone or school is missing, then, on a phone,
+// the line on how to install the app (07.3; components/install-app) until
+// the student closes it or the app is on the home screen. Off the page
+// (Sam, 2026-10-04): the channels card, the Quiz Builder and NMC
+// Procedures cards, the Portal Guide bubble.
 //
 // Reads: the readers that already exist, side by side (access and courses
 // shared with the layout's menu — one read a request); then
@@ -25,10 +27,11 @@ import { getCourses } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import { getRecentAttempts } from '@/lib/attempts/queries';
 import { getAnnouncementsForStudent } from '@/lib/announcements/queries';
-import { noticeStates } from '@/lib/announcements/scoping';
+import { firstLine, isNew, longWhen, noticeTime } from '@/lib/announcements/display';
 import { getDashboardNumbers, getStudentReceipts } from '@/lib/dashboard/student/queries';
 import { lastSevenDayLetters, topCardFor } from '@/lib/dashboard/student/status';
-import { AnnouncementsStrip } from '@/components/announcements/announcements-strip';
+import { NewFromQuademia } from '@/components/announcements/new-from-quademia';
+import { MustSee } from '@/components/announcements/must-see';
 import { InstallAppLine } from '@/components/install-app/install-app';
 import { ProfileNudge } from './profile-nudge';
 import { TopCardView } from './top-card';
@@ -53,7 +56,10 @@ export default async function StudentDashboardPage() {
     // the notices and the student's marks in one read (A1, A2)
     getAnnouncementsForStudent(supabase),
   ]);
-  const states = noticeStates(announcements);
+  // what is new; the first new Must-see pops up, the card holds the rest
+  const fresh = announcements.filter(isNew);
+  const mustSee = fresh.find((a) => a.must_see) ?? null;
+  const newsItems = fresh.filter((a) => a !== mustSee).map((a) => ({ ...a, line: firstLine(a) }));
 
   const card = topCardFor(receipts);
   const onFloor = card.kind === 'floor' || card.kind === 'future';
@@ -87,6 +93,9 @@ export default async function StudentDashboardPage() {
     <div className="sdash sd">
       <h1 className="sd-hello">Welcome back{profile.forename ? `, ${profile.forename}` : ''}</h1>
 
+      <NewFromQuademia items={newsItems} />
+      {mustSee ? <MustSee notice={mustSee} date={longWhen(noticeTime(mustSee))} /> : null}
+
       {hasPhone && hasSchool ? null : <ProfileNudge />}
       <InstallAppLine closeFor={profile.user_id} />
 
@@ -98,7 +107,6 @@ export default async function StudentDashboardPage() {
           <CoursesCard rows={rows} met={numbers.courses} locked={onFloor} />
         </div>
         <div className="sd-side">
-          <AnnouncementsStrip announcements={announcements} states={states} />
           <RecentCard attempts={attempts} titleOf={titleOf} />
         </div>
       </div>

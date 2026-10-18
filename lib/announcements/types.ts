@@ -14,8 +14,8 @@ export const ANNOUNCEMENT_STATUSES = ['draft', 'active', 'archived'] as const;
 // legacy computeDisplayStatus: what the table's badge and the stats count.
 export type DisplayStatus = 'active' | 'scheduled' | 'expired' | 'draft' | 'archived';
 
-// What the student's page shows for one notice until its redesign (08.7):
-// dismissed, else tapped ('clicked'), else seen ('read'); none = new.
+// The words the student pieces send recordNoticeState: read (Seen),
+// clicked (Tapped), dismissed — each mapped to a mark in actions.ts.
 export const NOTICE_STATES = ['read', 'clicked', 'dismissed'] as const;
 export type NoticeState = (typeof NOTICE_STATES)[number];
 
@@ -92,6 +92,8 @@ export type SaveAnnouncementInput = {
   priority: number;
   pinned: boolean;
   dismissible: boolean;
+  /** Also pops up once on the dashboard (08.8). */
+  must_see: boolean;
   /** One of the admin's kinds (08.13). */
   kind: string;
   scope_audience: string;
@@ -115,6 +117,3 @@ export const PICTURE_LIST_MAX_BYTES = 200 * 1024;
 /** A student's mark, with the new number for the bell and the menu row (08.9; null: not read). */
 export type MarkResult = { ok: true; newCount: number | null } | { ok: false; error: string };
 export type SaveResult = { ok: true; announcement_id: string; created: boolean } | { ok: false; error: string };
-
-// The student page's view of each notice's marks, by id.
-export type StudentNoticeMap = Record<string, NoticeState>;

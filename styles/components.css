@@ -271,6 +271,8 @@
   overflow: auto;
 }
 .dlg::backdrop { background: rgba(17, 24, 39, 0.5); }
+/* a picture across the top, edge to edge (the Must-see notice, 08.8) */
+.dlg-media { display: block; width: 100%; aspect-ratio: 2 / 1; object-fit: cover; background: var(--surface-page); }
 .dlg-body { padding: var(--space-24); }
 .dlg-title {
   margin: 0;

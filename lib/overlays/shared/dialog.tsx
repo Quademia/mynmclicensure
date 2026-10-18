@@ -19,7 +19,7 @@
 
 'use client';
 
-import { useEffect, useId, useRef } from 'react';
+import { useCallback, useEffect, useId, useRef } from 'react';
 import { BodyPortal } from './body-portal';
 
 export function Dialog({
@@ -28,6 +28,7 @@ export function Dialog({
   title,
   children,
   role = 'dialog',
+  media,
 }: {
   open: boolean;
   /** Escape, the backdrop, and the caller's Cancel. */
@@ -36,8 +37,10 @@ export function Dialog({
   children: React.ReactNode;
   /** 'alertdialog' for a confirm that interrupts (screen readers announce it as such). */
   role?: 'dialog' | 'alertdialog';
+  /** A picture across the top, edge to edge, above the title (the Must-see notice, 08.8). */
+  media?: React.ReactNode;
 }) {
-  const ref = useRef<HTMLDialogElement>(null);
+  const ref = useRef<HTMLDialogElement | null>(null);
   const titleId = useId();
 
   // Open and close are DOM calls on the element, not state, so an effect
@@ -50,12 +53,20 @@ export function Dialog({
     else if (!open && el.open) el.close();
   }, [open]);
 
+  // A dialog open from its first paint (the dashboard's Must-see, 08.8)
+  // is not on the page when that effect runs — the portal draws nothing
+  // on the first paint — so the element opens itself as it arrives.
+  const attach = useCallback((el: HTMLDialogElement | null) => {
+    ref.current = el;
+    if (el && !el.open) el.showModal();
+  }, []);
+
   if (!open) return null;
 
   return (
     <BodyPortal>
       <dialog
-        ref={ref}
+        ref={attach}
         className="dlg"
         role={role}
         aria-labelledby={titleId}
@@ -81,6 +92,7 @@ export function Dialog({
           if (e.target === e.currentTarget) onClose();
         }}
       >
+        {media}
         <div className="dlg-body">
           <h2 className="dlg-title" id={titleId}>
             {title}
