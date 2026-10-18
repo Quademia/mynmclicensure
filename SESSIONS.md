@@ -23,7 +23,7 @@ should stay rich.
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
 - 2026-10-18, afternoon into evening — announcements redesigned; built: floor (A1, A2, 08.1), page, number, pictures, kinds, card, follow-up (08.7–08.13), "I've read this" (08.16)
-  - ↳ all ten ideas · Seen by itself · like Messages · hybrid list · upload only · card C + Must-see · kinds, 13 icons · reach rule once · in-app buttons (A4) · javascript: links dropped · Chrome walks · Must-see = read · Read (confirmed) · 1 of 3 · pop-up 560 · Read 0 fix
+  - ↳ all ten ideas · Seen by itself · like Messages · hybrid list · upload only · card C + Must-see · kinds, 13 icons · reach rule once · in-app buttons (A4) · javascript: links dropped · Chrome walks · Must-see = read · Read (confirmed) · 1 of 3 · pop-up 560 · Read 0 fix · welcome as dashboards' title
 
 - 2026-10-17, night, into 10-18 — the badge on a live line (08.5a); phone notifications both ways, walked on a phone (08.5b); a new reply marked in blue
   - ↳ live chat's line, no recount per page · Broadcast parked · Free 200 / Pro 500 · label only · device not phone · @block65 pinned · anon line trap · Edge bell · :3001 Google → old site · card out · dev messages cleared
