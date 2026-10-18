@@ -43,10 +43,8 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="adash">
-      <PageHeader
-        title="Admin Dashboard"
-        subtitle={`Welcome back, ${profile.forename || 'Admin'}!`}
-      />
+      {/* the welcome as the title, as the student's dashboard (Sam, 2026-10-18) */}
+      <PageHeader title={`Welcome back${profile.forename ? `, ${profile.forename}` : ''}`} />
 
       <div className="stats-grid">
         <div className="stat-card"><div className="stat-label">Total Users</div><div className="stat-value">{counts.totalUsers}</div><div className="stat-sub">All registered accounts</div></div>

@@ -31,6 +31,7 @@ import { getAnnouncementsForStudent } from '@/lib/announcements/queries';
 import { firstLine, isNew, longWhen, noticeTime } from '@/lib/announcements/display';
 import { getDashboardNumbers, getStudentReceipts } from '@/lib/dashboard/student/queries';
 import { lastSevenDayLetters, topCardFor } from '@/lib/dashboard/student/status';
+import { PageHeader } from '@/components/shell/page-header';
 import { NewFromQuademia } from '@/components/announcements/new-from-quademia';
 import { MustSee } from '@/components/announcements/must-see';
 import { InstallAppLine } from '@/components/install-app/install-app';
@@ -96,7 +97,9 @@ export default async function StudentDashboardPage() {
 
   return (
     <div className="sdash sd">
-      <h1 className="sd-hello">Welcome back{profile.forename ? `, ${profile.forename}` : ''}</h1>
+      {/* every page's title row, the welcome as its title (Sam, 2026-10-18): the menu and the
+          phone's tab already say Dashboard; a line beneath is for later */}
+      <PageHeader title={`Welcome back${profile.forename ? `, ${profile.forename}` : ''}`} />
 
       <NewFromQuademia items={newsItems} />
       {mustSee.length ? <MustSee notices={mustSee} dateOf={mustSeeDates} userId={profile.user_id} /> : null}
