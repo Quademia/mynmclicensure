@@ -386,7 +386,10 @@ above sit at the repo root; the audience grouping inside them is kept.
   Chrome fires `cancel` only with user activation, so a synthesised key
   press (the pane's) closes the box without telling React. A confirm
   at a call site is `if (!(await confirm({…}))) return;` from
-  `useConfirm()`; never `window.confirm`.
+  `useConfirm()`; never `window.confirm`. A dialog may start open (the
+  dashboard's Must-see, 08.8): the body portal draws nothing on the first
+  paint, so the element opens itself as it arrives (a callback ref) —
+  an open effect alone never fired there (2026-10-18).
 - **A token is not a change until a rule reads it.** `tokens.css` DS1
   aliased the old names; it did not make the new ones used. The price
   weight was changed at the token and three price rules had literals

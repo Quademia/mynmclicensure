@@ -22,8 +22,8 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
-- 2026-10-18, afternoon — announcements redesigned; built: the floor (A1, A2, 08.1), the page and number (08.7, 08.9), pictures (08.10), kinds (08.13)
-  - ↳ all ten ideas · Seen by itself · like Messages · signed-in only · hybrid list · upload only, no links · card C + Must-see · kinds Sam's list, 13 icons · admin walked in Chrome
+- 2026-10-18, afternoon into evening — announcements redesigned; built: floor (A1, A2, 08.1), page, number, pictures, kinds, dashboard card (08.7–08.13)
+  - ↳ all ten ideas · Seen by itself · like Messages · signed-in only · hybrid list · upload only · card C + Must-see · kinds Sam's list, 13 icons · admin walked in Chrome · dialog open on first paint fixed
 
 - 2026-10-17, night, into 10-18 — the badge on a live line (08.5a); phone notifications both ways, walked on a phone (08.5b); a new reply marked in blue
   - ↳ live chat's line, no recount per page · Broadcast parked · Free 200 / Pro 500 · label only · device not phone · @block65 pinned · anon line trap · Edge bell · :3001 Google → old site · card out · dev messages cleared

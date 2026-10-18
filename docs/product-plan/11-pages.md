@@ -29,8 +29,8 @@ opens it (00, The menu).
   sittings, the last 3–5 with Resume and Report. **News moves up**
   (Sam, 2026-10-18: C, drawn): a "New from Quademia" card under the
   welcome, only while something is new — up to two, a tap opens, ✕
-  dismisses — and a Must-see notice pops up once (08.8); on a phone the
-  old box sat last, under the courses. A profile nudge only
+  dismisses — and a Must-see notice pops up once (08.8, built
+  2026-10-18); on a phone the old box sat last, under the courses. A profile nudge only
   while something is missing (the school). Off the page: the plan
   status bar (into the top card), the channels card (to Help and
   news), the Create a Custom Quiz and NMC Procedures cards (the menu
