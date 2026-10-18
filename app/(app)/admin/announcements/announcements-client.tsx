@@ -551,7 +551,7 @@ export function AnnouncementsClient({
                 filtered.map((a) => {
                   const ds = computeDisplayStatus(a);
                   const schedule = a.start_at || a.end_at ? `${a.start_at ? fmtShort(a.start_at) : '—'} → ${a.end_at ? fmtShort(a.end_at) : '∞'}` : 'Always';
-                  const ec = engage[a.announcement_id] || { seen: 0, tapped: 0, dismissed: 0 };
+                  const ec = engage[a.announcement_id] || { seen: 0, tapped: 0, dismissed: 0, confirmed: 0 };
                   return (
                     <tr key={a.announcement_id} onClick={() => openPanel(a.announcement_id)}>
                       <td>
