@@ -15,7 +15,7 @@ import type { Metadata } from 'next';
 import { requireAdmin } from '@/lib/access';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getAllProducts, getCourses, getPrograms } from '@/lib/catalogue/queries';
-import { getAllAnnouncements, getCohorts, getEngagementCounts } from '@/lib/announcements/queries';
+import { getAllAnnouncements, getCohorts, getEngagementCounts, getKinds } from '@/lib/announcements/queries';
 import { PageHeader } from '@/components/shell/page-header';
 import { AnnouncementsClient } from './announcements-client';
 import '@/styles/admin-announcements.css';
@@ -29,13 +29,14 @@ export const dynamic = 'force-dynamic';
 export default async function AdminAnnouncementsPage() {
   const { supabase } = await requireAdmin();
   const service = createServiceRoleClient();
-  const [announcements, engage, programs, courses, products, cohorts] = await Promise.all([
+  const [announcements, engage, programs, courses, products, cohorts, kinds] = await Promise.all([
     getAllAnnouncements(service),
     getEngagementCounts(service),
     getPrograms(supabase),
     getCourses(supabase),
     getAllProducts(supabase),
     getCohorts(supabase),
+    getKinds(service),
   ]);
 
   return (
@@ -49,6 +50,7 @@ export default async function AdminAnnouncementsPage() {
         courses={courses}
         products={products}
         cohorts={cohorts}
+        kinds={kinds}
       />
     </>
   );

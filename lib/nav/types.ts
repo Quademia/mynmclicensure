@@ -68,7 +68,21 @@ export type IconName =
   // the row menu's button (09.10, 2026-10-17)
   | 'dots'
   // Report an issue, a speech bubble holding "!" (06.2; Sam, 2026-10-17)
-  | 'report';
+  | 'report'
+  // the announcement kinds' grid (08.13; Sam, 2026-10-18: all thirteen)
+  | 'calendar'
+  | 'tag'
+  | 'percent'
+  | 'gift'
+  | 'bell'
+  | 'clock'
+  | 'sparkles'
+  | 'trophy'
+  | 'newspaper'
+  | 'info'
+  | 'video'
+  | 'heart-pulse'
+  | 'baby';
 
 /** The nav row's icon. Every icon name is allowed; see IconName. */
 export type NavIcon = IconName;

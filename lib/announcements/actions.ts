@@ -28,6 +28,7 @@ import { PICTURE_BUCKET, pictureFile } from './display';
 import { getAllAnnouncements } from './queries';
 import {
   ANNOUNCEMENT_STATUSES,
+  DEFAULT_KIND,
   NOTICE_STATES,
   PICTURE_FULL_MAX_BYTES,
   PICTURE_LIST_MAX_BYTES,
@@ -63,9 +64,23 @@ export async function saveAnnouncement(input: SaveAnnouncementInput): Promise<Sa
   const scopeCourses = cleanList(input.scope_courses);
   const scopeProducts = cleanList(input.scope_product_ids);
   const scopeUserIds = cleanList(input.scope_user_ids);
+  const editingId = String(input.announcement_id || '').trim();
+
+  // the kind (08.13): one of the admin's; a retired one only where the
+  // notice already has it
+  const kind = String(input.kind || '').trim() || DEFAULT_KIND;
+  const [{ data: kindRow }, { data: currentRow }] = await Promise.all([
+    supabase.from('announcement_kinds').select('active').eq('name', kind).maybeSingle(),
+    editingId ? supabase.from('announcements').select('kind').eq('announcement_id', editingId).maybeSingle() : Promise.resolve({ data: null }),
+  ]);
+  if (!kindRow) return fail('Pick a kind from the list.');
+  if (!(kindRow as { active: boolean }).active && (currentRow as { kind: string } | null)?.kind !== kind) {
+    return fail(`"${kind}" is retired. Pick another kind, or bring it back under Kinds.`);
+  }
 
   const payload = {
     title,
+    kind,
     body_html: String(input.body_html || ''),
     body_text: String(input.body_text || ''),
     status,
@@ -83,8 +98,6 @@ export async function saveAnnouncement(input: SaveAnnouncementInput): Promise<Sa
     start_at: String(input.start_at || '').trim() || null,
     end_at: String(input.end_at || '').trim() || null,
   };
-
-  const editingId = String(input.announcement_id || '').trim();
 
   if (editingId) {
     const { error } = await supabase.from('announcements').update(payload).eq('announcement_id', editingId);

@@ -18,7 +18,7 @@
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import { readAll } from '@/lib/supabase/read-all';
-import type { Announcement, EngageMap, StudentAnnouncement } from './types';
+import type { Announcement, AnnouncementKind, EngageMap, StudentAnnouncement } from './types';
 
 type ServiceClient = ReturnType<typeof import('@/lib/supabase/server').createServiceRoleClient>;
 
@@ -32,6 +32,16 @@ export async function getAllAnnouncements(db: ServiceClient): Promise<Announceme
     return [];
   }
   return data;
+}
+
+// The admin's kinds (08.13), in their order — a short list, read whole.
+export async function getKinds(db: ServiceClient): Promise<AnnouncementKind[]> {
+  const { data, error } = await db.from('announcement_kinds').select('name, icon, position, active').order('position').order('name');
+  if (error) {
+    console.error('getKinds:', error);
+    return [];
+  }
+  return (data ?? []) as AnnouncementKind[];
 }
 
 export async function getEngagementCounts(db: ServiceClient): Promise<EngageMap> {

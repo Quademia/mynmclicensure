@@ -43,8 +43,8 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
 - **No Bulk Send**: announcements are the broadcast, with the same
   targeting; New Thread reaches one student (Sam, 2026-09-18).
 
-**Redesigned (Sam, 2026-10-18; drawn in the chat).** *(08.7, 08.9 and
-08.10 built 2026-10-18; to build: 08.8, 08.11–08.15)*
+**Redesigned (Sam, 2026-10-18; drawn in the chat).** *(08.7, 08.9, 08.10
+and 08.13 built 2026-10-18; to build: 08.8, 08.11, 08.12, 08.14, 08.15)*
 
 - **The page, like Messages**: the list, and a tap opens the notice —
   beside the list on a computer, the newest opening by itself; in its
@@ -63,7 +63,11 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
   be enough"): a name and an icon picked from a grid of the app's icons;
   added, renamed, re-iconed, ordered, retired (never deleted while in
   use). It starts with Exam date · New questions · Offer · Alert · News;
-  News when none is picked. *(08.13)*
+  News when none is picked. *(built 2026-10-18: 08.13 — the Kinds panel
+  beside "+ New Announcement" and the editor's Kind; the grid is 25
+  icons, the app's 12 and 13 added from Lucide on Sam's yes; a retired
+  kind is kept by its notices and offered to no new one; at least one
+  kind stays offered.)*
 - **One picture per notice, uploaded** — never a pasted link (Sam: the
   app would copy it in anyway, doing the job twice); wide (2:1, about
   1200 × 600), the upload box saying so; made at upload into two small

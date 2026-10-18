@@ -33,8 +33,10 @@ import { useRouter } from 'next/navigation';
 import { Toast } from '@/lib/toast/toast';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { archiveAnnouncement, removeAnnouncementPicture, saveAnnouncement, searchStudentsForScope, setAnnouncementPicture } from '@/lib/announcements/actions';
-import { pictureUrl } from '@/lib/announcements/display';
+import { kindIcon, pictureUrl } from '@/lib/announcements/display';
 import { makePicture, type MadePicture } from '@/lib/announcements/picture-maker';
+import { DEFAULT_KIND, type AnnouncementKind } from '@/lib/announcements/types';
+import { KindsPanel } from './kinds-panel';
 import { computeDisplayStatus } from '@/lib/announcements/scoping';
 import { htmlToText, newlinesToParagraphs, sanitiseHtml } from '@/lib/announcements/sanitise';
 import { LEVELS, type Announcement, type EngageMap } from '@/lib/announcements/types';
@@ -65,6 +67,7 @@ export function AnnouncementsClient({
   courses,
   products,
   cohorts,
+  kinds,
 }: {
   announcements: Announcement[];
   engage: EngageMap;
@@ -72,6 +75,7 @@ export function AnnouncementsClient({
   courses: Course[];
   products: Product[];
   cohorts: string[];
+  kinds: AnnouncementKind[];
 }) {
   const router = useRouter();
   const [msg, setMsg] = useState<Msg>(null);
@@ -96,6 +100,13 @@ export function AnnouncementsClient({
   });
 
   // ── the side panel form (legacy resetForm / fillForm) ──
+  // ── the kinds (08.13): the panel, and each kind's announcements counted ──
+  const [kindsOpen, setKindsOpen] = useState(false);
+  const usedBy: Record<string, number> = {};
+  for (const a of announcements) usedBy[a.kind] = (usedBy[a.kind] ?? 0) + 1;
+  const firstKind = kinds.find((k) => k.active && k.name === DEFAULT_KIND)?.name ?? kinds.find((k) => k.active)?.name ?? DEFAULT_KIND;
+  const [kind, setKind] = useState(firstKind);
+
   const [panelOpen, setPanelOpen] = useState(false);
   const [editingId, setEditingId] = useState('');
   const [editingStatus, setEditingStatus] = useState('');
@@ -163,6 +174,7 @@ export function AnnouncementsClient({
 
   function resetForm() {
     setTitle('');
+    setKind(firstKind);
     setBody('');
     setStatus('draft');
     setPriority('1');
@@ -199,6 +211,7 @@ export function AnnouncementsClient({
       setEditingId(a.announcement_id);
       setEditingStatus(a.status);
       setTitle(a.title || '');
+      setKind(a.kind || firstKind);
       setBody(a.body_html || a.body_text || '');
       setCurrentPicture(a.picture_path);
       // §9 #18: a legacy row saved as 'scheduled' shows as draft in the form
@@ -343,6 +356,7 @@ export function AnnouncementsClient({
       priority: Number.parseInt(priority, 10) || 1,
       pinned,
       dismissible,
+      kind,
       scope_audience: audience,
       scope_subscription_kind: subKind,
       scope_cohort: cohort,
@@ -457,7 +471,8 @@ export function AnnouncementsClient({
             <option value="STUDENTS">Students only</option>
           </select>
           <button type="button" className="btn btn-ghost" onClick={() => { setSearch(''); setFStatus(''); setFAudience(''); }}>Clear</button>
-          <button type="button" className="btn btn-primary new-btn" onClick={() => openPanel(null)}>+ New Announcement</button>
+          <button type="button" className="btn btn-ghost kinds-btn" onClick={() => setKindsOpen(true)}>Kinds</button>
+          <button type="button" className="btn btn-primary" onClick={() => openPanel(null)}>+ New Announcement</button>
           <span className="result-count">{filtered.length} announcement{filtered.length !== 1 ? 's' : ''}</span>
         </div>
       </div>
@@ -511,6 +526,7 @@ export function AnnouncementsClient({
 
       <BodyPortal>
         <div className="ann-overlay">
+          <KindsPanel open={kindsOpen} onClose={() => setKindsOpen(false)} kinds={kinds} usedBy={usedBy} onError={err} onDone={ok} />
           {/* Side panel */}
           <div className={`panel-overlay${panelOpen ? ' show' : ''}`} onClick={closePanel} />
           <div className={`side-panel${panelOpen ? ' open' : ''}`}>
@@ -528,6 +544,21 @@ export function AnnouncementsClient({
               <div className="form-group">
                 <label htmlFor="fieldTitle">Title <span className="req">*</span></label>
                 <input id="fieldTitle" type="text" placeholder="e.g. New Mock Exam Available" maxLength={200} value={title} onChange={(e) => setTitle(e.target.value)} />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="fieldKind">Kind</label>
+                <div className="kind-pick">
+                  <span className="kind-square" aria-hidden="true"><Icon name={kindIcon(kinds.find((k) => k.name === kind)?.icon)} size={20} /></span>
+                  <select id="fieldKind" value={kind} onChange={(e) => setKind(e.target.value)}>
+                    {kinds
+                      .filter((k) => k.active || k.name === kind)
+                      .map((k) => (
+                        <option key={k.name} value={k.name}>{k.name}{k.active ? '' : ' (retired)'}</option>
+                      ))}
+                  </select>
+                </div>
+                <p className="form-hint">Its icon shows beside the title in students&apos; list. Add or change kinds under Kinds.</p>
               </div>
 
               <div className="form-group">

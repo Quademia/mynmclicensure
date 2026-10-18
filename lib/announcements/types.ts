@@ -74,6 +74,11 @@ export type StudentAnnouncement = {
   dismissed_at: string | null;
 };
 
+/** One of the admin's kinds (08.13): `announcement_kinds`. */
+export type AnnouncementKind = { name: string; icon: string; position: number; active: boolean };
+export const KIND_NAME_MAX = 40;
+export const DEFAULT_KIND = 'News';
+
 export type EngageCounts = { seen: number; tapped: number; dismissed: number };
 export type EngageMap = Record<string, EngageCounts>;
 
@@ -87,6 +92,8 @@ export type SaveAnnouncementInput = {
   priority: number;
   pinned: boolean;
   dismissible: boolean;
+  /** One of the admin's kinds (08.13). */
+  kind: string;
   scope_audience: string;
   scope_subscription_kind: string;
   scope_cohort: string;

@@ -49,16 +49,23 @@ export function firstLine(a: Pick<StudentAnnouncement, 'body_text' | 'body_html'
   return text.length > 140 ? `${text.slice(0, 139)}…` : text;
 }
 
-// The icons a kind may wear today — names the app's set draws. A kind
-// whose icon is not here (the five's calendar and tag until 08.13 adds
-// them) shows the megaphone.
-const KIND_ICONS = new Set<IconName>([
-  'megaphone', 'book', 'book-open', 'alert', 'flag', 'zap', 'timer', 'hourglass', 'graduation',
-  'clipboard', 'target', 'chart', 'stethoscope', 'ticket', 'card', 'package', 'download', 'help',
-]);
+// The icons a kind may wear: the grid the admin picks from (08.13; Sam,
+// 2026-10-18) — twelve the app had, thirteen added from the same family.
+// A kind whose icon is not here shows the megaphone.
+export const KIND_ICON_GRID: readonly IconName[] = [
+  'megaphone', 'alert', 'book', 'book-open', 'clipboard', 'target', 'chart', 'hourglass',
+  'graduation', 'stethoscope', 'wrench', 'card',
+  'calendar', 'tag', 'percent', 'gift', 'bell', 'clock', 'sparkles', 'trophy', 'newspaper', 'info',
+  'video', 'heart-pulse', 'baby',
+];
+const KIND_ICONS = new Set<string>(KIND_ICON_GRID);
+
+export function isKindIcon(icon: string): icon is IconName {
+  return KIND_ICONS.has(icon);
+}
 
 export function kindIcon(icon: string | null | undefined): IconName {
-  return icon && KIND_ICONS.has(icon as IconName) ? (icon as IconName) : 'megaphone';
+  return icon && isKindIcon(icon) ? icon : 'megaphone';
 }
 
 /**

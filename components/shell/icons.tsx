@@ -14,7 +14,8 @@
 //     nav-icon.tsx, from Feather, Lucide's ancestor): shapes copied in,
 //     no package added. DS6 drew the nineteen the two sidebars needed;
 //     DS15 pass B added twenty-four more for the buttons, section
-//     headings and empty states that were carrying emoji.
+//     headings and empty states that were carrying emoji; 08.13 added
+//     thirteen for the announcement kinds' grid (Sam, 2026-10-18).
 //
 // <Icon name="…"> looks one up by name and <NavIcon name="…"> is the
 // same thing wearing the sidebar's class. The names are the IconName
@@ -422,6 +423,113 @@ function inner(name: IconName) {
     case 'play':
       return (
         <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />
+      );
+    // the announcement kinds' grid (08.13; Sam, 2026-10-18: all thirteen)
+    case 'calendar':
+      return (
+        <>
+          <path d="M8 2v4" />
+          <path d="M16 2v4" />
+          <rect width="18" height="18" x="3" y="4" rx="2" />
+          <path d="M3 10h18" />
+        </>
+      );
+    case 'tag':
+      return (
+        <>
+          <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z" />
+          <circle cx="7.5" cy="7.5" r=".5" fill="currentColor" />
+        </>
+      );
+    case 'percent':
+      return (
+        <>
+          <line x1="19" x2="5" y1="5" y2="19" />
+          <circle cx="6.5" cy="6.5" r="2.5" />
+          <circle cx="17.5" cy="17.5" r="2.5" />
+        </>
+      );
+    case 'gift':
+      return (
+        <>
+          <rect x="3" y="8" width="18" height="4" rx="1" />
+          <path d="M12 8v13" />
+          <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7" />
+          <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5" />
+        </>
+      );
+    case 'bell':
+      return (
+        <>
+          <path d="M10.268 21a2 2 0 0 0 3.464 0" />
+          <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
+        </>
+      );
+    case 'clock':
+      return (
+        <>
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 6v6l4 2" />
+        </>
+      );
+    case 'sparkles':
+      return (
+        <>
+          <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
+          <path d="M20 3v4" />
+          <path d="M22 5h-4" />
+        </>
+      );
+    case 'trophy':
+      return (
+        <>
+          <path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978" />
+          <path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978" />
+          <path d="M18 9h1.5a1 1 0 0 0 0-5H18" />
+          <path d="M4 22h16" />
+          <path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z" />
+          <path d="M6 9H4.5a1 1 0 0 1 0-5H6" />
+        </>
+      );
+    case 'newspaper':
+      return (
+        <>
+          <path d="M15 18h-5" />
+          <path d="M18 14h-8" />
+          <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0v-9a2 2 0 0 1 2-2h2" />
+          <rect width="8" height="4" x="10" y="6" rx="1" />
+        </>
+      );
+    case 'info':
+      return (
+        <>
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 16v-4" />
+          <path d="M12 8h.01" />
+        </>
+      );
+    case 'video':
+      return (
+        <>
+          <path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" />
+          <rect x="2" y="6" width="14" height="12" rx="2" />
+        </>
+      );
+    case 'heart-pulse':
+      return (
+        <>
+          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+          <path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27" />
+        </>
+      );
+    case 'baby':
+      return (
+        <>
+          <path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5" />
+          <path d="M15 12h.01" />
+          <path d="M19.38 6.813A9 9 0 0 1 20.8 10.2a2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1" />
+          <path d="M9 12h.01" />
+        </>
       );
     case 'pointer':
       return (

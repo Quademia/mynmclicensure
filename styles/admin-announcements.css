@@ -27,7 +27,7 @@
 .ann .filters-bar input, .ann .filters-bar select { padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; font-family: inherit; color: var(--text); background: var(--white); }
 .ann .filters-bar input { min-width: 220px; }
 .ann .filters-bar input:focus, .ann .filters-bar select:focus { outline: none; border-color: var(--primary); }
-.ann .new-btn { margin-left: auto; }
+.ann .kinds-btn { margin-left: auto; }
 .ann .result-count { font-size: 13px; color: var(--text-muted); }
 
 /* ── Table ── */
@@ -147,6 +147,66 @@
 .ann-overlay .form-group .pic-input { position: absolute; width: 1px; height: 1px; padding: 0; border: 0; opacity: 0; pointer-events: none; }
 .ann-overlay .pic-actions { display: flex; align-items: center; gap: var(--space-12); }
 
+/* ── The kinds (08.13, 2026-10-18): the editor's Kind field, the Kinds
+   panel's rows and form, the icon grid. The square is the one students'
+   rows draw. Tokens only. ── */
+.ann-overlay .kind-square {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  background: var(--brand-teal-pale);
+  color: var(--brand-teal-hover);
+}
+.ann-overlay .kind-pick { display: flex; align-items: center; gap: var(--space-10); }
+.ann-overlay .kind-pick select { flex: 1; }
+.ann-overlay .kinds-panel { width: 540px; }
+.ann-overlay .kind-rows { list-style: none; margin: 0 0 var(--space-12); padding: 0; border: 1px solid var(--border); border-radius: var(--radius); }
+.ann-overlay .kind-row + .kind-row { border-top: 1px solid var(--border); }
+.ann-overlay .kind-line { display: flex; align-items: center; gap: var(--space-10); padding: var(--space-10) var(--space-12); }
+.ann-overlay .kind-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ann-overlay .kind-name { font-size: var(--type-ui-size); font-weight: 600; color: var(--ink); }
+.ann-overlay .kind-used { font-size: var(--type-meta-size); color: var(--ink-muted); }
+.ann-overlay .kind-actions { flex: none; display: flex; align-items: center; gap: var(--space-4); }
+.ann-overlay .kind-row.is-retired .kind-name { color: var(--ink-muted); }
+.ann-overlay .kind-row.is-retired .kind-square { background: var(--surface-page); color: var(--ink-muted); }
+.ann-overlay .kind-form { display: flex; flex-direction: column; gap: var(--space-6); padding: var(--space-12); border-top: 1px dashed var(--border); background: var(--surface-page); }
+.ann-overlay .kind-form label { font-size: var(--type-ui-size); font-weight: 600; color: var(--ink); }
+.ann-overlay .kind-form input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font: inherit;
+  font-size: var(--type-ui-size);
+  color: var(--ink);
+  background: var(--surface);
+}
+.ann-overlay .kind-form input:focus { outline: none; border-color: var(--brand-teal); }
+.ann-overlay .kind-form-actions { display: flex; justify-content: flex-end; gap: var(--space-8); margin-top: var(--space-6); }
+.ann-overlay .kind-grid { display: grid; grid-template-columns: repeat(auto-fill, 44px); gap: var(--space-6); }
+.ann-overlay .kind-tile {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+.ann-overlay .kind-tile:hover { border-color: var(--brand-teal); color: var(--brand-teal-hover); }
+.ann-overlay .kind-tile.is-on { border: 2px solid var(--brand-teal); background: var(--brand-teal-pale); color: var(--brand-teal-hover); }
+.ann-overlay .kind-tile:focus-visible { outline: 2px solid var(--brand-teal); outline-offset: 2px; }
+.ann-overlay .kind-add { margin-bottom: var(--space-8); }
+.ann-overlay .kind-note { margin-top: var(--space-4); }
+
 /* ── Archive dialog (portalled) ── */
 .ann-overlay .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.35); z-index: 200; align-items: center; justify-content: center; padding: 16px; }
 .ann-overlay .modal-overlay.show { display: flex; }
@@ -161,7 +221,7 @@
 @media (max-width: 768px) {
   .ann .stats-row { grid-template-columns: 1fr 1fr; }
   .ann .filters-bar input, .ann .filters-bar select { width: 100%; min-width: 0; }
-  .ann .new-btn { margin-left: 0; width: 100%; }
+  .ann .kinds-btn { margin-left: 0; }
   .ann-overlay .side-panel { width: 100%; max-width: 100%; }
   .ann-overlay .form-row { grid-template-columns: 1fr; }
   .ann-overlay .panel-footer .btn { flex: 1; }
