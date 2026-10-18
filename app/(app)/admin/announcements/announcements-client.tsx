@@ -3,7 +3,7 @@
 // The script block of legacy admin/announcements.html (slice 11a): the
 // five counts, the search / status / audience filters, the table
 // (title with programme chips, the computed status pill and the pinned
-// badge, audience, schedule, the read / clicked / dismissed counts,
+// badge, audience, schedule, the seen / tapped / dismissed counts (A2),
 // flags, Edit), the side panel — title, the body box with its Bold /
 // Italic / Link / Button helpers and the dead "Quiz Link" one, the
 // character count, the live preview, status (draft / active /
@@ -166,7 +166,7 @@ export function AnnouncementsClient({
       setCohort(a.scope_cohort || '');
       setProgs(a.scope_programs || []);
       setScopeCourses(a.scope_courses || []);
-      setLevels(a.scope_level ? a.scope_level.split(',').map((s) => s.trim()) : []);
+      setLevels(a.scope_level || []);
       setScopeProducts(a.scope_product_ids || []);
       setSelectedUsers((a.scope_user_ids || []).map((uid) => ({ user_id: uid, name: uid })));
       setUserSearch('');
@@ -396,7 +396,7 @@ export function AnnouncementsClient({
                 filtered.map((a) => {
                   const ds = computeDisplayStatus(a);
                   const schedule = a.start_at || a.end_at ? `${a.start_at ? fmtShort(a.start_at) : '—'} → ${a.end_at ? fmtShort(a.end_at) : '∞'}` : 'Always';
-                  const ec = engage[a.announcement_id] || { read: 0, clicked: 0, dismissed: 0 };
+                  const ec = engage[a.announcement_id] || { seen: 0, tapped: 0, dismissed: 0 };
                   return (
                     <tr key={a.announcement_id} onClick={() => openPanel(a.announcement_id)}>
                       <td>
@@ -411,7 +411,7 @@ export function AnnouncementsClient({
                       <td className="cell-muted">{schedule}</td>
                       <td>
                         <div className="engage-counts">
-                          <span title="Read"><Icon name="check-circle" size={13} />{ec.read}</span><span title="Clicked"><Icon name="pointer" size={13} />{ec.clicked}</span><span title="Dismissed"><Icon name="x" size={13} />{ec.dismissed}</span>
+                          <span title="Seen"><Icon name="check-circle" size={13} />{ec.seen}</span><span title="Tapped"><Icon name="pointer" size={13} />{ec.tapped}</span><span title="Dismissed"><Icon name="x" size={13} />{ec.dismissed}</span>
                         </div>
                       </td>
                       <td className="cell-flags">{a.dismissible ? <span>dismissible</span> : null}</td>

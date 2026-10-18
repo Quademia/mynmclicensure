@@ -5,35 +5,41 @@
 // (no notice row), up to two, pinned expanded and the rest collapsed;
 // "N unread" in the header; two empty states — "Nothing from us yet"
 // when nothing reaches the student at all, "You're all caught up!"
-// when everything has a state; the ✕ marks the item read (legacy
-// clearFromStrip) and fades it out; "View all announcements →" with
-// the unread count when more than two. The dashboard's server half
+// when everything has a state; the ✕ dismisses the item (A2, Sam
+// 2026-09-18: it had marked it read) and fades it out, the count falling
+// and the next unread one taking its place; "View all announcements →"
+// with the unread count when more than two. The dashboard's server half
 // hands in the student's announcements and states; from 7e the block
-// sits among the other dashboard cards.
+// sits among the other dashboard cards. Its redesign is 08.8.
 
 'use client';
 
 import { useState } from 'react';
 import { AnnouncementBody } from './announcement-body';
 import { recordNoticeState } from '@/lib/announcements/actions';
-import type { Announcement, StudentNoticeMap } from '@/lib/announcements/types';
+import type { StudentAnnouncement, StudentNoticeMap } from '@/lib/announcements/types';
 import { Icon } from '@/components/shell/icons';
 import { AppLink } from '@/components/shell/link-pending';
 
-export function AnnouncementsStrip({ announcements, states }: { announcements: Announcement[]; states: StudentNoticeMap }) {
+export function AnnouncementsStrip({ announcements, states }: { announcements: StudentAnnouncement[]; states: StudentNoticeMap }) {
   const [cleared, setCleared] = useState<Record<string, 'fading' | 'gone'>>({});
   const [open, setOpen] = useState<Record<string, boolean>>({});
 
-  const unread = announcements.filter((a) => !states[a.announcement_id]);
-  const totalUnread = unread.length;
-  const toShow = unread.slice(0, 2).filter((a) => cleared[a.announcement_id] !== 'gone');
+  const unread = announcements.filter((a) => !states[a.announcement_id] && cleared[a.announcement_id] !== 'gone');
+  const totalUnread = unread.filter((a) => !cleared[a.announcement_id]).length;
+  const toShow = unread.slice(0, 2);
 
-  function isOpen(a: Announcement): boolean {
+  function isOpen(a: StudentAnnouncement): boolean {
     return open[a.announcement_id] ?? Boolean(a.pinned);
   }
 
   async function clearFromStrip(id: string) {
-    const result = await recordNoticeState(id, 'read');
+    let result;
+    try {
+      result = await recordNoticeState(id, 'dismissed');
+    } catch {
+      return; // a dropped connection: the item stays, the ✕ can be pressed again
+    }
     if (!result.ok) return;
     setCleared((c) => ({ ...c, [id]: 'fading' }));
     window.setTimeout(() => setCleared((c) => ({ ...c, [id]: 'gone' })), 250);

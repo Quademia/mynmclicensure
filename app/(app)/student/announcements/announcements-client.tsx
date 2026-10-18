@@ -16,7 +16,7 @@ import { useState } from 'react';
 import { PageHeader } from '@/components/shell/page-header';
 import { AnnouncementBody } from '@/components/announcements/announcement-body';
 import { recordNoticeState } from '@/lib/announcements/actions';
-import type { Announcement, NoticeState, StudentNoticeMap } from '@/lib/announcements/types';
+import type { NoticeState, StudentAnnouncement, StudentNoticeMap } from '@/lib/announcements/types';
 import { Icon } from '@/components/shell/icons';
 import type { IconName } from '@/lib/nav/types';
 
@@ -37,7 +37,7 @@ export function AnnouncementsClient({
   announcements,
   initialStates,
 }: {
-  announcements: Announcement[];
+  announcements: StudentAnnouncement[];
   initialStates: StudentNoticeMap;
 }) {
   const [states, setStates] = useState<StudentNoticeMap>(initialStates);

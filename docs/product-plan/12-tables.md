@@ -575,35 +575,30 @@ table by table as each is next changed (AGENTS.md rule 9).
 |---|---|
 | `announcement_id` | The notice's id |
 | `title`, `body_html`, `body_text` | The title; the body as written and as plain text |
+| `kind` | The notice's kind, a name from `announcement_kinds`; News when none is picked |
+| `picture_path` | Where its picture sits in the bucket `licensure-gh-announcement-images` (the list's square and the opened notice's size); empty when none |
 | `status` | `draft`, `active` or `archived` |
 | `start_at`, `end_at` | When it shows |
 | `pinned`, `priority` | Order |
 | `dismissible` | Whether ✕ is offered |
-| `scope_audience`, `scope_programs`, `scope_courses`, `scope_level`, `scope_subscription_kind`, `scope_product_ids`, `scope_cohort`, `scope_user_ids` | Who it is for; a student must match every scope set |
+| `must_see` | Also pops up once on the dashboard (08.8) |
+| `send_to_devices`, `sent_at` | Also sent as a device notice; when it went, so it goes once, when the notice goes live (08.15) |
+| `scope_audience` | `ALL` or `STUDENTS` |
+| `scope_programs`, `scope_courses`, `scope_level`, `scope_subscription_kind`, `scope_product_ids`, `scope_cohort`, `scope_user_ids` | Who it is for (lists, the subscription kind `PAID`, `TRIAL` or `FREE`); a student must match every scope set; a course scope reaches whoever has held one of its courses (08.1) |
 | `created_at` | When made |
 
-- *To build — ticked 2026-09-18 (08 A1):* read only through one database
-  function that returns what the signed-in student should see; the
-  table itself admin-only; checks on the status and scope words;
-  `scope_level` a list. Why: today every signed-in account reads every
-  notice, the named-students list included.
-- *To build — ticked by Sam 2026-10-18 (08 redesign):*
-  - `kind` — the notice's kind, from the admin's own list in
-    `announcement_kinds` (below), keyed on its name; News when none is
-    picked (08.13).
-  - `picture_path` — where the notice's picture sits in a new bucket,
-    `licensure-gh-announcement-images` (anyone may read a picture, only
-    the server writes): the two sizes made at upload, the list's square
-    and the opened notice's; empty when there is none (08.10).
-  - `must_see` — yes or no: also pops up once on the dashboard (08.8).
-  - `send_to_devices` — yes or no; `sent_at` — when the device notices
-    went, so a notice is sent once, when it goes live (08.15).
-  - With the new editor (08.14): `body_html` and `body_text` give way to
-    one body, its form chosen with the editor (its own tick then).
-- Browser today: every signed-in account reads every row; admin write.
-  *Old defaults.*
+- Built 2026-10-18 (A1, ticked 2026-09-18; the redesign's columns ticked
+  by Sam 2026-10-18; `20261018120000_announcements_floor.sql`): read only
+  through `announcements_for_me()` — every scope checked in the database,
+  the named students never leaving the server; the status, audience and
+  subscription-kind words checked; `scope_level` a list; `kind` keyed to
+  `announcement_kinds` on its name, on update cascade.
+- With the new editor (08.14): `body_html` and `body_text` give way to
+  one body, its form chosen with the editor (its own tick then).
+- Browser: nothing — the admin's page reads and writes through the
+  server.
 
-### `announcement_kinds` — the admin's list of kinds *(new)*
+### `announcement_kinds` — the admin's list of kinds
 | Column | Holds |
 |---|---|
 | `name` | The kind as students see it — "Exam date"; unique; a notice's `kind` points here |
@@ -612,12 +607,14 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `active` | No: retired — no longer offered for a new notice; notices that use it keep it |
 | `created_at` | When added |
 
-- *To build — ticked by Sam 2026-10-18 (08.13; Sam: "the examples given
-  may not be enough"):* the admin adds, renames, re-icons, orders and
-  retires kinds; a rename reaches every notice inside the database (the
-  key is the name, on update cascade, as the bank's topics, 08 B5); a
-  kind in use cannot be deleted, only retired. Starts with Exam date,
-  New questions, Offer, Alert and News. Why: the five may not be enough.
+- Built 2026-10-18, the table (ticked by Sam that day; 08.13 — Sam: "the
+  examples given may not be enough"): a rename reaches every notice
+  inside the database (the key is the name, on update cascade, as the
+  bank's topics, 08 B5); a kind in use cannot be deleted, only retired;
+  one name per kind whatever its case. Started with Exam date (calendar),
+  New questions (book), Offer (tag), Alert (alert) and News (megaphone).
+  The admin's page to add, rename, re-icon, order and retire them is
+  08.13, to build.
 - Browser: nothing — the student's reader hands each notice its kind's
   name and icon; the admin's page reads through the server.
 
@@ -625,18 +622,19 @@ table by table as each is next changed (AGENTS.md rule 9).
 | Column | Holds |
 |---|---|
 | `id` | The row's number |
-| `user_id`, `item_type`, `item_id` | Who, and which notice |
-| `state` | One word, overwritten (read, then dismissed, loses the read) |
-| `seen_at`, `updated_at` | When |
+| `user_id`, `item_type`, `item_id` | Who, and which notice (`ANNOUNCEMENT`, keyed to the notice) |
+| `seen_at` | **Seen** — when the notice first showed in full |
+| `tapped_at` | **Tapped** — the first tap on its button (sets Seen too) |
+| `dismissed_at` | **Dismissed** — when the student dismissed it |
 
-- *To build — ticked 2026-09-18 (08 A2), named by Sam 2026-10-18 after
-  the follow-up's words:* `seen_at`, `tapped_at`, `dismissed_at` — each
-  set once, never cleared — replace `state` and `updated_at` (today's
-  `seen_at`, the last touch, gives way to the new one; old rows carried
-  over); `item_id` keyed to the notice; written through the server only.
-  **Seen** sets itself when a notice shows in full; a tap sets Seen too;
-  a Must-see notice pops up while Seen is empty.
-- Browser: the owner reads and writes their own. *Old defaults.*
+- Built 2026-10-18 (A2, ticked 2026-09-18; named by Sam 2026-10-18 after
+  the follow-up's words; `20261018120000_announcements_floor.sql`): each
+  date set once, never cleared, by `notice_mark()` only — the student's
+  own notices, Dismiss only where it is allowed. The overwritten word
+  (`state`) and `updated_at` went; old rows kept their date as Seen, a
+  clicked one as Tapped too, a dismissed one as Dismissed. A Must-see
+  notice pops up while Seen is empty (08.8).
+- Browser: nothing — a student's marks come with their notices.
 
 ### `messages_threads` — conversations
 | Column | Holds |
@@ -766,7 +764,8 @@ table by table as each is next changed (AGENTS.md rule 9).
 ## The database's own functions
 
 Every write a student makes, and every grade, happens inside these;
-the browser can call only the first two lines.
+the browser can call only the first two lines and
+`announcements_for_me()`.
 
 - **Who is asking**: `auth_user_id()`, `auth_user_role()`.
 - **The gate**: `my_course_access()` (each course's latest live end),
@@ -815,6 +814,18 @@ the browser can call only the first two lines.
   topic or subtopic ("malar" finds malaria, "iron" not environment),
   published questions only, and with the third argument the free ones
   only — both builders' keyword (04.4; ticked and built 2026-10-11).
+- **Announcements** (A1, A2, 08.1; built 2026-10-18):
+  `announcements_for_user(person, course)` (server only) — the notices a
+  person should see now, in order (pinned, priority, newest), with their
+  own marks and the kind's icon; every scope checked: audience,
+  programme, level, cohort, the subscription kind and package of their
+  latest live receipt (FREE when none), named students, and courses —
+  whoever has held one, live or ended, revoked grants apart; with a
+  course, only that course's news. `announcements_for_me(course)` — the
+  same for the signed-in caller, the one a student's session may call.
+  `notice_mark(person, notices, mark)` (server only) — seen, tapped or
+  dismissed, each set once. `announcement_marks_counts()` (server only) —
+  seen, tapped and dismissed per notice, for the admin's page.
 - **Notifications** (server only; 08.5b, built 2026-10-17):
   `notify_device_save`, `notify_device_relink`, `notify_device_drop_kind`,
   `notify_targets` — see `notification_devices`.

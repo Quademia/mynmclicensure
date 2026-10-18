@@ -6,10 +6,14 @@
 // the active courses, every product (the picker shows the active ones)
 // and the distinct cohorts from `users` — handed to the client half,
 // which is the page's script. After a write the client refreshes the
-// route, so these props carry the new rows (legacy re-fetched).
+// route, so these props carry the new rows (legacy re-fetched). The
+// notices and their counts are read with the service role behind the
+// admin gate: the browser holds nothing on either table (A1, A2,
+// 2026-10-18).
 
 import type { Metadata } from 'next';
 import { requireAdmin } from '@/lib/access';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getAllProducts, getCourses, getPrograms } from '@/lib/catalogue/queries';
 import { getAllAnnouncements, getCohorts, getEngagementCounts } from '@/lib/announcements/queries';
 import { PageHeader } from '@/components/shell/page-header';
@@ -24,9 +28,10 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminAnnouncementsPage() {
   const { supabase } = await requireAdmin();
+  const service = createServiceRoleClient();
   const [announcements, engage, programs, courses, products, cohorts] = await Promise.all([
-    getAllAnnouncements(supabase),
-    getEngagementCounts(supabase),
+    getAllAnnouncements(service),
+    getEngagementCounts(service),
     getPrograms(supabase),
     getCourses(supabase),
     getAllProducts(supabase),

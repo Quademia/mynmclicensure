@@ -24,7 +24,8 @@ import { requireStudent } from '@/lib/access';
 import { getCourses } from '@/lib/catalogue/queries';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import { getRecentAttempts } from '@/lib/attempts/queries';
-import { getAnnouncementsForStudent, getStudentNoticeStates } from '@/lib/announcements/queries';
+import { getAnnouncementsForStudent } from '@/lib/announcements/queries';
+import { noticeStates } from '@/lib/announcements/scoping';
 import { getDashboardNumbers, getStudentReceipts } from '@/lib/dashboard/student/queries';
 import { lastSevenDayLetters, topCardFor } from '@/lib/dashboard/student/status';
 import { AnnouncementsStrip } from '@/components/announcements/announcements-strip';
@@ -44,14 +45,15 @@ export const metadata: Metadata = { title: 'Dashboard | MyNMCLicensure' };
 export default async function StudentDashboardPage() {
   const { supabase, profile } = await requireStudent();
 
-  const [accessMap, courses, receipts, attempts, announcements, states] = await Promise.all([
+  const [accessMap, courses, receipts, attempts, announcements] = await Promise.all([
     getStudentCourseAccess(supabase, profile.user_id),
     getCourses(supabase),
     getStudentReceipts(supabase, profile.user_id),
     getRecentAttempts(profile.user_id),
-    getAnnouncementsForStudent(supabase, profile),
-    getStudentNoticeStates(supabase, profile.user_id),
+    // the notices and the student's marks in one read (A1, A2)
+    getAnnouncementsForStudent(supabase),
   ]);
+  const states = noticeStates(announcements);
 
   const card = topCardFor(receipts);
   const onFloor = card.kind === 'floor' || card.kind === 'future';

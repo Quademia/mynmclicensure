@@ -11,7 +11,7 @@ import type { AuthGateResult } from '@/lib/access';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
 import { getDashboardNumbers } from '@/lib/dashboard/student/queries';
 import { getAnnouncementsForStudent } from '@/lib/announcements/queries';
-import type { Announcement } from '@/lib/announcements/types';
+import type { StudentAnnouncement } from '@/lib/announcements/types';
 import { builderDoorFor } from '@/lib/attempts/builder-door';
 import { getMockQuizzesForCourse } from '@/lib/quizzes/queries';
 import { getQuizAvailability } from '@/lib/quizzes/availability';
@@ -81,11 +81,11 @@ export type CoursePageData = {
   /** The row's link: the course's open mock's own page, else the Mock exams page (04.15). */
   mocksLine: { text: string; open: boolean; href: string };
   builderLine: { text: string; open: boolean };
-  news: Announcement[];
+  news: StudentAnnouncement[];
 };
 
 export async function loadCoursePage(gate: AuthGateResult, courseId: string): Promise<CoursePageData | null> {
-  const { supabase, profile } = gate;
+  const { supabase } = gate;
   const mine = await loadMyCourses(gate);
   const summary = mine.courses.find((c) => c.course.course_id === courseId);
   if (!summary) return null;
@@ -121,8 +121,9 @@ export async function loadCoursePage(gate: AuthGateResult, courseId: string): Pr
         : { text: 'No mocks right now', open: true, href: mocksHref };
   }
 
-  const announcements = await getAnnouncementsForStudent(supabase, profile);
-  const news = announcements.filter((a) => (a.scope_courses || []).includes(courseId)).slice(0, 2);
+  // the course's news: anyone who has held it reads it (08.1), the
+  // database choosing (A1)
+  const news = (await getAnnouncementsForStudent(supabase, courseId)).slice(0, 2);
 
   return {
     summary,

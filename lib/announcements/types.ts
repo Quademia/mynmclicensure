@@ -1,11 +1,12 @@
 // lib/announcements/types.ts
 //
-// The announcement shapes (slice 11): the `announcements` row as
-// legacy/db/schema.sql 1.8 defines it, the per-student notice state
-// (1.9), the admin page's computed display status, the student scope
-// the server-side filter matches against, and the Server Action
-// inputs and results. Plain constants and types only — actions.ts may
-// export only async functions (AGENTS.md, Known Workarounds).
+// The announcement shapes: the admin's row of `announcements` (every
+// column, read through the server), the student's notice as
+// announcements_for_me() hands it (no scope column, the student's own
+// marks and the kind's icon — A1, 2026-10-18), the admin page's computed
+// display status, the marks' counts, and the Server Action inputs and
+// results. Plain constants and types only — actions.ts may export only
+// async functions (AGENTS.md, Known Workarounds).
 
 // rebuild.md §9 #18: no 'scheduled' — Active plus a start date schedules.
 export const ANNOUNCEMENT_STATUSES = ['draft', 'active', 'archived'] as const;
@@ -13,12 +14,18 @@ export const ANNOUNCEMENT_STATUSES = ['draft', 'active', 'archived'] as const;
 // legacy computeDisplayStatus: what the table's badge and the stats count.
 export type DisplayStatus = 'active' | 'scheduled' | 'expired' | 'draft' | 'archived';
 
+// What the student's page shows for one notice until its redesign (08.7):
+// dismissed, else tapped ('clicked'), else seen ('read'); none = new.
 export const NOTICE_STATES = ['read', 'clicked', 'dismissed'] as const;
 export type NoticeState = (typeof NOTICE_STATES)[number];
+
+// The marks notice_mark() sets (A2, 2026-10-18): each once, never cleared.
+export type NoticeMark = 'seen' | 'tapped' | 'dismissed';
 
 // legacy's fixed level picker
 export const LEVELS = ['L100', 'L200', 'L300', 'L400'] as const;
 
+/** The admin's row: every column, read through the server. */
 export type Announcement = {
   announcement_id: string;
   title: string;
@@ -31,10 +38,14 @@ export type Announcement = {
   pinned: boolean;
   priority: number;
   dismissible: boolean;
+  kind: string;
+  picture_path: string | null;
+  must_see: boolean;
+  send_to_devices: boolean;
+  sent_at: string | null;
   scope_programs: string[] | null;
   scope_courses: string[] | null;
-  /** 'L100,L300' — comma-joined, as legacy stored it. */
-  scope_level: string | null;
+  scope_level: string[] | null;
   scope_subscription_kind: string | null;
   scope_product_ids: string[] | null;
   scope_audience: string | null;
@@ -42,22 +53,29 @@ export type Announcement = {
   scope_user_ids: string[] | null;
 };
 
-export type EngageCounts = { read: number; clicked: number; dismissed: number };
-export type EngageMap = Record<string, EngageCounts>;
-
-// What the student-side filter matches against (legacy passed the
-// profile, the subscription kind and the active product id; §9 #19
-// adds the courses the student's access covers).
-export type StudentScope = {
-  user_id: string;
-  role: string;
-  program_id: string | null;
-  level: string | null;
-  cohort: string | null;
-  subscriptionKind: string;
-  activeProductId: string;
-  courseIds: string[];
+/** A student's notice, as announcements_for_me() returns it. */
+export type StudentAnnouncement = {
+  announcement_id: string;
+  title: string;
+  body_html: string | null;
+  body_text: string | null;
+  kind: string;
+  kind_icon: string | null;
+  picture_path: string | null;
+  pinned: boolean;
+  priority: number;
+  dismissible: boolean;
+  must_see: boolean;
+  created_at: string | null;
+  start_at: string | null;
+  end_at: string | null;
+  seen_at: string | null;
+  tapped_at: string | null;
+  dismissed_at: string | null;
 };
+
+export type EngageCounts = { seen: number; tapped: number; dismissed: number };
+export type EngageMap = Record<string, EngageCounts>;
 
 // legacy saveAnnouncement's payload
 export type SaveAnnouncementInput = {
@@ -84,5 +102,5 @@ export type SaveAnnouncementInput = {
 export type ActionResult = { ok: true } | { ok: false; error: string };
 export type SaveResult = { ok: true; announcement_id: string; created: boolean } | { ok: false; error: string };
 
-// The student page's view of one announcement's state.
+// The student page's view of each notice's marks, by id.
 export type StudentNoticeMap = Record<string, NoticeState>;

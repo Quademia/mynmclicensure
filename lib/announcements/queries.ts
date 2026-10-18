@@ -1,35 +1,29 @@
 // lib/announcements/queries.ts
 //
-// The announcement reads, transcribed from legacy: the admin page's
-// loadData (every row newest first, the engagement counts from every
-// notice row, the distinct cohorts from `users`), and the student side —
-// getAnnouncements (js/mynmclicensure-api.js: active and in schedule,
-// pinned first then priority), the student's subscription kind and
-// active product (the inline read on the dashboard and the
-// announcements page: the most recently expiring ACTIVE subscription),
-// the student's notice rows. The scope filter runs here on the server
-// (rebuild.md §12 slice 11) through lib/announcements/scoping.
+// The announcement reads. The admin page's: every notice newest first and
+// the marks counted per notice in the database (announcement_marks_counts),
+// both with the service role, which the caller passes behind requireAdmin()
+// — the browser holds nothing on either table since A1 (2026-10-18); and
+// the distinct cohorts from `users`. The student's: one call to
+// announcements_for_me(), which checks every scope in the database and
+// returns only this student's notices, in order (pinned, priority,
+// newest), with their own marks — one read for a page, the course page's
+// with its course.
 //
-// Each takes the caller's per-request client and, as legacy, fails
-// open: an error is logged and an empty result returned. RLS is the
-// floor, not the filter (AGENTS.md): every student read names the
-// student.
+// Each fails open, as legacy did: an error is logged and an empty result
+// returned.
 //
-// D52 (2026-09-26; AGENTS.md rule 10): the admin page's three reads take
-// whole tables, so each goes through readAll() — the engagement counts
-// are one row per student per announcement and pass the API's 1,000-row
-// cap with a few hundred students.
+// D52 (AGENTS.md rule 10): the admin page's reads take every notice, so
+// each goes through readAll(); a student's own notices are exempt.
 
 import type { ServerSupabaseClient } from '@/lib/access';
-import type { Profile } from '@/lib/auth/profile';
 import { readAll } from '@/lib/supabase/read-all';
-import { nowIso } from '@/lib/subscriptions/dates';
-import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
-import { filterAnnouncementsForStudent, mergeNoticeStates } from './scoping';
-import type { Announcement, EngageMap, StudentNoticeMap, StudentScope } from './types';
+import type { Announcement, EngageMap, StudentAnnouncement } from './types';
+
+type ServiceClient = ReturnType<typeof import('@/lib/supabase/server').createServiceRoleClient>;
 
 // ── admin ──────────────────────────────────────────────────────────────
-export async function getAllAnnouncements(db: ServerSupabaseClient): Promise<Announcement[]> {
+export async function getAllAnnouncements(db: ServiceClient): Promise<Announcement[]> {
   const { data, error } = await readAll<Announcement>((from, to) =>
     db.from('announcements').select('*').order('created_at', { ascending: false }).order('announcement_id').range(from, to),
   );
@@ -40,18 +34,16 @@ export async function getAllAnnouncements(db: ServerSupabaseClient): Promise<Ann
   return data;
 }
 
-export async function getEngagementCounts(db: ServerSupabaseClient): Promise<EngageMap> {
-  const { data, error } = await readAll<{ item_id: string; state: string }>((from, to) =>
-    db.from('user_notice_state').select('item_id, state').eq('item_type', 'ANNOUNCEMENT').order('id').range(from, to),
-  );
+export async function getEngagementCounts(db: ServiceClient): Promise<EngageMap> {
+  type Row = { announcement_id: string; seen: number | string; tapped: number | string; dismissed: number | string };
+  const { data, error } = await readAll<Row>((from, to) => db.rpc('announcement_marks_counts').range(from, to));
   if (error) {
     console.error('getEngagementCounts:', error);
     return {};
   }
   const map: EngageMap = {};
   for (const row of data) {
-    if (!map[row.item_id]) map[row.item_id] = { read: 0, clicked: 0, dismissed: 0 };
-    if (row.state === 'read' || row.state === 'clicked' || row.state === 'dismissed') map[row.item_id][row.state]++;
+    map[row.announcement_id] = { seen: Number(row.seen), tapped: Number(row.tapped), dismissed: Number(row.dismissed) };
   }
   return map;
 }
@@ -69,76 +61,14 @@ export async function getCohorts(db: ServerSupabaseClient): Promise<string[]> {
 }
 
 // ── student ────────────────────────────────────────────────────────────
-// legacy getAnnouncements: active, in schedule, pinned first, then priority.
-export async function getActiveAnnouncements(db: ServerSupabaseClient): Promise<Announcement[]> {
-  const now = new Date().toISOString();
-  const { data, error } = await db
-    .from('announcements')
-    .select('*')
-    .eq('status', 'active')
-    .or(`start_at.is.null,start_at.lte.${now}`)
-    .or(`end_at.is.null,end_at.gte.${now}`)
-    .order('pinned', { ascending: false })
-    .order('priority', { ascending: false });
+// The signed-in student's notices with their marks; with a course, only
+// that course's news (the course page). A POST, so a mark written earlier
+// in the same render is seen (AGENTS.md: an .rpc() is a POST).
+export async function getAnnouncementsForStudent(db: ServerSupabaseClient, courseId?: string): Promise<StudentAnnouncement[]> {
+  const { data, error } = await db.rpc('announcements_for_me', courseId ? { p_course_id: courseId } : {});
   if (error) {
-    console.error('getActiveAnnouncements:', error);
+    console.error('getAnnouncementsForStudent:', error);
     return [];
   }
-  return (data ?? []) as Announcement[];
-}
-
-// The student's scope: the profile fields legacy read, the subscription
-// kind and product from the most recently expiring live subscription
-// (FREE and '' when none), and the courses the access map covers.
-// Live is the dates', not the status word's (02.1, 2026-10-04): the word
-// stays ACTIVE after the end date until an admin presses Sync expired,
-// so a lapsed trial kept counting as "trial" for its notices.
-export async function getStudentScope(db: ServerSupabaseClient, profile: Profile): Promise<StudentScope> {
-  const now = nowIso();
-  const [{ data: activeSub }, access] = await Promise.all([
-    db
-      .from('subscriptions')
-      .select('product_id, products(kind)')
-      .eq('user_id', profile.user_id)
-      .eq('status', 'ACTIVE')
-      .lte('start_utc', now)
-      .gt('expires_utc', now)
-      .order('expires_utc', { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-    getStudentCourseAccess(db, profile.user_id),
-  ]);
-
-  type SubRow = { product_id: string | null; products: { kind: string | null } | null };
-  const sub = (activeSub as SubRow | null) ?? null;
-
-  return {
-    user_id: profile.user_id,
-    role: profile.role,
-    program_id: profile.program_id,
-    level: profile.level,
-    cohort: profile.cohort,
-    subscriptionKind: sub?.products?.kind || 'FREE',
-    activeProductId: sub?.product_id || '',
-    courseIds: Object.keys(access),
-  };
-}
-
-// The announcements this student qualifies for, in legacy's order.
-export async function getAnnouncementsForStudent(db: ServerSupabaseClient, profile: Profile): Promise<Announcement[]> {
-  const [all, scope] = await Promise.all([getActiveAnnouncements(db), getStudentScope(db, profile)]);
-  return filterAnnouncementsForStudent(all, scope);
-}
-
-export async function getStudentNoticeStates(db: ServerSupabaseClient, userId: string): Promise<StudentNoticeMap> {
-  const { data, error } = await db
-    .from('user_notice_state')
-    .select('item_id, state')
-    .eq('user_id', userId)
-    .eq('item_type', 'ANNOUNCEMENT');
-  if (error) {
-    console.error('getStudentNoticeStates:', error);
-    return {};
-  }
-  return mergeNoticeStates((data ?? []) as { item_id: string; state: string }[]);
+  return (data ?? []) as StudentAnnouncement[];
 }

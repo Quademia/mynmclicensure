@@ -1,65 +1,16 @@
 // lib/announcements/scoping.ts
 //
-// The pure rules of announcements: legacy filterAnnouncementsForStudent
-// (js/mynmclicensure-api.js) — every scope is AND, an empty scope is no
-// restriction — plus the course scope that legacy saved and never
-// applied (rebuild.md §9 #19, fixed here: a course scope matches a
-// student whose course access covers any listed course); legacy
-// computeDisplayStatus from admin/announcements.html; and the "highest
-// state wins" merge the student page used. No database, no React.
+// The pure rules of announcements left in TypeScript: legacy
+// computeDisplayStatus from admin/announcements.html, and the student's
+// marks read as the one state today's pages show. Who sees which notice
+// is decided in the database since A1 (2026-10-18:
+// announcements_for_user() checks every scope, 08.1's held courses
+// included). No database, no React.
 
-import type { Announcement, DisplayStatus, NoticeState, StudentNoticeMap, StudentScope } from './types';
-
-function nonEmpty(arr: string[] | null | undefined): string[] {
-  return Array.isArray(arr) ? arr.filter(Boolean) : [];
-}
-
-// legacy's seven checks, in its order, then the course check (§9 #19).
-export function announcementMatches(a: Announcement, s: StudentScope): boolean {
-  // 1. Audience
-  if (a.scope_audience === 'STUDENTS' && s.role !== 'STUDENT') return false;
-
-  // 2. Programme
-  const programs = nonEmpty(a.scope_programs);
-  if (programs.length && !programs.includes(String(s.program_id || ''))) return false;
-
-  // 3. Level — 'L100,L300'
-  if (a.scope_level && a.scope_level.trim() !== '') {
-    const allowed = a.scope_level.split(',').map((x) => x.trim());
-    if (!allowed.includes(String(s.level || ''))) return false;
-  }
-
-  // 4. Cohort
-  if (a.scope_cohort && a.scope_cohort.trim() !== '') {
-    if (String(s.cohort || '') !== a.scope_cohort.trim()) return false;
-  }
-
-  // 5. Subscription kind
-  if (a.scope_subscription_kind && a.scope_subscription_kind.trim() !== '') {
-    if (s.subscriptionKind !== a.scope_subscription_kind.trim()) return false;
-  }
-
-  // 6. Specific products — the student's active product
-  const products = nonEmpty(a.scope_product_ids);
-  if (products.length && !products.includes(s.activeProductId)) return false;
-
-  // 7. Specific users
-  const users = nonEmpty(a.scope_user_ids);
-  if (users.length && !users.includes(s.user_id)) return false;
-
-  // 8. Courses (§9 #19) — any listed course the student's access covers
-  const courses = nonEmpty(a.scope_courses);
-  if (courses.length && !courses.some((c) => s.courseIds.includes(c))) return false;
-
-  return true;
-}
-
-export function filterAnnouncementsForStudent(list: Announcement[], scope: StudentScope): Announcement[] {
-  return list.filter((a) => announcementMatches(a, scope));
-}
+import type { DisplayStatus, NoticeState, StudentAnnouncement, StudentNoticeMap } from './types';
 
 // legacy computeDisplayStatus (admin page)
-export function computeDisplayStatus(a: Pick<Announcement, 'status' | 'start_at' | 'end_at'>, now: Date = new Date()): DisplayStatus {
+export function computeDisplayStatus(a: { status: string; start_at: string | null; end_at: string | null }, now: Date = new Date()): DisplayStatus {
   if (a.status === 'archived') return 'archived';
   if (a.status === 'draft') return 'draft';
   if (a.status === 'active') {
@@ -70,17 +21,20 @@ export function computeDisplayStatus(a: Pick<Announcement, 'status' | 'start_at'
   return a.status as DisplayStatus;
 }
 
-// legacy: "if a student both read and clicked, keep the highest state" —
-// clicked > read > dismissed. One row per item makes this a formality.
-const STATE_PRIORITY: Record<NoticeState, number> = { dismissed: 1, read: 2, clicked: 3 };
+// The marks as one state until the redesign (08.7): dismissed, else
+// tapped, else seen; a notice with none is new.
+export function noticeStateOf(a: Pick<StudentAnnouncement, 'seen_at' | 'tapped_at' | 'dismissed_at'>): NoticeState | null {
+  if (a.dismissed_at) return 'dismissed';
+  if (a.tapped_at) return 'clicked';
+  if (a.seen_at) return 'read';
+  return null;
+}
 
-export function mergeNoticeStates(rows: { item_id: string; state: string }[]): StudentNoticeMap {
+export function noticeStates(list: StudentAnnouncement[]): StudentNoticeMap {
   const map: StudentNoticeMap = {};
-  for (const row of rows) {
-    const state = row.state as NoticeState;
-    if (!(state in STATE_PRIORITY)) continue;
-    const existing = map[row.item_id];
-    if (!existing || STATE_PRIORITY[state] > STATE_PRIORITY[existing]) map[row.item_id] = state;
+  for (const a of list) {
+    const state = noticeStateOf(a);
+    if (state) map[a.announcement_id] = state;
   }
   return map;
 }

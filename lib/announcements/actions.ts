@@ -1,13 +1,16 @@
 // lib/announcements/actions.ts
 //
 // The announcement writes as Server Actions. The admin ones behind the
-// admin gate — legacy saveAnnouncement and confirmArchive on
-// admin/announcements.html wrote `announcements` from the browser; the
-// student search is the Grant dialog's (slice 8). The student one
-// behind the student gate — legacy recordState (announcements page) and
-// clearFromStrip (dashboard) upserted `user_notice_state` from the
-// browser. Each writes as the signed-in user; the policies are the
-// floor.
+// admin gate — legacy saveAnnouncement and confirmArchive — write
+// `announcements` with the service role: since A1 (2026-10-18) the
+// browser holds nothing on the table, and the database's checks (status,
+// audience, subscription kind, the kind's list) are the floor. The
+// student search is the Grant dialog's (slice 8). The student one behind
+// the student gate — the page's Mark as read, a tap on a notice's button,
+// Dismiss and the dashboard's ✕ — goes through notice_mark() with the
+// service role, naming the signed-in student (A2): each mark set once,
+// never cleared; only the student's own notices; Dismiss only where it is
+// allowed.
 //
 // rebuild.md §9 #18: a status outside draft | active | archived is
 // refused. The duplicate-title check legacy ran in the browser over
@@ -17,10 +20,11 @@
 'use server';
 
 import { requireAdmin, requireStudent } from '@/lib/access';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { searchStudents } from '@/lib/subscriptions/queries';
 import type { StudentHit } from '@/lib/subscriptions/types';
 import { getAllAnnouncements } from './queries';
-import { ANNOUNCEMENT_STATUSES, NOTICE_STATES, type ActionResult, type NoticeState, type SaveAnnouncementInput, type SaveResult } from './types';
+import { ANNOUNCEMENT_STATUSES, NOTICE_STATES, type ActionResult, type NoticeMark, type NoticeState, type SaveAnnouncementInput, type SaveResult } from './types';
 
 function fail(error: string): { ok: false; error: string } {
   return { ok: false, error };
@@ -32,7 +36,8 @@ function cleanList(values: unknown): string[] {
 
 // ── admin: save (legacy saveAnnouncement) ─────────────────────────────
 export async function saveAnnouncement(input: SaveAnnouncementInput): Promise<SaveResult> {
-  const { supabase } = await requireAdmin();
+  await requireAdmin();
+  const supabase = createServiceRoleClient();
 
   const title = String(input.title || '').trim();
   if (!title) return fail('Title is required.');
@@ -59,7 +64,7 @@ export async function saveAnnouncement(input: SaveAnnouncementInput): Promise<Sa
     scope_cohort: String(input.scope_cohort || '').trim() || null,
     scope_programs: scopePrograms.length ? scopePrograms : null,
     scope_courses: scopeCourses.length ? scopeCourses : null,
-    scope_level: scopeLevels.length ? scopeLevels.join(',') : null,
+    scope_level: scopeLevels.length ? scopeLevels : null,
     scope_product_ids: scopeProducts.length ? scopeProducts : null,
     scope_user_ids: scopeUserIds.length ? scopeUserIds : null,
     start_at: String(input.start_at || '').trim() || null,
@@ -89,10 +94,10 @@ export async function saveAnnouncement(input: SaveAnnouncementInput): Promise<Sa
 
 // ── admin: archive (legacy confirmArchive) ────────────────────────────
 export async function archiveAnnouncement(announcementId: string): Promise<ActionResult> {
-  const { supabase } = await requireAdmin();
+  await requireAdmin();
   const id = String(announcementId || '').trim();
   if (!id) return fail('Missing announcement.');
-  const { error } = await supabase.from('announcements').update({ status: 'archived' }).eq('announcement_id', id);
+  const { error } = await createServiceRoleClient().from('announcements').update({ status: 'archived' }).eq('announcement_id', id);
   if (error) return fail(error.message);
   return { ok: true };
 }
@@ -103,30 +108,27 @@ export async function searchStudentsForScope(q: string): Promise<StudentHit[]> {
   return searchStudents(supabase, String(q || ''));
 }
 
-// ── student: record a state (legacy recordState / clearFromStrip) ──────
-// An upsert on (user_id, item_type, item_id): one row per announcement
-// per student, the latest state winning.
+// ── student: a mark (the page's buttons, the dashboard's ✕) ─────────────
+// Today's pages speak in states — read, clicked, dismissed; the database
+// keeps marks: seen, tapped (which marks seen too), dismissed.
+const MARK_OF: Record<NoticeState, NoticeMark> = { read: 'seen', clicked: 'tapped', dismissed: 'dismissed' };
+
 export async function recordNoticeState(announcementId: string, state: NoticeState): Promise<ActionResult> {
-  const { supabase, profile } = await requireStudent();
+  const { profile } = await requireStudent();
   const id = String(announcementId || '').trim();
   if (!id) return fail('Missing announcement.');
   if (!(NOTICE_STATES as readonly string[]).includes(state)) return fail('Unknown state.');
 
-  const nowIso = new Date().toISOString();
-  const { error } = await supabase.from('user_notice_state').upsert(
-    {
-      user_id: profile.user_id,
-      item_type: 'ANNOUNCEMENT',
-      item_id: id,
-      state,
-      seen_at: nowIso,
-      updated_at: nowIso,
-    },
-    { onConflict: 'user_id,item_type,item_id' },
-  );
+  const { data, error } = await createServiceRoleClient().rpc('notice_mark', {
+    p_user_id: profile.user_id,
+    p_ids: [id],
+    p_mark: MARK_OF[state],
+  });
   if (error) {
     console.error('recordNoticeState:', error);
-    return fail(error.message);
+    return fail('Could not save that. Please try again.');
   }
+  // 0 rows: not one of this student's notices, or Dismiss where it is not allowed
+  if (!data) return fail(state === 'dismissed' ? 'This announcement cannot be dismissed.' : 'This announcement is no longer available.');
   return { ok: true };
 }
