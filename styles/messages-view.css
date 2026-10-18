@@ -61,7 +61,7 @@
 .smsg-row.is-on { background: var(--brand-teal-pale); }
 .smsg-row:focus-visible { outline: 2px solid var(--brand-teal); outline-offset: -2px; }
 .smsg-dot { flex: none; width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; }
-.smsg-row.is-unread .smsg-dot { background: var(--brand-teal); }
+.smsg-row.is-unread .smsg-dot { background: var(--badge-info-ink); }
 .smsg-row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .smsg-row-title { font-size: var(--type-ui-size); line-height: 1.4; font-weight: 600; }
 .smsg-row.is-unread .smsg-row-title { font-weight: 700; }
@@ -77,15 +77,14 @@
 .smsg-row-start { font-weight: 600; color: var(--brand-teal-hover); }
 .smsg-row-when { flex: none; margin-top: 2px; font-size: var(--type-meta-size); color: var(--ink-muted); }
 
-/* Something unread (Sam, 2026-10-18: A — the dot alone was missed): the
- * preview bold and blue (the info badges' blue; Sam: very obvious), the
- * time teal and a "New reply" / "New message" badge under it. The badge
- * is the shared .badge; its teal is this page's, as the dot's is. */
+/* Something unread (Sam, 2026-10-18: A — the dot alone was missed) is
+ * told in one colour, the info badges' blue (Sam: very obvious): the dot,
+ * the preview bold and blue, and a "New reply" / "New message" badge (the
+ * shared .badge-info) under the time, which stays grey. Teal on this page
+ * means only the open conversation and "Start a message". */
 .smsg-row-end { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-4); }
 .smsg-row-end .smsg-row-when { margin-top: 2px; }
 .smsg-row.is-unread .smsg-row-sub { color: var(--badge-info-ink); font-weight: 600; }
-.smsg-row.is-unread .smsg-row-when { color: var(--brand-teal-hover); font-weight: 600; }
-.smsg-new { background: var(--brand-teal-pale); border-color: var(--brand-teal-pale); color: var(--brand-teal-hover); }
 
 /* ── the conversation ── */
 .smsg-convo {

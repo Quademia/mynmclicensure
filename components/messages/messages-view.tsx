@@ -107,7 +107,7 @@ function Row({ row, on, side, onOpen }: { row: MessagesRow; on: boolean; side: S
         {row.when || row.unread ? (
           <span className="smsg-row-end">
             {row.when ? <span className="smsg-row-when">{row.when}</span> : null}
-            {row.unread ? <span className="badge smsg-new">{newWords(side)}</span> : null}
+            {row.unread ? <span className="badge badge-info">{newWords(side)}</span> : null}
           </span>
         ) : null}
       </button>
