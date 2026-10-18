@@ -13,34 +13,80 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
 
 ### Announcements
 
-- A notice an admin writes — exam dates, platform news, course news,
-  alerts, offers. It shows in three places: the **dashboard strip** (the
-  newest unread, two at most, pinned first, View all and the unread
-  count); the **Announcements page** (tabs, cards, Mark as read,
-  Dismiss); and a **course page's own section** when it is scoped to
-  that course.
+- A notice an admin writes — exam dates, new questions, offers, alerts,
+  news — **for signed-in students only** (Sam, 2026-10-18); visitors get
+  the site strip of the public pages instead (02.11).
 - **Targeting**: eight optional scopes — audience, programme, course,
   level, subscription kind (paid / trial / free), package, cohort, named
   students. A student must match every scope that is set.
 - **A course's announcements reach every student who has held the
   course** — live or ended, revoked grants apart; "subscribers only" is
-  the course plus Paid (Sam, 2026-10-04; no storage change). *(to build)*
+  the course plus Paid (Sam, 2026-10-04; no storage change). *(to build:
+  08.1, with A1)*
 - **The scoping runs in the database** (Sam, 2026-09-18): one function
-  returns only what the signed-in student should see, one read per
-  page; the table itself is admin-only, and the named-students list
-  never leaves the server. Draft, active, archived (no "scheduled");
-  start and end dates bound when it shows; pinned first, then priority;
-  archive is the way out, nothing deletes. *(to build: A1)*
-- **Each notice remembers its own state** for each student — read,
-  clicked, dismissed, each set once, never cleared; writes through the
-  server only. The strip's ✕ dismisses and the count falls. Engagement
-  figures for the admin are counts of these. *(to build: A2)*
-- The body is written in a toolbar editor, links through the shared
-  link dialog. Stored once, as text, and drawn on the server (ending
-  the extra line break per edit). *(to build: A3, later)* A real picker
-  for linking a quiz. *(to build: A4)*
+  returns only what the signed-in student should see, with the student's
+  own marks, one read per page; the table itself is admin-only, and the
+  named-students list never leaves the server. Draft, active, archived
+  (no "scheduled"); start and end dates bound when it shows; pinned
+  first, then priority; archive is the way out, nothing deletes. *(to
+  build: A1)*
+- **Each notice remembers its own marks** for each student — seen,
+  tapped, dismissed, each set once, never cleared; writes through the
+  server only. **Seen sets itself** when a notice shows in full — opened
+  on the page, the must-see pop-up, a course page's news — with no Mark
+  as read button; one small message after the page has shown, only when
+  something is new. A tap on a notice's button counts wherever it shows.
+  ✕ dismisses. *(to build: A2)*
 - **No Bulk Send**: announcements are the broadcast, with the same
   targeting; New Thread reaches one student (Sam, 2026-09-18).
+
+**Redesigned (Sam, 2026-10-18; drawn in the chat).** *(to build: 08.7–08.15)*
+
+- **The page, like Messages**: the list, and a tap opens the notice —
+  beside the list on a computer, the newest opening by itself; in its
+  place on a phone, "‹ Announcements" going back. Every notice has its
+  own address, so a link or a device notice opens it. **One list, no
+  tabs**: something new in Messages' blue (the dot, bold, a New badge);
+  Mark all as read; the dismissed ones at the foot. *(08.7)*
+- **The list is the hybrid**: the pinned notice a big card with its
+  picture; the rest rows — the dot, a square (the picture's middle, or
+  the kind's icon), the title, the first line, the time. **Opened**: the
+  picture across the top, kind · programme · date, the title, the
+  words, the button, **Ask about this** (the Message us box, its label
+  picked by the notice), Dismiss when allowed. *(08.7)*
+- **Kinds**: Exam date · New questions · Offer · Alert · News, an icon
+  each. *(08.13)*
+- **One picture per notice, uploaded** — never a pasted link (Sam: the
+  app would copy it in anyway, doing the job twice); wide (2:1, about
+  1200 × 600), the upload box saying so; made at upload into two small
+  sizes (about 10 KB for the list, 100 KB for the opened notice, loaded
+  only when opened); the words first, the picture after. A video is a
+  button to YouTube. *(08.10)*
+- **The ways in**: on a computer the bell with the number of new
+  notices; on a phone the menu's Announcements row with its number and
+  the menu button's dot (the phone's top bar keeps no bell, 2026-09-26);
+  the dashboard; a course page's news. *(08.9)*
+- **The dashboard (C)**: a "New from Quademia" card near the top, only
+  while something is new — up to two, a tap opens, ✕ dismisses —
+  replacing the box at the foot. A notice ticked **Must-see** also pops
+  up once, at the student's next dashboard, one at a time, on the
+  shared dialog with its picture. *(08.8)*
+- **The admin's editor**: no codes — what is typed is what students see
+  (the tool chosen with Sam at its build; the body stored once, which
+  ends the extra line break per save); the picture, the kind, Must-see,
+  **Also send to devices** (08.5b's notices, once, when it goes live); a
+  button pointing inside the app picked from a list; **"This will reach
+  N students today"** as the scopes are set. *(08.14, 08.15, A4, 08.12)*
+- **The follow-up**: Reaches today · Seen · Tapped · Dismissed, each
+  out of who it reaches, and the names behind each number, Not seen yet
+  among them (with the last sign-in once 01.6 is built, until then the
+  last sitting). *(08.11)*
+- **Parked**: a reminder to those who have not seen it; which button
+  was tapped when a notice has two; a bell panel on a computer; a
+  public NMC news page (with 08.3).
+- **Order**: A1, A2 and 08.1 with the storage below in one migration →
+  the student side (08.7, 08.9, 08.10, 08.13) → the dashboard (08.8) →
+  the admin side (08.11, 08.12, 08.14, A4) → devices (08.15).
 
 ### Messages — the support desk *(built 2026-10-17: 08.2)*
 
@@ -228,7 +274,14 @@ Written on the tables in `12-tables.md`, all ticked 2026-09-18:
 - `messages_threads` and `messages` — the support desk (08.2).
 - `announcements` — read through one function, admin-only, the level
   scope a list (A1).
-- `user_notice_state` — read, clicked, dismissed (A2).
+- `user_notice_state` — read, clicked, dismissed (A2); read is "seen",
+  set by itself (2026-10-18, no new column).
+
+Written 2026-10-18 for the redesign, **waiting for Sam's tick** there:
+`announcements` gains the kind, the picture, Must-see and the devices
+send; the body stored once (with 08.14); the bucket
+`licensure-gh-announcement-images`; `notification_devices` gains the
+`announcement` kind.
 
 ## Open
 
@@ -245,3 +298,8 @@ Written on the tables in `12-tables.md`, all ticked 2026-09-18:
   the dashboard), and how, is Sam's to decide later (2026-10-18). Mind the
   rules already ruled: the browser asks only after a tap, a Block cannot
   be asked again, and Not now holds for 7 days.
+- **Announcements on devices (08.15)** — whether a student's yes to
+  replies also brings announcements, or announcements ask their own yes
+  (with the item above); and whether a device notice shows the notice's
+  title (a notice is not private, unlike a message) or only "News from
+  Quademia".

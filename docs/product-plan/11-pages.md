@@ -25,8 +25,12 @@ opens it (00, The menu).
   20 answers, naming only a topic with at least 5 — Sam, 2026-10-04,
   MyNclex's gate) → my courses, a compact list with days left and
   questions met out of the course's bank ("212 of 1,080 met" — Sam,
-  2026-10-04) → news, the two newest (08) → recent
-  sittings, the last 3–5 with Resume and Report. A profile nudge only
+  2026-10-04) → recent
+  sittings, the last 3–5 with Resume and Report. **News moves up**
+  (Sam, 2026-10-18: C, drawn): a "New from Quademia" card under the
+  welcome, only while something is new — up to two, a tap opens, ✕
+  dismisses — and a Must-see notice pops up once (08.8); on a phone the
+  old box sat last, under the courses. A profile nudge only
   while something is missing (the school). Off the page: the plan
   status bar (into the top card), the channels card (to Help and
   news), the Create a Custom Quiz and NMC Procedures cards (the menu
@@ -280,7 +284,17 @@ opens it (00, The menu).
   (as the Quiz builder).
 
 ### Announcements
-- Tabs, cards, Mark as read, Dismiss (08).
+- **Redesigned (Sam, 2026-10-18; drawn on the app's own styles at 375px
+  and 1280px)**: Messages' layout — the list, and the opened notice
+  beside it on a computer (the newest opening by itself) or in its place
+  on a phone. The list: the pinned notice a big picture card, the rest
+  rows with the picture's square or the kind's icon; one list, no tabs,
+  Mark all as read, the dismissed ones at the foot. Opened: the picture
+  on top, kind · programme · date, the title, the words, the button, Ask
+  about this, Dismiss. The rules are in 08.
+- The same in every state: free, trial, paid and ended students see
+  what their scopes reach; a course's news reaches whoever has held the
+  course (08.1).
 
 ### Messages
 - **Redesigned (Sam, 2026-10-17; 08.2 step 3, drawn as B)**: the labels are

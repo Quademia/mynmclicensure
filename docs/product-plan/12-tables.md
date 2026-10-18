@@ -587,6 +587,18 @@ table by table as each is next changed (AGENTS.md rule 9).
   table itself admin-only; checks on the status and scope words;
   `scope_level` a list. Why: today every signed-in account reads every
   notice, the named-students list included.
+- *Needs Sam's tick before the build (08 redesign, written 2026-10-18):*
+  - `kind` — `exam`, `questions`, `offer`, `alert` or `news` (the
+    default), checked; the icon in the list follows it (08.13).
+  - `picture_path` — where the notice's picture sits in a new bucket,
+    `licensure-gh-announcement-images` (anyone may read a picture, only
+    the server writes): the two sizes made at upload, the list's square
+    and the opened notice's; empty when there is none (08.10).
+  - `must_see` — yes or no: also pops up once on the dashboard (08.8).
+  - `send_to_devices` — yes or no; `sent_at` — when the device notices
+    went, so a notice is sent once, when it goes live (08.15).
+  - With the new editor (08.14): `body_html` and `body_text` give way to
+    one body, its form chosen with the editor.
 - Browser today: every signed-in account reads every row; admin write.
   *Old defaults.*
 
@@ -601,7 +613,9 @@ table by table as each is next changed (AGENTS.md rule 9).
 - *To build — ticked 2026-09-18 (08 A2):* `read_at`, `clicked_at`,
   `dismissed_at` — each set once, never cleared — replace `state`,
   `seen_at`, `updated_at`; `item_id` keyed to the notice; written
-  through the server only.
+  through the server only. `read_at` is the follow-up's **Seen**, set
+  by itself when a notice shows in full; a Must-see notice pops up while
+  it is empty (Sam, 2026-10-18; no new column).
 - Browser: the owner reads and writes their own. *Old defaults.*
 
 ### `messages_threads` — conversations
@@ -676,6 +690,9 @@ table by table as each is next changed (AGENTS.md rule 9).
   notice goes to `notify_targets()` — a student's own devices, or every
   admin's — never a deactivated account's; an address the post office
   calls gone (404, 410) is deleted. All four functions server only.
+- *Needs Sam's tick before the build (08.15, written 2026-10-18):*
+  `kinds` gains `announcement`; whether a student's yes to replies
+  brings it or it asks its own yes is open (08).
 - Browser: nothing.
 
 ---

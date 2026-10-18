@@ -150,10 +150,19 @@ before then, and the old list's history, is in
 ## [08 Help and news](docs/product-plan/08-help-and-news.md)
 
 - ⬜ A1 Announcements' floor — one scoping function, the table admin-only, the level scope a list
-- ⬜ A2 Each notice's state — read, clicked, dismissed; server writes; ✕ dismisses
+- ⬜ A2 Each notice's marks — seen (by itself), tapped, dismissed; server writes; ✕ dismisses
 - ⬜ 08.1 Course news to everyone who has held the course, revoked grants apart (Sam, 10-04)
-- ⬜ A4 A real quiz-link picker in the announcement editor
-- ⬜ A3 The body stored once, no extra line break per edit, the dead read removed — later
+- ⬜ 08.7 The Announcements page redesigned — Messages' layout, the hybrid list, one list, Ask about this
+- ⬜ 08.8 The dashboard's New from Quademia card, near the top; the Must-see pop-up, once
+- ⬜ 08.9 The number of new notices on the bell (computer) and the menu's row (phone)
+- ⬜ 08.10 One picture per notice — uploaded only, two small sizes made at upload
+- ⬜ 08.11 The admin's follow-up — Reaches today, Seen, Tapped, Dismissed; the names behind each
+- ⬜ 08.12 "This will reach N students today" in the editor as the scopes are set
+- ⬜ 08.13 Kinds — Exam date, New questions, Offer, Alert, News; an icon each
+- ⬜ 08.14 The editor without codes — the tool chosen with Sam; the body stored once (takes in A3)
+- ⬜ 08.15 Announcements to devices — a tick in the editor, sent once when the notice goes live
+- ⬜ A4 A button pointing inside the app, picked from a list, in the announcement editor
+- ⏸ A3 The body stored once, no extra line break per edit — taken into 08.14 (2026-10-18)
 - ✅ 08.2 The support desk — server only, five labels, Message us box, both pages; admin by student — 2026-10-17
 - ✅ 08.2 (unplanned) A new reply marked in blue — the dot, the bold preview ("Quademia: …"), a New reply badge — 2026-10-18
 - ⬜ 08.4 "Message us" on other pages, each picking its label — as each page is touched (after 08.2)
