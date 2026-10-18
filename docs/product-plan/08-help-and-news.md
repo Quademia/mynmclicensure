@@ -239,3 +239,9 @@ Written on the tables in `12-tables.md`, all ticked 2026-09-18:
   repeatedly miss" and "monitor improvement over time": since 05.5
   (2026-10-17) that is each sitting's report and, later, the course
   page's topics (05.6) — Sam's words, with the help page's redesign.
+- **Where else to offer notifications (08.5b)** — today a student is asked
+  only right after sending a message, so one who never writes is never
+  asked. Whether to offer it elsewhere too (the Messages page, Profile,
+  the dashboard), and how, is Sam's to decide later (2026-10-18). Mind the
+  rules already ruled: the browser asks only after a tap, a Block cannot
+  be asked again, and Not now holds for 7 days.

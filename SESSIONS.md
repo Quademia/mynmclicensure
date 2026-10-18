@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-17, night, into 10-18 — the badge on a live line (08.5a); phone notifications both ways, walked on a phone (08.5b); a new reply marked in blue
+  - ↳ live chat's line, no recount per page · Broadcast parked · Free 200 / Pro 500 · label only · device not phone · @block65 pinned · anon line trap · Edge bell · :3001 Google → old site · card out · dev messages cleared
+
 - 2026-10-17, evening — the page title as one fading line (09.11); question reports (06.2); Messages rebuilt — five labels, a Message us box, both pages (08.2)
   - ↳ 4b fade over 240px, tabs lineless · Report an issue, reason dropdown, Closed tab · question threads deleted · admin by student, Sam's idea · inside scroll · wait from first unanswered · 08.5 push first, email fallback · cloud A then B
 
