@@ -77,43 +77,15 @@
 .smsg-row-start { font-weight: 600; color: var(--brand-teal-hover); }
 .smsg-row-when { flex: none; margin-top: 2px; font-size: var(--type-meta-size); color: var(--ink-muted); }
 
-/* Something unread (Sam, 2026-10-18: B): the preview dark, the time teal
- * and a "New reply" / "New message" badge under it — the dot alone was
- * missed — and the same conversations in a card above the list. The
- * badge is the shared .badge; its teal is this page's, as the dot's is. */
+/* Something unread (Sam, 2026-10-18: A — the dot alone was missed): the
+ * preview dark, the time teal and a "New reply" / "New message" badge
+ * under it. The badge is the shared .badge; its teal is this page's, as
+ * the dot's is. */
 .smsg-row-end { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-4); }
 .smsg-row-end .smsg-row-when { margin-top: 2px; }
 .smsg-row.is-unread .smsg-row-sub { color: var(--ink); font-weight: 600; }
 .smsg-row.is-unread .smsg-row-when { color: var(--brand-teal-hover); font-weight: 600; }
 .smsg-new { background: var(--brand-teal-pale); border-color: var(--brand-teal-pale); color: var(--brand-teal-hover); }
-
-.smsg-new-card { padding: var(--space-10) var(--space-12); margin-bottom: var(--space-16); border: 1.5px solid var(--brand-teal); }
-.smsg-new-head {
-  margin: 0 0 var(--space-4);
-  font-size: var(--type-meta-size);
-  line-height: var(--type-meta-line);
-  font-weight: 600;
-  color: var(--brand-teal-hover);
-}
-.smsg-new-rows { list-style: none; margin: 0; padding: 0; }
-.smsg-new-rows > li + li { border-top: 1px solid var(--border); }
-.smsg-new-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-10);
-  width: 100%;
-  min-height: 48px;
-  padding: var(--space-6) 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  text-align: left;
-  color: var(--ink);
-  cursor: pointer;
-}
-.smsg-new-row .smsg-row-sub { color: var(--ink); }
-.smsg-new-row:hover .smsg-row-title { color: var(--brand-teal-hover); }
-.smsg-new-row:focus-visible { outline: 2px solid var(--brand-teal); outline-offset: 2px; }
 
 /* ── the conversation ── */
 .smsg-convo {

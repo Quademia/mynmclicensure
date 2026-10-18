@@ -34,8 +34,6 @@ export type MessagesRow = {
   preview: string | null;
   /** "2h ago", "3d ago", "2 Oct". */
   when: string | null;
-  /** When the latest message was sent, for the New replies card's order (08.2, 2026-10-18). */
-  at: string | null;
   unread: boolean;
   /** The student's last message in an open conversation, not yet answered. */
   waiting: boolean;
@@ -83,7 +81,6 @@ function buildRows(
     status: t?.status ?? null,
     preview: t ? preview(t) : null,
     when: t ? ago(t.latest?.created_at ?? t.last_message_at, now) : null,
-    at: t ? t.latest?.created_at ?? t.last_message_at : null,
     unread: Boolean(t?.unread),
     waiting: Boolean(t && t.status === 'open' && t.last_sender_role === 'student'),
   });

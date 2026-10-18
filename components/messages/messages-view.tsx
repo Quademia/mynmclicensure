@@ -87,7 +87,7 @@ function linkify(s: string): React.ReactNode[] {
   return out;
 }
 
-/** What a row with something unread says (Sam, 2026-10-18: B). */
+/** What a row with something unread says (Sam, 2026-10-18: A — the dot alone was missed). */
 function newWords(side: Side): string {
   return side === 'student' ? 'New reply' : 'New message';
 }
@@ -114,36 +114,6 @@ function Row({ row, on, side, onOpen }: { row: MessagesRow; on: boolean; side: S
     </li>
   );
 }
-
-/**
- * The conversations with something unread, newest first, above the list —
- * shown only when there is one (Sam, 2026-10-18: B; on a phone a course's
- * row can sit below the screen). A tap opens it, as its row does; once
- * read it leaves the card.
- */
-function NewCard({ rows, side, onOpen }: { rows: MessagesRow[]; side: Side; onOpen: (row: MessagesRow) => void }) {
-  const fresh = rows.filter((r) => r.unread).sort((a, b) => (b.at ?? '').localeCompare(a.at ?? ''));
-  if (!fresh.length) return null;
-  return (
-    <section className="card smsg-new-card" aria-label={side === 'student' ? 'New replies' : 'New messages'}>
-      <h2 className="smsg-new-head">{side === 'student' ? 'New replies' : 'New messages'}</h2>
-      <ul className="smsg-new-rows">
-        {fresh.map((r) => (
-          <li key={r.key}>
-            <button type="button" className="smsg-new-row" onClick={() => onOpen(r)}>
-              <span className="smsg-row-main">
-                <span className="smsg-row-title">{r.title}</span>
-                <span className="smsg-row-sub">{r.preview}</span>
-              </span>
-              {r.when ? <span className="smsg-row-when">{r.when} ›</span> : null}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
 export function MessagesView({
   side,
   student,
@@ -242,7 +212,7 @@ export function MessagesView({
             toBottom();
             if (m.sender_role !== 'system' && m.body_text) {
               const text = m.body_text.replace(/\s+/g, ' ').trim();
-              patchRow(key, { preview: side === 'student' ? `Quademia: ${text}` : text, when: 'Just now', at: new Date().toISOString(), unread: false, waiting: side === 'admin' });
+              patchRow(key, { preview: side === 'student' ? `Quademia: ${text}` : text, when: 'Just now', unread: false, waiting: side === 'admin' });
             }
           } catch {
             /* it shows on the next open */
@@ -374,7 +344,7 @@ export function MessagesView({
       if (!r.ok) {
         undo(r.error);
       } else {
-        patchRow(row.key, { threadId: r.thread_id, status: 'open', preview: `You: ${text.replace(/\s+/g, ' ')}`, when: 'Just now', at: new Date().toISOString(), unread: false, waiting: side === 'student' });
+        patchRow(row.key, { threadId: r.thread_id, status: 'open', preview: `You: ${text.replace(/\s+/g, ' ')}`, when: 'Just now', unread: false, waiting: side === 'student' });
         if (r.reopened) {
           const again = await openThread(r.thread_id);
           if (again.ok && activeRef.current === row.key) setMessages(again.messages);
@@ -448,7 +418,6 @@ export function MessagesView({
 
       <div className="smsg-grid">
         <section className="smsg-list" aria-label="Conversations">
-          <NewCard rows={rows} side={side} onOpen={open} />
           <h2 className="smsg-head">{side === 'student' ? 'What do you need help with?' : 'About'}</h2>
           <ul className="card smsg-rows">
             {data.labels.map((r) => <Row key={r.key} row={r} on={r.key === activeKey} side={side} onOpen={open} />)}
