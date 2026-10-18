@@ -491,6 +491,15 @@ above sit at the repo root; the audience grouping inside them is kept.
   lines of Node on `localhost:8766`, 2026-09-26) — never from `public/`.
   Measure a lockup's **natural** width with `scrollWidth`, not the box:
   a flex box with `min-width: 0` shrinks to fit and the box lies.
+- **Walk the admin side in Sam's Chrome while the pane stays a student**
+  (2026-10-18): Claude in Chrome acts in his real Chrome with his own
+  sign-in, so with Chrome signed in to `localhost:3000` as the admin, an
+  admin write and the student's view of it are walked together — the
+  announcements' picture upload, kinds. Its `file_upload` puts a
+  scratchpad file into a file box (never click the box: the system picker
+  cannot be answered). Its screenshots time out while Chrome's window is
+  behind another; `find` and `read_page` still work. A click while a side
+  panel's backdrop is up lands on the backdrop — reload, then click.
 - **A new hardcoded colour in a stylesheet is refused by a pre-commit
   guard** (`scripts/css-baseline.mjs`, `.css-baseline.json`, 2026-09-22).
   It is `lint-baseline.mjs`'s shape for CSS: the literals already there
