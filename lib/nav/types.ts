@@ -84,8 +84,8 @@ export type NavItem = {
   href?: string;
   /** Opens in a new tab (the WhatsApp / Telegram channel links). */
   external?: boolean;
-  /** The Messages badge slot: the count is the shell's live one (slice 12; 08.5a). */
-  badge?: 'messages';
+  /** A count on the row: unread messages (slice 12; 08.5a) or new notices (08.9), the shell's numbers. */
+  badge?: 'messages' | 'announcements';
   /**
    * In the data, not on screen. The Telegram item waits for slice 17
    * (rebuild.md §9 #10); the sidebar must never show a dead link.

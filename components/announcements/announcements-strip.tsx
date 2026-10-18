@@ -10,7 +10,10 @@
 // and the next unread one taking its place; "View all announcements →"
 // with the unread count when more than two. The dashboard's server half
 // hands in the student's announcements and states; from 7e the block
-// sits among the other dashboard cards. Its redesign is 08.8.
+// sits among the other dashboard cards. Its redesign is 08.8. A tap on a
+// notice's own button counts (Tapped); "View on announcements page"
+// opens that notice there (?id=, 08.7); each mark hands the bell and the
+// menu row their new number (08.9).
 
 'use client';
 
@@ -20,10 +23,21 @@ import { recordNoticeState } from '@/lib/announcements/actions';
 import type { StudentAnnouncement, StudentNoticeMap } from '@/lib/announcements/types';
 import { Icon } from '@/components/shell/icons';
 import { AppLink } from '@/components/shell/link-pending';
+import { useNewsCount } from '@/components/shell/news-count';
 
 export function AnnouncementsStrip({ announcements, states }: { announcements: StudentAnnouncement[]; states: StudentNoticeMap }) {
+  const news = useNewsCount();
   const [cleared, setCleared] = useState<Record<string, 'fading' | 'gone'>>({});
   const [open, setOpen] = useState<Record<string, boolean>>({});
+
+  // a tap on a notice's own button counts (Tapped, 08.7) wherever it shows
+  function tapped(id: string) {
+    recordNoticeState(id, 'clicked')
+      .then((r) => {
+        if (r.ok) news.set(r.newCount);
+      })
+      .catch(() => {});
+  }
 
   const unread = announcements.filter((a) => !states[a.announcement_id] && cleared[a.announcement_id] !== 'gone');
   const totalUnread = unread.filter((a) => !cleared[a.announcement_id]).length;
@@ -41,6 +55,7 @@ export function AnnouncementsStrip({ announcements, states }: { announcements: S
       return; // a dropped connection: the item stays, the ✕ can be pressed again
     }
     if (!result.ok) return;
+    news.set(result.newCount);
     setCleared((c) => ({ ...c, [id]: 'fading' }));
     window.setTimeout(() => setCleared((c) => ({ ...c, [id]: 'gone' })), 250);
   }
@@ -74,11 +89,11 @@ export function AnnouncementsStrip({ announcements, states }: { announcements: S
                 </div>
                 <div className={`announcement-item-body${isOpen(a) ? ' open' : ''}`}>
                   {a.body_html || a.body_text ? (
-                    <AnnouncementBody html={a.body_html || a.body_text || ''} className="announcement-item-html" />
+                    <AnnouncementBody html={a.body_html || a.body_text || ''} className="announcement-item-html" onButtonClick={() => tapped(a.announcement_id)} />
                   ) : (
                     <p className="no-content">No content.</p>
                   )}
-                  <AppLink href="/student/announcements" className="announcement-read-more">View on announcements page →</AppLink>
+                  <AppLink href={`/student/announcements?id=${encodeURIComponent(a.announcement_id)}`} className="announcement-read-more">View on announcements page →</AppLink>
                 </div>
               </div>
             ))}

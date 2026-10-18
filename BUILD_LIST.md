@@ -152,9 +152,9 @@ before then, and the old list's history, is in
 - ✅ A1 Announcements' floor — one reader in the database, the tables closed to the browser, levels a list — 2026-10-18
 - ✅ A2 Each notice's marks — seen, tapped, dismissed, each dated once; server writes; ✕ dismisses — 2026-10-18
 - ✅ 08.1 Course news to everyone who has held the course, revoked grants apart (Sam, 10-04) — 2026-10-18
-- ⬜ 08.7 The Announcements page redesigned — Messages' layout, the hybrid list, Seen by itself, Ask about this
+- ✅ 08.7 The Announcements page redesigned — Messages' layout, the hybrid list, Seen by itself, Ask about this — 2026-10-18
 - ⬜ 08.8 The dashboard's New from Quademia card, near the top; the Must-see pop-up, once
-- ⬜ 08.9 The number of new notices on the bell (computer) and the menu's row (phone)
+- ✅ 08.9 The number of new notices on the bell (computer), the menu's row and the menu button's dot — 2026-10-18
 - ⬜ 08.10 One picture per notice — uploaded only, two small sizes made at upload
 - ⬜ 08.11 The admin's follow-up — Reaches today, Seen, Tapped, Dismissed; the names behind each
 - ⬜ 08.12 "This will reach N students today" in the editor as the scopes are set

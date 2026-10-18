@@ -10,6 +10,11 @@
 // under A3 the same count sits on the top bar's envelope, so a closed
 // sidebar cannot hide a reply (10-design-system.md DS5). Drawn first
 // here; the shell keeps it fresh (08.5a, components/shell/unread-live).
+//
+// The new notices' number (08.9; Sam, 2026-10-18): on the bell on a
+// computer, the menu's Announcements row and the menu button's dot on a
+// phone; counted by the database beside the Messages count, the shell
+// holding it after (components/shell/news-count).
 
 import { requireStudent } from '@/lib/access';
 import { AppShell } from '@/components/shell/app-shell';
@@ -17,19 +22,21 @@ import { StudentSidebar } from '@/components/nav/student/student-sidebar';
 import { displayNameOf } from '@/components/shell/page-header';
 import { NotifyRelink } from '@/components/notifications/notify-relink';
 import { getUnreadCountForUser } from '@/lib/messaging/badges';
+import { getNewNoticeCount } from '@/lib/announcements/badges';
 import { STUDENT_PHONE_TABS } from '@/lib/nav/student';
 import { PhoneCheckIn } from './phone-check-in';
 
 export const dynamic = 'force-dynamic';
 
 export default async function StudentLayout({ children }: { children: React.ReactNode }) {
-  const { profile } = await requireStudent();
-  const unread = (await getUnreadCountForUser(profile.user_id)) ?? 0;
+  const { supabase, profile } = await requireStudent();
+  const [unread, news] = await Promise.all([getUnreadCountForUser(profile.user_id), getNewNoticeCount(supabase)]);
 
   return (
     <AppShell
       sidebar={<StudentSidebar />}
-      unread={{ initial: unread, side: 'student', userId: profile.user_id }}
+      unread={{ initial: unread ?? 0, side: 'student', userId: profile.user_id }}
+      news={news ?? 0}
       phoneTabs={STUDENT_PHONE_TABS}
       topBar={{
         product: 'MyNMCLicensure',

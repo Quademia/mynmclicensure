@@ -1,48 +1,204 @@
 /* styles/student-announcements.css
  *
- * The student Announcements page (slice 11b). Transcribed from the
- * legacy page's inline <style> block (student/announcements.html),
- * scoped under `.sann`. The .top-nav block every page carried is in
- * shell.css already. Legacy's shared .btn / .btn-primary / .btn-ghost
- * (css/style.css) are scoped in with the inline sizes legacy put on
- * the two card buttons. Legacy had no breakpoint on this page; the
- * card's top row wraps on its own.
+ * The student Announcements page, redesigned (08.7; Sam, 2026-10-18,
+ * drawn on the app's own styles and taken). Messages' layout, its rules
+ * written here under the page's own .sann names (styles/messages-view.css
+ * is Messages' own; one shared list-and-pane piece would be a 09 line for
+ * Sam's yes). Tokens only; the list, the hero and the pane are .card, the
+ * New badge the shared .badge-info, the buttons the shared family.
+ *
+ * On a computer the list and the opened notice sit side by side, the
+ * notice's pane holding its place while the page scrolls; on a phone they
+ * take turns (.sann-open shows the notice). Something new is told in
+ * Messages' one colour for new, the info blue: the dot, the bold title
+ * and its first line, the New badge.
  */
 
-.sann .tab-bar { display: flex; gap: 6px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 0; flex-wrap: wrap; }
-.sann .tab-btn { padding: 8px 16px; font-size: 13px; font-weight: 500; cursor: pointer; background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-muted); font-family: inherit; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s; }
-.sann .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
-.sann .tab-btn:hover { color: var(--primary); }
+.sann-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+  gap: var(--space-16);
+  align-items: start;
+  max-width: 1080px;
+}
 
-.sann .announce-list { display: flex; flex-direction: column; gap: 14px; }
-.sann .announce-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; position: relative; transition: box-shadow 0.15s, opacity 0.3s; }
-.sann .announce-card:hover { box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07); }
-.sann .announce-card.pinned { border-left: 4px solid var(--accent); }
-.sann .announce-card.is-read { opacity: 0.65; }
-.sann .announce-card.fading { opacity: 0; }
+/* ── the list ── */
+.sann-list { display: flex; flex-direction: column; gap: var(--space-8); min-width: 0; }
+.sann-head {
+  margin: 0;
+  font-size: var(--type-meta-size);
+  line-height: var(--type-meta-line);
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+.sann-listhead { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-8); margin-top: var(--space-8); }
+.sann-listhead:first-child { margin-top: 0; }
+.sann-empty { margin: 0; font-size: var(--type-ui-size); line-height: 1.5; color: var(--ink-muted); }
+.sann-foot { align-self: flex-start; margin-top: var(--space-4); }
 
-.sann .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-.sann .card-title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.sann .card-title { font-size: 15px; font-weight: 700; color: var(--primary); }
-.sann .pin-badge { font-size: 11px; background: #e0f2fe; color: #1d4ed8; border-radius: 999px; padding: 2px 8px; font-weight: 600; }
-.sann .read-badge { font-size: 11px; background: #f0fdf4; color: #166534; border-radius: 999px; padding: 2px 8px; font-weight: 600; }
-.sann .card-date { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+/* the pinned notice, big */
+.sann-hero {
+  display: block;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  font: inherit;
+  text-align: left;
+  color: var(--ink);
+  cursor: pointer;
+}
+.sann-hero:hover { border-color: var(--brand-teal); }
+.sann-hero.is-on { border-color: var(--brand-teal); box-shadow: 0 0 0 1px var(--brand-teal); }
+.sann-hero:focus-visible { outline: 2px solid var(--brand-teal); outline-offset: 2px; }
+.sann-hero-pic { display: block; width: 100%; aspect-ratio: 2 / 1; object-fit: cover; background: var(--surface-page); }
+.sann-hero-body { display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-12) var(--space-16) var(--space-16); }
+.sann-hero-badge { margin-left: auto; }
+.sann-hero-title { font-size: var(--type-body-size); line-height: 1.35; font-weight: 700; }
+.sann-hero-sub { font-size: var(--type-meta-size); line-height: var(--type-meta-line); color: var(--ink-muted); }
+.sann-hero-sub.is-new { color: var(--badge-info-ink); font-weight: 600; }
 
-.sann .card-body { font-size: 14px; color: var(--text); line-height: 1.65; margin-bottom: 14px; }
-.sann .card-body:empty { display: none; }
-.sann .card-body p { margin: 0 0 8px; }
-.sann .card-body p:last-child { margin-bottom: 0; }
-.sann .card-body strong { font-weight: 700; }
-.sann .card-body em { font-style: italic; }
-.sann .card-body a[data-qa='btn'] { display: inline-block; padding: 8px 18px; background: var(--accent); color: #fff; border-radius: var(--radius); text-decoration: none; font-size: 13px; font-weight: 600; margin-top: 6px; transition: background 0.15s; }
-.sann .card-body a[data-qa='btn']:hover { background: var(--primary); }
-.sann .card-body a:not([data-qa='btn']) { color: var(--accent); text-decoration: underline; }
+/* the rows */
+.sann-rows { list-style: none; margin: 0; padding: 0; overflow: hidden; }
+.sann-rows > li + li { border-top: 1px solid var(--border); }
+.sann-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-10);
+  width: 100%;
+  min-height: 64px;
+  padding: var(--space-10) var(--space-12);
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  color: var(--ink);
+  cursor: pointer;
+}
+.sann-row:hover { background: var(--surface-page); }
+.sann-row.is-on { background: var(--brand-teal-pale); }
+.sann-row:focus-visible { outline: 2px solid var(--brand-teal); outline-offset: -2px; }
+.sann-row.is-faded { color: var(--ink-muted); }
 
-.sann .card-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-/* Buttons: the shared family in styles/components.css (DS3 sweep,
-   2026-09-22). Only this surface's tighter padding stays. */
-.sann .btn { padding: 7px 14px; }
+.sann-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; }
+.sann-row.is-new .sann-dot,
+.sann-dot.is-new { background: var(--badge-info-ink); }
 
-.sann .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 14px; }
-.sann .empty-state .empty-icon { display: flex; justify-content: center; color: var(--text-muted); margin-bottom: 12px; }
-.sann .empty-state p { margin: 0; }
+.sann-tile {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--brand-teal-pale);
+  color: var(--brand-teal-hover);
+}
+.sann-tile img { width: 100%; height: 100%; object-fit: cover; }
+.sann-row.is-faded .sann-tile { background: var(--surface-page); color: var(--ink-muted); }
+
+.sann-row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.sann-row-title { font-size: var(--type-ui-size); line-height: 1.4; font-weight: 600; }
+.sann-row.is-new .sann-row-title { font-weight: 700; }
+.sann-pin { margin-right: var(--space-4); vertical-align: -1px; color: var(--ink-muted); }
+.sann-row-sub {
+  font-size: var(--type-meta-size);
+  line-height: var(--type-meta-line);
+  color: var(--ink-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sann-row.is-new .sann-row-sub { color: var(--badge-info-ink); font-weight: 600; }
+.sann-row-end { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-4); }
+.sann-when { font-size: var(--type-meta-size); color: var(--ink-muted); }
+
+/* ── the opened notice ── */
+.sann-pane {
+  position: sticky;
+  top: calc(56px + var(--space-16));
+  max-height: calc(100dvh - 56px - var(--space-32));
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+.sann-pane-head { display: none; padding: 0 var(--space-12); border-bottom: 1px solid var(--border); }
+.sann-back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--type-ui-size);
+  font-weight: 600;
+  color: var(--brand-teal-hover);
+  cursor: pointer;
+}
+.sann-pane-scroll { flex: 1; min-height: 0; overflow-y: auto; }
+.sann-cover { display: block; width: 100%; aspect-ratio: 2 / 1; object-fit: cover; background: var(--surface-page); }
+.sann-read { max-width: 68ch; padding: var(--space-16) var(--space-24) var(--space-24); }
+.sann-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin: 0;
+  font-size: var(--type-meta-size);
+  line-height: var(--type-meta-line);
+  color: var(--ink-muted);
+}
+.sann-title {
+  margin: var(--space-6) 0 var(--space-12);
+  font-size: var(--type-page-title-size-phone);
+  line-height: var(--type-page-title-line-phone);
+  font-weight: 700;
+  color: var(--brand-navy);
+}
+.sann-body { font-size: var(--type-body-size); line-height: var(--type-body-line); color: var(--ink); overflow-wrap: anywhere; }
+.sann-body p { margin: 0 0 var(--space-12); }
+.sann-body p:last-child { margin-bottom: 0; }
+.sann-body strong { font-weight: 700; }
+.sann-body em { font-style: italic; }
+.sann-body img { max-width: 100%; height: auto; border-radius: var(--radius); }
+.sann-body a:not([data-qa='btn']) { color: var(--brand-teal-hover); text-decoration: underline; }
+/* the notice's own button: the shared primary's look */
+.sann-body a[data-qa='btn'] {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: var(--space-4);
+  padding: var(--space-10) var(--space-20);
+  border-radius: var(--radius);
+  background: var(--brand-navy);
+  color: var(--surface);
+  font-size: var(--type-ui-size);
+  font-weight: 600;
+  text-decoration: none;
+}
+.sann-body a[data-qa='btn']:hover { background: var(--brand-navy-dark); }
+.sann-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  margin-top: var(--space-20);
+  padding-top: var(--space-16);
+  border-top: 1px solid var(--border);
+}
+.sann-actions .btn-link { display: inline-flex; align-items: center; gap: var(--space-6); min-height: 44px; }
+.sann-pick { margin: auto; padding: var(--space-32) var(--space-24); text-align: center; font-size: var(--type-ui-size); color: var(--ink-muted); }
+
+/* ── a phone: the list and the notice take turns ── */
+@media (max-width: 768px) {
+  .sann-grid { grid-template-columns: minmax(0, 1fr); }
+  .sann:not(.sann-open) .sann-pane { display: none; }
+  .sann-open .sann-list { display: none; }
+  .sann-pane { position: static; max-height: none; }
+  .sann-pane-head { display: block; }
+  .sann-read { padding: var(--space-16); }
+  .sann:not(.sann-open) .sann-row.is-on { background: none; }
+  .sann:not(.sann-open) .sann-hero.is-on { border-color: var(--border); box-shadow: none; }
+}

@@ -74,7 +74,7 @@ export const STUDENT_NAV: NavItem[] = [
   { key: 'offline-packs', label: 'My packs', icon: 'download', href: `${S}/offline-packs` },
 
   { key: 'h-help', label: 'Help and news', heading: true },
-  { key: 'announcements', label: 'Announcements', icon: 'megaphone', href: `${S}/announcements` },
+  { key: 'announcements', label: 'Announcements', icon: 'megaphone', href: `${S}/announcements`, badge: 'announcements' },
   { key: 'messages', label: 'Messages', icon: 'message', href: `${S}/messages`, badge: 'messages' },
   { key: 'portal-guide', label: 'Portal guide', icon: 'help', href: `${S}/portal-guide` },
   { key: 'procedures', label: 'NMC procedures', icon: 'stethoscope', href: `${S}/procedures` },

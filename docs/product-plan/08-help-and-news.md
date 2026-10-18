@@ -32,29 +32,33 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
   out, nothing deletes. *(built 2026-10-18: A1)*
 - **Each notice remembers its own marks** for each student — seen,
   tapped, dismissed, each set once, never cleared; writes through the
-  server only; ✕ dismisses. *(built 2026-10-18: A2 — today's page still
-  marks Seen with its Mark as Read button.)* **Seen sets itself** when a
-  notice shows in full — opened on the page, the must-see pop-up, a
-  course page's news — with no Mark as read button; one small message
-  after the page has shown, only when something is new. A tap on a
-  notice's button counts wherever it shows. *(to build: 08.7)*
+  server only; ✕ dismisses. *(built 2026-10-18: A2)* **Seen sets
+  itself** when a notice shows in full — opened on the page, the newest on
+  a computer, a course page's news, and the must-see pop-up when it is
+  built — with no Mark as read button; one small message after the page
+  has shown, only when something is new. A tap on a notice's button
+  counts wherever it shows (the page, the dashboard, a course page). Each
+  mark brings back the new number for the bell and the menu row. *(built
+  2026-10-18: 08.7)*
 - **No Bulk Send**: announcements are the broadcast, with the same
   targeting; New Thread reaches one student (Sam, 2026-09-18).
 
-**Redesigned (Sam, 2026-10-18; drawn in the chat).** *(to build: 08.7–08.15)*
+**Redesigned (Sam, 2026-10-18; drawn in the chat).** *(08.7 and 08.9
+built 2026-10-18; to build: 08.8, 08.10–08.15)*
 
 - **The page, like Messages**: the list, and a tap opens the notice —
   beside the list on a computer, the newest opening by itself; in its
   place on a phone, "‹ Announcements" going back. Every notice has its
   own address, so a link or a device notice opens it. **One list, no
   tabs**: something new in Messages' blue (the dot, bold, a New badge);
-  Mark all as read; the dismissed ones at the foot. *(08.7)*
+  Mark all as read; the dismissed ones at the foot. *(built: 08.7)*
 - **The list is the hybrid**: the pinned notice a big card with its
   picture; the rest rows — the dot, a square (the picture's middle, or
   the kind's icon), the title, the first line, the time. **Opened**: the
-  picture across the top, kind · programme · date, the title, the
-  words, the button, **Ask about this** (the Message us box, its label
-  picked by the notice), Dismiss when allowed. *(08.7)*
+  picture across the top, kind · date, the title, the words, the button,
+  **Ask about this** (the Message us box on Something else, the notice
+  named in the draft), Dismiss when allowed. *(built: 08.7; the pictures
+  with 08.10, the kinds' own icons with 08.13)*
 - **Kinds are the admin's own list** (Sam: "the examples given may not
   be enough"): a name and an icon picked from a grid of the app's icons;
   added, renamed, re-iconed, ordered, retired (never deleted while in
@@ -69,7 +73,10 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
 - **The ways in**: on a computer the bell with the number of new
   notices; on a phone the menu's Announcements row with its number and
   the menu button's dot (the phone's top bar keeps no bell, 2026-09-26);
-  the dashboard; a course page's news. *(08.9)*
+  the dashboard; a course page's news. The number is the database's, read
+  with the Messages count when a page is first drawn, set again by each
+  mark, and asked again when the app comes back to the screen. *(built:
+  08.9)*
 - **The dashboard (C)**: a "New from Quademia" card near the top, only
   while something is new — up to two, a tap opens, ✕ dismisses —
   replacing the box at the foot. A notice ticked **Must-see** also pops

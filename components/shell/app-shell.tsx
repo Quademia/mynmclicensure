@@ -23,12 +23,14 @@ import { MobileDrawer } from './mobile/mobile-drawer';
 import { PhoneSubTabs, PhoneTabBar } from './mobile/phone-tabs';
 import { NAV_COOKIE } from './nav-cookie';
 import { UnreadLive } from './unread-live';
+import { NewsCountLive } from './news-count';
 import type { PhoneTab } from '@/lib/nav/types';
 
 export async function AppShell({
   sidebar,
   topBar,
   unread,
+  news,
   phoneTabs,
   children,
 }: {
@@ -37,6 +39,8 @@ export async function AppShell({
   topBar: TopBarProps;
   /** The Messages badge: the first count, whose side it is, and the signed-in person. */
   unread: { initial: number; side: 'student' | 'admin'; userId: string };
+  /** New notices, first count (08.9) — students only; the admin's bell carries none. */
+  news?: number;
   /** The bottom bar on a phone — students only (Sam, 2026-10-04); none for the admin. */
   phoneTabs?: PhoneTab[];
   children: React.ReactNode;
@@ -44,17 +48,21 @@ export async function AppShell({
   const jar = await cookies();
   const initialDesktopOpen = jar.get(NAV_COOKIE)?.value !== 'closed';
 
+  const frame = (
+    <ShellFrame initialDesktopOpen={initialDesktopOpen}>
+      <TopBar {...topBar} />
+      <MobileDrawer>{sidebar}</MobileDrawer>
+      <main className="main-content">
+        {phoneTabs ? <PhoneSubTabs tabs={phoneTabs} /> : null}
+        {children}
+      </main>
+      {phoneTabs ? <PhoneTabBar tabs={phoneTabs} /> : null}
+    </ShellFrame>
+  );
+
   return (
     <UnreadLive initial={unread.initial} side={unread.side} userId={unread.userId}>
-      <ShellFrame initialDesktopOpen={initialDesktopOpen}>
-        <TopBar {...topBar} />
-        <MobileDrawer>{sidebar}</MobileDrawer>
-        <main className="main-content">
-          {phoneTabs ? <PhoneSubTabs tabs={phoneTabs} /> : null}
-          {children}
-        </main>
-        {phoneTabs ? <PhoneTabBar tabs={phoneTabs} /> : null}
-      </ShellFrame>
+      {news !== undefined ? <NewsCountLive initial={news}>{frame}</NewsCountLive> : frame}
     </UnreadLive>
   );
 }

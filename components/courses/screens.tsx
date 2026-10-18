@@ -10,7 +10,7 @@
 
 import { AppLink } from '@/components/shell/link-pending';
 import { PageHeader } from '@/components/shell/page-header';
-import { AnnouncementBody } from '@/components/announcements/announcement-body';
+import { CourseNews } from '@/components/announcements/course-news';
 import { LaunchButton } from '@/components/practice-papers/paper-actions';
 import { MessageUsButton } from '@/components/messages/message-us';
 import { CourseChip, CourseHeading, CourseTabs } from './course-header';
@@ -183,13 +183,10 @@ export function CourseScreen({ data }: { data: CoursePageData }) {
           <h2 className="cp-section">Course news</h2>
           <div className="card cp-news">
             {news.length ? (
-              news.map((a) => (
-                <div key={a.announcement_id} className="cp-news-item">
-                  <span className="cp-name">{a.title}</span>
-                  <AnnouncementBody html={a.body_html || a.body_text || ''} className="cp-news-body" />
-                  {a.created_at ? <span className="cp-line">{formatDay(a.created_at)}</span> : null}
-                </div>
-              ))
+              <CourseNews
+                news={news}
+                dayOf={Object.fromEntries(news.map((a) => [a.announcement_id, a.created_at ? formatDay(a.created_at) : '']))}
+              />
             ) : (
               <p className="cp-news-empty">No news for this course yet.</p>
             )}

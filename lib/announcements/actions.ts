@@ -23,8 +23,9 @@ import { requireAdmin, requireStudent } from '@/lib/access';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { searchStudents } from '@/lib/subscriptions/queries';
 import type { StudentHit } from '@/lib/subscriptions/types';
+import { getNewNoticeCount } from './badges';
 import { getAllAnnouncements } from './queries';
-import { ANNOUNCEMENT_STATUSES, NOTICE_STATES, type ActionResult, type NoticeMark, type NoticeState, type SaveAnnouncementInput, type SaveResult } from './types';
+import { ANNOUNCEMENT_STATUSES, NOTICE_STATES, type ActionResult, type MarkResult, type NoticeMark, type NoticeState, type SaveAnnouncementInput, type SaveResult } from './types';
 
 function fail(error: string): { ok: false; error: string } {
   return { ok: false, error };
@@ -113,8 +114,8 @@ export async function searchStudentsForScope(q: string): Promise<StudentHit[]> {
 // keeps marks: seen, tapped (which marks seen too), dismissed.
 const MARK_OF: Record<NoticeState, NoticeMark> = { read: 'seen', clicked: 'tapped', dismissed: 'dismissed' };
 
-export async function recordNoticeState(announcementId: string, state: NoticeState): Promise<ActionResult> {
-  const { profile } = await requireStudent();
+export async function recordNoticeState(announcementId: string, state: NoticeState): Promise<MarkResult> {
+  const { supabase, profile } = await requireStudent();
   const id = String(announcementId || '').trim();
   if (!id) return fail('Missing announcement.');
   if (!(NOTICE_STATES as readonly string[]).includes(state)) return fail('Unknown state.');
@@ -130,5 +131,24 @@ export async function recordNoticeState(announcementId: string, state: NoticeSta
   }
   // 0 rows: not one of this student's notices, or Dismiss where it is not allowed
   if (!data) return fail(state === 'dismissed' ? 'This announcement cannot be dismissed.' : 'This announcement is no longer available.');
-  return { ok: true };
+  return { ok: true, newCount: await getNewNoticeCount(supabase) };
+}
+
+// ── student: Seen for several at once (08.7) ────────────────────────────
+// A notice opened on the page, the course page's news, Mark all as read:
+// one trip, and the new number back for the bell and the menu row (08.9).
+export async function markNoticesSeen(ids: string[]): Promise<MarkResult> {
+  const { supabase, profile } = await requireStudent();
+  const list = cleanList(ids).slice(0, 500);
+  if (!list.length) return fail('Nothing to mark.');
+  const { error } = await createServiceRoleClient().rpc('notice_mark', {
+    p_user_id: profile.user_id,
+    p_ids: list,
+    p_mark: 'seen',
+  });
+  if (error) {
+    console.error('markNoticesSeen:', error);
+    return fail('Could not save that. Please try again.');
+  }
+  return { ok: true, newCount: await getNewNoticeCount(supabase) };
 }

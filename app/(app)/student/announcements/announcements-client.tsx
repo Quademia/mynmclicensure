@@ -1,166 +1,309 @@
 // app/(app)/student/announcements/announcements-client.tsx
 //
-// The script block of legacy student/announcements.html (slice 11b):
-// the subtitle "N announcements · M unread", the four tabs (All shows
-// everything but the dismissed; Unread the ones with no state; Read the
-// read and clicked; Dismissed the dismissed), the cards (the pinned and
-// read badges, the date, the body, Mark as Read for an unread one,
-// Dismiss for a dismissible one), a click on a button inside a body
-// recording "clicked". Each write goes through recordNoticeState and
-// the local state follows, as legacy's did; the card fades on Dismiss
-// before it moves to the Dismissed tab.
+// The Announcements page (08.7; Sam, 2026-10-18 — drawn and taken on the
+// app's own styles). Messages' layout: the list, and the opened notice
+// beside it on a computer, in its place on a phone, where "‹
+// Announcements" and the phone's back button return to the list (a
+// history entry, no server trip, as Messages does).
+//
+// - The list is the hybrid: the first pinned notice a big card with its
+//   picture; the rest rows — the blue dot and bold title while new, the
+//   square (the picture's middle, or the kind's icon), the first line, the
+//   time, a New badge. One list, no tabs: Mark all as read over the rows;
+//   the dismissed ones folded at the foot.
+// - Opened: the picture across the top, kind · date, the title, the
+//   words with their button, Ask about this (the Message us box, the
+//   notice named in the draft) and Dismiss where it is allowed.
+// - On a computer the newest notice opens by itself; the address's notice
+//   (?id=, from the dashboard or a device notice) opens on any screen.
+// - **Seen sets itself** when a notice shows in full — opened here, or the
+//   newest on a computer — one small message after the page has shown,
+//   only when the notice is new; a tap on the notice's button counts
+//   (Tapped). Each mark brings back the new number for the bell and the
+//   menu row (08.9). A failed mark changes nothing on screen.
 
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { PageHeader } from '@/components/shell/page-header';
-import { AnnouncementBody } from '@/components/announcements/announcement-body';
-import { recordNoticeState } from '@/lib/announcements/actions';
-import type { NoticeState, StudentAnnouncement, StudentNoticeMap } from '@/lib/announcements/types';
 import { Icon } from '@/components/shell/icons';
-import type { IconName } from '@/lib/nav/types';
+import { useNewsCount } from '@/components/shell/news-count';
+import { AnnouncementBody } from '@/components/announcements/announcement-body';
+import { MessageUsDialog } from '@/components/messages/message-us';
+import { Toast } from '@/lib/toast/toast';
+import { BodyPortal } from '@/lib/overlays/shared/body-portal';
+import { markNoticesSeen, recordNoticeState } from '@/lib/announcements/actions';
+import { isNew, kindIcon, pictureUrl } from '@/lib/announcements/display';
+import type { StudentAnnouncement } from '@/lib/announcements/types';
 
-type Tab = 'all' | 'unread' | 'read' | 'dismissed';
+/** A notice with the words the server worked out for it. */
+export type NoticeItem = StudentAnnouncement & { when: string; date: string; line: string };
 
-const EMPTY: Record<Tab, { icon: IconName; text: string }> = {
-  all: { icon: 'inbox', text: 'No announcements at the moment.' },
-  unread: { icon: 'check-circle', text: "You're all caught up — no unread announcements." },
-  read: { icon: 'inbox', text: 'No read announcements yet.' },
-  dismissed: { icon: 'trash', text: 'No dismissed announcements.' },
-};
+type Marks = Record<string, { seen?: true; tapped?: true; dismissed?: true }>;
 
-function fmtDate(iso: string | null): string {
-  return iso ? new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+function isComputer(): boolean {
+  return typeof window !== 'undefined' && window.matchMedia('(min-width: 769px)').matches;
 }
 
-export function AnnouncementsClient({
-  announcements,
-  initialStates,
-}: {
-  announcements: StudentAnnouncement[];
-  initialStates: StudentNoticeMap;
-}) {
-  const [states, setStates] = useState<StudentNoticeMap>(initialStates);
-  const [tab, setTab] = useState<Tab>('all');
-  const [busy, setBusy] = useState<Record<string, 'saving' | 'dismissing'>>({});
-  const [fading, setFading] = useState<Record<string, boolean>>({});
+function timeOf(a: NoticeItem): number {
+  const t = Date.parse(a.start_at || a.created_at || '');
+  return Number.isNaN(t) ? 0 : t;
+}
 
-  const total = announcements.length;
-  const unread = announcements.filter((a) => !states[a.announcement_id]).length;
+export function AnnouncementsClient({ items, openId: askedId }: { items: NoticeItem[]; openId: string | null }) {
+  const news = useNewsCount();
+  const [marks, setMarks] = useState<Marks>({});
+  const [openId, setOpenId] = useState<string | null>(askedId);
+  const [showDismissed, setShowDismissed] = useState(false);
+  const [asking, setAsking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const dismissError = useCallback(() => setError(null), []);
+  const marking = useRef(new Set<string>());
 
-  const visible = announcements.filter((a) => {
-    const state = states[a.announcement_id];
-    if (tab === 'dismissed') return state === 'dismissed';
-    if (tab === 'unread') return !state;
-    if (tab === 'read') return state === 'read' || state === 'clicked';
-    return state !== 'dismissed';
+  // the notices with this visit's marks laid over
+  const all = items.map((a) => {
+    const m = marks[a.announcement_id];
+    if (!m) return a;
+    const at = 'now';
+    return {
+      ...a,
+      seen_at: a.seen_at || (m.seen || m.tapped ? at : null),
+      tapped_at: a.tapped_at || (m.tapped ? at : null),
+      dismissed_at: a.dismissed_at || (m.dismissed ? at : null),
+    };
   });
+  const live = all.filter((a) => !a.dismissed_at);
+  const dismissed = all.filter((a) => a.dismissed_at);
+  const hero = live.find((a) => a.pinned) ?? null;
+  const rows = live.filter((a) => a !== hero);
+  const newest = [...live].sort((x, y) => timeOf(y) - timeOf(x))[0] ?? null;
+  const newCount = live.filter(isNew).length;
 
-  async function record(id: string, state: NoticeState) {
-    const result = await recordNoticeState(id, state);
-    if (!result.ok) console.error('recordState error:', result.error);
-  }
+  // the notice in the reading pane: the one opened, else the newest (shown
+  // only on a computer; a phone shows the list until a notice is opened)
+  const shownId = openId ?? newest?.announcement_id ?? null;
+  const shown = all.find((a) => a.announcement_id === shownId) ?? null;
 
-  // legacy markRead
-  async function markRead(id: string) {
-    setBusy((b) => ({ ...b, [id]: 'saving' }));
-    await record(id, 'read');
-    setStates((s) => ({ ...s, [id]: 'read' }));
-    setBusy((b) => {
-      const next = { ...b };
-      delete next[id];
+  const lay = useCallback((ids: string[], mark: 'seen' | 'tapped' | 'dismissed') => {
+    setMarks((prev) => {
+      const next = { ...prev };
+      for (const id of ids) next[id] = { ...next[id], [mark]: true };
       return next;
     });
+  }, []);
+
+  // Seen sets itself when the notice is on screen in full.
+  const shownNew = shown ? isNew(shown) : false;
+  useEffect(() => {
+    if (!shownId || !shownNew || marking.current.has(shownId)) return;
+    if (openId === null && !isComputer()) return; // a phone's list: nothing open yet
+    const id = shownId;
+    marking.current.add(id);
+    markNoticesSeen([id])
+      .then((r) => {
+        if (r.ok) {
+          lay([id], 'seen');
+          news.set(r.newCount);
+        }
+      })
+      .catch(() => {})
+      .finally(() => marking.current.delete(id));
+  }, [shownId, shownNew, openId, lay, news]);
+
+  // The phone's back button returns to the list.
+  useEffect(() => {
+    function onPop() {
+      if (!window.history.state?.sann) setOpenId(null);
+    }
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  function open(id: string) {
+    if (!isComputer() && !window.history.state?.sann) {
+      window.history.pushState({ sann: id }, '');
+      window.scrollTo(0, 0);
+    }
+    setOpenId(id);
   }
 
-  // legacy dismiss: fade, then move to the Dismissed tab
+  function back() {
+    if (window.history.state?.sann) window.history.back();
+    else setOpenId(null);
+  }
+
+  async function markAll() {
+    const ids = live.filter(isNew).map((a) => a.announcement_id);
+    if (!ids.length) return;
+    try {
+      const r = await markNoticesSeen(ids);
+      if (!r.ok) return setError(r.error);
+      lay(ids, 'seen');
+      news.set(r.newCount);
+    } catch {
+      setError('Could not mark them. Please check your connection.');
+    }
+  }
+
   async function dismiss(id: string) {
-    setBusy((b) => ({ ...b, [id]: 'dismissing' }));
-    await record(id, 'dismissed');
-    setFading((f) => ({ ...f, [id]: true }));
-    window.setTimeout(() => {
-      setStates((s) => ({ ...s, [id]: 'dismissed' }));
-      setFading((f) => {
-        const next = { ...f };
-        delete next[id];
-        return next;
-      });
-      setBusy((b) => {
-        const next = { ...b };
-        delete next[id];
-        return next;
-      });
-    }, 300);
+    try {
+      const r = await recordNoticeState(id, 'dismissed');
+      if (!r.ok) return setError(r.error);
+      lay([id], 'dismissed');
+      news.set(r.newCount);
+      if (openId === id) {
+        if (window.history.state?.sann) window.history.back();
+        setOpenId(null);
+      }
+    } catch {
+      setError('Could not dismiss it. Please check your connection.');
+    }
   }
 
-  // legacy: a click on a data-qa="btn" link records "clicked"
-  function clicked(id: string) {
-    void record(id, 'clicked');
-    setStates((s) => (s[id] === 'dismissed' ? s : { ...s, [id]: 'clicked' }));
+  function tapped(id: string) {
+    lay([id], 'tapped');
+    recordNoticeState(id, 'clicked')
+      .then((r) => {
+        if (r.ok) news.set(r.newCount);
+      })
+      .catch(() => {});
   }
 
-  const tabs: { key: Tab; label: string }[] = [
-    { key: 'all', label: 'All' },
-    { key: 'unread', label: 'Unread' },
-    { key: 'read', label: 'Read' },
-    { key: 'dismissed', label: 'Dismissed' },
-  ];
+  const picture = (a: NoticeItem, size: 'list' | 'full') => pictureUrl(a.picture_path, size);
+
+  function row(a: NoticeItem, faded = false) {
+    const fresh = isNew(a);
+    const src = picture(a, 'list');
+    return (
+      <li key={a.announcement_id}>
+        <button
+          type="button"
+          className={`sann-row${fresh ? ' is-new' : ''}${a.announcement_id === shownId ? ' is-on' : ''}${faded ? ' is-faded' : ''}`}
+          onClick={() => open(a.announcement_id)}
+        >
+          <span className="sann-dot" aria-hidden="true" />
+          <span className="sann-tile" aria-hidden="true">
+            {/* eslint-disable-next-line @next/next/no-img-element -- a ~10 KB square made at upload (08.10) */}
+            {src ? <img src={src} alt="" loading="lazy" /> : <Icon name={kindIcon(a.kind_icon)} size={20} />}
+          </span>
+          <span className="sann-row-main">
+            <span className="sann-row-title">
+              {a.pinned ? <Icon name="flag" size={12} className="sann-pin" /> : null}
+              {a.title}
+            </span>
+            {a.line ? <span className="sann-row-sub">{a.line}</span> : null}
+          </span>
+          <span className="sann-row-end">
+            <span className="sann-when">{a.when}</span>
+            {fresh ? <span className="badge badge-info">New</span> : null}
+          </span>
+        </button>
+      </li>
+    );
+  }
 
   return (
     <>
-      <PageHeader title="Announcements" subtitle={`${total} announcement${total !== 1 ? 's' : ''} · ${unread} unread`} />
-      <div className="sann">
-        <div className="tab-bar">
-          {tabs.map((t) => (
-            <button key={t.key} type="button" className={`tab-btn${tab === t.key ? ' active' : ''}`} onClick={() => setTab(t.key)}>{t.label}</button>
-          ))}
-        </div>
+      <PageHeader title="Announcements" subtitle={newCount ? `${newCount} new · news and notices from Quademia` : 'News and notices from Quademia'} />
 
-        <div className="announce-list">
-          {!visible.length ? (
-            <div className="empty-state">
-              <div className="empty-icon"><Icon name={EMPTY[tab].icon} size={40} /></div>
-              <p>{EMPTY[tab].text}</p>
-            </div>
-          ) : (
-            visible.map((a) => {
-              const state = states[a.announcement_id];
-              const isRead = state === 'read' || state === 'clicked';
-              const b = busy[a.announcement_id];
-              return (
-                <div
-                  key={a.announcement_id}
-                  className={`announce-card${a.pinned ? ' pinned' : ''}${isRead ? ' is-read' : ''}${fading[a.announcement_id] ? ' fading' : ''}`}
-                >
-                  <div className="card-top">
-                    <div>
-                      <div className="card-title-row">
-                        <span className="card-title">{a.title}</span>
-                        {a.pinned ? <span className="pin-badge">Pinned</span> : null}
-                        {isRead ? <span className="read-badge">Read</span> : null}
-                      </div>
-                      <div className="card-date">{fmtDate(a.created_at)}</div>
+      <div className={`sann${openId ? ' sann-open' : ''}`}>
+        <div className="sann-grid">
+          <section className="sann-list" aria-label="Announcements">
+            {hero ? (
+              <button
+                type="button"
+                className={`card sann-hero${hero.announcement_id === shownId ? ' is-on' : ''}`}
+                onClick={() => open(hero.announcement_id)}
+              >
+                {picture(hero, 'full') ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- the opened notice's size, made at upload (08.10)
+                  <img className="sann-hero-pic" src={picture(hero, 'full')!} alt="" />
+                ) : null}
+                <span className="sann-hero-body">
+                  <span className="sann-meta">
+                    {isNew(hero) ? <span className="sann-dot is-new" aria-hidden="true" /> : null}
+                    <Icon name={kindIcon(hero.kind_icon)} size={13} />
+                    Pinned · {hero.kind} · {hero.when}
+                    {isNew(hero) ? <span className="badge badge-info sann-hero-badge">New</span> : null}
+                  </span>
+                  <span className="sann-hero-title">{hero.title}</span>
+                  {hero.line ? <span className={`sann-hero-sub${isNew(hero) ? ' is-new' : ''}`}>{hero.line}</span> : null}
+                </span>
+              </button>
+            ) : null}
+
+            {rows.length ? (
+              <>
+                <div className="sann-listhead">
+                  <h2 className="sann-head">Latest</h2>
+                  {newCount ? (
+                    <button type="button" className="btn-link" onClick={() => void markAll()}>Mark all as read</button>
+                  ) : null}
+                </div>
+                <ul className="card sann-rows">{rows.map((a) => row(a))}</ul>
+              </>
+            ) : !hero ? (
+              <p className="card sann-empty">Nothing from Quademia yet. News and notices will show here.</p>
+            ) : null}
+
+            {dismissed.length ? (
+              <>
+                <button type="button" className="btn-link sann-foot" aria-expanded={showDismissed} onClick={() => setShowDismissed((s) => !s)}>
+                  Dismissed ({dismissed.length}) {showDismissed ? '‹' : '›'}
+                </button>
+                {showDismissed ? <ul className="card sann-rows">{dismissed.map((a) => row(a, true))}</ul> : null}
+              </>
+            ) : null}
+          </section>
+
+          <section className="card sann-pane" aria-label="Announcement">
+            {shown ? (
+              <>
+                <div className="sann-pane-head">
+                  <button type="button" className="sann-back" onClick={back}>‹ Announcements</button>
+                </div>
+                <div className="sann-pane-scroll">
+                  {picture(shown, 'full') ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- the opened notice's size, made at upload (08.10)
+                    <img className="sann-cover" src={picture(shown, 'full')!} alt="" />
+                  ) : null}
+                  <div className="sann-read">
+                    <p className="sann-meta">
+                      <Icon name={kindIcon(shown.kind_icon)} size={13} />
+                      {shown.kind}{shown.date ? ` · ${shown.date}` : ''}
+                    </p>
+                    <h2 className="sann-title">{shown.title}</h2>
+                    <AnnouncementBody html={shown.body_html || shown.body_text || ''} className="sann-body" onButtonClick={() => tapped(shown.announcement_id)} />
+                    <div className="sann-actions">
+                      <button type="button" className="btn-link" onClick={() => setAsking(true)}>
+                        <Icon name="message" size={14} />Ask about this
+                      </button>
+                      {shown.dismissible && !shown.dismissed_at ? (
+                        <button type="button" className="btn btn-ghost btn-sm" onClick={() => void dismiss(shown.announcement_id)}>Dismiss</button>
+                      ) : null}
                     </div>
                   </div>
-                  <AnnouncementBody html={a.body_html || a.body_text || ''} className="card-body" onButtonClick={() => clicked(a.announcement_id)} />
-                  <div className="card-actions">
-                    {!isRead ? (
-                      <button type="button" className="btn btn-primary" disabled={Boolean(b)} onClick={() => markRead(a.announcement_id)}>
-                        {b === 'saving' ? 'Saving…' : <><Icon name="check-circle" />Mark as Read</>}
-                      </button>
-                    ) : null}
-                    {a.dismissible ? (
-                      <button type="button" className="btn btn-ghost" disabled={Boolean(b)} onClick={() => dismiss(a.announcement_id)}>
-                        {b === 'dismissing' ? 'Dismissing…' : '✕ Dismiss'}
-                      </button>
-                    ) : null}
-                  </div>
                 </div>
-              );
-            })
-          )}
+              </>
+            ) : (
+              <p className="sann-pick">Choose a notice to read it.</p>
+            )}
+          </section>
         </div>
       </div>
+
+      {shown ? (
+        <MessageUsDialog
+          key={shown.announcement_id}
+          open={asking}
+          onClose={() => setAsking(false)}
+          label="other"
+          draft={`About the announcement "${shown.title}": `}
+        />
+      ) : null}
+      <BodyPortal>
+        <Toast message={error} onDismiss={dismissError} />
+      </BodyPortal>
     </>
   );
 }

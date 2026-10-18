@@ -100,6 +100,8 @@ export type SaveAnnouncementInput = {
 };
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
+/** A student's mark, with the new number for the bell and the menu row (08.9; null: not read). */
+export type MarkResult = { ok: true; newCount: number | null } | { ok: false; error: string };
 export type SaveResult = { ok: true; announcement_id: string; created: boolean } | { ok: false; error: string };
 
 // The student page's view of each notice's marks, by id.
