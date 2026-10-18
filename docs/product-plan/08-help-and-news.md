@@ -94,6 +94,22 @@ built 2026-10-18; to build: 08.14, 08.15)*
   marks Seen as it shows; the Must-see switch in the admin form's
   Settings; the shared dialog gained a picture slot and opens itself when
   it starts open.)*
+- **Confirming a notice was read (Sam, 2026-10-18 evening)** — Seen is
+  "it was on their screen", not "they read it": people close a pop-up at
+  once. Two measures, kept apart:
+  - **Seen** stays automatic, as built (shown in full), for every notice;
+    it alone ends "new" (the bell, the blue).
+  - **"I've read this"** — a notice the admin ticks **Ask students to
+    confirm** shows the button on the opened notice; pressing it is
+    **Read (confirmed)**, the follow-up's fifth number, with a Not
+    confirmed yet list by name. Not on every notice: most do not need it,
+    and an unused button is clutter.
+  - **Must-see is delivery**: it always asks to confirm, and pops up on
+    the dashboard **until confirmed** — "I've read this" or **Later**,
+    which hides it until the student next opens the app. It stops for
+    good on confirming or at the notice's end date. The pop-up no longer
+    counts as Seen by appearing alone; opening the notice on the page
+    still does. *(to build: 08.16)*
 - **The admin's editor**: no codes — what is typed is what students see
   (the tool chosen with Sam at its build; the body stored once, which
   ends the extra line break per save); the picture, the kind, Must-see,

@@ -595,6 +595,11 @@ table by table as each is next changed (AGENTS.md rule 9).
   `announcement_kinds` on its name, on update cascade.
 - With the new editor (08.14): `body_html` and `body_text` give way to
   one body, its form chosen with the editor (its own tick then).
+- *Needs Sam's tick before the build (08.16, written 2026-10-18):*
+  `ask_confirm` — yes or no: the opened notice shows "I've read this";
+  Must-see always asks (`must_see` implies `ask_confirm`, checked).
+  Why: Seen is "shown on screen"; a notice that matters needs the
+  student to say they read it.
 - Browser: nothing — the admin's page reads and writes through the
   server.
 
@@ -634,6 +639,11 @@ table by table as each is next changed (AGENTS.md rule 9).
   (`state`) and `updated_at` went; old rows kept their date as Seen, a
   clicked one as Tapped too, a dismissed one as Dismissed. A Must-see
   notice pops up while Seen is empty (08.8).
+- *Needs Sam's tick before the build (08.16, written 2026-10-18):*
+  `confirmed_at` — **Read (confirmed)**: when the student pressed "I've
+  read this", set once, never cleared, only on a notice that asks to
+  confirm. A Must-see notice then pops up while `confirmed_at` is empty
+  (Later hides it until the app is next opened), no longer while Seen is.
 - Browser: nothing — a student's marks come with their notices.
 
 ### `messages_threads` — conversations
