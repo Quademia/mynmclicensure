@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loading screens — 19 Oct 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #1e3a5f; --teal: #2d7d72; --teal-dark: #235f56; --teal-pale: #edf6f5;
+  --ink: #111827; --muted: #6b7280; --border: #e5e7eb; --surface: #ffffff; --page: #f9fafb;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--surface); color: var(--ink); font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.6; }
+main { max-width: 1360px; margin: 0 auto; padding: 40px 16px 80px; }
+.prose { max-width: 820px; }
+h1 { font-size: 30px; line-height: 1.2; letter-spacing: -0.02em; margin: 0 0 8px; }
+h2 { font-size: 22px; line-height: 1.3; margin: 56px 0 12px; padding-top: 24px; border-top: 1px solid var(--border); }
+h3 { font-size: 17px; margin: 28px 0 8px; }
+p, li { margin: 0 0 8px; }
+ul, ol { padding-left: 22px; margin: 0 0 12px; }
+.lede { color: var(--muted); font-size: 16px; }
+.tag { display: inline-block; font-size: 12px; font-weight: 600; line-height: 16px; padding: 2px 8px; border-radius: 6px; background: var(--teal-pale); color: var(--teal-dark); vertical-align: 1px; }
+.tag.todo { background: #fffbeb; color: #92400e; }
+.note { background: var(--teal-pale); border-radius: 8px; padding: 12px 16px; margin: 12px 0 16px; }
+.warn { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 16px; margin: 12px 0 16px; }
+table { border-collapse: collapse; width: 100%; margin: 8px 0 16px; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+th { font-weight: 600; background: var(--page); }
+.table-wrap { overflow-x: auto; }
+code { font-size: 13px; background: var(--page); border: 1px solid var(--border); border-radius: 4px; padding: 0 4px; }
+a { color: var(--teal-dark); }
+nav.toc { background: var(--page); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin: 24px 0; }
+nav.toc ol { margin: 0; }
+
+/* the drawings — phone screens at 390 x 844, as on the canvas */
+.screens { display: flex; flex-wrap: wrap; gap: 32px; margin: 16px 0 40px; }
+.screen-wrap { width: 390px; max-width: 100%; }
+.screen-label { font-size: 13px; font-weight: 600; color: var(--muted); margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.04em; }
+.screen { position: relative; width: 390px; max-width: 100%; height: 844px; border: 1px solid var(--border); border-radius: 32px; overflow: hidden; display: flex; flex-direction: column; align-items: center; background: #ffffff; }
+.screen.navy { background: var(--navy); border-color: var(--navy); }
+.q { display: block; border-radius: 50%; flex-shrink: 0; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* the welcome screen */
+.w-top { height: 291px; flex-shrink: 0; }
+.w-text { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: 28px; text-align: center; }
+.w-brand { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal); }
+.w-name { font-size: 28px; font-weight: 700; letter-spacing: -0.01em; color: var(--navy); line-height: 1.15; }
+.w-tag { font-size: 15px; color: var(--muted); margin-top: 6px; }
+.navy .w-brand { color: rgba(255, 255, 255, 0.72); }
+.navy .w-name { color: #ffffff; }
+.navy .w-tag { color: rgba(255, 255, 255, 0.78); }
+.grow { flex-grow: 1; }
+.track { position: relative; overflow: hidden; width: 128px; height: 3px; border-radius: 2px; background: var(--border); margin-bottom: 72px; }
+.track span { position: absolute; top: 0; left: 0; width: 48px; height: 3px; border-radius: 2px; background: var(--teal); animation: slide 1.4s ease-in-out infinite; }
+.navy .track { background: rgba(255, 255, 255, 0.18); }
+.navy .track span { background: #ffffff; }
+@keyframes slide { 0% { transform: translateX(-48px); } 100% { transform: translateX(128px); } }
+
+/* the please-wait screen */
+.pw-mid { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; text-align: center; padding: 0 24px; }
+.pw-ring { position: relative; width: 96px; height: 96px; display: flex; align-items: center; justify-content: center; }
+.pw-ring::before { content: ''; position: absolute; inset: 0; border: 3px solid var(--border); border-top-color: var(--teal); border-radius: 50%; animation: spin 0.9s linear infinite; }
+.pw-msg { font-size: 16px; font-weight: 600; color: var(--navy); }
+.pw-sub { font-size: 14px; color: var(--muted); margin-top: -12px; }
+.pw-slow { display: flex; gap: 10px; max-width: 300px; padding: 12px 16px; border-radius: 8px; background: var(--teal-pale); text-align: left; font-size: 14px; line-height: 1.45; }
+.pw-foot { display: flex; flex-direction: column; align-items: center; gap: 2px; line-height: 1.15; padding-bottom: 56px; }
+.pw-foot span { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal); }
+.pw-foot b { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; color: var(--navy); }
+
+/* today's quiz loader (styles/runner.css .qa-loader) */
+.today-mid { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+.today-spin { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--teal); border-radius: 50%; animation: spin 0.8s linear infinite; }
+.today-msg { font-size: 14px; font-weight: 500; color: var(--muted); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .track span, .pw-ring::before, .today-spin { animation: none; }
+}
+</style>
+</head>
+<body>
+<main>
+
+<div class="prose">
+<h1>Loading screens: what we discussed</h1>
+<p class="lede">Sam and Claude (a cloud session), 19 October 2026. One file holding the question, the two designs Sam accepted, what was decided, what is still open, and the drawings. Nothing in <code>docs/product-plan/</code>, <code>BUILD_LIST.md</code> or the code was changed.</p>
+
+<div class="warn"><strong>Temporary — delete this file after it is discussed in a local session.</strong> Once Sam has answered the open questions and the decisions are written into the plan files and <code>BUILD_LIST.md</code>, this file is deleted in that same commit. Section 10 says what to do with it.</div>
+
+<p>The same drawings live on the canvas <a href="https://claude.ai/artifact/Y9uV5AtaQokNp92sbjmFey">Branded Loading Mockups</a> (private to Sam).</p>
+
+<nav class="toc">
+<ol>
+<li><a href="#question">The question and the short answer</a></li>
+<li><a href="#today">What the app has today</a></li>
+<li><a href="#designs">The two designs</a></li>
+<li><a href="#decisions">The decisions so far</a></li>
+<li><a href="#rule">The "please wait" screen as a shared piece</a></li>
+<li><a href="#desktop">On a computer</a></li>
+<li><a href="#skeleton">The skeleton: options, not decided</a></li>
+<li><a href="#found">Found while checking</a></li>
+<li><a href="#open">Still open</a></li>
+<li><a href="#next">For the local session</a></li>
+<li><a href="#drawings">The drawings</a></li>
+</ol>
+</nav>
+
+<h2 id="question">1. The question and the short answer</h2>
+
+<p><strong>Sam asked:</strong> what is the loading thing we chose called? Should we have built our own instead (the NMC Ghana logo, our logo and the app's name), or can we add our own on top of it? Some apps at Sam's work show their name while a page loads.</p>
+
+<ul>
+<li><strong>Its name:</strong> a <em>skeleton screen</em> (also "skeleton loader"): grey shapes in the page's layout, pulsing gently, until the real page arrives.</li>
+<li><strong>Should we have built our own instead?</strong> No, not for moving between pages. The skeleton costs almost no data (no pictures), keeps the top bar and the menu still, and the pages arrive in about half a second once it shows; a logo animation would only flash.</li>
+<li><strong>What the work apps show</strong> is a <em>splash screen</em>: shown once when the app opens, not on every page. It sits beside the skeleton, not in place of it.</li>
+<li><strong>Can we add our own on top?</strong> Yes. Five ways were offered:</li>
+</ul>
+
+<div class="table-wrap">
+<table>
+<tr><th>Option</th><th>What it is</th><th>Outcome</th></tr>
+<tr><td>1. A welcome screen when the app opens</td><td>The Q and the name, once</td><td><span class="tag">accepted</span> — design 1</td></tr>
+<tr><td>2. Branded long waits</td><td>A Q-and-message screen for the waits of seconds</td><td><span class="tag">accepted</span> — design 2</td></tr>
+<tr><td>3. A small Q in the skeleton</td><td>For the two pages with no top bar</td><td>not taken</td></tr>
+<tr><td>4. A branded progress bar</td><td>A thin teal line along the top</td><td>not taken</td></tr>
+<tr><td>5. A full-screen logo on every page</td><td>In place of the skeleton</td><td>advised against</td></tr>
+</table>
+</div>
+
+<h3>About the logos</h3>
+<ul>
+<li><strong>The NMC Ghana logo:</strong> advised against, unless NMC gives written permission. It is the regulator's logo; in a prep app it can look like NMC endorses us, which is a trademark risk. Using the words "NMC Ghana" in a description, as the app does, is different.</li>
+<li><strong>"Our logo and the app's name":</strong> the rules say the brand is Quademia and MyNMCLicensure has no logo of its own (<code>AGENTS.md</code>, UI rule 5). The Quademia Q with "MyNMCLicensure" beside it is within that rule; a separate MyNMCLicensure logo would change it.</li>
+</ul>
+
+<h2 id="today">2. What the app has today</h2>
+<p>Built 2026-09-28, when Sam picked A + D from four ways (A a page placeholder, B a bar along the top, C a full-screen spinner, D the tapped link reacting):</p>
+<ul>
+<li><strong>The skeleton</strong> — <code>components/shell/page-loading.tsx</code>, in two shapes: <em>framed</em> (a title and three cards, inside the top bar and the menu) and <em>bare</em> (one card, for the quiz screen and the printable pack). Every area shows it through its <code>loading.tsx</code>.</li>
+<li><strong>The pressed link</strong> — <code>components/shell/link-pending.tsx</code>: a small spinner on the menu's row, a gently pulsing link anywhere else. Look: <code>styles/loading.css</code>.</li>
+<li><strong>The quiz's own loader</strong> — <code>.qa-loader</code> in <code>components/runner/quiz-runner.tsx</code>: a grey spinner with "Loading your quiz…", "Saving your progress…" or "Quiz submitted.".</li>
+</ul>
+
+<h2 id="designs">3. The two designs</h2>
+
+<h3>Design 1 — the welcome screen</h3>
+<ul>
+<li><strong>When:</strong> once, when the app opens (the installed app's icon opens <code>/router</code>) and right after signing in. Never again in that visit.</li>
+<li><strong>What:</strong> the Q; QUADEMIA in small capitals; <strong>MyNMCLicensure</strong>; "NMC Ghana licensure exam prep"; a thin moving line at the bottom.</li>
+<li><strong>The phone's own screen comes first.</strong> Android draws a screen of its own from the app's settings (<code>app/manifest.ts</code>) before the app starts; an iPhone shows plain white. The Q in design 1 sits where Android puts it, so the two read as one screen.</li>
+<li>Drawn in two colours: <strong>1B white</strong> and <strong>1C navy</strong>.</li>
+</ul>
+
+<h3>Design 2 — the "please wait" screen</h3>
+<ul>
+<li><strong>When:</strong> only for waits of several seconds that hold the whole screen. Never for an ordinary move between pages.</li>
+<li><strong>What:</strong> the Q inside a spinning teal ring, one line saying what is happening, the name at the bottom. The look is the same everywhere; only the message changes:</li>
+</ul>
+
+<div class="table-wrap">
+<table>
+<tr><th>Where</th><th>Message</th><th></th></tr>
+<tr><td>Starting a quiz</td><td>"Loading your quiz…"</td><td>today's words</td></tr>
+<tr><td>Save &amp; Exit in a quiz</td><td>"Saving your progress…"</td><td>today's words</td></tr>
+<tr><td>Submit &amp; Exit in a quiz</td><td>"Quiz submitted."</td><td>today's words</td></tr>
+<tr><td>Coming back from Paystack</td><td>"Confirming your payment…" and "This can take a few seconds."</td><td><span class="tag todo">new — proposed</span> (no screen there today)</td></tr>
+<tr><td>Downloading a pack's PDF</td><td>"Making your PDF…"</td><td><span class="tag todo">new — proposed</span> (today only the button says "Making…")</td></tr>
+<tr><td>Any wait past about 8 seconds</td><td>"Still loading — your connection is slow. Please keep this page open."</td><td><span class="tag todo">new — proposed</span></td></tr>
+</table>
+</div>
+
+<h2 id="decisions">4. The decisions so far (Sam, 2026-10-19)</h2>
+<ul>
+<li><strong>Design 1 accepted; 1C, navy, chosen.</strong> Going navy means the phone's own opening screen turns navy too, so the two match (the manifest's <code>background_color</code>; the bar colour, <code>theme_color</code>, stays white to match the top bar — Claude's recommendation, not yet put to Sam).</li>
+<li><strong>Design 2 accepted</strong>, the message changing with the place.</li>
+<li><strong>The skeleton stays</strong> for every move between pages. Neither design replaces it.</li>
+<li><strong>The "please wait" screen becomes a shared piece of the design system</strong> (Sam's idea): every wait of seconds from now on uses it.</li>
+<li><strong>No code yet.</strong></li>
+</ul>
+
+<h2 id="rule">5. The "please wait" screen as a shared piece</h2>
+<p>So that it is not overused, one rule for which kind of waiting goes where:</p>
+<div class="table-wrap">
+<table>
+<tr><th>What is happening</th><th>What the student sees</th></tr>
+<tr><td>Moving to another page</td><td><strong>The skeleton</strong> — automatic</td></tr>
+<tr><td>A quick action, a second or two</td><td><strong>The button's words change</strong> ("Start" → "Starting…") — the app does this already</td></tr>
+<tr><td>A wait of several seconds that holds the screen</td><td><strong>The "please wait" screen</strong> with its message</td></tr>
+<tr><td>Any wait past about 8 seconds</td><td><strong>The slow-connection note</strong> beneath it, if Sam says yes</td></tr>
+</table>
+</div>
+<p>When it is built, it goes in three places, so it is used every time without anyone asking:</p>
+<ol>
+<li><strong>The code:</strong> one shared component every wait uses.</li>
+<li><strong>The design system:</strong> a line under <em>Shared pieces</em> in <code>09-design-system.md</code>, and a card on the MyNMCLicensure design system on Claude.</li>
+<li><strong>The rules:</strong> a line in <code>AGENTS.md</code>'s UI conventions — "a wait of seconds uses the please-wait screen".</li>
+</ol>
+
+<h2 id="desktop">6. On a computer</h2>
+<ul>
+<li><strong>The welcome screen:</strong> the same look, filling the window, the Q and the name in the middle at the same size. It shows after signing in. A computer has no "phone's own screen" before it.</li>
+<li><strong>The "please wait" screen:</strong> exactly the same, centred. The quiz's loader already covers the whole window on a computer, so it is a straight swap.</li>
+<li><strong>The skeleton:</strong> the same; the top bar and the menu on the left stay put, only the content area shows the grey shapes.</li>
+<li>Only phone sizes were drawn. A computer-size drawing was offered, not yet asked for.</li>
+</ul>
+
+<h2 id="skeleton">7. The skeleton: options, not decided</h2>
+<div class="table-wrap">
+<table>
+<tr><th>Option</th><th>What it does</th><th>Claude's view</th></tr>
+<tr><td>A. Leave it</td><td>As it is today</td><td>Fine for now</td></tr>
+<tr><td>B. One waiting screen when a quiz starts</td><td>Today a quiz start shows the bare skeleton card, then the "Loading your quiz…" spinner: two waiting screens in a row. The quiz screen's <code>loading.tsx</code> would show design 2's "Loading your quiz…" from the start instead.</td><td>Recommended, with design 2</td></tr>
+<tr><td>C. The real page name in the skeleton</td><td>"Courses", "Practice Papers"… in place of the grey title bar. Each page needs its own <code>loading.tsx</code>. Not the dashboard ("Welcome back, Samuel" changes per student).</td><td>If Sam likes it</td></tr>
+<tr><td>D. Each skeleton shaped like its page</td><td>The courses skeleton looks like the course list, and so on</td><td>With each page's redesign — shapes drawn now would be redrawn after</td></tr>
+<tr><td>E. A shine in place of the pulse</td><td>A light sweep across the shapes</td><td>Looks only; skip unless liked</td></tr>
+</table>
+</div>
+<p>Sam noticed Claude leaning towards leaving the skeleton. The reasons given: it suits students on slow, paid data; it is built and measured; the redesign is coming. Changing it is Sam's call and any of B–E is safe.</p>
+
+<h2 id="found">8. Found while checking</h2>
+<ul>
+<li><strong>Coming back from Paystack shows nothing.</strong> <code>app/payment-confirmation/</code> has no <code>loading.tsx</code>, so while the payment is checked the student most likely sees Paystack's page sit there. Read in the code, not walked. Who it reaches: every paying student once this app is live; today only dev, since the live product is still the old site.</li>
+<li><strong>A bookmark skips the welcome screen.</strong> Opening the installed app always passes <code>/router</code>; a bookmark straight to a page (say, Courses) goes to that page.</li>
+<li><strong>The full Q is 91 KB</strong> (<code>public/images/quademia-mark.png</code>). The screens should use the 18 KB copy (<code>quademia-mark-192.png</code>) so they show on a weak signal.</li>
+<li><strong>iPhone's own opening screen is white.</strong> With a navy welcome screen, an iPhone would flash white first unless start-up images are added for it.</li>
+<li><strong>The hand-over to the dashboard</strong> must be checked when building: the welcome screen should give way to the dashboard with no skeleton flashing in between (see <code>AGENTS.md</code>, <em>Under a <code>loading.tsx</code>, <code>redirect()</code> and <code>notFound()</code> answer 200</em>).</li>
+</ul>
+
+<h2 id="open">9. Still open</h2>
+<p>Sam: "we can decide those 4 when we do".</p>
+<ol>
+<li>Which waits get the "please wait" screen — all five in section 3, or some?</li>
+<li>The 8-second slow-connection note — yes or no?</li>
+<li>The two new messages — "Confirming your payment…" and "Making your PDF…" — as written?</li>
+<li>The skeleton — B, C, both, or neither for now?</li>
+</ol>
+<p>Also to put to Sam: the bar colour staying white while the opening screen turns navy (section 4).</p>
+
+<h2 id="next">10. For the local session</h2>
+<ol>
+<li>This file was pushed by a cloud session on <code>origin/claude/cool-brown-y68156</code> — a stray remote branch to report, as <code>AGENTS.md</code> says. Bring the file in on Sam's word (cherry-pick, as with <code>docs/home-page-plans-2026-10-05.html</code>); Sam deletes the remote branch.</li>
+<li>Talk through section 9 with Sam.</li>
+<li>Write the rulings in a few lines: the welcome screen and the "please wait" screen into <code>09-design-system.md</code> (and <em>Speed and scale</em> in <code>10-launch-and-platform.md</code>), each piece a <code>BUILD_LIST.md</code> line; the "please wait" rule into <code>AGENTS.md</code> when it is built.</li>
+<li><strong>Delete this file in that same commit.</strong></li>
+<li>The cloud session wrote no session log entry; the local session logs this discussion when it places the decisions.</li>
+</ol>
+</div>
+
+<h2 id="drawings">11. The drawings</h2>
+<p class="prose">Phone size, 390 × 844. The spinners and lines move as they would in the app (they rest if your device has motion turned off). The Q is read from <code>public/images/</code>, so open this file from inside the repo.</p>
+
+<h3>1 · When the app opens</h3>
+<div class="screens">
+
+<div class="screen-wrap">
+<p class="screen-label">1A · Today — the phone draws it</p>
+<div class="screen" style="font-family: Roboto, system-ui, sans-serif; color: #202124;">
+<div class="grow" style="display: flex; align-items: center; justify-content: center;">
+<img class="q" src="../public/images/quademia-mark-192.png" alt="Quademia" width="144" height="144">
+</div>
+<div style="padding-bottom: 96px; font-size: 18px; font-weight: 500;">MyNMCLicensure</div>
+</div>
+</div>
+
+<div class="screen-wrap">
+<p class="screen-label">1B · Welcome screen — white</p>
+<div class="screen" role="img" aria-label="Welcome screen on white">
+<div class="w-top"></div>
+<img class="q" src="../public/images/quademia-mark-192.png" alt="" width="144" height="144">
+<div class="w-text">
+<span class="w-brand">Quademia</span>
+<span class="w-name">MyNMCLicensure</span>
+<span class="w-tag">NMC Ghana licensure exam prep</span>
+</div>
+<div class="grow"></div>
+<div class="track"><span></span></div>
+</div>
+</div>
+
+<div class="screen-wrap">
+<p class="screen-label">1C · Welcome screen — navy <span class="tag">chosen</span></p>
+<div class="screen navy" role="img" aria-label="Welcome screen on navy">
+<div class="w-top"></div>
+<img class="q" src="../public/images/quademia-mark-192.png" alt="" width="144" height="144" style="box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.08);">
+<div class="w-text">
+<span class="w-brand">Quademia</span>
+<span class="w-name">MyNMCLicensure</span>
+<span class="w-tag">NMC Ghana licensure exam prep</span>
+</div>
+<div class="grow"></div>
+<div class="track"><span></span></div>
+</div>
+</div>
+
+</div>
+
+<h3>2 · The long waits</h3>
+<div class="screens">
+
+<div class="screen-wrap">
+<p class="screen-label">2A · Today — starting a quiz</p>
+<div class="screen" role="img" aria-label="Today's quiz loader">
+<div class="today-mid">
+<div class="today-spin"></div>
+<div class="today-msg">Loading your quiz…</div>
+</div>
+</div>
+</div>
+
+<div class="screen-wrap">
+<p class="screen-label">2B · Please wait — starting a quiz</p>
+<div class="screen" role="img" aria-label="Please-wait screen: loading your quiz">
+<div class="pw-mid">
+<div class="pw-ring"><img class="q" src="../public/images/quademia-mark-192.png" alt="" width="72" height="72"></div>
+<div class="pw-msg">Loading your quiz…</div>
+</div>
+<div class="pw-foot"><span>Quademia</span><b>MyNMCLicensure</b></div>
+</div>
+</div>
+
+<div class="screen-wrap">
+<p class="screen-label">2C · Please wait — back from Paystack</p>
+<div class="screen" role="img" aria-label="Please-wait screen: confirming your payment">
+<div class="pw-mid">
+<div class="pw-ring"><img class="q" src="../public/images/quademia-mark-192.png" alt="" width="72" height="72"></div>
+<div class="pw-msg">Confirming your payment…</div>
+<div class="pw-sub">This can take a few seconds.</div>
+</div>
+<div class="pw-foot"><span>Quademia</span><b>MyNMCLicensure</b></div>
+</div>
+</div>
+
+<div class="screen-wrap">
+<p class="screen-label">2D · Please wait — after 8 s on a slow line</p>
+<div class="screen" role="img" aria-label="Please-wait screen with the slow-connection note">
+<div class="pw-mid">
+<div class="pw-ring"><img class="q" src="../public/images/quademia-mark-192.png" alt="" width="72" height="72"></div>
+<div class="pw-msg">Loading your quiz…</div>
+<div class="pw-slow">
+<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#235f56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px;"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8" stroke-opacity="0.35"/><path d="M22 4v16" stroke-opacity="0.35"/></svg>
+<div><strong>Still loading — your connection is slow.</strong><br>Please keep this page open.</div>
+</div>
+</div>
+<div class="pw-foot"><span>Quademia</span><b>MyNMCLicensure</b></div>
+</div>
+</div>
+
+</div>
+
+</main>
+</body>
+</html>
