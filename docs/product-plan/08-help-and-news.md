@@ -142,7 +142,11 @@ built 2026-10-18; to build: 08.14, 08.15, 08.17, 08.18)*
   the editor's document, and drawn by the server; saving keeps only the
   toolbar's pieces. Every notice there is is deleted (Sam: none reaches
   anyone). The character count stays. *(to build: 08.14)*
-- **The admin's page redesigned (Sam, 2026-10-19; drawn in the chat)**:
+- **The admin's page redesigned (Sam, 2026-10-19; drawn in the chat;
+  mocked up and approved 2026-10-20 — the editor on a computer and a
+  phone, the check before Publish, Preview, the list and Follow-up:
+  [canvas](https://claude.ai/artifact/72BfRQLPkr7xqk7RzkYY4L), private to
+  Sam; its words and numbers are samples)**:
   - **The list (A)** — tabs Live · Scheduled · Drafts · Ended, with
     counts (an archived notice labelled inside Ended), in place of the
     five count boxes and the status filter; search by title; Kinds;
