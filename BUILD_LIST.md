@@ -161,7 +161,9 @@ before then, and the old list's history, is in
 - ✅ 08.12 "This will reach N students today" in the editor as the scopes are set — 2026-10-18
 - ✅ 08.13 Kinds — the admin's own list, a name and an icon from a 25-icon grid; the editor's Kind — 2026-10-18
 - ✅ 08.16 "I've read this" — an Ask-to-confirm tick; Must-see pops up until confirmed, one after another; Read (confirmed) — 2026-10-18
-- ⬜ 08.14 The editor without codes — the tool chosen with Sam; the body stored once (takes in A3)
+- ⬜ 08.14 The editor without codes — Tiptap, Sam's toolbar, the body stored once, every notice deleted (10-19)
+- ⬜ 08.17 The admin's list redesigned — tabs Live, Scheduled, Drafts, Ended; quiet rows; the row menu (10-19)
+- ⬜ 08.18 The notice editor as its own page — message left, settings right; Narrow down; Publish asks once (10-19)
 - ⬜ 08.15 Announcements to devices — a tick in the editor, sent once when the notice goes live
 - ✅ A4 A button pointing inside the app, picked from a list — pages, courses, mocks; opens in the app — 2026-10-18
 - ⏸ A3 The body stored once, no extra line break per edit — taken into 08.14 (2026-10-18)
@@ -186,6 +188,7 @@ before then, and the old list's history, is in
 - ⬜ 09.4 Dark mode — after the above
 - ⬜ 09.5 The old token names retired once no page uses them
 - ⬜ 09.12 One switch — the announcements editor and the admin's notifications switch draw their own (10-17)
+- ⬜ 09.13 The shared rich-text editor (Tiptap) — each place its toolbar, one renderer; with 08.14 (Sam, 10-19)
 - ✅ 09.11 The page title — one line, teal fading to grey over 240px; subtitles below; tabs lineless — 2026-10-17
 - ✅ 09.10 A row menu (three dots) — what a row allows, closed items in grey; on Learning History — 2026-10-17
 - ✅ 09.6 The phone's bottom bar and sub-tab row — four fixed tabs, a row per group, the drawer kept — 2026-10-04

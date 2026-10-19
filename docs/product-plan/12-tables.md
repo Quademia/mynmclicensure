@@ -593,8 +593,20 @@ table by table as each is next changed (AGENTS.md rule 9).
   the named students never leaving the server; the status, audience and
   subscription-kind words checked; `scope_level` a list; `kind` keyed to
   `announcement_kinds` on its name, on update cascade.
-- With the new editor (08.14): `body_html` and `body_text` give way to
-  one body, its form chosen with the editor (its own tick then).
+- *Ticked by Sam 2026-10-19, to build (08.14):* `body_html` and
+  `body_text` give way to one `body` — the notice's words as the editor's
+  own document (Tiptap's; the shared editor, 09), which the database
+  checks is one and under 64 KB; the server keeps only the pieces the
+  notices' toolbar has. Every notice there is is deleted first, its marks
+  with it (Sam: "we will assume there is none as it reaches no one";
+  going live starts announcements empty anyway, 10). Why: one copy, no
+  extra line break per save, and the words drawn by the server with the
+  page rather than after its scripts load.
+- *Ticked by Sam 2026-10-19, to build (08.18):* `scope_audience`
+  dropped — the editor's Audience setting goes (notices are for
+  signed-in students since 2026-10-18). Every notice behaves as
+  Everyone did: the students its scopes match, and a signed-in admin
+  sees it too.
 - Built 2026-10-18 (08.16, ticked by Sam that day;
   `20261018220000_announcement_confirm.sql`): `ask_confirm` — yes or
   no: the opened notice shows "I've read this"; Must-see always asks

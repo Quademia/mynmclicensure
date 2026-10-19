@@ -53,6 +53,13 @@ Detail and history: `archive/product-plan/10-design-system.md`.
 - **Row menu** — three dots at a row's end opening what that row allows
   now; what is closed is told in grey, a locked line adds Choose a
   package (`components/shell/row-menu.tsx`; 09.10, Sam, 2026-10-17).
+- **Rich-text editor** — Tiptap, MyNclex's engine at MyNclex's version:
+  one shared editor (Sam, 2026-10-19: "we can use it for future other
+  things such as the questions"). Each place picks its toolbar; the words
+  are stored as the editor's document and drawn by one renderer, on the
+  server, keeping only what that place allows; colours are the app's own.
+  First the notices (08.14), then the questions. *(to build: 09.13, with
+  08.14)*
 - **Name circle** — the photo, else initials on the teal-navy blend;
   the logo where Quademia speaks.
 - **Icons** — a 16px Lucide outline set in `components/shell/icons.tsx`;

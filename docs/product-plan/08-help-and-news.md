@@ -44,7 +44,7 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
   targeting; New Thread reaches one student (Sam, 2026-09-18).
 
 **Redesigned (Sam, 2026-10-18; drawn in the chat).** *(08.7–08.13 and A4
-built 2026-10-18; to build: 08.14, 08.15)*
+built 2026-10-18; to build: 08.14, 08.15, 08.17, 08.18)*
 
 - **The page, like Messages**: the list, and a tap opens the notice —
   beside the list on a computer, the newest opening by itself; in its
@@ -121,8 +121,8 @@ built 2026-10-18; to build: 08.14, 08.15)*
     row and in the follow-up, with Confirmed and Not confirmed yet — the
     panel opens on the second.)*
 - **The admin's editor**: no codes — what is typed is what students see
-  (the tool chosen with Sam at its build; the body stored once, which
-  ends the extra line break per save); the picture, the kind, Must-see,
+  (Tiptap, 2026-10-19, below; the body stored once, which ends the extra
+  line break per save); the picture, the kind, Must-see,
   **Also send to devices** (08.5b's notices, once, when it goes live); a
   button pointing inside the app picked from a list; **"This will reach
   N students today"** as the scopes are set. *(the picture, kind,
@@ -131,7 +131,45 @@ built 2026-10-18; to build: 08.14, 08.15)*
   each course and its practice papers, each mock with its course; an
   in-app address is a path and opens inside the app; a link keeps only a
   web, email or in-app address — and 08.12. To build: the editor without
-  codes 08.14, devices 08.15.)*
+  codes 08.14, devices 08.15, the page redesigned 08.17 and 08.18.)*
+- **The editor without codes (Sam, 2026-10-19)** — Tiptap, the shared
+  editor (09), on MyNclex's version. The notices' toolbar: Undo, Redo ·
+  Bold, Italic, Strikethrough, Superscript, Subscript · Highlight, Text
+  colour (the app's own colours) · Subheading, bulleted and numbered
+  lists, Callout, Divider · Link, Button (A4's list) · Clear formatting.
+  Not Underline (reads as a link on a phone), Alignment or Table — kept
+  in the shared editor for the questions. The words are stored once, as
+  the editor's document, and drawn by the server; saving keeps only the
+  toolbar's pieces. Every notice there is is deleted (Sam: none reaches
+  anyone). The character count stays. *(to build: 08.14)*
+- **The admin's page redesigned (Sam, 2026-10-19; drawn in the chat)**:
+  - **The list (A)** — tabs Live · Scheduled · Drafts · Ended, with
+    counts (an archived notice labelled inside Ended), in place of the
+    five count boxes and the status filter; search by title; Kinds;
+    + New announcement. A row: the kind's icon, the title (Must-see
+    marked), who and when on one small line, Seen out of the reach as a
+    bar, Read (when it asks to confirm) or Tapped, and the row menu
+    (09.10): Edit, Follow-up, Archive. A tap on the row opens the
+    editor; on the numbers, Follow-up. No Duplicate. On a phone a row
+    stacks and the tabs wrap. Not taken: two panes, the follow-up beside
+    the list (B). *(to build: 08.17)*
+  - **The editor, its own page (A)** — a new notice and each notice at
+    its own address, in place of the side panel (Sam asked: a page, not a
+    pop-up — Back, refresh and a link work; room for the toolbar; a
+    phone's full screen). The message on the left: title, kind, the
+    words, the picture. The settings in a column on the right, under the
+    message on a phone: **Who sees it** — "Everyone" and **+ Narrow
+    down**, adding only the scopes used, each a chip, its picker dropping
+    under it, the reach line beneath; **When** — starts, ends; **How it
+    shows** — Must-see, Ask to confirm, Pin, Students can close it, Send
+    to phones, Priority, each switch with its one-line hint. Only the
+    small pickers, Link and Button, and the check before Publish open
+    over the page. **Publish asks once**: "Publish to 412 students?",
+    adding "It also goes to their phones" when that is on. Leaving with
+    unsaved changes asks first. **The Audience setting goes** (notices
+    are for signed-in students only since 2026-10-18). Not taken: two
+    tabs (B), a Publish step holding the settings (C), "See who" beside
+    the reach (Sam: not for now). *(to build: 08.18)*
 - **The follow-up**: Reaches today · Seen · Tapped · Dismissed, each
   out of who it reaches, and the names behind each number, Not seen yet
   among them (with the last sign-in once 01.6 is built, until then the
@@ -144,7 +182,8 @@ built 2026-10-18; to build: 08.14, 08.15)*
   public NMC news page (with 08.3).
 - **Order**: A1, A2 and 08.1 with the storage below in one migration →
   the student side (08.7, 08.9, 08.10, 08.13) → the dashboard (08.8) →
-  the admin side (08.11, 08.12, 08.14, A4) → devices (08.15).
+  the admin side (08.11, 08.12, A4) → the admin's page redesigned with
+  the editor (08.14, 08.17, 08.18) → devices (08.15).
 
 ### Messages — the support desk *(built 2026-10-17: 08.2)*
 
@@ -338,8 +377,9 @@ Written on the tables in `12-tables.md`, all ticked 2026-09-18:
 Ticked by Sam 2026-10-18 for the redesign: `announcements` gains the
 kind, the picture, Must-see and the devices send; the new table
 `announcement_kinds`; the bucket `licensure-gh-announcement-images`.
-Still to tick at their builds: the body stored once (08.14) and the
-`announcement` kind on `notification_devices` (08.15).
+Ticked by Sam 2026-10-19: the body stored once, every notice deleted
+(08.14); `scope_audience` dropped (08.18). Still to tick at its build:
+the `announcement` kind on `notification_devices` (08.15).
 
 ## Open
 
@@ -361,7 +401,8 @@ Still to tick at their builds: the body stored once (08.14) and the
   (with the item above); and whether a device notice shows the notice's
   title (a notice is not private, unlike a message) or only "News from
   Quademia".
-- **Small things offered on 2026-10-18, not ruled**: a proper pin icon on
-  the admin's rows; the editor's Ask students to confirm looking locked
-  (greyed) while Must-see holds it on — today only its hint says so;
-  "keep it rare **and short**" in the Must-see hint.
+- **Small things offered on 2026-10-18, not ruled — to settle as 08.17
+  and 08.18 are built**: a proper pin icon on the admin's rows; the
+  editor's Ask students to confirm looking locked (greyed) while Must-see
+  holds it on — today only its hint says so; "keep it rare **and
+  short**" in the Must-see hint.
