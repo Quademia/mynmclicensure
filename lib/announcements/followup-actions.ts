@@ -36,7 +36,6 @@ function list(values: unknown): string[] | null {
 export async function previewReach(scopes: ReachScopes): Promise<number | null> {
   await requireAdmin();
   const { data, error } = await createServiceRoleClient().rpc('announcement_reach_preview', {
-    p_audience: scopes.scope_audience === 'STUDENTS' ? 'STUDENTS' : 'ALL',
     p_programs: list(scopes.scope_programs),
     p_levels: list(scopes.scope_levels),
     p_cohort: String(scopes.scope_cohort || '').trim() || null,

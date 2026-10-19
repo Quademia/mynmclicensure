@@ -1,0 +1,302 @@
+/* styles/editor.css — the shared rich-text editor and the words it makes
+ * (09.13; Sam, 2026-10-19). Two halves:
+ *
+ *   .rt-doc …   how a document reads — on a student's page, in the
+ *               admin's preview, and inside the editor itself, so what is
+ *               typed is what is seen.
+ *   .rte …      the editor's own box: the toolbar, its colour lists, the
+ *               writing area.
+ *
+ * Colours are kept in a document by name and mapped here to the app's
+ * tokens only: text colours to the badge inks (they read on white),
+ * highlights to the badge edges (pale enough for text on top). */
+
+/* ── the words ─────────────────────────────────────────────────────── */
+/* A place may set its own size, line and ink on the box around the words
+   (the course page's news is smaller and grey): --rt-size, --rt-line,
+   --rt-ink. */
+.rt-doc {
+  font-size: var(--rt-size, var(--type-body-size));
+  line-height: var(--rt-line, var(--type-body-line));
+  color: var(--rt-ink, var(--ink));
+  overflow-wrap: anywhere;
+}
+.rt-doc > * + *,
+.rt-callout > * + *,
+.rt-doc li > * + * {
+  margin-top: var(--space-10);
+}
+.rt-doc p,
+.rt-doc ul,
+.rt-doc ol,
+.rt-doc h3,
+.rt-doc hr {
+  margin-bottom: 0;
+}
+.rt-doc p {
+  margin-top: 0;
+}
+.rt-doc > :first-child {
+  margin-top: 0;
+}
+.rt-doc .rt-empty {
+  min-height: var(--type-body-line);
+}
+.rt-doc .rt-subheading,
+.rt-doc h3 {
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 700;
+  color: var(--brand-navy);
+  margin: var(--space-16) 0 0;
+}
+.rt-doc ul,
+.rt-doc ol {
+  padding-left: 22px;
+  margin: var(--space-10) 0 0;
+}
+.rt-doc li + li {
+  margin-top: var(--space-4);
+}
+.rt-doc li > p {
+  margin: 0;
+}
+.rt-doc a {
+  color: var(--brand-teal-hover);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.rt-doc sup,
+.rt-doc sub {
+  font-size: 0.75em;
+  line-height: 0;
+}
+.rt-doc .rt-divider,
+.rt-doc hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: var(--space-16) 0 0;
+}
+.rt-callout {
+  background: var(--brand-teal-pale);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-12) var(--space-16);
+  margin-top: var(--space-12);
+}
+.rt-button-row {
+  margin: var(--space-16) 0 0;
+}
+/* the notice's Button: the shared primary's look, a student's 44px tap */
+.rt-doc a.rt-button,
+.rt-doc a.rt-button:hover {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-20);
+  border-radius: var(--radius);
+  background: var(--brand-navy);
+  color: var(--surface);
+  font-size: var(--type-ui-size);
+  line-height: var(--type-ui-line);
+  font-weight: 600;
+  text-decoration: none;
+}
+.rt-doc a.rt-button:hover {
+  background: var(--brand-navy-dark);
+}
+/* a link or Button inside the app, pressed until its page arrives (A4) */
+.rt-doc a.is-pending {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.rt-tone[data-tone='red'] { color: var(--badge-danger-ink); }
+.rt-tone[data-tone='amber'] { color: var(--badge-warning-ink); }
+.rt-tone[data-tone='green'] { color: var(--badge-success-ink); }
+.rt-tone[data-tone='blue'] { color: var(--badge-info-ink); }
+.rt-tone[data-tone='teal'] { color: var(--brand-teal-hover); }
+.rt-tone[data-tone='navy'] { color: var(--brand-navy); }
+.rt-tone[data-tone='purple'] { color: var(--kind-plum-ink); }
+.rt-tone[data-tone='grey'] { color: var(--ink-muted); }
+
+.rt-marker {
+  color: inherit;
+  padding: 0 2px;
+  border-radius: 2px;
+  background: var(--badge-warning-border);
+}
+.rt-marker[data-marker='green'] { background: var(--badge-success-border); }
+.rt-marker[data-marker='blue'] { background: var(--kind-sky-border); }
+.rt-marker[data-marker='pink'] { background: var(--kind-plum-border); }
+.rt-marker[data-marker='red'] { background: var(--badge-danger-border); }
+.rt-marker[data-marker='purple'] { background: var(--kind-indigo-border); }
+
+/* ── the editor ────────────────────────────────────────────────────── */
+.rte {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.rte:focus-within {
+  border-color: var(--brand-teal);
+}
+.rte-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-6) var(--space-8);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-page);
+  border-radius: var(--radius) var(--radius) 0 0;
+  color: var(--ink-muted);
+}
+.rte-toolbar-wait {
+  min-height: 45px;
+}
+.rte-gap {
+  width: 1px;
+  height: 20px;
+  margin: 0 var(--space-4);
+  background: var(--border);
+}
+.rte-btn {
+  position: relative;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 var(--space-6);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  font: inherit;
+  font-size: var(--type-meta-size);
+  font-weight: 600;
+  cursor: pointer;
+}
+.rte-btn:hover {
+  background: var(--badge-neutral-bg);
+  color: var(--ink);
+}
+.rte-btn.is-on {
+  background: var(--brand-teal-pale);
+  color: var(--brand-teal-hover);
+}
+.rte-btn:disabled {
+  color: var(--ink-faint);
+  background: transparent;
+  cursor: default;
+}
+.rte-btn:focus-visible,
+.rte-swatch:focus-visible,
+.rte-swatch-none:focus-visible {
+  outline: 2px solid var(--brand-teal);
+  outline-offset: 1px;
+}
+.rte-swatch-line {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 4px;
+  height: 3px;
+  border-radius: 2px;
+  background: currentColor;
+}
+.rte-swatch-line[data-tone='none'] {
+  background: var(--ink-faint);
+}
+.rte-pop-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.rte-pop {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  width: 188px;
+  padding: var(--space-8);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+}
+.rte-swatch {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: var(--type-meta-size);
+  font-weight: 600;
+}
+.rte-swatch.is-on {
+  border-color: var(--brand-teal);
+  box-shadow: inset 0 0 0 1px var(--brand-teal);
+}
+.rte-swatch-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.rte-swatch-none {
+  flex-basis: 100%;
+  margin-top: var(--space-4);
+  padding: var(--space-6) 0;
+  border: 0;
+  background: transparent;
+  color: var(--brand-teal-hover);
+  font: inherit;
+  font-size: var(--type-meta-size);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.rte-body .ProseMirror,
+.rte-body-wait {
+  min-height: 200px;
+  padding: var(--space-16) var(--space-16) var(--space-20);
+  outline: none;
+}
+.rte-body .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--ink-faint);
+  pointer-events: none;
+}
+.rte-body .ProseMirror-selectednode .rt-button,
+.rte-body .rt-button-row.ProseMirror-selectednode .rt-button {
+  outline: 2px solid var(--brand-teal);
+  outline-offset: 2px;
+}
+.rte-body .rt-button {
+  cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  .rte-btn {
+    min-width: 40px;
+    height: 40px;
+  }
+  .rte-pop {
+    width: 220px;
+  }
+  .rte-swatch {
+    width: 40px;
+    height: 40px;
+  }
+}

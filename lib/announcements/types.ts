@@ -8,6 +8,8 @@
 // results. Plain constants and types only — actions.ts may export only
 // async functions (AGENTS.md, Known Workarounds).
 
+import type { RichDoc } from '@/lib/editor/types';
+
 // rebuild.md §9 #18: no 'scheduled' — Active plus a start date schedules.
 export const ANNOUNCEMENT_STATUSES = ['draft', 'active', 'archived'] as const;
 
@@ -25,12 +27,17 @@ export type NoticeMark = 'seen' | 'tapped' | 'dismissed' | 'confirmed';
 // legacy's fixed level picker
 export const LEVELS = ['L100', 'L200', 'L300', 'L400'] as const;
 
-/** The admin's row: every column, read through the server. */
+/** The admin's row in the list: every column but the words (08.17). */
+export type AnnouncementRow = Omit<Announcement, 'body'>;
+export const ANNOUNCEMENT_ROW_COLUMNS =
+  'announcement_id, title, status, created_at, start_at, end_at, pinned, priority, dismissible, kind, picture_path, must_see, ask_confirm, send_to_devices, sent_at, scope_programs, scope_courses, scope_level, scope_subscription_kind, scope_product_ids, scope_cohort, scope_user_ids';
+
+/** The admin's notice, read through the server: every column. */
 export type Announcement = {
   announcement_id: string;
   title: string;
-  body_html: string | null;
-  body_text: string | null;
+  /** The words, as the shared editor's document (08.14, 2026-10-19). */
+  body: RichDoc;
   status: string;
   created_at: string | null;
   start_at: string | null;
@@ -50,7 +57,6 @@ export type Announcement = {
   scope_level: string[] | null;
   scope_subscription_kind: string | null;
   scope_product_ids: string[] | null;
-  scope_audience: string | null;
   scope_cohort: string | null;
   scope_user_ids: string[] | null;
 };
@@ -59,8 +65,7 @@ export type Announcement = {
 export type StudentAnnouncement = {
   announcement_id: string;
   title: string;
-  body_html: string | null;
-  body_text: string | null;
+  body: RichDoc | null;
   kind: string;
   kind_icon: string | null;
   picture_path: string | null;
@@ -104,9 +109,8 @@ export type FollowUpRow = {
 };
 export type FollowUpResult = { ok: true; rows: FollowUpRow[] } | { ok: false; error: string };
 
-/** The scopes the editor's reach line counts (08.12). */
+/** The scopes the editor's reach line counts (08.12); Audience went with 08.18. */
 export type ReachScopes = {
-  scope_audience: string;
   scope_programs: string[];
   scope_levels: string[];
   scope_cohort: string;
@@ -116,12 +120,14 @@ export type ReachScopes = {
   scope_courses: string[];
 };
 
-// legacy saveAnnouncement's payload
+// the editor page's save (08.18): the status the pressed button means —
+// Save draft and Move to drafts 'draft', Publish 'active', Save changes the
+// notice's own
 export type SaveAnnouncementInput = {
   announcement_id: string | null;
   title: string;
-  body_html: string;
-  body_text: string;
+  /** The editor's document; cleaned on the server to the notices' tools. */
+  body: RichDoc;
   status: string;
   priority: number;
   pinned: boolean;
@@ -132,7 +138,6 @@ export type SaveAnnouncementInput = {
   ask_confirm: boolean;
   /** One of the admin's kinds (08.13). */
   kind: string;
-  scope_audience: string;
   scope_subscription_kind: string;
   scope_cohort: string;
   scope_programs: string[];
@@ -145,6 +150,9 @@ export type SaveAnnouncementInput = {
 };
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
+
+/** The stored words' ceiling; the database refuses past 64 KB (08.14). */
+export const BODY_MAX_BYTES = 60 * 1024;
 
 // A notice's picture as it reaches the server (08.10): already made small
 // in the admin's browser (picture-maker.ts); these are the ceilings.

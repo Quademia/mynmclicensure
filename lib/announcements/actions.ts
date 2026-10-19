@@ -20,6 +20,8 @@
 'use server';
 
 import { requireAdmin, requireStudent } from '@/lib/access';
+import { cleanDoc } from '@/lib/editor/doc';
+import { NOTICE_TOOLS } from '@/lib/editor/types';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { searchStudents } from '@/lib/subscriptions/queries';
 import type { StudentHit } from '@/lib/subscriptions/types';
@@ -28,6 +30,7 @@ import { PICTURE_BUCKET, pictureFile } from './display';
 import { getAllAnnouncements } from './queries';
 import {
   ANNOUNCEMENT_STATUSES,
+  BODY_MAX_BYTES,
   DEFAULT_KIND,
   NOTICE_STATES,
   PICTURE_FULL_MAX_BYTES,
@@ -78,11 +81,15 @@ export async function saveAnnouncement(input: SaveAnnouncementInput): Promise<Sa
     return fail(`"${kind}" is retired. Pick another kind, or bring it back under Kinds.`);
   }
 
+  // the words (08.14): only what the notices' toolbar makes, checked here —
+  // a document from a browser is never trusted
+  const body = cleanDoc(input.body, NOTICE_TOOLS);
+  if (JSON.stringify(body).length > BODY_MAX_BYTES) return fail('The announcement is too long. Please shorten it.');
+
   const payload = {
     title,
     kind,
-    body_html: String(input.body_html || ''),
-    body_text: String(input.body_text || ''),
+    body,
     status,
     priority: Number.parseInt(String(input.priority), 10) || 1,
     pinned: Boolean(input.pinned),
@@ -90,7 +97,6 @@ export async function saveAnnouncement(input: SaveAnnouncementInput): Promise<Sa
     must_see: Boolean(input.must_see),
     // Must-see always asks to confirm (08.16; the database checks it too)
     ask_confirm: Boolean(input.ask_confirm) || Boolean(input.must_see),
-    scope_audience: input.scope_audience === 'STUDENTS' ? 'STUDENTS' : 'ALL',
     scope_subscription_kind: String(input.scope_subscription_kind || '').trim() || null,
     scope_cohort: String(input.scope_cohort || '').trim() || null,
     scope_programs: scopePrograms.length ? scopePrograms : null,
@@ -130,7 +136,6 @@ export async function archiveAnnouncement(announcementId: string): Promise<Actio
   if (error) return fail(error.message);
   return { ok: true };
 }
-
 // ── admin: a notice's picture (08.10) ───────────────────────────────────
 // The two sizes arrive made small by the admin's browser
 // (picture-maker.ts). Each picture gets a folder of its own —

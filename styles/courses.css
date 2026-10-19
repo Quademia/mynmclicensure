@@ -92,7 +92,8 @@ a.cp-way:hover { background: var(--surface-page); text-decoration: none; }
 .cp-news-item { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-12) var(--space-16); }
 .cp-news-item + .cp-news-item { border-top: 1px solid var(--border); }
 .cp-news-empty { margin: 0; padding: var(--space-16); font-size: var(--type-ui-size); color: var(--ink-muted); line-height: var(--type-meta-line); }
-.cp-news-body { font-size: var(--type-ui-size); color: var(--ink-muted); line-height: var(--type-meta-line); }
+/* the words are the shared renderer's (styles/editor.css, 08.14), smaller and grey here */
+.cp-news-body { --rt-size: var(--type-ui-size); --rt-line: var(--type-meta-line); --rt-ink: var(--ink-muted); }
 
 @media (min-width: 769px) {
   .cp-grid2 { flex-direction: row; align-items: flex-start; }
@@ -105,6 +106,3 @@ a.cp-way:hover { background: var(--surface-page); text-decoration: none; }
   .cp-tab { display: none; }
   .cp-message { margin-left: 0; }
 }
-
-/* a news link inside the app, pressed until its page arrives (A4) */
-.cp-news-body a.is-pending { opacity: 0.7; pointer-events: none; }

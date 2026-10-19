@@ -157,28 +157,8 @@
   font-weight: 700;
   color: var(--brand-navy);
 }
-.sann-body { font-size: var(--type-body-size); line-height: var(--type-body-line); color: var(--ink); overflow-wrap: anywhere; }
-.sann-body p { margin: 0 0 var(--space-12); }
-.sann-body p:last-child { margin-bottom: 0; }
-.sann-body strong { font-weight: 700; }
-.sann-body em { font-style: italic; }
-.sann-body img { max-width: 100%; height: auto; border-radius: var(--radius); }
-.sann-body a:not([data-qa='btn']) { color: var(--brand-teal-hover); text-decoration: underline; }
-/* the notice's own button: the shared primary's look */
-.sann-body a[data-qa='btn'] {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  margin-top: var(--space-4);
-  padding: var(--space-10) var(--space-20);
-  border-radius: var(--radius);
-  background: var(--brand-navy);
-  color: var(--surface);
-  font-size: var(--type-ui-size);
-  font-weight: 600;
-  text-decoration: none;
-}
-.sann-body a[data-qa='btn']:hover { background: var(--brand-navy-dark); }
+/* the words, the links and the Button are the shared renderer's (styles/editor.css, 08.14) */
+.sann-body { overflow-wrap: anywhere; }
 .sann-actions {
   display: flex;
   align-items: center;
@@ -203,8 +183,6 @@
   .sann:not(.sann-open) .sann-hero.is-on { border-color: var(--border); box-shadow: none; }
 }
 
-/* a notice's button inside the app, pressed until its page arrives (A4) */
-.sann-body a[data-qa='btn'].is-pending { opacity: 0.7; pointer-events: none; }
 
 /* "I've read this" (08.16): on a notice that asks the student to confirm */
 .sann-confirm { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8) var(--space-12); margin-top: var(--space-16); }

@@ -29,6 +29,7 @@ export function LinkDialog({
   urlLabel,
   textLabel,
   textDefault = '',
+  urlDefault = 'https://',
   submitLabel = 'Insert',
   pages,
   onSubmit,
@@ -39,19 +40,21 @@ export function LinkDialog({
   urlLabel: string;
   textLabel: string;
   textDefault?: string;
+  /** The address it opens with — an existing link's, when one is being changed (09.13). */
+  urlDefault?: string;
   submitLabel?: string;
   /** The app's pages to pick from (A4). */
   pages?: LinkPageGroup[];
   onSubmit: (v: { url: string; text: string }) => void;
   onCancel: () => void;
 }) {
-  const [url, setUrl] = useState('https://');
+  const [url, setUrl] = useState(urlDefault);
   const [text, setText] = useState(textDefault);
-  const [picked, setPicked] = useState('');
+  const [picked, setPicked] = useState(pages?.flatMap((g) => g.items).some((p) => p.href === urlDefault) ? urlDefault : '');
   const [problem, setProblem] = useState<string | null>(null);
 
   function reset() {
-    setUrl('https://');
+    setUrl(urlDefault);
     setText(textDefault);
     setPicked('');
     setProblem(null);

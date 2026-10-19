@@ -17,21 +17,65 @@
 // each goes through readAll(); a student's own notices are exempt.
 
 import type { ServerSupabaseClient } from '@/lib/access';
+import { getAllProducts, getCourses, getPrograms } from '@/lib/catalogue/queries';
+import { getAllQuizzes } from '@/lib/quizzes/queries';
 import { readAll } from '@/lib/supabase/read-all';
-import type { Announcement, AnnouncementKind, EngageMap, ReachMap, StudentAnnouncement } from './types';
+import { ANNOUNCEMENT_ROW_COLUMNS, type Announcement, type AnnouncementKind, type AnnouncementRow, type EngageMap, type ReachMap, type StudentAnnouncement } from './types';
 
 type ServiceClient = ReturnType<typeof import('@/lib/supabase/server').createServiceRoleClient>;
 
 // ── admin ──────────────────────────────────────────────────────────────
-export async function getAllAnnouncements(db: ServiceClient): Promise<Announcement[]> {
-  const { data, error } = await readAll<Announcement>((from, to) =>
-    db.from('announcements').select('*').order('created_at', { ascending: false }).order('announcement_id').range(from, to),
+// The list (08.17): every notice without its words, which only the
+// editor page reads.
+export async function getAllAnnouncements(db: ServiceClient): Promise<AnnouncementRow[]> {
+  const { data, error } = await readAll<AnnouncementRow>((from, to) =>
+    db.from('announcements').select(ANNOUNCEMENT_ROW_COLUMNS).order('created_at', { ascending: false }).order('announcement_id').range(from, to),
   );
   if (error) {
     console.error('getAllAnnouncements:', error);
     return [];
   }
   return data;
+}
+
+// What the editor page's pickers offer (08.18): the programmes, the courses,
+// the packages (the active ones offered), the cohorts, the kinds, and the
+// mock exams a Button may open (A4).
+export async function getEditorChoices(supabase: ServerSupabaseClient, service: ServiceClient) {
+  const [programs, courses, products, cohorts, kinds, mockRows] = await Promise.all([
+    getPrograms(supabase),
+    getCourses(supabase),
+    getAllProducts(supabase),
+    getCohorts(supabase),
+    getKinds(service),
+    getAllQuizzes(service, 'mock'),
+  ]);
+  const mocks = mockRows.map((m) => ({ quiz_id: m.quiz_id, title: m.title, course_id: m.course_id, status: m.status }));
+  return { programs, courses, products: products.filter((p) => p.status === 'active'), cohorts, kinds, mocks };
+}
+export type EditorChoices = Awaited<ReturnType<typeof getEditorChoices>>;
+
+// The names behind a notice's Named students, for its chips (08.18).
+export async function getStudentNames(service: ServiceClient, ids: string[]): Promise<{ user_id: string; name: string }[]> {
+  if (!ids.length) return [];
+  const { data, error } = await service.from('users').select('user_id, forename, surname, name, email').in('user_id', ids.slice(0, 500));
+  if (error) {
+    console.error('getStudentNames:', error);
+    return ids.map((id) => ({ user_id: id, name: id }));
+  }
+  type U = { user_id: string; forename: string | null; surname: string | null; name: string | null; email: string | null };
+  const byId = new Map((data as U[]).map((u) => [u.user_id, [u.forename, u.surname].filter(Boolean).join(' ').trim() || u.name || u.email || u.user_id]));
+  return ids.map((id) => ({ user_id: id, name: byId.get(id) ?? id }));
+}
+
+// One notice, words and all, for its editor page (08.18); null when there is none.
+export async function getAnnouncement(db: ServiceClient, id: string): Promise<Announcement | null> {
+  const { data, error } = await db.from('announcements').select('*').eq('announcement_id', id).maybeSingle();
+  if (error) {
+    console.error('getAnnouncement:', error);
+    return null;
+  }
+  return (data as Announcement | null) ?? null;
 }
 
 // The admin's kinds (08.13), in their order — a short list, read whole.

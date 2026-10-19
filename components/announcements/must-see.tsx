@@ -88,7 +88,7 @@ export function MustSee({
         {notices.length > 1 ? <span className="mustsee-count">{position} of {notices.length}</span> : null}
       </p>
       {/* the same dialog stays open from one notice to the next; only its contents change */}
-      <AnnouncementBody key={notice.announcement_id} html={notice.body_html || notice.body_text || ''} className="mustsee-body" onButtonClick={() => tapped(notice.announcement_id)} />
+      <AnnouncementBody key={notice.announcement_id} doc={notice.body} className="mustsee-body" onButtonClick={() => tapped(notice.announcement_id)} />
       {error ? <p className="dlg-text dlg-problem">{error}</p> : null}
       <div className="dlg-actions">
         <button type="button" className="btn btn-ghost" disabled={busy} onClick={() => chooseLater(userId)}>Later</button>

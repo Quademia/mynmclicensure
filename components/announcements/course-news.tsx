@@ -43,7 +43,7 @@ export function CourseNews({ news, dayOf }: { news: StudentAnnouncement[]; dayOf
       {news.map((a) => (
         <div key={a.announcement_id} className="cp-news-item">
           <span className="cp-name">{a.title}</span>
-          <AnnouncementBody html={a.body_html || a.body_text || ''} className="cp-news-body" onButtonClick={() => tapped(a.announcement_id)} />
+          <AnnouncementBody doc={a.body} className="cp-news-body" onButtonClick={() => tapped(a.announcement_id)} />
           {dayOf[a.announcement_id] ? <span className="cp-line">{dayOf[a.announcement_id]}</span> : null}
         </div>
       ))}

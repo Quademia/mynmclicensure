@@ -293,7 +293,7 @@ export function AnnouncementsClient({ items, openId: askedId }: { items: NoticeI
                       {shown.kind}{shown.date ? ` · ${shown.date}` : ''}
                     </p>
                     <h2 className="sann-title">{shown.title}</h2>
-                    <AnnouncementBody html={shown.body_html || shown.body_text || ''} className="sann-body" onButtonClick={() => tapped(shown.announcement_id)} />
+                    <AnnouncementBody doc={shown.body} className="sann-body" onButtonClick={() => tapped(shown.announcement_id)} />
                     {shown.ask_confirm ? (
                       shown.confirmed_at ? (
                         <p className="sann-confirmed"><Icon name="check-circle" size={14} />You confirmed you read this.</p>

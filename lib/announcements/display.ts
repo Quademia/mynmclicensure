@@ -8,6 +8,7 @@
 // sizes in the bucket. The clock is read here, never in a component's
 // render (AGENTS.md: react-hooks/purity). No database, no React.
 
+import { firstLineOf } from '@/lib/editor/doc';
 import type { IconName } from '@/lib/nav/types';
 import type { StudentAnnouncement } from './types';
 
@@ -43,10 +44,9 @@ export function longWhen(iso: string | null): string {
   return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-/** The notice's first line for a row: its plain text, one line, trimmed. */
-export function firstLine(a: Pick<StudentAnnouncement, 'body_text' | 'body_html'>): string {
-  const text = (a.body_text || (a.body_html || '').replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim();
-  return text.length > 140 ? `${text.slice(0, 139)}…` : text;
+/** The notice's first line for a row: its words as plain text, one line, cut at 140. */
+export function firstLine(a: Pick<StudentAnnouncement, 'body'>): string {
+  return firstLineOf(a.body, 140);
 }
 
 // The icons a kind may wear: the grid the admin picks from (08.13; Sam,

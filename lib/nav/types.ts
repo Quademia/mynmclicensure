@@ -82,7 +82,25 @@ export type IconName =
   | 'info'
   | 'video'
   | 'heart-pulse'
-  | 'baby';
+  | 'baby'
+  // the shared editor's toolbar and the editor page's way back (09.13, 2026-10-19)
+  | 'undo'
+  | 'redo'
+  | 'bold'
+  | 'italic'
+  | 'strikethrough'
+  | 'superscript'
+  | 'subscript'
+  | 'highlight'
+  | 'text-color'
+  | 'subheading'
+  | 'list-bulleted'
+  | 'list-numbered'
+  | 'callout'
+  | 'divider'
+  | 'button'
+  | 'clear-formatting'
+  | 'chevron-left';
 
 /** The nav row's icon. Every icon name is allowed; see IconName. */
 export type NavIcon = IconName;

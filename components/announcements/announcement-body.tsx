@@ -1,49 +1,41 @@
 // components/announcements/announcement-body.tsx
 //
-// One announcement body, sanitised at render as every legacy surface
-// did (lib/announcements/sanitise): the allow-list keeps paragraphs,
-// emphasis, lists, links (href and data-qa) and images; anything else
-// becomes its text. Client-only because the sanitiser uses the browser's
-// DOM; nothing renders until hydration, so the server never emits the
-// stored HTML. A click on a `data-qa="btn"` link inside the body reports
-// up (Tapped, 08.7). A link to a page inside the app (A4, 2026-10-18 — a
-// path such as /student/mock-exams, picked from the editor's list) opens
-// through the app's router, with no full reload, the button marked as
+// One notice's words, drawn by the shared renderer (09.13) from the
+// editor's document (08.14, 2026-10-19) — on the server with the page, so
+// the words arrive with it instead of after its scripts, which the old HTML
+// cleaner needed. A click on the notice's Button (`a[data-button]`)
+// reports up (Tapped, 08.7). A link to a page inside the app (A4 — a path
+// such as /student/mock-exams, picked from the editor's list) opens
+// through the app's router, with no full reload, the link marked as
 // pressed until the page arrives (a tap is never silent); a web address
 // opens a new tab.
 
 'use client';
 
-import { useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
-import { sanitiseHtml } from '@/lib/announcements/sanitise';
-import { isAppPath } from '@/lib/announcements/app-pages';
-
-const subscribeNever = () => () => {};
+import { RichRender } from '@/components/editor/rich-render';
+import { isAppPath } from '@/lib/editor/doc';
+import type { RichDoc } from '@/lib/editor/types';
 
 export function AnnouncementBody({
-  html,
+  doc,
   className,
   onButtonClick,
 }: {
-  html: string;
+  doc: RichDoc | null;
   className: string;
   onButtonClick?: () => void;
 }) {
   const router = useRouter();
-  const mounted = useSyncExternalStore(subscribeNever, () => true, () => false);
-  if (!mounted) return <div className={className} />;
-  const clean = sanitiseHtml(html);
-  if (!clean) return null;
+  if (!doc) return null;
   return (
     <div
       className={className}
-      dangerouslySetInnerHTML={{ __html: clean }}
       onClick={(e) => {
         const target = e.target as HTMLElement | null;
         const link = target?.closest('a') as HTMLAnchorElement | null;
         if (!link) return;
-        if (onButtonClick && link.matches('a[data-qa="btn"]')) onButtonClick();
+        if (onButtonClick && link.matches('a[data-button]')) onButtonClick();
         const href = link.getAttribute('href') || '';
         if (isAppPath(href) && !e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
           e.preventDefault();
@@ -51,6 +43,8 @@ export function AnnouncementBody({
           router.push(href);
         }
       }}
-    />
+    >
+      <RichRender doc={doc} />
+    </div>
   );
 }
