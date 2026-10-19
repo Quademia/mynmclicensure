@@ -170,6 +170,20 @@ built 2026-10-18; to build: 08.14, 08.15, 08.17, 08.18)*
     are for signed-in students only since 2026-10-18). Not taken: two
     tabs (B), a Publish step holding the settings (C), "See who" beside
     the reach (Sam: not for now). *(to build: 08.18)*
+  - **The buttons follow the notice's state** (the Status dropdown
+    goes): new or a draft — **Save draft** · **Publish** (a later start
+    date makes it **Schedule**, asking "Schedule for 25 Oct, to 412
+    students?"); live or scheduled — **Save changes** (reaches students at
+    once) and a ⋯ with **Move to drafts** and **Archive** (Archive asks
+    first); ended or archived — **Restore to drafts**. *(08.18)*
+  - **Preview** — a button at the top showing the notice as a student
+    sees it on a phone: the list's row, the opened notice (picture,
+    kind · date, the words, the button) and the Must-see pop-up when on.
+    *(08.18)*
+  - **Follow-up and Kinds stay side panels** on the list: Follow-up from a
+    row's numbers or its ⋯, Kinds from the list's Kinds. The editor links
+    to both: a live notice's **Follow-up** at the top, **Edit kinds**
+    beside the Kind picker, opening the same panels. *(08.17, 08.18)*
 - **The follow-up**: Reaches today · Seen · Tapped · Dismissed, each
   out of who it reaches, and the names behind each number, Not seen yet
   among them (with the last sign-in once 01.6 is built, until then the
