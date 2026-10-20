@@ -94,6 +94,7 @@ before then, and the old list's history, is in
 - ⏸ 04.18 Status and Published as one switch — at the admin redesign (Sam, 2026-10-13)
 - ⏸ 04.19 An admin's extra sitting for one student — when a support case asks
 - ⏸ 04.21 Replaced by 06.8 (pools, Sam 2026-10-15) — not built on its own. A paper or mock archived before its results date keeps its questions held back — today archiving releases them to the Quiz Builder (whose Learning mode shows the answers) and to packs, so the next group could see them; found while building 04.12 (2026-10-15), not built
+- ✅ 04.23 (unplanned) Save & Resume Later closes the Leave box first — it hid the saving screen — 2026-10-20
 - ✅ 04.20 Abandon back, on the sitting's own page — a quiet link under Resume on a paper's and a mock's card while a sitting is going; the app's confirm box, the sitting still counts toward sittings allowed; no migration — 2026-10-14
 - ⬜ G2 The daily challenge — 5 a day per programme, one course a day in turn, its own mode (storage ticked 10-08)
 - ⬜ Q19 The admin's preview says Preview — on the card and in the sitting
@@ -190,9 +191,9 @@ before then, and the old list's history, is in
 - ⬜ 09.4 Dark mode — after the above
 - ⬜ 09.5 The old token names retired once no page uses them
 - ⬜ 09.12 One switch — the announcements editor and the notification places (device-switch.tsx) draw their own
-- ⬜ 09.14 Please wait — a shared screen for waits of seconds, the 8 s slow note; first after Start and in the quiz
-- ⬜ 09.15 The welcome screen — navy (1C), on the way in through /router, while the first page loads
-- ⏸ 09.16 Please wait elsewhere — the Paystack return, the PDF, the sitting's grey card — only if a redesign needs it
+- ✅ 09.14 Please wait — a shared screen, the 8 s slow note; after Start and in the quiz's loader — 2026-10-20
+- ✅ 09.15 The welcome screen — navy (1C), on the way in through /router, while the first page loads — 2026-10-20
+- ⏸ 09.16 Please wait elsewhere — the Paystack return, the PDF, the sitting's grey card — if a redesign needs it
 - ⏸ 09.17 An iPhone's own opening screen navy — start-up pictures per iPhone size; later (Sam, 10-20)
 - ✅ 09.13 The shared rich-text editor (Tiptap) — each place its toolbar, one renderer on the server — 2026-10-20
 - ✅ 09.11 The page title — one line, teal fading to grey over 240px; subtitles below; tabs lineless — 2026-10-17

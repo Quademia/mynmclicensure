@@ -4,8 +4,10 @@
 // picture as app/icon.png; 192px made from it for the phone's launcher).
 // The icon opens the Dashboard (Sam): /router sends a signed-in student
 // there and anyone else to the sign-in page; with no signal the offline
-// app shows the packs on the phone instead (public/sw.js). The colours are
-// the top bar's white, so the phone's own bar matches it.
+// app shows the packs on the phone instead (public/sw.js). The phone's own
+// bar stays the top bar's white, so it matches the app; the background —
+// the phone's own opening screen, drawn before the app starts — is the
+// welcome screen's navy (09.15, Sam 2026-10-20), so the two read as one.
 
 import type { MetadataRoute } from 'next';
 
@@ -18,7 +20,7 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: '/router',
     scope: '/',
     display: 'standalone',
-    background_color: '#ffffff',
+    background_color: '#1e3a5f',
     theme_color: '#ffffff',
     icons: [
       { src: '/images/quademia-mark-192.png', sizes: '192x192', type: 'image/png' },

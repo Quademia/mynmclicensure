@@ -10,6 +10,10 @@
 //
 // Legacy painted a "Checking your session…" card while its script ran;
 // a server redirect has nothing to paint, so there is no markup here.
+// The dashboard it sends to carries ?welcome=1: this is the way in (the
+// installed app's icon, signing in), so the welcome screen shows over
+// that first page while it loads (09.15, Sam 2026-10-20; the signed-in
+// layout draws it).
 
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
@@ -29,7 +33,7 @@ export default async function RouterPage() {
   if (!profile || !profile.active) redirect(GATE_SIGNOUT_PATH);
 
   const role = (profile.role ?? '').toUpperCase();
-  if (role === 'ADMIN') redirect('/admin/dashboard');
-  if (role === 'STUDENT') redirect('/student/dashboard');
+  if (role === 'ADMIN') redirect('/admin/dashboard?welcome=1');
+  if (role === 'STUDENT') redirect('/student/dashboard?welcome=1');
   redirect(GATE_SIGNOUT_PATH);
 }

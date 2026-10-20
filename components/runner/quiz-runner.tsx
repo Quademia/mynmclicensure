@@ -69,6 +69,7 @@ import { ReportIssueDialog } from './report-issue';
 import { MessageUsDialog } from '@/components/messages/message-us';
 import { Icon } from '@/components/shell/icons';
 import { KindChip, QUESTION_TYPE_HUE } from '@/components/shell/chips';
+import { PleaseWait } from '@/components/shell/please-wait';
 import {
   chosenToStored,
   countAnswered,
@@ -785,6 +786,10 @@ export function QuizRunner({
   }
 
   async function saveAndExit() {
+    // the Leave box closes first, as Submit & Exit's does: it sits in the
+    // page's top layer, over the please-wait screen, which it hid until
+    // the next page came (walked 2026-10-20)
+    setExitOpen(false);
     setSaving('Saving your progress…');
     await flushSaves({ withTime: true });
     // the loader stays up until the next page takes over — cleared here,
@@ -1134,11 +1139,14 @@ export function QuizRunner({
   const timerColor = timerPercent <= 10 ? 'red' : timerPercent <= 20 ? 'amber' : '';
   const timerText = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
 
-  const loader = phase === 'init' || saving ? (
-    <div className="qa-loader">
-      <div className="loader-spinner" />
-      <div className="loader-msg">{saving && saving !== 'submitting' ? saving : 'Loading your quiz…'}</div>
-    </div>
+  // The please-wait screen (09.14, Sam 2026-10-20): on opening a sitting
+  // (the start card's own wait carries on into it, same words), and on
+  // Submit, Save & Exit and Submit & Exit until the next page takes over.
+  // Submit said "Loading your quiz…" until then. Not on a review: the
+  // server draws that, and the screen, drawn only in the browser, would
+  // flash over it for a moment.
+  const loader = (phase === 'init' && !reviewMode) || saving ? (
+    <PleaseWait message={saving === 'submitting' ? 'Submitting your answers…' : saving || 'Loading your quiz…'} />
   ) : null;
 
   // 04.12: submitted with its results held — the screen a reopen shows, in

@@ -180,6 +180,13 @@ above sit at the repo root; the audience grouping inside them is kept.
    (`components/shell/page-loading.tsx`) through its `loading.tsx` (see
    *Known Workarounds* for where one is needed). The admin and public
    pages' plain links are queued, not yet converted.
+7. **A wait of seconds that holds the whole screen uses the please-wait
+   screen** (`components/shell/please-wait.tsx`, 09.14, Sam 2026-10-20),
+   with the place's own words; its slow-connection note after 8 seconds
+   comes with it. A move between pages keeps the grey placeholder, and a
+   quick action its button's words ("Starting…"). It is portalled to
+   `<body>`, so an open `<dialog>` (the top layer) covers it: close the
+   dialog before showing it — Save & Exit's Leave box hid it (2026-10-20).
 
 ## Non-Negotiable Rules
 

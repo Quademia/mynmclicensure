@@ -34,12 +34,6 @@
 @media (max-width: 640px) { .runner .timer-label { display: none; } }
 .runner * { box-sizing: border-box; }
 
-/* ── Loader ── */
-.runner .qa-loader { display: flex; position: fixed; inset: 0; background: rgba(255, 255, 255, 0.92); z-index: 999; align-items: center; justify-content: center; flex-direction: column; gap: 14px; }
-.runner .loader-spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: runner-spin 0.8s linear infinite; }
-@keyframes runner-spin { to { transform: rotate(360deg); } }
-.runner .loader-msg { font-size: 14px; color: var(--text-muted); font-weight: 500; }
-
 /* ── Sticky header ── */
 .runner .runner-header { position: sticky; top: 0; z-index: 50; background: var(--primary); box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2); }
 .runner .header-top { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; gap: 10px; }

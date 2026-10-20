@@ -108,8 +108,179 @@ a:has(> .link-pending.is-pending) {
 
 @keyframes link-pending-spin { to { transform: rotate(360deg); } }
 
+/* ── Please wait (09.14, 2026-10-20) ─────────────────────────────── */
+
+/* A wait of seconds that holds the screen (components/shell/
+   please-wait.tsx): white, the Q in a spinning teal ring, the place's
+   line, the wordmark's words at the foot. Over the top bar (1100) and
+   its menu (1200). */
+.please-wait {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--surface);
+  text-align: center;
+}
+.pw-middle {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-20);
+  padding: 0 var(--space-24);
+}
+.pw-ring {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pw-ring::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 3px solid var(--border);
+  border-top-color: var(--brand-teal);
+  border-radius: var(--radius-pill);
+  animation: pw-spin 0.9s linear infinite;
+}
+.pw-mark { display: block; border-radius: var(--radius-pill); }
+.pw-message {
+  margin: 0;
+  font-size: var(--type-body-strong-size);
+  line-height: var(--type-body-strong-line);
+  font-weight: var(--type-body-strong-weight);
+  color: var(--brand-navy);
+}
+/* a second line sits close under the first */
+.pw-detail {
+  margin: calc(-1 * var(--space-12)) 0 0;
+  font-size: var(--type-field-size);
+  line-height: var(--type-field-line);
+  color: var(--ink-muted);
+}
+.pw-slow {
+  display: flex;
+  gap: var(--space-10);
+  max-width: 300px;
+  padding: var(--space-12) var(--space-16);
+  border-radius: var(--radius);
+  background: var(--brand-teal-pale);
+  text-align: left;
+  font-size: var(--type-field-size);
+  line-height: var(--type-field-line);
+  color: var(--ink);
+}
+.pw-slow svg { flex: none; margin-top: 2px; color: var(--brand-teal-hover); }
+.pw-slow p { margin: 0; }
+/* the wordmark's two lines (.wordmark-text, components.css), centred */
+.pw-foot { align-items: center; padding-bottom: 56px; }
+
+@keyframes pw-spin { to { transform: rotate(360deg); } }
+
+/* ── The welcome screen (09.15, 2026-10-20) ──────────────────────── */
+
+/* Navy, drawn over the first page's grey placeholder and only while it
+   is on screen: when the page arrives the placeholder goes and this
+   fades with it — before the page's scripts have even loaded. The
+   layout sends it only on the way in through /router (welcome-screen.tsx
+   takes it away for good once the page is in). The Q's centre sits at
+   43% of the height, where Android's own opening screen puts it with
+   the name beneath, so the two read as one screen. Over the please-wait
+   screen too. */
+.welcome {
+  position: fixed;
+  inset: 0;
+  z-index: 1600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--brand-navy);
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+}
+body:has(.page-loading) .welcome {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: none;
+}
+.welcome-top { flex: 0 0 calc(43% - 72px); }
+.welcome-mark {
+  display: block;
+  width: 144px;
+  height: 144px;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 0 0 6px var(--surface-on-navy-hover);
+}
+.welcome-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  margin-top: 28px;
+  padding: 0 var(--space-24);
+}
+.welcome-brand {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-on-navy-soft);
+}
+.welcome-name {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  color: var(--surface);
+}
+.welcome-tag {
+  margin-top: var(--space-6);
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line);
+  color: var(--ink-on-navy-soft);
+}
+.welcome-grow { flex-grow: 1; }
+.welcome-track {
+  position: relative;
+  overflow: hidden;
+  width: 128px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--ink-on-navy);
+  margin-bottom: 72px;
+}
+.welcome-track span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 48px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--surface);
+  animation: welcome-slide 1.4s ease-in-out infinite;
+}
+
+@keyframes welcome-slide {
+  0% { transform: translateX(-48px); }
+  100% { transform: translateX(128px); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pl-bone { animation: none; }
   a:has(> .link-pending.is-pending) { animation: none; opacity: 0.6; }
   .sidebar-nav .link-pending.is-pending { animation: none; }
+  .pw-ring::before { animation: none; }
+  .welcome-track span { animation: none; transform: translateX(40px); }
+  .welcome { transition: none; }
 }

@@ -84,7 +84,9 @@ Detail and history: `archive/product-plan/10-design-system.md`.
   in the quiz: after Start while the questions come, and Submit, Save &
   Exit, Submit & Exit. Another place takes it only if its redesign still
   needs a wait (Sam: the Paystack return, the PDF, the sitting's grey
-  card, 09.16). *(to build)*
+  card, 09.16). *(built 2026-10-20: 09.14 — `components/shell/
+  please-wait.tsx`, its look in `styles/loading.css`; Submit's words
+  became "Submitting your answers…".)*
 
 ### The shell
 
@@ -117,7 +119,10 @@ Detail and history: `archive/product-plan/10-design-system.md`.
   a page skips it. The phone's own opening screen turns navy to match
   (the manifest's background); the strip at the top of the phone stays
   white, like the top bar. An iPhone's own opening screen stays white
-  (09.17). *(to build)*
+  (09.17). *(built 2026-10-20: 09.15 — `/router` sends to the dashboard
+  with `?welcome=1`, the middleware passes it to the signed-in layout as
+  a header, `components/shell/welcome-screen.tsx` draws it after the page;
+  the stylesheet shows it only while the grey placeholder is on screen.)*
 - The sitting and the offline pack take no chrome.
 - **Two menus only**: the app's drawer and the public menu — plus, for
   students on a phone, the bottom bar and the sub-tab row, which are

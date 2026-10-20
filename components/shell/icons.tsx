@@ -677,6 +677,17 @@ function inner(name: IconName) {
       );
     case 'chevron-left':
       return <path d="m15 18-6-6 6-6" />;
+    // Lucide's signal, its two tallest bars faint: a weak connection
+    case 'signal':
+      return (
+        <>
+          <path d="M2 20h.01" />
+          <path d="M7 20v-4" />
+          <path d="M12 20v-8" />
+          <path d="M17 20V8" strokeOpacity="0.35" />
+          <path d="M22 4v16" strokeOpacity="0.35" />
+        </>
+      );
   }
 }
 

@@ -21,6 +21,11 @@
 // sitting is spent. So does one whose results are held (04.12, Sam
 // 2026-10-15), with the date beside the sitting line: it is where the
 // student learns the score will not follow the submit.
+//
+// While the questions come after Start or Resume — 100 to 180 of them,
+// on weak data the quiz's longest wait — the please-wait screen holds
+// the screen with "Loading your quiz…" (09.14, Sam 2026-10-20), the same
+// screen and words the runner opens with, so it is one wait to the eye.
 
 'use client';
 
@@ -33,6 +38,7 @@ import { modeOf, preflightBrief } from '@/lib/attempts/modes';
 import type { SessionPlay, StartCard } from '@/lib/attempts/runner-load';
 import { formatResultsAt } from '@/lib/quizzes/results-date';
 import { Icon } from '@/components/shell/icons';
+import { PleaseWait } from '@/components/shell/please-wait';
 import { QuizRunner } from './quiz-runner';
 import { RunnerError } from './runner-error';
 
@@ -136,6 +142,7 @@ export function SessionStart({ card, exit, previewMode }: { card: StartCard; exi
 
   return (
     <div className="runner session-start">
+      {pending ? <PleaseWait message="Loading your quiz…" /> : null}
       <Toast message={toast} onDismiss={() => setToast(null)} />
       <div className="runner-wrap">
         <div className="preflight-card">

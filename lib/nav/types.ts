@@ -100,7 +100,9 @@ export type IconName =
   | 'divider'
   | 'button'
   | 'clear-formatting'
-  | 'chevron-left';
+  | 'chevron-left'
+  // the please-wait screen's slow-connection note (09.14, 2026-10-20)
+  | 'signal';
 
 /** The nav row's icon. Every icon name is allowed; see IconName. */
 export type NavIcon = IconName;

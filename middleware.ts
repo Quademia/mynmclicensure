@@ -24,6 +24,11 @@ const AUTH_REQUIRED_PREFIXES = ['/router', '/student', '/admin', '/logout'];
 const AUTH_FORBIDDEN_PATHS = ['/login', '/register'];
 
 export async function middleware(request: NextRequest) {
+  // 09.15: /router sends the way in to its dashboard with ?welcome=1; a
+  // layout is not handed the address's query, so the signed-in layout
+  // reads this header instead and draws the welcome screen.
+  if (request.nextUrl.searchParams.has('welcome')) request.headers.set('x-qd-welcome', '1');
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
