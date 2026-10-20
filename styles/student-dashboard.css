@@ -108,6 +108,17 @@ a.sd-list-row:hover .sd-row-title { color: var(--accent); }
   .sd-carry .btn { flex: 1 0 auto; }
 }
 
+/* ── today's challenge (04.26; Sam, 2026-10-20: C) ──
+   One slim line under the title, the whole line a link; tinted before the
+   day's play, plain after it. */
+.sd-challenge { display: flex; align-items: center; gap: var(--space-10); min-height: 44px; margin-bottom: var(--space-12); padding: var(--space-8) var(--space-16); border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); color: var(--ink); font-size: var(--type-ui-size); text-decoration: none; }
+a.sd-challenge:hover { text-decoration: none; border-color: var(--brand-teal); }
+.sd-challenge-new { background: var(--brand-teal-pale); border-color: var(--brand-teal-pale); }
+.sd-challenge-icon { flex: none; display: flex; color: var(--brand-teal-hover); }
+.sd-challenge-text { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sd-challenge-text strong { font-weight: 700; color: var(--brand-navy); }
+.sd-challenge-go { flex: none; font-weight: 600; color: var(--accent); }
+
 /* ── New from Quademia (08.8; Sam, 2026-10-18: C) ──
    Under the welcome, only while something is new: up to two rows, each a
    link into the Announcements page; the dot, the square and the blue first

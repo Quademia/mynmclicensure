@@ -4,8 +4,9 @@
 //
 // Where sign-in lands, for every status (A). Top to bottom: the top card
 // (the student's next step — a trial's or a package's days and Carry on;
-// on the floor the recap and the free practice card) → today's challenge
-// (when 04 G2 lands) → the streak and questions mastered (05 G1a) → the
+// on the floor the recap and the free practice card), with today's
+// challenge as one slim line under the title above it (04.26; Sam
+// 2026-10-20: C) → the streak and questions mastered (05 G1a) → the
 // weakest topic → my courses → recent sittings; the news moved up (08.8;
 // Sam, 2026-10-18 — C): "New from Quademia" under the welcome, only while
 // something is new, and the Must-see notices popping up until confirmed
@@ -30,12 +31,14 @@ import { getRecentAttempts } from '@/lib/attempts/queries';
 import { getAnnouncementsForStudent } from '@/lib/announcements/queries';
 import { firstLine, isNew, longWhen, noticeTime } from '@/lib/announcements/display';
 import { getDashboardNumbers, getStudentReceipts } from '@/lib/dashboard/student/queries';
+import { getChallengeToday } from '@/lib/challenge/queries';
 import { lastSevenDayLetters, topCardFor } from '@/lib/dashboard/student/status';
 import { PageHeader } from '@/components/shell/page-header';
 import { NewFromQuademia } from '@/components/announcements/new-from-quademia';
 import { MustSee } from '@/components/announcements/must-see';
 import { InstallAppLine } from '@/components/install-app/install-app';
 import { ProfileNudge } from './profile-nudge';
+import { ChallengeLine } from './challenge-line';
 import { TopCardView } from './top-card';
 import { StreakCard } from './streak-card';
 import { WeakestCard } from './weakest-card';
@@ -50,13 +53,15 @@ export const metadata: Metadata = { title: 'Dashboard | MyNMCLicensure' };
 export default async function StudentDashboardPage() {
   const { supabase, profile } = await requireStudent();
 
-  const [accessMap, courses, receipts, attempts, announcements] = await Promise.all([
+  const [accessMap, courses, receipts, attempts, announcements, challenge] = await Promise.all([
     getStudentCourseAccess(supabase, profile.user_id),
     getCourses(supabase),
     getStudentReceipts(supabase, profile.user_id),
     getRecentAttempts(profile.user_id),
     // the notices and the student's marks in one read (A1, A2)
     getAnnouncementsForStudent(supabase),
+    // today's challenge and the student's play (04.26) — the paper made by the first to open it
+    getChallengeToday(profile.user_id),
   ]);
   // The Must-see notices not yet confirmed pop up, one after another
   // (08.16); the card holds the other new ones.
@@ -101,6 +106,7 @@ export default async function StudentDashboardPage() {
           phone's tab already say Dashboard; a line beneath is for later */}
       <PageHeader title={`Welcome back${profile.forename ? `, ${profile.forename}` : ''}`} />
 
+      <ChallengeLine today={challenge} />
       <NewFromQuademia items={newsItems} />
       {mustSee.length ? <MustSee notices={mustSee} dateOf={mustSeeDates} userId={profile.user_id} /> : null}
 

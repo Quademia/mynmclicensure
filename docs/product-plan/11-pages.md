@@ -20,7 +20,8 @@ opens it (00, The menu).
   student's next step** (Sam, 2026-10-04: A).
 - **The blocks, top to bottom** (Sam, 2026-10-04 — a redesign, not
   today's page; drawn in the chat): today's challenge as one slim line
-  under the title, with the rank line (Sam, 2026-10-20: C, drawn; 04) →
+  under the title, with the rank line (Sam, 2026-10-20: C, drawn; 04;
+  the line built 2026-10-20, 04.26 — the rank line comes with G1b) →
   the top card → the streak and questions
   mastered → your weakest topic, one tap into the builder (shown from
   20 answers, naming only a topic with at least 5 — Sam, 2026-10-04,
