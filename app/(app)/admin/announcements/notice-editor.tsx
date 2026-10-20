@@ -2,7 +2,10 @@
 //
 // The notice's own page (08.18; Sam, 2026-10-19 — layout A, mocked up and
 // approved 2026-10-20), shared by a new notice (/new) and each notice
-// (/[id]). The message on the left — title, kind (Edit kinds opens the
+// (/[id]). "‹ Announcements" above the shared page title (09.11) — "New
+// announcement" or "Edit announcement", not the notice's own title, which
+// the Title box below holds (Sam, 2026-10-20: B, like Messages' student
+// page) — then the state and the buttons. The message on the left — title, kind (Edit kinds opens the
 // Kinds panel), the words in the shared editor with the notices' toolbar
 // (08.14), the picture (08.10) — and the settings in a column on the
 // right, under the message on a phone: Who sees it (chips, + Narrow down,
@@ -32,6 +35,7 @@ import { useConfirm } from '@/lib/overlays/shared/confirm-dialog';
 import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { AppLink } from '@/components/shell/link-pending';
 import { Icon } from '@/components/shell/icons';
+import { PageHeader } from '@/components/shell/page-header';
 import { RichEditor } from '@/components/editor/rich-editor';
 import { docText, emptyDoc } from '@/lib/editor/doc';
 import { NOTICE_TOOLS, type RichDoc } from '@/lib/editor/types';
@@ -331,7 +335,8 @@ export function NoticeEditor({
     const who = reach === null ? 'the students it reaches' : `${reach} student${reach === 1 ? '' : 's'}`;
     const asks = askConfirm || mustSee ? " They'll be asked to confirm they've read it." : '';
     const popup = mustSee ? ' As Must-see, it pops up on their dashboard until they press "I\'ve read this".' : '';
-    const sending = sendDevices && !startsLater;
+    // a notice is sent once: one sent before, restored and published again, is not
+    const sending = sendDevices && !startsLater && !notice?.sent_at;
     const toDevices = !sending
       ? ''
       : devices === null
@@ -435,11 +440,15 @@ export function NoticeEditor({
       <Toast message={msg?.text ?? null} tone={msg?.tone} onDismiss={dismiss} />
       {confirmEl}
 
-      <div className="ann-ed-top">
+      <div className="ann-ed-head">
         <AppLink href={LIST} className="ann-back">
           <Icon name="chevron-left" />
           Announcements
         </AppLink>
+        <PageHeader title={notice ? 'Edit announcement' : 'New announcement'} />
+      </div>
+
+      <div className="ann-ed-top">
         <span className={`badge badge-${badge.tone}`}>{badge.word}</span>
         <span className="ann-ed-meta">{notice && dirty && state !== 'draft' ? 'Changes not saved' : meta}</span>
         {state === 'live' && notice ? (

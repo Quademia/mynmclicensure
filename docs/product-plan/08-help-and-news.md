@@ -223,7 +223,11 @@ built 2026-10-18; 08.14, 08.15, 08.17 and 08.18 built 2026-10-20)*
     the reach (Sam: not for now). *(built 2026-10-20: 08.18 — at
     /admin/announcements/new and /admin/announcements/<id>; a Named
     students chip shows names, read on the server; Send to phones came with
-    08.15 as "Also send to devices", after Ask to confirm.)*
+    08.15 as "Also send to devices", after Ask to confirm. The mockup's top
+    row gained the shared page title (09.11; Sam, 2026-10-20: B, like
+    Messages' student page): "‹ Announcements", then "New announcement"
+    or "Edit announcement" — not the notice's title, which the Title box
+    holds — then the state and the buttons.)*
   - **The buttons follow the notice's state** (the Status dropdown
     goes): new or a draft — **Save draft** · **Publish** (a later start
     date makes it **Schedule**, asking "Schedule for 25 Oct, to 412
