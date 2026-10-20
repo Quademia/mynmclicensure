@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-20, afternoon into evening — loading screens built (09.14 please-wait, 09.15 welcome); the daily challenge and leaderboards planned and drawn
+  - ↳ cloud file narrowed · Submit's wrong words · Leave box hid saving · Practice pool kept · answers on the day only · joining by choice · All time by average · suggested schools · groups later · home page open
+
 - 2026-10-20, morning into afternoon — announcements on devices (08.15), Profile's Notifications, the open app follows a notice (08.19), editor title
   - ↳ one yes for both · ask atop Announcements · wording A · published-now only · main switch + kinds · kinds grouped, By email later · clock parked 10.22 · claim then batched read · B over live line · title B · Edge silent · Chrome profiles
 
