@@ -74,6 +74,17 @@ Detail and history: `archive/product-plan/10-design-system.md`.
   weight renders as 700). The home page is set in the device's own font,
   where 800 is real.
 - **Toasts** for messages, top right, about 5 s, with ✕.
+- **Please wait** (Sam, 2026-10-19, drawn by a cloud session; placed
+  2026-10-20; 09.14) — for a wait of seconds that holds the whole
+  screen. Moving between pages keeps the grey placeholder, and a quick
+  action keeps its button's words ("Start" → "Starting…"). The Q in a
+  spinning teal ring, one line saying what is happening (the place's own
+  words), the wordmark's words at the foot; after 8 seconds, "Still
+  loading — your connection is slow. Please keep this page open." First
+  in the quiz: after Start while the questions come, and Submit, Save &
+  Exit, Submit & Exit. Another place takes it only if its redesign still
+  needs a wait (Sam: the Paystack return, the PDF, the sitting's grey
+  card, 09.16). *(to build)*
 
 ### The shell
 
@@ -97,6 +108,16 @@ Detail and history: `archive/product-plan/10-design-system.md`.
 - **The public bar**: Home · Premium Prep · Packages · Dashboard, one
   action (Sign in); on a phone a menu from the right; a footer with the
   year computed.
+- **The welcome screen** (Sam, 2026-10-19: 1C, navy; placed 2026-10-20;
+  09.15) — the Q, QUADEMIA, MyNMCLicensure and "NMC Ghana licensure exam
+  prep" on navy, a thin moving line beneath. Shown on the way in through
+  `/router` — the installed app's icon, and after signing in — on a phone
+  and a computer, to students and the admin; only while that first page
+  loads, then a gentle fade, never an added wait. A bookmark straight to
+  a page skips it. The phone's own opening screen turns navy to match
+  (the manifest's background); the strip at the top of the phone stays
+  white, like the top bar. An iPhone's own opening screen stays white
+  (09.17). *(to build)*
 - The sitting and the offline pack take no chrome.
 - **Two menus only**: the app's drawer and the public menu — plus, for
   students on a phone, the bottom bar and the sub-tab row, which are

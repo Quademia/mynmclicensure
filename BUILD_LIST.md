@@ -190,6 +190,10 @@ before then, and the old list's history, is in
 - ⬜ 09.4 Dark mode — after the above
 - ⬜ 09.5 The old token names retired once no page uses them
 - ⬜ 09.12 One switch — the announcements editor and the notification places (device-switch.tsx) draw their own
+- ⬜ 09.14 Please wait — a shared screen for waits of seconds, the 8 s slow note; first after Start and in the quiz
+- ⬜ 09.15 The welcome screen — navy (1C), on the way in through /router, while the first page loads
+- ⏸ 09.16 Please wait elsewhere — the Paystack return, the PDF, the sitting's grey card — only if a redesign needs it
+- ⏸ 09.17 An iPhone's own opening screen navy — start-up pictures per iPhone size; later (Sam, 10-20)
 - ✅ 09.13 The shared rich-text editor (Tiptap) — each place its toolbar, one renderer on the server — 2026-10-20
 - ✅ 09.11 The page title — one line, teal fading to grey over 240px; subtitles below; tabs lineless — 2026-10-17
 - ✅ 09.10 A row menu (three dots) — what a row allows, closed items in grey; on Learning History — 2026-10-17
