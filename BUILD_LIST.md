@@ -165,7 +165,7 @@ before then, and the old list's history, is in
 - ✅ 08.17 The admin's list redesigned — tabs Live, Scheduled, Drafts, Ended; quiet rows; the row menu — 2026-10-20
 - ✅ 08.18 The notice editor as its own page — message left, settings right; Narrow down; Publish asks — 2026-10-20
 - ✅ (unplanned) The Kinds and Follow-up panels above the top bar — it hid their title and ✕ — 2026-10-20
-- ⬜ 08.15 Announcements to devices — a tick in the editor, sent once when the notice goes live
+- ✅ 08.15 Announcements to devices — from Publish, once; one yes for both; Profile's main switch and kinds — 2026-10-20
 - ✅ A4 A button pointing inside the app, picked from a list — pages, courses, mocks; opens in the app — 2026-10-18
 - ✅ A3 The body stored once, no extra line break per edit — built with 08.14 — 2026-10-20
 - ✅ 08.2 The support desk — server only, five labels, Message us box, both pages; admin by student — 2026-10-17
@@ -188,7 +188,7 @@ before then, and the old list's history, is in
 - ⬜ 09.3 A content width limit above 1440px
 - ⬜ 09.4 Dark mode — after the above
 - ⬜ 09.5 The old token names retired once no page uses them
-- ⬜ 09.12 One switch — the announcements editor and the admin's notifications switch draw their own (10-17)
+- ⬜ 09.12 One switch — the announcements editor and the notification places (device-switch.tsx) draw their own
 - ✅ 09.13 The shared rich-text editor (Tiptap) — each place its toolbar, one renderer on the server — 2026-10-20
 - ✅ 09.11 The page title — one line, teal fading to grey over 240px; subtitles below; tabs lineless — 2026-10-17
 - ✅ 09.10 A row menu (three dots) — what a row allows, closed items in grey; on Learning History — 2026-10-17
@@ -222,4 +222,5 @@ before then, and the old list's history, is in
 - ⬜ 10.18 `db/schema.sql` and `db/rls.sql` brought up to date
 - ⬜ 10.19 A check on prod whether sharing the project slows it
 - ⏸ 10.20 The app's own offline page and a "You're offline" banner — Sam: later (09-29)
+- ⏸ 10.22 The app's clock — a timer for scheduled notices to devices, 02.3, D34, 10.9; with the first of them (10-20)
 - ⏸ 10.21 Paystack's live key on prod — waits on the company / Paystack account decision

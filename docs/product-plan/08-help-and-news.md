@@ -44,7 +44,7 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
   targeting; New Thread reaches one student (Sam, 2026-09-18).
 
 **Redesigned (Sam, 2026-10-18; drawn in the chat).** *(08.7–08.13 and A4
-built 2026-10-18; 08.14, 08.17 and 08.18 built 2026-10-20; to build: 08.15)*
+built 2026-10-18; 08.14, 08.15, 08.17 and 08.18 built 2026-10-20)*
 
 - **The page, like Messages**: the list, and a tap opens the notice —
   beside the list on a computer, the newest opening by itself; in its
@@ -131,8 +131,39 @@ built 2026-10-18; 08.14, 08.17 and 08.18 built 2026-10-20; to build: 08.15)*
   each course and its practice papers, each mock with its course; an
   in-app address is a path and opens inside the app; a link keeps only a
   web, email or in-app address — and 08.12; the editor without codes and
-  the page redesigned, 2026-10-20: 08.14, 08.17, 08.18. To build: devices
-  08.15.)*
+  the page redesigned, 2026-10-20: 08.14, 08.17, 08.18; devices, 2026-10-20:
+  08.15, below.)*
+- **Announcements on devices (Sam, 2026-10-20; drawn in the chat)** —
+  **Also send to devices** in How it shows: the notice's **title, with
+  its first line beneath** (a notice is not private, and on slow data the
+  notification carries the news), goes **once, from Publish, for a notice
+  starting now**, to the devices that said yes of the students it
+  reaches; a tap opens the notice; each notice its own (not replacing
+  the last), held a day for a phone with no signal. A later edit, or
+  drafts and back, sends nothing again. **A scheduled notice sends
+  nothing** — its switch locked off with the hint — since the app has
+  no clock to send it at its start (parked: 10). Publish's question
+  names the devices ("2 of their devices get it as a notification"); the
+  switch's hint counts them now; a sent notice says when it went. **One
+  yes covers both** of a student's kinds — our replies and important
+  news (the browser's Allow covers the whole app anyway); the ask says
+  both, under a sent message (08.5b) and **at the top of
+  Announcements**. **Profile holds the switches** until an account or
+  settings page exists: **one main switch, "Notifications on this
+  device"**, with each kind beneath it while on — When Quademia replies,
+  Important news; per device, remembered there; main off takes the
+  device off the list, both kinds off reads as main off, on again starts
+  with both. Later kinds join as rows **grouped by what the student
+  cares about** (one Reminders row for the daily challenge, a streak, a
+  package ending — not one per feature), each Sam's call, including
+  whether it starts on; optional emails, when they come, a "By email"
+  block below in the same pattern (receipts and sign-in links have no
+  switch). Not taken: news asking its own yes; the dashboard's card as a
+  third ask; "News from Quademia" or nothing of the notice as the
+  wording. *(built 2026-10-20: 08.15 — walked end to end on a production
+  build: Sam's Chrome as student1 turned on from Profile, Publish from the
+  pane as admin, the notification shown and its tap opening the notice;
+  news off on Profile, the next notice not sent there.)*
 - **The editor without codes (Sam, 2026-10-19)** — Tiptap, the shared
   editor (09), on MyNclex's version. The notices' toolbar: Undo, Redo ·
   Bold, Italic, Strikethrough, Superscript, Subscript · Highlight, Text
@@ -182,9 +213,9 @@ built 2026-10-18; 08.14, 08.17 and 08.18 built 2026-10-20; to build: 08.15)*
     are for signed-in students only since 2026-10-18). Not taken: two
     tabs (B), a Publish step holding the settings (C), "See who" beside
     the reach (Sam: not for now). *(built 2026-10-20: 08.18 — at
-    /admin/announcements/new and /admin/announcements/<id>; Send to phones
-    waits for 08.15, so the switch is not on the page yet; a Named
-    students chip shows names, read on the server.)*
+    /admin/announcements/new and /admin/announcements/<id>; a Named
+    students chip shows names, read on the server; Send to phones came with
+    08.15 as "Also send to devices", after Ask to confirm.)*
   - **The buttons follow the notice's state** (the Status dropdown
     goes): new or a draft — **Save draft** · **Publish** (a later start
     date makes it **Schedule**, asking "Schedule for 25 Oct, to 412
@@ -350,8 +381,11 @@ Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
     on that device again. The words say **device**, never phone — a
     student may be on a phone, a tablet or a computer (Sam, 2026-10-18).
     **Not now** hides it on that device for 7 days, then it comes back
-    after a send — there is no other switch for a student (the browser's
-    or device's settings turn it off). A Block: once, "Notifications are
+    after a send. *Since 08.15 (Sam, 2026-10-20) the card says "Get
+    notifications from Quademia · Our replies and important news…", one
+    yes saving both, the same card heads Announcements, and Profile holds
+    the student's switches (above, under Announcements); its last line
+    points there.* A Block: once, "Notifications are
     blocked on this device. You can allow them in your browser or device
     settings." An iPhone not on the Home Screen: "Want a notification
     when we reply? On iPhone, add the app to your Home Screen first",
@@ -411,9 +445,9 @@ Ticked by Sam 2026-10-18 for the redesign: `announcements` gains the
 kind, the picture, Must-see and the devices send; the new table
 `announcement_kinds`; the bucket `licensure-gh-announcement-images`.
 Built 2026-10-20 (ticked by Sam 2026-10-19): the body stored once, every
-notice deleted (08.14); `scope_audience` dropped (08.18). Still to tick at
-its build:
-the `announcement` kind on `notification_devices` (08.15).
+notice deleted (08.14); `scope_audience` dropped (08.18). Built 2026-10-20
+(ticked by Sam that day): the `announcement` kind on
+`notification_devices`, one yes saving both of a student's kinds (08.15).
 
 ## Open
 
@@ -424,14 +458,9 @@ the `announcement` kind on `notification_devices` (08.15).
   repeatedly miss" and "monitor improvement over time": since 05.5
   (2026-10-17) that is each sitting's report and, later, the course
   page's topics (05.6) — Sam's words, with the help page's redesign.
-- **Where else to offer notifications (08.5b)** — today a student is asked
-  only right after sending a message, so one who never writes is never
-  asked. Whether to offer it elsewhere too (the Messages page, Profile,
-  the dashboard), and how, is Sam's to decide later (2026-10-18). Mind the
-  rules already ruled: the browser asks only after a tap, a Block cannot
-  be asked again, and Not now holds for 7 days.
-- **Announcements on devices (08.15)** — whether a student's yes to
-  replies also brings announcements, or announcements ask their own yes
-  (with the item above); and whether a device notice shows the notice's
-  title (a notice is not private, unlike a message) or only "News from
-  Quademia".
+- **Where else to offer notifications (08.5b)** — ruled in part with 08.15
+  (Sam, 2026-10-20): the top of Announcements and Profile's switches, the
+  dashboard's card not. Whether more places ask (a later kind's own
+  page, say the daily challenge), each Sam's call. Mind the rules already
+  ruled: the browser asks only after a tap, a Block cannot be asked
+  again, and Not now holds for 7 days.

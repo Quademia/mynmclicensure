@@ -105,6 +105,16 @@ a student's sittings indexed by date (05 Q12, 2026-10-17).
 - The admin Attempts page reads at most 5,000 sittings — numbers past
   that are the newest 5,000's (05 moves it to database queries).
 
+*Parked (Sam, 2026-10-20):* **the app's clock** — a Cloudflare timer
+waking the app every few minutes, so work can happen at a set time with
+nobody on a page: a scheduled notice sent to devices as it goes live
+(08.15 sends only from Publish until then), and the jobs already queued —
+expiry reminders (02.3), the nightly payment sweep (D34), the purge
+(10.9). Built when the first of them is; walked on the dev site only.
+One send reaches a few hundred devices well inside Cloudflare's limits
+(10,000 outside calls a request on our plan, about 30 seconds after the
+answer); past that, a queue.
+
 ### Error and offline
 
 - A "couldn't load, try again" page — the app has none. *(to build)*
