@@ -505,15 +505,11 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `ts_iso` | When made |
 | `started_utc`, `ended_utc` | An exam's clock: started, ended |
 
-- *To build (04 G2) — ticked 2026-10-08:* a `source` value
-  `challenge` and a mode of its own (Untimed's screen, timed by the
-  server from Start to Submit, closed at its limit); a challenge sitting
-  names the day's draw, and one per student per day. Why: the daily
-  challenge (Sam, 2026-10-08).
-- *Needs Sam's tick before the build (05 G1b; Sam, 2026-10-20):* a
-  challenge sitting keeps the student's school when it was played. Why:
-  a challenge counts for the school the student was in, and a student
-  may move school.
+- The daily challenge does not use this table or `attempt_items` (Sam,
+  2026-10-20): its plays and answers have tables of their own (*The daily
+  challenge*, below), in place of the `challenge` source and mode ticked
+  here on 2026-10-08, and the school a challenge keeps (ticked the same
+  day) is on its play.
 - Indexed by student and date, newest first (`user_id`, `ts_iso`):
   the order Learning History lists a student's sittings in, twenty at a
   time, and its figures read them (05 Q12; ticked and built 2026-10-17).
@@ -541,6 +537,95 @@ table by table as each is next changed (AGENTS.md rule 9).
   its owner at all (04.12, 04.13, 2026-10-15: the policy asks
   `_my_sealed_attempt_ids()`); the report reads the rows with the service
   role for its summary.
+
+### The daily challenge — four tables *(to build: 04 G2)*
+
+Ticked by Sam 2026-10-20 ("go on"), in place of the draw ticked 2026-10-08
+and the `challenge` source and mode on `attempts`. Why: the challenge's
+rules — one paper a day for everyone, the server's clock on an untimed
+screen, answers open until midnight, voiding, the school — share nothing
+with the quiz engine's (results held, review settings, first mode,
+sittings allowed, the package's limits), so it is kept apart and the
+quiz engine is not touched; the questions are stored once for everyone
+instead of copied into every student's sitting (Sam's idea); and the
+feature comes out whole, as the leaderboard card does. No browser
+access to any of the four: read and written through the database's own
+functions. Not in Learning History, which reads `attempts` only.
+
+**`challenge_days` — the day's paper**, one per programme per day, made
+by the first student to open that day's challenge and fixed after.
+
+| Column | Holds |
+|---|---|
+| `challenge_id` | The paper's id (`CH_RM_20261020`) |
+| `day` | The date (UTC, Ghana's time) |
+| `program_id` | The programme → `programs` |
+| `course_id` | The course whose turn it is → `courses`; one of the programme's |
+| `created_utc` | When it was made |
+
+- One per programme per day (unique). The courses take turns in the
+  order the app lists them, by name — the one after the last paper's,
+  skipping a course with fewer Practice questions than the day needs; a
+  new course takes its place by name. With none able to fill a paper,
+  no row ("Back tomorrow").
+
+**`challenge_day_items` — the paper's questions, stored once**
+
+| Column | Holds |
+|---|---|
+| `challenge_id`, `position` | The paper and the question's place on it |
+| `item_id` | The question → `question_bank` |
+| The copy: `question_type`, `stem`, `option_a` … `option_f`, `fb_a` … `fb_f`, `correct`, `rationale`, `rationale_img`, `subject`, `maintopic`, `subtopic`, `difficulty`, `bloom_level`, `tags`, `marks`, `shuffle_options`, `version` | The question as it stood when the paper was made — everyone that day answers the same words |
+| `voided_utc` | Empty, or when the admin voided it |
+
+- Only published Practice-pool questions of the paper's course, each
+  once on a paper; the least recently drawn first, at random among
+  equals (this table is the record of what was drawn when). A question a
+  paper has used cannot be deleted from the bank — unpublished instead,
+  as a paper's.
+- The admin may **swap** a question (its copy replaced) until the first
+  play of that day; after that only **void** it, which re-marks every
+  play of that paper.
+
+**`challenge_plays` — one per student per day**
+
+| Column | Holds |
+|---|---|
+| `play_id` | The play's id |
+| `user_id` | Whose → `users` |
+| `day` | The day — one play per student per day (unique) |
+| `challenge_id` | The paper → `challenge_days` |
+| `school_id` | The student's school when they played → `schools`; empty for a school typed in (until suggested schools, 01) |
+| `seed` | The student's shuffle of the options |
+| `started_utc` | Start, by the server's clock |
+| `ends_utc` | When the time is up: Start + questions × `builder_minutes_per_question`, fixed at Start |
+| `submitted_utc` | When it ended |
+| `status` | `playing`, `submitted` or `time_up` |
+| `time_taken_s` | Start to the end, by the server — the boards' time |
+| `right`, `out_of` | "4 of 5 right"; re-marked when a question is voided |
+
+- A play still `playing` past `ends_utc` is closed as `time_up` on what
+  was answered when it is next read — no clock needed. Why `school_id`:
+  a challenge counts for the school the student was in, and a student may
+  move school (05 G1b).
+
+**`challenge_answers` — a play's answer lines**
+
+| Column | Holds |
+|---|---|
+| `play_id`, `position` | The play, and the question's place on the paper |
+| `item_id` | The question → `question_bank`, for the streak and mastered |
+| `chosen` | The student's choice |
+| `flagged` | Flagged to come back to |
+| `is_correct` | Marked at Submit against the paper (the same marking as a quiz's: a SATA right only when exactly right) |
+| `time_spent_s`, `answered_utc` | Seconds spent on it, and when |
+
+- No copy of the question or its answer key — they are on the paper.
+- The dashboard's streak, questions met and mastered, and weakest topic
+  count these with `attempt_items`, through one list in the database of
+  every answer a student gave, so no count can miss them (05).
+- The questions, answers and explanations reach the student after Submit
+  until midnight of the day, then nothing (04).
 
 ---
 
@@ -771,9 +856,11 @@ table by table as each is next changed (AGENTS.md rule 9).
   a typed list of known settings with their bounds; the unused
   `builder_default_questions` dropped. Why: today any signed-in account
   reads every setting, and any text is accepted for any key.
-- *To build (04 G2) — ticked 2026-10-08:* a setting for the daily
-  challenge's number of questions, 5 to start; its time limit uses
-  `builder_minutes_per_question` (Sam, 2026-10-08).
+- *To build (04 G2) — ticked 2026-10-08, named 2026-10-20:*
+  `challenge_questions`, the daily challenge's number of questions, 5 to
+  start, 1 to 20, one for every programme; a change applies from the next
+  day's paper. Its time limit uses `builder_minutes_per_question` (Sam,
+  2026-10-08).
 - `offline_packs_per_course` retired (07.1, 2026-10-15): the package
   says how many packs per course.
 - `offline_checkin_days` (07.3, 2026-10-15) — how many days a phone keeps
@@ -811,11 +898,9 @@ table by table as each is next changed (AGENTS.md rule 9).
   admin removes leaves the profile itself (`users.avatar_url`), so no
   mark here. No browser access; read and written through the database's
   own functions.
-- **The daily challenge's draw** — *ticked 2026-10-08 (04 G2)*: one
-  row per programme per day — the date, the programme, the course, the
-  questions in order, and any voided — made by the first student to
-  open that day's challenge and fixed after. Read only through the
-  database's own functions; no browser access.
+- **The daily challenge's draw** — ticked 2026-10-08, now
+  `challenge_days` and `challenge_day_items` (Practice, 04 — *The daily
+  challenge*, ticked 2026-10-20).
 
 ## The database's own functions
 

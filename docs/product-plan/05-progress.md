@@ -241,9 +241,10 @@ live.
 - Q13 — none.
 - G1a — none.
 - G1b — a table of its own, a leaderboard card per student (in place
-  of the two columns on `users` planned 2026-10-04), and the school kept
-  on each challenge sitting: written in 12, needs Sam's tick before the
-  build.
+  of the two columns on `users` planned 2026-10-04): written in 12, needs
+  Sam's tick before the build. The school kept on each challenge play
+  was ticked with the challenge's tables (`challenge_plays`, 12; Sam,
+  2026-10-20).
 - G3 — a small table remembering which "New achievement!" has been
   shown: needs Sam's tick at the build.
 

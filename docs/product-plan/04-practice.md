@@ -291,18 +291,34 @@ live.
   number applies from the next day's draw.
 - **The draw, made once a day**, by the first student to open it, and
   kept: the day, the programme, the course, the questions in order.
-  - **One course a day**, the programme's own courses in their listed
-    order, in turn. A General Paper is one of those courses only where
-    the programme has one; no draw is shared between programmes (a
-    programme may lack a General Paper or have its own).
-  - A course with fewer free questions than the day needs is skipped;
-    if none has enough, no challenge that day ("Back tomorrow").
+  - **One course a day**, the programme's own courses in turn, in the
+    order the app lists them — by name (Sam, 2026-10-20); a new course
+    takes its place by name. A General Paper is one of those courses
+    only where the programme has one; no draw is shared between
+    programmes (a programme may lack a General Paper or have its own).
+  - A course with fewer Practice questions than the day needs is
+    skipped; if none has enough, no challenge that day ("Back
+    tomorrow").
   - Published, in the Practice pool (so never a paper's or a mock's,
     06.8); the least recently drawn first, at random among equals, so a
     question returns as late as the pool allows.
   - The same order for everyone; the options shuffled per student.
   - An admin may swap a question before anyone has played that day;
     after that, void it — it leaves every score.
+- **Kept apart from the quizzes** (Sam, 2026-10-20; the tables in 12):
+  a challenge is not a sitting — it has its own plays and answers, so
+  papers, mocks and the builder are untouched. The day's questions are
+  stored once, on the day's paper, for everyone (Sam's idea, in place of
+  a copy in every student's sitting); a play's answer lines say what was
+  chosen and are marked against the paper. A question a paper has used
+  is unpublished, never deleted, as a paper's. One number of questions
+  for every programme.
+- **Built first without the leaderboards** (Sam, 2026-10-20): the
+  challenge plays, marks and shows "4 of 5 right" on its own; the join
+  offer, the start screen's leaderboards box and the results' rank lines
+  come with the leaderboards (05 G1b). Every play keeps its school and
+  time from the first day, and past challenges count once a student
+  joins.
 - **Its own mode, Challenge mode** (named 2026-10-20): Untimed
   practice's screen — a clock counting up, move freely, change answers
   until Submit, the answers and rationales straight after Submit.
