@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-10-17. Rules for **any** assistant working in this
+Last updated: 2026-10-20. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What the app is
@@ -287,7 +287,9 @@ above sit at the repo root; the audience grouping inside them is kept.
   fixed` with no error. The flip side: a portalled dialog sits outside
   the surface's wrapper, so the surface's scoped rules (`.runner …`) do
   not reach it — its own rules are written unscoped (03 Q18's results
-  pop-up, 2026-09-27).
+  pop-up, 2026-09-27). A portalled panel that is not a `<dialog>` also
+  needs a `z-index` above the top bar's 1100, or the bar hides its title
+  and ✕ (the announcements' side panels at 101, fixed 2026-10-20).
 - **What a Server Component hands a client component is in the page**,
   rendered or not: the props are serialised into the HTML the browser
   receives. A screen that must not show something — a sitting's
@@ -691,6 +693,23 @@ above sit at the repo root; the audience grouping inside them is kept.
   database refuses a paper or mock listing another pool's question and a
   builder sitting holding one; nothing is worked out from which papers
   or mocks list a question.
+
+- **Rich text is the shared editor's document, never HTML** (09.13,
+  2026-10-20): Tiptap's JSON, written in `components/editor/rich-editor.tsx`
+  with the place's tools, cleaned on save by `cleanDoc()` (`lib/editor/doc.ts`)
+  to those tools, and drawn by `RichRender` — on the server, with no
+  `innerHTML`. Colours are kept by name and mapped to tokens in
+  `styles/editor.css`. A new place picks its tools; it never stores HTML.
+- **Every Tiptap part is pinned to one version** in `package.json` — the
+  dependencies and the `overrides` together. Left alone, npm installed newer
+  copies of Tiptap's core under the starter kit, and two cores fail the
+  types (and the editor). After any Tiptap change, `npm ls @tiptap/core`
+  must show one version (2026-10-20).
+- **A database check passes on null**: a check on a jsonb key —
+  `body ->> 'type' = 'doc'` — lets a document without the key through.
+  Wrap each part in `coalesce` (the proof run caught it, 2026-10-20). In a
+  proof script, hand a JSON string to `$1::text::jsonb`, not `$1::jsonb`,
+  which postgres.js encodes a second time.
 
 - **Some files here have mixed line endings** (CRLF and LF together), so a
   scripted multi-line find-and-replace that contains `\n` can match

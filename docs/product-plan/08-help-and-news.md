@@ -44,7 +44,7 @@ Detail and history: `archive/product-plan/05-announcements.md` (A1–A4),
   targeting; New Thread reaches one student (Sam, 2026-09-18).
 
 **Redesigned (Sam, 2026-10-18; drawn in the chat).** *(08.7–08.13 and A4
-built 2026-10-18; to build: 08.14, 08.15, 08.17, 08.18)*
+built 2026-10-18; 08.14, 08.17 and 08.18 built 2026-10-20; to build: 08.15)*
 
 - **The page, like Messages**: the list, and a tap opens the notice —
   beside the list on a computer, the newest opening by itself; in its
@@ -130,8 +130,9 @@ built 2026-10-18; to build: 08.14, 08.15, 08.17, 08.18)*
   08.13, 08.8, A4 — the Link and Button boxes list the student's pages,
   each course and its practice papers, each mock with its course; an
   in-app address is a path and opens inside the app; a link keeps only a
-  web, email or in-app address — and 08.12. To build: the editor without
-  codes 08.14, devices 08.15, the page redesigned 08.17 and 08.18.)*
+  web, email or in-app address — and 08.12; the editor without codes and
+  the page redesigned, 2026-10-20: 08.14, 08.17, 08.18. To build: devices
+  08.15.)*
 - **The editor without codes (Sam, 2026-10-19)** — Tiptap, the shared
   editor (09), on MyNclex's version. The notices' toolbar: Undo, Redo ·
   Bold, Italic, Strikethrough, Superscript, Subscript · Highlight, Text
@@ -141,7 +142,10 @@ built 2026-10-18; to build: 08.14, 08.15, 08.17, 08.18)*
   in the shared editor for the questions. The words are stored once, as
   the editor's document, and drawn by the server; saving keeps only the
   toolbar's pieces. Every notice there is is deleted (Sam: none reaches
-  anyone). The character count stays. *(to build: 08.14)*
+  anyone). The character count stays. *(built 2026-10-20: 08.14 — the
+  shared editor and renderer, 09.13; the notice's Button is the student
+  pages' navy, 44px tall, where the mockup drew it teal; a link or Button
+  to a page in the app opens inside it.)*
 - **The admin's page redesigned (Sam, 2026-10-19; drawn in the chat;
   mocked up and approved 2026-10-20 — the editor on a computer and a
   phone, the check before Publish, Preview, the list and Follow-up:
@@ -156,7 +160,10 @@ built 2026-10-18; to build: 08.14, 08.15, 08.17, 08.18)*
     (09.10): Edit, Follow-up, Archive. A tap on the row opens the
     editor; on the numbers, Follow-up. No Duplicate. On a phone a row
     stacks and the tabs wrap. Not taken: two panes, the follow-up beside
-    the list (B). *(to build: 08.17)*
+    the list (B). *(built 2026-10-20: 08.17 — Kinds and + New
+    announcement sit on a row under the page title, as the shared title
+    has no place for buttons beside it; the list opens on Live, or on the
+    first tab with something in it.)*
   - **The editor, its own page (A)** — a new notice and each notice at
     its own address, in place of the side panel (Sam asked: a page, not a
     pop-up — Back, refresh and a link work; room for the toolbar; a
@@ -173,21 +180,28 @@ built 2026-10-18; to build: 08.14, 08.15, 08.17, 08.18)*
     unsaved changes asks first. **The Audience setting goes** (notices
     are for signed-in students only since 2026-10-18). Not taken: two
     tabs (B), a Publish step holding the settings (C), "See who" beside
-    the reach (Sam: not for now). *(to build: 08.18)*
+    the reach (Sam: not for now). *(built 2026-10-20: 08.18 — at
+    /admin/announcements/new and /admin/announcements/<id>; Send to phones
+    waits for 08.15, so the switch is not on the page yet; a Named
+    students chip shows names, read on the server.)*
   - **The buttons follow the notice's state** (the Status dropdown
     goes): new or a draft — **Save draft** · **Publish** (a later start
     date makes it **Schedule**, asking "Schedule for 25 Oct, to 412
     students?"); live or scheduled — **Save changes** (reaches students at
     once) and a ⋯ with **Move to drafts** and **Archive** (Archive asks
-    first); ended or archived — **Restore to drafts**. *(08.18)*
+    first); ended or archived — **Restore to drafts**. Each saves what is
+    on the page with the status it means. *(built 2026-10-20: 08.18)*
   - **Preview** — a button at the top showing the notice as a student
     sees it on a phone: the list's row, the opened notice (picture,
     kind · date, the words, the button) and the Must-see pop-up when on.
-    *(08.18)*
+    *(built 2026-10-20: 08.18 — three tabs in the shared dialog, what is on
+    the page whether saved or not)*
   - **Follow-up and Kinds stay side panels** on the list: Follow-up from a
     row's numbers or its ⋯, Kinds from the list's Kinds. The editor links
     to both: a live notice's **Follow-up** at the top, **Edit kinds**
-    beside the Kind picker, opening the same panels. *(08.17, 08.18)*
+    beside the Kind picker, opening the same panels. *(built 2026-10-20:
+    08.17, 08.18 — both panels now open above the top bar, which had hidden
+    their title and ✕)*
 - **The follow-up**: Reaches today · Seen · Tapped · Dismissed, each
   out of who it reaches, and the names behind each number, Not seen yet
   among them (with the last sign-in once 01.6 is built, until then the
@@ -395,8 +409,9 @@ Written on the tables in `12-tables.md`, all ticked 2026-09-18:
 Ticked by Sam 2026-10-18 for the redesign: `announcements` gains the
 kind, the picture, Must-see and the devices send; the new table
 `announcement_kinds`; the bucket `licensure-gh-announcement-images`.
-Ticked by Sam 2026-10-19: the body stored once, every notice deleted
-(08.14); `scope_audience` dropped (08.18). Still to tick at its build:
+Built 2026-10-20 (ticked by Sam 2026-10-19): the body stored once, every
+notice deleted (08.14); `scope_audience` dropped (08.18). Still to tick at
+its build:
 the `announcement` kind on `notification_devices` (08.15).
 
 ## Open
@@ -419,8 +434,3 @@ the `announcement` kind on `notification_devices` (08.15).
   (with the item above); and whether a device notice shows the notice's
   title (a notice is not private, unlike a message) or only "News from
   Quademia".
-- **Small things offered on 2026-10-18, not ruled — to settle as 08.17
-  and 08.18 are built**: a proper pin icon on the admin's rows; the
-  editor's Ask students to confirm looking locked (greyed) while Must-see
-  holds it on — today only its hint says so; "keep it rare **and
-  short**" in the Must-see hint.

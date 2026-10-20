@@ -58,8 +58,12 @@ Detail and history: `archive/product-plan/10-design-system.md`.
   things such as the questions"). Each place picks its toolbar; the words
   are stored as the editor's document and drawn by one renderer, on the
   server, keeping only what that place allows; colours are the app's own.
-  First the notices (08.14), then the questions. *(to build: 09.13, with
-  08.14)*
+  First the notices (08.14), then the questions. *(built 2026-10-20:
+  09.13 — `components/editor/rich-editor.tsx` and `rich-render.tsx`,
+  `lib/editor/` (the document, the save's clean-up, the custom pieces),
+  `styles/editor.css`; every Tiptap part pinned to one version in
+  `package.json`'s overrides; a place sizes the words with `--rt-size`,
+  `--rt-line`, `--rt-ink`.)*
 - **Name circle** — the photo, else initials on the teal-navy blend;
   the logo where Quademia speaks.
 - **Icons** — a 16px Lucide outline set in `components/shell/icons.tsx`;

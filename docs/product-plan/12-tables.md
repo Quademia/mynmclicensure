@@ -574,7 +574,8 @@ table by table as each is next changed (AGENTS.md rule 9).
 | Column | Holds |
 |---|---|
 | `announcement_id` | The notice's id |
-| `title`, `body_html`, `body_text` | The title; the body as written and as plain text |
+| `title` | The title |
+| `body` | The words: the shared editor's document (Tiptap's JSON, 09.13), checked by the database to be one and under 64 KB |
 | `kind` | The notice's kind, a name from `announcement_kinds`; News when none is picked |
 | `picture_path` | Where its picture sits in the bucket `licensure-gh-announcement-images` (the list's square and the opened notice's size); empty when none |
 | `status` | `draft`, `active` or `archived` |
@@ -583,30 +584,27 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `dismissible` | Whether ✕ is offered |
 | `must_see` | Also pops up once on the dashboard (08.8) |
 | `send_to_devices`, `sent_at` | Also sent as a device notice; when it went, so it goes once, when the notice goes live (08.15) |
-| `scope_audience` | `ALL` or `STUDENTS` |
 | `scope_programs`, `scope_courses`, `scope_level`, `scope_subscription_kind`, `scope_product_ids`, `scope_cohort`, `scope_user_ids` | Who it is for (lists, the subscription kind `PAID`, `TRIAL` or `FREE`); a student must match every scope set; a course scope reaches whoever has held one of its courses (08.1) |
 | `created_at` | When made |
 
 - Built 2026-10-18 (A1, ticked 2026-09-18; the redesign's columns ticked
   by Sam 2026-10-18; `20261018120000_announcements_floor.sql`): read only
   through `announcements_for_me()` — every scope checked in the database,
-  the named students never leaving the server; the status, audience and
+  the named students never leaving the server; the status and
   subscription-kind words checked; `scope_level` a list; `kind` keyed to
   `announcement_kinds` on its name, on update cascade.
-- *Ticked by Sam 2026-10-19, to build (08.14):* `body_html` and
-  `body_text` give way to one `body` — the notice's words as the editor's
-  own document (Tiptap's; the shared editor, 09), which the database
-  checks is one and under 64 KB; the server keeps only the pieces the
-  notices' toolbar has. Every notice there is is deleted first, its marks
-  with it (Sam: "we will assume there is none as it reaches no one";
-  going live starts announcements empty anyway, 10). Why: one copy, no
-  extra line break per save, and the words drawn by the server with the
-  page rather than after its scripts load.
-- *Ticked by Sam 2026-10-19, to build (08.18):* `scope_audience`
-  dropped — the editor's Audience setting goes (notices are for
-  signed-in students since 2026-10-18). Every notice behaves as
-  Everyone did: the students its scopes match, and a signed-in admin
-  sees it too.
+- Built 2026-10-20 (08.14 and 08.18, ticked by Sam 2026-10-19;
+  `20261020001500_announcement_body.sql`): `body_html` and `body_text`
+  gave way to one `body`, the editor's own document; the save keeps only
+  the pieces the notices' toolbar makes (`lib/editor/doc.ts`). Every
+  notice there was was deleted first, its marks with it (Sam: "we will
+  assume there is none as it reaches no one"; going live starts
+  announcements empty anyway, 10). `scope_audience` dropped with the
+  Audience setting (notices are for signed-in students since
+  2026-10-18): every notice reaches whoever its other scopes match, a
+  signed-in admin too; `notice_scope_ok()` lost its first argument and
+  its callers were made again. Why: one copy, no extra line break per
+  save (A3), and the words drawn by the server with the page.
 - Built 2026-10-18 (08.16, ticked by Sam that day;
   `20261018220000_announcement_confirm.sql`): `ask_confirm` — yes or
   no: the opened notice shows "I've read this"; Must-see always asks
