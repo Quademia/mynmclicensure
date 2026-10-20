@@ -19,6 +19,12 @@
 // (04.12, Sam 2026-10-15: "pop-up B"): the date they come out instead of
 // the score, what is known without the key (the mode, the time, how many
 // were answered), and the way back — no review, no report, no retake.
+//
+// ChallengeResultsPopup is the daily challenge's (04.25; Sam 2026-10-20: A,
+// drawn): "Challenge done" or "Time is up", the right answers as a count —
+// no percentage, no grade word — the time, a dot per question that opens
+// it, and "Answers stay open until midnight"; See answers and the way back.
+// No report and no retake. The leaderboards' rank lines come with G1b.
 
 'use client';
 
@@ -107,6 +113,73 @@ export function ResultsPopup({
               <Icon name="refresh" />{retake.pending ? 'Starting…' : 'Retake'}
             </button>
           ) : null}
+          <button type="button" className="btn btn-ghost" onClick={exit.onClick}>{exit.label}</button>
+        </div>
+      </div>
+    </Dialog>
+  );
+}
+
+export type ChallengeDot = { n: number; mark: 'right' | 'wrong' | 'unanswered' | 'voided' };
+
+const DOT_WORDS: Record<ChallengeDot['mark'], string> = {
+  right: 'right',
+  wrong: 'wrong',
+  unanswered: 'not answered',
+  voided: 'voided — not counted',
+};
+
+export type ChallengeSummary = {
+  /** "Challenge done", or "Time is up". */
+  heading: string;
+  right: number;
+  /** The questions counted — a voided one out. */
+  outOf: number;
+  timeTakenS: number | null;
+  dots: ChallengeDot[];
+};
+
+export function ChallengeResultsPopup({
+  open,
+  summary,
+  onJump,
+  onAnswers,
+  onClose,
+  exit,
+}: {
+  open: boolean;
+  summary: ChallengeSummary;
+  /** A dot: the answers, at that question (1-based). */
+  onJump: (n: number) => void;
+  onAnswers: () => void;
+  onClose: () => void;
+  exit: { label: string; onClick: () => void };
+}) {
+  const s = summary;
+  return (
+    <Dialog open={open} onClose={onClose} title={s.heading}>
+      <div className="results-pop challenge-pop">
+        <div className="challenge-pop-count">
+          <span className="num">{s.right}</span> of {s.outOf} right
+        </div>
+        <div className="challenge-pop-time">
+          <Icon name="timer" />
+          {formatSeconds(s.timeTakenS)}
+        </div>
+        <ul className="challenge-pop-dots" aria-label="Your answers">
+          {s.dots.map((d) => (
+            <li key={d.n}>
+              <button type="button" className={`challenge-dot ${d.mark}`} aria-label={`Question ${d.n}: ${DOT_WORDS[d.mark]}`} onClick={() => onJump(d.n)}>
+                {d.n}
+              </button>
+            </li>
+          ))}
+        </ul>
+        <p className="challenge-pop-note">Answers stay open until midnight.</p>
+        <div className="dlg-actions stack">
+          <button type="button" className="btn btn-primary" onClick={onAnswers}>
+            <Icon name="book-open" />See answers
+          </button>
           <button type="button" className="btn btn-ghost" onClick={exit.onClick}>{exit.label}</button>
         </div>
       </div>

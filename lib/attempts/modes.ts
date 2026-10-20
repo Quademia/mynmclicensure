@@ -25,8 +25,8 @@ import { ATTEMPT_MODES, type AttemptMode } from './types';
 export type ModeGroup = 'study' | 'exam';
 
 export type ModeDef = {
-  /** The stored code (attempts.mode). */
-  code: AttemptMode;
+  /** The stored code (attempts.mode); CHALLENGE is the daily challenge's, which keeps its own plays. */
+  code: AttemptMode | 'CHALLENGE';
   group: ModeGroup;
   /** "Study" / "Exam" — the heading the mode sits under. */
   groupLabel: string;
@@ -34,8 +34,12 @@ export type ModeDef = {
   name: string;
   /** Where a mode is named in full: "Study · Learning". */
   fullName: string;
-  /** A wall clock runs from the server-stamped start, whether the student is there or not. */
-  clock: 'none' | 'wall';
+  /**
+   * A wall clock runs from the server-stamped start, whether the student is
+   * there or not. `up` is the same clock and limit shown counting up — the
+   * daily challenge's (04 G2).
+   */
+  clock: 'none' | 'wall' | 'up';
   /** When the answer and its rationale show: straight after each question, or at the end. */
   feedback: 'each' | 'end';
   /** Free: any question, in any order. Forward: one at a time, no going back (the database holds it). */
@@ -154,6 +158,42 @@ export const MODES: Record<AttemptMode, ModeDef> = {
     },
     skipKey: 'qa_skip_preflight_sequential',
   },
+};
+
+/**
+ * The daily challenge's mode (04 G2; named by Sam 2026-10-20): Untimed
+ * practice's screen — move freely, change answers until Submit, the answers
+ * and rationales straight after — with the server's clock from Start, shown
+ * counting up to its limit, where what is answered is submitted. Not one of
+ * a sitting's four: the challenge keeps its own plays (04.24), so it is
+ * offered nowhere a mode is chosen and modeOf() never returns it — the
+ * challenge's page hands it to the quiz screen.
+ */
+export const CHALLENGE_MODE: ModeDef = {
+  code: 'CHALLENGE',
+  group: 'study',
+  groupLabel: 'Study',
+  name: 'Challenge mode',
+  fullName: 'Challenge mode',
+  clock: 'up',
+  feedback: 'end',
+  nav: 'free',
+  brief: 'The clock starts when you press Start and keeps running if you leave. Move between the questions and change your answers until you submit; the answers and explanations come straight after.',
+  card: '',
+  words: {
+    listStart: 'Play',
+    listResume: 'Resume',
+    title: "Today's challenge",
+    start: 'Start',
+    resume: 'Resume',
+    starting: 'Starting…',
+    submit: 'Submit',
+    reviewBanner: 'Your answers — open until midnight.',
+    flaggedEmptySub: 'Flag questions during the challenge, then switch back here to see only those.',
+    exitTitle: 'Leave the challenge?',
+    exitText: 'Your answers are saved, and the clock keeps running. Come back before it runs out — when the time is up, what you have answered is submitted.',
+  },
+  skipKey: 'qa_skip_challenge',
 };
 
 /** Every mode in the order they are offered: Study's, then Exam's. */

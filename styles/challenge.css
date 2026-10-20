@@ -1,0 +1,90 @@
+/* styles/challenge.css — the daily challenge's own pieces (04.25), on the
+   quiz screen's look (styles/runner.css): the start screen's course line
+   and its five rules, and the results pop-up's count, time and dots. Tokens
+   only. The pop-up is portalled to <body>, so its rules are not under
+   .runner (AGENTS.md: a portalled dialog's rules are written unscoped). */
+
+/* ── the start screen ── */
+.runner .challenge-start-course {
+  font-size: var(--type-field-size);
+  color: var(--ink-muted);
+  margin: calc(-1 * var(--space-4)) 0 var(--space-16);
+}
+.runner .challenge-rules {
+  list-style: none;
+  margin: 0 0 var(--space-8);
+  padding: 0;
+  display: grid;
+  gap: var(--space-10);
+}
+.runner .challenge-rules li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-10);
+  font-size: var(--type-field-size);
+  line-height: 1.5;
+  color: var(--ink);
+}
+.runner .challenge-rule-icon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-pill);
+  background: var(--brand-teal-pale);
+  color: var(--brand-teal-hover);
+}
+
+/* ── the results pop-up ── */
+.challenge-pop { padding-top: var(--space-4); }
+.challenge-pop-count {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.challenge-pop-count .num {
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--brand-navy);
+}
+.challenge-pop-time {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  margin: var(--space-8) 0 var(--space-16);
+  font-size: var(--type-field-size);
+  color: var(--ink-muted);
+}
+.challenge-pop-dots {
+  list-style: none;
+  margin: 0 0 var(--space-12);
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-8);
+}
+.challenge-dot {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--badge-neutral-border);
+  background: var(--badge-neutral-bg);
+  color: var(--badge-neutral-ink);
+  font-size: var(--type-field-size);
+  font-weight: 700;
+  cursor: pointer;
+}
+.challenge-dot.right { background: var(--badge-success-bg); border-color: var(--badge-success-border); color: var(--badge-success-ink); }
+.challenge-dot.wrong { background: var(--badge-danger-bg); border-color: var(--badge-danger-border); color: var(--badge-danger-ink); }
+.challenge-dot.voided { border-style: dashed; text-decoration: line-through; }
+.challenge-dot:focus-visible { outline: 2px solid var(--brand-teal); outline-offset: 2px; }
+.challenge-pop-note {
+  font-size: var(--type-meta-size);
+  color: var(--ink-muted);
+  margin: 0 0 var(--space-16);
+}

@@ -99,7 +99,8 @@ before then, and the old list's history, is in
 - ⬜ G2 The daily challenge — 5 a day per programme, a course a day in turn; own tables (ticked 10-20): 04.24–04.29
 - ✅ 04.24 The challenge's database — four tables, the draw, play, save, submit, time up, void, swap — 2026-10-20
 - ⬜ 04.30 The bank's Delete names the challenge that used a question — today it shows Postgres's words (found at 04.24)
-- ⬜ 04.25 Playing it — its start screen, the quiz screen in Challenge mode, the results pop-up, answers till midnight
+- ✅ 04.25 Playing it — /challenge/play: its start screen, the quiz screen in Challenge mode, the results pop-up — 2026-10-20
+- ⬜ 04.31 Report an issue from a challenge question — report_question takes a play (a migration); hidden till then
 - ⬜ 04.26 The dashboard's challenge line (C) — Play ›, then "4 of 5 right" and Answers ›, or Back tomorrow
 - ⏸ 04.27 The admin's swap and void screen — with the admin pages (the database's half is 04.24)
 - ⏸ 04.28 The daily reminder on the phone — needs the app's clock (10.22)

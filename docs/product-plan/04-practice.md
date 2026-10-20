@@ -312,7 +312,11 @@ live.
   a copy in every student's sitting); a play's answer lines say what was
   chosen and are marked against the paper. A question a paper has used
   is unpublished, never deleted, as a paper's. One number of questions
-  for every programme.
+  for every programme. Played on the quiz screen every sitting uses, from
+  a page of its own, `/challenge/play` (Sam: "a player on a different
+  route that uses the shared things"; built 2026-10-20, 04.25); `/challenge`
+  waits for its home page. The clock shows "1:23 / 5:00". Report an
+  issue waits for 04.31.
 - **Built first without the leaderboards** (Sam, 2026-10-20): the
   challenge plays, marks and shows "4 of 5 right" on its own; the join
   offer, the start screen's leaderboards box and the results' rank lines

@@ -52,6 +52,13 @@
 // answered — no score, no secret half. The sitting then never enters its
 // review: the runner becomes the held screen a reopen shows
 // (results-held.tsx), with the held pop-up over it.
+//
+// The daily challenge (04.25, Sam 2026-10-20) plays here too, from its own
+// page (/challenge/play): it is not a sitting — its plays and answers are
+// its own tables (04.24) — so it hands in its saving and ending (`challenge`)
+// in place of the quiz engine's, and Challenge mode with them: the clock
+// counts up to its limit, the score is "4 of 5 right" with no percentage,
+// its own results pop-up, no Report an issue yet (04.31), no retake.
 
 'use client';
 import { Dialog } from '@/lib/overlays/shared/dialog';
@@ -63,7 +70,7 @@ import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { Toast } from '@/lib/toast/toast';
 import { advanceAttempt, checkAnswer, expireAttempt, finishAttempt, retakeAttempt, saveAnswers } from '@/lib/attempts/actions';
 import { reportHref, sessionHref } from '@/lib/attempts/links';
-import { ResultsHeldPopup, ResultsPopup, type ResultsSummary } from './results-popup';
+import { ChallengeResultsPopup, ResultsHeldPopup, ResultsPopup, type ChallengeDot, type ResultsSummary } from './results-popup';
 import { ResultsHeld, ReviewClosed } from './results-held';
 import { ReportIssueDialog } from './report-issue';
 import { MessageUsDialog } from '@/components/messages/message-us';
@@ -83,9 +90,10 @@ import {
   type OptionView,
 } from '@/lib/attempts/scoring';
 import type { SessionExit } from '@/lib/attempts/links';
-import { modeOf } from '@/lib/attempts/modes';
+import { CHALLENGE_MODE, modeOf } from '@/lib/attempts/modes';
 import { isCloseRefusal } from '@/lib/quizzes/results-date';
 import type { AnswerPatch, Attempt, ChosenMap, FinishResult, FlagMap, Score, SealedItem, SecretsMap } from '@/lib/attempts/types';
+import type { ChallengeRun } from '@/lib/challenge/types';
 import {
   close as closeClockItem,
   createClock,
@@ -152,6 +160,7 @@ export function QuizRunner({
   retakeAllowed = false,
   initialQuestion = null,
   closeNote = null,
+  challenge = null,
 }: {
   attempt: Attempt;
   items: SealedItem[];
@@ -169,10 +178,12 @@ export function QuizRunner({
   initialQuestion?: number | null;
   /** 04.14: this open finished the sitting at its paper's close — the line saying so. */
   closeNote?: string | null;
+  /** 04.25: the daily challenge — its own saving and ending, and Challenge mode. */
+  challenge?: ChallengeRun | null;
 }) {
   const router = useRouter();
   // The mode's row (03 Q8): the runner asks it, never the code.
-  const M = modeOf(attempt.mode);
+  const M = challenge ? CHALLENGE_MODE : modeOf(attempt.mode);
   const W = M.words;
   const hasClock = M.clock !== 'none';
   const feedbackEach = M.feedback === 'each';
@@ -280,7 +291,8 @@ export function QuizRunner({
   const flushTimerRef = useRef<number | null>(null);
   const totalSeconds = (attempt.duration_min || items.length) * 60;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
-  const [timeUp, setTimeUp] = useState(false);
+  // a challenge reopened after its time ran out says so, as at the moment
+  const [timeUp, setTimeUp] = useState(challenge?.timeUp ?? false);
   const headerRef = useRef<HTMLDivElement>(null);
 
   // legacy buildShufCache: the option order per item, once per attempt.
@@ -404,7 +416,7 @@ export function QuizRunner({
       else sending.push(t);
     }
     if (!sending.length) return true;
-    const result = await saveAnswers(attempt.attempt_id, sending);
+    const result = challenge ? await challenge.save(sending) : await saveAnswers(attempt.attempt_id, sending);
     if (!result.ok) {
       if (isCloseRefusal(result.error)) {
         onClosed(result.error);
@@ -416,7 +428,7 @@ export function QuizRunner({
       markSent(clockOf(clockRef, items), times);
     }
     return result.ok;
-  }, [previewMode, reviewMode, attempt.attempt_id, items, onClosed]);
+  }, [previewMode, reviewMode, attempt.attempt_id, items, onClosed, challenge]);
 
   function queueSave(patch: AnswerPatch, immediate = false) {
     if (previewMode || locked || reviewMode) return;
@@ -685,7 +697,10 @@ export function QuizRunner({
       try {
         // every question's last time goes with the last save (Q11)
         await flushSaves({ withTime: true });
-        result = autoSubmit ? await expireAttempt(attempt.attempt_id) : await finishAttempt(attempt.attempt_id, timeTakenS);
+        // the challenge's one ending: the database closes it as time up past the limit
+        result = challenge
+          ? await challenge.finish()
+          : autoSubmit ? await expireAttempt(attempt.attempt_id) : await finishAttempt(attempt.attempt_id, timeTakenS);
       } catch {
         // a dropped connection rejects rather than replying: the button
         // (or the auto-submit's next try) comes back
@@ -806,9 +821,22 @@ export function QuizRunner({
     // is the pop-up, which Submit & Exit does not open, so the pause
     // showed nothing. The way out is at once, the loader up with legacy's
     // "Quiz submitted." until the next page takes over (2026-09-28).
-    setSaving('Quiz submitted.');
+    setSaving(challenge ? 'Challenge submitted.' : 'Quiz submitted.');
     leavingRef.current = true;
     router.push(exit.href);
+  }
+
+  // 04.25: a dot on the challenge's results — the answers, at that question
+  function jumpToQuestion(n: number) {
+    setResultsOpen(false);
+    setViewMode('ALL');
+    setPage(Math.floor((n - 1) / questionsPerPage));
+    window.setTimeout(() => {
+      const el = document.getElementById(`q-${n}`);
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY - (headerRef.current?.offsetHeight ?? 0) - 8;
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    }, 0);
   }
 
   // ── grid (legacy openGridOverlay / hideDesktopGrid / showDesktopGrid) ──
@@ -870,7 +898,8 @@ export function QuizRunner({
     });
   }
 
-  const gridScoreText = locked ? `${score.raw}/${score.total} (${score.pct}%)` : '';
+  // the challenge's score is a count, never a percentage (Sam, 2026-10-20)
+  const gridScoreText = !locked ? '' : challenge ? `${score.raw} of ${score.total} right` : `${score.raw}/${score.total} (${score.pct}%)`;
   const gridToolbar = (
     <div className="grid-toolbar">
       {/* Sequential while live has nothing to come back to, so no flags */}
@@ -1016,7 +1045,8 @@ export function QuizRunner({
                 <Icon name="flag" />{flags[item.item_id] ? 'Unflag' : 'Flag'}
               </button>
             )}
-            {previewMode ? null : (
+            {/* 04.31: a challenge's question is reported once report_question takes a play */}
+            {previewMode || challenge ? null : (
               <button type="button" className="btn-sm-link btn-report" onClick={() => setReportFor({ item, globalIdx, chosen: chosenRaw ?? null })}>
                 <Icon name="report" />Report an issue
               </button>
@@ -1138,6 +1168,19 @@ export function QuizRunner({
   const timerPercent = totalSeconds > 0 ? secondsLeft / totalSeconds * 100 : 0;
   const timerColor = timerPercent <= 10 ? 'red' : timerPercent <= 20 ? 'amber' : '';
   const timerText = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
+  // Challenge mode's clock counts up to its limit (04 G2): "1:23 of 5:00"
+  const countsUp = M.clock === 'up';
+  const elapsedText = formatClock(totalSeconds - secondsLeft);
+  const limitText = formatClock(totalSeconds);
+  // 04.25: the challenge's results — five dots of right and wrong, a voided one apart
+  const voided = new Set(challenge?.voided ?? []);
+  const dots: ChallengeDot[] = items.map((item, i) => {
+    if (voided.has(item.item_id)) return { n: i + 1, mark: 'voided' };
+    if (!hasAnswerFor(item)) return { n: i + 1, mark: 'unanswered' };
+    const secret = secrets[item.item_id];
+    const right = secret ? isCorrectAnswer(item.question_type, secret.correct, answers[item.item_id]) : item.is_correct === true;
+    return { n: i + 1, mark: right ? 'right' : 'wrong' };
+  });
 
   // The please-wait screen (09.14, Sam 2026-10-20): on opening a sitting
   // (the start card's own wait carries on into it, same words), and on
@@ -1146,7 +1189,7 @@ export function QuizRunner({
   // server draws that, and the screen, drawn only in the browser, would
   // flash over it for a moment.
   const loader = (phase === 'init' && !reviewMode) || saving ? (
-    <PleaseWait message={saving === 'submitting' ? 'Submitting your answers…' : saving || 'Loading your quiz…'} />
+    <PleaseWait message={saving === 'submitting' ? 'Submitting your answers…' : saving || (challenge ? "Loading today's challenge…" : 'Loading your quiz…')} />
   ) : null;
 
   // 04.12: submitted with its results held — the screen a reopen shows, in
@@ -1222,7 +1265,11 @@ export function QuizRunner({
           <div className="header-title">{label}</div>
           <div className="header-actions">
             {/* Q18: a finished sitting's score, opening the results pop-up again */}
-            {finished && phase === 'quiz' ? (
+            {finished && phase === 'quiz' && challenge ? (
+              <button type="button" className="hbtn hbtn-ghost hbtn-score" onClick={() => setResultsOpen(true)} aria-label={`Your results: ${score.raw} of ${score.total} right`}>
+                {score.raw} of {score.total} right
+              </button>
+            ) : finished && phase === 'quiz' ? (
               <button type="button" className="hbtn hbtn-ghost hbtn-score" onClick={() => setResultsOpen(true)} aria-label={`Your results: ${score.raw} of ${score.total}, ${score.pct} percent`}>
                 {score.raw} / {score.total} · {score.pct}%
               </button>
@@ -1237,10 +1284,11 @@ export function QuizRunner({
         </div>
         {hasClock && !locked && !reviewMode ? (
           <div className="timer-bar">
-            <div className="timer-display" role="timer" aria-label={`${timerText} remaining`}>
+            <div className="timer-display" role="timer" aria-label={countsUp ? `${elapsedText} of ${limitText}` : `${timerText} remaining`}>
               <span className="timer-icon"><Icon name="timer" /></span>
-              <span className={`timer-value ${timerColor}`}>{timerText}</span>
-              <span className="timer-label">remaining</span>
+              {/* the limit beside the count: a phone hides the label */}
+              <span className={`timer-value ${timerColor}`}>{countsUp ? `${elapsedText} / ${limitText}` : timerText}</span>
+              <span className="timer-label">{countsUp ? M.fullName : 'remaining'}</span>
             </div>
             <div className="timer-progress-wrap"><div className={`timer-progress-fill ${timerColor}`} style={{ width: `${timerPercent}%` }} /></div>
           </div>
@@ -1286,7 +1334,11 @@ export function QuizRunner({
       <div className="desktop-flex-wrap">
         <div className="runner-wrap">
           {reviewMode ?<div className="review-banner">{W.reviewBanner}</div> : null}
-          {timeUp ? <div className="timeup-banner">Time is up! Your exam has been automatically submitted.</div> : null}
+          {timeUp ? (
+            <div className="timeup-banner">
+              {challenge ? 'Time is up. What you answered has been submitted.' : 'Time is up! Your exam has been automatically submitted.'}
+            </div>
+          ) : null}
           {closeNote ? <div className="timeup-banner">{closeNote}</div> : null}
 
           {phase === 'quiz' && desktopGridHidden ? (
@@ -1398,16 +1450,33 @@ export function QuizRunner({
             </div>
           ) : null}
 
-          {/* Q18: the results, once the sitting is finished */}
-          <ResultsPopup
-            open={resultsOpen && finished}
-            summary={results}
-            reportHref={previewMode ? null : reportHref(attempt.attempt_id)}
-            onReview={reviewAnswers}
-            onClose={() => setResultsOpen(false)}
-            retake={retakeAllowed && !previewMode ? { onClick: () => void retakeNow(), pending: retaking } : null}
-            exit={{ label: exit.label, onClick: () => { leavingRef.current = true; router.push(exit.href); } }}
-          />
+          {/* Q18: the results, once the sitting is finished (04.25: the challenge's own) */}
+          {challenge ? (
+            <ChallengeResultsPopup
+              open={resultsOpen && finished}
+              summary={{
+                heading: timeUp ? 'Time is up' : 'Challenge done',
+                right: score.raw,
+                outOf: score.total,
+                timeTakenS: serverTime ?? attempt.time_taken_s,
+                dots,
+              }}
+              onJump={jumpToQuestion}
+              onAnswers={reviewAnswers}
+              onClose={() => setResultsOpen(false)}
+              exit={{ label: exit.label, onClick: () => { leavingRef.current = true; router.push(exit.href); } }}
+            />
+          ) : (
+            <ResultsPopup
+              open={resultsOpen && finished}
+              summary={results}
+              reportHref={previewMode ? null : reportHref(attempt.attempt_id)}
+              onReview={reviewAnswers}
+              onClose={() => setResultsOpen(false)}
+              retake={retakeAllowed && !previewMode ? { onClick: () => void retakeNow(), pending: retaking } : null}
+              exit={{ label: exit.label, onClick: () => { leavingRef.current = true; router.push(exit.href); } }}
+            />
+          )}
 
           {/* the exit choice (slice 6a), on the shared dialog since DS4; a
               choice of three stacks full-width */}
