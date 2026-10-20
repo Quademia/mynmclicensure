@@ -22,7 +22,9 @@
  * who and the label only, never the message's text — and is shown with the
  * painted Q; one per conversation (the tag), a new one replacing the last.
  * A tap opens the conversation: in an app window already open, else a new
- * one.
+ * one. An announcement (08.15, tag notice-…) also tells any open app window
+ * {type: 'notice-arrived'}, so its number and the Announcements list follow
+ * without the student leaving the page.
  *
  * Plain JavaScript, served as it is: nothing in the build touches it.
  */
@@ -72,13 +74,23 @@ self.addEventListener('push', (event) => {
   }
   const tag = typeof n.tag === 'string' && n.tag ? n.tag : undefined;
   event.waitUntil(
-    self.registration.showNotification(typeof n.title === 'string' && n.title ? n.title : 'Quademia', {
-      body: typeof n.body === 'string' ? n.body : '',
-      icon: '/images/quademia-mark-192.png',
-      tag,
-      renotify: Boolean(tag),
-      data: { url: typeof n.url === 'string' && n.url.startsWith('/') ? n.url : '/router' },
-    }),
+    Promise.all([
+      self.registration.showNotification(typeof n.title === 'string' && n.title ? n.title : 'Quademia', {
+        body: typeof n.body === 'string' ? n.body : '',
+        icon: '/images/quademia-mark-192.png',
+        tag,
+        renotify: Boolean(tag),
+        data: { url: typeof n.url === 'string' && n.url.startsWith('/') ? n.url : '/router' },
+      }),
+      // an announcement (08.15): an app window open on this device asks its
+      // number again, and the Announcements page its list (Sam, 2026-10-20)
+      tag && tag.startsWith('notice-')
+        ? self.clients
+            .matchAll({ type: 'window', includeUncontrolled: true })
+            .then((wins) => wins.forEach((win) => win.postMessage({ type: 'notice-arrived' })))
+            .catch(() => {})
+        : null,
+    ]),
   );
 });
 

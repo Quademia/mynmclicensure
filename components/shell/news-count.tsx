@@ -6,7 +6,9 @@
 // redraw (AGENTS.md), so this holds it: a page that marks notices hands
 // in the number its mark brought back (useNewsCount().set), and the
 // number is asked again when the app comes back to the screen — a notice
-// published while the student was away. No live line: notices are few,
+// published while the student was away — and when a notice sent to this
+// device arrives while the app is open (public/sw.js says
+// 'notice-arrived'; 08.15, Sam 2026-10-20). No live line: notices are few,
 // and a return to the app is when one matters. The count is the
 // database's (lib/announcements/badges.ts), never worked out here; a
 // failed ask keeps the number shown.
@@ -37,8 +39,7 @@ export function NewsCountLive({ initial, children }: { initial: number; children
 
   useEffect(() => {
     let stopped = false;
-    const onVisible = async () => {
-      if (document.visibilityState !== 'visible') return;
+    const recount = async () => {
       try {
         const n = await recountNewNotices();
         if (!stopped && n != null) setCount(n);
@@ -46,10 +47,19 @@ export function NewsCountLive({ initial, children }: { initial: number; children
         /* a dropped connection: keep the number shown */
       }
     };
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void recount();
+    };
+    const onWorker = (e: MessageEvent) => {
+      if (e.data?.type === 'notice-arrived') void recount();
+    };
     document.addEventListener('visibilitychange', onVisible);
+    navigator.serviceWorker?.addEventListener('message', onWorker);
+    navigator.serviceWorker?.startMessages?.();
     return () => {
       stopped = true;
       document.removeEventListener('visibilitychange', onVisible);
+      navigator.serviceWorker?.removeEventListener('message', onWorker);
     };
   }, []);
 

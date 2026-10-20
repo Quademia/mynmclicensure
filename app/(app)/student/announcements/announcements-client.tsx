@@ -26,10 +26,12 @@
 //   once pressed, the notice says so.
 // - **The notifications ask** (08.15) heads the list: our replies and
 //   important news on this device, where it can work and is not on yet.
+//   A notice sent to this device while the page is open refreshes the list.
 
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { PageHeader } from '@/components/shell/page-header';
 import { Icon } from '@/components/shell/icons';
 import { useNewsCount } from '@/components/shell/news-count';
@@ -75,6 +77,19 @@ export function AnnouncementsClient({
   const [confirming, setConfirming] = useState(false);
   const dismissError = useCallback(() => setError(null), []);
   const marking = useRef(new Set<string>());
+
+  // a notice sent to this device while the page is open: the list asks the
+  // server again (08.15; public/sw.js says 'notice-arrived'); what is open
+  // stays open
+  const router = useRouter();
+  useEffect(() => {
+    const onWorker = (e: MessageEvent) => {
+      if (e.data?.type === 'notice-arrived') router.refresh();
+    };
+    navigator.serviceWorker?.addEventListener('message', onWorker);
+    navigator.serviceWorker?.startMessages?.();
+    return () => navigator.serviceWorker?.removeEventListener('message', onWorker);
+  }, [router]);
 
   // the notices with this visit's marks laid over
   const all = items.map((a) => {
