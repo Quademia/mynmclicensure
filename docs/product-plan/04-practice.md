@@ -326,6 +326,16 @@ live.
   still shows the first time.
 - **Once a day**: one challenge sitting per student per day, counted for
   the day it started.
+- **The results: the pop-up every quiz has, over the answers** (Sam,
+  2026-10-20: A, drawn — in place of a screen of its own or the answers
+  with a strip): "Challenge done" (or "Time is up"), "4 of 5 right" —
+  a count, no percentage or grade word — the time, five dots of right
+  and wrong that jump to a question; to a student who has joined, today's
+  rank and this week's with "See the leaderboards ›", else "Join the
+  leaderboards to see where you rank ›"; "Answers stay open until
+  midnight." See answers (the main button) and Back to dashboard. No
+  report page and no Retake. Reopened from the dashboard's Answers ›, it
+  lands on the answers; the score pill brings the pop-up back.
 - **Its answers only on its day** (Sam, 2026-10-20), for every student
   whatever their account: the day's challenge, its answers and
   rationales, can be reopened until midnight (UTC, Ghana's time); after

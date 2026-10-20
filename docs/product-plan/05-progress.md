@@ -122,6 +122,22 @@ live.
 - **One look for every board** (Sam, 2026-10-20, in place of a shape
   per view): the top 10, then the student — outside the top 10 their
   line with the one above and the one below ("You: 41st of 58").
+- **The page** (Sam, 2026-10-20: B, drawn — in place of four view
+  tabs): the time switch, then **the board as a dropdown** naming it in
+  full ("My school · St Mary's · RN", "My programme · RN", "All of
+  Ghana", "Schools · RN"); then **the student's own place first**, a small
+  card ("You're 41st of 58 · 22 right · 17 min 31 s · ends Sunday"), then
+  the top 10 and the neighbours; Share on WhatsApp at the foot (what it
+  shares waits on the challenge's home page, 04). A row opens nothing —
+  there are no student profiles to visit. Before joining, the card
+  reads "Join to see where you rank" with Join. The Schools view: the
+  student's school marked ("St Mary's is 3rd of 24"), then "Not on the
+  board yet" with how many more players each needs.
+- **My school is the student's school in their programme** (Sam,
+  2026-10-08, reconfirmed 2026-10-20): a school training RN and RM has
+  a board for each, and appears on the RN and the RM schools boards by
+  each programme's students. A board of the whole school, all
+  programmes together, only if students ask for it.
 - **Joining is the student's choice** (Sam, 2026-10-20). The first time
   a student goes to play a challenge, before its questions, a screen of
   its own says what the boards are — ranked by right answers then time,

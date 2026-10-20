@@ -215,6 +215,8 @@ opens it (00, The menu).
   in Learning History (04).
 - Its own start screen, A: the five rules of Challenge mode, the
   leaderboards box, Don't show this again (04; Sam, 2026-10-20, drawn).
+- Its results, A: the quiz's pop-up over the answers — the count, the
+  time, five dots, the ranks; See answers; no report, no Retake (04).
 - A home page of its own — who opens it and what it shows, open (04).
 
 ### The sitting — start screen, sitting, review
@@ -272,10 +274,12 @@ opens it (00, The menu).
   raw word "mock".
 
 ### Leaderboards
-- Today · This week · All time; My school · My programme · All of
-  Ghana · Schools; opens on This week · My school. Every board the top
-  10, then the student with the one above and below; "Join to see where
-  you rank" before joining; Share on WhatsApp (05; Sam, 2026-10-20).
+- Today · This week · All time; the board a dropdown — My school (the
+  school in the student's programme) · My programme · All of Ghana ·
+  Schools; opens on This week · My school. The student's place first,
+  then the top 10 and the neighbours; a row opens nothing; "Join to see
+  where you rank" before joining; Share on WhatsApp (05; Sam,
+  2026-10-20: B, drawn).
 - The same in every state.
 
 ### Achievements
