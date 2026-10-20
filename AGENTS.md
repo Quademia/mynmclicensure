@@ -505,6 +505,12 @@ above sit at the repo root; the audience grouping inside them is kept.
   cannot be answered). Its screenshots time out while Chrome's window is
   behind another; `find` and `read_page` still work. A click while a side
   panel's backdrop is up lands on the backdrop — reload, then click.
+  **Sam's Chrome has more than one profile**, each its own sign-in and its
+  own device for notifications, and Claude in Chrome acts in only one:
+  before judging a walk, read which account the tab is signed in as and
+  match the device row's endpoint (2026-10-20: the bell test went to the
+  student the tab was not). A window opened before a production build
+  still runs the old page code — have Sam reload it first.
 - **A new hardcoded colour in a stylesheet is refused by a pre-commit
   guard** (`scripts/css-baseline.mjs`, `.css-baseline.json`, 2026-09-22).
   It is `lint-baseline.mjs`'s shape for CSS: the literals already there
@@ -534,7 +540,11 @@ above sit at the repo root; the audience grouping inside them is kept.
   (`npm run db:migrate`, `scripts/db-migrate.mjs`), recorded in
   `licensure_gh.migrations`. Never `supabase db push`, never the MCP
   `apply_migration` — both stamp the project's shared tracker, which
-  this repo does not own.
+  this repo does not own. **The runner records a file's name, not its
+  contents**: a file amended after it ran on dev (before any commit) is
+  made re-runnable — `drop … if exists` before a function whose shape
+  changed — proved rolled back over dev as it stands, and re-run by hand
+  from a scratchpad, so prod runs the final file once (2026-10-20).
 - **The dev Supabase tool declines a DELETE** (2026-10-18, twice); an
   UPDATE and reads go through. When Sam asks for dev rows deleted, read
   the count first, then run it through the app's own connection — an
@@ -632,7 +642,11 @@ above sit at the repo root; the audience grouping inside them is kept.
   click still works. **Edge often shows its Allow only as a bell at the
   end of the address bar**, and the page waits until it is answered. The
   deployed sites need `VAPID_PRIVATE_KEY` as a Worker **Secret** (each
-  environment its own pair).
+  environment its own pair). **Sam's Edge shows no notifications since
+  2026-10-20** — Microsoft's service accepts each, its settings are on, and
+  Chrome on the same computer shows them: walk in Chrome. A device row's
+  `last_sent_at` moving means the post office said yes, not that the device
+  showed it.
 - **Google sign-in on `localhost:3001` lands on the old site**: Supabase
   sends a sign-in back only to an address on the shared dev project's
   Redirect URLs list, else to its Site URL (the legacy site), and :3001 is

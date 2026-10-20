@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-20, morning into afternoon — announcements on devices (08.15), Profile's Notifications, the open app follows a notice (08.19), editor title
+  - ↳ one yes for both · ask atop Announcements · wording A · published-now only · main switch + kinds · kinds grouped, By email later · clock parked 10.22 · claim then batched read · B over live line · title B · Edge silent · Chrome profiles
+
 - 2026-10-19, night, into 10-20 — admin announcements redesigned: shared Tiptap editor (09.13, 08.14), list as tabs (08.17), a notice's own page (08.18)
   - ↳ Tiptap over Lexical · Sam's toolbar · body stored once, notices deleted · Audience gone · page not pop-up · layout A · mockup approved · Tiptap pinned · check passes on null · panels over top bar · samples per scope
 
