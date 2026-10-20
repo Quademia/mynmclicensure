@@ -7,7 +7,8 @@
 // region (the picker), and the active subscription with its product
 // (the Subscription panel) — plus the `?complete=1` flag the dashboard
 // nudge passes — handed to the client half, which is the page's script
-// (the three panels, the edit modes, the two saves).
+// (the three panels, the edit modes, the two saves), with what the
+// Notifications panel needs (08.15).
 //
 // Legacy's profile page had no top-nav row: its header sat inside the
 // 720px column ("My Profile" / "Your NMC Licensure account details"),
@@ -17,6 +18,7 @@ import type { Metadata } from 'next';
 import { requireStudent } from '@/lib/access';
 import { getPrograms } from '@/lib/catalogue/queries';
 import { getActiveSchools, getProfileSubscription } from '@/lib/profile/queries';
+import { vapidPublicKey } from '@/lib/notifications/keys';
 import { ProfileClient } from './profile-client';
 import '@/styles/student-profile.css';
 
@@ -56,6 +58,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
       schools={schools}
       subscription={subscription}
       complete={complete === '1'}
+      notify={{ userId: profile.user_id, publicKey: vapidPublicKey() }}
     />
   );
 }

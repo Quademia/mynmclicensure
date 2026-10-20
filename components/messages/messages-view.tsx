@@ -34,7 +34,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Toast } from '@/lib/toast/toast';
 import { NameCircle } from '@/components/shell/name-circle';
 import { NotifyAsk } from '@/components/notifications/notify-ask';
-import { askAfterSend, type AskShape } from '@/lib/notifications/client';
+import { askShape, type AskShape } from '@/lib/notifications/client';
 import { createClient } from '@/lib/supabase/client';
 import type { MessagesPageData, MessagesRow } from '@/lib/messaging/page-data';
 import { MESSAGE_MAX_LEN, type ActionResult, type Message, type OpenThreadResult, type SendMessageResult } from '@/lib/messaging/types';
@@ -353,7 +353,7 @@ export function MessagesView({
         }
         if (!row.threadId) subscribe(row.key, r.thread_id);
         // the ask under the sent message, where it can work and is wanted (08.5b)
-        if (notify) setAsk(askAfterSend(notify.userId, notify.publicKey));
+        if (notify) setAsk(askShape(notify.userId, notify.publicKey));
         toBottom();
       }
     } catch {

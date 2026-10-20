@@ -15,7 +15,13 @@
 // on the page with the status it means; Publish and Schedule ask once,
 // naming who it reaches; Move to drafts and Archive ask too. Preview shows
 // the student's view. Leaving with unsaved changes asks first — a link in
-// the app or closing the tab. Send to phones comes with 08.15.
+// the app or closing the tab.
+//
+// Also send to devices (08.15; Sam, 2026-10-20): the notice's title and
+// first line go, once, to the devices of the students it reaches that said
+// yes — only from Publish, for a notice starting now. A scheduled notice
+// keeps it off (its hint says why; the app has no clock to send it later),
+// and a sent one shows when it went. Publish's question names the devices.
 
 'use client';
 
@@ -34,7 +40,7 @@ import { previewReach } from '@/lib/announcements/followup-actions';
 import { appPageGroups } from '@/lib/announcements/app-pages';
 import { kindIcon, longWhen, pictureUrl } from '@/lib/announcements/display';
 import { makePicture, type MadePicture } from '@/lib/announcements/picture-maker';
-import { DEFAULT_KIND, type Announcement, type DisplayStatus } from '@/lib/announcements/types';
+import { DEFAULT_KIND, type Announcement, type DisplayStatus, type Reach } from '@/lib/announcements/types';
 import type { EditorChoices } from '@/lib/announcements/queries';
 import { KindsPanel } from './kinds-panel';
 import { FollowUpPanel } from './followup-panel';
@@ -111,6 +117,7 @@ export function NoticeEditor({
   const [endAt, setEndAt] = useState(toLocalInput(notice?.end_at ?? null));
   const [mustSee, setMustSee] = useState(Boolean(notice?.must_see));
   const [askConfirm, setAskConfirm] = useState(Boolean(notice?.ask_confirm));
+  const [sendDevices, setSendDevices] = useState(Boolean(notice?.send_to_devices));
   const [pinned, setPinned] = useState(Boolean(notice?.pinned));
   const [dismissible, setDismissible] = useState(notice ? Boolean(notice.dismissible) : true);
   const [priority, setPriority] = useState(String(notice?.priority ?? 1));
@@ -167,7 +174,7 @@ export function NoticeEditor({
   const showList = newPicture ? newPicture.listUrl : currentPicture && !dropPicture ? pictureUrl(currentPicture, 'list') : null;
 
   // ── unsaved changes ──
-  const snapshot = JSON.stringify([title, kind, body, startOn, startAt, endOn, endAt, mustSee, askConfirm, pinned, dismissible, priority, scopes, Boolean(newPicture), dropPicture]);
+  const snapshot = JSON.stringify([title, kind, body, startOn, startAt, endOn, endAt, mustSee, askConfirm, sendDevices, pinned, dismissible, priority, scopes, Boolean(newPicture), dropPicture]);
   const [baseline, setBaseline] = useState(snapshot);
   const dirty = snapshot !== baseline;
 
@@ -210,8 +217,10 @@ export function NoticeEditor({
 
   // ── the reach line (08.12): counted a moment after the scopes stop changing ──
   const scopeKey = JSON.stringify([scopes.programs, scopes.courses, scopes.levels, scopes.subKind, scopes.products, scopes.users.map((u) => u.user_id), scopes.cohort]);
-  const [reachCount, setReachCount] = useState<{ key: string; n: number } | null>(null);
-  const reach = reachCount && reachCount.key === scopeKey ? reachCount.n : null;
+  const [reachCount, setReachCount] = useState<{ key: string; n: Reach } | null>(null);
+  const reachNow = reachCount && reachCount.key === scopeKey ? reachCount.n : null;
+  const reach = reachNow ? reachNow.students : null;
+  const devices = reachNow ? reachNow.devices : null;
   useEffect(() => {
     let stopped = false;
     const [pr, co, lv, sk, pd, us, ch] = JSON.parse(scopeKey) as [string[], string[], string[], string, string[], string[], string];
@@ -242,7 +251,7 @@ export function NoticeEditor({
   const startsLater = startOn && Boolean(startAt) && new Date(startAt).getTime() > openedAt;
   const chars = docText(body).length;
 
-  async function save(status: 'draft' | 'active' | 'archived', doneWords: string): Promise<boolean> {
+  async function save(status: 'draft' | 'active' | 'archived', doneWords: string, sendNow = false): Promise<boolean> {
     if (!title.trim()) {
       err('Give the notice a title first.');
       return false;
@@ -266,6 +275,8 @@ export function NoticeEditor({
       dismissible,
       must_see: mustSee,
       ask_confirm: askConfirm || mustSee,
+      send_to_devices: sendDevices && !startsLater,
+      send_now: sendNow,
       kind,
       scope_subscription_kind: scopes.subKind,
       scope_cohort: scopes.cohort,
@@ -303,10 +314,10 @@ export function NoticeEditor({
     return true;
   }
 
-  async function run(label: string, status: 'draft' | 'active' | 'archived', doneWords: string) {
+  async function run(label: string, status: 'draft' | 'active' | 'archived', doneWords: string, sendNow = false) {
     setBusy(label);
     try {
-      await save(status, doneWords);
+      await save(status, doneWords, sendNow);
     } catch {
       // a dropped connection rejects (AGENTS.md); the page keeps what was typed
       err('Could not save. Please check your connection and try again.');
@@ -320,6 +331,14 @@ export function NoticeEditor({
     const who = reach === null ? 'the students it reaches' : `${reach} student${reach === 1 ? '' : 's'}`;
     const asks = askConfirm || mustSee ? " They'll be asked to confirm they've read it." : '';
     const popup = mustSee ? ' As Must-see, it pops up on their dashboard until they press "I\'ve read this".' : '';
+    const sending = sendDevices && !startsLater;
+    const toDevices = !sending
+      ? ''
+      : devices === null
+        ? ' Their devices with notifications on get it as a notification.'
+        : devices === 0
+          ? ' None of their devices has notifications on yet, so no notification goes.'
+          : ` ${devices} of their devices get${devices === 1 ? 's' : ''} it as a notification.`;
     const yes = await confirm(
       startsLater
         ? {
@@ -329,12 +348,28 @@ export function NoticeEditor({
           }
         : {
             title: `Publish to ${who}?`,
-            body: `"${title.trim()}" shows on their Announcements page now.${asks}${popup}`,
+            body: `"${title.trim()}" shows on their Announcements page now.${toDevices}${asks}${popup}`,
             confirmLabel: 'Publish',
           },
     );
-    if (yes) await run('publish', 'active', startsLater ? 'Scheduled.' : 'Published.');
+    if (yes) await run('publish', 'active', startsLater ? 'Scheduled.' : sending && devices !== 0 ? 'Published. The notifications are on their way.' : 'Published.', !startsLater);
   }
+
+  // the devices switch's state and words (08.15)
+  const sentAt = notice?.sent_at ?? null;
+  const devicesLocked = Boolean(sentAt) || state !== 'draft' || startsLater;
+  const devicesOn = sentAt ? Boolean(notice?.send_to_devices) : state === 'draft' && !startsLater && sendDevices;
+  const devicesHint = sentAt
+    ? notice?.send_to_devices
+      ? `Sent to devices when it was published, ${whenWords(toLocalInput(sentAt))}. A notice is sent once.`
+      : 'A notice is sent to devices once, when it is published.'
+    : state !== 'draft'
+      ? 'Sent only from Publish, for a notice starting now. This one went out without it.'
+      : startsLater
+        ? 'Only for a notice published now: a scheduled notice is not sent to devices.'
+        : `Its title and first line go once, when you publish, to students' devices that have notifications on${
+            devices === null ? '' : ` (${devices} now)`
+          }. Keep it for news that can't wait: students who get too many turn them off.`;
 
   async function moveToDrafts() {
     const yes = await confirm({
@@ -543,6 +578,7 @@ export function NoticeEditor({
               locked={mustSee}
               onChange={setAskConfirm}
             />
+            <Switch label="Also send to devices" hint={devicesHint} on={devicesOn} locked={devicesLocked} onChange={setSendDevices} />
             <Switch label="Pin to top" hint="Shows above the others. The top pinned notice shows big, with its picture." on={pinned} onChange={setPinned} />
             <Switch label="Students can close it" hint="Shows ✕ on the notice. A closed notice moves to the foot of their list." on={dismissible} onChange={setDismissible} />
             <label className="ann-switch-row">

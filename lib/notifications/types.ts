@@ -2,8 +2,13 @@
 // 2026-10-17). The shared words, kept out of the 'use server' module
 // (AGENTS.md: such a module exports only async functions).
 
-/** What a device is sent: a student their replies, an admin's device the students' messages. Later kinds are Sam's call, one at a time. */
-export type NoticeKind = 'reply' | 'student_message';
+/** What a device is sent: a student their replies and important news (08.15), an admin's device the students' messages. Later kinds are Sam's call, one at a time, grouped by what the student cares about. */
+export type NoticeKind = 'reply' | 'student_message' | 'announcement';
+
+export const NOTICE_KINDS: readonly NoticeKind[] = ['reply', 'student_message', 'announcement'];
+
+/** A student's kinds, in Profile's order: one yes turns on both (Sam, 2026-10-20). */
+export const STUDENT_KINDS: readonly NoticeKind[] = ['reply', 'announcement'];
 
 /** What the service worker shows: the title and line are ours, the label only — never the message's text (Sam: phones are shared). */
 export type Notice = { title: string; body: string; url: string; tag: string };

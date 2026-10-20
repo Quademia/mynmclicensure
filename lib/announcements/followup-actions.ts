@@ -6,14 +6,16 @@
 // reaches today and everyone with a mark on it, in batches (AGENTS.md rule
 // 10: past a thousand students one read would be cut short); the page
 // counts and sorts them. The reach line counts the active students the
-// editor's scopes match now, saved or not.
+// editor's scopes match now, saved or not, and how many of their devices
+// said yes to news (08.15: the devices switch's hint and Publish's
+// question) — the two counted side by side, one trip from the page.
 
 'use server';
 
 import { requireAdmin } from '@/lib/access';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { readAll } from '@/lib/supabase/read-all';
-import type { FollowUpResult, FollowUpRow, ReachScopes } from './types';
+import type { FollowUpResult, FollowUpRow, Reach, ReachScopes } from './types';
 
 export async function getFollowUp(announcementId: string): Promise<FollowUpResult> {
   await requireAdmin();
@@ -33,9 +35,10 @@ function list(values: unknown): string[] | null {
   return clean.length ? clean : null;
 }
 
-export async function previewReach(scopes: ReachScopes): Promise<number | null> {
+export async function previewReach(scopes: ReachScopes): Promise<Reach | null> {
   await requireAdmin();
-  const { data, error } = await createServiceRoleClient().rpc('announcement_reach_preview', {
+  const db = createServiceRoleClient();
+  const args = {
     p_programs: list(scopes.scope_programs),
     p_levels: list(scopes.scope_levels),
     p_cohort: String(scopes.scope_cohort || '').trim() || null,
@@ -43,10 +46,14 @@ export async function previewReach(scopes: ReachScopes): Promise<number | null> 
     p_products: list(scopes.scope_product_ids),
     p_users: list(scopes.scope_user_ids),
     p_courses: list(scopes.scope_courses),
-  });
-  if (error) {
-    console.error('previewReach:', error);
+  };
+  const [students, devices] = await Promise.all([
+    db.rpc('announcement_reach_preview', args),
+    db.rpc('announcement_devices_preview', args),
+  ]);
+  if (students.error || devices.error) {
+    console.error('previewReach:', students.error ?? devices.error);
     return null;
   }
-  return Number(data) || 0;
+  return { students: Number(students.data) || 0, devices: Number(devices.data) || 0 };
 }

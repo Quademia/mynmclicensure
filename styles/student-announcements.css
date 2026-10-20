@@ -35,6 +35,8 @@
 .sann-listhead:first-child { margin-top: 0; }
 .sann-empty { margin: 0; font-size: var(--type-ui-size); line-height: 1.5; color: var(--ink-muted); }
 .sann-foot { align-self: flex-start; margin-top: var(--space-4); }
+/* the notifications ask at the top (08.15) */
+.sann-ask { margin-bottom: var(--space-8); }
 
 /* the pinned notice, big */
 .sann-hero {

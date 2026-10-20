@@ -7,7 +7,8 @@
 // the names, the joined name, the phone and the photo address; Cancel
 // restores), the Academic Details panel (Programme read-only; the
 // region-grouped school picker with "My school isn't listed" and its
-// text box; Level; Cohort), the Subscription panel (read-only), and
+// text box; Level; Cohort), the Subscription panel (read-only), the
+// Notifications panel (08.15, notifications-panel.tsx), and
 // the `?complete=1` arrival (the panel with the missing phone or school
 // opens in edit mode, the field highlighted, scrolled to). The page's
 // own bottom-right toast is the shared top-right one (UI convention #1),
@@ -26,6 +27,7 @@ import { PageHeader } from '@/components/shell/page-header';
 import { saveAcademicDetails, savePersonalDetails } from '@/lib/profile/actions';
 import { PROFILE_IMAGE_MAX_BYTES, PROFILE_LEVELS, type ProfileSubscription, type SchoolOption } from '@/lib/profile/types';
 import { Icon } from '@/components/shell/icons';
+import { NotificationsPanel } from './notifications-panel';
 
 type ProfileFields = {
   forename: string | null;
@@ -53,12 +55,15 @@ export function ProfileClient({
   schools,
   subscription,
   complete,
+  notify,
 }: {
   profile: ProfileFields;
   programName: string | null;
   schools: SchoolOption[];
   subscription: ProfileSubscription | null;
   complete: boolean;
+  /** Notifications on this device (08.15). */
+  notify: { userId: string; publicKey: string | null };
 }) {
   const router = useRouter();
   const [msg, setMsg] = useState<Msg>(null);
@@ -359,6 +364,9 @@ export function ProfileClient({
             </div>
           </div>
         </div>
+
+        {/* Notifications (08.15) */}
+        <NotificationsPanel userId={notify.userId} publicKey={notify.publicKey} />
       </div>
     </div>
   );

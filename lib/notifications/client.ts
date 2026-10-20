@@ -7,21 +7,23 @@
 //     phone's own answer so far (denied, not asked, granted);
 //   turnOn — the phone's Allow (called in the tap: a browser asks only
 //     after one), then this device's address from its post office, then
-//     the server; turnOff — the admin's switch off;
+//     the server, with the kinds to send it (a student's yes: both, 08.15);
+//   turnOff — kinds switched off (Profile's, the admin's switch);
 //   relinkOnce — once a sitting, this device's row moves to this sign-in
 //     when it is the same person's (the week ran out, they signed in
 //     again), and what it is sent is kept for the sitting;
-//   askAfterSend — whether a student's send shows the ask: not when it
-//     cannot work, when blocked, when already on, or within 7 days of Not
-//     now on this device.
+//   askShape — whether a student's ask shows (after a send on Messages,
+//     at the top of Announcements): not when it cannot work, when blocked,
+//     when this device is already on for any of a student's kinds (Profile
+//     holds the rest), or within 7 days of Not now on this device.
 //
 // What is kept, keyed by the person (AGENTS.md: phones are shared): the
 // kinds this device is sent, for the sitting (sessionStorage); the end of
 // a Not now, on the phone (localStorage). Both read in try/catch.
 
 import { installWay, registerOfflineApp } from '@/lib/offline-packs/offline-app';
-import { dropKindAction, relinkDeviceAction, saveDeviceAction } from './actions';
-import { ASK_LATER_DAYS, type NoticeKind } from './types';
+import { dropKindsAction, relinkDeviceAction, saveDeviceAction } from './actions';
+import { ASK_LATER_DAYS, NOTICE_KINDS, STUDENT_KINDS, type NoticeKind } from './types';
 
 export type PushState = 'unsupported' | 'iphone' | 'denied' | 'default' | 'granted';
 
@@ -66,7 +68,7 @@ export function keptKindsRaw(userId: string): string {
 export function parseKinds(raw: string): NoticeKind[] {
   try {
     const v = JSON.parse(raw);
-    return Array.isArray(v) ? v.filter((k): k is NoticeKind => k === 'reply' || k === 'student_message') : [];
+    return Array.isArray(v) ? v.filter((k): k is NoticeKind => (NOTICE_KINDS as readonly unknown[]).includes(k)) : [];
   } catch {
     return [];
   }
@@ -87,6 +89,7 @@ export function askLater(userId: string): void {
   } catch {
     // shown again after the next send
   }
+  for (const fn of listeners) fn();
 }
 
 function laterUntil(userId: string): number {
@@ -122,7 +125,7 @@ async function existingSubscription(): Promise<PushSubscription | null> {
 export type TurnOnResult = 'on' | 'denied' | 'dismissed' | { error: string };
 
 /** Call from the tap itself: the phone shows its Allow box only after one. */
-export async function turnOn(userId: string, publicKey: string, kind: NoticeKind): Promise<TurnOnResult> {
+export async function turnOn(userId: string, publicKey: string, kinds: readonly NoticeKind[]): Promise<TurnOnResult> {
   if (!canPush()) return { error: 'This browser cannot show notifications.' };
   const permission = await Notification.requestPermission();
   if (permission === 'denied') return 'denied';
@@ -140,7 +143,7 @@ export async function turnOn(userId: string, publicKey: string, kind: NoticeKind
     const json = sub.toJSON();
     const r = await saveDeviceAction(
       { endpoint: sub.endpoint, keys: { p256dh: json.keys?.p256dh ?? '', auth: json.keys?.auth ?? '' } },
-      kind,
+      [...kinds],
     );
     if (!r.ok) return { error: r.error };
     keepKinds(userId, r.kinds);
@@ -150,15 +153,15 @@ export async function turnOn(userId: string, publicKey: string, kind: NoticeKind
   }
 }
 
-export async function turnOff(userId: string, kind: NoticeKind): Promise<boolean> {
+export async function turnOff(userId: string, kinds: readonly NoticeKind[]): Promise<boolean> {
   try {
     const sub = await existingSubscription();
-    const kept = parseKinds(keptKindsRaw(userId)).filter((k) => k !== kind);
+    const kept = parseKinds(keptKindsRaw(userId)).filter((k) => !kinds.includes(k));
     if (!sub) {
       keepKinds(userId, kept);
       return true;
     }
-    const r = await dropKindAction(sub.endpoint, kind);
+    const r = await dropKindsAction(sub.endpoint, [...kinds]);
     if (r.ok) keepKinds(userId, kept);
     return r.ok;
   } catch {
@@ -179,11 +182,15 @@ export async function relinkOnce(userId: string): Promise<void> {
 
 export type AskShape = 'card' | 'iphone' | null;
 
-export function askAfterSend(userId: string, publicKey: string | null): AskShape {
+/** Whether a student's ask shows on this device now (a store's snapshot: a plain value). */
+export function askShape(userId: string, publicKey: string | null): AskShape {
   const state = pushState(publicKey);
   if (state === 'unsupported' || state === 'denied') return null;
   if (Date.now() < laterUntil(userId)) return null;
   if (state === 'iphone') return 'iphone';
-  if (parseKinds(keptKindsRaw(userId)).includes('reply')) return null;
+  const raw = keptKindsRaw(userId);
+  // allowed, but this sitting's kinds not read back yet (relinkOnce): wait rather than flash the card
+  if (state === 'granted' && !raw) return null;
+  if (parseKinds(raw).some((k) => STUDENT_KINDS.includes(k))) return null;
   return 'card';
 }

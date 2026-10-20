@@ -4,7 +4,9 @@
 // admin gate — legacy saveAnnouncement and confirmArchive — write
 // `announcements` with the service role: since A1 (2026-10-18) the
 // browser holds nothing on the table, and the database's checks (status,
-// audience, subscription kind, the kind's list) are the floor. The
+// audience, subscription kind, the kind's list) are the floor. Publish for
+// a notice starting now, with Also send to devices, sends it to the devices
+// of the students it reaches once the answer has gone (08.15). The
 // student search is the Grant dialog's (slice 8). The student one behind
 // the student gate — the page's Mark as read, a tap on a notice's button,
 // Dismiss and the dashboard's ✕ — goes through notice_mark() with the
@@ -19,8 +21,10 @@
 
 'use server';
 
+import { after } from 'next/server';
 import { requireAdmin, requireStudent } from '@/lib/access';
 import { cleanDoc } from '@/lib/editor/doc';
+import { notifyAnnouncement } from '@/lib/notifications/send';
 import { NOTICE_TOOLS } from '@/lib/editor/types';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { searchStudents } from '@/lib/subscriptions/queries';
@@ -74,10 +78,11 @@ export async function saveAnnouncement(input: SaveAnnouncementInput): Promise<Sa
   const kind = String(input.kind || '').trim() || DEFAULT_KIND;
   const [{ data: kindRow }, { data: currentRow }] = await Promise.all([
     supabase.from('announcement_kinds').select('active').eq('name', kind).maybeSingle(),
-    editingId ? supabase.from('announcements').select('kind').eq('announcement_id', editingId).maybeSingle() : Promise.resolve({ data: null }),
+    editingId ? supabase.from('announcements').select('kind, sent_at').eq('announcement_id', editingId).maybeSingle() : Promise.resolve({ data: null }),
   ]);
+  const current = currentRow as { kind: string; sent_at: string | null } | null;
   if (!kindRow) return fail('Pick a kind from the list.');
-  if (!(kindRow as { active: boolean }).active && (currentRow as { kind: string } | null)?.kind !== kind) {
+  if (!(kindRow as { active: boolean }).active && current?.kind !== kind) {
     return fail(`"${kind}" is retired. Pick another kind, or bring it back under Kinds.`);
   }
 
@@ -85,6 +90,13 @@ export async function saveAnnouncement(input: SaveAnnouncementInput): Promise<Sa
   // a document from a browser is never trusted
   const body = cleanDoc(input.body, NOTICE_TOOLS);
   if (JSON.stringify(body).length > BODY_MAX_BYTES) return fail('The announcement is too long. Please shorten it.');
+
+  // devices (08.15; Sam, 2026-10-20): only a notice published now is sent,
+  // once — a scheduled one keeps the tick off, and a sent one keeps its own
+  const startAt = String(input.start_at || '').trim() || null;
+  const startsLater = Boolean(startAt && Date.parse(startAt) > Date.now());
+  const sentBefore = Boolean(current?.sent_at);
+  const sendToDevices = Boolean(input.send_to_devices) && !startsLater;
 
   const payload = {
     title,
@@ -104,13 +116,20 @@ export async function saveAnnouncement(input: SaveAnnouncementInput): Promise<Sa
     scope_level: scopeLevels.length ? scopeLevels : null,
     scope_product_ids: scopeProducts.length ? scopeProducts : null,
     scope_user_ids: scopeUserIds.length ? scopeUserIds : null,
-    start_at: String(input.start_at || '').trim() || null,
+    start_at: startAt,
     end_at: String(input.end_at || '').trim() || null,
+    ...(sentBefore ? {} : { send_to_devices: sendToDevices }),
+  };
+  // Publish for a notice starting now: the devices follow the answer, once
+  // (the database marks it sent before any goes; nothing for a sent one)
+  const sendAfter = (id: string) => {
+    if (input.send_now && status === 'active' && sendToDevices && !sentBefore) after(() => notifyAnnouncement(id, title, body));
   };
 
   if (editingId) {
     const { error } = await supabase.from('announcements').update(payload).eq('announcement_id', editingId);
     if (error) return fail('Save failed: ' + error.message);
+    sendAfter(editingId);
     return { ok: true, announcement_id: editingId, created: false };
   }
 
@@ -124,6 +143,7 @@ export async function saveAnnouncement(input: SaveAnnouncementInput): Promise<Sa
   const announcementId = 'ANN_' + Date.now();
   const { error } = await supabase.from('announcements').insert({ ...payload, announcement_id: announcementId });
   if (error) return fail('Save failed: ' + error.message);
+  sendAfter(announcementId);
   return { ok: true, announcement_id: announcementId, created: true };
 }
 

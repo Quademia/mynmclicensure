@@ -1,15 +1,18 @@
 // lib/notifications/actions.ts — a device's yes, its quiet takeover, and
-// the admin's switch off (08.5b; Sam, 2026-10-17). Server Actions; every
-// write goes through the database's notify_* functions with the service
-// role, naming the signed-in person and this device's sign-in (the
+// a switch off (08.5b; Sam, 2026-10-17; 08.15, 2026-10-20). Server Actions;
+// every write goes through the database's notify_* functions with the
+// service role, naming the signed-in person and this device's sign-in (the
 // session cookie), which the database checks is theirs and live:
-//   saveDeviceAction — the device says yes to a kind (a student's
-//     `reply` after the ask, an admin's `student_message` by the switch);
+//   saveDeviceAction — the device says yes to its kinds (a student's
+//     `reply` and `announcement` together after an ask or Profile's main
+//     switch, one of them by its own switch; an admin's `student_message`
+//     by the switch on Messages);
 //   relinkDeviceAction — on each sitting, the same person's row moves to
 //     this sign-in (the week ran out, they signed in again); returns the
 //     kinds it is sent, none for a device that has not said yes — or that
 //     another person on this phone said yes from;
-//   dropKindAction — the admin's switch off.
+//   dropKindsAction — a switch off: one kind, or a student's both when
+//     Profile's main switch goes off; the row goes with its last kind.
 // A refusal or a failed read answers plainly; the caller's page says so.
 
 'use server';
@@ -18,14 +21,22 @@ import { cookies } from 'next/headers';
 import { requireAdmin, requireStudent } from '@/lib/access';
 import { SESSION_COOKIE } from '@/lib/auth/sessions';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import type { DeviceSubscription, NoticeKind, SaveDeviceResult } from './types';
+import { NOTICE_KINDS, type DeviceSubscription, type NoticeKind, type SaveDeviceResult } from './types';
 
 function isKind(v: unknown): v is NoticeKind {
-  return v === 'reply' || v === 'student_message';
+  return (NOTICE_KINDS as readonly unknown[]).includes(v);
 }
 
-async function gateFor(kind: NoticeKind) {
-  return kind === 'student_message' ? requireAdmin() : requireStudent();
+/** The kinds asked for; null when one is unknown, or an admin's is mixed with a student's. */
+function cleanKinds(v: unknown): NoticeKind[] | null {
+  const list = Array.isArray(v) ? [...new Set(v as unknown[])] : [];
+  if (!list.length || !list.every(isKind)) return null;
+  if (list.includes('student_message') && list.length > 1) return null;
+  return list;
+}
+
+async function gateFor(kinds: NoticeKind[]) {
+  return kinds.includes('student_message') ? requireAdmin() : requireStudent();
 }
 
 async function sessionId(): Promise<string | null> {
@@ -45,9 +56,10 @@ async function kindsOf(userId: string, session: string, endpoint: string): Promi
   return ((data ?? []) as string[]).filter(isKind);
 }
 
-export async function saveDeviceAction(sub: DeviceSubscription, kind: NoticeKind): Promise<SaveDeviceResult> {
-  if (!isKind(kind)) return { ok: false, error: 'Could not turn on notifications.' };
-  const { profile } = await gateFor(kind);
+export async function saveDeviceAction(sub: DeviceSubscription, kindsIn: NoticeKind[]): Promise<SaveDeviceResult> {
+  const kinds = cleanKinds(kindsIn);
+  if (!kinds) return { ok: false, error: 'Could not turn on notifications.' };
+  const { profile } = await gateFor(kinds);
   const session = await sessionId();
   const endpoint = String(sub?.endpoint ?? '');
   const p256dh = String(sub?.keys?.p256dh ?? '');
@@ -59,7 +71,7 @@ export async function saveDeviceAction(sub: DeviceSubscription, kind: NoticeKind
     p_endpoint: endpoint,
     p_p256dh: p256dh,
     p_auth: auth,
-    p_kind: kind,
+    p_kinds: kinds,
   });
   const r = (data ?? {}) as { ok?: boolean; code?: string };
   if (error || !r.ok) {
@@ -80,16 +92,17 @@ export async function relinkDeviceAction(endpointIn: string): Promise<NoticeKind
   return kindsOf(profile.user_id, session, endpoint);
 }
 
-export async function dropKindAction(endpointIn: string, kind: NoticeKind): Promise<{ ok: boolean }> {
-  if (!isKind(kind)) return { ok: false };
-  const { profile } = await gateFor(kind);
+export async function dropKindsAction(endpointIn: string, kindsIn: NoticeKind[]): Promise<{ ok: boolean }> {
+  const kinds = cleanKinds(kindsIn);
+  if (!kinds) return { ok: false };
+  const { profile } = await gateFor(kinds);
   const endpoint = String(endpointIn ?? '');
   if (!endpoint) return { ok: false };
-  const { error } = await createServiceRoleClient().rpc('notify_device_drop_kind', {
+  const { error } = await createServiceRoleClient().rpc('notify_device_drop_kinds', {
     p_user_id: profile.user_id,
     p_endpoint: endpoint,
-    p_kind: kind,
+    p_kinds: kinds,
   });
-  if (error) console.error('notify_device_drop_kind:', error);
+  if (error) console.error('notify_device_drop_kinds:', error);
   return { ok: !error };
 }

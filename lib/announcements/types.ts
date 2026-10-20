@@ -109,6 +109,9 @@ export type FollowUpRow = {
 };
 export type FollowUpResult = { ok: true; rows: FollowUpRow[] } | { ok: false; error: string };
 
+/** The editor's reach line (08.12): the students the scopes match now, and their devices that said yes to news (08.15). */
+export type Reach = { students: number; devices: number };
+
 /** The scopes the editor's reach line counts (08.12); Audience went with 08.18. */
 export type ReachScopes = {
   scope_programs: string[];
@@ -136,6 +139,10 @@ export type SaveAnnouncementInput = {
   must_see: boolean;
   /** Ask students to confirm (08.16); Must-see implies it. */
   ask_confirm: boolean;
+  /** Also send to devices (08.15): kept only for a notice not scheduled and not yet sent. */
+  send_to_devices: boolean;
+  /** Publish was pressed for a notice starting now: send it to devices, once. */
+  send_now: boolean;
   /** One of the admin's kinds (08.13). */
   kind: string;
   scope_subscription_kind: string;

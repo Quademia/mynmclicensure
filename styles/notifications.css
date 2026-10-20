@@ -2,10 +2,11 @@
  *
  * Phone notifications (08.5b; Sam, 2026-10-17, drawn): the ask under a
  * student's sent message (.nask, components/notifications/notify-ask.tsx),
- * its one grey line after (.nask-line), and the admin's per-device switch
- * on Messages (.nsw, admin-notify-switch.tsx). Tokens only; the box is
- * .card, the buttons the shared family. The design system has no switch,
- * so .nsw-switch is drawn here (a shared one offered, 09).
+ * its one grey line after (.nask-line), the admin's per-device switch on
+ * Messages (.nsw, admin-notify-switch.tsx), and Profile's Notifications
+ * (.nset, 08.15). Tokens only; the box is .card, the buttons the shared
+ * family. The design system has no switch, so .nsw-switch is drawn here
+ * (device-switch.tsx; a shared one queued, 09.12).
  */
 
 .nask { padding: var(--space-12); display: flex; flex-direction: column; gap: var(--space-10); }
@@ -33,6 +34,20 @@
   font-size: var(--type-meta-size);
   line-height: var(--type-meta-line);
   color: var(--ink-muted);
+}
+
+/* Profile's Notifications (08.15): the main switch, each kind beneath it */
+.nset { display: flex; flex-direction: column; }
+.nset-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-12); padding: var(--space-12) 0; }
+.nset-row:first-child { padding-top: 0; }
+.nset-row:last-child { padding-bottom: 0; }
+.nset-row + .nset-row { border-top: 1px solid var(--border); }
+.nset-kind { padding-left: var(--space-16); }
+.nset-label {
+  margin: 0;
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line);
+  color: var(--ink);
 }
 
 .nsw { padding: var(--space-12) var(--space-16); display: flex; align-items: center; gap: var(--space-12); margin-bottom: var(--space-16); }

@@ -583,7 +583,7 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `pinned`, `priority` | Order |
 | `dismissible` | Whether ✕ is offered |
 | `must_see` | Also pops up once on the dashboard (08.8) |
-| `send_to_devices`, `sent_at` | Also sent as a device notice; when it went, so it goes once, when the notice goes live (08.15) |
+| `send_to_devices`, `sent_at` | Also sent as a device notice; when it went, so it goes once — from Publish, for a notice starting now; a scheduled one keeps it off (08.15) |
 | `scope_programs`, `scope_courses`, `scope_level`, `scope_subscription_kind`, `scope_product_ids`, `scope_cohort`, `scope_user_ids` | Who it is for (lists, the subscription kind `PAID`, `TRIAL` or `FREE`); a student must match every scope set; a course scope reaches whoever has held one of its courses (08.1) |
 | `created_at` | When made |
 
@@ -712,7 +712,7 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `session_id` | The sign-in it was allowed under (→ `sessions`) |
 | `endpoint` | The device's delivery address at its maker's post office (Google, Apple, Mozilla); one row per address |
 | `key_p256dh`, `key_auth` | The browser's two keys that seal each envelope |
-| `kinds` | What it is sent: `reply` (a student), `student_message` (an admin); a later kind is added to the check, each Sam's call |
+| `kinds` | What it is sent: `reply` and `announcement` (a student — one yes saves both, Profile switches each), `student_message` (an admin); a later kind is added to the check, each Sam's call |
 | `created_at` | When it said yes |
 | `last_sent_at` | When a notice was last handed to its post office |
 
@@ -723,15 +723,22 @@ table by table as each is next changed (AGENTS.md rule 9).
   week running out keeps it, and the next sign-in of the **same** person
   on that phone takes it over (`notify_device_relink`) — another person
   must say yes themselves. One person per address: a new person's yes
-  moves the row to them with only their kind (`notify_device_save`, which
-  checks the sign-in is theirs and live). The admin's switch off drops
-  the kind, the row going with its last (`notify_device_drop_kind`). A
-  notice goes to `notify_targets()` — a student's own devices, or every
-  admin's — never a deactivated account's; an address the post office
-  calls gone (404, 410) is deleted. All four functions server only.
-- *Needs Sam's tick before the build (08.15, written 2026-10-18):*
-  `kinds` gains `announcement`; whether a student's yes to replies
-  brings it or it asks its own yes is open (08).
+  moves the row to them with only their kinds (`notify_device_save`, which
+  takes a list of kinds and checks the sign-in is theirs and live). A
+  switch off drops its kinds — one, or a student's both from Profile's
+  main switch — the row going with its last (`notify_device_drop_kinds`).
+  A message's notice goes to `notify_targets()` — a student's own devices,
+  or every admin's — never a deactivated account's; an address the post
+  office calls gone (404, 410) is deleted.
+- `announcement` built 2026-10-20 (08.15, ticked by Sam that day;
+  `20261020120000_announcement_devices.sql`): every device then sent
+  replies gained it (one yes covers both). A notice's send:
+  `announcement_send_claim()` marks it sent (`announcements.sent_at`) —
+  only a live notice with the tick, never sent before — then
+  `announcement_send_targets()` names the devices with `announcement` of
+  the active students it reaches, read a thousand at a time;
+  `announcement_devices_preview()` counts them for the editor. All server
+  only.
 - Browser: nothing.
 
 ---
@@ -858,9 +865,12 @@ the browser can call only the first two lines and
   students today") and `announcement_followup(notice)` (everyone reached
   today and everyone with a mark: name, programme, kind, last sitting,
   reached, the four dates).
-- **Notifications** (server only; 08.5b, built 2026-10-17):
-  `notify_device_save`, `notify_device_relink`, `notify_device_drop_kind`,
-  `notify_targets` — see `notification_devices`.
+- **Notifications** (server only; 08.5b, built 2026-10-17; 08.15,
+  2026-10-20): `notify_device_save`, `notify_device_relink`,
+  `notify_device_drop_kinds`, `notify_targets`, and a notice's send —
+  `announcement_send_claim`, `announcement_send_targets`,
+  `announcement_devices_preview`, the last two on the same rule as the
+  reach — see `notification_devices`.
 - **Sign-in and payments** (server only): `check_login_rate_limit`,
   `check_reset_rate_limit`, `check_payment_rate_limit`,
   `log_auth_event`, `log_reset_request`, `mark_reset_used`.

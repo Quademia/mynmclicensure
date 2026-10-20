@@ -24,6 +24,8 @@
 // - **"I've read this"** (08.16) on a notice that asks to confirm (every
 //   Must-see does): Read (confirmed), which stops a Must-see's pop-up;
 //   once pressed, the notice says so.
+// - **The notifications ask** (08.15) heads the list: our replies and
+//   important news on this device, where it can work and is not on yet.
 
 'use client';
 
@@ -38,6 +40,7 @@ import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { confirmNoticeRead, markNoticesSeen, recordNoticeState } from '@/lib/announcements/actions';
 import { isNew, kindIcon, pictureUrl } from '@/lib/announcements/display';
 import type { StudentAnnouncement } from '@/lib/announcements/types';
+import { NewsAsk } from './news-ask';
 
 /** A notice with the words the server worked out for it. */
 export type NoticeItem = StudentAnnouncement & { when: string; date: string; line: string };
@@ -53,7 +56,16 @@ function timeOf(a: NoticeItem): number {
   return Number.isNaN(t) ? 0 : t;
 }
 
-export function AnnouncementsClient({ items, openId: askedId }: { items: NoticeItem[]; openId: string | null }) {
+export function AnnouncementsClient({
+  items,
+  openId: askedId,
+  notify,
+}: {
+  items: NoticeItem[];
+  openId: string | null;
+  /** The notifications ask at the top (08.15). */
+  notify: { userId: string; publicKey: string | null } | null;
+}) {
   const news = useNewsCount();
   const [marks, setMarks] = useState<Marks>({});
   const [openId, setOpenId] = useState<string | null>(askedId);
@@ -229,6 +241,7 @@ export function AnnouncementsClient({ items, openId: askedId }: { items: NoticeI
       <div className={`sann${openId ? ' sann-open' : ''}`}>
         <div className="sann-grid">
           <section className="sann-list" aria-label="Announcements">
+            {notify ? <NewsAsk userId={notify.userId} publicKey={notify.publicKey} /> : null}
             {hero ? (
               <button
                 type="button"

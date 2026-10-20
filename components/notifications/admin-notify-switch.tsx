@@ -6,13 +6,14 @@
 // kind. Where notifications cannot work it says why in one grey line
 // rather than vanishing (Sam looked for it on the dev server, 2026-10-17):
 // the dev server, an iPhone off the Home Screen, a browser without them; a
-// browser that blocked them is told so too. The design system has no
-// switch (09: a shared one offered), so this one is drawn here on tokens.
+// browser that blocked them is told so too. The switch is the notification
+// places' own (device-switch.tsx; 09.12, one for the whole app, queued).
 
 'use client';
 
 import { useState, useSyncExternalStore } from 'react';
 import { Toast } from '@/lib/toast/toast';
+import { DeviceSwitch } from './device-switch';
 import { keptKindsRaw, parseKinds, pushState, subscribeNotify, turnOff, turnOn, type PushState } from '@/lib/notifications/client';
 import { WAITING_WORDS } from '@/lib/notifications/types';
 import '@/styles/notifications.css';
@@ -48,10 +49,10 @@ export function AdminNotifySwitch({ userId, publicKey }: { userId: string; publi
     setBusy(true);
     setError(null);
     if (on) {
-      if (!(await turnOff(userId, 'student_message'))) setError('Could not turn notifications off. Please check your connection and try again.');
+      if (!(await turnOff(userId, ['student_message']))) setError('Could not turn notifications off. Please check your connection and try again.');
     } else {
       setAsking(true);
-      const r = await turnOn(userId, publicKey, 'student_message');
+      const r = await turnOn(userId, publicKey, ['student_message']);
       setAsking(false);
       if (r === 'denied') setBlocked(true);
       else if (typeof r === 'object') setError(r.error);
@@ -65,17 +66,7 @@ export function AdminNotifySwitch({ userId, publicKey }: { userId: string; publi
         <p className="nask-title" id="nsw-label">Notify this device when a student writes</p>
         <p className="nask-sub">{asking ? WAITING_WORDS : 'This device only.'}</p>
       </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={on}
-        aria-labelledby="nsw-label"
-        className={`nsw-switch${on ? ' on' : ''}`}
-        onClick={flip}
-        disabled={busy}
-      >
-        <span className="nsw-knob" />
-      </button>
+      <DeviceSwitch on={on} busy={busy} labelledBy="nsw-label" onFlip={() => void flip()} />
       <Toast message={error} onDismiss={() => setError(null)} />
     </div>
   );
