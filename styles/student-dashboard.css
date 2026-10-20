@@ -118,6 +118,12 @@ a.sd-challenge:hover { text-decoration: none; border-color: var(--brand-teal); }
 .sd-challenge-text { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sd-challenge-text strong { font-weight: 700; color: var(--brand-navy); }
 .sd-challenge-go { flex: none; font-weight: 600; color: var(--accent); }
+/* played: on a phone the words take the line and the link sits under them,
+   in line with the words (the icon's 16px and the gap) */
+@media (max-width: 600px) {
+  .sd-challenge-done { flex-wrap: wrap; row-gap: var(--space-2); }
+  .sd-challenge-done .sd-challenge-go { flex-basis: 100%; padding-left: calc(16px + var(--space-10)); }
+}
 
 /* ── New from Quademia (08.8; Sam, 2026-10-18: C) ──
    Under the welcome, only while something is new: up to two rows, each a

@@ -5,8 +5,10 @@
 //   before playing, tinted — "Today's challenge · Midwifery · 5 questions",
 //     Play ›
 //   playing — the same, Resume ›
-//   played — "Today · 4 of 5 right", Answers › (today's answers are open
-//     until midnight; after it, the line is the next day's)
+//   played — "Today's challenge done · 4 of 5 right", Review the answers ›
+//     (Sam, 2026-10-20, in place of "Today · 4 of 5 right", Answers ›;
+//     today's answers are open until midnight, after it the line is the
+//     next day's); on a phone the link sits under the words
 //   none today — "Back tomorrow", no link.
 // The rank line comes with the leaderboards (05 G1b). Nothing with no
 // programme: the play page says to choose one.
@@ -30,12 +32,12 @@ export function ChallengeLine({ today }: { today: ChallengeToday | null }) {
   const play = today.play;
   if (play && play.status !== 'playing') {
     return (
-      <AppLink className="sd-challenge" href={CHALLENGE_PLAY_HREF}>
-        <span className="sd-challenge-icon"><Icon name="zap" /></span>
+      <AppLink className="sd-challenge sd-challenge-done" href={CHALLENGE_PLAY_HREF}>
+        <span className="sd-challenge-icon"><Icon name="check-circle" /></span>
         <span className="sd-challenge-text">
-          Today · <strong>{play.right ?? 0} of {play.outOf ?? 0} right</strong>
+          Today&apos;s challenge done · <strong>{play.right ?? 0} of {play.outOf ?? 0} right</strong>
         </span>
-        <span className="sd-challenge-go">Answers ›</span>
+        <span className="sd-challenge-go">Review the answers ›</span>
       </AppLink>
     );
   }

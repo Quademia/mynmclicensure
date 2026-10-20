@@ -372,9 +372,11 @@ live.
 - **On the dashboard, one slim line under the title** (Sam, 2026-10-20:
   C, drawn — in place of the top card or a card of its own), for every
   status; the top card stays as it is. Before playing, tinted: "Today's
-  challenge · Midwifery · 5 questions" and Play ›. After: "Today · 4 of
-  5 right", the rank line ("4th in St Mary's this week", or "See this
-  week's leaderboard ›" before joining) and Answers › until midnight. On
+  challenge · Midwifery · 5 questions" and Play ›. After: "Today's
+  challenge done · 4 of 5 right" and Review the answers › until midnight
+  (Sam, 2026-10-20, in place of "Today · 4 of 5 right" and Answers ›; on
+  a phone the link under the words), then the rank line ("4th in St
+  Mary's this week", or "See this week's leaderboard ›" before joining). On
   a day with none, "Back tomorrow". No menu item of its own (Sam,
   2026-10-04; 00, The menu).
 - **A home of its own** (Sam, 2026-10-20): a page that houses the daily
