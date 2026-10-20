@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-19, night, into 10-20 — admin announcements redesigned: shared Tiptap editor (09.13, 08.14), list as tabs (08.17), a notice's own page (08.18)
+  - ↳ Tiptap over Lexical · Sam's toolbar · body stored once, notices deleted · Audience gone · page not pop-up · layout A · mockup approved · Tiptap pinned · check passes on null · panels over top bar · samples per scope
+
 - 2026-10-18, afternoon into evening — announcements redesigned: floor (A1, A2, 08.1), page, pictures, kinds, card, follow-up, "I've read this" (08.7–08.16)
   - ↳ ten ideas · Seen by itself · like Messages · hybrid list · upload only · card + Must-see · kinds, 13 icons · reach rule once · in-app buttons · Must-see = read · 1 of 3 · pop-up 560 · welcome as title
 
