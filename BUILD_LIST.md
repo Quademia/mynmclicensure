@@ -166,6 +166,7 @@ before then, and the old list's history, is in
 - ✅ 08.18 The notice editor as its own page — message left, settings right; Narrow down; Publish asks — 2026-10-20
 - ✅ (unplanned) The Kinds and Follow-up panels above the top bar — it hid their title and ✕ — 2026-10-20
 - ✅ 08.15 Announcements to devices — from Publish, once; one yes for both; Profile's main switch and kinds — 2026-10-20
+- ✅ 08.19 A notice sent to devices refreshes the open app — the bell's number, the Announcements list — 2026-10-20
 - ✅ A4 A button pointing inside the app, picked from a list — pages, courses, mocks; opens in the app — 2026-10-18
 - ✅ A3 The body stored once, no extra line break per edit — built with 08.14 — 2026-10-20
 - ✅ 08.2 The support desk — server only, five labels, Message us box, both pages; admin by student — 2026-10-17

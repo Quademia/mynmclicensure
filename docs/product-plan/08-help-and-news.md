@@ -164,6 +164,14 @@ built 2026-10-18; 08.14, 08.15, 08.17 and 08.18 built 2026-10-20)*
   build: Sam's Chrome as student1 turned on from Profile, Publish from the
   pane as admin, the notification shown and its tap opening the notice;
   news off on Profile, the next notice not sent there.)*
+  - **The open app follows a notice sent to it** (Sam, 2026-10-20: B,
+    over a live line like Messages' — notices are few, and a line costs
+    a connection per open app): when the notification arrives, an open
+    window asks the bell's number again, and an open Announcements page
+    its list. Other notices still show on the next return to the app or
+    page load (08.9). On a computer, a student who has not picked a notice
+    sees the new one open by itself, as on a fresh load. *(built
+    2026-10-20: 08.19)*
 - **The editor without codes (Sam, 2026-10-19)** — Tiptap, the shared
   editor (09), on MyNclex's version. The notices' toolbar: Undo, Redo ·
   Bold, Italic, Strikethrough, Superscript, Subscript · Highlight, Text
