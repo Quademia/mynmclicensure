@@ -154,7 +154,8 @@ built 2026-10-18; 08.14, 08.17 and 08.18 built 2026-10-20; to build: 08.15)*
   - **The list (A)** — tabs Live · Scheduled · Drafts · Ended, with
     counts (an archived notice labelled inside Ended), in place of the
     five count boxes and the status filter; search by title; Kinds;
-    + New announcement. A row: the kind's icon, the title (Must-see
+    + New announcement. A row: the picture's square, else the kind's
+    icon (Sam, 2026-10-20, as students' list draws it), the title (Must-see
     marked), who and when on one small line, Seen out of the reach as a
     bar, Read (when it asks to confirm) or Tapped, and the row menu
     (09.10): Edit, Follow-up, Archive. A tap on the row opens the

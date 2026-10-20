@@ -23,7 +23,7 @@ import { AppLink } from '@/components/shell/link-pending';
 import { Icon } from '@/components/shell/icons';
 import { RowMenu, type RowMenuItem } from '@/components/shell/row-menu';
 import { archiveAnnouncement } from '@/lib/announcements/actions';
-import { kindIcon, longWhen } from '@/lib/announcements/display';
+import { kindIcon, longWhen, pictureUrl } from '@/lib/announcements/display';
 import type { AnnouncementKind, AnnouncementRow, DisplayStatus, EngageMap, ReachMap } from '@/lib/announcements/types';
 import { KindsPanel } from './kinds-panel';
 import { FollowUpPanel } from './followup-panel';
@@ -168,10 +168,17 @@ export function AnnouncementsClient({
               ...(counted ? [{ type: 'button' as const, label: 'Follow-up', icon: 'chart' as const, onSelect: () => openFollow(a) }] : []),
               ...(a.display !== 'archived' ? [{ type: 'button' as const, label: 'Archive…', icon: 'inbox' as const, danger: true, onSelect: () => void archive(a) }] : []),
             ];
+            const square = pictureUrl(a.picture_path, 'list');
             return (
               <div key={a.announcement_id} className="ann-row">
-                <span className="ann-kind-square" aria-hidden="true">
-                  <Icon name={kindIcon(iconOf.get(a.kind))} size={18} />
+                {/* the picture's square when there is one, as students' list draws it; else the kind's icon */}
+                <span className={`ann-kind-square${square ? ' has-picture' : ''}`} aria-hidden="true">
+                  {square ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- the list's 160px square, made at upload
+                    <img src={square} alt="" loading="lazy" />
+                  ) : (
+                    <Icon name={kindIcon(iconOf.get(a.kind))} size={18} />
+                  )}
                 </span>
                 <AppLink href={`/admin/announcements/${encodeURIComponent(a.announcement_id)}`} className="ann-row-main">
                   <span className="ann-row-title">

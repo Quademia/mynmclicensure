@@ -131,6 +131,16 @@
   background: var(--brand-teal-pale);
   color: var(--brand-teal-hover);
 }
+.ann-kind-square.has-picture {
+  overflow: hidden;
+  background: var(--surface-page);
+}
+.ann-kind-square img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 .ann-row-main,
 .ann-row-main:hover {
   min-width: 0;
