@@ -96,7 +96,14 @@ before then, and the old list's history, is in
 - ⏸ 04.21 Replaced by 06.8 (pools, Sam 2026-10-15) — not built on its own. A paper or mock archived before its results date keeps its questions held back — today archiving releases them to the Quiz Builder (whose Learning mode shows the answers) and to packs, so the next group could see them; found while building 04.12 (2026-10-15), not built
 - ✅ 04.23 (unplanned) Save & Resume Later closes the Leave box first — it hid the saving screen — 2026-10-20
 - ✅ 04.20 Abandon back, on the sitting's own page — a quiet link under Resume on a paper's and a mock's card while a sitting is going; the app's confirm box, the sitting still counts toward sittings allowed; no migration — 2026-10-14
-- ⬜ G2 The daily challenge — 5 a day per programme, one course a day in turn, its own mode (storage ticked 10-08)
+- ⬜ G2 The daily challenge — 5 a day per programme, a course a day in turn; own tables (ticked 10-20): 04.24–04.29
+- ✅ 04.24 The challenge's database — four tables, the draw, play, save, submit, time up, void, swap — 2026-10-20
+- ⬜ 04.30 The bank's Delete names the challenge that used a question — today it shows Postgres's words (found at 04.24)
+- ⬜ 04.25 Playing it — its start screen, the quiz screen in Challenge mode, the results pop-up, answers till midnight
+- ⬜ 04.26 The dashboard's challenge line (C) — Play ›, then "4 of 5 right" and Answers ›, or Back tomorrow
+- ⏸ 04.27 The admin's swap and void screen — with the admin pages (the database's half is 04.24)
+- ⏸ 04.28 The daily reminder on the phone — needs the app's clock (10.22)
+- ⏸ 04.29 The challenge's home page — who opens it and what it shows are Sam's (04, Open)
 - ⬜ Q19 The admin's preview says Preview — on the card and in the sitting
 - ⬜ Q20 Preview this paper — an editor button: questions, answers, rationales, no sitting
 - ⬜ Q7 Select-all partial credit — the rule first (open), then the three-state display

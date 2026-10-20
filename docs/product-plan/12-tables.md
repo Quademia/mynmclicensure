@@ -538,9 +538,11 @@ table by table as each is next changed (AGENTS.md rule 9).
   `_my_sealed_attempt_ids()`); the report reads the rows with the service
   role for its summary.
 
-### The daily challenge — four tables *(to build: 04 G2)*
+### The daily challenge — four tables
 
-Ticked by Sam 2026-10-20 ("go on"), in place of the draw ticked 2026-10-08
+Ticked by Sam 2026-10-20 ("go on") and built the same day (04.24,
+migration `20261020220000_daily_challenge`; the pages are 04.25 and
+04.26), in place of the draw ticked 2026-10-08
 and the `challenge` source and mode on `attempts`. Why: the challenge's
 rules — one paper a day for everyone, the server's clock on an untimed
 screen, answers open until midnight, voiding, the school — share nothing
@@ -596,18 +598,22 @@ by the first student to open that day's challenge and fixed after.
 | `day` | The day — one play per student per day (unique) |
 | `challenge_id` | The paper → `challenge_days` |
 | `school_id` | The student's school when they played → `schools`; empty for a school typed in (until suggested schools, 01) |
-| `seed` | The student's shuffle of the options |
 | `started_utc` | Start, by the server's clock |
 | `ends_utc` | When the time is up: Start + questions × `builder_minutes_per_question`, fixed at Start |
-| `submitted_utc` | When it ended |
+| `submitted_utc` | When it ended (empty exactly while `playing`) |
 | `status` | `playing`, `submitted` or `time_up` |
-| `time_taken_s` | Start to the end, by the server — the boards' time |
-| `right`, `out_of` | "4 of 5 right"; re-marked when a question is voided |
+| `time_taken_s` | Start to the end, by the server, at most the limit — the boards' time |
+| `right_count`, `out_of` | "4 of 5 right"; marked again when a question is voided |
 
 - A play still `playing` past `ends_utc` is closed as `time_up` on what
   was answered when it is next read — no clock needed. Why `school_id`:
   a challenge counts for the school the student was in, and a student may
-  move school (05 G1b).
+  move school (05 G1b); a school merged away (suggested schools) must move
+  its plays too.
+- The ticked `seed` was left out at the build: the quiz screen shuffles a
+  student's options from the sitting's own id and the question's, and the
+  play's id does the same. `right` is `right_count` — a word Postgres
+  keeps.
 
 **`challenge_answers` — a play's answer lines**
 
@@ -856,11 +862,11 @@ by the first student to open that day's challenge and fixed after.
   a typed list of known settings with their bounds; the unused
   `builder_default_questions` dropped. Why: today any signed-in account
   reads every setting, and any text is accepted for any key.
-- *To build (04 G2) — ticked 2026-10-08, named 2026-10-20:*
-  `challenge_questions`, the daily challenge's number of questions, 5 to
-  start, 1 to 20, one for every programme; a change applies from the next
-  day's paper. Its time limit uses `builder_minutes_per_question` (Sam,
-  2026-10-08).
+- `challenge_questions` (04 G2, ticked 2026-10-08, built 2026-10-20): the
+  daily challenge's number of questions, 5 to start, one for every
+  programme; anything but 1 to 20 reads as 5; a change applies from the
+  next day's paper. Its time limit uses `builder_minutes_per_question`
+  (above 0 and up to 10, else 1) (Sam, 2026-10-08).
 - `offline_packs_per_course` retired (07.1, 2026-10-15): the package
   says how many packs per course.
 - `offline_checkin_days` (07.3, 2026-10-15) — how many days a phone keeps
@@ -936,7 +942,24 @@ the browser can call only the first two lines and
   met, not in under 5 s), the weakest topic (from 20 answers, at least 5
   in the topic), questions met of each course's published bank, the
   latest unfinished sitting, and a recap inside a window the page passes
-  (05.4, G1a; built 2026-10-04).
+  (05.4, G1a; built 2026-10-04). Every count but the unfinished sitting
+  reads `_student_answers(student)` — the sittings' answers and the daily
+  challenge's (a voided one out), each with its course, topic and whether
+  its results are held — so the challenge counts toward the streak, met,
+  mastered, the weakest topic and the recap (04.24, 2026-10-20).
+- **The daily challenge** (server only; 04.24, built 2026-10-20):
+  `challenge_today(student)` — today's paper for the student's programme
+  (made by the first to open it), its course and size, and the student's
+  play today; `start_challenge` (one a day: a play going is resumed, one
+  ended refused; the limit fixed), `save_challenge_answers`,
+  `submit_challenge` (marked against the paper by `grade_answer`, the
+  server's time; past the limit it closes as time up),
+  `challenge_play_lines(play, student)` — the questions from the paper;
+  the answers, marks, explanations and feedback only once the play has
+  ended, until the midnight after; then refused. The admin's
+  `swap_challenge_item` (only before the paper's first play) and
+  `void_challenge_item` (marks the ended plays again). A play past its
+  time is closed as time up whenever these read it.
 - **The history's figures** (server only, reads only):
   `student_history_figures(student, course or all)` — one row: the
   sittings (every status), the average and the best score of finished
