@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-10-20. Rules for **any** assistant working in this
+Last updated: 2026-10-20 (night). Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What the app is
@@ -566,7 +566,9 @@ above sit at the repo root; the audience grouping inside them is kept.
   file alone with a summary SELECT, then a second run exercising the
   rules on a scratch row — triggers, refusals, grants — with `do`
   blocks catching `sqlerrm` into a temp table. Both runs leave nothing
-  behind. `set local role authenticated` inside a transaction proves
+  behind. A function that writes, called inside the WHERE of a read of the
+  table it writes, is not seen by that read — call it in a statement of
+  its own, then read (2026-10-20: the challenge's rotation read empty). `set local role authenticated` inside a transaction proves
   what the student's role can read (2026-09-26, 08 B4). **The runner
   prints no notices** (`onnotice` is silenced in `db-migrate.mjs`), so a
   count a migration raises — what a tidy step left out — is seen only in

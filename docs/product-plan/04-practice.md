@@ -447,6 +447,14 @@ live.
   first suggestion — today's course per programme, how it works, the
   week's top schools and counts, never the questions or a student's
   name — did not sit right with him.
+- **Resume on a sitting that ended while the student was away**
+  (Sam's idea, 2026-10-20, discussed, unruled): today the page ends it as
+  it opens (the clock ran out, or the paper closed) and drops the student
+  into the review with no word, or only the paper's line. Offered: A, a
+  line atop the review; B, the start card saying so with "See your
+  results"; C (recommended), its report — where every finished sitting
+  already lands — with the line. A finished sitting's Review already
+  goes through its report, the light front page Sam asked for.
 - **Q3 — the rest of mock exams' design** (ruled 2026-10-13: the first
   sitting, sittings allowed, results on a date, the review period, the
   close, the page — above): notices when a mock opens and when results

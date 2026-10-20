@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-20, night — the daily challenge built: its own four tables (04.24), played at /challenge/play (04.25), the dashboard line (04.26)
+  - ↳ columns ticked one by one · questions stored once · kept apart from quizzes · voided_utc kept · seed dropped · same player, own route · leaderboards later · "Review the answers" · two RN students, one paper · Resume gap open
+
 - 2026-10-20, afternoon into evening — loading screens built (09.14 please-wait, 09.15 welcome); the daily challenge and leaderboards planned and drawn
   - ↳ cloud file narrowed · Submit's wrong words · Leave box hid saving · Practice pool kept · answers on the day only · joining by choice · All time by average · suggested schools · groups later · home page open
 
