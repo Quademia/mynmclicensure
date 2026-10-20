@@ -155,7 +155,8 @@ built 2026-10-18; 08.14, 08.15, 08.17 and 08.18 built 2026-10-20)*
   device off the list, both kinds off reads as main off, on again starts
   with both. Later kinds join as rows **grouped by what the student
   cares about** (one Reminders row for the daily challenge, a streak, a
-  package ending — not one per feature), each Sam's call, including
+  package ending — not one per feature; the daily challenge's "Today's
+  challenge is ready" agreed 2026-10-20, 04), each Sam's call, including
   whether it starts on; optional emails, when they come, a "By email"
   block below in the same pattern (receipts and sign-in links have no
   switch). Not taken: news asking its own yes; the dashboard's card as a

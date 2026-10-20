@@ -123,9 +123,13 @@ live.
   per view): the top 10, then the student — outside the top 10 their
   line with the one above and the one below ("You: 41st of 58").
 - **Joining is the student's choice** (Sam, 2026-10-20). The first time
-  a student goes to play a challenge, before its questions, a card says
-  what the boards are — how you will appear, ranks in your school, your
-  programme and all of Ghana — with **Join** and **Not now, just play**.
+  a student goes to play a challenge, before its questions, a screen of
+  its own says what the boards are — ranked by right answers then time,
+  you pick how you appear, leave any time from Profile — with **Join**
+  and **Not now, just play**. Join opens **How you'll appear**, both
+  ways on one screen (drawn 2026-10-20): the username card chosen
+  already, its word spun in place, Change animal a panel from below; or
+  "Ama O." with the photo. Done goes on to the start screen (04).
   Asked once; after that a quiet "Join the leaderboards" on the
   challenge's card and its results, and Profile's switch **Show me on
   the leaderboards**, to join or leave at any time. Before joining, the

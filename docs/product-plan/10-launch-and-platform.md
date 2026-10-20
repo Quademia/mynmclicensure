@@ -111,7 +111,8 @@ waking the app every few minutes, so work can happen at a set time with
 nobody on a page: a scheduled notice sent to devices as it goes live
 (08.15 sends only from Publish until then), and the jobs already queued —
 expiry reminders (02.3), the nightly payment sweep (D34), the purge
-(10.9). Built when the first of them is; walked on the dev site only.
+(10.9), and the daily challenge's reminder (04, agreed 2026-10-20). Built
+when the first of them is; walked on the dev site only.
 One send reaches a few hundred devices well inside Cloudflare's limits
 (10,000 outside calls a request on our plan, about 30 seconds after the
 answer); past that, a queue.

@@ -72,12 +72,12 @@ Full Access stays the admin's grant (02).
 
 | Group | Page | What it is for |
 |---|---|---|
-| Home | Dashboard | Where sign-in lands, for every status; its top card is this student's next step — today's challenge, days left, carry on, the recap (11) |
+| Home | Dashboard | Where sign-in lands, for every status; its top card is this student's next step — days left, carry on, the recap — with today's challenge a slim line above it (11) |
 | | My courses | A card for each course — days left, how far through, where to carry on; a plain row with no dropdown (Sam, 2026-10-12). Each opens the course page: a front door to its papers, mocks and builder, with its news (11) |
 | Practise | Practice papers | The set papers of each course (today "Fixed quizzes") |
 | | Mock exams | Timed papers in exam conditions |
 | | Quiz builder | A quiz built from chosen topics |
-| | Daily challenge — *new* | A set number of questions a day (5 to start), one course in turn; opened from the dashboard's top card, no menu item (04 G2) |
+| | Daily challenge — *new* | A set number of questions a day (5 to start), one course in turn; a slim line under the dashboard's title opens it; a home page of its own (what it shows, open); no menu item (04 G2) |
 | | The sitting | Answering questions, in four modes |
 | | Report | One sitting's debrief: what to fix next |
 | Progress | Learning history | Every past sitting, by course: open its report, resume, review, retake; the figures by kind (05) |
@@ -149,7 +149,8 @@ taken back the same day: "too busy" (Sam, 2026-10-04).
   says what opens it; upgrading removes the locks and moves nothing.
 - **Sign-in lands on the dashboard for everyone**; its top card changes
   with the student's status (11).
-- The daily challenge has no menu item — its card is on the dashboard.
+- The daily challenge has no menu item — its slim line is on the
+  dashboard (Sam, 2026-10-20), and it has a home page of its own (04).
   Leaderboards and Achievements are rows under Progress, beside
   Learning history (Sam, 2026-10-20); a line on that card opens the
   leaderboards.

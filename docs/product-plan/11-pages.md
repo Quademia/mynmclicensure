@@ -19,8 +19,9 @@ opens it (00, The menu).
 - **Where sign-in lands, for every status; its top card is this
   student's next step** (Sam, 2026-10-04: A).
 - **The blocks, top to bottom** (Sam, 2026-10-04 — a redesign, not
-  today's page; drawn in the chat): the top card → today's challenge
-  with the rank line (when G2 lands) → the streak and questions
+  today's page; drawn in the chat): today's challenge as one slim line
+  under the title, with the rank line (Sam, 2026-10-20: C, drawn; 04) →
+  the top card → the streak and questions
   mastered → your weakest topic, one tap into the builder (shown from
   20 answers, naming only a topic with at least 5 — Sam, 2026-10-04,
   MyNclex's gate) → my courses, a compact list with days left and
@@ -210,8 +211,11 @@ opens it (00, The menu).
   once; Join opens the choice of how to appear and, for a username, the
   card: an animal from the grid and a word already filled, up to 3 spins
   of the word, one tap to accept (05).
-- Its answers reopen from the dashboard's card until midnight; not in
-  Learning History (04).
+- Its answers reopen from the dashboard's slim line until midnight; not
+  in Learning History (04).
+- Its own start screen, A: the five rules of Challenge mode, the
+  leaderboards box, Don't show this again (04; Sam, 2026-10-20, drawn).
+- A home page of its own — who opens it and what it shows, open (04).
 
 ### The sitting — start screen, sitting, review
 - **Parked (Sam, 2026-10-15):** the sitting and the report are special

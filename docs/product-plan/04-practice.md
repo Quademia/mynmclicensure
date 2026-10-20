@@ -297,21 +297,33 @@ live.
     programme may lack a General Paper or have its own).
   - A course with fewer free questions than the day needs is skipped;
     if none has enough, no challenge that day ("Back tomorrow").
-  - Published, free, not held by a mock; the least recently drawn
-    first, at random among equals, so a question returns as late as
-    the pool allows.
+  - Published, in the Practice pool (so never a paper's or a mock's,
+    06.8); the least recently drawn first, at random among equals, so a
+    question returns as late as the pool allows.
   - The same order for everyone; the options shuffled per student.
   - An admin may swap a question before anyone has played that day;
     after that, void it — it leaves every score.
-- **Its own mode**: Untimed practice's screen — a clock counting up,
-  move freely, change answers until Submit, the answers and rationales
-  straight after Submit. Unlike Untimed, the time is the server's from
-  Start to Submit, leaving the page does not stop it, and the sitting
-  submits what is answered at the limit: the number of questions × the
-  builder's minutes per question (`builder_minutes_per_question`; NMC
-  questions share one pace). The start screen says the time counts
-  towards the ranking — to a student who has joined the leaderboards
-  (05).
+- **Its own mode, Challenge mode** (named 2026-10-20): Untimed
+  practice's screen — a clock counting up, move freely, change answers
+  until Submit, the answers and rationales straight after Submit.
+  Unlike Untimed, the time is the server's from Start to Submit,
+  leaving the page does not stop it, and the sitting submits what is
+  answered at the limit: the number of questions × the builder's
+  minutes per question (`builder_minutes_per_question`; NMC questions
+  share one pace). The name shows in the sitting's header.
+- **A start screen of its own** (Sam, 2026-10-20: A, drawn), not the
+  card every quiz shares: "Today's challenge", the course, the date;
+  the number of questions, the minutes and "Challenge mode"; its five
+  rules, each with a small icon — the clock starts at Start and keeps
+  running if you leave; move and change answers until you submit; at
+  the limit what is answered is submitted; answers and explanations
+  straight after, until midnight; one go a day. A box beneath: "Your
+  time counts towards the leaderboards — right answers first, then
+  time", with this week's rank, to a student who has joined; "Join the
+  leaderboards ›" to one who has not. Start, Cancel, and "Don't show
+  this again" as every mode has it (remembered by the phone), so a
+  regular player goes from Play straight to the questions; the screen
+  still shows the first time.
 - **Once a day**: one challenge sitting per student per day, counted for
   the day it started.
 - **Its answers only on its day** (Sam, 2026-10-20), for every student
@@ -323,9 +335,24 @@ live.
   Its answers count toward the streak and questions mastered like any
   others (05).
 - **The first time a student goes to play, before its questions, the
-  offer to join the leaderboards** (05; Sam, 2026-10-20), asked once.
-- **Opened from the dashboard's top card**, for every status; no menu
-  item of its own (Sam, 2026-10-04; 00, The menu).
+  offer to join the leaderboards** (05; Sam, 2026-10-20, drawn), asked
+  once: a screen of its own on the way to play — Join, then How you'll
+  appear, then the start screen; Not now, just play, straight to the
+  start screen.
+- **On the dashboard, one slim line under the title** (Sam, 2026-10-20:
+  C, drawn — in place of the top card or a card of its own), for every
+  status; the top card stays as it is. Before playing, tinted: "Today's
+  challenge · Midwifery · 5 questions" and Play ›. After: "Today · 4 of
+  5 right", the rank line ("4th in St Mary's this week", or "See this
+  week's leaderboard ›" before joining) and Answers › until midnight. On
+  a day with none, "Back tomorrow". No menu item of its own (Sam,
+  2026-10-04; 00, The menu).
+- **A home of its own** (Sam, 2026-10-20): a page that houses the daily
+  challenge — the dashboard and other places only feature it. Who can
+  open it and what it shows are open (below).
+- **A reminder on the phone** (Sam, 2026-10-20): "Today's challenge is
+  ready", under Notifications' Reminders row (08). A reminder at a set
+  hour needs the app's clock (10), which this would bring.
 
 ### Mock exams
 
@@ -382,9 +409,12 @@ live.
 
 ## Open
 
-- **Where the challenge's card sits on the dashboard** — on the top
-  card (00) or a card of its own under it (11); settled when its
-  screens are drawn (2026-10-20).
+- **The daily challenge's home page** — whether anyone may open it
+  (shareable, Play asking a visitor to sign in) or only signed-in
+  students, and what it shows. Sam is looking into it (2026-10-20); a
+  first suggestion — today's course per programme, how it works, the
+  week's top schools and counts, never the questions or a student's
+  name — did not sit right with him.
 - **Q3 — the rest of mock exams' design** (ruled 2026-10-13: the first
   sitting, sittings allowed, results on a date, the review period, the
   close, the page — above): notices when a mock opens and when results
