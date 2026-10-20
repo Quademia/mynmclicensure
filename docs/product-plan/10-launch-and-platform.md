@@ -97,7 +97,8 @@ a student's sittings indexed by date (05 Q12, 2026-10-17).
 *(to build)*
 
 - The photo served at full size (1.38 MB for a 24px circle) and fetched
-  on every page — resized and kept.
+  on every page — resized and kept. Needed before the leaderboards show
+  photos, and built with them (05; Sam, 2026-10-20).
 - The admin and public pages' links reload the whole page.
 - The student layout's three reads hold up every student page.
 - Two lists read every column of a student's sittings — name the
@@ -142,8 +143,13 @@ ticked 2026-09-18.
   sittings and receipts). The filter must spare this product's own
   users. Sam's call before going live.
 - Whether prod opens with the paid packages paused.
-- **Schools** — a regulator's list with no way to change it (D50,
-  unruled since 2026-09-18).
+- ~~**Schools** — a regulator's list with no way to change it (D50,
+  unruled since 2026-09-18).~~ Settled 2026-10-20: suggested schools,
+  the admin approves, merges or removes (01).
+- **An AI helper in the app** (Sam's idea, 2026-10-20) — an assistant
+  like Claude doing daily admin work: checking new profile pictures and
+  suggested school names for anything offensive and flagging them for
+  the admin, and other routine checks. To consider; not planned.
 - **The Telegram group's keys** — free text holding junk, no list (D3),
   tied to the group (08).
 - Five old-app bugs the port fixed without a record — keep (Sam to

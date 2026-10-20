@@ -55,9 +55,12 @@ table by table as each is next changed (AGENTS.md rule 9).
 - *To build — ticked 2026-09-18 (10):* `level` keyed to `levels`;
   `cohort` becomes a year (a number). Why: today both are free text the
   admin's pickers can't rely on.
-- *Needs Sam's tick before the build (05 G1b):* `username` (generated,
-  unique, display only) and the animal. Why: the boards never show a
-  real name or photo.
+- *Needs Sam's tick before the build (01, 05 G1b; Sam, 2026-10-20):*
+  `school_other` retired — every name typed into it becomes a suggested
+  school (`schools`, below) and `school_id` points there. Why: a school
+  is always one row, picked or suggested, never loose text.
+- The username and the animal planned here on 2026-10-04 move to the
+  leaderboard card (Decided, no table yet; Sam, 2026-10-20).
 - Browser: a student reads their own row and can change only `name`,
   `forename`, `surname`, `phone_number`, `school_id`, `school_other`,
   `cohort`, `level`, `avatar_url`; an admin reads all. Three leftover
@@ -73,6 +76,14 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `created_at` | When added |
 
 - No way to change the list from the app (open, 10).
+- *Needs Sam's tick before the build (01, 05 G1b; Sam, 2026-10-20):*
+  **suggested schools** — a mark, listed or suggested; a `town`; who
+  suggested it and when. A suggested school is offered only under "Not
+  listed?" in its region; the admin approves it (listed), merges it
+  into a listed school (its students moved, the row gone) or removes it
+  (its students' school cleared, to choose again). Why: the school
+  boards need one name per school, and the list grows only through the
+  admin (settles D50).
 - Browser: anyone reads. *Old defaults.*
 
 ### `levels` — study levels (L100–L400)
@@ -499,6 +510,10 @@ table by table as each is next changed (AGENTS.md rule 9).
   server from Start to Submit, closed at its limit); a challenge sitting
   names the day's draw, and one per student per day. Why: the daily
   challenge (Sam, 2026-10-08).
+- *Needs Sam's tick before the build (05 G1b; Sam, 2026-10-20):* a
+  challenge sitting keeps the student's school when it was played. Why:
+  a challenge counts for the school the student was in, and a student
+  may move school.
 - Indexed by student and date, newest first (`user_id`, `ts_iso`):
   the order Learning History lists a student's sittings in, twenty at a
   time, and its figures read them (05 Q12; ticked and built 2026-10-17).
@@ -782,7 +797,20 @@ table by table as each is next changed (AGENTS.md rule 9).
   the database refuses a second trial for a number on it. No browser
   access. (No table of SMS codes — the SMS company checks the code.)
 - **The email outbox** (10.2) — needs Sam's tick at the build.
-- **The badges already shown** (05 G3) — needs Sam's tick at the build.
+- **The achievements already shown** (05 G3) — needs Sam's tick at the
+  build.
+- **The leaderboard card** — *needs Sam's tick before the build (05
+  G1b; Sam, 2026-10-20)*: one row per student, made the first time they
+  are asked to join — when asked (so it is asked once); joined, yes or
+  no, and when; shown as — name and photo, or username and animal; the
+  username (unique) and the animal; when the username last changed (once
+  a week). In place of the two columns on `users` planned 2026-10-04.
+  Why: the leaderboards are a feature of their own; the boards show
+  other students' names while `users` stays private to each student, so
+  they read only this; and the feature comes out whole. A photo the
+  admin removes leaves the profile itself (`users.avatar_url`), so no
+  mark here. No browser access; read and written through the database's
+  own functions.
 - **The daily challenge's draw** — *ticked 2026-10-08 (04 G2)*: one
   row per programme per day — the date, the programme, the course, the
   questions in order, and any voided — made by the first student to

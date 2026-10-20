@@ -35,10 +35,20 @@ Detail and history: `archive/product-plan/04-access-control.md`,
   programme's trial granted (after the SMS check, F4b), the welcome
   email; then a "now sign in" screen. If
   the profile fails, the login is removed.
-- **A school is required**, picked from the regulator's list; "My
-  school isn't listed" is allowed, and an admin matches the typed name
-  later (10, D50). The student can change school on the profile at any
-  time.
+- **A school is required** — the region first, then the school from
+  the regulator's list. **Suggested schools** (Sam, 2026-10-20, in
+  place of typing a name the admin matches later; settles D50): under
+  "Not listed?", the schools other students suggested in that region,
+  to pick from; still not there, **Add your school** — its name and
+  town (the region already chosen), a simple word check against rude
+  names. A suggestion is offered to the next student who says not
+  listed and never shown with the listed ones; the admin approves it
+  onto the list, merges it into a listed school (its students move
+  there) or removes it. Why: three students from one school typed three
+  spellings, and the school boards (05) need one; a suggestion picked
+  by classmates arrives as one name with a place. The student changes
+  school on Profile at any time, the same steps. *(to build, with the
+  leaderboards)*
 - **A programme not Open to the public is refused** (02 C5a, built
   2026-10-04): "This programme is not open yet."
 - **The email is lowercased and unique.** The student's own browser may
@@ -87,6 +97,15 @@ Detail and history: `archive/product-plan/04-access-control.md`,
   is type-to-confirm. *(to build)*
 - **Last sign-in** — written at every sign-in, shown in the Users
   drawer, a filter for dormant accounts on the Users list. *(to build)*
+- **Schools not on the list** (Sam, 2026-10-20) — each suggested school
+  with its region and town and how many students picked it: **Approve**
+  (it joins the list), **Merge** (a listed school under another
+  spelling; its students move there) or **Remove** (a joke or a mistake;
+  its students choose again). The names typed before suggested schools
+  arrive here as suggestions to tidy. *(to build, with the leaderboards)*
+- **Remove picture** on a student's row (Sam, 2026-10-20) — takes the
+  profile photo off entirely: profile pictures can be abused, and the
+  leaderboards show them (05). *(to build, with the leaderboards)*
 - **A Security page, done fully** (Sam, 2026-09-18: "we do it fully if
   we are doing it"). *(to build)*
   - **Sessions** — a panel in the Users drawer and a list across the

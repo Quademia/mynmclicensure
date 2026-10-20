@@ -273,11 +273,22 @@ four-step page built from it, were set aside the same day.
 ### The daily challenge *(to build: G2, before the leaderboard)*
 
 Settled by Sam, 2026-10-08, replacing the 09-26 "seed from the date"
-and "instant runner", which predate the four modes.
+and "instant runner", which predate the four modes; gone over again
+with the leaderboards on 2026-10-20 (05), both to be built before going
+live.
 
+- **For signed-in students only** (Sam, 2026-10-20): free, trial and
+  paid alike; no play for visitors — today's answers would be out before
+  the boards count, and "once a day" needs a person.
 - **A set number of questions a day per programme** — an admin setting,
   5 to start — the same for everyone in it, free, trial and paid, from
-  the free set (03). A change applies from the next day's draw.
+  **the Practice pool** (06.8, Sam 2026-10-15; reconfirmed 2026-10-20).
+  Not the free set: about 50 a course, drawn every third day, it would
+  repeat within a month and show nothing new; Practice (about 900 a
+  course) returns a question after a year or more, so the boards measure
+  knowing, not remembering. A free student sees five Practice questions
+  a day this way, never chosen and never kept (below). A change to the
+  number applies from the next day's draw.
 - **The draw, made once a day**, by the first student to open it, and
   kept: the day, the programme, the course, the questions in order.
   - **One course a day**, the programme's own courses in their listed
@@ -299,12 +310,20 @@ and "instant runner", which predate the four modes.
   submits what is answered at the limit: the number of questions × the
   builder's minutes per question (`builder_minutes_per_question`; NMC
   questions share one pace). The start screen says the time counts
-  towards the ranking.
+  towards the ranking — to a student who has joined the leaderboards
+  (05).
 - **Once a day**: one challenge sitting per student per day, counted for
   the day it started.
-- A new kind of sitting: every list that sorts sittings by kind learns
-  it.
-- A student's first challenge brings the username card (05).
+- **Its answers only on its day** (Sam, 2026-10-20), for every student
+  whatever their account: the day's challenge, its answers and
+  rationales, can be reopened until midnight (UTC, Ghana's time); after
+  that it is gone from view. Nobody builds a library of answers from it.
+- **Not in Learning History** (Sam, 2026-10-20): not listed and not
+  counted in the history's figures; its record is the leaderboards (05).
+  Its answers count toward the streak and questions mastered like any
+  others (05).
+- **The first time a student goes to play, before its questions, the
+  offer to join the leaderboards** (05; Sam, 2026-10-20), asked once.
 - **Opened from the dashboard's top card**, for every status; no menu
   item of its own (Sam, 2026-10-04; 00, The menu).
 
@@ -363,6 +382,9 @@ and "instant runner", which predate the four modes.
 
 ## Open
 
+- **Where the challenge's card sits on the dashboard** — on the top
+  card (00) or a card of its own under it (11); settled when its
+  screens are drawn (2026-10-20).
 - **Q3 — the rest of mock exams' design** (ruled 2026-10-13: the first
   sitting, sittings allowed, results on a date, the review period, the
   close, the page — above): notices when a mock opens and when results

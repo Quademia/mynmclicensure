@@ -82,8 +82,8 @@ Full Access stays the admin's grant (02).
 | | Report | One sitting's debrief: what to fix next |
 | Progress | Learning history | Every past sitting, by course: open its report, resume, review, retake; the figures by kind (05) |
 | | Streak and questions mastered — *new* | A card on the dashboard, not a page (05 G1a) |
-| | Leaderboard — *new* | My school, my programme, schools — each board one programme's; a "your rank" line on the challenge card opens it (05 G1b) |
-| | Badges — *later* | Milestones, once there are real numbers (05 G3) |
+| | Leaderboards — *new* | Today · This week · All time; my school, my programme, all of Ghana, schools; joined by choice; a line on the challenge card opens it (05 G1b) |
+| | Achievements — *later* | Doing, keeping at it, placing — in place of badges (05 G3; Sam, 2026-10-20) |
 | | A course's topics — *later* | Strongest and to work on, on the course page, not a page of its own (05.6, parked; Sam, 2026-10-17) |
 | Study offline | My packs | The packs the student has made |
 | | Build a pack | Questions picked to study without data |
@@ -94,7 +94,7 @@ Full Access stays the admin's grant (02).
 | | NMC procedures | The NMC's procedure manuals |
 | | WhatsApp and Telegram channels | Links out |
 | | Premium channel — *later* | Premium Prep's Telegram channel, one per programme, joined through the bot (08) |
-| Account | Profile | Details and photo; the username and animal for the boards (*new*, 05) |
+| Account | Profile | Details and photo; the school; Show me on the leaderboards, and as name and photo or username and animal (*new*, 05) |
 | | Packages | Buy or extend a package (today "Upgrade") |
 
 In the sitting: **Report an issue** — *new*, in place of Send
@@ -150,7 +150,9 @@ taken back the same day: "too busy" (Sam, 2026-10-04).
 - **Sign-in lands on the dashboard for everyone**; its top card changes
   with the student's status (11).
 - The daily challenge has no menu item — its card is on the dashboard.
-  The leaderboard is one item under Progress and a line on that card.
+  Leaderboards and Achievements are rows under Progress, beside
+  Learning history (Sam, 2026-10-20); a line on that card opens the
+  leaderboards.
 - Why: one place to learn, as Duolingo, Spotify and Quizlet do; a menu
   or a landing that changes with status moves things when the student
   upgrades and hides what they could unlock ("locked, not gone", 03).
@@ -158,7 +160,8 @@ taken back the same day: "too busy" (Sam, 2026-10-04).
   never change — Home, Practise, Progress, Offline. A group's other
   pages sit in a row of tabs at the top of its pages (Home: Dashboard ·
   Courses, a course's own page with only its way back; Practise: Papers ·
-  Mocks · Builder; Progress: History · Leaderboard; Offline: My packs ·
+  Mocks · Builder; Progress: History · Leaderboards · Achievements (to
+  check it fits at 360px); Offline: My packs ·
   Build); each tab opens on the first, not remembered. The ☰ menu stays
   the full list; a computer keeps the sidebar. A bar that swaps to the
   group's items was drawn and declined: two taps between groups (09).

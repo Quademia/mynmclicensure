@@ -1,9 +1,10 @@
 # 05 — Progress
 
 What the student can see of their own progress — their history, the
-streak, questions mastered, where they stand — and the weekly
-leaderboard that runs on the daily challenge (04). Open to every
-student: free, trial and paid.
+streak, questions mastered, where they stand — the leaderboards that
+run on the daily challenge (04), and achievements. Open to every
+student: free, trial and paid. In the menu, Progress holds Learning
+history · Leaderboards · Achievements (00; Sam, 2026-10-20).
 
 Detail and history: `archive/product-plan/09-free-account-and-gamification.md`
 §3 (*G1, part by part*; *The leaderboard settled*; *Four parked ideas*)
@@ -44,7 +45,8 @@ parked). *(built 2026-10-17: 05.5)*
   and a count by kind — practice papers, mocks, quiz builder, free
   practice (a builder quiz of free questions only). A retake counts as
   its original's kind. The count by mode goes. *(built 2026-10-17: Q12)*
-- Offline pack practice is not listed (07: no sync).
+- Offline pack practice is not listed (07: no sync), nor the daily
+  challenge (04; Sam, 2026-10-20).
 - **A course's topics on its course page** — its strongest topics and
   its topics to work on (each with Practise), over the course's whole
   history, perhaps a score trend; no page of its own (Sam,
@@ -76,49 +78,105 @@ already saves — no new table.
   time", where answered means new questions met.
 - Questions mastered is on no board.
 
-### The leaderboard *(to build: G1b, after the daily challenge)*
+### Leaderboards *(to build: G1b, after the daily challenge)*
 
-Settled by Sam, 2026-10-04.
+Settled by Sam, 2026-10-04 and 10-08; gone over again on 2026-10-20,
+planned with the daily challenge (04) — both to be built before going
+live.
 
-- **Where it sits**: its own page, one item under Progress in the menu,
-  and a "your rank" line on the dashboard's challenge card that opens it
-  (00, The menu).
-
-- **From the daily challenge only** — the same questions a day for free,
-  trial and paid students: at most the day's number (an admin setting,
-  5 to start; 04) a day; the week Monday
-  to Sunday (UTC); the best 6 of the 7 days count.
-- **Order**: right answers first, then the quicker time — the server's
-  time from Start to Submit, the challenge's own mode (04; Sam,
-  2026-10-08, replacing the phone's engaged seconds, which leaving the
-  page stopped). Speed adds no points of its own.
-- **Every board is one programme's** (Sam, 2026-10-08): each programme
-  plays its own questions, so only students who played the same ones are
-  ranked together.
-- **Three views:**
-  - **My school**, shown first — the student's school and programme
-    ("St Mary's · RN"). The top 10 are public; the student's own rank is
-    private ("You: 41st of 58").
-  - **My programme** — the top 3, plus the two above and two below the
-    student.
-  - **Schools** — per programme ("RN schools"): the average of each
-    school's best 10 in it; a school with fewer shows "N more players
-    and your school enters the board". Only school names show.
-- Points count for the school the student was in when they earned them.
-  A student who typed in an unlisted school waits for an admin to match
-  it (01).
-- **A username and an animal, never the real name or photo.** The
-  username is generated — an adjective and an animal, a number added on
-  a clash — given at the student's first daily challenge with up to 3
-  spins of the word, changeable once a week on the profile; unique, for
-  display only; the admin sees it beside the real name. The student
-  picks the animal from a grid; the card arrives filled, one tap
-  accepts it.
+- **The name is Leaderboards**: one page, a row under Progress (00),
+  and a line on the dashboard's challenge card that opens it — the
+  student's rank once they have joined, else "See this week's
+  leaderboard ›".
+- **From the daily challenge only.** Every challenge keeps the right
+  answers, the server's time from Start to Submit (the challenge's own
+  mode, 04; Sam 2026-10-08) and the school the student was in — from the
+  first challenge, joined or not.
+- **Every ranking is worked out; the page picks what shows** (Sam,
+  2026-10-20). A switch **Today · This week · All time** and four views
+  **My school · My programme · All of Ghana · Schools**; it opens on
+  **This week · My school**, the board a student can climb.
+  - **Today** — the day's right answers, then the quicker time.
+  - **This week** — Monday to Sunday (UTC, Ghana's time), restarting
+    every Monday, so a student who joins late competes on equal terms
+    (Duolingo's weekly leagues; Stack Overflow's users open on the week).
+    A day's result is its right answers and time, a day not played 0;
+    the best 6 of the 7 days count; the week's score is their right
+    answers, the lower total time on a level, a shared rank on a full
+    tie.
+  - **All time** — **the average right answers per challenge**, shown
+    once a student has played 10; on a level average, more challenges
+    played first, then the quicker average time (Sam, 2026-10-20, like
+    a batting average after its minimum — in place of totals, which a
+    late joiner can never catch, and of counting from each viewer's
+    start, which gives everyone a different board). How long a student
+    has kept at it is honoured by Achievements, not a board.
+  - **My school** and **My programme** are one programme's: each
+    programme plays its own questions (Sam, 2026-10-08). **All of
+    Ghana** puts every programme's students together (Sam, 2026-10-20) —
+    less exact on one day, evened out over a week. **Schools** ranks a
+    programme's schools by the average of each school's best 10 in the
+    chosen time, "N more players and your school enters the board"; only
+    school names show.
+  - A voided question (04) leaves everyone's score.
+- **One look for every board** (Sam, 2026-10-20, in place of a shape
+  per view): the top 10, then the student — outside the top 10 their
+  line with the one above and the one below ("You: 41st of 58").
+- **Joining is the student's choice** (Sam, 2026-10-20). The first time
+  a student goes to play a challenge, before its questions, a card says
+  what the boards are — how you will appear, ranks in your school, your
+  programme and all of Ghana — with **Join** and **Not now, just play**.
+  Asked once; after that a quiet "Join the leaderboards" on the
+  challenge's card and its results, and Profile's switch **Show me on
+  the leaderboards**, to join or leave at any time. Before joining, the
+  boards show "Join to see where you rank" in place of their line, and
+  the challenge's start screen does not speak of the ranking. Joining
+  later costs nothing: the past challenges count.
+- **How a student appears is their choice at joining, changed on
+  Profile** (Sam, 2026-10-20 — bringing back as a choice what 10-04's
+  "never the real name or photo" ruled out): **a username and an
+  animal** (the default) or **their first name and surname's initial
+  with their profile photo** ("Ama O."), never the full name. Every
+  joined student holds a username and an animal either way, so a switch
+  is one tap; with no photo, the animal shows.
+- **The username**: a word and an animal ("Brave Lion"), a number on a
+  clash; the animal picked from a grid of drawings, the word spun up to
+  3 times; unique, for display only, changed at most once a week on
+  Profile; the admin sees it beside the real name. **The lists, in
+  English, approved by Sam 2026-10-20** — plain words, only kind ones;
+  no animal used as an insult or linked with witchcraft or bad luck in
+  Ghana:
+  - Words (52): Agile, Alert, Bold, Brave, Bright, Brilliant, Calm,
+    Cheerful, Clever, Cosmic, Daring, Dazzling, Eager, Epic, Fearless,
+    Focused, Gentle, Glowing, Golden, Grand, Happy, Hardy, Heroic,
+    Honest, Jolly, Joyful, Keen, Kind, Lively, Loyal, Lucky, Merry,
+    Mighty, Nimble, Noble, Quick, Radiant, Rapid, Royal, Sharp, Shining,
+    Smart, Speedy, Steady, Stellar, Sunny, Swift, Trusty, Valiant,
+    Vibrant, Wise, Witty.
+  - Animals (38): Lion, Leopard, Tiger, Elephant, Giraffe, Zebra,
+    Rhino, Camel, Horse, Deer, Bison, Bear, Panda, Koala, Kangaroo, Fox,
+    Wolf, Rabbit, Squirrel, Hedgehog, Otter, Beaver, Eagle, Peacock,
+    Flamingo, Swan, Dove, Penguin, Dolphin, Octopus, Turtle, Crocodile,
+    Butterfly, Bee, Ladybird, Spider, Unicorn, Dragon.
+  - Left out: monkey, gorilla, ape, chimp, pig, dog, donkey, goat, cow,
+    sheep, rat, chicken, turkey, dodo (insults); snake, owl, bat,
+    parrot (bad links); hippo, whale, sloth, snail (unkind jokes); the
+    words Patient and Zesty.
+  - A set in Ghanaian languages may be added later, written or checked
+    by speakers (Sam: English for now); the name maker only reads lists.
 - **The animals are Google's Noto emoji animals** (Apache 2.0, about
-  4 KB each, bundled with the app, the notice kept), the animal
-  matching the username. Only animals with a drawing are in the list;
-  no monkeys, apes or any animal used as an insult. DiceBear's
+  4 KB each, bundled with the app, the notice kept). DiceBear's
   Avataaars is the documented alternative.
+- **Schools.** A challenge counts for the school the student was in
+  when they played it. A suggested school (01) has its My school board
+  at once and joins the Schools ranking only when the admin approves it,
+  so a joke name never reaches it.
+- **Pictures.** Profile photos are shown small — made small first (10's
+  speed list, built with this). The admin's **Remove picture** on a
+  student's row in Users takes the photo off the profile entirely
+  (profile pictures can be abused anywhere, not only here); the boards
+  then show the animal. Whether the student is told why (a line from
+  Quademia on the support desk) — at the build.
 - **Share on WhatsApp** — a register link with the school filled in.
 - No prizes for now.
 
@@ -140,12 +198,20 @@ Settled by Sam, 2026-10-04.
   page's read of at most 5,000 sittings (where past that the numbers are
   the newest 5,000's). *(to build)*
 
-### Badges *(later: G3)*
+### Achievements *(later: G3, after the leaderboards)*
 
-- Badges in place of tiers, once G1a has real numbers (Sam,
-  2026-10-04): milestones on questions mastered and the streak ("first
-  100 mastered", "a 7-day streak", "a first full Practice Paper"),
-  never on questions answered. The art is a set Sam approves.
+- **Achievements, in place of badges** (Sam, 2026-10-20; badges in
+  place of tiers, 2026-10-04): their own row under Progress. Three
+  kinds:
+  - **Doing** — a first Practice Paper, a first mock, a first challenge.
+  - **Keeping at it** — questions mastered (100, 500, 1,000…), never
+    questions answered, which tapping anything would farm; streaks;
+    challenges played (50, 100) — where staying with it is honoured,
+    rather than on a board.
+  - **Placing** — 1st, 2nd or 3rd on a This week board, given when the
+    week closes (Sunday midnight), only on a board of at least 10
+    players, and only to students who joined the leaderboards.
+- The list and the pictures: Sam sees them before the build.
 
 ## Storage
 
@@ -154,10 +220,12 @@ Settled by Sam, 2026-10-04.
   written on `attempts` and the functions in 12, ticked 2026-10-17.
 - Q13 — none.
 - G1a — none.
-- G1b — two columns on `users`, the username and the animal: needs
-  Sam's tick before the build.
-- G3 — a small table remembering which "New badge!" has been shown:
-  needs Sam's tick at the build.
+- G1b — a table of its own, a leaderboard card per student (in place
+  of the two columns on `users` planned 2026-10-04), and the school kept
+  on each challenge sitting: written in 12, needs Sam's tick before the
+  build.
+- G3 — a small table remembering which "New achievement!" has been
+  shown: needs Sam's tick at the build.
 
 ## Open
 
@@ -166,9 +234,8 @@ Settled by Sam, 2026-10-04.
   5 in a topic), whether a trend.
 - **Q13** — the minimum before "how everyone did" shows (MyNclex uses
   30); the readiness band's signals and words.
-- The username word lists — adjectives and animals; Sam sees them
-  before anyone gets a name.
-- The badge milestones and the art set.
+- Achievements' list and their pictures.
+- Whether a student is told why the admin removed their picture.
 - The percentile's threshold (about 30) — set at the build.
 - Later, parked (Sam, 2026-10-04): days left to the exam (needs the
   NMC's dates — asked, not answered; the student's sitting asked once,

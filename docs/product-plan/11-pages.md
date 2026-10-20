@@ -203,9 +203,15 @@ opens it (00, The menu).
   quiz" instead of the database's sentence.
 
 ### Daily challenge
-- The first visit brings the username card: an animal and a word
-  already filled, one tap to accept, the animal grid, up to 3 spins of
-  the word (05).
+- The same in every state: free, trial, paid and ended students all
+  play; signed in only (04).
+- The first time a student goes to play, before its questions: the
+  offer to join the leaderboards — Join or Not now, just play — asked
+  once; Join opens the choice of how to appear and, for a username, the
+  card: an animal from the grid and a word already filled, up to 3 spins
+  of the word, one tap to accept (05).
+- Its answers reopen from the dashboard's card until midnight; not in
+  Learning History (04).
 
 ### The sitting — start screen, sitting, review
 - **Parked (Sam, 2026-10-15):** the sitting and the report are special
@@ -261,12 +267,16 @@ opens it (00, The menu).
   only the loaded pages; no Mock option in Source, and a mock shows the
   raw word "mock".
 
-### Leaderboard
-- My school (in the student's programme) first — the top 10 and the
-  student's own rank, privately;
-  my programme — the top 3 and the neighbours; schools — "N more players
-  and your school enters the board"; Share on WhatsApp; usernames and
-  animals only (05).
+### Leaderboards
+- Today · This week · All time; My school · My programme · All of
+  Ghana · Schools; opens on This week · My school. Every board the top
+  10, then the student with the one above and below; "Join to see where
+  you rank" before joining; Share on WhatsApp (05; Sam, 2026-10-20).
+- The same in every state.
+
+### Achievements
+- Doing, keeping at it, placing (05 G3); the list and pictures Sam's,
+  before the build.
 
 ### Offline packs — my packs, build, the pack
 - **Redesigned from 07's ruling (Sam, 2026-10-15)**: My packs one page,
@@ -312,9 +322,11 @@ opens it (00, The menu).
   (04).
 
 ### Profile
-- The username, changed once a week; the school, any time; the phone
-  number changed through the server, clearing its verification (01, 03,
-  05).
+- The username, changed once a week; the school, any time, by region
+  with suggested schools (01); the phone number changed through the
+  server, clearing its verification (01, 03, 05).
+- Show me on the leaderboards, and as name and photo or username and
+  animal (05; Sam, 2026-10-20).
 - **Check**: the subscription panel shows one subscription only, the
   first returned.
 
@@ -336,8 +348,9 @@ opens it (00, The menu).
 
 ### Register, sign in, forgot and reset password
 - Register: registering starts the 14-day trial (01); the school
-  required; closed programmes not offered; the SMS code here, before the
-  trial starts (03 F4b).
+  required — region, then the list, then suggested schools, then Add
+  your school (01; Sam, 2026-10-20); closed programmes not offered; the
+  SMS code here, before the trial starts (03 F4b).
 - Sign in: "This account has been deactivated" (01). Reset: signed in
   on success (01).
 - **Check**: the "N-day free trial — no card required" hint never shows;
@@ -367,7 +380,9 @@ opens it (00, The menu).
 
 ### Users
 - The Sessions panel and last sign-in in the drawer; a dormant filter
-  on the list (01); the username beside the real name (05).
+  on the list (01); the username beside the real name (05); Remove
+  picture on a student's row (01, 05; Sam, 2026-10-20).
+- **Schools not on the list** — Approve, Merge, Remove (01).
 - **Check**: Assign refuses a deactivated account.
 
 ### Subscriptions
