@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-10-20 (night). Rules for **any** assistant working in this
+Last updated: 2026-10-24. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What the app is
@@ -552,6 +552,13 @@ above sit at the repo root; the audience grouping inside them is kept.
   made re-runnable — `drop … if exists` before a function whose shape
   changed — proved rolled back over dev as it stands, and re-run by hand
   from a scratchpad, so prod runs the final file once (2026-10-20).
+- **An identity column shows no `column_default`** in
+  `information_schema.columns`, so a table can look as if its id has no
+  numbering: read `is_identity` (and `pg_get_serial_sequence`) before giving
+  it a sequence — `schools.id` is one (2026-10-24, refused by the proof).
+- **A script writing many rows through the pooler pays a round trip a row**
+  (~300 ms): the dev sample's 1,151 plays, one insert each, took six
+  minutes (2026-10-24). Send them as one insert of many rows.
 - **The dev Supabase tool declines a DELETE** (2026-10-18, twice); an
   UPDATE and reads go through. When Sam asks for dev rows deleted, read
   the count first, then run it through the app's own connection — an

@@ -43,6 +43,7 @@ before then, and the old list's history, is in
 - ⏸ 01.8 Email confirmation at sign-up — parked under the port's rule, which has ended; to re-rule
 - ⬜ 01.10 "Can't sign in?" on the sign-in page — WhatsApp or email; Messages needs a sign-in (10-17)
 - ✅ 01.9 (unplanned) A sign-out ends only its own device, not all; a password reset still ends all — 2026-10-17
+- ⬜ 01.11 Profile's save writes an empty level or cohort as blank text, not empty — before level is keyed (10)
 
 ## [02 Packages and payments](docs/product-plan/02-packages-and-payments.md)
 
