@@ -11,16 +11,24 @@
 // a card; no play yet, or one going, the start screen — its data only, no
 // question; a play ended, its answers until midnight, with the score pill
 // bringing the results back.
+//
+// The leaderboards (05 G1b): a student never asked, with nothing going,
+// meets the offer to join before the start screen; the start screen's box
+// carries this week's place to one who joined, Join the leaderboards to
+// one who has not. Their card is read beside today's challenge.
 
 import type { Metadata } from 'next';
 import { requireStudent } from '@/lib/access';
 import { challengeCard, getChallengeToday, readChallengeSitting } from '@/lib/challenge/queries';
 import { CHALLENGE_EXIT } from '@/lib/challenge/types';
+import { getJoinChoices, getLeaderboardCard, getWeekRank } from '@/lib/leaderboards/queries';
+import { personOf } from '@/lib/leaderboards/types';
 import { RunnerError } from '@/components/runner/runner-error';
 import { ChallengeRunner } from './challenge-client';
 import { ChallengeStart } from './start-screen';
 import '@/styles/runner.css';
 import '@/styles/challenge.css';
+import '@/styles/leaderboards.css';
 
 export const metadata: Metadata = {
   title: "Today's challenge | MyNMCLicensure",
@@ -30,7 +38,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function ChallengePlayPage() {
   const { supabase, profile } = await requireStudent();
-  const today = await getChallengeToday(profile.user_id);
+  const [today, lbCard] = await Promise.all([getChallengeToday(profile.user_id), getLeaderboardCard(profile.user_id)]);
 
   if (!today) {
     return <RunnerError title="Could Not Load the Challenge" message="Please check your connection and try again." exit={CHALLENGE_EXIT} />;
@@ -48,5 +56,17 @@ export default async function ChallengePlayPage() {
     return <ChallengeRunner sitting={read.sitting} reviewMode />;
   }
 
-  return <ChallengeStart card={challengeCard(today)} userId={profile.user_id} />;
+  const joined = lbCard?.joined === true;
+  const [choices, weekRank] = await Promise.all([
+    joined ? null : getJoinChoices(personOf(profile.forename, profile.surname), profile.avatar_url),
+    joined ? getWeekRank(profile.user_id, Boolean(profile.school_id)) : null,
+  ]);
+
+  return (
+    <ChallengeStart
+      card={challengeCard(today)}
+      userId={profile.user_id}
+      leaderboards={{ offer: !lbCard && !today.play && choices !== null, joined, choices, weekRank }}
+    />
+  );
 }

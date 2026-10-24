@@ -211,7 +211,8 @@ opens it (00, The menu).
   offer to join the leaderboards — Join or Not now, just play — asked
   once; Join opens the choice of how to appear and, for a username, the
   card: an animal from the grid and a word already filled, up to 3 spins
-  of the word, one tap to accept (05).
+  of the word, one tap to accept (05). *(built 2026-10-24: 05.9, How
+  you'll appear as 2A)*
 - Its answers reopen from the dashboard's slim line until midnight; not
   in Learning History (04).
 - Its own start screen, A: the five rules of Challenge mode, the

@@ -151,7 +151,12 @@ live.
   the leaderboards**, to join or leave at any time. Before joining, the
   boards show "Join to see where you rank" in place of their line, and
   the challenge's start screen does not speak of the ranking. Joining
-  later costs nothing: the past challenges count.
+  later costs nothing: the past challenges count. *(built 2026-10-24:
+  05.9 — the offer, How you'll appear as 2A (Sam, 2026-10-24: two cards
+  in place of 2B's preview row and switch), Cancel there counting as Not
+  now from the offer, and the start screen's Join the leaderboards going
+  straight to How you'll appear; Profile's switch and the challenge card's
+  and results' quiet Join lines to build)*
 - **How a student appears is their choice at joining, changed on
   Profile** (Sam, 2026-10-20 — bringing back as a choice what 10-04's
   "never the real name or photo" ruled out): **a username and an
@@ -184,8 +189,11 @@ live.
     words Patient and Zesty.
   - A set in Ghanaian languages may be added later, written or checked
     by speakers (Sam: English for now); the name maker only reads lists.
-- **The animals are Google's Noto emoji animals** (Apache 2.0, about
-  4 KB each, bundled with the app, the notice kept). DiceBear's
+- **The animals are Google's Noto emoji animals** (Apache 2.0, bundled
+  with the app in `public/animals`, the notice kept; a face where Noto has
+  one). Fetched 2026-10-24: about 9 KB each as files, about 5 KB as sent
+  compressed — the same as Noto's sharp 128-pixel pictures, so the SVGs
+  were kept; the grid fetches only the drawings on screen. DiceBear's
   Avataaars is the documented alternative.
 - **Schools.** A challenge counts for the school the student was in
   when they played it. A suggested school (01) has its My school board

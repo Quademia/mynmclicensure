@@ -1,0 +1,219 @@
+/* styles/leaderboards.css — the leaderboards' own pieces (05 G1b): the
+   offer to join and How you'll appear, on the quiz start screen's card
+   (styles/runner.css); the animal circle; Change animal's panel from
+   below; the start screen's box. Tokens only. The panel is portalled to
+   <body>, so its rules are not under .runner (AGENTS.md). */
+
+/* ── the animal circle, on the shared name circle (.name-circle) ── */
+.lb-circle-32 { width: 32px; height: 32px; }
+.lb-circle-48 { width: 48px; height: 48px; }
+.lb-circle-64 { width: 64px; height: 64px; }
+.name-circle.lb-animal { background: var(--brand-teal-pale); }
+.name-circle.lb-animal img {
+  width: 72%;
+  height: 72%;
+  object-fit: contain;
+}
+
+/* ── the offer ── */
+.lb-offer-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--space-12);
+  border-radius: var(--radius-pill);
+  background: var(--brand-teal-pale);
+  color: var(--brand-teal-hover);
+}
+.lb-offer-badge svg { width: 28px; height: 28px; }
+.lb-offer-lead {
+  margin: 0 0 var(--space-16);
+  font-size: var(--type-field-size);
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
+/* ── How you'll appear ── */
+.lb-options {
+  display: grid;
+  gap: var(--space-12);
+  margin: var(--space-16) 0 var(--space-12);
+}
+.lb-option {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+.lb-option.is-on {
+  border-color: var(--brand-teal);
+  box-shadow: 0 0 0 1px var(--brand-teal);
+}
+.lb-option-pick {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-16);
+  cursor: pointer;
+}
+.lb-option-main {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+.lb-option-name {
+  font-size: var(--type-card-title-size);
+  font-weight: var(--type-card-title-weight);
+  color: var(--ink);
+}
+.lb-option-note {
+  font-size: var(--type-meta-size);
+  color: var(--ink-muted);
+}
+.lb-option-pick input[type='radio'] {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--brand-teal);
+}
+.lb-option-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8) var(--space-20);
+  padding: 0 var(--space-16) var(--space-12) calc(var(--space-16) + 48px + var(--space-12));
+}
+.lb-option-tools .btn-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 32px;
+  font-size: var(--type-field-size);
+}
+.lb-option-tools .btn-link svg { width: 16px; height: 16px; }
+.lb-option-tools .btn-link:disabled {
+  color: var(--ink-faint);
+  text-decoration: none;
+  cursor: default;
+}
+.lb-appear-note {
+  margin: 0;
+  font-size: var(--type-meta-size);
+  color: var(--ink-muted);
+}
+@media (max-width: 768px) {
+  .lb-option-tools { padding-left: var(--space-16); }
+}
+
+/* ── Change animal: a panel from below ── */
+.lb-sheet {
+  border: 0;
+  padding: 0;
+  margin: auto auto 0;
+  width: min(560px, 100vw);
+  max-width: 100vw;
+  max-height: 80vh;
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow: var(--shadow-lg);
+  overflow: auto;
+}
+.lb-sheet::backdrop { background: var(--scrim); }
+.lb-sheet-body { padding: var(--space-16) var(--space-16) var(--space-24); }
+.lb-sheet-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin-bottom: var(--space-12);
+}
+.lb-sheet-title {
+  flex: 1;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.lb-sheet-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: calc(-1 * var(--space-8));
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+.lb-sheet-close:hover { background: var(--surface-page); }
+.lb-animal-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: var(--space-8);
+}
+.lb-animal-pick {
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  padding: var(--space-8) var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: none;
+  font-size: var(--type-meta-size);
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+.lb-animal-pick:hover { background: var(--surface-page); }
+.lb-animal-pick.is-on {
+  border-color: var(--brand-teal);
+  background: var(--brand-teal-pale);
+  color: var(--brand-teal-hover);
+  font-weight: 600;
+}
+
+/* ── the start screen's box ── */
+.lb-box {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-10);
+  width: 100%;
+  margin: var(--space-4) 0 0;
+  padding: var(--space-12) var(--space-16);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--brand-teal-pale);
+  font-size: var(--type-field-size);
+  line-height: 1.5;
+  color: var(--ink);
+  text-align: left;
+}
+.lb-box-icon {
+  flex: none;
+  display: flex;
+  color: var(--brand-teal-hover);
+  padding-top: 2px;
+}
+.lb-box-icon svg { width: 18px; height: 18px; }
+.lb-box-rank {
+  margin-top: var(--space-4);
+  font-weight: 600;
+  color: var(--brand-teal-hover);
+}
+.lb-box-join {
+  align-items: center;
+  background: var(--surface);
+  color: var(--brand-teal-hover);
+  font-weight: 600;
+  cursor: pointer;
+}
+.lb-box-join:hover:not(:disabled) { background: var(--brand-teal-pale); }
+.lb-box-join .lb-box-icon { padding-top: 0; }
+.lb-box-join-text { flex: 1; }

@@ -340,7 +340,9 @@ live.
   straight after, until midnight; one go a day. A box beneath: "Your
   time counts towards the leaderboards — right answers first, then
   time", with this week's rank, to a student who has joined; "Join the
-  leaderboards ›" to one who has not. Start, Cancel, and "Don't show
+  leaderboards ›" to one who has not, straight to How you'll appear (Sam,
+  2026-10-24). *(the box built 2026-10-24: 05.9; the rank is on the
+  student's school board, the programme's with no school)* Start, Cancel, and "Don't show
   this again" as every mode has it (remembered by the phone), so a
   regular player goes from Play straight to the questions; the screen
   still shows the first time.
@@ -368,7 +370,8 @@ live.
   offer to join the leaderboards** (05; Sam, 2026-10-20, drawn), asked
   once: a screen of its own on the way to play — Join, then How you'll
   appear, then the start screen; Not now, just play, straight to the
-  start screen.
+  start screen. Not asked while a play is going. *(built 2026-10-24:
+  05.9)*
 - **On the dashboard, one slim line under the title** (Sam, 2026-10-20:
   C, drawn — in place of the top card or a card of its own), for every
   status; the top card stays as it is. Before playing, tinted: "Today's
