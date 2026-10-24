@@ -242,20 +242,70 @@ live.
   page's read of at most 5,000 sittings (where past that the numbers are
   the newest 5,000's). *(to build)*
 
-### Achievements *(later: G3, after the leaderboards)*
+### Achievements *(to build: G3; approved by Sam 2026-10-24)*
 
 - **Achievements, in place of badges** (Sam, 2026-10-20; badges in
-  place of tiers, 2026-10-04): their own row under Progress. Three
-  kinds:
-  - **Doing** — a first Practice Paper, a first mock, a first challenge.
-  - **Keeping at it** — questions mastered (100, 500, 1,000…), never
-    questions answered, which tapping anything would farm; streaks;
-    challenges played (50, 100) — where staying with it is honoured,
-    rather than on a board.
-  - **Placing** — 1st, 2nd or 3rd on a This week board, given when the
-    week closes (Sunday midnight), only on a board of at least 10
-    players, and only to students who joined the leaderboards.
-- The list and the pictures: Sam sees them before the build.
+  place of tiers, 2026-10-04): their own row under Progress. Open to
+  every student, free, trial and paid alike. Planned by another agent's
+  report and revised here; **approved as written by Sam, 2026-10-24**
+  (drawn in the chat: the page, Placing, one opened, the New achievements
+  box, the two picture styles).
+- **The 15**, in three kinds:
+
+  | Kind | Achievement | Earned when | Picture |
+  |---|---|---|---|
+  | Doing | First Steps | the first Practice Paper finished | 👣 |
+  | | Exam Explorer | the first mock finished | 📝 |
+  | | Challenge Accepted | the first daily challenge finished | ⚡ |
+  | Keeping at it | Knowledge Builder, 4 levels | 100 · 500 · 1,000 · 2,500 questions mastered | 🧠 |
+  | | Steady Learner, 3 levels | a best streak of 7 · 30 · 100 days | 🔥 |
+  | | Challenge Regular, 2 levels | 50 · 100 daily challenges played | 📅 |
+  | Placing | Weekly Champion · Runner-up · Podium | 1st · 2nd · 3rd on a This week board | 🥇 🥈 🥉 |
+
+  - **Mastered** as above: right the first time a question is met, never
+    in under 5 seconds; questions answered is never counted (tapping
+    anything would farm it). 2,500 added (Sam) — a programme's bank passes
+    1,000 well before the exam.
+  - **The streak** is the dashboard's (one missed day a week forgiven),
+    counted by the **best** streak, so one that later broke still earns
+    its level. A daily challenge counts once a day.
+  - **Finished** means a sitting completed (any mode); abandoned or
+    unfinished does not count; no minimum score.
+  - Left out (Sam): "First quiz you built yourself" — a free student
+    earns it on day one and it says little.
+- **Placing** — 1st, 2nd or 3rd on a **This week** board of at least 10
+  players, to students who joined the leaderboards, on **My school, My
+  programme and All of Ghana** (the Schools board ranks schools, not
+  students). **Settled once, when the week closes**: the first time
+  anyone opens the app after Sunday midnight (UTC, Ghana's time), that
+  week's top 3 on every eligible board is written down for good — no
+  timer, as the challenge closes a play when it is next read. Why it must
+  be written down: a student who joins later brings their past challenges
+  onto the boards, so a week worked out later could change. A medal won
+  again shows a count ("Weekly Champion ×2") with the latest week and
+  board; opened, every week it was won.
+- **The page**: "5 of 15 earned", then Doing, Keeping at it, Placing; an
+  earned one in colour with its date, a locked one in grey with what it
+  needs; a family with levels shows its level ("level 1 of 4") and a bar
+  to the next. A tap opens a small box (the shared dialog): what it is
+  for, each level with its date or how far along. Placing, before
+  joining: "Join the leaderboards to compete for these". Locked, not gone
+  (03).
+- **New achievements** — on the **dashboard only**, at the next visit,
+  once per achievement; several at once in one box; after any Must-see
+  notice, never two boxes at once; never in a quiz or on the results
+  pop-up. See achievements and Close.
+- **The pictures** — Google's Noto drawings (Apache 2.0, the leaderboard
+  animals' source; about 3–5 KB each), in colour when earned and grey
+  when locked; loaded only on the Achievements page and in the box. In
+  place of the app's own line icons, which made a flat page. Bundled in
+  `public/` with the licence kept, as the animals are.
+- **Counted from what is kept**: sittings (`attempts`), answers
+  (`_student_answers`, as the dashboard counts mastered and the best
+  streak), challenge plays, and the leaderboards' week boards. Only what
+  was earned, and its box shown, is stored (below).
+- Not now (Sam): a dashboard card, a Profile display, sharing, custom
+  artwork, more levels.
 
 ## Storage
 
@@ -271,8 +321,9 @@ live.
   worked out as the page opens, no stored totals (12). The school kept on
   each challenge play was ticked with the challenge's tables
   (`challenge_plays`, 12; Sam, 2026-10-20).
-- G3 — a small table remembering which "New achievement!" has been
-  shown: needs Sam's tick at the build.
+- G3 — `student_achievements` (what each student earned, and when its
+  box was shown) and `leaderboard_weeks` (the weeks whose medals are
+  settled): written in 12, need Sam's tick before the build (2026-10-24).
 
 ## Open
 
@@ -281,7 +332,6 @@ live.
   5 in a topic), whether a trend.
 - **Q13** — the minimum before "how everyone did" shows (MyNclex uses
   30); the readiness band's signals and words.
-- Achievements' list and their pictures.
 - Whether a student is told why the admin removed their picture.
 - The percentile's threshold (about 30) — set at the build.
 - Later, parked (Sam, 2026-10-04): days left to the exam (needs the

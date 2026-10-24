@@ -18,7 +18,7 @@ up; nothing here is described against them.
 | [02 Packages and payments](02-packages-and-payments.md) | Programmes, packages, checkout, Paystack, course access, expiry |
 | [03 Free account and trial](03-free-account-and-trial.md) | The free question set, the 14-day trial, what happens after it |
 | [04 Practice](04-practice.md) | Practice papers, mock exams, the quiz builder, the sitting, the report, the daily challenge |
-| [05 Progress](05-progress.md) | Learning history, the streak, questions mastered, the leaderboard, badges |
+| [05 Progress](05-progress.md) | Learning history, the streak, questions mastered, the leaderboards, achievements |
 | [06 Question bank](06-question-bank.md) | The questions, the importer, the admin's bank page, question reports |
 | [07 Offline packs](07-offline-packs.md) | Packs to study without data |
 | [08 Help and news](08-help-and-news.md) | Announcements, messages, the portal guide, NMC procedures, channels |
@@ -83,7 +83,7 @@ Full Access stays the admin's grant (02).
 | Progress | Learning history | Every past sitting, by course: open its report, resume, review, retake; the figures by kind (05) |
 | | Streak and questions mastered — *new* | A card on the dashboard, not a page (05 G1a) |
 | | Leaderboards — *new* | Today · This week · All time; my school, my programme, all of Ghana, schools; joined by choice; a line on the challenge card opens it (05 G1b) |
-| | Achievements — *later* | Doing, keeping at it, placing — in place of badges (05 G3; Sam, 2026-10-20) |
+| | Achievements — *new* | 15 in three kinds — doing, keeping at it, weekly medals — earned in colour, locked in grey; a "New achievements" box on the dashboard (05 G3; approved by Sam 2026-10-24) |
 | | A course's topics — *later* | Strongest and to work on, on the course page, not a page of its own (05.6, parked; Sam, 2026-10-17) |
 | Study offline | My packs | The packs the student has made |
 | | Build a pack | Questions picked to study without data |

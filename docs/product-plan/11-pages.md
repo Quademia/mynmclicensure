@@ -288,8 +288,15 @@ opens it (00, The menu).
 - The same in every state.
 
 ### Achievements
-- Doing, keeping at it, placing (05 G3); the list and pictures Sam's,
-  before the build.
+- The 15 (05 G3; approved by Sam 2026-10-24): "5 of 15 earned", then
+  Doing, Keeping at it, Placing; earned in colour with its date, locked
+  in grey with what it needs, a level family with a bar to its next
+  level; a tap opens its levels and dates; Placing before joining, "Join
+  the leaderboards to compete for these". Noto pictures.
+- The same in every state; a free student's Exam Explorer stays locked
+  until a mock can be sat (locked, not gone).
+- **The dashboard**: the "New achievements" box at the next visit, once,
+  after any Must-see notice.
 
 ### Offline packs — my packs, build, the pack
 - **Redesigned from 07's ruling (Sam, 2026-10-15)**: My packs one page,

@@ -135,7 +135,7 @@ before then, and the old list's history, is in
 - ✅ 05.7 The leaderboards' database — the card, the boards as asked, suggested schools; school_other gone — 2026-10-24
 - ✅ 05.9 Joining — the offer once, How you'll appear (2A), the 38 Noto animals, the start screen's box — 2026-10-24
 - ⏸ 05.8 Running totals on the card — only if All time grows slow (Sam, 10-24: no stored totals)
-- ⬜ G3 Badges — milestones on mastered and the streak, in place of tiers; after G1a
+- ⬜ G3 Achievements — the 15 approved 10-24 (05); its two tables wait for Sam's tick (12)
 - ⬜ 05.1 Attempts analytics as database queries — "which questions everyone fails"; no 5,000 cap
 - ⏸ 05.2 Days left to the exam — needs the NMC's dates (Sam: later, 10-04)
 - ⏸ 05.3 A daily goal (Sam: later, 10-04)

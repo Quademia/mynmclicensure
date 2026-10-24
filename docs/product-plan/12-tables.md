@@ -683,6 +683,53 @@ asked to join.
 - No browser access; read and written through the database's own
   functions.
 
+### `student_achievements` — what each student earned *(needs Sam's tick before the build: 05 G3; 2026-10-24)*
+
+One row per achievement and level a student earns (05, *Achievements*,
+approved 2026-10-24). Everything an achievement is earned *from* is
+counted from what is already kept — sittings, answers, challenge plays,
+the week boards; only the earning itself is stored.
+
+| Column | Holds |
+|---|---|
+| `user_id` | Whose → `users` |
+| `achievement` | Which: `first_paper`, `first_mock`, `first_challenge`, `mastered`, `streak`, `challenges`, `weekly_1st`, `weekly_2nd`, `weekly_3rd` |
+| `level` | The level reached: mastered 1–4 (100 · 500 · 1,000 · 2,500), streak 1–3 (7 · 30 · 100 days), challenges 1–2 (50 · 100); 1 for the others |
+| `week` | A medal's week (its Monday); empty for the others |
+| `board` | A medal's board: `school`, `programme` or `ghana`; empty for the others |
+| `school_id`, `program_id` | A medal's board in full: its school → `schools`, its programme → `programs` |
+| `earned_utc` | When it was recorded |
+| `shown_utc` | When its "New achievements" box was shown; empty until then |
+
+- One row per student, achievement and level; a medal one row per
+  student, week and board (a second 1st in another week is a second row:
+  "×2"). Never deleted when a student leaves the leaderboards — earned is
+  earned.
+- Written by the database: the first-time and level achievements when
+  the dashboard is read (where it already counts mastered and the
+  streak) and after a sitting or a challenge is finished; the medals when
+  their week is settled (below). The box's mark when the dashboard shows
+  it.
+- Why its own table: an achievement is earned once and kept, while the
+  numbers it comes from can move (a question unpublished, a play voided);
+  and the box must be shown once.
+- No browser access; read and written through the database's own
+  functions.
+
+### `leaderboard_weeks` — the weeks whose medals are settled *(needs Sam's tick before the build: 05 G3; 2026-10-24)*
+
+| Column | Holds |
+|---|---|
+| `week` | The week (its Monday, UTC — Ghana's time) |
+| `settled_utc` | When its top 3 on every eligible board were written into `student_achievements` |
+
+- The first time anyone opens the app after a Sunday midnight, the week
+  just ended is settled once (a row here), whether or not any board
+  reached 10 players. Why: so a week is settled exactly once — including
+  a week that gave no medal — and never worked out again later, when a
+  student who joins brings their past challenges onto the boards.
+- No browser access.
+
 ---
 
 ## Offline packs — 07
@@ -940,8 +987,8 @@ asked to join.
   the database refuses a second trial for a number on it. No browser
   access. (No table of SMS codes — the SMS company checks the code.)
 - **The email outbox** (10.2) — needs Sam's tick at the build.
-- **The achievements already shown** (05 G3) — needs Sam's tick at the
-  build.
+- **The achievements** (05 G3) — written as `student_achievements` and
+  `leaderboard_weeks` (Progress, 05), waiting for Sam's tick (2026-10-24).
 - **The leaderboard card** — ticked 2026-10-24, now `leaderboard_cards`
   (Progress, 05).
 - **The daily challenge's draw** — ticked 2026-10-08, now

@@ -23,7 +23,7 @@ should stay rich.
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
 - 2026-10-24 — the leaderboards built: database, joining, the page and its ways in, Profile's panel, Show more; sample boards on dev
-  - ↳ ticked: card, suggested schools, school_other gone · no stored totals · 2A · 38 Noto SVGs · Share parked · ranks with Submit · switch reused · 76 sample students · Show more to the end · schools.id identity
+  - ↳ ticked: card, suggested schools, school_other gone · no stored totals · 2A · 38 Noto SVGs · Share parked · ranks with Submit · switch reused · 76 sample students · Show more to the end · G3's 15 approved
 
 - 2026-10-20, night — the daily challenge built: its own four tables (04.24), played at /challenge/play (04.25), the dashboard line (04.26)
   - ↳ columns ticked one by one · questions stored once · kept apart from quizzes · voided_utc kept · seed dropped · same player, own route · leaderboards later · "Review the answers" · two RN students, one paper · Resume gap open
