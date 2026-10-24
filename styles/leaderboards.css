@@ -445,3 +445,12 @@
   color: var(--ink-muted);
 }
 .lbf-block .lb-appear-note a { color: var(--brand-teal); font-weight: 600; }
+
+/* Show more under a board (05.14): the next 20, until every player shows */
+.lbp-more {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  min-height: 44px;
+  margin: var(--space-8) 0 var(--space-4);
+}

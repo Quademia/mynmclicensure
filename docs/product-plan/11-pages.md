@@ -279,7 +279,8 @@ opens it (00, The menu).
 - Today · This week · All time; the board a dropdown — My school (the
   school in the student's programme) · My programme · All of Ghana ·
   Schools; opens on This week · My school. The student's place first,
-  then the top 10 and the neighbours; a row opens nothing; "Join to see
+  then the top 10 and the neighbours, Show more the next 20 a tap until
+  every player shows (Sam, 2026-10-24); a row opens nothing; "Join to see
   where you rank" before joining; Share on WhatsApp (05; Sam,
   2026-10-20: B, drawn). *(built 2026-10-24: 05.10 — Share left out
   until the challenge's home page; with no school, My school says to add

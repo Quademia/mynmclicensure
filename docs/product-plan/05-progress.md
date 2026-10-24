@@ -124,6 +124,10 @@ live.
 - **One look for every board** (Sam, 2026-10-20, in place of a shape
   per view): the top 10, then the student — outside the top 10 their
   line with the one above and the one below ("You: 41st of 58").
+  **Show more** under it (Sam, 2026-10-24, after seeing the sample
+  boards): the next 20 a tap, until every player shows; the gap and the
+  neighbours fold into the list as it reaches them. *(built 2026-10-24:
+  05.14)*
 - **The page** (Sam, 2026-10-20: B, drawn — in place of four view
   tabs): the time switch, then **the board as a dropdown** naming it in
   full ("My school · St Mary's · RN", "My programme · RN", "All of

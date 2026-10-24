@@ -1012,8 +1012,13 @@ the browser can call only the first two lines and
   Only students who joined, active, their past plays counted; a full tie
   shares a rank. It hands back the top 10, the student's own line and,
   outside the top 10, the one above and below; for Schools, the student's
-  school and the schools waiting. Plays of the last week left going past
-  their time are closed first as time up. The card: `leaderboard_card`,
+  school and the schools waiting; each line with its place (`pos`). Plays
+  of the last week left going past their time are closed first as time up.
+  `leaderboard_board_rows(student, period, view, from, count)` — Show
+  more (05.14; Sam, 2026-10-24: 20 at a time, every player reachable):
+  `count` lines, 1 to 50, from place `from`, ranked as the board is. Both
+  read the ranking from `_leaderboard_people` and `_leaderboard_schools`
+  (`20261024230000_leaderboard_rows`). The card: `leaderboard_card`,
   `leaderboard_not_now`, `leaderboard_join` (how they appear and, the
   first time, the username), `leaderboard_leave`, `leaderboard_show_as`,
   `leaderboard_rename` (once a week), `leaderboard_random_name` (the join

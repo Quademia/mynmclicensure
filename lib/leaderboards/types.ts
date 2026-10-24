@@ -79,8 +79,13 @@ export function boardHref(period: BoardPeriod, view: BoardView): string {
   return period === 'week' && view === 'school' ? LEADERBOARDS_HREF : `${LEADERBOARDS_HREF}?period=${period}&board=${view}`;
 }
 
+/** Show more: the next players a tap brings (Sam, 2026-10-24). */
+export const SHOW_MORE_COUNT = 20;
+
 /** A student's line on a board. */
 export type BoardLine = {
+  /** Its place on the board, 1 to n (ranks can be shared; places are not). */
+  pos: number;
   rank: number;
   /** The username, or "Ama O." for one shown by name. */
   name: string;
@@ -97,6 +102,7 @@ export type BoardLine = {
 
 /** A school's line on the Schools board. */
 export type SchoolLine = {
+  pos: number;
   rank: number;
   school: string;
   players: number;
@@ -142,6 +148,12 @@ export type SchoolsBoard = BoardHead & {
 };
 
 export type Board = PeopleBoard | SchoolsBoard;
+
+/** Show more's reply: the next lines of a board of students, or of schools. */
+export type MoreResult =
+  | { ok: true; kind: 'people'; lines: BoardLine[] }
+  | { ok: true; kind: 'schools'; lines: SchoolLine[] }
+  | { ok: false; error: string };
 
 /** "1:12" under an hour, "1 h 4 min" past it. */
 export function clockOf(seconds: number): string {

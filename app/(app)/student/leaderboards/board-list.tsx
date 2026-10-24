@@ -1,29 +1,27 @@
 // app/(app)/student/leaderboards/board-list.tsx — the board under the
 // controls (05 G1b; Sam, 2026-10-20: B): the student's own place first, a
 // small card, then the top 10 and, outside it, the one above, the student
-// and the one below. One look for every board (Sam, 2026-10-20). A row
-// opens nothing: there are no profiles to visit. The Schools board marks
-// the student's school and lists the schools not on it yet with how many
-// more players each needs. Before joining, the card is Join (JoinCard).
-// Drawn on the server; nothing here is a control but Join and the links.
+// and the one below; Show more under them, 20 at a time (board-rows.tsx,
+// 05.14). One look for every board (Sam, 2026-10-20). A row opens nothing:
+// there are no profiles to visit. The Schools board marks the student's
+// school and lists the schools not on it yet with how many more players
+// each needs. Before joining, the card is Join (JoinCard). Drawn on the
+// server; the rows and Join are the client's.
 
 import { AppLink } from '@/components/shell/link-pending';
-import { AnimalAvatar } from '@/components/leaderboards/animal-avatar';
 import { CHALLENGE_PLAY_HREF } from '@/lib/challenge/types';
 import {
-  clockOf,
   longTimeOf,
   ordinal,
   type Board,
-  type BoardLine,
   type BoardPeriod,
   type BoardView,
   type JoinChoices,
   type PeopleBoard,
-  type SchoolLine,
   type SchoolsBoard,
 } from '@/lib/leaderboards/types';
 import { JoinCard } from './join-card';
+import { PeopleRows, SchoolRows } from './board-rows';
 
 const PROFILE_SCHOOL_HREF = '/student/profile?complete=1';
 
@@ -92,23 +90,14 @@ function PeopleBody({ board, join }: { board: PeopleBoard; join: React.ReactNode
             <span>{plural(board.players, 'player', 'players')}</span>
             <span>{p === 'all' ? 'Average · played' : 'Right · time'}</span>
           </div>
-          <ol className="lbp-rows">
-            {board.top.map((l) => (
-              <PersonRow key={`t${l.rank}-${l.name}`} line={l} period={p} />
-            ))}
-          </ol>
-          {board.around.length ? (
-            <>
-              <p className="lbp-gap" aria-hidden="true">
-                · · ·
-              </p>
-              <ol className="lbp-rows">
-                {board.around.map((l) => (
-                  <PersonRow key={`a${l.rank}-${l.name}`} line={l} period={p} />
-                ))}
-              </ol>
-            </>
-          ) : null}
+          <PeopleRows
+            key={`${p}-${board.view}`}
+            period={p}
+            view={board.view}
+            top={board.top}
+            around={board.around}
+            total={board.players}
+          />
         </section>
       )}
       <p className="lbp-note">{NOTES[p]}</p>
@@ -154,24 +143,6 @@ function MyPlace({ board }: { board: PeopleBoard }) {
   );
 }
 
-function PersonRow({ line, period }: { line: BoardLine; period: BoardPeriod }) {
-  const score =
-    period === 'all'
-      ? `${(line.average ?? 0).toFixed(1)} · ${line.played}`
-      : `${line.right} · ${clockOf(line.timeS)}`;
-  return (
-    <li className={`lbp-row${line.isMe ? ' is-me' : ''}`}>
-      <span className="lbp-rank">{line.rank}</span>
-      <AnimalAvatar animal={line.animal ?? 'Lion'} photo={line.photo} size={32} />
-      <span className="lbp-name">
-        {line.name}
-        {line.isMe ? <span className="lbp-you"> (you)</span> : null}
-      </span>
-      <span className="lbp-score">{score}</span>
-    </li>
-  );
-}
-
 // ── the Schools board ──
 
 function SchoolsBody({ board, join, noSchool }: { board: SchoolsBoard; join: React.ReactNode; noSchool: boolean }) {
@@ -188,23 +159,7 @@ function SchoolsBody({ board, join, noSchool }: { board: SchoolsBoard; join: Rea
             <span>{plural(board.schools, 'school', 'schools')}</span>
             <span>Average · players</span>
           </div>
-          <ol className="lbp-rows">
-            {board.top.map((l) => (
-              <SchoolRow key={`t${l.rank}-${l.school}`} line={l} />
-            ))}
-          </ol>
-          {board.around.length ? (
-            <>
-              <p className="lbp-gap" aria-hidden="true">
-                · · ·
-              </p>
-              <ol className="lbp-rows">
-                {board.around.map((l) => (
-                  <SchoolRow key={`a${l.rank}-${l.school}`} line={l} />
-                ))}
-              </ol>
-            </>
-          ) : null}
+          <SchoolRows key={`${board.period}-schools`} period={board.period} top={board.top} around={board.around} total={board.schools} />
         </section>
       ) : null}
       {board.waiting.length ? (
@@ -271,17 +226,3 @@ function MySchool({ board, noSchool }: { board: SchoolsBoard; noSchool: boolean 
   );
 }
 
-function SchoolRow({ line }: { line: SchoolLine }) {
-  return (
-    <li className={`lbp-row lbp-row-school${line.isMine ? ' is-me' : ''}`}>
-      <span className="lbp-rank">{line.rank}</span>
-      <span className="lbp-name">
-        {line.school}
-        {line.isMine ? <span className="lbp-you"> (yours)</span> : null}
-      </span>
-      <span className="lbp-score">
-        {line.average.toFixed(1)} · {line.players}
-      </span>
-    </li>
-  );
-}

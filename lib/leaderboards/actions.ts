@@ -10,8 +10,19 @@
 
 import { requireStudent } from '@/lib/access';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import { cardFrom } from './queries';
-import type { CardResult, JoinResult, NotNowResult, ShownAs } from './types';
+import { cardFrom, lineFrom, rows, schoolLineFrom } from './queries';
+import {
+  BOARD_PERIODS,
+  BOARD_VIEWS,
+  SHOW_MORE_COUNT,
+  type BoardPeriod,
+  type BoardView,
+  type CardResult,
+  type JoinResult,
+  type MoreResult,
+  type NotNowResult,
+  type ShownAs,
+} from './types';
 
 function rpcError(error: { message?: string } | null, fallback: string): string {
   const msg = String(error?.message || '').trim();
@@ -62,6 +73,28 @@ export async function leaveLeaderboards(): Promise<CardResult> {
 
 export async function showAsOnLeaderboards(shownAs: ShownAs): Promise<CardResult> {
   return cardCall('leaderboard_show_as', { p_shown_as: shownAs === 'name' ? 'name' : 'username' }, 'Could not save how you appear. Please try again.');
+}
+
+// Show more (05.14; Sam, 2026-10-24): the next 20 lines of a board from
+// place `from`, ranked as the board is — tap after tap, every player.
+export async function moreOnBoard(period: BoardPeriod, view: BoardView, from: number): Promise<MoreResult> {
+  const { profile } = await requireStudent();
+  const p = (BOARD_PERIODS as readonly string[]).includes(period) ? period : 'week';
+  const v = (BOARD_VIEWS as readonly string[]).includes(view) ? view : 'school';
+  const { data, error } = await createServiceRoleClient().rpc('leaderboard_board_rows', {
+    p_user_id: profile.user_id,
+    p_period: p,
+    p_view: v,
+    p_from: Math.max(1, Math.floor(Number(from) || 1)),
+    p_count: SHOW_MORE_COUNT,
+  });
+  if (error) {
+    console.error('moreOnBoard:', error);
+    return { ok: false, error: 'Could not load more. Please try again.' };
+  }
+  return v === 'schools'
+    ? { ok: true, kind: 'schools', lines: rows(data).map(schoolLineFrom) }
+    : { ok: true, kind: 'people', lines: rows(data).map(lineFrom) };
 }
 
 export async function renameOnLeaderboards(word: string, animal: string): Promise<CardResult> {

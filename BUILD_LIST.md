@@ -129,6 +129,8 @@ before then, and the old list's history, is in
 - ✅ 05.11 The ways in — the dashboard's rank line, the results' places, the menu row and phone tab — 2026-10-24
 - ⏸ 05.12 Share on WhatsApp on the Leaderboards — what it shares waits on the challenge's home page (04.29)
 - ✅ 05.13 Profile's Leaderboards — Show me on the leaderboards, how you appear, the weekly rename — 2026-10-24
+- ✅ 05.14 Show more under a board — the next 20 a tap, until every player shows (a function, no table) — 2026-10-24
+- ✅ (unplanned) Sample leaderboards on dev — 76 students, 1,151 plays; scripts/sample-leaderboards.mjs — 2026-10-24
 - ✅ 05.7 The leaderboards' database — the card, the boards as asked, suggested schools; school_other gone — 2026-10-24
 - ✅ 05.9 Joining — the offer once, How you'll appear (2A), the 38 Noto animals, the start screen's box — 2026-10-24
 - ⏸ 05.8 Running totals on the card — only if All time grows slow (Sam, 10-24: no stored totals)

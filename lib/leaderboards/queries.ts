@@ -126,8 +126,9 @@ export async function getChallengeRanks(userId: string, hasSchool: boolean): Pro
   return { joined: week.joined, today: today.rank, week: week.rank, board: week.board };
 }
 
-function lineFrom(r: Row): BoardLine {
+export function lineFrom(r: Row): BoardLine {
   return {
+    pos: n(r.pos),
     rank: n(r.rank),
     name: str(r.name) ?? '',
     animal: str(r.animal),
@@ -141,8 +142,9 @@ function lineFrom(r: Row): BoardLine {
   };
 }
 
-function schoolLineFrom(r: Row): SchoolLine {
+export function schoolLineFrom(r: Row): SchoolLine {
   return {
+    pos: n(r.pos),
     rank: n(r.rank),
     school: str(r.school) ?? '',
     players: n(r.players),
@@ -152,7 +154,7 @@ function schoolLineFrom(r: Row): SchoolLine {
   };
 }
 
-function rows(v: unknown): Row[] {
+export function rows(v: unknown): Row[] {
   return Array.isArray(v) ? (v.filter((x) => x && typeof x === 'object') as Row[]) : [];
 }
 
