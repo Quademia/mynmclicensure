@@ -25,7 +25,8 @@ import { BodyPortal } from '@/lib/overlays/shared/body-portal';
 import { WORD_SPINS, type JoinChoices, type ShownAs } from '@/lib/leaderboards/types';
 import { AnimalAvatar } from './animal-avatar';
 
-function otherWord(words: string[], current: string): string {
+/** A spin: another word from the list. Profile's rename spins with it too. */
+export function otherWord(words: string[], current: string): string {
   if (words.length < 2) return current;
   let next = current;
   while (next === current) next = words[Math.floor(Math.random() * words.length)];
@@ -39,10 +40,13 @@ export function AppearPicker({
   onDone,
   onCancel,
   brand = false,
+  bare = false,
 }: {
   choices: JoinChoices;
   /** "Quademia Nurses Hub" above the title, as the quiz start screen has it. */
   brand?: boolean;
+  /** Inside a panel that is its own box (Profile's): no card of its own. */
+  bare?: boolean;
   /** A save is going (Done's or Cancel's): every button waits. */
   pending: boolean;
   /** Done's save — the button says "Joining…". */
@@ -65,7 +69,7 @@ export function AppearPicker({
   }
 
   return (
-    <div className="card lb-appear">
+    <div className={bare ? 'lb-appear lb-appear-bare' : 'card lb-appear'}>
       {brand ? <div className="lb-appear-brand">Quademia Nurses Hub</div> : null}
       <h2 className="lb-appear-title">How you&apos;ll appear</h2>
 
@@ -116,7 +120,7 @@ export function AppearPicker({
         ) : null}
       </div>
 
-      <p className="lb-appear-note">Never your full name. You can change this on Profile.</p>
+      <p className="lb-appear-note">{bare ? 'Never your full name.' : 'Never your full name. You can change this on Profile.'}</p>
 
       <div className="lb-actions">
         <button type="button" className="btn btn-primary btn-lg" disabled={pending} onClick={() => onDone(shownAs, word, animal)}>
@@ -143,7 +147,8 @@ export function AppearPicker({
 
 // Change animal: a panel from below with the 38 drawings, the chosen one
 // marked; a tap picks and closes. Escape, the backdrop and ✕ close it.
-function AnimalSheet({
+// Profile's rename opens it too.
+export function AnimalSheet({
   open,
   animals,
   current,

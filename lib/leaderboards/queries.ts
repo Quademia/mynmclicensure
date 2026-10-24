@@ -27,6 +27,15 @@ function str(v: unknown): string | null {
   return v === null || v === undefined || v === '' ? null : String(v);
 }
 
+// The day the username may change again, while it is still to come (the
+// database refuses a change before it): "Saturday 31 October".
+function renameFromOf(nextChangeUtc: string | null): string | null {
+  if (!nextChangeUtc) return null;
+  const next = new Date(nextChangeUtc);
+  if (!Number.isFinite(next.getTime()) || next.getTime() <= Date.now()) return null;
+  return next.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
+}
+
 function cardFrom(data: unknown): LeaderboardCard | null {
   if (!data || typeof data !== 'object') return null;
   const r = data as Row;
@@ -38,6 +47,7 @@ function cardFrom(data: unknown): LeaderboardCard | null {
     username: str(r.username),
     person: str(r.person),
     photo: str(r.photo),
+    renameFrom: renameFromOf(str(r.next_change_utc)),
   };
 }
 

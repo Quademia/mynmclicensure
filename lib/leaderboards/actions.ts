@@ -11,7 +11,7 @@
 import { requireStudent } from '@/lib/access';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { cardFrom } from './queries';
-import type { JoinResult, NotNowResult, ShownAs } from './types';
+import type { CardResult, JoinResult, NotNowResult, ShownAs } from './types';
 
 function rpcError(error: { message?: string } | null, fallback: string): string {
   const msg = String(error?.message || '').trim();
@@ -43,4 +43,31 @@ export async function joinLeaderboards(shownAs: ShownAs, word: string, animal: s
   const card = cardFrom(data);
   if (!card) return { ok: false, error: 'Could not join the leaderboards. Please try again.' };
   return { ok: true, card };
+}
+
+// Profile's three (05; Sam, 2026-10-24): leave (the username kept for a
+// return), how you appear, and a new username once a week.
+async function cardCall(fn: string, args: Record<string, unknown>, fallback: string): Promise<CardResult> {
+  const { profile } = await requireStudent();
+  const { data, error } = await createServiceRoleClient().rpc(fn, { p_user_id: profile.user_id, ...args });
+  if (error) return { ok: false, error: rpcError(error, fallback) };
+  const card = cardFrom(data);
+  if (!card) return { ok: false, error: fallback };
+  return { ok: true, card };
+}
+
+export async function leaveLeaderboards(): Promise<CardResult> {
+  return cardCall('leaderboard_leave', {}, 'Could not take you off the leaderboards. Please try again.');
+}
+
+export async function showAsOnLeaderboards(shownAs: ShownAs): Promise<CardResult> {
+  return cardCall('leaderboard_show_as', { p_shown_as: shownAs === 'name' ? 'name' : 'username' }, 'Could not save how you appear. Please try again.');
+}
+
+export async function renameOnLeaderboards(word: string, animal: string): Promise<CardResult> {
+  return cardCall(
+    'leaderboard_rename',
+    { p_word: String(word || ''), p_animal: String(animal || '') },
+    'Could not change your username. Please try again.',
+  );
 }

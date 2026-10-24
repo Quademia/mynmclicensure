@@ -1,9 +1,10 @@
 // components/notifications/device-switch.tsx — the on/off switch of a
 // device's notifications: the admin's "Notify this device when a student
 // writes" on Messages (08.5b) and the student's switches on Profile
-// (08.15; Sam, 2026-10-20). The design system has no switch (09.12, one
-// for the whole app, queued), so this one is drawn on tokens in
-// styles/notifications.css and shared by the notification places only.
+// (08.15; Sam, 2026-10-20), and Profile's Show me on the leaderboards (05
+// G1b; Sam, 2026-10-24: reused rather than another drawn). The design
+// system has no switch (09.12, one for the whole app, queued), so this one
+// is drawn on tokens in styles/notifications.css.
 
 'use client';
 

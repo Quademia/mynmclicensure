@@ -8,7 +8,8 @@
 // (the Subscription panel) — plus the `?complete=1` flag the dashboard
 // nudge passes — handed to the client half, which is the page's script
 // (the three panels, the edit modes, the two saves), with what the
-// Notifications panel needs (08.15).
+// Notifications panel needs (08.15) and the Leaderboards panel's card and
+// word and animal lists (05 G1b).
 //
 // Legacy's profile page had no top-nav row: its header sat inside the
 // 720px column ("My Profile" / "Your NMC Licensure account details"),
@@ -18,6 +19,8 @@ import type { Metadata } from 'next';
 import { requireStudent } from '@/lib/access';
 import { getPrograms } from '@/lib/catalogue/queries';
 import { getActiveSchools, getProfileSubscription, getUnlistedSchoolName } from '@/lib/profile/queries';
+import { getJoinChoices, getLeaderboardCard } from '@/lib/leaderboards/queries';
+import { personOf } from '@/lib/leaderboards/types';
 import { vapidPublicKey } from '@/lib/notifications/keys';
 import { ProfileClient } from './profile-client';
 import '@/styles/student-profile.css';
@@ -32,11 +35,14 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
   const { supabase, profile } = await requireStudent();
   const { complete } = await searchParams;
 
-  const [programs, schools, subscription, unlistedSchool] = await Promise.all([
+  // the leaderboards' card and the word and animal lists (05 G1b) beside the rest
+  const [programs, schools, subscription, unlistedSchool, lbCard, lbChoices] = await Promise.all([
     getPrograms(supabase),
     getActiveSchools(supabase),
     getProfileSubscription(supabase, profile.user_id),
     getUnlistedSchoolName(supabase, profile.school_id),
+    getLeaderboardCard(profile.user_id),
+    getJoinChoices(personOf(profile.forename, profile.surname), profile.avatar_url),
   ]);
   const programName = programs.find((p) => p.program_id === profile.program_id)?.program_name ?? null;
 
@@ -60,6 +66,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
       subscription={subscription}
       complete={complete === '1'}
       notify={{ userId: profile.user_id, publicKey: vapidPublicKey() }}
+      leaderboards={{ card: lbCard, choices: lbChoices }}
     />
   );
 }

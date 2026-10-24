@@ -78,7 +78,7 @@ already saves — no new table.
   time", where answered means new questions met.
 - Questions mastered is on no board.
 
-### Leaderboards *(G1b: the database, joining, the page and its ways in built 2026-10-24 — 05.7, 05.9–05.11; Profile's switch and rename, the schools' pages, Remove picture and photos made small to build)*
+### Leaderboards *(G1b: the database, joining, the page, its ways in and Profile's part built 2026-10-24 — 05.7, 05.9–05.11, 05.13; the schools' pages, Remove picture and photos made small to build)*
 
 Settled by Sam, 2026-10-04 and 10-08; gone over again on 2026-10-20,
 planned with the daily challenge (04) — both to be built before going
@@ -152,6 +152,12 @@ live.
   ways on one screen (drawn 2026-10-20): the username card chosen
   already, its word spun in place, Change animal a panel from below; or
   "Ama O." with the photo. Done goes on to the start screen (04).
+  *(Profile's part built 2026-10-24: 05.13 — a Leaderboards panel after
+  Academic Details (Sam): the Notifications panel's switch reused, no
+  confirm on turning off (it keeps the username); turning on puts a
+  student who held a username straight back and asks How you'll appear
+  only of one who never had one; the two cards, a tap saving at once;
+  Change username in the username card, or the day it may change again)*
   Asked once; after that a quiet "Join the leaderboards" on the
   challenge's card and its results, and Profile's switch **Show me on
   the leaderboards**, to join or leave at any time. Before joining, the

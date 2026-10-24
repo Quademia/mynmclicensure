@@ -20,6 +20,9 @@ export type LeaderboardCard = {
   /** "Ama O." — the first name and the surname's initial. */
   person: string | null;
   photo: string | null;
+  /** The username was changed this week: "Saturday 31 October", the day it
+   * may change again; null when it may change now. Worked out on the server. */
+  renameFrom: string | null;
 };
 
 /** What How you'll appear needs — on the page before Join, so no tap waits. */
@@ -156,6 +159,8 @@ export function longTimeOf(seconds: number): string {
 }
 
 export type JoinResult = { ok: true; card: LeaderboardCard } | { ok: false; error: string };
+/** Leave, how you appear, rename: the card as it now is. */
+export type CardResult = JoinResult;
 export type NotNowResult = { ok: true } | { ok: false; error: string };
 
 /** Up to 3 spins of the word (05; Sam, 2026-10-20). */

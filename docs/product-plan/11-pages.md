@@ -338,7 +338,8 @@ opens it (00, The menu).
   with suggested schools (01); the phone number changed through the
   server, clearing its verification (01, 03, 05).
 - Show me on the leaderboards, and as name and photo or username and
-  animal (05; Sam, 2026-10-20).
+  animal (05; Sam, 2026-10-20). *(built 2026-10-24: 05.13, a panel after
+  Academic Details, with the weekly rename)*
 - **Check**: the subscription panel shows one subscription only, the
   first returned.
 

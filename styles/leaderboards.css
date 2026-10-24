@@ -49,6 +49,11 @@
   font-weight: 700;
   color: var(--brand-navy);
 }
+/* inside Profile's panel: a subheading, not a card's title */
+.lb-appear-bare .lb-appear-title {
+  font-size: var(--type-field-size);
+  color: var(--ink);
+}
 .lb-actions {
   display: flex;
   flex-wrap: wrap;
@@ -422,3 +427,21 @@
   .lbp-board select { font-size: 16px; }
   .lbp-list { padding: var(--space-4) var(--space-8); }
 }
+
+/* ── Profile's Leaderboards panel (05 G1b; on Notifications' rows, .nset) ── */
+.nset-row.lbf-block { display: block; }
+.lbf-sub {
+  margin: 0 0 var(--space-8);
+  font-size: var(--type-meta-size);
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+.lbf-block .lb-options { margin-top: 0; }
+.lbf-wait {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  font-size: var(--type-meta-size);
+  color: var(--ink-muted);
+}
+.lbf-block .lb-appear-note a { color: var(--brand-teal); font-weight: 600; }

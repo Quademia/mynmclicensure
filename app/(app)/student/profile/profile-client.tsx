@@ -27,7 +27,9 @@ import { PageHeader } from '@/components/shell/page-header';
 import { saveAcademicDetails, savePersonalDetails } from '@/lib/profile/actions';
 import { PROFILE_IMAGE_MAX_BYTES, PROFILE_LEVELS, type ProfileSubscription, type SchoolOption } from '@/lib/profile/types';
 import { Icon } from '@/components/shell/icons';
+import { personOf, type JoinChoices, type LeaderboardCard } from '@/lib/leaderboards/types';
 import { NotificationsPanel } from './notifications-panel';
+import { LeaderboardsPanel } from './leaderboards-panel';
 
 type ProfileFields = {
   forename: string | null;
@@ -57,6 +59,7 @@ export function ProfileClient({
   subscription,
   complete,
   notify,
+  leaderboards,
 }: {
   profile: ProfileFields;
   programName: string | null;
@@ -65,6 +68,8 @@ export function ProfileClient({
   complete: boolean;
   /** Notifications on this device (08.15). */
   notify: { userId: string; publicKey: string | null };
+  /** The leaderboards' card and the word and animal lists (05 G1b). */
+  leaderboards: { card: LeaderboardCard | null; choices: JoinChoices | null };
 }) {
   const router = useRouter();
   const [msg, setMsg] = useState<Msg>(null);
@@ -346,6 +351,14 @@ export function ProfileClient({
             <button type="button" className="btn btn-primary" disabled={academicSaving} onClick={saveAcademic}>{academicSaving ? 'Saving…' : 'Save Changes'}</button>
           </div>
         </div>
+
+        {/* Leaderboards (05 G1b; Sam, 2026-10-24: after Academic Details) */}
+        <LeaderboardsPanel
+          initial={leaderboards.card}
+          choices={leaderboards.choices}
+          person={personOf(user.forename, user.surname)}
+          photo={user.avatar_url}
+        />
 
         {/* Subscription */}
         <div className="panel">
