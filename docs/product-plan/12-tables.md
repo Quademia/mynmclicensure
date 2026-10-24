@@ -37,7 +37,7 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `phone_number` | The WhatsApp / phone number, as typed |
 | `name`, `forename`, `surname` | The full name and its two parts |
 | `program_id` | The student's programme → `programs` |
-| `school_id`, `school_other` | The school → `schools`; or the name typed when it is not on the list |
+| `school_id` | The school → `schools`: a listed one, or a suggested one when theirs is not on the list |
 | `cohort` | The year group, as typed |
 | `level` | The study level, as typed |
 | `referral_source` | How they heard of Quademia (asked at registration) |
@@ -55,36 +55,50 @@ table by table as each is next changed (AGENTS.md rule 9).
 - *To build — ticked 2026-09-18 (10):* `level` keyed to `levels`;
   `cohort` becomes a year (a number). Why: today both are free text the
   admin's pickers can't rely on.
-- *Needs Sam's tick before the build (01, 05 G1b; Sam, 2026-10-20):*
-  `school_other` retired — every name typed into it becomes a suggested
-  school (`schools`, below) and `school_id` points there. Why: a school
-  is always one row, picked or suggested, never loose text.
-- The username and the animal planned here on 2026-10-04 move to the
-  leaderboard card (Decided, no table yet; Sam, 2026-10-20).
+- `school_other` (the name typed when a school was not on the list) was
+  retired — ticked by Sam 2026-10-24, built the same day
+  (`20261024180000_leaderboards`): each name typed became the student's
+  suggested school (`schools`, below; no region, as the column had none),
+  or the listed school of that name when there was exactly one. "My
+  school isn't listed" on registering and on Profile now makes or finds a
+  suggested school. Why: a school is always one row, picked or
+  suggested, never loose text.
+- The username and the animal planned here on 2026-10-04 are on the
+  leaderboard card (`leaderboard_cards`, 05; Sam, 2026-10-20).
 - Browser: a student reads their own row and can change only `name`,
-  `forename`, `surname`, `phone_number`, `school_id`, `school_other`,
-  `cohort`, `level`, `avatar_url`; an admin reads all. Three leftover
+  `forename`, `surname`, `phone_number`, `school_id`, `cohort`, `level`,
+  `avatar_url`; an admin reads all. Three leftover
   permissions (truncate, references, trigger) go with the SMS half (F4b).
 
-### `schools` — the regulator's list of nursing schools (141)
+### `schools` — the regulator's list of nursing schools (141), and the schools students suggest
 | Column | Holds |
 |---|---|
-| `id` | The school's number |
-| `name`, `region`, `ownership` | As the regulator lists them |
-| `programmes` | The programmes the school trains |
+| `id` | The school's number (made by the table, the next after the highest) |
+| `name`, `region`, `ownership` | As the regulator lists them; for a suggestion, the name as typed and its region (empty only for the names typed before suggested schools) |
+| `programmes` | The programmes the school trains; for a suggestion, the suggester's |
 | `active` | Off = no longer offered |
+| `status` | `listed` (the regulator's and every approved one) or `suggested` |
+| `town` | The town given with a suggestion |
+| `suggested_by`, `suggested_utc` | Who suggested it → `users`, and when |
 | `created_at` | When added |
 
-- No way to change the list from the app (open, 10).
-- *Needs Sam's tick before the build (01, 05 G1b; Sam, 2026-10-20):*
-  **suggested schools** — a mark, listed or suggested; a `town`; who
-  suggested it and when. A suggested school is offered only under "Not
-  listed?" in its region; the admin approves it (listed), merges it
-  into a listed school (its students moved, the row gone) or removes it
-  (its students' school cleared, to choose again). Why: the school
-  boards need one name per school, and the list grows only through the
-  admin (settles D50).
-- Browser: anyone reads. *Old defaults.*
+- **Suggested schools** — ticked by Sam 2026-10-24, built the same day
+  (`20261024180000_leaderboards`; 01, 05 G1b). One name per region,
+  capitals and spaces ignored: a second "KNUST, Kumasi" in Ashanti is
+  refused, so a student naming one finds it. A listed school always has
+  a region. The admin **approves** a suggestion (listed, its spelling,
+  region and town corrected on the way; it needs a region), **merges** it
+  into a listed school (its students and their challenge plays move
+  there, the row goes) or **removes** it (its students' school cleared,
+  to choose again; their plays count for no school, the row goes). Why:
+  the school boards need one name per school, and the list grows only
+  through the admin (settles D50). The pages — "Not listed?" with the
+  region's suggestions and Add your school (name and town), and the
+  admin's Schools not on the list — are to build (01).
+- Browser: anyone reads `id`, `name`, `region`, `ownership`,
+  `programmes`, `active`, `status`, `town`, `created_at` — never who
+  suggested a school. No writes: suggestions through the database's own
+  functions (below).
 
 ### `levels` — study levels (L100–L400)
 | Column | Holds |
@@ -597,7 +611,7 @@ by the first student to open that day's challenge and fixed after.
 | `user_id` | Whose → `users` |
 | `day` | The day — one play per student per day (unique) |
 | `challenge_id` | The paper → `challenge_days` |
-| `school_id` | The student's school when they played → `schools`; empty for a school typed in (until suggested schools, 01) |
+| `school_id` | The student's school when they played → `schools`; empty when they had none, or its suggested school was removed |
 | `started_utc` | Start, by the server's clock |
 | `ends_utc` | When the time is up: Start + questions × `builder_minutes_per_question`, fixed at Start |
 | `submitted_utc` | When it ended (empty exactly while `playing`) |
@@ -608,8 +622,8 @@ by the first student to open that day's challenge and fixed after.
 - A play still `playing` past `ends_utc` is closed as `time_up` on what
   was answered when it is next read — no clock needed. Why `school_id`:
   a challenge counts for the school the student was in, and a student may
-  move school (05 G1b); a school merged away (suggested schools) must move
-  its plays too.
+  move school (05 G1b); a suggested school merged into a listed one moves
+  its plays there, and one removed leaves them with none.
 - The ticked `seed` was left out at the build: the quiz screen shuffles a
   student's options from the sitting's own id and the question's, and the
   play's id does the same. `right` is `right_count` — a word Postgres
@@ -632,6 +646,42 @@ by the first student to open that day's challenge and fixed after.
   every answer a student gave, so no count can miss them (05).
 - The questions, answers and explanations reach the student after Submit
   until midnight of the day, then nothing (04).
+
+---
+
+## Progress — 05
+
+### `leaderboard_cards` — a student's leaderboard card
+
+Ticked by Sam 2026-10-24 and built the same day (G1b, migration
+`20261024180000_leaderboards`), in place of the two columns on `users`
+planned 2026-10-04. One row per student, made the first time they are
+asked to join.
+
+| Column | Holds |
+|---|---|
+| `user_id` | Whose card → `users` |
+| `asked_utc` | When the join screen was first shown — so it is asked once |
+| `joined_utc` | When they joined; empty = not on the boards ("Not now", or left from Profile) |
+| `shown_as` | `username` (the username and animal) or `name` ("Ama O." with the profile photo) |
+| `word`, `animal`, `name_number` | The username in parts: "Brave" + "Lion" + 2 = "Brave Lion 2"; the animal is also the drawing; filled at joining |
+| `name_changed_utc` | When the username last changed — once a week; the name chosen at joining is not a change |
+| `created_utc` | When the card was made |
+
+- A username is unique: a second "Brave Lion" is "Brave Lion 2", the
+  smallest free number. The word and the animal come only from the lists
+  approved by Sam on 2026-10-20 (05), which the database holds. Leaving
+  keeps the username for a return.
+- Why: the leaderboards are a feature of their own; the boards show
+  other students' names while `users` stays private to each student, so
+  the board's function takes a name and photo from `users` only for a
+  student who chose them. A photo the admin removes leaves the profile
+  itself (`users.avatar_url`), so no mark here.
+- **No stored totals** (Sam, 2026-10-24): every board is worked out from
+  `challenge_plays` as it is asked. If All time grows slow, running
+  totals on the card are the next step (a ⏸ line in the build list).
+- No browser access; read and written through the database's own
+  functions.
 
 ---
 
@@ -892,18 +942,8 @@ by the first student to open that day's challenge and fixed after.
 - **The email outbox** (10.2) — needs Sam's tick at the build.
 - **The achievements already shown** (05 G3) — needs Sam's tick at the
   build.
-- **The leaderboard card** — *needs Sam's tick before the build (05
-  G1b; Sam, 2026-10-20)*: one row per student, made the first time they
-  are asked to join — when asked (so it is asked once); joined, yes or
-  no, and when; shown as — name and photo, or username and animal; the
-  username (unique) and the animal; when the username last changed (once
-  a week). In place of the two columns on `users` planned 2026-10-04.
-  Why: the leaderboards are a feature of their own; the boards show
-  other students' names while `users` stays private to each student, so
-  they read only this; and the feature comes out whole. A photo the
-  admin removes leaves the profile itself (`users.avatar_url`), so no
-  mark here. No browser access; read and written through the database's
-  own functions.
+- **The leaderboard card** — ticked 2026-10-24, now `leaderboard_cards`
+  (Progress, 05).
 - **The daily challenge's draw** — ticked 2026-10-08, now
   `challenge_days` and `challenge_day_items` (Practice, 04 — *The daily
   challenge*, ticked 2026-10-20).
@@ -960,6 +1000,33 @@ the browser can call only the first two lines and
   `swap_challenge_item` (only before the paper's first play) and
   `void_challenge_item` (marks the ended plays again). A play past its
   time is closed as time up whenever these read it.
+- **The leaderboards** (server only; G1b, built 2026-10-24):
+  `leaderboard_board(student, period, view, day)` — `today` (the day's
+  right answers, then the quicker time), `week` (Monday to Sunday, the
+  best 6 days' right answers, then the lower total time) or `all` (the
+  average right answers per challenge, from 10 played; then more played,
+  then the quicker average), over `school` (the student's school in their
+  programme, by the school each play was made at), `programme`, `ghana`
+  (every programme) or `schools` (the programme's listed schools by the
+  average of each one's best 10; fewer than 10 players waits, "N more").
+  Only students who joined, active, their past plays counted; a full tie
+  shares a rank. It hands back the top 10, the student's own line and,
+  outside the top 10, the one above and below; for Schools, the student's
+  school and the schools waiting. Plays of the last week left going past
+  their time are closed first as time up. The card: `leaderboard_card`,
+  `leaderboard_not_now`, `leaderboard_join` (how they appear and, the
+  first time, the username), `leaderboard_leave`, `leaderboard_show_as`,
+  `leaderboard_rename` (once a week), `leaderboard_random_name` (the join
+  screen's first card and a spin), and the lists `leaderboard_words()`,
+  `leaderboard_animals()`.
+- **Schools** (server only; 01, built 2026-10-24):
+  `choose_suggested_school(student, name, region, town)` — "My school
+  isn't listed": the same name in the same region is the same school;
+  with no region, the one listed school of that name when there is
+  exactly one; else a new suggestion; made the student's school. The
+  admin's `approve_school`, `merge_school`, `remove_school` and
+  `school_suggestions()` (each suggestion, who suggested it, when, and its
+  students).
 - **The history's figures** (server only, reads only):
   `student_history_figures(student, course or all)` — one row: the
   sittings (every status), the average and the best score of finished

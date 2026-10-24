@@ -29,7 +29,6 @@ export type Profile = {
   created_utc: string | null;
   last_login_utc: string | null;
   school_id: number | null;
-  school_other: string | null;
   referral_source: string | null;
 };
 

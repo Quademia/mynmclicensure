@@ -207,10 +207,8 @@ export function UsersClient({
   }
 
   const schoolText = detail?.schools
-    ? { name: detail.schools.name, note: detail.schools.region }
-    : detail?.school_other
-      ? { name: detail.school_other, note: 'not listed' }
-      : null;
+    ? { name: detail.schools.name, note: detail.schools.status === 'suggested' ? 'not listed' : detail.schools.region }
+    : null;
 
   return (
     <div className="usr">

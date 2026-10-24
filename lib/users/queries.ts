@@ -44,7 +44,7 @@ export async function getUsersPaginated(db: ServerSupabaseClient, filters: UserF
 export async function getUserDetail(db: ServerSupabaseClient, userId: string): Promise<UserDetail | null> {
   const { data: user, error: userError } = await db
     .from('users')
-    .select('*, schools ( name, region )')
+    .select('*, schools ( name, region, status )')
     .eq('user_id', userId)
     .maybeSingle();
   if (userError || !user) {

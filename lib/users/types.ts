@@ -51,7 +51,8 @@ export type DrawerSubscription = {
 };
 
 export type UserDetail = Profile & {
-  schools: { name: string; region: string } | null;
+  /** the student's school; a suggested one (01) may have no region yet */
+  schools: { name: string; region: string | null; status: 'listed' | 'suggested' } | null;
   activeSubscription: DrawerSubscription | null;
   subscriptionHistory: DrawerSubscription[];
 };

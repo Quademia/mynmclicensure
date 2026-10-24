@@ -164,7 +164,7 @@ export async function loadAdminStudentPage(db: ServerSupabaseClient, userId: str
   const service = createServiceRoleClient();
   const now = new Date().toISOString();
   const [userRes, allCourses, held, threads, subRes, paidRes, unfinishedRes] = await Promise.all([
-    service.from('users').select('user_id, name, forename, surname, email, program_id, school_id, school_other, avatar_url').eq('user_id', userId).maybeSingle(),
+    service.from('users').select('user_id, name, forename, surname, email, program_id, school_id, avatar_url').eq('user_id', userId).maybeSingle(),
     getCourses(db),
     heldNow(userId),
     getStudentThreads(db, userId, 'admin'),
@@ -188,14 +188,15 @@ export async function loadAdminStudentPage(db: ServerSupabaseClient, userId: str
   ]);
   const u = userRes.data as {
     user_id: string; name: string | null; forename: string | null; surname: string | null; email: string;
-    program_id: string | null; school_id: number | null; school_other: string | null; avatar_url: string | null;
+    program_id: string | null; school_id: number | null; avatar_url: string | null;
   } | null;
   if (!u) return null;
 
-  let school: string | null = u.school_other || null;
+  // a suggested school (01) is named with "(not listed)"
+  let school: string | null = null;
   if (u.school_id) {
-    const { data: s } = await service.from('schools').select('name').eq('id', u.school_id).maybeSingle();
-    school = (s?.name as string | undefined) ?? school;
+    const { data: s } = await service.from('schools').select('name, status').eq('id', u.school_id).maybeSingle();
+    if (s) school = s.status === 'suggested' ? `${s.name} (not listed)` : String(s.name);
   }
 
   const sub = (subRes.data ?? [])[0] as { expires_utc: string; products: { name: string } | { name: string }[] | null } | undefined;

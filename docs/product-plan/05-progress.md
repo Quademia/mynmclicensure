@@ -240,11 +240,13 @@ live.
   written on `attempts` and the functions in 12, ticked 2026-10-17.
 - Q13 — none.
 - G1a — none.
-- G1b — a table of its own, a leaderboard card per student (in place
-  of the two columns on `users` planned 2026-10-04): written in 12, needs
-  Sam's tick before the build. The school kept on each challenge play
-  was ticked with the challenge's tables (`challenge_plays`, 12; Sam,
-  2026-10-20).
+- G1b — a table of its own, a leaderboard card per student
+  (`leaderboard_cards`, in place of the two columns on `users` planned
+  2026-10-04), suggested schools on `schools` and `school_other` retired
+  (01): ticked by Sam 2026-10-24 and built the same day, the boards
+  worked out as the page opens, no stored totals (12). The school kept on
+  each challenge play was ticked with the challenge's tables
+  (`challenge_plays`, 12; Sam, 2026-10-20).
 - G3 — a small table remembering which "New achievement!" has been
   shown: needs Sam's tick at the build.
 

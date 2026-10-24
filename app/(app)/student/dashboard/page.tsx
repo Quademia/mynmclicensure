@@ -98,7 +98,7 @@ export default async function StudentDashboardPage() {
   const titleOf = (courseId: string) => titles.get(courseId) ?? courseId;
 
   const hasPhone = Boolean(profile.phone_number && profile.phone_number.trim());
-  const hasSchool = Boolean(profile.school_id || (profile.school_other && profile.school_other.trim()));
+  const hasSchool = Boolean(profile.school_id);
 
   return (
     <div className="sdash sd">

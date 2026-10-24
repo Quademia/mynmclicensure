@@ -124,7 +124,9 @@ before then, and the old list's history, is in
 - ✅ Q12 The history's figures — sittings, average, best, a count by kind, by the database — 2026-10-17
 - ⏸ 05.6 A course's topics on its course page — strongest and to work on; too busy as drawn (10-17); after 05.5
 - ⬜ Q13 Readiness and standing — the percentile first on the trial paper; a band; how others did
-- ⬜ G1b The leaderboard — from G2; three views; usernames and Noto animals; its storage tick first
+- ⬜ G1b The leaderboards — from G2; the join screen, the page, Profile's switch, the dashboard's rank line
+- ✅ 05.7 The leaderboards' database — the card, the boards as asked, suggested schools; school_other gone — 2026-10-24
+- ⏸ 05.8 Running totals on the card — only if All time grows slow (Sam, 10-24: no stored totals)
 - ⬜ G3 Badges — milestones on mastered and the streak, in place of tiers; after G1a
 - ⬜ 05.1 Attempts analytics as database queries — "which questions everyone fails"; no 5,000 cap
 - ⏸ 05.2 Days left to the exam — needs the NMC's dates (Sam: later, 10-04)

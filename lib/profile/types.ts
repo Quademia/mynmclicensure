@@ -32,9 +32,10 @@ export type PersonalInput = {
 export type AcademicInput = {
   level: string;
   cohort: string;
-  /** '' = none, '__OTHER__' = typed name, else a school id */
+  /** '' = none, '__OTHER__' = a school not listed (typed), else a school id */
   school: string;
-  school_other: string;
+  /** the typed name when '__OTHER__': the student's suggested school (01) */
+  unlisted_school: string;
 };
 
 export type ActionResult = { ok: true } | { ok: false; error: string };

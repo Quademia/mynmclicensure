@@ -1,9 +1,10 @@
 // app/register/page.tsx — legacy/mynmclicensure/register.html.
 //
 // The server half: loads the programme list (order program_name, as
-// getPrograms()) and the active schools (order region, name) with the
-// anon client — both tables are readable before login — and hands them
-// to the form. The "Signing up for MyTeacher instead?" link is gone with
+// getPrograms()) and the active listed schools (order region, name) with
+// the anon client — both tables are readable before login — and hands
+// them to the form. A suggested school is never shown with the listed
+// ones (01). The "Signing up for MyTeacher instead?" link is gone with
 // the April split.
 
 import type { Metadata } from 'next';
@@ -27,6 +28,7 @@ export default async function RegisterPage() {
       .from('schools')
       .select('id, name, region')
       .eq('active', true)
+      .eq('status', 'listed')
       .order('region', { ascending: true })
       .order('name', { ascending: true }),
   ]);

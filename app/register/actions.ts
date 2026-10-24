@@ -54,7 +54,8 @@ export async function registerAction(formData: FormData): Promise<RegisterResult
   if (!schoolVal) {
     return { ok: false, error: 'Please select your school.' };
   }
-  if (schoolVal === '__OTHER__' && !schoolOther) {
+  // a typed name becomes a suggested school, 3 to 120 characters (01)
+  if (schoolVal === '__OTHER__' && (schoolOther.length < 3 || schoolOther.length > 120)) {
     return { ok: false, error: "Please type your school's name." };
   }
   if (!referralVal) {
@@ -96,7 +97,8 @@ export async function registerAction(formData: FormData): Promise<RegisterResult
   // longer depends on "Confirm email" being off). Email lowercased as
   // Auth stores it; the table's trigger does the same (D26).
   const userId = makeUserId();
-  const { error: profileError } = await createServiceRoleClient().from('users').insert({
+  const service = createServiceRoleClient();
+  const { error: profileError } = await service.from('users').insert({
     user_id: userId,
     auth_id: data.user.id,
     email: email.toLowerCase(),
@@ -109,7 +111,6 @@ export async function registerAction(formData: FormData): Promise<RegisterResult
     signup_source: 'SUPABASE_AUTH',
     phone_number: phone,
     school_id: schoolVal === '__OTHER__' ? null : Number(schoolVal),
-    school_other: schoolVal === '__OTHER__' ? schoolOther : null,
     referral_source: referralVal === '__OTHER__' ? referralOther : referralVal,
   });
 
@@ -121,6 +122,15 @@ export async function registerAction(formData: FormData): Promise<RegisterResult
       ok: false,
       error: 'Account created but profile setup failed. Please contact support.',
     };
+  }
+
+  // "My school isn't listed": the typed name is the student's suggested
+  // school, found or made by the database (01). It never blocks the
+  // registration — on a failure the student has no school yet and the
+  // dashboard's nudge asks for one.
+  if (schoolVal === '__OTHER__') {
+    const { error: schoolError } = await service.rpc('choose_suggested_school', { p_user_id: userId, p_name: schoolOther });
+    if (schoolError) console.error('[register] suggested school failed:', schoolError.message);
   }
 
   // Step 3: the programme trial, service role, non-blocking (legacy too).

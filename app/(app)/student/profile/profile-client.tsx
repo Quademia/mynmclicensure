@@ -40,7 +40,8 @@ type ProfileFields = {
   level: string | null;
   cohort: string | null;
   school_id: number | null;
-  school_other: string | null;
+  /** the school's name when it is a suggested school, not on the list (01) */
+  unlisted_school: string | null;
 };
 
 type Msg = { text: string; tone: 'error' | 'success' } | null;
@@ -87,8 +88,8 @@ export function ProfileClient({
   const [academicEditing, setAcademicEditing] = useState(false);
   const [level, setLevel] = useState(profile.level || '');
   const [cohort, setCohort] = useState(profile.cohort || '');
-  const [school, setSchool] = useState(profile.school_id ? String(profile.school_id) : profile.school_other ? '__OTHER__' : '');
-  const [schoolOther, setSchoolOther] = useState(profile.school_other || '');
+  const [school, setSchool] = useState(profile.unlisted_school ? '__OTHER__' : profile.school_id ? String(profile.school_id) : '');
+  const [schoolOther, setSchoolOther] = useState(profile.unlisted_school || '');
   const [academicSaving, setAcademicSaving] = useState(false);
   const [schoolNeeds, setSchoolNeeds] = useState(false);
 
@@ -99,7 +100,7 @@ export function ProfileClient({
   useEffect(() => {
     if (!complete) return;
     const phoneEmpty = !(profile.phone_number && String(profile.phone_number).trim());
-    const schoolEmpty = !(profile.school_id || (profile.school_other && String(profile.school_other).trim()));
+    const schoolEmpty = !profile.school_id;
     const id = window.setTimeout(() => {
       if (phoneEmpty) {
         setPersonalEditing(true);
@@ -112,7 +113,7 @@ export function ProfileClient({
       (phoneEmpty ? personalRef : academicRef).current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 0);
     return () => window.clearTimeout(id);
-  }, [complete, profile.phone_number, profile.school_id, profile.school_other]);
+  }, [complete, profile.phone_number, profile.school_id]);
 
   // legacy renderPersonal / renderAcademic on cancel
   function cancelPersonal() {
@@ -128,8 +129,8 @@ export function ProfileClient({
     setAcademicEditing(false);
     setLevel(user.level || '');
     setCohort(user.cohort || '');
-    setSchool(user.school_id ? String(user.school_id) : user.school_other ? '__OTHER__' : '');
-    setSchoolOther(user.school_other || '');
+    setSchool(user.unlisted_school ? '__OTHER__' : user.school_id ? String(user.school_id) : '');
+    setSchoolOther(user.unlisted_school || '');
   }
 
   // legacy onAvatarSelected
@@ -192,17 +193,19 @@ export function ProfileClient({
         setMsg({ text: "Please type your school's name.", tone: 'error' });
         return;
       }
-      const result = await saveAcademicDetails({ level, cohort, school, school_other: schoolOther });
+      const result = await saveAcademicDetails({ level, cohort, school, unlisted_school: schoolOther });
       if (!result.ok) {
         setMsg({ text: result.error, tone: 'error' });
         return;
       }
+      // a school not listed keeps its id from the database; the refresh
+      // below brings it
       setUser((u) => ({
         ...u,
         level,
         cohort: cohort.trim(),
-        school_id: school === '__OTHER__' ? null : school ? Number(school) : null,
-        school_other: school === '__OTHER__' ? schoolOther.trim() : null,
+        school_id: school === '__OTHER__' ? u.school_id : school ? Number(school) : null,
+        unlisted_school: school === '__OTHER__' ? schoolOther.trim() : null,
       }));
       setAcademicEditing(false);
       setSchoolNeeds(false);
@@ -216,7 +219,7 @@ export function ProfileClient({
   const displayName = `${user.forename || ''} ${user.surname || ''}`.trim() || user.name || '—';
   const avatarSrc = photoPreview || user.avatar_url;
   const schoolRow = schools.find((s) => String(s.id) === String(user.school_id));
-  const schoolLabel = schoolRow ? schoolRow.name : user.school_other || '—';
+  const schoolLabel = user.unlisted_school || (schoolRow ? schoolRow.name : '—');
 
   // legacy populateSchoolPicker: grouped by region in the order they arrive
   const regions: { region: string; items: SchoolOption[] }[] = [];

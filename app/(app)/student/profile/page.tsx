@@ -17,7 +17,7 @@
 import type { Metadata } from 'next';
 import { requireStudent } from '@/lib/access';
 import { getPrograms } from '@/lib/catalogue/queries';
-import { getActiveSchools, getProfileSubscription } from '@/lib/profile/queries';
+import { getActiveSchools, getProfileSubscription, getUnlistedSchoolName } from '@/lib/profile/queries';
 import { vapidPublicKey } from '@/lib/notifications/keys';
 import { ProfileClient } from './profile-client';
 import '@/styles/student-profile.css';
@@ -32,10 +32,11 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
   const { supabase, profile } = await requireStudent();
   const { complete } = await searchParams;
 
-  const [programs, schools, subscription] = await Promise.all([
+  const [programs, schools, subscription, unlistedSchool] = await Promise.all([
     getPrograms(supabase),
     getActiveSchools(supabase),
     getProfileSubscription(supabase, profile.user_id),
+    getUnlistedSchoolName(supabase, profile.school_id),
   ]);
   const programName = programs.find((p) => p.program_id === profile.program_id)?.program_name ?? null;
 
@@ -52,7 +53,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
         level: profile.level,
         cohort: profile.cohort,
         school_id: profile.school_id,
-        school_other: profile.school_other,
+        unlisted_school: unlistedSchool,
       }}
       programName={programName}
       schools={schools}

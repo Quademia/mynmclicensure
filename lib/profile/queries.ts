@@ -15,6 +15,7 @@ export async function getActiveSchools(db: ServerSupabaseClient): Promise<School
     .from('schools')
     .select('id, name, region')
     .eq('active', true)
+    .eq('status', 'listed')
     .order('region', { ascending: true })
     .order('name', { ascending: true });
   if (error) {
@@ -22,6 +23,18 @@ export async function getActiveSchools(db: ServerSupabaseClient): Promise<School
     return [];
   }
   return (data ?? []).map((s) => ({ id: Number(s.id), name: String(s.name), region: String(s.region) }));
+}
+
+// The student's school when it is not on the list — a suggested school
+// (01): its name for "My school isn't listed", else null.
+export async function getUnlistedSchoolName(db: ServerSupabaseClient, schoolId: number | null): Promise<string | null> {
+  if (!schoolId) return null;
+  const { data, error } = await db.from('schools').select('name, status').eq('id', schoolId).maybeSingle();
+  if (error) {
+    console.error('getUnlistedSchoolName:', error);
+    return null;
+  }
+  return data && data.status === 'suggested' ? String(data.name) : null;
 }
 
 export async function getProfileSubscription(db: ServerSupabaseClient, userId: string): Promise<ProfileSubscription | null> {

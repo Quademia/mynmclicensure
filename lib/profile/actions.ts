@@ -14,6 +14,7 @@
 'use server';
 
 import { requireStudent } from '@/lib/access';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { uploadProfileImage } from './images';
 import { PROFILE_LEVELS, type AcademicInput, type ActionResult, type PersonalInput, type PersonalResult } from './types';
 
@@ -63,15 +64,29 @@ export async function saveAcademicDetails(input: AcademicInput): Promise<ActionR
   const level = (PROFILE_LEVELS as readonly string[]).includes(levelRaw) ? levelRaw : '';
   const cohort = String(input.cohort || '').trim();
   const schoolSel = String(input.school || '');
-  const schoolOther = String(input.school_other || '').trim();
+  const unlisted = String(input.unlisted_school || '').trim();
+  const isUnlisted = schoolSel === '__OTHER__';
 
-  if (schoolSel === '__OTHER__' && !schoolOther) return fail("Please type your school's name.");
+  if (isUnlisted && (unlisted.length < 3 || unlisted.length > 120)) return fail("Please type your school's name.");
 
-  const school_id = schoolSel === '__OTHER__' ? null : schoolSel ? Number(schoolSel) : null;
+  const school_id = isUnlisted ? null : schoolSel ? Number(schoolSel) : null;
   if (school_id !== null && !Number.isFinite(school_id)) return fail('Unknown school.');
-  const school_other = schoolSel === '__OTHER__' ? schoolOther : null;
 
-  const { error } = await supabase.from('users').update({ level, cohort, school_id, school_other }).eq('user_id', profile.user_id);
+  // a school not listed: the database finds or makes the suggested school
+  // and makes it the student's (01)
+  if (isUnlisted) {
+    const { error: schoolError } = await createServiceRoleClient().rpc('choose_suggested_school', {
+      p_user_id: profile.user_id,
+      p_name: unlisted,
+    });
+    if (schoolError) {
+      console.error('saveAcademicDetails - school:', schoolError);
+      return fail('Could not save your school. Please try again.');
+    }
+  }
+
+  const fields = isUnlisted ? { level, cohort } : { level, cohort, school_id };
+  const { error } = await supabase.from('users').update(fields).eq('user_id', profile.user_id);
   if (error) {
     console.error('saveAcademicDetails:', error);
     return fail(error.message);
