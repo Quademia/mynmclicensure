@@ -1,8 +1,9 @@
 /* styles/leaderboards.css — the leaderboards' own pieces (05 G1b): the
-   offer to join and How you'll appear, on the quiz start screen's card
-   (styles/runner.css); the animal circle; Change animal's panel from
-   below; the start screen's box. Tokens only. The panel is portalled to
-   <body>, so its rules are not under .runner (AGENTS.md). */
+   offer to join (on the quiz start screen's card, styles/runner.css) and
+   How you'll appear (on .card); the animal circle; Change animal's panel
+   from below; the start screen's box; the Leaderboards page (.lbp). Tokens
+   only. The panel is portalled to <body>, so its rules are not under
+   .runner (AGENTS.md). */
 
 /* ── the animal circle, on the shared name circle (.name-circle) ── */
 .lb-circle-32 { width: 32px; height: 32px; }
@@ -35,7 +36,26 @@
   color: var(--ink-muted);
 }
 
-/* ── How you'll appear ── */
+/* ── How you'll appear (on .card: the challenge's way in and the page's Join) ── */
+.lb-appear-brand {
+  margin-bottom: var(--space-12);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--brand-teal);
+}
+.lb-appear-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--brand-navy);
+}
+.lb-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-10);
+  margin-top: var(--space-20);
+}
 .lb-options {
   display: grid;
   gap: var(--space-12);
@@ -217,3 +237,188 @@
 .lb-box-join:hover:not(:disabled) { background: var(--brand-teal-pale); }
 .lb-box-join .lb-box-icon { padding-top: 0; }
 .lb-box-join-text { flex: 1; }
+
+/* ── the Leaderboards page (05 G1b; Sam, 2026-10-20: B) ── */
+.lbp {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  max-width: 720px;
+}
+.lbp-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+.lbp-periods {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+}
+.lbp-period {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: var(--space-8);
+  font-size: var(--type-field-size);
+  font-weight: 600;
+  color: var(--ink-muted);
+  text-decoration: none;
+}
+.lbp-period + .lbp-period { border-left: 1px solid var(--border); }
+.lbp-period:hover { color: var(--ink); text-decoration: none; }
+.lbp-period.is-on {
+  background: var(--brand-teal-pale);
+  color: var(--brand-teal-hover);
+}
+.lbp-board {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  margin: 0;
+}
+.lbp-board select {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: var(--space-8) var(--space-12);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font: inherit;
+  font-size: var(--type-field-size);
+  font-weight: 600;
+  color: var(--ink);
+}
+.lbp-board select:focus { outline: none; border-color: var(--brand-navy); }
+.lbp-wait { flex: none; font-size: var(--type-meta-size); color: var(--ink-muted); }
+
+/* the student's own place, first */
+.lbp-me {
+  padding: var(--space-12) var(--space-16);
+  border-radius: var(--radius);
+  background: var(--brand-teal-pale);
+  color: var(--brand-teal-hover);
+}
+.lbp-me-off {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--ink);
+}
+.lbp-me-place {
+  margin: 0;
+  font-size: var(--type-card-title-size);
+  font-weight: 700;
+}
+.lbp-me-detail {
+  margin: var(--space-2) 0 0;
+  font-size: var(--type-meta-size);
+  color: var(--brand-teal-hover);
+}
+.lbp-me-off .lbp-me-detail { color: var(--ink-muted); }
+.lbp-me-go {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  margin-top: var(--space-4);
+  font-size: var(--type-field-size);
+  font-weight: 600;
+  color: var(--brand-teal);
+}
+.lbp-join {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--ink);
+}
+.lbp-join-text { flex: 1; min-width: 0; }
+.lbp-join .lbp-me-detail { color: var(--ink-muted); }
+
+/* the rows */
+.lbp-list {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: var(--space-8) var(--space-12);
+}
+.lbp-list-head {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-4) var(--space-8);
+  font-size: var(--type-meta-size);
+  color: var(--ink-muted);
+}
+.lbp-sub {
+  margin: var(--space-4) var(--space-4) var(--space-8);
+  font-size: var(--type-field-size);
+  font-weight: 700;
+  color: var(--ink);
+}
+.lbp-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.lbp-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-10);
+  min-height: 48px;
+  padding: var(--space-6) var(--space-4);
+  border-top: 1px solid var(--border);
+  font-size: var(--type-field-size);
+  color: var(--ink);
+}
+.lbp-row.is-me {
+  background: var(--brand-teal-pale);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+}
+.lbp-rank {
+  flex: none;
+  width: 24px;
+  text-align: right;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+.lbp-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lbp-you { color: var(--brand-teal-hover); }
+.lbp-score {
+  flex: none;
+  font-size: var(--type-meta-size);
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+.lbp-gap {
+  margin: 0;
+  padding: var(--space-4) 0;
+  text-align: center;
+  letter-spacing: 3px;
+  color: var(--ink-faint);
+}
+.lbp-empty,
+.lbp-note {
+  margin: 0;
+  font-size: var(--type-meta-size);
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+.lbp-card { display: grid; gap: var(--space-8); justify-items: start; }
+.lbp-card-title { margin: 0; font-size: var(--type-card-title-size); font-weight: 700; color: var(--ink); }
+.lbp-card-text { margin: 0; font-size: var(--type-field-size); color: var(--ink-muted); }
+@media (max-width: 768px) {
+  .lbp-board select { font-size: 16px; }
+  .lbp-list { padding: var(--space-4) var(--space-8); }
+}

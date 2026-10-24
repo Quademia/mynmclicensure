@@ -20,6 +20,7 @@ export const STUDENT_PAGES: AppPage[] = [
   { label: 'Mock exams', href: `${S}/mock-exams` },
   { label: 'Quiz builder', href: `${S}/quiz-builder` },
   { label: 'Learning history', href: `${S}/learning-history` },
+  { label: 'Leaderboards', href: `${S}/leaderboards` },
   { label: 'My packs', href: `${S}/offline-packs` },
   { label: 'Announcements', href: `${S}/announcements` },
   { label: 'Messages', href: `${S}/messages` },

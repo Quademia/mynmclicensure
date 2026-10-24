@@ -88,3 +88,26 @@
   color: var(--ink-muted);
   margin: 0 0 var(--space-16);
 }
+/* the leaderboards' places (05 G1b): today's and this week's, then the way to the page */
+.challenge-pop-rank {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  margin: 0 0 var(--space-12);
+}
+.challenge-pop-place {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin: 0;
+  font-size: var(--type-field-size);
+  font-weight: 600;
+  color: var(--brand-teal-hover);
+}
+.challenge-pop-place svg { width: 16px; height: 16px; }
+.challenge-pop-rank .btn-link {
+  min-height: 32px;
+  font-size: var(--type-field-size);
+  font-weight: 600;
+  text-decoration: none;
+}

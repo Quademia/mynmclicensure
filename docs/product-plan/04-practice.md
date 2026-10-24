@@ -354,8 +354,9 @@ live.
   a count, no percentage or grade word — the time, five dots of right
   and wrong that jump to a question; to a student who has joined, today's
   rank and this week's with "See the leaderboards ›", else "Join the
-  leaderboards to see where you rank ›"; "Answers stay open until
-  midnight." See answers (the main button) and Back to dashboard. No
+  leaderboards to see where you rank ›" *(built 2026-10-24: 05.11 — read
+  with Submit's reply, so no second trip; and with the page when the
+  answers are reopened)*; "Answers stay open until midnight." See answers (the main button) and Back to dashboard. No
   report page and no Retake. Reopened from the dashboard's Answers ›, it
   lands on the answers; the score pill brings the pop-up back.
 - **Its answers only on its day** (Sam, 2026-10-20), for every student
@@ -379,7 +380,8 @@ live.
   challenge done · 4 of 5 right" and Review the answers › until midnight
   (Sam, 2026-10-20, in place of "Today · 4 of 5 right" and Answers ›; on
   a phone the link under the words), then the rank line ("4th in St
-  Mary's this week", or "See this week's leaderboard ›" before joining). On
+  Mary's this week", or "See this week's leaderboard ›" before joining)
+  *(built 2026-10-24: 05.11, a line of its own beneath, its own tap)*. On
   a day with none, "Back tomorrow". No menu item of its own (Sam,
   2026-10-04; 00, The menu).
 - **A home of its own** (Sam, 2026-10-20): a page that houses the daily

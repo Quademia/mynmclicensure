@@ -34,6 +34,7 @@ import type { SessionExit } from '@/lib/attempts/links';
 import { formatResultsAt } from '@/lib/quizzes/results-date';
 import { AppLink } from '@/components/shell/link-pending';
 import { Icon } from '@/components/shell/icons';
+import { ordinal, type ChallengeRanks } from '@/lib/leaderboards/types';
 import { ResultsHeldMark } from './results-held';
 
 export type ResultsSummary = {
@@ -146,6 +147,8 @@ export function ChallengeResultsPopup({
   onAnswers,
   onClose,
   exit,
+  ranks = null,
+  onLeaderboards,
 }: {
   open: boolean;
   summary: ChallengeSummary;
@@ -154,8 +157,17 @@ export function ChallengeResultsPopup({
   onAnswers: () => void;
   onClose: () => void;
   exit: { label: string; onClick: () => void };
+  /** 05 G1b: today's and this week's places; null leaves the line out. */
+  ranks?: ChallengeRanks | null;
+  onLeaderboards?: () => void;
 }) {
   const s = summary;
+  // "3rd today and 14th this week in St Mary's" (04; Sam, 2026-10-20)
+  const places = ranks?.joined
+    ? [ranks.today ? `${ordinal(ranks.today)} today` : null, ranks.week ? `${ordinal(ranks.week)} this week` : null]
+        .filter(Boolean)
+        .join(' and ')
+    : '';
   return (
     <Dialog open={open} onClose={onClose} title={s.heading}>
       <div className="results-pop challenge-pop">
@@ -175,6 +187,19 @@ export function ChallengeResultsPopup({
             </li>
           ))}
         </ul>
+        {ranks && onLeaderboards ? (
+          <div className="challenge-pop-rank">
+            {places ? (
+              <p className="challenge-pop-place">
+                <Icon name="trophy" />
+                {places} in {ranks.board}
+              </p>
+            ) : null}
+            <button type="button" className="btn-link" onClick={onLeaderboards}>
+              {ranks.joined ? 'See the leaderboards ›' : 'Join the leaderboards to see where you rank ›'}
+            </button>
+          </div>
+        ) : null}
         <p className="challenge-pop-note">Answers stay open until midnight.</p>
         <div className="dlg-actions stack">
           <button type="button" className="btn btn-primary" onClick={onAnswers}>

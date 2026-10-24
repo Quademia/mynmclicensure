@@ -281,7 +281,9 @@ opens it (00, The menu).
   Schools; opens on This week · My school. The student's place first,
   then the top 10 and the neighbours; a row opens nothing; "Join to see
   where you rank" before joining; Share on WhatsApp (05; Sam,
-  2026-10-20: B, drawn).
+  2026-10-20: B, drawn). *(built 2026-10-24: 05.10 — Share left out
+  until the challenge's home page; with no school, My school says to add
+  it on Profile)*
 - The same in every state.
 
 ### Achievements

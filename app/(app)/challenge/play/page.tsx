@@ -21,7 +21,7 @@ import type { Metadata } from 'next';
 import { requireStudent } from '@/lib/access';
 import { challengeCard, getChallengeToday, readChallengeSitting } from '@/lib/challenge/queries';
 import { CHALLENGE_EXIT } from '@/lib/challenge/types';
-import { getJoinChoices, getLeaderboardCard, getWeekRank } from '@/lib/leaderboards/queries';
+import { getChallengeRanks, getJoinChoices, getLeaderboardCard, getWeekRank } from '@/lib/leaderboards/queries';
 import { personOf } from '@/lib/leaderboards/types';
 import { RunnerError } from '@/components/runner/runner-error';
 import { ChallengeRunner } from './challenge-client';
@@ -51,9 +51,13 @@ export default async function ChallengePlayPage() {
   }
 
   if (today.play && today.play.status !== 'playing') {
-    const read = await readChallengeSitting(supabase, profile.user_id, today);
+    // the answers, and the places the results pop-up brings back with them
+    const [read, ranks] = await Promise.all([
+      readChallengeSitting(supabase, profile.user_id, today),
+      getChallengeRanks(profile.user_id, Boolean(profile.school_id)),
+    ]);
     if (!read.ok) return <RunnerError title="Today's Answers Have Closed" message={read.error} exit={CHALLENGE_EXIT} />;
-    return <ChallengeRunner sitting={read.sitting} reviewMode />;
+    return <ChallengeRunner sitting={read.sitting} reviewMode ranks={ranks} />;
   }
 
   const joined = lbCard?.joined === true;

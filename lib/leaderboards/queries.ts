@@ -7,7 +7,19 @@
 // leaves the challenge playable, without the leaderboards' parts.
 
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import type { JoinChoices, LeaderboardCard, ShownAs, WeekRank } from './types';
+import type {
+  Board,
+  BoardLine,
+  BoardPeriod,
+  BoardPlace,
+  BoardView,
+  ChallengeRanks,
+  JoinChoices,
+  LeaderboardCard,
+  SchoolLine,
+  ShownAs,
+  WeekRank,
+} from './types';
 
 type Row = Record<string, unknown>;
 
@@ -59,21 +71,138 @@ export async function getJoinChoices(person: string | null, photo: string | null
   return { words, animals, first: { word: pick(words), animal: pick(animals) }, person, photo };
 }
 
-/** This week's place for the start screen: on the student's school board,
- * or their programme's when they have no school. Null if the read fails. */
-export async function getWeekRank(userId: string, hasSchool: boolean): Promise<WeekRank | null> {
+function n(v: unknown): number {
+  const x = Number(v);
+  return Number.isFinite(x) ? x : 0;
+}
+
+function nOrNull(v: unknown): number | null {
+  if (v === null || v === undefined || v === '') return null;
+  const x = Number(v);
+  return Number.isFinite(x) ? x : null;
+}
+
+/** A student's place on their own board: the school's, or the programme's
+ * when they have no school. Null if the read fails. */
+export async function getBoardPlace(userId: string, period: BoardPeriod, hasSchool: boolean): Promise<BoardPlace | null> {
   const { data, error } = await createServiceRoleClient().rpc('leaderboard_board', {
     p_user_id: userId,
-    p_period: 'week',
+    p_period: period,
     p_view: hasSchool ? 'school' : 'programme',
   });
   if (error || !data || typeof data !== 'object') {
-    if (error) console.error('getWeekRank:', error);
+    if (error) console.error('getBoardPlace:', error);
     return null;
   }
   const b = data as Row;
   const me = b.me && typeof b.me === 'object' ? (b.me as Row) : null;
-  const rank = me && me.rank !== null && me.rank !== undefined ? Number(me.rank) : null;
-  const board = (hasSchool ? str(b.school_name) : str(b.program_id)) ?? 'your programme';
-  return { rank: Number.isFinite(rank) ? rank : null, board };
+  return {
+    joined: b.joined === true,
+    rank: me ? nOrNull(me.rank) : null,
+    board: (hasSchool ? str(b.school_name) : str(b.program_id)) ?? 'your programme',
+  };
+}
+
+/** This week's place for the start screen's box. */
+export async function getWeekRank(userId: string, hasSchool: boolean): Promise<WeekRank | null> {
+  const place = await getBoardPlace(userId, 'week', hasSchool);
+  return place ? { rank: place.rank, board: place.board } : null;
+}
+
+/** The results pop-up's line: today's place and this week's, on the same board. */
+export async function getChallengeRanks(userId: string, hasSchool: boolean): Promise<ChallengeRanks | null> {
+  const [today, week] = await Promise.all([getBoardPlace(userId, 'today', hasSchool), getBoardPlace(userId, 'week', hasSchool)]);
+  if (!today || !week) return null;
+  return { joined: week.joined, today: today.rank, week: week.rank, board: week.board };
+}
+
+function lineFrom(r: Row): BoardLine {
+  return {
+    rank: n(r.rank),
+    name: str(r.name) ?? '',
+    animal: str(r.animal),
+    photo: str(r.photo),
+    right: n(r.right),
+    timeS: n(r.time_s),
+    played: n(r.played),
+    average: nOrNull(r.average),
+    averageTimeS: nOrNull(r.average_time_s),
+    isMe: r.is_me === true,
+  };
+}
+
+function schoolLineFrom(r: Row): SchoolLine {
+  return {
+    rank: n(r.rank),
+    school: str(r.school) ?? '',
+    players: n(r.players),
+    average: n(r.average),
+    averageTimeS: n(r.average_time_s),
+    isMine: r.is_mine === true,
+  };
+}
+
+function rows(v: unknown): Row[] {
+  return Array.isArray(v) ? (v.filter((x) => x && typeof x === 'object') as Row[]) : [];
+}
+
+/** One board as the database works it out (05.7); null if the read fails. */
+export async function getBoard(userId: string, period: BoardPeriod, view: BoardView): Promise<Board | null> {
+  const { data, error } = await createServiceRoleClient().rpc('leaderboard_board', {
+    p_user_id: userId,
+    p_period: period,
+    p_view: view,
+  });
+  if (error || !data || typeof data !== 'object') {
+    if (error) console.error('getBoard:', error);
+    return null;
+  }
+  const b = data as Row;
+  const head = {
+    period,
+    view,
+    programId: str(b.program_id),
+    schoolId: nOrNull(b.school_id),
+    schoolName: str(b.school_name),
+    schoolSuggested: b.school_suggested === true,
+    joined: b.joined === true,
+    minPlayed: n(b.min_played) || 10,
+    minPlayers: n(b.min_players) || 10,
+  };
+  if (view === 'schools') {
+    const m = b.mine && typeof b.mine === 'object' ? (b.mine as Row) : null;
+    return {
+      ...head,
+      kind: 'schools',
+      schools: n(b.schools),
+      top: rows(b.top).map(schoolLineFrom),
+      mine: m
+        ? {
+            school: str(m.school) ?? '',
+            suggested: m.suggested === true,
+            players: n(m.players),
+            rank: nOrNull(m.rank),
+            of: n(m.of),
+            needed: nOrNull(m.needed),
+          }
+        : null,
+      around: rows(b.around).map(schoolLineFrom),
+      waiting: rows(b.waiting).map((w) => ({
+        school: str(w.school) ?? '',
+        players: n(w.players),
+        needed: n(w.needed),
+        isMine: w.is_mine === true,
+      })),
+    };
+  }
+  const me = b.me && typeof b.me === 'object' ? lineFrom(b.me as Row) : null;
+  return {
+    ...head,
+    kind: 'people',
+    players: n(b.players),
+    top: rows(b.top).map(lineFrom),
+    me,
+    around: rows(b.around).map(lineFrom),
+    mePlayed: n(b.me_played),
+  };
 }

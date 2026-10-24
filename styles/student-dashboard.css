@@ -118,6 +118,11 @@ a.sd-challenge:hover { text-decoration: none; border-color: var(--brand-teal); }
 .sd-challenge-text { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sd-challenge-text strong { font-weight: 700; color: var(--brand-navy); }
 .sd-challenge-go { flex: none; font-weight: 600; color: var(--accent); }
+/* played: the rank line beneath, its own tap to the Leaderboards (05 G1b) */
+.sd-challenge-wrap { margin-bottom: var(--space-12); }
+.sd-challenge-wrap .sd-challenge { margin-bottom: var(--space-2); }
+.sd-challenge-rank { display: inline-flex; align-items: center; gap: var(--space-6); min-height: 32px; padding: 0 var(--space-16); font-size: var(--type-meta-size); font-weight: 600; color: var(--brand-teal); text-decoration: none; }
+.sd-challenge-rank svg { width: 16px; height: 16px; }
 /* played: on a phone the words take the line and the link sits under them,
    in line with the words (the icon's 16px and the gap) */
 @media (max-width: 600px) {

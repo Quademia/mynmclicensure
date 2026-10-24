@@ -17,7 +17,7 @@ const S = '/student';
 
 // The bottom bar on a phone (Sam, 2026-10-04: A — 00 The menu, 09). The
 // drawer below stays the full menu; these are shortcuts into its pages.
-// Progress gains Leaderboard with 05 G1b, so its row appears then.
+// Progress: History · Leaderboards (05 G1b, 2026-10-24); Achievements joins with G3.
 export const STUDENT_PHONE_TABS: PhoneTab[] = [
   {
     key: 'home',
@@ -44,7 +44,10 @@ export const STUDENT_PHONE_TABS: PhoneTab[] = [
     key: 'progress',
     label: 'Progress',
     icon: 'chart',
-    pages: [{ label: 'History', href: `${S}/learning-history` }],
+    pages: [
+      { label: 'History', href: `${S}/learning-history` },
+      { label: 'Leaderboards', href: `${S}/leaderboards` },
+    ],
     also: [`${S}/report`],
   },
   {
@@ -69,6 +72,7 @@ export const STUDENT_NAV: NavItem[] = [
 
   { key: 'h-progress', label: 'Progress', heading: true },
   { key: 'learning-history', label: 'Learning history', icon: 'chart', href: `${S}/learning-history` },
+  { key: 'leaderboards', label: 'Leaderboards', icon: 'trophy', href: `${S}/leaderboards` },
 
   { key: 'h-offline', label: 'Study offline', heading: true },
   { key: 'offline-packs', label: 'My packs', icon: 'download', href: `${S}/offline-packs` },

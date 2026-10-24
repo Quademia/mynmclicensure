@@ -9,6 +9,7 @@
 
 import type { ActionResult, AnswerPatch, Attempt, FinishResult, SealedItem, SecretsMap } from '@/lib/attempts/types';
 import type { SessionExit } from '@/lib/attempts/links';
+import type { ChallengeRanks } from '@/lib/leaderboards/types';
 
 export type ChallengePlayStatus = 'playing' | 'submitted' | 'time_up';
 
@@ -65,6 +66,10 @@ export type ChallengeRun = {
 };
 
 export type ChallengeStartResult = { ok: true; sitting: ChallengeSitting } | { ok: false; error: string };
+
+/** Submit's reply: the quiz's, with the leaderboards' places (05 G1b) for
+ * the results pop-up — read on the server in the same trip. */
+export type ChallengeFinishResult = FinishResult & { ranks?: ChallengeRanks | null };
 
 /** What the start screen shows — no question reaches the page before Start. */
 export type ChallengeCard = {

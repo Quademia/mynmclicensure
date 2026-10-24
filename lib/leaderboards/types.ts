@@ -40,6 +40,121 @@ export type WeekRank = {
   board: string;
 };
 
+/** A student's place on their own board (the school's, else the programme's). */
+export type BoardPlace = {
+  joined: boolean;
+  /** Null when they are not on it (not joined, or no play in the time). */
+  rank: number | null;
+  /** "St Mary's" or the programme ("RM"). */
+  board: string;
+};
+
+/** The results pop-up's line (04): today's place and this week's. */
+export type ChallengeRanks = {
+  joined: boolean;
+  today: number | null;
+  week: number | null;
+  board: string;
+};
+
+// ── The Leaderboards page (05 G1b; Sam, 2026-10-20: B) ────────────────
+
+export const BOARD_PERIODS = ['today', 'week', 'all'] as const;
+export type BoardPeriod = (typeof BOARD_PERIODS)[number];
+export const BOARD_VIEWS = ['school', 'programme', 'ghana', 'schools'] as const;
+export type BoardView = (typeof BOARD_VIEWS)[number];
+
+export const PERIOD_LABELS: Record<BoardPeriod, string> = {
+  today: 'Today',
+  week: 'This week',
+  all: 'All time',
+};
+
+export const LEADERBOARDS_HREF = '/student/leaderboards';
+
+export function boardHref(period: BoardPeriod, view: BoardView): string {
+  return period === 'week' && view === 'school' ? LEADERBOARDS_HREF : `${LEADERBOARDS_HREF}?period=${period}&board=${view}`;
+}
+
+/** A student's line on a board. */
+export type BoardLine = {
+  rank: number;
+  /** The username, or "Ama O." for one shown by name. */
+  name: string;
+  animal: string | null;
+  photo: string | null;
+  right: number;
+  timeS: number;
+  played: number;
+  /** All time: the average right answers per challenge and the average time. */
+  average: number | null;
+  averageTimeS: number | null;
+  isMe: boolean;
+};
+
+/** A school's line on the Schools board. */
+export type SchoolLine = {
+  rank: number;
+  school: string;
+  players: number;
+  /** The average of its best 10. */
+  average: number;
+  averageTimeS: number;
+  isMine: boolean;
+};
+
+type BoardHead = {
+  period: BoardPeriod;
+  view: BoardView;
+  /** The programme's code ("RN"); null without one. */
+  programId: string | null;
+  schoolId: number | null;
+  schoolName: string | null;
+  schoolSuggested: boolean;
+  joined: boolean;
+  /** All time: challenges played before a student shows (10). */
+  minPlayed: number;
+  /** Schools: players before a school shows (10). */
+  minPlayers: number;
+};
+
+export type PeopleBoard = BoardHead & {
+  kind: 'people';
+  players: number;
+  top: BoardLine[];
+  me: BoardLine | null;
+  /** Outside the top 10: the one above, the student, the one below. */
+  around: BoardLine[];
+  /** Challenges the student played in the time (All time's "3 played"). */
+  mePlayed: number;
+};
+
+export type SchoolsBoard = BoardHead & {
+  kind: 'schools';
+  schools: number;
+  top: SchoolLine[];
+  mine: { school: string; suggested: boolean; players: number; rank: number | null; of: number; needed: number | null } | null;
+  around: SchoolLine[];
+  waiting: { school: string; players: number; needed: number; isMine: boolean }[];
+};
+
+export type Board = PeopleBoard | SchoolsBoard;
+
+/** "1:12" under an hour, "1 h 4 min" past it. */
+export function clockOf(seconds: number): string {
+  const s = Math.max(0, Math.round(seconds));
+  if (s >= 3600) return `${Math.floor(s / 3600)} h ${Math.floor((s % 3600) / 60)} min`;
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+
+/** "17 min 31 s", "45 s". */
+export function longTimeOf(seconds: number): string {
+  const s = Math.max(0, Math.round(seconds));
+  const m = Math.floor(s / 60);
+  if (m >= 60) return `${Math.floor(m / 60)} h ${m % 60} min`;
+  return m ? `${m} min ${s % 60} s` : `${s} s`;
+}
+
 export type JoinResult = { ok: true; card: LeaderboardCard } | { ok: false; error: string };
 export type NotNowResult = { ok: true } | { ok: false; error: string };
 

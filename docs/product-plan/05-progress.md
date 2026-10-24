@@ -78,7 +78,7 @@ already saves — no new table.
   time", where answered means new questions met.
 - Questions mastered is on no board.
 
-### Leaderboards *(to build: G1b, after the daily challenge)*
+### Leaderboards *(G1b: the database, joining, the page and its ways in built 2026-10-24 — 05.7, 05.9–05.11; Profile's switch and rename, the schools' pages, Remove picture and photos made small to build)*
 
 Settled by Sam, 2026-10-04 and 10-08; gone over again on 2026-10-20,
 planned with the daily challenge (04) — both to be built before going
@@ -87,7 +87,9 @@ live.
 - **The name is Leaderboards**: one page, a row under Progress (00),
   and a line on the dashboard's challenge card that opens it — the
   student's rank once they have joined, else "See this week's
-  leaderboard ›".
+  leaderboard ›". *(built 2026-10-24: 05.11 — the line beneath the played
+  challenge line, this week's place on the school board, the
+  programme's with no school)*
 - **From the daily challenge only.** Every challenge keeps the right
   answers, the server's time from Start to Submit (the challenge's own
   mode, 04; Sam 2026-10-08) and the school the student was in — from the
@@ -132,7 +134,11 @@ live.
   there are no student profiles to visit. Before joining, the card
   reads "Join to see where you rank" with Join. The Schools view: the
   student's school marked ("St Mary's is 3rd of 24"), then "Not on the
-  board yet" with how many more players each needs.
+  board yet" with how many more players each needs. *(built 2026-10-24:
+  05.10 — Share on WhatsApp left out until the challenge's home page,
+  05.12; with no school, My school says to add it on Profile (Sam,
+  2026-10-24); a suggested school says it joins the Schools board once
+  added to the list; the board kept in the address, ?period=&board=)*
 - **My school is the student's school in their programme** (Sam,
   2026-10-08, reconfirmed 2026-10-20): a school training RN and RM has
   a board for each, and appears on the RN and the RM schools boards by

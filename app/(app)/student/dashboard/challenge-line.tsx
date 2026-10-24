@@ -10,14 +10,26 @@
 //     today's answers are open until midnight, after it the line is the
 //     next day's); on a phone the link sits under the words
 //   none today — "Back tomorrow", no link.
-// The rank line comes with the leaderboards (05 G1b). Nothing with no
-// programme: the play page says to choose one.
+// Beneath a played line, the rank line (05 G1b; 04, built 2026-10-24), a
+// tap to the Leaderboards: "4th in St Mary's this week ›" once joined, else
+// "See this week's leaderboard ›". Nothing with no programme: the play page
+// says to choose one.
 
 import { AppLink } from '@/components/shell/link-pending';
 import { Icon } from '@/components/shell/icons';
 import { CHALLENGE_PLAY_HREF, type ChallengeToday } from '@/lib/challenge/types';
+import { LEADERBOARDS_HREF, ordinal, type BoardPlace } from '@/lib/leaderboards/types';
 
-export function ChallengeLine({ today }: { today: ChallengeToday | null }) {
+function RankLine({ place }: { place: BoardPlace | null }) {
+  return (
+    <AppLink className="sd-challenge-rank" href={LEADERBOARDS_HREF}>
+      <Icon name="trophy" />
+      {place?.joined && place.rank ? `${ordinal(place.rank)} in ${place.board} this week ›` : "See this week's leaderboard ›"}
+    </AppLink>
+  );
+}
+
+export function ChallengeLine({ today, place }: { today: ChallengeToday | null; place: BoardPlace | null }) {
   if (!today || !today.programId) return null;
 
   if (!today.challengeId) {
@@ -32,13 +44,16 @@ export function ChallengeLine({ today }: { today: ChallengeToday | null }) {
   const play = today.play;
   if (play && play.status !== 'playing') {
     return (
-      <AppLink className="sd-challenge sd-challenge-done" href={CHALLENGE_PLAY_HREF}>
-        <span className="sd-challenge-icon"><Icon name="check-circle" /></span>
-        <span className="sd-challenge-text">
-          Today&apos;s challenge done · <strong>{play.right ?? 0} of {play.outOf ?? 0} right</strong>
-        </span>
-        <span className="sd-challenge-go">Review the answers ›</span>
-      </AppLink>
+      <div className="sd-challenge-wrap">
+        <AppLink className="sd-challenge sd-challenge-done" href={CHALLENGE_PLAY_HREF}>
+          <span className="sd-challenge-icon"><Icon name="check-circle" /></span>
+          <span className="sd-challenge-text">
+            Today&apos;s challenge done · <strong>{play.right ?? 0} of {play.outOf ?? 0} right</strong>
+          </span>
+          <span className="sd-challenge-go">Review the answers ›</span>
+        </AppLink>
+        <RankLine place={place} />
+      </div>
     );
   }
 

@@ -7,8 +7,9 @@
 // animal when there is no photo). Done joins; the database checks the
 // word and the animal against its lists and makes the name unique ("Brave
 // Lion 2"). The spins are made here from the lists the page carries, so a
-// tap never waits on the network. On the way to the challenge today;
-// Profile uses it too when its switch is built.
+// tap never waits on the network. On the way to the challenge and on the
+// Leaderboards page's Join, on the shared .card; Profile uses it too when
+// its switch is built.
 //
 // The animal panel is this screen's own piece (not the shared dialog,
 // which opens in the middle): the browser's <dialog>, opened with
@@ -37,8 +38,11 @@ export function AppearPicker({
   joining,
   onDone,
   onCancel,
+  brand = false,
 }: {
   choices: JoinChoices;
+  /** "Quademia Nurses Hub" above the title, as the quiz start screen has it. */
+  brand?: boolean;
   /** A save is going (Done's or Cancel's): every button waits. */
   pending: boolean;
   /** Done's save — the button says "Joining…". */
@@ -61,9 +65,9 @@ export function AppearPicker({
   }
 
   return (
-    <div className="preflight-card lb-appear">
-      <div className="preflight-logo">Quademia Nurses Hub</div>
-      <div className="preflight-title">How you&apos;ll appear</div>
+    <div className="card lb-appear">
+      {brand ? <div className="lb-appear-brand">Quademia Nurses Hub</div> : null}
+      <h2 className="lb-appear-title">How you&apos;ll appear</h2>
 
       <div className="lb-options" role="radiogroup" aria-label="How you'll appear">
         <div className={`lb-option${shownAs === 'username' ? ' is-on' : ''}`}>
@@ -114,7 +118,7 @@ export function AppearPicker({
 
       <p className="lb-appear-note">Never your full name. You can change this on Profile.</p>
 
-      <div className="preflight-actions">
+      <div className="lb-actions">
         <button type="button" className="btn btn-primary btn-lg" disabled={pending} onClick={() => onDone(shownAs, word, animal)}>
           {joining ? 'Joining…' : 'Done'}
         </button>

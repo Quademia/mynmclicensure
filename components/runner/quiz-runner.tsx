@@ -94,6 +94,7 @@ import { CHALLENGE_MODE, modeOf } from '@/lib/attempts/modes';
 import { isCloseRefusal } from '@/lib/quizzes/results-date';
 import type { AnswerPatch, Attempt, ChosenMap, FinishResult, FlagMap, Score, SealedItem, SecretsMap } from '@/lib/attempts/types';
 import type { ChallengeRun } from '@/lib/challenge/types';
+import { LEADERBOARDS_HREF, type ChallengeRanks } from '@/lib/leaderboards/types';
 import {
   close as closeClockItem,
   createClock,
@@ -161,6 +162,7 @@ export function QuizRunner({
   initialQuestion = null,
   closeNote = null,
   challenge = null,
+  challengeRanks = null,
 }: {
   attempt: Attempt;
   items: SealedItem[];
@@ -180,6 +182,8 @@ export function QuizRunner({
   closeNote?: string | null;
   /** 04.25: the daily challenge — its own saving and ending, and Challenge mode. */
   challenge?: ChallengeRun | null;
+  /** 05 G1b: the challenge's places for its results pop-up; null to leave them out. */
+  challengeRanks?: ChallengeRanks | null;
 }) {
   const router = useRouter();
   // The mode's row (03 Q8): the runner asks it, never the code.
@@ -1465,6 +1469,8 @@ export function QuizRunner({
               onAnswers={reviewAnswers}
               onClose={() => setResultsOpen(false)}
               exit={{ label: exit.label, onClick: () => { leavingRef.current = true; router.push(exit.href); } }}
+              ranks={challengeRanks}
+              onLeaderboards={() => { leavingRef.current = true; router.push(LEADERBOARDS_HREF); }}
             />
           ) : (
             <ResultsPopup

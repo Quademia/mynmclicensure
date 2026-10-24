@@ -178,6 +178,7 @@ export function ChallengeStart({
             />
           ) : leaderboards.choices ? (
             <AppearPicker
+              brand
               choices={leaderboards.choices}
               pending={lbPending !== null}
               joining={lbPending === 'join'}

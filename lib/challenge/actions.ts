@@ -11,9 +11,10 @@
 import { requireStudent } from '@/lib/access';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { chosenToStored } from '@/lib/attempts/scoring';
-import { TIME_SPENT_MAX_S, type ActionResult, type AnswerPatch, type FinishResult } from '@/lib/attempts/types';
+import { TIME_SPENT_MAX_S, type ActionResult, type AnswerPatch } from '@/lib/attempts/types';
+import { getChallengeRanks } from '@/lib/leaderboards/queries';
 import { readChallengeSecrets, readChallengeSitting, todayFrom } from './queries';
-import type { ChallengeStartResult } from './types';
+import type { ChallengeFinishResult, ChallengeStartResult } from './types';
 
 function fail(error: string): { ok: false; error: string } {
   return { ok: false, error };
@@ -65,8 +66,9 @@ export async function saveChallengeAnswers(playId: string, rows: AnswerPatch[]):
 // Submit, or the clock running out: marked against the paper, timed by the
 // server (past the limit it closes as time up). The play being over, the
 // reply carries every question's answer and explanation, so the answers
-// show without a reload.
-export async function submitChallenge(playId: string): Promise<FinishResult> {
+// show without a reload, and today's and this week's places for the
+// results (05 G1b) — no second trip from the phone.
+export async function submitChallenge(playId: string): Promise<ChallengeFinishResult> {
   const { profile } = await requireStudent();
   const { data, error } = await createServiceRoleClient().rpc('submit_challenge', {
     p_play_id: String(playId || ''),
@@ -76,14 +78,20 @@ export async function submitChallenge(playId: string): Promise<FinishResult> {
   const r = (data ?? {}) as { right?: number; out_of?: number; time_taken_s?: number | null };
   const raw = Number(r.right) || 0;
   const total = Number(r.out_of) || 0;
+  // the answers, read back through the function the page reads them by,
+  // beside the places
+  const [secrets, ranks] = await Promise.all([
+    readChallengeSecrets(profile.user_id, String(playId || '')),
+    getChallengeRanks(profile.user_id, Boolean(profile.school_id)),
+  ]);
 
   return {
     ok: true,
     held: false,
     score: { raw, total, pct: total > 0 ? Math.round((raw / total) * 100) : 0 },
-    // the answers, read back through the function the page reads them by
-    secrets: await readChallengeSecrets(profile.user_id, String(playId || '')),
+    secrets,
     timeTakenS: r.time_taken_s === null || r.time_taken_s === undefined ? null : Number(r.time_taken_s),
     reviewClosed: null,
+    ranks,
   };
 }
