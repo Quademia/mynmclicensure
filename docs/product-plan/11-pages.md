@@ -366,6 +366,18 @@ opens it (00, The menu).
 ## Visitor
 
 ### Home page
+- **The page, in order** (Sam, 2026-10-30): the hero, words only for
+  now — a headline, one line, **Start your 14-day trial** (the page's
+  first filled button) and Sign in; the plans row C (below); the open
+  programmes as one compact row of names, read from the database; the
+  footer. Pictures come later (Sam). **Gone**: the stats strip (typed
+  counts, three already wrong), About the exam (NMC facts that neither
+  sell nor route; the Portal Guide could take it), What you get and How
+  it works (the plans row says both), the closing band (a short page
+  needs none), the old quiz drawing, the green trial badge. The social
+  links move to the shared public footer, on every public page, until
+  Sam updates them. Why: the page was eleven phone screens; MyNclex's is
+  a hero and one routing section.
 - **The plans row, design C** (Sam, 2026-10-05), under "Start your
   14-day trial, then free practice, forever", in place of today's
   "Where do you start?": three cards — Trial ("Start here"), Standard
