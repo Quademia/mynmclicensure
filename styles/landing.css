@@ -190,21 +190,26 @@
   margin: 0 auto;
 }
 
+/* Compact (Sam, 2026-10-30: "too big and tall", nothing removed): the
+ * drawing a short band, the spacing and type a step down — 828px → ~600
+ * on a computer. */
 .hp-card {
   display: flex;
   flex-direction: column;
-  gap: var(--space-20);
-  padding: var(--space-20);
+  gap: var(--space-12);
+  padding: var(--space-16);
 }
 .hp-card-featured {
   border: 2px solid var(--brand-teal);
-  padding: calc(var(--space-20) - 1px);
+  padding: calc(var(--space-16) - 1px);
 }
 
+/* The drawing fitted into a 96px band, centred on its own light teal. */
 .hp-art {
   display: block;
   width: 100%;
-  height: auto;
+  height: 96px;
+  background: var(--brand-teal-pale);
   border-radius: var(--radius);
 }
 /* The drawings' colours, the tokens (no picture files: Sam, 2026-10-30). */
@@ -226,7 +231,7 @@
 .hp-art .s-navy { stroke: var(--brand-navy); }
 .hp-art .s-bg { stroke: var(--brand-teal-pale); }
 
-.hp-card-head { display: flex; flex-direction: column; gap: 6px; }
+.hp-card-head { display: flex; flex-direction: column; gap: var(--space-2); }
 .hp-card-titlerow { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); }
 .hp-card h3 {
   margin: 0;
@@ -242,22 +247,22 @@
   color: var(--ink-muted);
 }
 .hp-price {
-  margin: var(--space-8) 0 0;
+  margin: var(--space-4) 0 0;
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 6px;
 }
 .hp-price-amount {
-  font-size: 32px;
-  line-height: 38px;
+  font-size: 26px;
+  line-height: 32px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--ink);
 }
 .hp-price-note {
-  font-size: 14px;
-  line-height: 20px;
+  font-size: 13px;
+  line-height: 18px;
   color: var(--ink-muted);
 }
 
@@ -265,10 +270,10 @@
 .hp-forever {
   background: var(--brand-teal-pale);
   border-radius: var(--radius);
-  padding: var(--space-16);
+  padding: var(--space-10) var(--space-12);
   display: flex;
   flex-direction: column;
-  gap: var(--space-12);
+  gap: var(--space-8);
 }
 .hp-forever-title {
   margin: 0;
@@ -280,13 +285,13 @@
   font-weight: 700;
   color: var(--brand-teal-hover);
 }
-.hp-forever .hp-list { gap: var(--space-8); }
+.hp-forever .hp-list { gap: var(--space-4); }
 .hp-forever .hp-tick { stroke: var(--brand-teal-hover); }
 .hp-strip {
   margin: 0;
   background: var(--brand-teal-pale);
   border-radius: var(--radius);
-  padding: var(--space-10) var(--space-12);
+  padding: var(--space-8) var(--space-12);
   display: flex;
   align-items: flex-start;
   gap: var(--space-8);
@@ -305,34 +310,35 @@
   font-weight: 600;
   color: var(--ink);
 }
-.hp-plus + .hp-list { margin-top: -10px; }
+.hp-plus + .hp-list { margin-top: calc(var(--space-6) - var(--space-12)); }
 .hp-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-10);
+  gap: var(--space-4);
 }
 .hp-list li {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-10);
-  font-size: 14px;
-  line-height: 20px;
+  gap: var(--space-8);
+  font-size: 13px;
+  line-height: 19px;
   color: var(--ink);
 }
 .hp-list li.hp-off { color: var(--ink-muted); }
 .hp-tick,
-.hp-dash { flex: none; margin-top: 2px; }
+.hp-dash { flex: none; width: 14px; height: 14px; margin-top: 2.5px; }
 .hp-tick { stroke: var(--brand-teal); }
 .hp-dash { stroke: var(--ink-faint); }
 
 .hp-cta {
   margin-top: auto;
+  padding-top: var(--space-4);
   display: flex;
   flex-direction: column;
-  gap: var(--space-10);
+  gap: var(--space-6);
 }
 .hp-cta .btn { width: 100%; }
 .hp-cta-note {
@@ -378,9 +384,9 @@
   .hp-progs { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: var(--space-8) var(--space-12); padding: var(--space-16) 80px; }
   .hp-plans { padding: 64px 80px; gap: 40px; }
   .hp-plans-head h2 { font-size: 28px; line-height: 34px; }
-  .hp-card { padding: var(--space-24); }
-  .hp-card-featured { padding: calc(var(--space-24) - 1px); }
-  .hp-price-amount { font-size: 36px; line-height: 40px; }
+  .hp-card { padding: var(--space-20); }
+  .hp-card-featured { padding: calc(var(--space-20) - 1px); }
+  .hp-price-amount { font-size: 28px; line-height: 34px; }
 }
 @media (min-width: 960px) {
   .hp-plans-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-24); }
