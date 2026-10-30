@@ -396,6 +396,16 @@ opens it (00, The menu).
   line, and "and the channel" in Premium's tagline, wait for 17. On the
   design system: tokens, Inter, `.card`, the button family. 2,095px on a
   computer and 3,892px on a phone (4,734 and 8,674 before).
+- **The hero's pictures** (Sam, 2026-10-30): the words stay still and a
+  picture beside them (under them on a phone) fades through four of
+  Sam's Cloudinary photos, one a programme — not a slider (sliders hide
+  their later slides and move what is being read). 6 s each, in the
+  stylesheet with no JavaScript; held under a finger or a mouse; one
+  picture only, and the rest not downloaded, with "reduce motion".
+  Cloudinary cuts each to 3:2 at its economy quality, 480 or 720px wide:
+  the four 159 KB at 720px, the first loaded with the page and the rest
+  after it. When the security headers come (10.1), the content policy
+  must allow `res.cloudinary.com` for pictures.
 - **The plans row, design C** (Sam, 2026-10-05), under "Start your
   14-day trial, then free practice, forever", in place of today's
   "Where do you start?": three cards — Trial ("Start here"), Standard

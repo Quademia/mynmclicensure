@@ -22,15 +22,58 @@
 /* base.css underlines every link on hover; a button never (09.2, AGENTS.md). */
 .landing .btn:hover { text-decoration: none; }
 
-/* ── The hero: words only for now (Sam, 2026-10-30) ─────────────────── */
+/* ── The hero: the words stay still, the picture beside them fades ──── */
 .hp-hero {
   background: var(--surface);
   padding: 40px var(--space-16) 36px;
+}
+.hp-hero-inner {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-24);
+}
+.hp-hero-text {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-16);
   text-align: center;
+}
+
+/* The pictures (Sam, 2026-10-30): four stacked in one 3:2 space, so the
+ * page never moves. The first is always underneath and shows from the
+ * first paint; the other three fade in over it in turn, 6 s each, and all
+ * fade out together back to the first — 24 s round. Only opacity moves.
+ * A finger or a mouse on it holds it; "reduce motion" shows the first
+ * alone, and the rest are not drawn (so not downloaded). */
+.hp-shots {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--brand-teal-pale);
+}
+.hp-shot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.hp-shot:nth-child(2) { opacity: 0; animation: hp-shot-2 24s ease-in-out infinite; }
+.hp-shot:nth-child(3) { opacity: 0; animation: hp-shot-3 24s ease-in-out infinite; }
+.hp-shot:nth-child(4) { opacity: 0; animation: hp-shot-4 24s ease-in-out infinite; }
+.hp-shots:hover .hp-shot { animation-play-state: paused; }
+@keyframes hp-shot-2 { 0%, 22% { opacity: 0; } 27%, 95% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes hp-shot-3 { 0%, 47% { opacity: 0; } 52%, 95% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes hp-shot-4 { 0%, 72% { opacity: 0; } 77%, 95% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .hp-shot:not(:first-child) { display: none; animation: none; }
 }
 .hp-hero h1 {
   margin: 0;
@@ -341,4 +384,9 @@
 }
 @media (min-width: 960px) {
   .hp-plans-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-24); }
+  /* the words left, the picture right */
+  .hp-hero-inner { flex-direction: row; gap: 48px; }
+  .hp-hero-text { flex: 1; align-items: flex-start; text-align: left; }
+  .hp-hero-actions { justify-content: flex-start; }
+  .hp-shots { flex: 0 0 520px; width: 520px; }
 }
