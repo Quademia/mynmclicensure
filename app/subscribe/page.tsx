@@ -47,7 +47,6 @@ import Link from 'next/link';
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { getCourses, getOpenPrograms, getProducts } from '@/lib/catalogue/queries';
 import { courseScopeMap, isForOpenProgramme, isForSale, partitionByProgramme, programmesOf } from '@/lib/catalogue/for-sale';
-import { formatMinor } from '@/lib/money/format-minor';
 import { PublicTopBar } from '@/components/shell/public-top-bar';
 import { PublicFooter } from '@/components/shell/public-footer';
 import { ProductCard } from '@/components/catalogue/product-card';
@@ -56,7 +55,7 @@ import '@/styles/subscribe.css';
 
 export const metadata: Metadata = {
   title: 'Subscribe | MyNMCLicensure',
-  description: 'Full access, single courses and exam-year packages for every NMC Ghana programme.',
+  description: 'Standard Prep, Premium Prep and single courses for every NMC Ghana programme.',
 };
 
 export const dynamic = 'force-dynamic';
@@ -208,8 +207,8 @@ export default async function SubscribePage({
         <aside className="subp-note">
           <h2>Sitting the exam this year?</h2>
           <p>
-            Premium Prep opens the same courses as Full Access for 240 days at{' '}
-            {formatMinor(9900, 'GHS')} instead of {formatMinor(15000, 'GHS')}.{' '}
+            Premium Prep opens the same courses as Standard Prep, plus mock exams, for 240
+            days.{' '}
             <Link href="/premium-prep">See Premium Prep</Link>. Every student can also{' '}
             <Link href="/register">register free</Link> and start on a trial.
           </p>

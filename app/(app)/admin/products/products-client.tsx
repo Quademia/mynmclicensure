@@ -447,7 +447,7 @@ export function ProductsClient({
 
                 <div className="form-group">
                   <label htmlFor="fieldName">Product Name *</label>
-                  <input id="fieldName" type="text" placeholder="e.g. Registered Nursing Full Access 2027" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                  <input id="fieldName" type="text" placeholder="e.g. Registered Nursing Standard Prep" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
                 </div>
 
                 <div className="form-row">

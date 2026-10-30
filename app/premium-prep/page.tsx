@@ -27,13 +27,14 @@
 //   - a larger offline-pack allowance (one global config number today,
 //     `offline_packs_per_course`, the same for everyone).
 // Premium-only mock exams ARE built (02.10, 2026-10-04: products.allow_mocks
-// follows is_premium), so the page may now say so — in words Sam approves;
-// until he does, the copy below is unchanged.
+// follows is_premium), so the page says so (Sam, 2026-10-30).
 // Sam ruled these are added to Premium Prep rather than taken from the
 // others, and that the page ships on what is true and grows as each
-// lands (2026-09-22). Until then the honest offer is the one below: the
-// same courses as Full Access, for 240 days instead of 365, at GHS 99
-// instead of GHS 150.
+// lands (2026-09-22). The offer below: everything in Standard Prep (the
+// name Full Access took on 2026-10-05, 02), plus mock exams, for 240
+// days. No price is typed into a sentence (02.12): the cards carry each
+// package's own price, so a price the admin changes never leaves the
+// words wrong.
 //
 // ALL COPY HERE IS NEW AND IS SAM'S TO CHANGE. Nothing was transcribed;
 // legacy's words were written for a form.
@@ -43,7 +44,6 @@ import Link from 'next/link';
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { getCourses, getOpenPrograms, getProducts } from '@/lib/catalogue/queries';
 import { courseScopeMap, isForOpenProgramme } from '@/lib/catalogue/for-sale';
-import { formatMinor } from '@/lib/money/format-minor';
 import { PublicTopBar } from '@/components/shell/public-top-bar';
 import { PublicFooter } from '@/components/shell/public-footer';
 import { ProductCard } from '@/components/catalogue/product-card';
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
   // names (§8 S14): it dates the page every January.
   title: 'Premium Prep | MyNMCLicensure',
   description:
-    'Exam-year access to your whole NMC programme — the same courses as Full Access, for less.',
+    'Exam-year access to your whole NMC programme — everything in Standard Prep, plus mock exams, for 240 days.',
 };
 
 export const dynamic = 'force-dynamic';
@@ -102,9 +102,8 @@ export default async function PremiumPrepPage() {
           <p className="prep-eyebrow">NMC Licensure Exam Prep</p>
           <h1>Premium Prep</h1>
           <p className="prep-lede">
-            Your whole programme, priced for exam year. The same courses as Full Access — for
-            240 days instead of 365, at {formatMinor(9900, 'GHS')} instead of{' '}
-            {formatMinor(15000, 'GHS')}.
+            Your whole programme for exam year: everything in Standard Prep, plus mock exams, for
+            240 days.
           </p>
           <p className="prep-sub">
             Pick your programme below. You pay with Paystack, then set up your account on the
@@ -133,8 +132,8 @@ export default async function PremiumPrepPage() {
         <aside className="prep-note">
           <h2>Not sitting the exam this year?</h2>
           <p>
-            Full Access opens the same courses for a full year at {formatMinor(15000, 'GHS')}, and
-            single courses are {formatMinor(5900, 'GHS')} each.{' '}
+            Standard Prep opens the same courses for 365 days, without the mock exams, and single
+            courses can be taken on their own.{' '}
             <Link href="/subscribe">See every package</Link>. Every student can also{' '}
             <Link href="/register">register free</Link> and start on a trial.
           </p>

@@ -58,7 +58,7 @@ export default async function LandingPage() {
               <a href="/register" className="btn-hero-p">Create Free Account</a>
               <a href="/login" className="btn-hero-g">Sign In</a>
             </div>
-            <p className="hero-already">Already registered? <a href="/subscribe">Subscribe to full access →</a></p>
+            <p className="hero-already">Already registered? <a href="/subscribe">See the packages →</a></p>
           </div>
 
           {/* HERO VISUAL — quiz UI mockup */}
@@ -187,8 +187,8 @@ export default async function LandingPage() {
                 <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M11 2l2.1 4.2L18 7.4l-3.5 3.4.8 4.8L11 13.3l-4.3 2.3.8-4.8L4 7.4l4.9-.7z" /></svg>
               </div>
               <span className="path-tag">Recommended</span>
-              <div className="path-title">Subscribe to Full Access</div>
-              <p className="path-blurb">Unlock all quizzes, mock exams, PDF downloads, and your Telegram study community.</p>
+              <div className="path-title">Standard or Premium Prep</div>
+              <p className="path-blurb">Every practice paper, unlimited Quiz Builder and offline packs. Premium Prep adds mock exams.</p>
               <a href="/subscribe" className="path-btn white">Subscribe Now</a>
             </div>
 

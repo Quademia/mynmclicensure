@@ -336,7 +336,7 @@ export function PortalGuide() {
           <div className="guide-cta">
             <div>
               <h3>Ready to upgrade your prep?</h3>
-              <p>Get full access and premium support for your 2026 licensure preparation.</p>
+              <p>Every practice paper and the full Quiz Builder with Standard Prep; mock exams with Premium Prep.</p>
             </div>
             <div className="guide-cta-actions">
               <Link href="/student/upgrade" className="btn btn-primary btn-lg">Upgrade Access</Link>
