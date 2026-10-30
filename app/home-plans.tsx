@@ -253,7 +253,7 @@ export function HomePlans({
   const packsPerCourse = packs.length === standard.length && packs.length ? Math.min(...packs) : null;
 
   return (
-    <section className="hp-plans" aria-labelledby="hp-plans-title">
+    <section className="hp-plans" id="plans" aria-labelledby="hp-plans-title">
       <div className="hp-plans-head">
         <span className="hp-kicker">Plans</span>
         <h2 id="hp-plans-title">Start your {trialDays}-day trial, then free practice, forever</h2>

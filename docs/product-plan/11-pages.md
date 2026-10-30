@@ -389,7 +389,10 @@ opens it (00, The menu).
   programme, timed like the real paper, each with the reason behind the
   answer. On your phone, tablet or computer. Start with a 14-day trial."
   (Sam: the exam is sat on a computer or tablet, so the phone is not the
-  headline). The footer redesigned with it, on
+  headline). The hero's filled button is **See plans**, a jump to the
+  plans row (Sam, 2026-10-30: the hero should not lead straight into the
+  trial); Start your 14-day trial stays on the trial card and in the
+  footer. The footer redesigned with it, on
   every public page: the wordmark and a line, Follow us, the open
   programmes each linking to the shop with its packages first (Sam: kept),
   the pages, Back to Quademia and the year. Every number is read: the

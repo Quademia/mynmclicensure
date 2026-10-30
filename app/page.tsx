@@ -83,9 +83,11 @@ export default async function HomePage() {
                 behind the answer. On your phone, tablet or computer. Start with a {days}-day trial.
               </p>
               <div className="hp-hero-actions">
-                <AppLink href="/register" className="btn btn-primary btn-lg">
-                  Start your {days}-day trial
-                </AppLink>
+                {/* Sam, 2026-10-30: the hero leads to the plans, not straight
+                    into the trial; a jump within the page, so a plain <a>. */}
+                <a href="#plans" className="btn btn-primary btn-lg">
+                  See plans
+                </a>
                 <AppLink href="/login" className="btn btn-outline btn-lg">
                   Sign in
                 </AppLink>
