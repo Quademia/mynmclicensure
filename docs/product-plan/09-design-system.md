@@ -47,9 +47,14 @@ Detail and history: `archive/product-plan/10-design-system.md`.
   two-line title's teal ran across the row). A subtitle, count or
   sentence, always below the line. Course tabs above a title
   (the course page, a course in Practice Papers) carry no line, the
-  current course navy: one teal line a page. Not on it yet: the
-  dashboard's greeting, the portal guide's hero, Packages, the offline
-  pack, the admin's Messages (buttons beside its title).
+  current course navy: one teal line a page. **On a student page on a
+  computer** (Sam, 2026-10-30: B) the line runs the whole width beside the
+  menu, and the words sit on the edge of the student column (The shell,
+  below), the teal starting under them, grey either side. Not on it yet:
+  Packages (its own title in a card), the offline screen's pack
+  (`/offline`), the admin's Messages (buttons beside its title); the
+  portal guide's hero and Procedures' first box repeat the title beneath
+  it (09.19).
 - **Row menu** — three dots at a row's end opening what that row allows
   now; what is closed is told in grey, a locked line adds Choose a
   package (`components/shell/row-menu.tsx`; 09.10, Sam, 2026-10-17).
@@ -123,6 +128,14 @@ Detail and history: `archive/product-plan/10-design-system.md`.
   with `?welcome=1`, the middleware passes it to the signed-in layout as
   a header, `components/shell/welcome-screen.tsx` draws it after the page;
   the stylesheet shows it only while the grey placeholder is on screen.)*
+- **The student column** (Sam, 2026-10-30; 09.3): every student page in
+  one column, **1040px** at most, **centred** in the space beside the menu;
+  where that space is narrower — a 1366px laptop with the menu open has
+  1062px — the column is all of it, and on a phone the whole screen. Set
+  once (`.page-col` in `styles/shell.css`, from the student layout); no
+  page sets a width of its own, so the pages that were 720px stretch to
+  it. The page title's line runs the whole width (Page title, above). The
+  admin's pages are not in it (Open).
 - The sitting and the offline pack take no chrome.
 - **Two menus only**: the app's drawer and the public menu — plus, for
   students on a phone, the bottom bar and the sub-tab row, which are
@@ -146,13 +159,19 @@ Detail and history: `archive/product-plan/10-design-system.md`.
   rules across the stylesheets set `none`, and many are undone on hover
   by it; the Practice Papers rows set it off on hover themselves. A new
   shared style, so each page is walked when it changes; not built.
-- A content width limit above 1440px.
 - Dark mode — after the above.
 - Shell data (the unread badge, My Courses, name and photo) loaded once
   and kept fresh across pages.
 
 ## Open
 
+- **The admin's pages and the column** — whether they take the student
+  column (1040px, centred, the line across) or keep the whole width for
+  their tables (Sam: student pages first, 2026-10-30).
+- **Upgrade / Extend's title row sits over the top bar** (found
+  2026-10-30, 09.18): the page names its row `.topbar`, so the shell's
+  top-bar rules pin it to the top of the screen, over the menu button,
+  wordmark, envelope, bell and avatar. A rename fixes it; Sam's yes.
 - **DS18** — the colours for a package's kind (paid / free / trial),
   which today borrow the state colours.
 - **The sign-in pages' lockup** — whether login, register, forgot and
