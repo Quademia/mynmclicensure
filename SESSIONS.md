@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-30, evening — 10-05 decisions placed; Standard Prep on dev; Premium goes first (02.13) walked; paused Standard (02.14); home page redesigned (F3)
+  - ↳ idea already decided, not in plan · Packages page set aside · 16 packages renamed · no typed prices · C over A/B/D · floor_utc · dev webhook beats localhost · Premium highlighted · photos fade, words still · cards 828→630
+
 - 2026-10-30 — the student column: every student page 1040px, centred, the title line across the whole width (B); pack pages on the shared title
   - ↳ nine widths found · 1040 over 1366 · B over A, C · 720 pages stretched · admin later · /offline kept 720 · Upgrade row over the top bar (09.18) · title twice (09.19) · cloud build needs the proxy
 

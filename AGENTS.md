@@ -473,6 +473,17 @@ above sit at the repo root; the audience grouping inside them is kept.
   site's admin Grant / Edit / Revoke / Sync refused for the length of the
   session (2026-09-23). Say so when proposing the migration; it reaches
   only Sam, on dev.
+- **A test payment made on `localhost` is activated by the dev site.**
+  Paystack's test webhook reaches `licensure-dev`, which runs `main`'s
+  code and activates the payment about two seconds after it is paid,
+  before the buyer's tab returns to `localhost` — so a change to what
+  activation writes (the chain, a receipt's rows) cannot be walked with a
+  real payment until it is merged; the local server only adopts the
+  receipt the webhook made (2026-10-30: Premium goes first's walk queued
+  the old way). Walk such a change by running the new code's writer over
+  the paid student's rows from a scratchpad, or after the merge on the
+  dev site. The database's request log names the writer (a Cloudflare
+  address, an empty user agent).
 - **A webhook cannot reach `localhost`, but its handler can be walked
   there**: sign a body the way the sender does (for Paystack, HMAC-SHA512
   of the raw body under the test secret key) with a scratchpad script

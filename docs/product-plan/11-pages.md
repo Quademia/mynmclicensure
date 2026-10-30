@@ -434,6 +434,21 @@ opens it (00, The menu).
   card, the private colours and the device font.
 - **Open**: the open programmes are listed by name, so NACNAP (its name
   today) comes first; an order of Sam's would need a column.
+- **More to come on the page** (Sam, 2026-10-30: "we will need to do more
+  on the page"; to scope next time). Today it goes from the headline
+  straight to prices and leaves a student's questions unanswered. Talked
+  through, not yet ruled, each short so the page stays near six phone
+  screens: **See it working** after the hero — two or three real
+  screenshots (a question, its explanation, a timed paper), a caption
+  each; **Proof** before the plans — only real things, numbers read live
+  (questions in the bank, students practising this week) and two or
+  three quotes Sam collects from real students, never written for him;
+  **Common questions** after the plans — five that open on a tap (is it
+  free; after the trial; paying by mobile money or card through
+  Paystack; offline; which programmes and exam); and a line by the plans,
+  "Pay with mobile money or card". Claude's suggestion: the screenshots
+  and the questions first (they need nothing from anyone), drawn by
+  Claude Design from a short brief, then built.
 
 ### Register, sign in, forgot and reset password
 - Register: registering starts the 14-day trial (01); the school
