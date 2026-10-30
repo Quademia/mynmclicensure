@@ -54,7 +54,7 @@ before then, and the old list's history, is in
 - ⬜ 02.11 Public pages' words Sam's to edit — Premium Prep's text, a season banner — with their redesign
 - ✅ 02.12 No price typed into Premium Prep's or the shop's words — the cards carry each package's — 2026-10-30
 - ✅ (unplanned) Full Access → Standard Prep: packages renamed on dev, the typed words follow — 2026-10-30
-- ✅ 02.13 Premium goes first — Standard pauses, resumes after; checkout says when — 2026-10-30 (Sam's payment to come)
+- ✅ 02.13 Premium goes first — Standard pauses, resumes after; checkout says when — 2026-10-30 (Sam's payment walked)
 - ⬜ 02.14 A paused Standard on Profile, the Upgrade page, Messages — they read the whole window (found 10-30)- ✅ 02.1 Ended means ended — the four places that trusted "active" now read the dates — 2026-10-04
 - ⬜ D31 The account made at payment — a set-password link; the setup token and its rescue go
 - ⬜ D33 The same browser sees the password form, another the emailed link; a check tells status only
@@ -62,7 +62,7 @@ before then, and the old list's history, is in
 - ⬜ 02.2 For sale everywhere — the in-app Packages page and Premium Prep check it too (D23 item 3)
 - ⬜ 02.3 Expiry reminders — a daily job, the email through the outbox, a dashboard status line
 - ⬜ 02.4 Courses: the form suggests a code from programme and title; drop page_slug when next touched
-- ⬜ 02.5 The webhook on the dev site — the test URL in Paystack, one payment with the tab closed
+- ✅ 02.5 The webhook on the dev site — it activated a test payment before the tab came back — 2026-10-30
 - ⏸ 02.6 A price per course — the package stays the unit until a package per course is a chore
 - ⏸ 02.7 A basket — one package a payment until buyers are seen paying twice a day
 - ⏸ 02.8 Editing one course's access row by hand — until a real support case asks
