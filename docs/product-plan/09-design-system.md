@@ -174,7 +174,8 @@ Detail and history: `archive/product-plan/10-design-system.md`.
   wordmark, envelope, bell and avatar. A rename fixes it; Sam's yes.
 - **DS18** — the colours for a package's kind (paid / free / trial),
   which today borrow the state colours.
-- **The sign-in pages' lockup** — whether login, register, forgot and
-  reset take the shared wordmark (found 2026-09-26).
+- **The sign-in pages' lockup** — sign in takes the shared wordmark
+  (Sam's canvas, 2026-10-30); register, forgot and reset with their
+  redesign (01.15).
 - **Tailwind** — finishing in CSS was recommended, and Tailwind put to
   Sam for the next fresh product (MyTeacher); not ruled (2026-09-22).

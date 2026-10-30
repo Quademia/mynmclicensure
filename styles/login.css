@@ -1,0 +1,206 @@
+/* styles/login.css
+ *
+ * The sign-in page (01.12; Sam's layout B, 2026-10-30, drawn on the
+ * canvas https://claude.ai/artifact/5vmaSLpvdCZtyxKhchQCTU, after
+ * Claude's own sign-in page). On a phone: the wordmark, the words and
+ * the card, nothing else. From 960px: two halves — the same column on
+ * the left, one photo on the right. Below 960px the photo is neither
+ * drawn nor downloaded (app/login/page.tsx's <picture>).
+ *
+ * On the design system: the shared .card, .btn family and wordmark; the
+ * field is the page's own until 09.1 makes one. Tokens only — no colour
+ * literals (the CSS guard). Every class here carries the page's prefix,
+ * si-, so no shell rule reaches it (AGENTS.md).
+ */
+
+.si-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.si-main {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-16) var(--space-20) var(--space-24);
+}
+
+/* The wordmark, a way back to the home page. base.css underlines every
+   link on hover; a control is never underlined (09.2). */
+.si-home {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: none;
+}
+.si-home:hover { text-decoration: none; }
+
+.si-centre {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: var(--space-24);
+}
+
+.si-column {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+.si-head h1 {
+  margin: 0;
+  font-size: 26px;
+  line-height: 32px;
+  font-weight: var(--type-page-title-weight);
+  letter-spacing: var(--type-page-title-track);
+  color: var(--brand-navy);
+  text-wrap: balance;
+}
+.si-head p {
+  margin: var(--space-6) 0 0;
+  font-size: var(--type-body-size);
+  line-height: 22px;
+  color: var(--ink-muted);
+}
+
+/* Why this phone was signed out (a sign-in elsewhere took its place). */
+.si-notice {
+  margin: 0;
+  padding: var(--space-12) 14px;
+  border-radius: var(--radius);
+  background: var(--brand-teal-pale);
+  color: var(--brand-teal-hover);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* The card: on .card, rounder because it holds rounded things (the
+   design system's 12px rule), and a step tighter on a phone. */
+.si-card {
+  border-radius: var(--radius-lg);
+  padding: var(--space-20);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.si-card .btn { width: 100%; }
+
+.si-field { display: flex; flex-direction: column; gap: var(--space-6); }
+.si-label-row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-8); }
+.si-label {
+  font-size: var(--type-ui-size);
+  line-height: var(--type-ui-line);
+  font-weight: var(--type-ui-weight);
+  color: var(--ink);
+}
+.si-forgot {
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-ui-weight);
+  color: var(--brand-teal-hover);
+  text-decoration: none;
+}
+.si-forgot:hover { color: var(--brand-navy); }
+
+/* 16px text so a phone does not zoom into the field on a tap. */
+.si-input {
+  width: 100%;
+  height: 44px;
+  box-sizing: border-box;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--ink);
+}
+.si-input::placeholder { color: var(--ink-muted); }
+.si-input:focus {
+  outline: none;
+  border-color: var(--brand-teal);
+  box-shadow: 0 0 0 3px var(--brand-teal-pale);
+}
+
+.si-or {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  font-size: var(--type-ui-size);
+  color: var(--ink-muted);
+}
+.si-or::before,
+.si-or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Google and the emailed sign-in: the shared ghost button on the page's
+   pale ground, the two drawn alike so either reads as a real way in. */
+.si-alt { gap: 10px; background: var(--surface-page); }
+.si-mail { flex: none; color: var(--brand-teal); }
+
+/* The emailed link's answer, in the card's place. */
+.si-sent h2 {
+  margin: 0;
+  font-size: var(--type-section-title-size);
+  font-weight: 700;
+  color: var(--brand-navy);
+}
+.si-sent p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-muted);
+}
+.si-sent strong { color: var(--ink); font-weight: 600; }
+
+.si-foot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  text-align: center;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-muted);
+}
+.si-foot p { margin: 0; }
+.si-foot a { font-weight: var(--type-ui-weight); color: var(--brand-teal-hover); text-decoration: none; }
+.si-foot a:hover { color: var(--brand-navy); }
+
+.si-photo { display: none; }
+
+@media (min-width: 960px) {
+  .si-page { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .si-main { padding: var(--space-24) calc(var(--space-24) * 2); }
+  .si-centre { align-items: center; padding-top: 0; }
+  .si-head { text-align: center; }
+  .si-head h1 { font-size: 36px; line-height: 42px; }
+  .si-head p { font-size: 16px; line-height: 24px; }
+  .si-card { padding: var(--space-24); }
+
+  /* The photo fills its half and never sets the page's height: placed
+     inside it, so its own size (taller than a short screen) cannot make
+     the page scroll. */
+  .si-photo { display: block; position: relative; }
+  .si-photo picture {
+    position: absolute;
+    inset: var(--space-24) var(--space-24) var(--space-24) 0;
+  }
+  .si-photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+  }
+}

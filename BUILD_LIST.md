@@ -41,9 +41,13 @@ before then, and the old list's history, is in
 - ⬜ 01.6 Last sign-in — written at sign-in, shown in the drawer, a dormant filter on Users
 - ⬜ 01.7 One Quademia account — "sign in to add this product"; "complete your profile"
 - ⏸ 01.8 Email confirmation at sign-up — parked under the port's rule, which has ended; to re-rule
-- ⬜ 01.10 "Can't sign in?" on the sign-in page — WhatsApp or email; Messages needs a sign-in (10-17)
+- ✅ 01.10 "Can't sign in?" on the sign-in page — WhatsApp, the emails' support number — 2026-10-30
 - ✅ 01.9 (unplanned) A sign-out ends only its own device, not all; a password reset still ends all — 2026-10-17
 - ⬜ 01.11 Profile's save writes an empty level or cohort as blank text, not empty — before level is keyed (10)
+- ✅ 01.12 The sign-in page redesigned — B, two halves; the card's order; a dropped connection — 2026-10-30
+- ⬜ 01.13 An emailed code in place of the emailed link — six digits in the same tab (Sam, 10-30)
+- ⬜ 01.14 Signing in returns to the page asked for — today always the dashboard (found 10-30)
+- ⬜ 01.15 Register, forgot and reset on the sign-in page's look — the old card and colours (found 10-30)
 
 ## [02 Packages and payments](docs/product-plan/02-packages-and-payments.md)
 

@@ -144,6 +144,16 @@ export async function completeExternalLoginAction(input: {
  * browser that asked for it, and a student who reads her email on her
  * phone and taps the link there must still get in. The link returns to
  * /login with the tokens in the hash, exactly the shape legacy handled.
+ *
+ * ⭐ NO SIGN-IN ROW FOR AN UNKNOWN EMAIL, AND ONE ANSWER (01.12,
+ * 2026-10-30). Supabase's default made a bare, confirmed row in the
+ * sign-in table — shared with the old site and MyTeacher — for any
+ * address typed here. `shouldCreateUser: false` stops that, but then an
+ * unknown address gets its own error back, which would let anyone learn
+ * who studies here by typing addresses. So every refusal is logged and
+ * answered as a send ("If … has an account here, we've sent it a link" on
+ * the card) — MyNclex's rule for its code door, and /forgot-password's.
+ * The six-digit code replaces this link at 01.13.
  */
 export async function sendMagicLinkAction(formData: FormData): Promise<ActionResult> {
   const email = String(formData.get('email') ?? '').trim();
@@ -167,11 +177,11 @@ export async function sendMagicLinkAction(formData: FormData): Promise<ActionRes
 
   const { error } = await plain.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: `${origin}/login` },
+    options: { emailRedirectTo: `${origin}/login`, shouldCreateUser: false },
   });
 
   if (error) {
-    return { ok: false, error: 'Could not send the link. Please check the email and try again.' };
+    console.error('[login] email link not sent:', error.code ?? error.status, error.message);
   }
   return { ok: true };
 }

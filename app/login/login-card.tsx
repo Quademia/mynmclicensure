@@ -1,42 +1,63 @@
 // app/login/login-card.tsx
 //
-// The interactive login card — legacy login.html's markup and script,
-// one component. Three doors: password (a Server Action), Google (the
-// browser Supabase client starts it; Supabase returns here), magic link
-// (a Server Action sends it; the emailed link returns here).
+// The sign-in card (01.12; Sam's order, 2026-10-30): email, password and
+// Sign in first; then "or", and two equal ways in — Google, and an
+// emailed sign-in (a link today; the six-digit code is 01.13). Three
+// doors: password (a Server Action), Google (the browser Supabase client
+// starts it; Supabase returns here), the emailed link (a Server Action
+// sends it; the link returns here).
 //
-// THE RETURN FROM GOOGLE OR A MAGIC LINK lands on this same page, as it
-// did in legacy, and is finished by completeExternalLoginAction. Two link
-// shapes arrive (see MyNclex app/reset-password/page.tsx for the why):
+// THE RETURN FROM GOOGLE OR THE EMAILED LINK lands on this same page and
+// is finished by completeExternalLoginAction. Two link shapes arrive (see
+// MyNclex app/reset-password/page.tsx for the why):
 //   ?code=…          Google (PKCE). The browser client exchanges it by
 //                    itself the moment it is constructed — we only wait.
-//   #access_token=…  the magic link (implicit, see sendMagicLinkAction).
+//   #access_token=…  the emailed link (implicit, see sendMagicLinkAction).
 //                    The library refuses this shape under PKCE, so we
 //                    call setSession ourselves.
-// Either way: show the overlay, get a session, hand off to the server.
+// Either way: the please-wait screen (09.14), a session, the server.
+//
+// A DROPPED CONNECTION never leaves a button stuck (AGENTS.md): every
+// action call is caught and says so. But a sign-in that WORKS also
+// "throws" — Next settles an action that redirects by rejecting its call
+// with a redirect signal while it moves to /router — so a catch first
+// lets Next's own signals through (isNavigation) and keeps "Signing in…"
+// up while the page changes.
 
 'use client';
 
-import Link from 'next/link';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { unstable_rethrow } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
+import { AppLink } from '@/components/shell/link-pending';
+import { PleaseWait } from '@/components/shell/please-wait';
 import { createClient } from '@/lib/supabase/client';
 import { buildFpHash } from '@/lib/auth/fingerprint';
 import { Toast } from '@/lib/toast/toast';
 import { completeExternalLoginAction, loginAction, sendMagicLinkAction } from './actions';
+
+const NO_SIGN_IN = 'Could not sign in. Please check your connection and try again.';
+const NO_LINK = 'Could not send the link. Please check your connection and try again.';
+const GENERIC_ERROR = 'Something went wrong during sign-in. Please try again.';
+
+/** Next's redirect (and its other router signals) arrive as a thrown error. */
+function isNavigation(err: unknown): boolean {
+  try {
+    unstable_rethrow(err);
+    return false;
+  } catch {
+    return true;
+  }
+}
 
 export function LoginCard() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [email, setEmail] = useState('');
   const [fpHash, setFpHash] = useState<string | null>(null);
-  const [overlay, setOverlay] = useState<string | null>(null);
-
-  // Magic-link modal
-  const [magicOpen, setMagicOpen] = useState(false);
-  const [magicSent, setMagicSent] = useState(false);
-  const [magicEmail, setMagicEmail] = useState('');
-  const [magicSending, setMagicSending] = useState(false);
-  const magicInput = useRef<HTMLInputElement>(null);
+  const [waiting, setWaiting] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
+  const [sentTo, setSentTo] = useState<string | null>(null);
+  const emailInput = useRef<HTMLInputElement>(null);
 
   const dismiss = useCallback(() => setError(null), []);
 
@@ -44,7 +65,7 @@ export function LoginCard() {
     buildFpHash().then(setFpHash);
   }, []);
 
-  // ── Returning from Google / magic link ────────────────────────────
+  // ── Returning from Google / the emailed link ──────────────────────
   useEffect(() => {
     const rawHash = window.location.hash.startsWith('#') ? window.location.hash.slice(1) : '';
     const hashParams = new URLSearchParams(rawHash);
@@ -56,67 +77,96 @@ export function LoginCard() {
 
     const via: 'GOOGLE' | 'MAGIC_LINK' =
       hashParams.get('type') === 'magiclink' ? 'MAGIC_LINK' : 'GOOGLE';
-    // Deferred a tick, as legacy deferred its own handler (setTimeout 0):
-    // the overlay is state set from an effect, and React asks that it not
-    // be set synchronously there.
-    const showOverlay = setTimeout(
-      () => setOverlay(via === 'GOOGLE' ? 'Signing in with Google...' : 'Signing in with magic link...'),
-      0
-    );
+    // Deferred a tick: the screen is state set from an effect, and React
+    // asks that it not be set synchronously there. ⚠ A broken or expired
+    // link fails sooner than that tick (the token is refused before any
+    // request), so stopping the wait also cancels a screen not yet shown —
+    // else it appeared after the failure and stayed (found 2026-10-30;
+    // the old overlay did the same).
+    let stopped = false;
+    const showWaiting = setTimeout(() => {
+      if (!stopped) setWaiting(via === 'GOOGLE' ? 'Signing you in with Google…' : 'Signing you in…');
+    }, 0);
+    function stopWaiting(message: string) {
+      stopped = true;
+      clearTimeout(showWaiting);
+      // The link's tokens leave the address bar on a failure too.
+      window.history.replaceState(null, '', window.location.pathname);
+      setWaiting(null);
+      setError(message);
+    }
 
     const supabase = createClient();
     let settled = false;
     let unsubscribe: (() => void) | null = null;
 
+    function fail(message: string) {
+      if (settled) return;
+      settled = true;
+      stopWaiting(message);
+    }
+
     async function finish() {
       if (settled) return;
       settled = true;
       window.history.replaceState(null, '', window.location.pathname);
-      const fp = await buildFpHash();
-      const result = await completeExternalLoginAction({ via, fpHash: fp });
-      // On success the action redirects; only failures come back.
-      if (result && !result.ok) {
-        setOverlay(null);
-        setError(result.error);
+      try {
+        const fp = await buildFpHash();
+        const result = await completeExternalLoginAction({ via, fpHash: fp });
+        // On success the action redirects; only failures come back.
+        if (result && !result.ok) stopWaiting(result.error);
+      } catch (err) {
+        if (isNavigation(err)) return;
+        stopWaiting(NO_SIGN_IN);
       }
-    }
-
-    function fail() {
-      if (settled) return;
-      settled = true;
-      setOverlay(null);
-      setError('Something went wrong during sign-in. Please try again.');
     }
 
     if (accessToken && refreshToken) {
       supabase.auth
         .setSession({ access_token: accessToken, refresh_token: refreshToken })
-        .then(({ error }) => (error ? fail() : finish()));
+        .then(({ error }) => (error ? fail(GENERIC_ERROR) : finish()))
+        .catch(() => fail(NO_SIGN_IN));
     } else {
       const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
         if (session?.user) void finish();
       });
       unsubscribe = () => sub.subscription.unsubscribe();
-      supabase.auth.getUser().then(({ data }) => {
-        if (data.user) void finish();
-      });
+      supabase.auth
+        .getUser()
+        .then(({ data }) => {
+          if (data.user) void finish();
+        })
+        .catch(() => {
+          // the deadline below says so
+        });
     }
 
-    const deadline = setTimeout(fail, 10_000);
+    const deadline = setTimeout(() => fail(GENERIC_ERROR), 10_000);
     return () => {
-      clearTimeout(showOverlay);
+      clearTimeout(showWaiting);
       clearTimeout(deadline);
       unsubscribe?.();
     };
   }, []);
 
-  // ── Email / password ──────────────────────────────────────────────
-  async function handleSubmit(formData: FormData) {
+  // ── Email and password ────────────────────────────────────────────
+  // A plain onSubmit, not <form action>: React resets a form's fields
+  // after its action returns, and a student whose signal dropped should
+  // find the password still typed (AGENTS.md).
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
     setError(null);
     setSubmitting(true);
-    const result = await loginAction(formData);
-    if (result && !result.ok) {
-      setError(result.error);
+    try {
+      const result = await loginAction(formData);
+      if (result && !result.ok) {
+        setError(result.error);
+        setSubmitting(false);
+      }
+    } catch (err) {
+      if (isNavigation(err)) return;
+      setError(NO_SIGN_IN);
       setSubmitting(false);
     }
   }
@@ -124,75 +174,69 @@ export function LoginCard() {
   // ── Google ────────────────────────────────────────────────────────
   async function startGoogle() {
     setError(null);
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: `${window.location.origin}/login` },
-    });
-    if (error) setError('Could not start Google sign-in. Please try again.');
+    try {
+      const { error } = await createClient().auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: `${window.location.origin}/login` },
+      });
+      if (error) setError('Could not start Google sign-in. Please try again.');
+    } catch {
+      setError('Could not start Google sign-in. Please check your connection and try again.');
+    }
   }
 
-  // ── Magic link ────────────────────────────────────────────────────
-  function openMagic() {
-    setMagicEmail(email.trim());
-    setMagicSent(false);
-    setMagicOpen(true);
-    setTimeout(() => magicInput.current?.focus(), 0);
-  }
-
-  async function sendMagic() {
-    const value = magicEmail.trim();
+  // ── The emailed link ──────────────────────────────────────────────
+  // It goes to the address typed above: one email field on the card.
+  async function sendLink() {
+    const value = email.trim();
     if (!value) {
-      setError('Please enter your email address to receive a sign-in link.');
+      setError('Enter your email above first, then tap Email me a sign-in link.');
+      emailInput.current?.focus();
       return;
     }
-    setMagicSending(true);
-    const fd = new FormData();
-    fd.set('email', value);
-    const result = await sendMagicLinkAction(fd);
-    setMagicSending(false);
-    if (result.ok) setMagicSent(true);
-    else setError(result.error);
+    setError(null);
+    setSending(true);
+    try {
+      const fd = new FormData();
+      fd.set('email', value);
+      const result = await sendMagicLinkAction(fd);
+      if (result.ok) setSentTo(value);
+      else setError(result.error);
+    } catch {
+      setError(NO_LINK);
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
     <>
       <Toast message={error} onDismiss={dismiss} />
+      {waiting ? <PleaseWait message={waiting} /> : null}
 
-      <div className={`auth-overlay${overlay ? ' show' : ''}`} aria-hidden={!overlay}>
-        <div className="auth-overlay-card">
-          <div className="auth-overlay-spinner" />
-          <p className="auth-overlay-text">{overlay ?? 'Signing in...'}</p>
+      {sentTo ? (
+        <div className="card si-card si-sent" role="status">
+          <h2>Check your email</h2>
+          <p>
+            If <strong>{sentTo}</strong>{' '}
+            has an account here, we&apos;ve sent it a sign-in link. Tap it to sign in. It can take a minute to
+            arrive.
+          </p>
+          <button type="button" className="btn btn-ghost btn-lg si-alt" onClick={() => setSentTo(null)}>
+            Back to sign in
+          </button>
         </div>
-      </div>
-
-      <div className="qa-card">
-        <div className="qa-wordmark">
-          <div>
-            <div className="qa-wordmark-name">Quademia</div>
-            <div className="qa-wordmark-sub">MyNMCLicensure</div>
-          </div>
-        </div>
-
-        <div className="qa-head">
-          <h1 className="qa-h1">Welcome back</h1>
-          <p className="qa-sub">Sign in to continue your NMC licensure prep.</p>
-        </div>
-
-        <div className="qa-infobox">
-          <strong>New here?</strong> You can sign in 3 ways — with your <strong>password</strong>,
-          with <strong>Google</strong>, or with a <strong>magic link</strong> emailed to you. Use
-          whichever is easiest. Forgot your password? The magic link signs you in without one.
-        </div>
-
-        <form action={handleSubmit}>
+      ) : (
+        <form className="card si-card" method="post" onSubmit={handleSubmit}>
           <input type="hidden" name="fp_hash" value={fpHash ?? ''} />
-          <div className="qa-field">
-            <label className="qa-label" htmlFor="email">
-              Email address
+
+          <div className="si-field">
+            <label className="si-label" htmlFor="email">
+              Email
             </label>
             <input
-              className="qa-input"
+              ref={emailInput}
+              className="si-input"
               type="email"
               id="email"
               name="email"
@@ -204,36 +248,34 @@ export function LoginCard() {
             />
           </div>
 
-          <div className="qa-field">
-            <div className="qa-label-row">
-              <label className="qa-label" htmlFor="password">
+          <div className="si-field">
+            <div className="si-label-row">
+              <label className="si-label" htmlFor="password">
                 Password
               </label>
-              <Link className="qa-forgot" href="/forgot-password">
+              <AppLink className="si-forgot" href="/forgot-password">
                 Forgot password?
-              </Link>
+              </AppLink>
             </div>
             <input
-              className="qa-input"
+              className="si-input"
               type="password"
               id="password"
               name="password"
-              placeholder="Enter your password"
+              placeholder="Your password"
               required
               autoComplete="current-password"
             />
           </div>
 
-          <button type="submit" className="qa-btn qa-btn-navy qa-submit" disabled={submitting}>
-            {submitting ? 'Signing in...' : 'Sign In'}
+          <button type="submit" className="btn btn-primary btn-lg" disabled={submitting}>
+            {submitting ? 'Signing in…' : 'Sign in'}
           </button>
-        </form>
 
-        <div className="qa-divider">or</div>
+          <div className="si-or">or</div>
 
-        <div className="qa-doors">
-          <button type="button" className="qa-btn qa-btn-google" onClick={startGoogle}>
-            <svg width="19" height="19" viewBox="0 0 48 48" aria-hidden="true">
+          <button type="button" className="btn btn-ghost btn-lg si-alt" onClick={startGoogle}>
+            <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
               <path
                 fill="#EA4335"
                 d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
@@ -253,98 +295,27 @@ export function LoginCard() {
             </svg>
             Continue with Google
           </button>
-          <button type="button" className="qa-btn qa-btn-magic" onClick={openMagic}>
-            Email me a magic link
+
+          <button type="button" className="btn btn-ghost btn-lg si-alt" onClick={sendLink} disabled={sending}>
+            <svg
+              className="si-mail"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <path d="M3.5 6.5l8.5 6 8.5-6" />
+            </svg>
+            {sending ? 'Sending…' : 'Email me a sign-in link'}
           </button>
-        </div>
-
-        <div className="qa-foot">
-          <p className="qa-footer">
-            Don&apos;t have an account? <Link href="/register">Register here</Link>
-          </p>
-          <div className="qa-back-wrap">
-            <Link className="qa-back" href="/">
-              &larr; Back to Home
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Magic-link modal */}
-      <div
-        className={`qa-modal-scrim${magicOpen ? ' show' : ''}`}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) setMagicOpen(false);
-        }}
-      >
-        <div className="qa-modal" role="dialog" aria-modal="true">
-          {!magicSent ? (
-            <div>
-              <div className="qa-modal-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <rect x="2.5" y="4.5" width="19" height="15" rx="3" stroke="#2d7d72" strokeWidth="2" />
-                  <path
-                    d="M3.5 6.5l8.5 6 8.5-6"
-                    stroke="#2d7d72"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-              <h3 className="qa-modal-title">Sign in without a password</h3>
-              <p className="qa-modal-help">Enter your email and we&apos;ll send you a sign-in link.</p>
-              <div className="qa-field">
-                <label className="qa-label" htmlFor="magicEmail">
-                  Email address
-                </label>
-                <input
-                  ref={magicInput}
-                  className="qa-input"
-                  type="email"
-                  id="magicEmail"
-                  placeholder="you@example.com"
-                  autoComplete="email"
-                  value={magicEmail}
-                  onChange={(e) => setMagicEmail(e.target.value)}
-                />
-              </div>
-              <div className="qa-modal-actions">
-                <button type="button" className="qa-btn qa-btn-ghost" onClick={() => setMagicOpen(false)}>
-                  Cancel
-                </button>
-                <button type="button" className="qa-btn qa-btn-navy" onClick={sendMagic} disabled={magicSending}>
-                  {magicSending ? 'Sending...' : 'Send link'}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="qa-sent">
-              <div className="qa-sent-icon">
-                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path
-                    d="M5 12.5l4.5 4.5L19 7.5"
-                    stroke="#16a34a"
-                    strokeWidth="2.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-              <h3 className="qa-sent-title">Check your inbox</h3>
-              <p className="qa-sent-text">
-                Tap the link we sent to <span className="qa-sent-email">{magicEmail || 'your email'}</span> to
-                sign in. It may take a minute to arrive.
-              </p>
-              <div className="qa-modal-actions">
-                <button type="button" className="qa-btn qa-btn-ghost" onClick={() => setMagicOpen(false)}>
-                  Done
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+        </form>
+      )}
     </>
   );
 }

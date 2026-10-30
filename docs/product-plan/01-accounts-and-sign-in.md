@@ -60,10 +60,30 @@ Detail and history: `archive/product-plan/04-access-control.md`,
 
 ### Signing in
 
-- **Three doors**: email and password, Google, and an email link. A
+- **Three doors**: email and password, Google, and an emailed code (a
+  link until 01.13). A
   wrong password says "Invalid email or password", never whether the
   account exists. A sign-in with no profile here says so and signs out;
   Google and the email link never make a profile.
+- **The sign-in page** (Sam, 2026-10-30, after Claude's own sign-in
+  page; canvas https://claude.ai/artifact/5vmaSLpvdCZtyxKhchQCTU):
+  layout B — on a computer the words and the card on the left, one of
+  Sam's Cloudinary photos on the right; on a phone the card alone, no
+  photo. The card: email, password and Sign in first; then "or", Continue
+  with Google and Email me a sign-in code as two equal buttons (Sam: so
+  the code reads as a real option). Under it "New here? Start your
+  N-day trial" and **"Can't sign in? Message us on WhatsApp"** — the
+  support number the emails carry (01.10; drawn so, Sam's "proceed"). A
+  phone signed out by a sign-in elsewhere is told why above the card.
+  The page's entry: 11.
+- **An emailed code, not an emailed link** (Sam, 2026-10-30): six
+  digits typed in the same tab. A link tapped in the Gmail app signs the
+  student in inside Gmail's own browser, not the tab or the installed
+  app they started from; MyNclex made the same change. *(to build:
+  01.13)* Until then the button sends the link, and an unknown email gets
+  the same answer as a known one and no sign-in row: Supabase's default
+  made a bare one in the sign-in table shared with the old site and
+  MyTeacher.
 - **A deactivated account is refused at sign-in** with "This account
   has been deactivated", logged as a refusal so the admin can see it.
   *(to build)*
@@ -137,10 +157,6 @@ Detail and history: `archive/product-plan/04-access-control.md`,
   allows for it. To re-rule.
 - **The sign-in check's round trips** — six before a protected page
   shows (D28); the fix is in code, waiting only on Sam's word.
-- **A way out for a student who cannot sign in** (01.10, found
-  2026-10-17 with 08's labels): Messages needs a sign-in, so the sign-in
-  page needs its own "Can't sign in?" line — WhatsApp or email, which
-  and its words Sam's.
 - **A phone number format check** on register, checkout and profile —
   any 9 digits are taken today (10-03, unruled); the trial's verified
   number already uses one form (03).

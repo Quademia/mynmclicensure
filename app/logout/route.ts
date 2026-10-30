@@ -14,13 +14,22 @@
 // elsewhere, lands on /login?packs=clear, and the sign-in page clears the
 // packs kept on it (app/login/clear-phone-packs.tsx). A sign-in that only
 // ran out its week lands on plain /login and keeps them
-// (currentSessionEnded).
+// (currentSessionEnd).
+//
+// A phone bumped by a sign-in elsewhere also carries ?reason=other-device,
+// and the sign-in page says why it was signed out (01.12, 2026-10-30).
 
 import { NextResponse, type NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { currentSessionEnded, deactivateCurrentSession } from '@/lib/auth/sessions';
+import { currentSessionEnd, deactivateCurrentSession, type SessionEnd } from '@/lib/auth/sessions';
 
-async function signOutAndGo(request: NextRequest, clearPacks: boolean): Promise<NextResponse> {
+const LANDING: Record<SessionEnd, string> = {
+  'other-device': '?packs=clear&reason=other-device',
+  ended: '?packs=clear',
+  'ran-out': '',
+};
+
+async function signOutAndGo(request: NextRequest, search: string): Promise<NextResponse> {
   await deactivateCurrentSession();
   const supabase = await createClient();
   // This device only (2026-10-17): the default, 'global', ended every
@@ -31,17 +40,17 @@ async function signOutAndGo(request: NextRequest, clearPacks: boolean): Promise<
 
   const url = request.nextUrl.clone();
   url.pathname = '/login';
-  url.search = clearPacks ? '?packs=clear' : '';
+  url.search = search;
   return NextResponse.redirect(url, { status: 303 });
 }
 
 export async function POST(request: NextRequest) {
-  return signOutAndGo(request, true);
+  return signOutAndGo(request, '?packs=clear');
 }
 
 export async function GET(request: NextRequest) {
   if (request.nextUrl.searchParams.get('via') === 'gate') {
-    return signOutAndGo(request, await currentSessionEnded());
+    return signOutAndGo(request, LANDING[await currentSessionEnd()]);
   }
   const url = request.nextUrl.clone();
   url.pathname = '/router';

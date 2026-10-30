@@ -458,11 +458,24 @@ opens it (00, The menu).
   required — region, then the list, then suggested schools, then Add
   your school (01; Sam, 2026-10-20); closed programmes not offered; the
   SMS code here, before the trial starts (03 F4b).
-- Sign in: "This account has been deactivated" (01). Reset: signed in
-  on success (01).
+- **Sign in, redesigned** (Sam, 2026-10-30; 01): layout B from the
+  canvas https://claude.ai/artifact/5vmaSLpvdCZtyxKhchQCTU, after
+  Claude's sign-in page. The shared wordmark (to the home page), "Pick up
+  where you left off." and one line; the card — email, password, Sign in,
+  "or", Continue with Google and Email me a sign-in code as equal
+  buttons; "New here? Start your N-day trial" (the days read) and "Can't
+  sign in? Message us on WhatsApp". On a computer one Cloudinary photo
+  beside it (Sam's: students sitting an exam on computers), on a phone
+  none and not downloaded. Messages as toasts: a wrong password, and a dropped
+  connection that gives the button back. A phone bumped by a sign-in
+  elsewhere: "You were signed out because your account was signed in on
+  another device." Gone: the blue "New here?" box, "Register here", the
+  faint photo, the email-link box. "This account has been deactivated"
+  (01.1) still to come. Headline and lines Claude's, Sam's to change.
+- Reset: signed in on success (01).
 - **Check**: the "N-day free trial — no card required" hint never shows;
-  the old lockup in place of the shared wordmark (09, open); private
-  colour tokens in the sign-in pages' stylesheet.
+  register, forgot and reset keep the old lockup and the private colour
+  tokens until their redesign (01.15).
 
 ### Packages (the shop) and Premium Prep
 - On a computer, a side panel of tickable filters in place of the chip

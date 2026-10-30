@@ -129,26 +129,36 @@ export async function verifySession(userId: string): Promise<boolean> {
 }
 
 /**
- * Why a gate refused this device, for its offline packs (07.3; Sam,
+ * Why a gate refused this device — for its offline packs (07.3; Sam,
  * 2026-10-15: a phone signed out, or bumped by a sign-in elsewhere, clears
- * them). True when the device's sign-in was ended — its row turned
- * inactive (a sign-out, or a third device's sign-in), or the row is live
- * yet the gate refused (the account is gone or switched off). False when
- * the week simply ran out, or no cookie is left to tell: the student signs
- * in again on the same phone and keeps the packs, rather than downloading
- * them all again every week. Read before deactivateCurrentSession.
+ * them) and for the sign-in page's line (01.12, 2026-10-30):
+ *
+ *   'other-device' — its row turned inactive. Only a third device's
+ *                    sign-in does that to a row a gate can still meet:
+ *                    this device's own Sign out clears its cookie too.
+ *   'ended'        — the row is live yet the gate refused (the account
+ *                    is gone or switched off), or the row is missing.
+ *   'ran-out'      — the week simply ran out, or no cookie is left to
+ *                    tell: the student signs in again on the same phone
+ *                    and keeps the packs, rather than downloading them
+ *                    all again every week.
+ *
+ * Read before deactivateCurrentSession.
  */
-export async function currentSessionEnded(): Promise<boolean> {
+export type SessionEnd = 'other-device' | 'ended' | 'ran-out';
+
+export async function currentSessionEnd(): Promise<SessionEnd> {
   const jar = await cookies();
   const sessionId = jar.get(SESSION_COOKIE)?.value;
-  if (!sessionId) return false;
+  if (!sessionId) return 'ran-out';
   const { data } = await createServiceRoleClient()
     .from('sessions')
     .select('active, expires_utc')
     .eq('session_id', sessionId)
     .maybeSingle();
-  if (!data || !data.active) return true;
-  return new Date(data.expires_utc).getTime() > Date.now();
+  if (!data) return 'ended';
+  if (!data.active) return 'other-device';
+  return new Date(data.expires_utc).getTime() > Date.now() ? 'ended' : 'ran-out';
 }
 
 /**
