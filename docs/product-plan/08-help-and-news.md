@@ -439,8 +439,9 @@ Ruled by Sam, 2026-09-18; the labels, the pop-up and the rest of step 2
 - **Members only, through the bot**: the student links their Telegram
   account to their Quademia account with a one-time code (the Sheets
   era's Connect page); the channel takes join requests only, and the bot
-  approves one only from a linked account with live Premium Prep, so a
-  forwarded link admits nobody. Each day the bot removes members whose
+  approves one only from a linked account with live Premium Prep — a
+  Premium single course included (02, Sam 2026-10-05) — so a forwarded
+  link admits nobody. Each day the bot removes members whose
   Premium Prep has ended, with a message to renew, and lets them back
   in when they do. *(to build: 17)*
 

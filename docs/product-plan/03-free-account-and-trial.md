@@ -13,6 +13,13 @@ Detail and history: `archive/product-plan/09-free-account-and-gamification.md` Â
 
 ### The free account
 
+- **Its public name is "Free forever"** (Sam, 2026-10-05); "free
+  account" stays the plan's working word. No page shows a Free card and
+  no button says "free account": the only way in is "Start your 14-day
+  trial" (01). Why: a Free that never ends matches the floor, not the
+  trial â€” calling the trial "Free" would make Free shrink on day 15; and
+  a question bank is used up once seen, so what stays forever is the
+  free set, not the real bank.
 - A free account practises without limit on the **free set**: bank
   questions the admin puts in the Free pool (06.8), per programme. It holds no
   course access. The free set is not the bank.

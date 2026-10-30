@@ -15,7 +15,9 @@ Detail and history: `archive/product-plan/04-access-control.md`,
 - **Two ways in** (Sam, 2026-10-04, replacing the morning's "three ways
   in"): **registering starts the 14-day trial** — today's register page,
   which already does this — and **buying a package makes the account**
-  at checkout (02, D31). There is no free account door.
+  at checkout (02, D31). There is no free account door. The only
+  way-in wording on any page is **Start your 14-day trial** (Sam,
+  2026-10-05); the floor's public name is Free forever (03).
 - **The free account is the floor**: every account keeps it for good,
   and a student whose trial or package ends lands on it — the account
   kept, free practice forever, the rest locked, not gone (03). Why: one

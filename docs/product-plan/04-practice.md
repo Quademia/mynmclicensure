@@ -152,7 +152,7 @@ https://claude.ai/artifact/5QQCWH9ECauT7k69cUUxC3 (board B).
   score, the report, the review (inside its period) and the sittings —
   no new sitting. A student whose package ended keeps the score and the
   summary, the review locked (03 F2). A student who moved from Premium
-  Prep to Full Access keeps the review of the mocks they sat (Sam).
+  Prep to Standard Prep keeps the review of the mocks they sat (Sam).
 
 ### The Quiz Builder
 

@@ -41,7 +41,7 @@ opens it (00, The menu).
   in the last three), carry on where they left off, Choose a package
   (03).
 - Paid: the package and its days left, carry on. With only a future
-  access row: "RN Full access starts 13 Oct 2026" in place of an offer
+  access row: "RN Standard Prep starts 13 Oct 2026" in place of an offer
   (02).
 - **On the floor** — a trial or package ended, or free with no trial
   (03): the recap card, then **the free practice card** ("Build a free
@@ -352,6 +352,9 @@ opens it (00, The menu).
   first returned.
 
 ### Packages (today "Upgrade")
+- Its redesign starts from the plans row (Home page, below) and 02's two
+  tiers — drawn and set aside 2026-10-30 (Sam). Every signed-in student
+  reaches it, trial and free ones too, from each "Choose a package".
 - **Check**: its own card styles and its own for-sale list (02); a
   failed read shows "No active subscriptions found yet." instead of an
   error.
@@ -359,13 +362,31 @@ opens it (00, The menu).
 ## Visitor
 
 ### Home page
-- "Start your 14-day trial, then free practice, forever"; the two ways
-  in — register (the trial) or buy a package (03 F3, 01); only
-  programmes open to the public (02); a link to Premium Prep. Built
-  last, on the pages that exist (00).
+- **The plans row, design C** (Sam, 2026-10-05), under "Start your
+  14-day trial, then free practice, forever", in place of today's
+  "Where do you start?": three cards — Trial ("Start here"), Standard
+  Prep, Premium Prep. The Free forever box once, on the trial card, then
+  "Plus, for 14 days", the page's one filled button ("Start your 14-day
+  trial") and "After 14 days, Free forever stays."; the two paid cards a
+  one-line strip ("Free forever included, and kept when the package
+  ends"), what they pay for, an outlined button; under the row, "Only
+  need one course? Take it on its own, as Standard Prep or Premium Prep,
+  from GHS …" and See single courses. Why C: A's Free card had no button
+  (a dead end on a phone); B said the free list three times. The approved
+  words and the drawings: `docs/home-page-plans-2026-10-05.html` (§3,
+  §8) and Sam's canvas "Home page plan cards"; the taglines and the strip
+  are Claude's words, Sam's to change.
+- Prices read from the packages, never typed in; a feature not live at
+  launch comes off its card (today: the premium channel). No Free card,
+  no "free account" button (03). The two ways in — register (the trial)
+  or buy a package (03 F3, 01); only programmes open to the public (02).
+  Built last, on the pages that exist (00).
 - **Check**: the hero says "Sign In" and "Sign In to Portal" beside the
   bar's "Sign in"; eight private colour tokens; the device font (800)
-  against Inter — for the redesign.
+  against Inter — for the redesign. "Create Free Account" three times,
+  though it starts the trial; the Full Access card promises mock exams
+  (Premium Prep only); "2 Quiz modes" (there are four); an Extend /
+  Upgrade card on a public page; the stats typed in, not read.
 
 ### Register, sign in, forgot and reset password
 - Register: registering starts the 14-day trial (01); the school
@@ -385,6 +406,9 @@ opens it (00, The menu).
 - **Check**: Premium Prep's paragraph has GHS 99 and GHS 150 typed in,
   not read from the packages — a price changed by the admin leaves the
   page wrong (found 2026-10-04; 02.12).
+- **Check**: "Full Access" typed into the words — the shop, Premium Prep
+  (three times), the home page (twice), the Portal Guide — goes with the
+  rename to Standard Prep (02).
 
 ### Checkout
 - The package with "Change package"; the details; a side panel with the

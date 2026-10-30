@@ -46,6 +46,35 @@ findings D4, D20, D23, D31–D36 in `archive/product-plan/post-rebuild-diagnosis
   has no programme of its own — it is for the programmes its courses
   are in, General Paper apart). It carries a kind (paid, trial, free), a
   status, a price in GHS, a length in days, and premium yes / no.
+- **Two tiers, one tick** (Sam, 2026-10-05): **Standard Prep** is a
+  paid package without the Premium tick — its courses for 365 days,
+  every paper, the Quiz Builder without limit, offline packs; **Premium
+  Prep** is a package with it — the same, plus mock exams and the
+  premium channel, for 240 days. The tick (`is_premium`) is the only
+  mark the app reads: it lists the package on Premium Prep and opens its
+  mocks (below). Names are labels the admin edits; package ids never
+  change. Free Full Access stays the admin's grant, never sold.
+- **Full Access is renamed Standard Prep** (Sam, 2026-10-05): "RM
+  Standard Prep". Why: "Full" promised everything, but Premium Prep has
+  more; Standard and Premium read as a pair, and the shared "Prep" says
+  they are the same kind of thing. Passed over: Full Year; Regular Prep
+  (in Ghana "regular" means full-time students, against sandwich and
+  distance); Standard / Premium Access ("Access" says only that a door
+  opens, and keeps the old confusion); anything with Pass (reads as a
+  promise to pass the exam).
+- **A single course comes as Standard Prep or Premium Prep** (Sam,
+  2026-10-05), with its tier's days, 365 or 240: "Midwifery Standard
+  Prep", "Midwifery Premium Prep" (today "Midwifery Standalone Access").
+  A Premium single course opens that course's mocks, and its buyer joins
+  the programme's channel (08). No code: a one-course package with the
+  tick. *(to do: the standalone packages renamed; the Premium ones made,
+  at Sam's prices — 11 standalone courses on dev today)*
+- **A rename reaches every reader at once**: each page and email reads
+  the name from the package, so a student who bought "RM Full Access"
+  sees "RM Standard Prep"; a payment keeps the name it was paid under.
+  The words typed into pages — "Full Access" on the home page, Premium
+  Prep, the shop and the Portal Guide, and Premium Prep's prices — are
+  fixed with the rename *(to do; 02.11, 02.12)*.
 - **Each package carries four limits** — builder quizzes, offline packs
   per course, papers (all, or the trial paper only), mocks (yes / no) —
   copied onto each receipt by the database when it is written (03; 12,
@@ -57,9 +86,10 @@ findings D4, D20, D23, D31–D36 in `archive/product-plan/post-rebuild-diagnosis
 - **Mock exams open only on Premium Prep packages** — the ones marked
   premium (Sam, 2026-10-04: "the most important thing is that mock is
   for premium prep products"): mocks are seasonal, built for the main
-  August/September sitting. Full Access, the single-course packages and
-  Free Full Access carry no mocks; a tester is granted a Premium Prep
-  package. Packages already bought keep what they came with. Product
+  August/September sitting. Standard Prep — the programme packages and
+  the single courses — and Free Full Access carry no mocks; a tester
+  is granted a Premium Prep package. Packages already bought keep what
+  they came with. Product
   names are labels Sam changes at will. The mocks limit follows the
   premium tick, and a new package starts without (02.10, built
   2026-10-04). A student whose package has no mocks is told "Mock exams
@@ -67,7 +97,7 @@ findings D4, D20, D23, D31–D36 in `archive/product-plan/post-rebuild-diagnosis
 - **Premium Prep includes the premium channel** for its programme (Sam,
   2026-10-04: "yes we need the groups") — the human layer the platform
   does not replace (08). Mocks and the channel are what set it apart
-  from Full Access, which is the app alone.
+  from Standard Prep, which is the app alone.
 - **Premium Prep is open all year, never a batch** (Sam, 2026-10-04):
   bought any day, its 240 days counted from then, every buyer in the
   same channel for their programme. A batch, a season or a resit
@@ -180,6 +210,14 @@ Written on the tables in `12-tables.md`:
 
 - **For C5b**: NAC and NAP package prices (prices parked until Sam's
   real numbers, 2026-10-04) and RCN's courses.
+- **Prices** (2026-10-05): Standard and Premium the same — Standard's
+  card then says "for 365 days", so the choice is more time or mocks and
+  the channel — or Premium higher. Dev's sample prices have Premium
+  cheaper (GHS 99 against 150).
+- **Standard Prep to Premium Prep mid-way** (found 2026-10-30): the chain
+  lines Premium up behind the Standard days still to run, so its mocks
+  open only when Standard ends — keep it and say so before paying, or
+  start Premium at once (a change to the chain).
 - **Does D31 / D34's change to the payments table need its own tick?**
 - **Signed-out visitors cannot read courses**, so public pages read them
   with the server's key — open the policy (a storage tick) or keep the

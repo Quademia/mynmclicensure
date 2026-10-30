@@ -104,7 +104,7 @@ feedback (06).
 
 | Page | What it is for |
 |---|---|
-| Home page | Free practice questions, forever; the trial and the packages as the way to the full bank (03 F3) |
+| Home page | The plans row — Trial, Standard Prep, Premium Prep — with Free forever on the trial card; the trial and the packages the way to the full bank (03 F3, 11) |
 | Premium Prep | The premium packages |
 | Packages | Every package for sale, chosen by programme |
 | Checkout | One package: four fields, then Paystack |

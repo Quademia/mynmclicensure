@@ -204,7 +204,7 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `status` | Active, draft or archived |
 | `price_minor`, `currency` | The price in pesewas, GHS |
 | `duration_days` | How long a grant lasts (the programme trials 14, the welcome trial 7) |
-| `is_premium` | Shown on Premium Prep |
+| `is_premium` | The tier: ticked is Premium Prep, not ticked Standard Prep (02, 2026-10-05) — lists the package on Premium Prep and sets `allow_mocks` |
 | `telegram_group_keys` | The Telegram groups it admits — free text (open, 10) |
 | `allow_builder_quizzes` | Quiz Builder quizzes over the whole grant, in any of its courses; empty = unlimited |
 | `allow_packs_per_course` | Offline packs per course; empty = unlimited, 0 = none (new packages start at 5) |
@@ -215,7 +215,7 @@ table by table as each is next changed (AGENTS.md rule 9).
   paper · no; Free Full Access and paid packages unlimited · 5 · all;
   mocks yes on the Premium Prep packages only (02.10, built 2026-10-04 —
   Sam: mocks are seasonal and, with the channel, what Premium Prep has
-  and Full Access does not). Why: each package says what it opens, not
+  and Standard Prep does not). Why: each package says what it opens, not
   only which courses and for how long. Set by the database for now; the
   admin's form gets the four fields with its redesign *(to build:
   03.1)*.
