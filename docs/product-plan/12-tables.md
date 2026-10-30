@@ -260,9 +260,21 @@ table by table as each is next changed (AGENTS.md rule 9).
 | `start_utc`, `expires_utc` | This course's own window |
 | `revoked_utc` | When revoked |
 | `created_utc` | When written |
+| `floor_utc` *(to add — needs Sam's tick: 02, Premium goes first; 2026-10-30)* | A piece's own earliest start; empty = its receipt's (the admin's requested start, else when it was made) |
 
 - The one thing every gate reads.
 - Browser: the owner and an admin read; writes through the server only.
+- **Premium goes first** (02, option C, to build): when a Premium Prep
+  receipt starts while a Standard one is running on the course, the
+  running row is cut at that moment and a second row of the same receipt
+  holds the rest, its `floor_utc` that moment, so every later re-pack
+  keeps it behind the Premium days instead of joining it back to the
+  first piece. A receipt can then hold more than one row for a course
+  (the table already allows it); rows are only added, never deleted — a
+  revoked Premium leaves the two pieces end to end. Each row stays a
+  plain window, so the gate and every reader of access are unchanged.
+  Why this and not pause dates on one row: those would change every
+  reader of access, the security floor.
 
 ### `payments` — every Paystack payment
 | Column | Holds |
@@ -989,6 +1001,8 @@ the week boards; only the earning itself is stored.
 - **The email outbox** (10.2) — needs Sam's tick at the build.
 - **The achievements** (05 G3) — written as `student_achievements` and
   `leaderboard_weeks` (Progress, 05), waiting for Sam's tick (2026-10-24).
+- **Premium goes first** (02) — written as `course_access.floor_utc`,
+  waiting for Sam's tick (2026-10-30).
 - **The leaderboard card** — ticked 2026-10-24, now `leaderboard_cards`
   (Progress, 05).
 - **The daily challenge's draw** — ticked 2026-10-08, now

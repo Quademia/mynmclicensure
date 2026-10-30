@@ -42,7 +42,9 @@ opens it (00, The menu).
   (03).
 - Paid: the package and its days left, carry on. With only a future
   access row: "RN Standard Prep starts 13 Oct 2026" in place of an offer
-  (02).
+  (02). A Standard paused by Premium shows as the next one, on the
+  existing line: "Then RM Standard Prep until 28 Aug 2028" (02, Premium
+  goes first; to build).
 - **On the floor** — a trial or package ended, or free with no trial
   (03): the recap card, then **the free practice card** ("Build a free
   quiz" from the free questions of their courses), then today's
