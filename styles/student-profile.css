@@ -3,13 +3,11 @@
  * The student profile page (slice 7e). Transcribed from the legacy
  * page's inline <style> block (student/profile.html), scoped under
  * `.spf`. Legacy's .dashboard-wrapper / .main-content rules are the
- * shell's; its page header sat inside the 720px column and is kept
- * there (no top-nav on this page). The page's own bottom-right toast
+ * shell's; its width is the student column's (shell.css .page-col;
+ * Sam, 2026-10-30), its page header the shared one. The page's own bottom-right toast
  * is the shared one (UI convention #1) and has no rules here. Legacy's
  * 768px breakpoint is the repo's.
  */
-
-.spf .profile-container { max-width: 720px; margin: 0 auto; }
 
 /* ── Panel ── */
 .spf .panel { background: var(--white); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 2px 12px rgba(30, 58, 95, 0.06); margin-bottom: 20px; }

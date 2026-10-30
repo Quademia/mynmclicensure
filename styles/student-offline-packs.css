@@ -20,7 +20,8 @@
 .opk-seg { background: var(--scale-bar-off); }
 .opk-seg-made { background: var(--brand-navy); }
 
-/* A pack's own page. */
+/* The offline screen's pack (app/offline): its name and facts. The signed-in
+   pack page and a course's packs take the shared title (PageHeader). */
 .opk-pack-facts { display: flex; flex-direction: column; gap: var(--space-4); }
 .opk-pack-title { margin: 0; font-size: 26px; line-height: 32px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); }
 .opk-delete { align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--space-8) 0 0; }

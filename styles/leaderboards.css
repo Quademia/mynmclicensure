@@ -243,12 +243,12 @@
 .lb-box-join .lb-box-icon { padding-top: 0; }
 .lb-box-join-text { flex: 1; }
 
-/* ── the Leaderboards page (05 G1b; Sam, 2026-10-20: B) ── */
+/* ── the Leaderboards page (05 G1b; Sam, 2026-10-20: B); its width is the
+   student column's (shell.css .page-col; Sam, 2026-10-30) ── */
 .lbp {
   display: flex;
   flex-direction: column;
   gap: var(--space-16);
-  max-width: 720px;
 }
 .lbp-controls {
   display: flex;

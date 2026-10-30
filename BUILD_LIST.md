@@ -205,7 +205,10 @@ before then, and the old list's history, is in
 - ⬜ DS21 The app's drawer opens from the right, like the public menu (Sam, later)
 - ⬜ 09.1 One form field — three copies of one field today
 - ⬜ 09.2 One link style — a link inside a sentence always underlined, a control (row, card, button, tab) never, the global hover-only underline in base.css gone (recommended and logged 2026-10-12; Sam's yes still to give before it is built)
-- ⬜ 09.3 A content width limit above 1440px
+- ✅ 09.3 The student column — every student page 1040px, centred; the title's line across the whole width, its words on the column (B); the 720px pages stretched; the two pack pages on the shared title — 2026-10-30 (Sam's walk at 1366 and a big screen to come)
+- ⬜ 09.18 Upgrade / Extend's title row pinned over the top bar — the page's own .topbar takes the shell's rules (found 2026-10-30; a rename, Sam's yes)
+- ⬜ 09.19 The title said twice — Portal Guide's hero and Procedures' first box repeat the page title (found 2026-10-30)
+- ⬜ 09.20 The admin's pages and the column — the student column, or the whole width for their tables (09 Open; Sam, later)
 - ⬜ 09.4 Dark mode — after the above
 - ⬜ 09.5 The old token names retired once no page uses them
 - ⬜ 09.12 One switch — the announcements editor and the notification places (device-switch.tsx) draw their own

@@ -15,6 +15,7 @@ import { getCourses } from '@/lib/catalogue/queries';
 import { getPackDoor } from '@/lib/offline-packs/door';
 import { listMyPacks } from '@/lib/offline-packs/queries';
 import { AppLink } from '@/components/shell/link-pending';
+import { PageHeader } from '@/components/shell/page-header';
 import { Allowance, BUILD_HREF, PackRows } from '../../pack-parts';
 import '@/styles/practice-papers.css';
 import '@/styles/courses.css';
@@ -46,8 +47,10 @@ export default async function PackCoursePage({ params }: { params: Promise<{ cou
         ‹ My packs
       </AppLink>
 
-      <div className="opk-pack-facts">
-        <h1 className="opk-pack-title">{title}</h1>
+      {/* the shared title over the allowance, as a course's heading in
+          Practice Papers has it (courses.css .cp-head; Sam, 2026-10-30) */}
+      <div className="cp-head">
+        <PageHeader title={title} />
         {open ? (
           <Allowance allowed={open.packsAllowed} left={open.packsLeft} />
         ) : (

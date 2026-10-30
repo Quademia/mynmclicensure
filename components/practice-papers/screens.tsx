@@ -82,7 +82,7 @@ export function CoursesScreen({ data }: { data: PracticePapers }) {
   const { courses, ended } = data;
   const anyLocked = courses.some((c) => c.papers.some((p) => !p.open));
   return (
-    <div className="pp-page pp-page-wide">
+    <div className="pp-page">
       <PageHeader title="Practice Papers" />
       <EndedNote ended={ended} />
       {courses.length ? (

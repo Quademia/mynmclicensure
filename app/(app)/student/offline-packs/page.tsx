@@ -59,7 +59,7 @@ export default async function MyPacksPage() {
   const earlierIds = [...new Set(mine.filter((p) => !open.has(p.course_id)).map((p) => p.course_id))];
 
   return (
-    <div className="pp-page pp-page-wide opk">
+    <div className="pp-page opk">
       <PageHeader title="My packs" subtitle="Packs of questions to practise anywhere, even with no signal." />
 
       {door.length || mine.length ? <InstallAppLine /> : null}

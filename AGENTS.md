@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-10-24. Rules for **any** assistant working in this
+Last updated: 2026-10-30. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What the app is
@@ -388,6 +388,17 @@ above sit at the repo root; the audience grouping inside them is kept.
   because `.spf .btn` out-ranks `.btn-primary`. A converted surface may
   keep its **size**; if it keeps a colour, the filled variants must be
   restated there (2026-09-22, caught by walking the page).
+  The other side of it: **a page's own class named like a shell class takes
+  the shell's rules** — `shell.css`'s names are unscoped too (`.topbar`,
+  `.sidebar`, `.main-content`), and Upgrade's own `.topbar` title row is
+  pinned over the app's top bar by them (found 2026-10-30, 09.18). A
+  page's own pieces carry its prefix.
+- **A student page sets no width; the column is the shell's**
+  (`.page-col`, `styles/shell.css`, 2026-10-30). The title's line is the
+  row's `::after`, placed against `.page-col` as the nearest positioned
+  box: a page wrapper between the two that takes `position`, `transform`
+  or `filter` shrinks the line to that wrapper, and `overflow: hidden` on
+  one clips it. Check by measuring the line at 1920px, not by reading.
 - **The shared dialog is the browser's own `<dialog>` opened with
   `showModal()`** (`lib/overlays/shared/dialog.tsx`, DS4): focus trap,
   Escape, inert page, top layer and focus return come from the element.
@@ -406,6 +417,15 @@ above sit at the repo root; the audience grouping inside them is kept.
 - **A desktop-app worktree has no `node_modules`** — `npm ci` in it —
   and gets a COPY of `.env.local` when created; a key added to the
   main checkout's file later must be copied across by hand.
+- **A cloud session has no `node_modules` and no `.env.local`**: `npm ci`
+  first; no sign-in, so pages are checked by the build and a measured
+  proof sheet, and walked by Sam. **Its `npm run build` fails in
+  `next/font`** ("Cannot read properties of null (reading '1')", fetching
+  Inter from Google): Node's own fetch ignores the container's proxy. Run
+  `NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt npm
+  run build`, and read the build's own exit code — a background command
+  reports its last command's, and a `tail` after the build says 0
+  (2026-10-30).
 - **A reused worktree can carry a stale `.next`, and then every route
   but `/` is a 404** — `/login` included, with no error in the log
   (2026-09-23: a worktree with a `.next` from 2026-09-13). Stop the

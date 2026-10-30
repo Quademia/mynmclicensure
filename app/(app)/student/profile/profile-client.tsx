@@ -241,149 +241,147 @@ export function ProfileClient({
   return (
     <div className="spf">
       <Toast message={msg?.text ?? null} tone={msg?.tone} onDismiss={dismiss} />
-      <div className="profile-container">
-        <PageHeader title="My Profile" subtitle="Your NMC Licensure account details" />
+      <PageHeader title="My Profile" subtitle="Your NMC Licensure account details" />
 
-        {/* Personal Details */}
-        <div className={`panel${personalEditing ? ' editing' : ''}`} ref={personalRef}>
-          <div className="panel-head">
-            <h2>Personal Details</h2>
-            <span className="edit-btn" title="Edit" onClick={() => setPersonalEditing(true)}><Icon name="pencil" size={14} /></span>
-          </div>
-          <div className="panel-body">
-            <div className={`avatar-wrap${personalEditing ? ' editing' : ''}`}>
-              <div>
-                <NameCircle
-                  name={displayName}
-                  avatarUrl={avatarSrc}
-                  size="lg"
-                  alt={photoPreview ? 'Preview' : 'Profile'}
-                  className="avatar-circle"
-                />
-              </div>
-              <div className="avatar-info">
-                <div className="avatar-name">{displayName}</div>
-                <div className="avatar-role">Student</div>
-              </div>
-              <div className="avatar-upload">
-                <label htmlFor="avatarInput">Change photo</label>
-                <input ref={fileRef} type="file" id="avatarInput" accept="image/jpeg,image/png,image/webp" onChange={onPhotoSelected} />
-              </div>
+      {/* Personal Details */}
+      <div className={`panel${personalEditing ? ' editing' : ''}`} ref={personalRef}>
+        <div className="panel-head">
+          <h2>Personal Details</h2>
+          <span className="edit-btn" title="Edit" onClick={() => setPersonalEditing(true)}><Icon name="pencil" size={14} /></span>
+        </div>
+        <div className="panel-body">
+          <div className={`avatar-wrap${personalEditing ? ' editing' : ''}`}>
+            <div>
+              <NameCircle
+                name={displayName}
+                avatarUrl={avatarSrc}
+                size="lg"
+                alt={photoPreview ? 'Preview' : 'Profile'}
+                className="avatar-circle"
+              />
             </div>
-
-            <div className="profile-row">
-              <div className="profile-label">First Name</div>
-              <div className="profile-value">{user.forename || '—'}</div>
-              <div className="profile-input"><input type="text" value={forename} onChange={(e) => setForename(e.target.value)} /></div>
+            <div className="avatar-info">
+              <div className="avatar-name">{displayName}</div>
+              <div className="avatar-role">Student</div>
             </div>
-            <div className="profile-row">
-              <div className="profile-label">Last Name</div>
-              <div className="profile-value">{user.surname || '—'}</div>
-              <div className="profile-input"><input type="text" value={surname} onChange={(e) => setSurname(e.target.value)} /></div>
-            </div>
-            <div className="profile-row">
-              <div className="profile-label">Email</div>
-              <div className="profile-value">{user.email || '—'}</div>
-            </div>
-            <div className="profile-row">
-              <div className="profile-label">Phone</div>
-              <div className="profile-value">{user.phone_number || '—'}</div>
-              <div className="profile-input"><input type="tel" className={phoneNeeds ? 'needs-input' : ''} value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
+            <div className="avatar-upload">
+              <label htmlFor="avatarInput">Change photo</label>
+              <input ref={fileRef} type="file" id="avatarInput" accept="image/jpeg,image/png,image/webp" onChange={onPhotoSelected} />
             </div>
           </div>
-          <div className="save-bar">
-            <button type="button" className="btn" onClick={cancelPersonal}>Cancel</button>
-            <button type="button" className="btn btn-primary" disabled={personalSaving} onClick={savePersonal}>{personalSaving ? 'Saving…' : 'Save Changes'}</button>
+
+          <div className="profile-row">
+            <div className="profile-label">First Name</div>
+            <div className="profile-value">{user.forename || '—'}</div>
+            <div className="profile-input"><input type="text" value={forename} onChange={(e) => setForename(e.target.value)} /></div>
+          </div>
+          <div className="profile-row">
+            <div className="profile-label">Last Name</div>
+            <div className="profile-value">{user.surname || '—'}</div>
+            <div className="profile-input"><input type="text" value={surname} onChange={(e) => setSurname(e.target.value)} /></div>
+          </div>
+          <div className="profile-row">
+            <div className="profile-label">Email</div>
+            <div className="profile-value">{user.email || '—'}</div>
+          </div>
+          <div className="profile-row">
+            <div className="profile-label">Phone</div>
+            <div className="profile-value">{user.phone_number || '—'}</div>
+            <div className="profile-input"><input type="tel" className={phoneNeeds ? 'needs-input' : ''} value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
           </div>
         </div>
-
-        {/* Academic Details */}
-        <div className={`panel${academicEditing ? ' editing' : ''}`} ref={academicRef}>
-          <div className="panel-head">
-            <h2>Academic Details</h2>
-            <span className="edit-btn" title="Edit" onClick={() => setAcademicEditing(true)}><Icon name="pencil" size={14} /></span>
-          </div>
-          <div className="panel-body">
-            <div className="profile-row">
-              <div className="profile-label">Programme</div>
-              <div className="profile-value">{programName || user.program_id || '—'}</div>
-            </div>
-            <div className="profile-row">
-              <div className="profile-label">School</div>
-              <div className="profile-value">{schoolLabel}</div>
-              <div className="profile-input school-input">
-                <select
-                  className={schoolNeeds ? 'needs-input' : ''}
-                  value={school}
-                  onChange={(e) => { setSchool(e.target.value); if (e.target.value !== '__OTHER__') setSchoolOther(''); }}
-                >
-                  {!schools.length ? <option value="">Could not load schools</option> : <option value="">— Select —</option>}
-                  {regions.map((r) => (
-                    <optgroup key={r.region} label={r.region}>
-                      {r.items.map((s) => <option key={s.id} value={String(s.id)}>{s.name}</option>)}
-                    </optgroup>
-                  ))}
-                  {schools.length ? <option value="__OTHER__">My school isn&apos;t listed</option> : null}
-                </select>
-                {school === '__OTHER__' ? (
-                  <input type="text" className="school-other" placeholder="Type your school's name" value={schoolOther} onChange={(e) => setSchoolOther(e.target.value)} />
-                ) : null}
-              </div>
-            </div>
-            <div className="profile-row">
-              <div className="profile-label">Level</div>
-              <div className="profile-value">{user.level || '—'}</div>
-              <div className="profile-input">
-                <select value={level} onChange={(e) => setLevel(e.target.value)}>
-                  <option value="">— Select —</option>
-                  {PROFILE_LEVELS.map((l) => <option key={l} value={l}>{l}</option>)}
-                </select>
-              </div>
-            </div>
-            <div className="profile-row">
-              <div className="profile-label">Cohort</div>
-              <div className="profile-value">{user.cohort || '—'}</div>
-              <div className="profile-input"><input type="text" placeholder="e.g. 2024" value={cohort} onChange={(e) => setCohort(e.target.value)} /></div>
-            </div>
-          </div>
-          <div className="save-bar">
-            <button type="button" className="btn" onClick={cancelAcademic}>Cancel</button>
-            <button type="button" className="btn btn-primary" disabled={academicSaving} onClick={saveAcademic}>{academicSaving ? 'Saving…' : 'Save Changes'}</button>
-          </div>
+        <div className="save-bar">
+          <button type="button" className="btn" onClick={cancelPersonal}>Cancel</button>
+          <button type="button" className="btn btn-primary" disabled={personalSaving} onClick={savePersonal}>{personalSaving ? 'Saving…' : 'Save Changes'}</button>
         </div>
-
-        {/* Leaderboards (05 G1b; Sam, 2026-10-24: after Academic Details) */}
-        <LeaderboardsPanel
-          initial={leaderboards.card}
-          choices={leaderboards.choices}
-          person={personOf(user.forename, user.surname)}
-          photo={user.avatar_url}
-        />
-
-        {/* Subscription */}
-        <div className="panel">
-          <div className="panel-head">
-            <h2>Subscription</h2>
-          </div>
-          <div className="panel-body">
-            <div className="profile-row">
-              <div className="profile-label">Status</div>
-              <div className="profile-value"><span className={`badge ${subStatusClass}`}>{subscription ? subscription.status : 'None'}</span></div>
-            </div>
-            <div className="profile-row">
-              <div className="profile-label">Plan</div>
-              <div className="profile-value">{subscription ? subscription.products?.name || subscription.product_id || '—' : '—'}</div>
-            </div>
-            <div className="profile-row">
-              <div className="profile-label">Expires</div>
-              <div className="profile-value">{subscription ? fmtDate(subscription.expires_utc) : '—'}</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Notifications (08.15) */}
-        <NotificationsPanel userId={notify.userId} publicKey={notify.publicKey} />
       </div>
+
+      {/* Academic Details */}
+      <div className={`panel${academicEditing ? ' editing' : ''}`} ref={academicRef}>
+        <div className="panel-head">
+          <h2>Academic Details</h2>
+          <span className="edit-btn" title="Edit" onClick={() => setAcademicEditing(true)}><Icon name="pencil" size={14} /></span>
+        </div>
+        <div className="panel-body">
+          <div className="profile-row">
+            <div className="profile-label">Programme</div>
+            <div className="profile-value">{programName || user.program_id || '—'}</div>
+          </div>
+          <div className="profile-row">
+            <div className="profile-label">School</div>
+            <div className="profile-value">{schoolLabel}</div>
+            <div className="profile-input school-input">
+              <select
+                className={schoolNeeds ? 'needs-input' : ''}
+                value={school}
+                onChange={(e) => { setSchool(e.target.value); if (e.target.value !== '__OTHER__') setSchoolOther(''); }}
+              >
+                {!schools.length ? <option value="">Could not load schools</option> : <option value="">— Select —</option>}
+                {regions.map((r) => (
+                  <optgroup key={r.region} label={r.region}>
+                    {r.items.map((s) => <option key={s.id} value={String(s.id)}>{s.name}</option>)}
+                  </optgroup>
+                ))}
+                {schools.length ? <option value="__OTHER__">My school isn&apos;t listed</option> : null}
+              </select>
+              {school === '__OTHER__' ? (
+                <input type="text" className="school-other" placeholder="Type your school's name" value={schoolOther} onChange={(e) => setSchoolOther(e.target.value)} />
+              ) : null}
+            </div>
+          </div>
+          <div className="profile-row">
+            <div className="profile-label">Level</div>
+            <div className="profile-value">{user.level || '—'}</div>
+            <div className="profile-input">
+              <select value={level} onChange={(e) => setLevel(e.target.value)}>
+                <option value="">— Select —</option>
+                {PROFILE_LEVELS.map((l) => <option key={l} value={l}>{l}</option>)}
+              </select>
+            </div>
+          </div>
+          <div className="profile-row">
+            <div className="profile-label">Cohort</div>
+            <div className="profile-value">{user.cohort || '—'}</div>
+            <div className="profile-input"><input type="text" placeholder="e.g. 2024" value={cohort} onChange={(e) => setCohort(e.target.value)} /></div>
+          </div>
+        </div>
+        <div className="save-bar">
+          <button type="button" className="btn" onClick={cancelAcademic}>Cancel</button>
+          <button type="button" className="btn btn-primary" disabled={academicSaving} onClick={saveAcademic}>{academicSaving ? 'Saving…' : 'Save Changes'}</button>
+        </div>
+      </div>
+
+      {/* Leaderboards (05 G1b; Sam, 2026-10-24: after Academic Details) */}
+      <LeaderboardsPanel
+        initial={leaderboards.card}
+        choices={leaderboards.choices}
+        person={personOf(user.forename, user.surname)}
+        photo={user.avatar_url}
+      />
+
+      {/* Subscription */}
+      <div className="panel">
+        <div className="panel-head">
+          <h2>Subscription</h2>
+        </div>
+        <div className="panel-body">
+          <div className="profile-row">
+            <div className="profile-label">Status</div>
+            <div className="profile-value"><span className={`badge ${subStatusClass}`}>{subscription ? subscription.status : 'None'}</span></div>
+          </div>
+          <div className="profile-row">
+            <div className="profile-label">Plan</div>
+            <div className="profile-value">{subscription ? subscription.products?.name || subscription.product_id || '—' : '—'}</div>
+          </div>
+          <div className="profile-row">
+            <div className="profile-label">Expires</div>
+            <div className="profile-value">{subscription ? fmtDate(subscription.expires_utc) : '—'}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Notifications (08.15) */}
+      <NotificationsPanel userId={notify.userId} publicKey={notify.publicKey} />
     </div>
   );
 }

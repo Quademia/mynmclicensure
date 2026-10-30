@@ -20,6 +20,7 @@ import { getCourses } from '@/lib/catalogue/queries';
 import { getMyPack } from '@/lib/offline-packs/queries';
 import { pickedWords } from '@/lib/offline-packs/labels';
 import { AppLink } from '@/components/shell/link-pending';
+import { PageHeader } from '@/components/shell/page-header';
 import { PackMain, PackRemove } from '../phone-pack';
 import { courseHref } from '../pack-parts';
 import { DeletePack } from './delete-pack';
@@ -63,13 +64,17 @@ export default async function PackPage({
         ‹ {course}
       </AppLink>
 
-      <div className="opk-pack-facts">
-        <h1 className="opk-pack-title">{pack.pack_name || 'Offline pack'}</h1>
-        <span className="pp-line">
-          {course} · {n} {n === 1 ? 'question' : 'questions'} · made {longDay(pack.created_utc)}
-        </span>
-        <span className="pp-line">{pickedWords(pack)}</span>
-      </div>
+      {/* the shared title, as a paper's page has it (09.11; Sam, 2026-10-30) */}
+      <PageHeader
+        title={pack.pack_name || 'Offline pack'}
+        subtitle={
+          <>
+            {course} · {n} {n === 1 ? 'question' : 'questions'} · made {longDay(pack.created_utc)}
+            <br />
+            {pickedWords(pack)}
+          </>
+        }
+      />
 
       <div className="card pp-card">
         <PackMain

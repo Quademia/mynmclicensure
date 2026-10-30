@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-30 — the student column: every student page 1040px, centred, the title line across the whole width (B); pack pages on the shared title
+  - ↳ nine widths found · 1040 over 1366 · B over A, C · 720 pages stretched · admin later · /offline kept 720 · Upgrade row over the top bar (09.18) · title twice (09.19) · cloud build needs the proxy
+
 - 2026-10-24 — the leaderboards built: database, joining, the page and its ways in, Profile's panel, Show more; sample boards on dev
   - ↳ ticked: card, suggested schools, school_other gone · no stored totals · 2A · 38 Noto SVGs · Share parked · ranks with Submit · switch reused · 76 sample students · Show more to the end · G3's 15 approved
 
