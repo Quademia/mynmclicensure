@@ -491,10 +491,10 @@ above sit at the repo root; the audience grouping inside them is kept.
   700. Measured, 2026-09-22: the same string at 40px is 405.6 / 408.5 /
   411.4 / 414.2 / 414.2 / 414.2px at 400 / 500 / 600 / 700 / 800 / 900.
   DS16 was opened calling those declarations a visual defect; they were
-  not. Measure the rendered width before calling a weight a defect —
-  and note the landing page is the one surface **not** on Inter
-  (`styles/landing.css:19` puts it on the device's own font), where 800
-  *is* a real heavier face.
+  not. Measure the rendered width before calling a weight a defect.
+  Every surface is on Inter since the home page's redesign (2026-10-30);
+  until then it alone used the device's own font, where 800 was a real
+  heavier face.
 - **A class name assembled at runtime is invisible to a rename.** DS13
   renamed `` `pill pill-${ds}` `` only half — the base, not the prefix —
   and missed two `Record<string, string>` maps holding `'chip-mcq'` and

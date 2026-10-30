@@ -378,6 +378,24 @@ opens it (00, The menu).
   links move to the shared public footer, on every public page, until
   Sam updates them. Why: the page was eleven phone screens; MyNclex's is
   a hero and one routing section.
+- **Built 2026-10-30** (03 F3) from Claude Design's canvas "Home page",
+  with Sam's choices on it: the programmes row **under the hero**;
+  **Premium Prep stands out** (its teal border, "Best for the exam", the
+  row's filled "Get Premium Prep"; the trial card's button outlined, no
+  "Start here" — in place of 10-05's trial-first C); **each card keeps its
+  drawing**, code written into the page (no picture files, no extra
+  downloads: Sam); the hero's words as drawn ("Practise for the NMC
+  licensure exam, on your phone."). The footer redesigned with it, on
+  every public page: the wordmark and a line, Follow us, the open
+  programmes each linking to the shop with its packages first (Sam: kept),
+  the pages, Back to Quademia and the year. Every number is read: the
+  trial's days and builder quizzes from the trial packages, prices
+  ("from" when a tier's differ) and days from the packages on sale, the
+  packs a course from Standard Prep; "or Premium Prep" on the single
+  courses line waits for a Premium single course on sale; the channel's
+  line, and "and the channel" in Premium's tagline, wait for 17. On the
+  design system: tokens, Inter, `.card`, the button family. 2,095px on a
+  computer and 3,892px on a phone (4,734 and 8,674 before).
 - **The plans row, design C** (Sam, 2026-10-05), under "Start your
   14-day trial, then free practice, forever", in place of today's
   "Where do you start?": three cards — Trial ("Start here"), Standard
@@ -397,13 +415,11 @@ opens it (00, The menu).
   no "free account" button (03). The two ways in — register (the trial)
   or buy a package (03 F3, 01); only programmes open to the public (02).
   Built last, on the pages that exist (00).
-- **Check**: the hero says "Sign In" and "Sign In to Portal" beside the
-  bar's "Sign in"; eight private colour tokens; the device font (800)
-  against Inter — for the redesign. "Create Free Account" three times,
-  though it starts the trial; "2 Quiz modes" (there are four); an
-  Extend / Upgrade card on a public page; the stats typed in, not read.
-  (The Full Access card's words, which promised mocks to every package,
-  were corrected 2026-10-30.)
+- The old page's faults went with it (2026-10-30): "Create Free Account"
+  three times, the typed stats ("2 Quiz modes"), the Extend / Upgrade
+  card, the private colours and the device font.
+- **Open**: the open programmes are listed by name, so NACNAP (its name
+  today) comes first; an order of Sam's would need a column.
 
 ### Register, sign in, forgot and reset password
 - Register: registering starts the 14-day trial (01); the school

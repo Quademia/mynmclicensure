@@ -11,7 +11,7 @@
 // name their filter here.
 
 import { cache } from 'react';
-import type { createClient } from '@/lib/supabase/server';
+import { createServiceRoleClient, type createClient } from '@/lib/supabase/server';
 import type { ConfigMap, ConfigRow, Course, Product, Program } from './types';
 
 type Db = Awaited<ReturnType<typeof createClient>>;
@@ -46,6 +46,43 @@ export async function getOpenPrograms(db: Db): Promise<Program[]> {
   }
   return (data ?? []) as Program[];
 }
+
+/** The open programmes and what their trial gives, for the public pages' words. */
+export type PublicProgrammes = {
+  programs: { program_id: string; program_name: string }[];
+  /** The trial's length in days — "Start your 14-day trial" — from the programmes' trial packages; null if none reads. */
+  trialDays: number | null;
+  /** Builder quizzes on the trial ("3 Quiz Builder quizzes"); null when unlimited or unread. */
+  trialQuizzes: number | null;
+};
+
+// The home page and the public footer (03 F3, 2026-10-30) each say "Start
+// your 14-day trial", so the length is read, not typed: an admin who
+// changes the trial changes every page. One request — the programme's
+// trial package embedded — and cache() so the page and its footer share
+// it within a render (no argument, so the key is the same for both; the
+// server's own client, as the public pages read courses, since there is
+// nothing personal in it). The shortest trial when programmes differ.
+export const getPublicProgrammes = cache(async function getPublicProgrammes(): Promise<PublicProgrammes> {
+  const { data, error } = await createServiceRoleClient()
+    .from('programs')
+    .select('program_id, program_name, trial:products!programs_trial_product_id_fkey ( duration_days, allow_builder_quizzes )')
+    .eq('is_open', true)
+    .order('program_name');
+  if (error) {
+    console.error('getPublicProgrammes:', error);
+    return { programs: [], trialDays: null, trialQuizzes: null };
+  }
+  type Row = { program_id: string; program_name: string; trial: { duration_days: number | null; allow_builder_quizzes: number | null } | null };
+  const rows = (data ?? []) as unknown as Row[];
+  const days = rows.map((r) => r.trial?.duration_days).filter((n): n is number => typeof n === 'number' && n > 0);
+  const quizzes = rows.map((r) => r.trial?.allow_builder_quizzes).filter((n): n is number => typeof n === 'number');
+  return {
+    programs: rows.map((r) => ({ program_id: r.program_id, program_name: r.program_name })),
+    trialDays: days.length ? Math.min(...days) : null,
+    trialQuizzes: quizzes.length ? Math.min(...quizzes) : null,
+  };
+});
 
 // A product's courses are product_courses rows (02 C1); the select embeds
 // them and the row is flattened to `courses`, sorted by id.

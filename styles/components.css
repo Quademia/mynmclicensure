@@ -587,19 +587,83 @@
   .pubmenu { display: none; }
 }
 
+/* The public footer (components/shell/public-footer.tsx), redesigned
+ * 2026-10-30 with the home page: the wordmark and a line, Follow us, the
+ * open programmes, the pages; then Back to Quademia and the year. Two
+ * columns on a phone, four from 769px. */
 .pubfoot {
-  background: var(--brand-navy-dark);
-  color: var(--ink-on-navy);
-  text-align: center;
-  padding: var(--space-24) var(--space-24);
-  font-size: var(--type-meta-size);
   margin-top: auto;
+  background: var(--brand-navy-dark);
+  color: var(--ink-on-navy-soft);
+  padding: 32px var(--space-16) var(--space-20);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-24);
+  font-size: 14px;
+  line-height: 20px;
 }
-.pubfoot a { color: var(--ink-on-navy); text-decoration: none; font-size: var(--type-meta-size); }
-.pubfoot a:hover { color: var(--surface); }
+.pubfoot-cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-24) var(--space-16);
+  align-items: start;
+}
+.pubfoot-brand {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-12);
+}
+.pubfoot-brand p { margin: 0; max-width: 380px; font-size: 13px; line-height: 18px; }
+.pubfoot-home { display: inline-flex; text-decoration: none; }
+.pubfoot .wordmark-text b { color: var(--surface); }
+.pubfoot .wordmark-text span { color: var(--brand-teal-pale); }
+.pubfoot-col { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.pubfoot-head {
+  margin: 0;
+  font-size: 12px;
+  line-height: 17px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--surface);
+}
+.pubfoot ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.pubfoot-col a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-10) 0;
+  color: var(--ink-on-navy-soft);
+  text-decoration: none;
+}
+.pubfoot-col a svg { flex: none; }
+.pubfoot a:hover { color: var(--surface); text-decoration: none; }
+.pubfoot-base {
+  border-top: 1px solid var(--surface-on-navy-hover);
+  padding-top: var(--space-16);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8) var(--space-16);
+  font-size: 12px;
+  line-height: 17px;
+}
+.pubfoot-base a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  color: var(--ink-on-navy-soft);
+  font-weight: 500;
+  text-decoration: none;
+}
+@media (min-width: 769px) {
+  .pubfoot { padding: 48px 80px var(--space-24); gap: 32px; }
+  .pubfoot-cols { grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 40px; }
+  .pubfoot-brand { grid-column: auto; }
+}
 
 /* ── The row menu (09.10; Sam, 2026-10-17) ─────────────────────────
  * Three dots at a row's end and what that row allows now
