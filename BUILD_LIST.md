@@ -52,7 +52,8 @@ before then, and the old list's history, is in
 - ⬜ 02.9 The Open to the public tick on the admin's Courses page — with its redesign
 - ✅ 02.10 Mocks on Premium Prep packages only — the mocks limit follows the premium tick — 2026-10-04
 - ⬜ 02.11 Public pages' words Sam's to edit — Premium Prep's text, a season banner — with their redesign
-- ⬜ 02.12 Premium Prep's page reads its prices from the packages — GHS 99 and 150 typed in today
+- ✅ 02.12 No price typed into Premium Prep's or the shop's words — the cards carry each package's — 2026-10-30
+- ✅ (unplanned) Full Access → Standard Prep: packages renamed on dev, the typed words follow — 2026-10-30
 - ✅ 02.1 Ended means ended — the four places that trusted "active" now read the dates — 2026-10-04
 - ⬜ D31 The account made at payment — a set-password link; the setup token and its rescue go
 - ⬜ D33 The same browser sees the password form, another the emailed link; a check tells status only

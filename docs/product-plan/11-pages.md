@@ -384,9 +384,10 @@ opens it (00, The menu).
 - **Check**: the hero says "Sign In" and "Sign In to Portal" beside the
   bar's "Sign in"; eight private colour tokens; the device font (800)
   against Inter — for the redesign. "Create Free Account" three times,
-  though it starts the trial; the Full Access card promises mock exams
-  (Premium Prep only); "2 Quiz modes" (there are four); an Extend /
-  Upgrade card on a public page; the stats typed in, not read.
+  though it starts the trial; "2 Quiz modes" (there are four); an
+  Extend / Upgrade card on a public page; the stats typed in, not read.
+  (The Full Access card's words, which promised mocks to every package,
+  were corrected 2026-10-30.)
 
 ### Register, sign in, forgot and reset password
 - Register: registering starts the 14-day trial (01); the school
@@ -403,12 +404,8 @@ opens it (00, The menu).
 - On a computer, a side panel of tickable filters in place of the chip
   row (Sam, 2026-09-22).
 - Premium Prep's words and a season banner, Sam's to edit (02.11).
-- **Check**: Premium Prep's paragraph has GHS 99 and GHS 150 typed in,
-  not read from the packages — a price changed by the admin leaves the
-  page wrong (found 2026-10-04; 02.12).
-- **Check**: "Full Access" typed into the words — the shop, Premium Prep
-  (three times), the home page (twice), the Portal Guide — goes with the
-  rename to Standard Prep (02).
+- No price typed into the words, and Standard Prep named in place of
+  Full Access (2026-10-30, 02.12): the cards carry each package's price.
 
 ### Checkout
 - The package with "Change package"; the details; a side panel with the

@@ -67,14 +67,16 @@ findings D4, D20, D23, D31–D36 in `archive/product-plan/post-rebuild-diagnosis
   Prep", "Midwifery Premium Prep" (today "Midwifery Standalone Access").
   A Premium single course opens that course's mocks, and its buyer joins
   the programme's channel (08). No code: a one-course package with the
-  tick. *(to do: the standalone packages renamed; the Premium ones made,
-  at Sam's prices — 11 standalone courses on dev today)*
+  tick. The standalone packages renamed on dev 2026-10-30 (prod at the
+  release, in the admin). *(to do: the Premium ones made, at Sam's
+  prices — 11 standalone courses on dev today)*
 - **A rename reaches every reader at once**: each page and email reads
   the name from the package, so a student who bought "RM Full Access"
   sees "RM Standard Prep"; a payment keeps the name it was paid under.
   The words typed into pages — "Full Access" on the home page, Premium
-  Prep, the shop and the Portal Guide, and Premium Prep's prices — are
-  fixed with the rename *(to do; 02.11, 02.12)*.
+  Prep, the shop and the Portal Guide — follow the rename, and no price
+  is typed into a sentence: the cards carry each package's own (Sam,
+  2026-10-30; the Full Access packages renamed on dev the same day).
 - **Each package carries four limits** — builder quizzes, offline packs
   per course, papers (all, or the trial paper only), mocks (yes / no) —
   copied onto each receipt by the database when it is written (03; 12,
