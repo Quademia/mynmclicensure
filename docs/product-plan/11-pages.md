@@ -384,8 +384,12 @@ opens it (00, The menu).
   row's filled "Get Premium Prep"; the trial card's button outlined, no
   "Start here" — in place of 10-05's trial-first C); **each card keeps its
   drawing**, code written into the page (no picture files, no extra
-  downloads: Sam); the hero's words as drawn ("Practise for the NMC
-  licensure exam, on your phone."). The footer redesigned with it, on
+  downloads: Sam); the hero's words "Practise for the NMC licensure exam
+  the way you'll sit it." and "Exam-style questions for every NMC Ghana
+  programme, timed like the real paper, each with the reason behind the
+  answer. On your phone, tablet or computer. Start with a 14-day trial."
+  (Sam: the exam is sat on a computer or tablet, so the phone is not the
+  headline). The footer redesigned with it, on
   every public page: the wordmark and a line, Follow us, the open
   programmes each linking to the shop with its packages first (Sam: kept),
   the pages, Back to Quademia and the year. Every number is read: the

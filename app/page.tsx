@@ -30,7 +30,7 @@ import '@/styles/landing.css';
 
 export const metadata: Metadata = {
   title: 'MyNMCLicensure | Quademia',
-  description: 'Practise for the NMC Ghana licensure exam on your phone: exam-style questions for every programme, each with the reason behind the answer.',
+  description: 'Practise for the NMC Ghana licensure exam the way you’ll sit it: exam-style questions for every programme, timed like the real paper, each with the reason behind the answer.',
 };
 
 export const dynamic = 'force-dynamic';
@@ -77,10 +77,10 @@ export default async function HomePage() {
         <section className="hp-hero">
           <div className="hp-hero-inner">
             <div className="hp-hero-text">
-              <h1>Practise for the NMC licensure exam, on your phone.</h1>
+              <h1>Practise for the NMC licensure exam the way you&apos;ll sit it.</h1>
               <p>
-                Exam-style questions for every NMC Ghana programme, each with the reason behind the answer. Register
-                and your {days}-day trial starts at once.
+                Exam-style questions for every NMC Ghana programme, timed like the real paper, each with the reason
+                behind the answer. On your phone, tablet or computer. Start with a {days}-day trial.
               </p>
               <div className="hp-hero-actions">
                 <AppLink href="/register" className="btn btn-primary btn-lg">
