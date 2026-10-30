@@ -29,6 +29,21 @@
   .pl-head-row { padding-bottom: 14px; }
   .pl-title { height: 22px; }
 }
+/* in the student pages' column, on a computer, the line runs the whole
+   width beside the menu as the title's does (shell.css .page-col): drawn
+   against .page-col, 16px below the title's shape, where the border was */
+@media (min-width: 769px) {
+  .page-col .pl-head-row { border-bottom: 0; padding-bottom: 17px; }
+  .page-col .pl-head-row::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    margin-top: 16px;
+    background: var(--border);
+  }
+}
 
 .pl-card {
   background: var(--surface);

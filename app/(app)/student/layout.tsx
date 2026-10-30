@@ -15,6 +15,10 @@
 // computer, the menu's Announcements row and the menu button's dot on a
 // phone; counted by the database beside the Messages count, the shell
 // holding it after (components/shell/news-count).
+//
+// Every page sits in the one column (Sam, 2026-10-30: 1040px, centred,
+// the title's line across the whole width): .page-col in shell.css, so no
+// page sets a width of its own.
 
 import { requireStudent } from '@/lib/access';
 import { AppShell } from '@/components/shell/app-shell';
@@ -50,7 +54,8 @@ export default async function StudentLayout({ children }: { children: React.Reac
         ],
       }}
     >
-      {children}
+      {/* the student pages' column (shell.css .page-col; Sam, 2026-10-30) */}
+      <div className="page-col">{children}</div>
       <PhoneCheckIn userId={profile.user_id} />
       <NotifyRelink userId={profile.user_id} />
     </AppShell>

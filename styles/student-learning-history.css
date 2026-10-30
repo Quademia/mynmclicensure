@@ -3,11 +3,12 @@
  * Learning History, redesigned (05.5; Sam, 2026-10-17): the course dropdown,
  * the figures, the list of sittings and Load more, scoped under `.lh`.
  * Tokens only. The card is .card; the row menu's own rules are
- * components.css's (.row-menu, 09.10). One narrow column, the same on a
- * phone and a computer; below 768px the page's gutters are the shell's.
+ * components.css's (.row-menu, 09.10). One column, the same on a phone and
+ * a computer, as wide as the student column (shell.css .page-col; Sam,
+ * 2026-10-30); below 768px the page's gutters are the shell's.
  */
 
-.lh { display: flex; flex-direction: column; gap: var(--space-16); max-width: 760px; }
+.lh { display: flex; flex-direction: column; gap: var(--space-16); }
 .lh .page-header { margin-bottom: 0; }
 
 /* ── The course dropdown (Sam, 2026-10-17, in place of chips): one line

@@ -49,7 +49,7 @@ export function MyCoursesScreen({ data }: { data: MyCourses }) {
   const { courses, ended } = data;
   const anyLocked = courses.some((c) => c.course.access !== 'all');
   return (
-    <div className="cp-page cp-wide">
+    <div className="cp-page">
       <PageHeader title="My courses" subtitle={courses.length ? `${courses.length} course${courses.length === 1 ? '' : 's'}` : undefined} />
       <EndedNote ended={ended} />
       {courses.length ? (
@@ -116,7 +116,7 @@ export function CourseScreen({ data }: { data: CoursePageData }) {
   const papersLocked = papersLine === 'Opens with a package';
 
   return (
-    <div className="cp-page cp-course">
+    <div className="cp-page">
       <CourseTabs
         backHref="/student/courses"
         backLabel="My courses"

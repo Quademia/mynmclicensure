@@ -7,9 +7,8 @@
  * "‹ My courses" link, the cards stack, the news goes below.
  */
 
+/* its width is the student column's (shell.css .page-col; Sam, 2026-10-30) */
 .cp-page { display: flex; flex-direction: column; gap: var(--space-20); }
-.cp-wide { max-width: 1040px; }
-.cp-course { max-width: 960px; }
 
 .cp-note {
   margin: 0;

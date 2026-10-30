@@ -8,15 +8,15 @@
  * the card beside the sittings on a computer and stacks them on a phone.
  */
 
+/* its width is the student column's (shell.css .page-col; Sam, 2026-10-30);
+   the offline screen sets its own (offline.css .off-main) */
 .pp-page {
   display: flex;
   flex-direction: column;
   gap: var(--space-20);
-  max-width: 720px;
 }
 
 .pp-back { align-self: flex-start; }
-.pp-page-wide { max-width: 1040px; }
 
 .pp-note {
   margin: 0;
@@ -89,7 +89,6 @@ a.pp-row:hover { background: var(--surface-page); text-decoration: none; }
 .pp-paper-grid { display: flex; flex-direction: column; gap: var(--space-20); }
 .pp-section { margin: 0 0 var(--space-8); font-size: var(--type-ui-size); font-weight: 600; color: var(--ink-muted); }
 @media (min-width: 769px) {
-  .pp-page:has(.pp-paper-grid) { max-width: 960px; }
   .pp-paper-grid { flex-direction: row; align-items: flex-start; }
   .pp-paper-grid > * { flex: 1; min-width: 0; }
 }

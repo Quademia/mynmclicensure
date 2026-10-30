@@ -35,7 +35,7 @@
 }
 .off-open { display: inline-flex; align-items: center; min-height: 44px; }
 
-.off-main { margin: 0 auto; padding: var(--space-20) var(--space-16) var(--space-32); }
+.off-main { max-width: 720px; margin: 0 auto; padding: var(--space-20) var(--space-16) var(--space-32); }
 .off-title { margin: 0; font-size: 28px; line-height: 34px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); }
 
 /* A row is a button here (it opens the pack's view, not a page). */

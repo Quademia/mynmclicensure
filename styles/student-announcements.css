@@ -19,7 +19,6 @@
   grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
   gap: var(--space-16);
   align-items: start;
-  max-width: 1080px;
 }
 
 /* ── the list ── */

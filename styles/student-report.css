@@ -6,10 +6,8 @@
  * counts repeat the results pop-up's look (runner.css) so the two read
  * as one result. Phones first: one column, the map's numbers large
  * enough to tap; the rows stack their figures under the name below
- * 480px.
+ * 480px. Its width is the student column's (shell.css .page-col).
  */
-
-.srp { max-width: 820px; }
 
 .srp-back {
   display: inline-block;
