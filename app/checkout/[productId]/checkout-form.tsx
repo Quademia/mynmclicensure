@@ -64,6 +64,8 @@ export function CheckoutForm({
   programs,
   defaultProgram,
   buyer,
+  startsNote,
+  startsLater,
 }: {
   /** The product card, rendered on the server. */
   children: ReactNode;
@@ -79,6 +81,10 @@ export function CheckoutForm({
   defaultProgram: string;
   /** The signed-in account, or null for a new buyer. */
   buyer: { email: string; programName: string } | null;
+  /** When the new days begin and what they pause (02, Premium goes first); null when they begin now and pause nothing. */
+  startsNote: string | null;
+  /** "1 Jan 2028" when the new days begin later (a renewal), else null. */
+  startsLater: string | null;
 }) {
   const [msg, setMsg] = useState<Msg>(null);
   const [busy, setBusy] = useState(false);
@@ -272,6 +278,7 @@ export function CheckoutForm({
             <span>Pay today</span>
             <span className="chk-total-amount">{amountLabel}</span>
           </div>
+          {startsNote ? <p className="chk-starts">{startsNote}</p> : null}
           <button type="submit" className="btn btn-accent btn-lg chk-submit" disabled={busy}>
             {busy ? 'Starting payment…' : `Pay ${amountLabel}`}
           </button>
@@ -290,7 +297,9 @@ export function CheckoutForm({
                 password there — that creates your account.
               </li>
             )}
-            {buyer ? (
+            {buyer && startsLater ? (
+              <li>The new days begin on {startsLater}; until then your current package carries on.</li>
+            ) : buyer ? (
               <li>The new courses are on your dashboard straight away.</li>
             ) : (
               <li>Your courses open as soon as you sign in.</li>

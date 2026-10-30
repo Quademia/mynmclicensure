@@ -45,6 +45,7 @@ import { PublicTopBar } from '@/components/shell/public-top-bar';
 import { PublicFooter } from '@/components/shell/public-footer';
 import { ProductCard } from '@/components/catalogue/product-card';
 import type { ServerSupabaseClient } from '@/lib/access';
+import { planPurchase, type PurchasePlan } from '@/lib/subscriptions/access-rows';
 import { CheckoutForm } from './checkout-form';
 import '@/styles/checkout.css';
 
@@ -62,14 +63,37 @@ export const dynamic = 'force-dynamic';
  */
 async function signedInBuyer(
   supabase: ServerSupabaseClient,
-): Promise<{ email: string; programId: string } | null> {
+): Promise<{ userId: string; email: string; programId: string } | null> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return null;
   const profile = await findProfileByAuthId(supabase, user.id);
   if (!profile || profile.active === false) return null;
-  return { email: profile.email, programId: profile.program_id ?? '' };
+  return { userId: profile.user_id, email: profile.email, programId: profile.program_id ?? '' };
+}
+
+function dayMonthYear(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+}
+
+/**
+ * The words before Pay for a signed-in buyer (02, Premium goes first):
+ * when the new days begin and what they pause, by the same packing the
+ * payment will run. Null when they simply begin now and pause nothing.
+ */
+function startsNote(plan: PurchasePlan | null, productName: string): { text: string; startsLater: string | null } | null {
+  if (!plan) return null;
+  if (plan.waits_for) {
+    const on = dayMonthYear(plan.start_utc);
+    return { text: `Starts ${on}, when your ${plan.waits_for} ends.`, startsLater: on };
+  }
+  if (!plan.pauses.length) return null;
+  const pauses = plan.pauses.map(
+    (p) =>
+      `Your ${p.product_name} pauses today, and its ${p.days_left} day${p.days_left === 1 ? '' : 's'} left continue on ${dayMonthYear(p.resumes_utc)}, when ${productName} ends.`,
+  );
+  return { text: ['Starts today.', ...pauses].join(' '), startsLater: null };
 }
 
 export default async function CheckoutPage({
@@ -119,6 +143,12 @@ export default async function CheckoutPage({
     );
   }
 
+  const plan = buyer ? await planPurchase(createServiceRoleClient(), buyer.userId, product.product_id, product.duration_days).catch((err) => {
+    console.error('checkout planPurchase:', err);
+    return null;
+  }) : null;
+  const starts = startsNote(plan, product.name);
+
   const courseTitle = new Map(courses.map((c) => [c.course_id, c.title]));
   const forProgrammes = programmesOf(product, courseScopeMap(courses), programs.length);
   const defaultProgram = forProgrammes.length === 1 ? forProgrammes[0] : '';
@@ -142,6 +172,8 @@ export default async function CheckoutPage({
           programs={programs.map((p) => ({ id: p.program_id, name: p.program_name || p.program_id }))}
           defaultProgram={defaultProgram}
           buyer={buyer ? { email: buyer.email, programName: buyerProgram } : null}
+          startsNote={starts?.text ?? null}
+          startsLater={starts?.startsLater ?? null}
         >
           {/* h3: under the page's h1 and the section's "Your package" h2. */}
           <ProductCard

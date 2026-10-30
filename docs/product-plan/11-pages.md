@@ -44,7 +44,9 @@ opens it (00, The menu).
   access row: "RN Standard Prep starts 13 Oct 2026" in place of an offer
   (02). A Standard paused by Premium shows as the next one, on the
   existing line: "Then RM Standard Prep until 28 Aug 2028" (02, Premium
-  goes first; to build).
+  goes first; built 2026-10-30). **Check**: Profile's panel, the Upgrade
+  page and Messages' package line read a receipt's whole window, so a
+  paused Standard shows there as live to its last day (02.14).
 - **On the floor** — a trial or package ended, or free with no trial
   (03): the recap card, then **the free practice card** ("Build a free
   quiz" from the free questions of their courses), then today's

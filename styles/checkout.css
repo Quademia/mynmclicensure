@@ -177,6 +177,15 @@
 /* Layout only — the skin is .btn .btn-accent .btn-lg. */
 .chk-submit { width: 100%; margin-top: var(--space-16); }
 
+/* When the new days begin and what they pause — above Pay, so it is read
+   before paying (02, Premium goes first). */
+.chk-starts {
+  margin: var(--space-12) 0 0;
+  font-size: var(--type-meta-size);
+  line-height: 1.6;
+  color: var(--ink);
+}
+
 .chk-note {
   margin: var(--space-10) 0 0;
   font-size: var(--type-meta-size);

@@ -176,7 +176,7 @@ findings D4, D20, D23, D31–D36 in `archive/product-plan/post-rebuild-diagnosis
   re-packs the chain: a revoke pulls the later ones forward, an
   extension pushes them back. A renewal is a receipt of its own. Trials
   sit outside the chain.
-- **Premium goes first** (Sam, 2026-10-30, option C) *(to build)*: a
+- **Premium goes first** (Sam, 2026-10-30, option C; built the same day): a
   Premium Prep receipt is laid down at its own start even when a
   Standard one is running on that course; the running one is cut there
   and the rest of it laid after the Premium days — no day lost, the end
@@ -189,8 +189,8 @@ findings D4, D20, D23, D31–D36 in `archive/product-plan/post-rebuild-diagnosis
   Passed over: A, queued behind Standard (the mocks come after the
   exam); B, both at once (paid days run out underneath); D, pay the
   difference (a price per student, and a receipt changed after buying).
-- **Before Pay, checkout says when the days start** *(to build)*, from
-  the same packing the admin's Grant preview uses: "Starts today. Your
+- **Before Pay, checkout says when the days start** (built 2026-10-30),
+  from the same packing the admin's Grant preview uses: "Starts today. Your
   Standard Prep pauses today, and its 214 days left continue on 27 Jan
   2028, when Premium Prep ends."; for a renewal, "Starts 1 Jan 2028,
   when your Standard Prep ends."
@@ -226,7 +226,7 @@ Written on the tables in `12-tables.md`:
 - `payments` — the setup columns and a status go, "abandoned" comes
   (D31, D34): ruled 2026-09-18, no tick recorded — see Open.
 - `course_access` — a piece's own earliest start, for Premium goes
-  first: written 2026-10-30, waiting for Sam's tick.
+  first: ticked and built 2026-10-30 (`floor_utc`).
 
 ## Open
 
