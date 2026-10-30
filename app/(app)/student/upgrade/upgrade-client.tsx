@@ -134,7 +134,14 @@ export function UpgradeClient({
                 <div className="subs">
                   {subscriptions.map((row) => {
                     const left = daysLeft(row.expires_utc);
-                    const leftLabel = left == null ? 'Active' : `${left} day${left === 1 ? '' : 's'} left`;
+                    // Queued, or paused by Premium (02.14): when it starts, not days left.
+                    const startsIn = daysLeft(row.start_utc);
+                    const leftLabel =
+                      startsIn != null && startsIn > 0
+                        ? `Starts ${new Date(row.start_utc).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })}`
+                        : left == null
+                          ? 'Active'
+                          : `${left} day${left === 1 ? '' : 's'} left`;
                     const productName = row.products?.name || row.product_id || 'Subscription';
                     return (
                       <div key={row.subscription_id} className="sub-item">

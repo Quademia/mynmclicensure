@@ -55,7 +55,7 @@ before then, and the old list's history, is in
 - ✅ 02.12 No price typed into Premium Prep's or the shop's words — the cards carry each package's — 2026-10-30
 - ✅ (unplanned) Full Access → Standard Prep: packages renamed on dev, the typed words follow — 2026-10-30
 - ✅ 02.13 Premium goes first — Standard pauses, resumes after; checkout says when — 2026-10-30 (Sam's payment walked)
-- ⬜ 02.14 A paused Standard on Profile, the Upgrade page, Messages — they read the whole window (found 10-30)- ✅ 02.1 Ended means ended — the four places that trusted "active" now read the dates — 2026-10-04
+- ✅ 02.14 A paused Standard on Profile, the Upgrade page, Messages — read by its access rows — 2026-10-30- ✅ 02.1 Ended means ended — the four places that trusted "active" now read the dates — 2026-10-04
 - ⬜ D31 The account made at payment — a set-password link; the setup token and its rescue go
 - ⬜ D33 The same browser sees the password form, another the emailed link; a check tells status only
 - ⬜ D34 A nightly sweep — unfinished payments checked with Paystack; paid activated, rest abandoned

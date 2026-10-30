@@ -20,6 +20,7 @@ import { cache } from 'react';
 import type { ServerSupabaseClient } from '@/lib/access';
 import { readAll } from '@/lib/supabase/read-all';
 import { nowIso } from './dates';
+import { windowNow, type Stretch } from './window-now';
 import type { ActiveSubscriptionWithProduct, CourseAccessMap, StudentHit, Subscription, SubscriptionListRow } from './types';
 
 // ── getStudentCourseAccess ──────────────────────────────────────────────
@@ -102,17 +103,25 @@ export async function getSubscriptionById(db: ServerSupabaseClient, subscription
 // ── the upgrade page's list (legacy loadActiveSubscriptions, slice 9b) ─
 // The student's ACTIVE, unexpired subscriptions with their product
 // name, latest expiry first.
+/**
+ * The Upgrade page's list: every receipt not yet ended, each dated by its
+ * access rows (windowNow) — a Standard paused by Premium shows from when
+ * it continues, not as live through the pause (02.14) — the running ones
+ * first, then by start.
+ */
 export async function getActiveSubscriptionsWithProduct(db: ServerSupabaseClient, userId: string): Promise<ActiveSubscriptionWithProduct[]> {
   const { data, error } = await db
     .from('subscriptions')
-    .select('subscription_id, user_id, product_id, start_utc, expires_utc, status, products ( name )')
+    .select('subscription_id, user_id, product_id, start_utc, expires_utc, status, products ( name ), course_access ( start_utc, expires_utc, revoked_utc )')
     .eq('user_id', userId)
     .eq('status', 'ACTIVE')
-    .gt('expires_utc', nowIso())
-    .order('expires_utc', { ascending: false });
+    .gt('expires_utc', nowIso());
   if (error) {
     console.error('getActiveSubscriptionsWithProduct:', error);
     return [];
   }
-  return (data ?? []) as unknown as ActiveSubscriptionWithProduct[];
+  type Row = ActiveSubscriptionWithProduct & { course_access: Stretch[] | null };
+  return ((data ?? []) as unknown as Row[])
+    .map(({ course_access, ...r }) => ({ ...r, ...windowNow(r, course_access) }))
+    .sort((a, b) => new Date(a.start_utc).getTime() - new Date(b.start_utc).getTime());
 }

@@ -9,37 +9,13 @@
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { windowNow, type Stretch } from '@/lib/subscriptions/window-now';
 import { EMPTY_NUMBERS, type DashNumbers, type DashReceipt, type ReceiptKind } from './types';
-
-type Stretch = { start_utc: string; expires_utc: string; revoked_utc: string | null };
-
-function nowMs(): number {
-  return Date.now();
-}
-
-/**
- * A receipt's dates as the top card reads them. A receipt's own window is
- * its first row's start to its last row's end, and a Standard paused by
- * Premium days (02, Premium goes first) has a gap inside it: read as one
- * window it would look live through the pause. So: from the start of the
- * stretch running now, or else the next one, to the last end — a paused
- * receipt reads as coming, the dashboard's "Then … until …". A receipt
- * with no rows keeps its own dates.
- */
-function windowNow(own: { start_utc: string; expires_utc: string }, rows: Stretch[]): { start_utc: string; expires_utc: string } {
-  const ms = (iso: string) => new Date(iso).getTime();
-  const kept = rows.filter((r) => !r.revoked_utc).sort((a, b) => ms(a.start_utc) - ms(b.start_utc));
-  if (!kept.length) return own;
-  const now = nowMs();
-  const end = kept.reduce((last, r) => (ms(r.expires_utc) > ms(last) ? r.expires_utc : last), kept[0].expires_utc);
-  const running = kept.find((r) => ms(r.start_utc) <= now && now < ms(r.expires_utc));
-  const next = kept.find((r) => ms(r.start_utc) > now);
-  return { start_utc: (running ?? next ?? kept[0]).start_utc, expires_utc: end };
-}
 
 /**
  * The student's own receipts with their package's name and kind — the
- * top card's input — each with its access rows, in the same request.
+ * top card's input — each with its access rows, in the same request, so
+ * a Standard paused by Premium reads as the next package (windowNow).
  * One student's rows (AGENTS.md rule 10's exemption); the owner reads
  * them under RLS, so the cookie client serves.
  */
@@ -66,7 +42,7 @@ export async function getStudentReceipts(db: ServerSupabaseClient, userId: strin
     product_id: r.product_id,
     product_name: r.products?.name || r.product_id,
     kind: (r.products?.kind?.toUpperCase() as ReceiptKind) || 'PAID',
-    ...windowNow(r, r.course_access ?? []),
+    ...windowNow(r, r.course_access),
     status: String(r.status || '').toUpperCase(),
   }));
 }

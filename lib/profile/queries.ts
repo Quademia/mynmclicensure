@@ -8,6 +8,7 @@
 
 import type { ServerSupabaseClient } from '@/lib/access';
 import { nowIso } from '@/lib/subscriptions/dates';
+import { isLiveNow, windowNow, type Stretch } from '@/lib/subscriptions/window-now';
 import type { ProfileSubscription, SchoolOption } from './types';
 
 export async function getActiveSchools(db: ServerSupabaseClient): Promise<SchoolOption[]> {
@@ -37,19 +38,30 @@ export async function getUnlistedSchoolName(db: ServerSupabaseClient, schoolId: 
   return data && data.status === 'suggested' ? String(data.name) : null;
 }
 
+/**
+ * The live package with the latest end. Read with each receipt's access
+ * rows, so a Standard paused by Premium (02, Premium goes first) is not
+ * taken for the live one through its pause (02.14). One student's rows.
+ */
 export async function getProfileSubscription(db: ServerSupabaseClient, userId: string): Promise<ProfileSubscription | null> {
   const { data, error } = await db
     .from('subscriptions')
-    .select('subscription_id, product_id, status, expires_utc, products ( name )')
+    .select('subscription_id, product_id, status, start_utc, expires_utc, products ( name ), course_access ( start_utc, expires_utc, revoked_utc )')
     .eq('user_id', userId)
     .eq('status', 'ACTIVE')
-    .gt('expires_utc', nowIso()) // expired is the date's word, not the button's (D20, 02 C2)
-    .order('expires_utc', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .gt('expires_utc', nowIso()); // expired is the date's word, not the button's (D20, 02 C2)
   if (error) {
     console.error('getProfileSubscription:', error);
     return null;
   }
-  return (data as unknown as ProfileSubscription | null) ?? null;
+  type Row = ProfileSubscription & { start_utc: string; expires_utc: string; course_access: Stretch[] | null };
+  const t = (iso: string) => new Date(iso).getTime();
+  const all = ((data ?? []) as unknown as Row[]).map((r) => ({ row: r, window: windowNow(r, r.course_access) }));
+  // The live one with the latest end; with none live, the next to start.
+  const live = all.filter((r) => isLiveNow(r.window)).sort((a, b) => t(b.window.expires_utc) - t(a.window.expires_utc));
+  const coming = all.filter((r) => !isLiveNow(r.window)).sort((a, b) => t(a.window.start_utc) - t(b.window.start_utc));
+  const pick = live[0] ?? coming[0];
+  if (!pick) return null;
+  const { row, window } = pick;
+  return { subscription_id: row.subscription_id, product_id: row.product_id, status: row.status, expires_utc: window.expires_utc, products: row.products };
 }

@@ -18,6 +18,7 @@ import type { AuthGateResult, ServerSupabaseClient } from '@/lib/access';
 import { getCourses } from '@/lib/catalogue/queries';
 import { studentCourseList } from '@/lib/practice-papers/derive';
 import { getStudentCourseAccess } from '@/lib/subscriptions/queries';
+import { isLiveNow, windowNow, type Stretch } from '@/lib/subscriptions/window-now';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { getStudentThreads } from './queries';
 import { labelWords, type MessageLabel, type StudentThread } from './types';
@@ -168,15 +169,15 @@ export async function loadAdminStudentPage(db: ServerSupabaseClient, userId: str
     getCourses(db),
     heldNow(userId),
     getStudentThreads(db, userId, 'admin'),
+    // Every receipt not yet ended, with its access rows: the live one is
+    // picked by its rows below, so a Standard paused by Premium is not
+    // taken for it (02.14). One student's rows.
     service
       .from('subscriptions')
-      .select('expires_utc, products ( name )')
+      .select('start_utc, expires_utc, products ( name ), course_access ( start_utc, expires_utc, revoked_utc )')
       .eq('user_id', userId)
       .eq('status', 'ACTIVE')
-      .lte('start_utc', now)
-      .gt('expires_utc', now)
-      .order('expires_utc', { ascending: false })
-      .limit(1),
+      .gt('expires_utc', now),
     service
       .from('payments')
       .select('amount_minor_paid, amount_minor_expected, currency, paid_utc, status')
@@ -199,7 +200,11 @@ export async function loadAdminStudentPage(db: ServerSupabaseClient, userId: str
     if (s) school = s.status === 'suggested' ? `${s.name} (not listed)` : String(s.name);
   }
 
-  const sub = (subRes.data ?? [])[0] as { expires_utc: string; products: { name: string } | { name: string }[] | null } | undefined;
+  type SubRow = { start_utc: string; expires_utc: string; products: { name: string } | { name: string }[] | null; course_access: Stretch[] | null };
+  const sub = ((subRes.data ?? []) as unknown as SubRow[])
+    .map((r) => ({ ...r, ...windowNow(r, r.course_access) }))
+    .filter(isLiveNow)
+    .sort((a, b) => new Date(b.expires_utc).getTime() - new Date(a.expires_utc).getTime())[0];
   const productName = sub ? (Array.isArray(sub.products) ? sub.products[0]?.name : sub.products?.name) ?? 'A package' : null;
   const pay = (paidRes.data ?? [])[0] as { amount_minor_paid: number | null; amount_minor_expected: number; currency: string; paid_utc: string; status: string } | undefined;
 
