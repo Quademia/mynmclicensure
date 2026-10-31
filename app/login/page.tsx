@@ -10,6 +10,7 @@ import type { Metadata } from 'next';
 import { AppLink } from '@/components/shell/link-pending';
 import { SignInFrame, SUPPORT_WHATSAPP, TRIAL_DAYS_FALLBACK } from '@/components/sign-in/frame';
 import { getPublicProgrammes } from '@/lib/catalogue/queries';
+import { readLastDoor } from '@/lib/auth/last-door';
 import { LoginCard } from './login-card';
 import { ClearPhonePacks } from './clear-phone-packs';
 
@@ -37,7 +38,7 @@ export default async function LoginPage({
 }) {
   const { reason } = await searchParams;
   const notice = reason ? REASONS[reason] : undefined;
-  const { trialDays } = await getPublicProgrammes();
+  const [{ trialDays }, lastDoor] = await Promise.all([getPublicProgrammes(), readLastDoor()]);
   const days = trialDays ?? TRIAL_DAYS_FALLBACK;
 
   return (
@@ -52,7 +53,7 @@ export default async function LoginPage({
 
       {notice ? <p className="si-notice">{notice}</p> : null}
 
-      <LoginCard />
+      <LoginCard lastDoor={lastDoor} />
 
       {/* New here? Premium Prep leads, Standard Prep and the trial after
           (Sam, 2026-10-31: B), in the home page's own words. */}

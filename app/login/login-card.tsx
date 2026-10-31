@@ -1,11 +1,21 @@
 // app/login/login-card.tsx
 //
-// The sign-in card (01.12; Sam's order, 2026-10-30): email, password and
-// Sign in first; then "or", and two equal ways in — Google, and an
-// emailed sign-in (a link today; the six-digit code is 01.13). Three
-// doors: password (a Server Action), Google (the browser Supabase client
-// starts it; Supabase returns here), the emailed link (a Server Action
-// sends it; the link returns here).
+// The sign-in card (01.12, folded at 01.16; Sam, 2026-10-31: C). Three
+// equal ways in first — Continue with password, Continue with Google,
+// Email me a sign-in link (the six-digit code is 01.13) — and a
+// tap opens that one: the email and password, or an email box for the
+// link; Google starts at once. "Other ways to sign in" goes back. A
+// device that has signed in before (lib/auth/last-door.ts) opens straight
+// on the way it used last — the password or the link — and Google, or a
+// way chosen after "Other ways", is marked Last used. Why folded: the
+// three ways read as equal, and a student unsure of the password sees
+// Google and the emailed link before typing a wrong one (Sam: passwords
+// were what sent legacy's students to the admin); the returning device
+// pays no extra tap. The steps are in the page, so a tap costs no wait.
+//
+// Three doors: password (a Server Action), Google (the browser Supabase
+// client starts it; Supabase returns here), the emailed link (a Server
+// Action sends it; the link returns here).
 //
 // THE RETURN FROM GOOGLE OR THE EMAILED LINK lands on this same page and
 // is finished by completeExternalLoginAction. Two link shapes arrive (see
@@ -32,6 +42,7 @@ import { PleaseWait } from '@/components/shell/please-wait';
 import { createClient } from '@/lib/supabase/client';
 import { buildFpHash } from '@/lib/auth/fingerprint';
 import { isNavigation } from '@/lib/auth/is-navigation';
+import type { SignInDoor } from '@/lib/auth/types';
 import { Toast } from '@/lib/toast/toast';
 import { completeExternalLoginAction, loginAction, sendMagicLinkAction } from './actions';
 
@@ -39,7 +50,9 @@ const NO_SIGN_IN = 'Could not sign in. Please check your connection and try agai
 const NO_LINK = 'Could not send the link. Please check your connection and try again.';
 const GENERIC_ERROR = 'Something went wrong during sign-in. Please try again.';
 
-export function LoginCard() {
+type View = 'choose' | 'password' | 'link';
+
+export function LoginCard({ lastDoor }: { lastDoor: SignInDoor | null }) {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [email, setEmail] = useState('');
@@ -47,13 +60,32 @@ export function LoginCard() {
   const [waiting, setWaiting] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
+  // A returning device opens on the way it used last; Google has no step.
+  const [view, setView] = useState<View>(lastDoor === 'password' || lastDoor === 'link' ? lastDoor : 'choose');
   const emailInput = useRef<HTMLInputElement>(null);
+  const passwordInput = useRef<HTMLInputElement>(null);
+  // Set by a tap, so the step it opens takes the focus; a step the page
+  // opened by itself does not, or a phone's keyboard would pop up unasked.
+  const focusOnOpen = useRef(false);
 
   const dismiss = useCallback(() => setError(null), []);
 
   useEffect(() => {
     buildFpHash().then(setFpHash);
   }, []);
+
+  useEffect(() => {
+    if (!focusOnOpen.current || view === 'choose') return;
+    focusOnOpen.current = false;
+    if (view === 'password' && emailInput.current?.value) passwordInput.current?.focus();
+    else emailInput.current?.focus();
+  }, [view]);
+
+  function open(next: View) {
+    focusOnOpen.current = true;
+    setError(null);
+    setView(next);
+  }
 
   // ── Returning from Google / the emailed link ──────────────────────
   useEffect(() => {
@@ -176,11 +208,13 @@ export function LoginCard() {
   }
 
   // ── The emailed link ──────────────────────────────────────────────
-  // It goes to the address typed above: one email field on the card.
-  async function sendLink() {
+  // Its own step asks for the email (the same box the password step
+  // uses, so an address typed in one carries to the other).
+  async function sendLink(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
     const value = email.trim();
     if (!value) {
-      setError('Enter your email above first, then tap Email me a sign-in link.');
+      setError('Please enter your email address to receive a sign-in link.');
       emailInput.current?.focus();
       return;
     }
@@ -199,6 +233,32 @@ export function LoginCard() {
     }
   }
 
+  const otherWays = (
+    <button type="button" className="si-linkbtn si-other-ways" onClick={() => open('choose')}>
+      Other ways to sign in
+    </button>
+  );
+
+  const emailField = (
+    <div className="si-field">
+      <label className="si-label" htmlFor="email">
+        Email
+      </label>
+      <input
+        ref={emailInput}
+        className="si-input"
+        type="email"
+        id="email"
+        name="email"
+        placeholder="you@example.com"
+        required
+        autoComplete="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+    </div>
+  );
+
   return (
     <>
       <Toast message={error} onDismiss={dismiss} />
@@ -216,27 +276,11 @@ export function LoginCard() {
             Back to sign in
           </button>
         </div>
-      ) : (
+      ) : view === 'password' ? (
         <form className="card si-card" method="post" onSubmit={handleSubmit}>
           <input type="hidden" name="fp_hash" value={fpHash ?? ''} />
 
-          <div className="si-field">
-            <label className="si-label" htmlFor="email">
-              Email
-            </label>
-            <input
-              ref={emailInput}
-              className="si-input"
-              type="email"
-              id="email"
-              name="email"
-              placeholder="you@example.com"
-              required
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
+          {emailField}
 
           <div className="si-field">
             <div className="si-label-row">
@@ -248,6 +292,7 @@ export function LoginCard() {
               </AppLink>
             </div>
             <input
+              ref={passwordInput}
               className="si-input"
               type="password"
               id="password"
@@ -262,50 +307,109 @@ export function LoginCard() {
             {submitting ? 'Signing in…' : 'Sign in'}
           </button>
 
-          <div className="si-or">or</div>
+          {otherWays}
+        </form>
+      ) : view === 'link' ? (
+        <form className="card si-card" method="post" onSubmit={sendLink}>
+          {emailField}
 
-          <button type="button" className="btn btn-ghost btn-lg si-alt" onClick={startGoogle}>
-            <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
-              <path
-                fill="#EA4335"
-                d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
-              />
-              <path
-                fill="#4285F4"
-                d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.01 24.01 0 0 0 0 21.56l7.98-6.19z"
-              />
-              <path
-                fill="#34A853"
-                d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
-              />
-            </svg>
-            Continue with Google
-          </button>
-
-          <button type="button" className="btn btn-ghost btn-lg si-alt" onClick={sendLink} disabled={sending}>
-            <svg
-              className="si-mail"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <rect x="3" y="5" width="18" height="14" rx="2" />
-              <path d="M3.5 6.5l8.5 6 8.5-6" />
-            </svg>
+          <button type="submit" className="btn btn-primary btn-lg" disabled={sending}>
             {sending ? 'Sending…' : 'Email me a sign-in link'}
           </button>
+
+          {otherWays}
         </form>
+      ) : (
+        <div className="card si-card">
+          <button type="button" className="btn btn-ghost btn-lg si-alt" onClick={() => open('password')}>
+            <KeyMark />
+            {/* Not "…with email and password": that wraps to two lines on a
+                phone; the step asks for both. */}
+            Continue with password
+            {lastDoor === 'password' ? <LastUsed /> : null}
+          </button>
+
+          <button type="button" className="btn btn-ghost btn-lg si-alt" onClick={startGoogle}>
+            <GoogleMark />
+            Continue with Google
+            {lastDoor === 'google' ? <LastUsed /> : null}
+          </button>
+
+          <button type="button" className="btn btn-ghost btn-lg si-alt" onClick={() => open('link')}>
+            <MailMark />
+            Email me a sign-in link
+            {lastDoor === 'link' ? <LastUsed /> : null}
+          </button>
+        </div>
       )}
     </>
+  );
+}
+
+/** On the way this device used last, sitting on the button's top edge. */
+function LastUsed() {
+  return <span className="badge badge-info si-last">Last used</span>;
+}
+
+function KeyMark() {
+  return (
+    <svg
+      className="si-icon"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="4" y="10" width="16" height="10" rx="2" />
+      <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+    </svg>
+  );
+}
+
+function MailMark() {
+  return (
+    <svg
+      className="si-icon"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="M3.5 6.5l8.5 6 8.5-6" />
+    </svg>
+  );
+}
+
+function GoogleMark() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+      <path
+        fill="#EA4335"
+        d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
+      />
+      <path
+        fill="#4285F4"
+        d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.01 24.01 0 0 0 0 21.56l7.98-6.19z"
+      />
+      <path
+        fill="#34A853"
+        d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
+      />
+    </svg>
   );
 }

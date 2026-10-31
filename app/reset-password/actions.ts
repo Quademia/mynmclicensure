@@ -17,6 +17,7 @@ import { redirect } from 'next/navigation';
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { findProfileByAuthId } from '@/lib/auth/profile';
 import { logLoginFail, logLoginSuccess, markResetUsed } from '@/lib/auth/events';
+import { rememberDoor } from '@/lib/auth/last-door';
 import { requestInfo } from '@/lib/auth/request-info';
 import { createLoginSession } from '@/lib/auth/sessions';
 
@@ -85,6 +86,8 @@ export async function completeResetAction(formData: FormData): Promise<ResetResu
     }
     await logLoginSuccess(serviceDb, { ...base, userId: profile.user_id });
     await createLoginSession(profile.user_id, 'EMAIL', info);
+    // Next time this device opens on the password just set (01.16).
+    await rememberDoor('password');
     signedIn = true;
   } catch (err) {
     console.error('[reset] signing in after the reset failed:', err);

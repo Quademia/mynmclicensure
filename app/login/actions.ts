@@ -20,6 +20,7 @@ import { redirect } from 'next/navigation';
 import { createClient as createPlainClient } from '@supabase/supabase-js';
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { findProfileByAuthId } from '@/lib/auth/profile';
+import { rememberDoor } from '@/lib/auth/last-door';
 import { createLoginSession, type LoginVia } from '@/lib/auth/sessions';
 import { requestInfo, requestOrigin } from '@/lib/auth/request-info';
 import {
@@ -79,6 +80,7 @@ export async function loginAction(formData: FormData): Promise<ActionResult> {
     }
 
     await createLoginSession(profile.user_id, 'EMAIL', info);
+    await rememberDoor('password');
   } catch (err) {
     console.error('[login] post-login error:', err);
     return { ok: false, error: GENERIC_ERROR };
@@ -130,6 +132,7 @@ export async function completeExternalLoginAction(input: {
 
     await logLoginSuccess(serviceDb, { ...base, userId: profile.user_id });
     await createLoginSession(profile.user_id, input.via, info);
+    await rememberDoor(input.via === 'GOOGLE' ? 'google' : 'link');
   } catch (err) {
     console.error('[login] external sign-in error:', err);
     return { ok: false, error: GENERIC_ERROR };

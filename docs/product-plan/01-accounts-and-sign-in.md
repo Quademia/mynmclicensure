@@ -83,9 +83,21 @@ Detail and history: `archive/product-plan/04-access-control.md`,
   page; canvas https://claude.ai/artifact/5vmaSLpvdCZtyxKhchQCTU):
   layout B — on a computer the words and the card on the left, one of
   Sam's Cloudinary photos on the right; on a phone the card alone, no
-  photo. The card: email, password and Sign in first; then "or", Continue
-  with Google and Email me a sign-in code as two equal buttons (Sam: so
-  the code reads as a real option). Under it **Premium Prep leads**
+  photo. **The card, folded** (Sam, 2026-10-31: C, replacing 10-30's
+  email and password first with Google and the code below "or"): three
+  equal buttons — Continue with password, Continue with Google, Email me
+  a sign-in code — and a tap opens that one (the email and password, or
+  an email box for the code; Google starts at once), with "Other ways to
+  sign in" back. Why: the three ways read as equal, and a student unsure
+  of the password sees the other two before typing a wrong one (Sam:
+  passwords were what sent legacy's students to the admin). **A device
+  that has signed in before opens on the way it used last** — a cookie
+  holding the way in, never who, written at every sign-in, register and
+  reset — and the chosen way is marked "Last used", so a returning
+  password student pays no extra tap. The steps are in the page: a tap
+  costs no wait (not 10-30's rejected email-first, which did). "Continue
+  with password", not "…with email and password", which wraps to two
+  lines on a phone. Under it **Premium Prep leads**
   (Sam, 2026-10-31: B, so a newcomer sees the best option first, not
   only the trial): "New here? Get Premium Prep, best for the exam." /
   "Or Standard Prep · Start your N-day trial" — the home page's own

@@ -23,6 +23,7 @@ import type { AuthError } from '@supabase/supabase-js';
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { makeUserId } from '@/lib/auth/ids';
 import { logLoginSuccess } from '@/lib/auth/events';
+import { rememberDoor } from '@/lib/auth/last-door';
 import { requestInfo } from '@/lib/auth/request-info';
 import { createLoginSession } from '@/lib/auth/sessions';
 import { grantTrialSubscription } from '@/lib/subscriptions/trial';
@@ -162,6 +163,8 @@ export async function registerAction(formData: FormData): Promise<RegisterResult
         userId,
       });
       await createLoginSession(userId, 'EMAIL', info);
+      // Next time this device opens on the password (01.16).
+      await rememberDoor('password');
       signedIn = true;
     } catch (err) {
       console.error('[register] signing in after registering failed:', err);

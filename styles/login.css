@@ -214,25 +214,30 @@ select.si-input option { color: var(--ink); }
 }
 .si-dlg-email strong { color: var(--ink); font-weight: 600; }
 
-.si-or {
-  display: flex;
-  align-items: center;
-  gap: var(--space-12);
-  font-size: var(--type-ui-size);
-  color: var(--ink-muted);
-}
-.si-or::before,
-.si-or::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
+/* The three ways in (01.16, Sam 2026-10-31: folded): the shared ghost
+   button on the page's pale ground, the three drawn alike so each reads as
+   a real way in. */
+.si-alt { position: relative; gap: 10px; background: var(--surface-page); }
+.si-icon { flex: none; color: var(--brand-teal); }
+
+/* "Last used": the shared badge, sitting on the button's top edge so it
+   never pushes the words onto a second line on a phone. */
+.si-last {
+  position: absolute;
+  top: -10px;
+  right: var(--space-12);
+  pointer-events: none;
 }
 
-/* Google and the emailed sign-in: the shared ghost button on the page's
-   pale ground, the two drawn alike so either reads as a real way in. */
-.si-alt { gap: 10px; background: var(--surface-page); }
-.si-mail { flex: none; color: var(--brand-teal); }
+/* "Other ways to sign in", under an opened way in: a link-look button
+   (.si-linkbtn, below), made a 44px tap. */
+.si-linkbtn.si-other-ways {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 14px;
+}
 
 /* The emailed link's answer, in the card's place. */
 .si-sent h2 {

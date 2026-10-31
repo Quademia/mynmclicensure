@@ -48,6 +48,7 @@ before then, and the old list's history, is in
 - ⬜ 01.13 An emailed code in place of the emailed link — six digits in the same tab (Sam, 10-30)
 - ⬜ 01.14 Signing in returns to the page asked for — today always the dashboard (found 10-30)
 - ✅ 01.15 Register, forgot and reset on the sign-in page's look — Show, straight in after registering — 2026-10-31
+- ✅ 01.16 The sign-in card folded — three ways first; a device opens on its last way, "Last used" — 2026-10-31
 
 ## [02 Packages and payments](docs/product-plan/02-packages-and-payments.md)
 
