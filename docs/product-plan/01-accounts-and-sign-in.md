@@ -85,8 +85,11 @@ Detail and history: `archive/product-plan/04-access-control.md`,
   Sam's Cloudinary photos on the right; on a phone the card alone, no
   photo. The card: email, password and Sign in first; then "or", Continue
   with Google and Email me a sign-in code as two equal buttons (Sam: so
-  the code reads as a real option). Under it "New here? Start your
-  N-day trial" and **"Can't sign in? Message us on WhatsApp"** — the
+  the code reads as a real option). Under it **Premium Prep leads**
+  (Sam, 2026-10-31: B, so a newcomer sees the best option first, not
+  only the trial): "New here? Get Premium Prep, best for the exam." /
+  "Or Standard Prep · Start your N-day trial" — the home page's own
+  words — and **"Can't sign in? Message us on WhatsApp"** — the
   support number the emails carry (01.10; drawn so, Sam's "proceed"). A
   phone signed out by a sign-in elsewhere is told why above the card.
   The page's entry: 11.

@@ -51,9 +51,16 @@ export default async function LoginPage({
 
       <LoginCard />
 
+      {/* New here? Premium Prep leads, Standard Prep and the trial after
+          (Sam, 2026-10-31: B), in the home page's own words. */}
       <div className="si-foot">
         <p>
-          New here? <AppLink href="/register">Start your {days}-day trial</AppLink>
+          New here? <AppLink href="/premium-prep">Get Premium Prep</AppLink>, best for the exam.
+        </p>
+        <p>
+          Or <AppLink href="/subscribe">Standard Prep</AppLink>
+          {' · '}
+          <AppLink href="/register">Start your {days}-day trial</AppLink>
         </p>
         <p>
           Can&apos;t sign in?{' '}

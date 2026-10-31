@@ -463,8 +463,12 @@ opens it (00, The menu).
   Claude's sign-in page. The shared wordmark (to the home page), "Pick up
   where you left off." and one line; the card — email, password, Sign in,
   "or", Continue with Google and Email me a sign-in code as equal
-  buttons; "New here? Start your N-day trial" (the days read) and "Can't
-  sign in? Message us on WhatsApp". On a computer one Cloudinary photo
+  buttons; under it Premium Prep leads (Sam, 2026-10-31: B) — "New here?
+  Get Premium Prep, best for the exam." / "Or Standard Prep · Start your
+  N-day trial" (the days read) — and "Can't sign in? Message us on
+  WhatsApp". Register, the trial's own door, carries "Ready to buy? Get
+  Premium Prep, best for the exam. Or Standard Prep." under "Already have
+  an account? Sign in" (buying makes the account at checkout, no trial). On a computer one Cloudinary photo
   beside it (Sam's: students sitting an exam on computers), on a phone
   none and not downloaded. Messages as toasts: a wrong password, and a dropped
   connection that gives the button back. A phone bumped by a sign-in

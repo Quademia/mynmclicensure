@@ -57,9 +57,16 @@ export default async function RegisterPage() {
 
       <RegisterForm programs={programs} schools={schools} days={days} />
 
+      {/* For someone who would rather pay now: Premium Prep first, then
+          Standard Prep (Sam, 2026-10-31: B, as sign in). Buying makes the
+          account at checkout, with no trial (01). */}
       <div className="si-foot">
         <p>
           Already have an account? <AppLink href="/login">Sign in</AppLink>
+        </p>
+        <p>
+          Ready to buy? <AppLink href="/premium-prep">Get Premium Prep</AppLink>, best for the exam. Or{' '}
+          <AppLink href="/subscribe">Standard Prep</AppLink>.
         </p>
       </div>
     </SignInFrame>
