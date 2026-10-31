@@ -485,7 +485,10 @@ opens it (00, The menu).
 - **Register, forgot and reset on sign in's look** (Sam, 2026-10-31,
   01.15; drawn on the same canvas): the same frame and photo (one
   download for all four), the photo held in place while register's form
-  scrolls on a computer. Register: "Start your N-day trial." / "Then free
+  scrolls on a computer. All four carry a quiet "← Home" at the top
+  right, level with the wordmark (Sam, 2026-10-31: tried and kept — the
+  wordmark goes home too, as on most sign-in pages, but a student who
+  arrived by a link may not know that habit). Register: "Start your N-day trial." / "Then free
   practice, forever. No card needed." (the days read; the old per-programme
   hint, which never showed, gone), first and last name side by side, the
   password once with Show, "Start your N-day trial", "Almost done!" in the
