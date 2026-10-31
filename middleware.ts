@@ -21,7 +21,8 @@ import { NextResponse, type NextRequest } from 'next/server';
 const AUTH_REQUIRED_PREFIXES = ['/router', '/student', '/admin', '/logout'];
 
 // Paths that should redirect to /router if the user IS already signed in.
-const AUTH_FORBIDDEN_PATHS = ['/login', '/register'];
+// /trial is registering (01.15; /register forwards there, next.config.ts).
+const AUTH_FORBIDDEN_PATHS = ['/login', '/trial'];
 
 export async function middleware(request: NextRequest) {
   // 09.15: /router sends the way in to its dashboard with ?welcome=1; a

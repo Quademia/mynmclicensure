@@ -1,4 +1,4 @@
-// app/register/page.tsx — registering, the trial's door (01; 01.15, Sam
+// app/trial/page.tsx — registering, the trial's door (01; 01.15, Sam
 // 2026-10-31: the sign-in page's look, canvas
 // https://claude.ai/artifact/5vmaSLpvdCZtyxKhchQCTU).
 //

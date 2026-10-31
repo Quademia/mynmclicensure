@@ -289,7 +289,7 @@ export function HomePlans({
             <li className="hp-off"><Dash /><span>No mock exams or offline packs</span></li>
           </ul>
           <div className="hp-cta">
-            <AppLink href="/register" className="btn btn-outline btn-lg">
+            <AppLink href="/trial" className="btn btn-outline btn-lg">
               Start your {trialDays}-day trial
             </AppLink>
             <p className="hp-cta-note">After {trialDays} days, Free forever stays.</p>

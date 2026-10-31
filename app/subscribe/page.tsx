@@ -209,8 +209,8 @@ export default async function SubscribePage({
           <p>
             Premium Prep opens the same courses as Standard Prep, plus mock exams, for 240
             days.{' '}
-            <Link href="/premium-prep">See Premium Prep</Link>. Every student can also{' '}
-            <Link href="/register">register free</Link> and start on a trial.
+            <Link href="/premium-prep">See Premium Prep</Link>. You can also{' '}
+            <Link href="/trial">start your trial</Link> first.
           </p>
         </aside>
       </main>

@@ -135,7 +135,7 @@ export async function PublicFooter() {
             <li><AppLink href="/">Home</AppLink></li>
             <li><AppLink href="/premium-prep">Premium Prep</AppLink></li>
             <li><AppLink href="/subscribe">Packages</AppLink></li>
-            <li><AppLink href="/register">Start your {days}-day trial</AppLink></li>
+            <li><AppLink href="/trial">Start your {days}-day trial</AppLink></li>
             <li><AppLink href="/login">Sign in</AppLink></li>
           </ul>
         </nav>

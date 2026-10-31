@@ -1,4 +1,4 @@
-// app/register/actions.ts
+// app/trial/actions.ts
 //
 // Registration — legacy register.html's submit handler as ONE server
 // call (rebuild.md §10): validate in the legacy order with the legacy

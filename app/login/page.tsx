@@ -64,7 +64,7 @@ export default async function LoginPage({
         <p>
           Or <AppLink href="/subscribe">Standard Prep</AppLink>
           {' · '}
-          <AppLink href="/register">Start your {days}-day trial</AppLink>
+          <AppLink href="/trial">Start your {days}-day trial</AppLink>
         </p>
         <p>
           Can&apos;t sign in?{' '}

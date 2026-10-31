@@ -134,8 +134,8 @@ export default async function PremiumPrepPage() {
           <p>
             Standard Prep opens the same courses for 365 days, without the mock exams, and single
             courses can be taken on their own.{' '}
-            <Link href="/subscribe">See every package</Link>. Every student can also{' '}
-            <Link href="/register">register free</Link> and start on a trial.
+            <Link href="/subscribe">See every package</Link>. You can also{' '}
+            <Link href="/trial">start your trial</Link> first.
           </p>
         </aside>
       </main>

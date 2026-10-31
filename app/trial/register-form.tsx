@@ -1,4 +1,4 @@
-// app/register/register-form.tsx — the register card (01.15, Sam
+// app/trial/register-form.tsx — the register card (01.15, Sam
 // 2026-10-31, on the sign-in page's look).
 //
 //   1. Start your N-day trial only checks the fields and opens "Almost
