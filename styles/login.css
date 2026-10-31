@@ -87,6 +87,7 @@
 /* The card: on .card, rounder because it holds rounded things (the
    design system's 12px rule), and a step tighter on a phone. */
 .si-card {
+  position: relative; /* holds sign in's "Last used" on its top edge */
   border-radius: var(--radius-lg);
   padding: var(--space-20);
   display: flex;
@@ -230,8 +231,10 @@ select.si-input option { color: var(--ink); }
 .si-alt { position: relative; gap: 10px; background: var(--surface-page); }
 .si-icon { flex: none; color: var(--brand-teal); }
 
-/* "Last used": the shared badge, sitting on the button's top edge so it
-   never pushes the words onto a second line on a phone. */
+/* "Last used": the shared badge, sitting on the top edge of the way this
+   device used last — the card when that way is open on top, its button
+   when it is one of the others — so it never pushes words onto a second
+   line on a phone. */
 .si-last {
   position: absolute;
   top: -10px;
@@ -239,14 +242,25 @@ select.si-input option { color: var(--ink); }
   pointer-events: none;
 }
 
-/* "Other ways to sign in", under an opened way in: a link-look button
-   (.si-linkbtn, below), made a 44px tap. */
-.si-linkbtn.si-other-ways {
-  align-self: center;
-  display: inline-flex;
+/* The way open on top: its fields and button, spaced as the card. */
+.si-form { display: flex; flex-direction: column; gap: 14px; }
+
+/* "Other ways to sign in" — a line, not a link: the other two ways stay
+   in view below it (Sam, 2026-10-31: B). */
+.si-divider {
+  display: flex;
   align-items: center;
-  min-height: 44px;
-  font-size: 14px;
+  gap: var(--space-12);
+  margin-top: var(--space-4);
+  font-size: var(--type-ui-size);
+  color: var(--ink-muted);
+}
+.si-divider::before,
+.si-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
 }
 
 /* The emailed link's answer, in the card's place. */

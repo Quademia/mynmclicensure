@@ -1,17 +1,18 @@
 // app/login/login-card.tsx
 //
-// The sign-in card (01.12, folded at 01.16; Sam, 2026-10-31: C). Three
-// equal ways in first — Continue with password, Continue with Google,
-// Email me a sign-in link (the six-digit code is 01.13) — and a
-// tap opens that one: the email and password, or an email box for the
-// link; Google starts at once. "Other ways to sign in" goes back. A
-// device that has signed in before (lib/auth/last-door.ts) opens straight
-// on the way it used last — the password or the link — and Google, or a
-// way chosen after "Other ways", is marked Last used. Why folded: the
-// three ways read as equal, and a student unsure of the password sees
-// Google and the emailed link before typing a wrong one (Sam: passwords
-// were what sent legacy's students to the admin); the returning device
-// pays no extra tap. The steps are in the page, so a tap costs no wait.
+// The sign-in card (01.12; 01.16, Sam 2026-10-31). A new device sees
+// three equal ways in — Continue with password, Continue with Google,
+// Email me a sign-in link (the six-digit code is 01.13). A tap opens that
+// way on top (the email and password, or an email box for the link;
+// Google starts at once), and under a line, "Other ways to sign in", the
+// other two stay in view as buttons (Sam: B, nothing hidden behind a
+// link). A device that has signed in before (lib/auth/last-door.ts) opens
+// with the way it used last on top, marked Last used; tapping one of the
+// other two moves it up, and the last-used way, below, keeps its tag.
+// Why: a student unsure of the password sees Google and the emailed link
+// before typing a wrong one (Sam: passwords were what sent legacy's
+// students to the admin); the returning device pays no extra tap. The
+// ways are in the page, so a tap costs no wait.
 //
 // Three doors: password (a Server Action), Google (the browser Supabase
 // client starts it; Supabase returns here), the emailed link (a Server
@@ -50,7 +51,8 @@ const NO_SIGN_IN = 'Could not sign in. Please check your connection and try agai
 const NO_LINK = 'Could not send the link. Please check your connection and try again.';
 const GENERIC_ERROR = 'Something went wrong during sign-in. Please try again.';
 
-type View = 'choose' | 'password' | 'link';
+// The ways in, in the order the buttons always take.
+const DOORS: readonly SignInDoor[] = ['password', 'google', 'link'];
 
 export function LoginCard({ lastDoor }: { lastDoor: SignInDoor | null }) {
   const [error, setError] = useState<string | null>(null);
@@ -60,11 +62,12 @@ export function LoginCard({ lastDoor }: { lastDoor: SignInDoor | null }) {
   const [waiting, setWaiting] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
-  // A returning device opens on the way it used last; Google has no step.
-  const [view, setView] = useState<View>(lastDoor === 'password' || lastDoor === 'link' ? lastDoor : 'choose');
+  // The way on top: a returning device's last one; none on a new device,
+  // which sees the three equal buttons.
+  const [main, setMain] = useState<SignInDoor | null>(lastDoor);
   const emailInput = useRef<HTMLInputElement>(null);
   const passwordInput = useRef<HTMLInputElement>(null);
-  // Set by a tap, so the step it opens takes the focus; a step the page
+  // Set by a tap, so the way it opens takes the focus; a way the page
   // opened by itself does not, or a phone's keyboard would pop up unasked.
   const focusOnOpen = useRef(false);
 
@@ -75,16 +78,16 @@ export function LoginCard({ lastDoor }: { lastDoor: SignInDoor | null }) {
   }, []);
 
   useEffect(() => {
-    if (!focusOnOpen.current || view === 'choose') return;
+    if (!focusOnOpen.current || main === null || main === 'google') return;
     focusOnOpen.current = false;
-    if (view === 'password' && emailInput.current?.value) passwordInput.current?.focus();
+    if (main === 'password' && emailInput.current?.value) passwordInput.current?.focus();
     else emailInput.current?.focus();
-  }, [view]);
+  }, [main]);
 
-  function open(next: View) {
+  function open(next: SignInDoor) {
     focusOnOpen.current = true;
     setError(null);
-    setView(next);
+    setMain(next);
   }
 
   // ── Returning from Google / the emailed link ──────────────────────
@@ -233,12 +236,6 @@ export function LoginCard({ lastDoor }: { lastDoor: SignInDoor | null }) {
     }
   }
 
-  const otherWays = (
-    <button type="button" className="si-linkbtn si-other-ways" onClick={() => open('choose')}>
-      Other ways to sign in
-    </button>
-  );
-
   const emailField = (
     <div className="si-field">
       <label className="si-label" htmlFor="email">
@@ -259,6 +256,31 @@ export function LoginCard({ lastDoor }: { lastDoor: SignInDoor | null }) {
     </div>
   );
 
+  // One way in as a button: the three on a new device, the other two
+  // under the line otherwise. Password and the link open on top; Google
+  // starts at once.
+  function doorButton(door: SignInDoor) {
+    const tag = lastDoor === door ? <LastUsed /> : null;
+    if (door === 'google') {
+      return (
+        <button key={door} type="button" className="btn btn-ghost btn-lg si-alt" onClick={startGoogle}>
+          <GoogleMark />
+          Continue with Google
+          {tag}
+        </button>
+      );
+    }
+    return (
+      <button key={door} type="button" className="btn btn-ghost btn-lg si-alt" onClick={() => open(door)}>
+        {door === 'password' ? <KeyMark /> : <MailMark />}
+        {/* Not "…with email and password": that wraps to two lines on a
+            phone; the way asks for both. */}
+        {door === 'password' ? 'Continue with password' : 'Email me a sign-in link'}
+        {tag}
+      </button>
+    );
+  }
+
   return (
     <>
       <Toast message={error} onDismiss={dismiss} />
@@ -276,70 +298,62 @@ export function LoginCard({ lastDoor }: { lastDoor: SignInDoor | null }) {
             Back to sign in
           </button>
         </div>
-      ) : view === 'password' ? (
-        <form className="card si-card" method="post" onSubmit={handleSubmit}>
-          <input type="hidden" name="fp_hash" value={fpHash ?? ''} />
-
-          {emailField}
-
-          <div className="si-field">
-            <div className="si-label-row">
-              <label className="si-label" htmlFor="password">
-                Password
-              </label>
-              <AppLink className="si-forgot" href="/forgot-password">
-                Forgot password?
-              </AppLink>
-            </div>
-            <input
-              ref={passwordInput}
-              className="si-input"
-              type="password"
-              id="password"
-              name="password"
-              placeholder="Your password"
-              required
-              autoComplete="current-password"
-            />
-          </div>
-
-          <button type="submit" className="btn btn-primary btn-lg" disabled={submitting}>
-            {submitting ? 'Signing in…' : 'Sign in'}
-          </button>
-
-          {otherWays}
-        </form>
-      ) : view === 'link' ? (
-        <form className="card si-card" method="post" onSubmit={sendLink}>
-          {emailField}
-
-          <button type="submit" className="btn btn-primary btn-lg" disabled={sending}>
-            {sending ? 'Sending…' : 'Email me a sign-in link'}
-          </button>
-
-          {otherWays}
-        </form>
+      ) : main === null ? (
+        <div className="card si-card">{DOORS.map(doorButton)}</div>
       ) : (
         <div className="card si-card">
-          <button type="button" className="btn btn-ghost btn-lg si-alt" onClick={() => open('password')}>
-            <KeyMark />
-            {/* Not "…with email and password": that wraps to two lines on a
-                phone; the step asks for both. */}
-            Continue with password
-            {lastDoor === 'password' ? <LastUsed /> : null}
-          </button>
+          {/* The way on top is the one this device used last: say so. */}
+          {main === lastDoor ? <LastUsed /> : null}
 
-          <button type="button" className="btn btn-ghost btn-lg si-alt" onClick={startGoogle}>
-            <GoogleMark />
-            Continue with Google
-            {lastDoor === 'google' ? <LastUsed /> : null}
-          </button>
+          {main === 'password' ? (
+            <form className="si-form" method="post" onSubmit={handleSubmit}>
+              <input type="hidden" name="fp_hash" value={fpHash ?? ''} />
 
-          <button type="button" className="btn btn-ghost btn-lg si-alt" onClick={() => open('link')}>
-            <MailMark />
-            Email me a sign-in link
-            {lastDoor === 'link' ? <LastUsed /> : null}
-          </button>
+              {emailField}
+
+              <div className="si-field">
+                <div className="si-label-row">
+                  <label className="si-label" htmlFor="password">
+                    Password
+                  </label>
+                  <AppLink className="si-forgot" href="/forgot-password">
+                    Forgot password?
+                  </AppLink>
+                </div>
+                <input
+                  ref={passwordInput}
+                  className="si-input"
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="Your password"
+                  required
+                  autoComplete="current-password"
+                />
+              </div>
+
+              <button type="submit" className="btn btn-primary btn-lg" disabled={submitting}>
+                {submitting ? 'Signing in…' : 'Sign in'}
+              </button>
+            </form>
+          ) : main === 'link' ? (
+            <form className="si-form" method="post" onSubmit={sendLink}>
+              {emailField}
+
+              <button type="submit" className="btn btn-primary btn-lg" disabled={sending}>
+                {sending ? 'Sending…' : 'Email me a sign-in link'}
+              </button>
+            </form>
+          ) : (
+            <button type="button" className="btn btn-ghost btn-lg si-alt" onClick={startGoogle}>
+              <GoogleMark />
+              Continue with Google
+            </button>
+          )}
+
+          <div className="si-divider">Other ways to sign in</div>
+
+          {DOORS.filter((d) => d !== main).map(doorButton)}
         </div>
       )}
     </>

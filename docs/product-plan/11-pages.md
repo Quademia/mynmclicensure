@@ -464,11 +464,12 @@ opens it (00, The menu).
   heading "Sign in to your NMC licensure practice." alone (Sam,
   2026-10-31: it says what the page is, as the other three do, and names
   the product the shared sign-in is for; "Pick up where you left off."
-  went); the card folded (Sam, 2026-10-31: C; 01) — Continue with
+  went); the card (Sam, 2026-10-31; 01) — on a new device Continue with
   password, Continue with Google, Email me a sign-in code as three equal
-  buttons, a tap opening that way with "Other ways to sign in" back, and
-  a device that signed in before opening on its last way, marked "Last
-  used"; under it Premium Prep leads (Sam, 2026-10-31: B) — "New here?
+  buttons; a tap, or a device that signed in before, puts that way open
+  on top ("Last used" for the device's own), and under a line, "Other
+  ways to sign in", the other two stay as full buttons; under it Premium
+  Prep leads (Sam, 2026-10-31: B) — "New here?
   Get Premium Prep, best for the exam." / "Or Standard Prep · Start your
   N-day trial" (the days read) — and "Can't sign in? Message us on
   WhatsApp". Register, the trial's own door, carries "Ready to buy? Get

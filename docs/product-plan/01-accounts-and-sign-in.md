@@ -103,21 +103,24 @@ Detail and history: `archive/product-plan/04-access-control.md`,
   page; canvas https://claude.ai/artifact/5vmaSLpvdCZtyxKhchQCTU):
   layout B — on a computer the words and the card on the left, one of
   Sam's Cloudinary photos on the right; on a phone the card alone, no
-  photo. **The card, folded** (Sam, 2026-10-31: C, replacing 10-30's
-  email and password first with Google and the code below "or"): three
-  equal buttons — Continue with password, Continue with Google, Email me
-  a sign-in code — and a tap opens that one (the email and password, or
-  an email box for the code; Google starts at once), with "Other ways to
-  sign in" back. Why: the three ways read as equal, and a student unsure
-  of the password sees the other two before typing a wrong one (Sam:
-  passwords were what sent legacy's students to the admin). **A device
-  that has signed in before opens on the way it used last** — a cookie
-  holding the way in, never who, written at every sign-in, register and
-  reset — and the chosen way is marked "Last used", so a returning
-  password student pays no extra tap. The steps are in the page: a tap
-  costs no wait (not 10-30's rejected email-first, which did). "Continue
-  with password", not "…with email and password", which wraps to two
-  lines on a phone. Under it **Premium Prep leads**
+  photo. **The card** (Sam, 2026-10-31, replacing 10-30's email and
+  password first with Google and the code below "or"): **a new device**
+  sees three equal buttons — Continue with password, Continue with
+  Google, Email me a sign-in code; a tap opens that way on top (the email
+  and password, or an email box for the code; Google starts at once).
+  **A device that has signed in before opens with the way it used last
+  on top**, marked "Last used" — a cookie holding the way in, never who,
+  written at every sign-in, register and reset — so a returning password
+  student pays no extra tap. **The other two always stay in view** under
+  a line, "Other ways to sign in", as full buttons (Sam: B, over hiding
+  them behind a link, and over a half-width row); a tap moves one up, and
+  the last-used way keeps its tag below. Why: a student unsure of the
+  password sees the other two before typing a wrong one (Sam: passwords
+  were what sent legacy's students to the admin). One phone screen in
+  every view. The ways are in the page: a tap costs no wait (not 10-30's
+  rejected email-first, which did). "Continue with password", not
+  "…with email and password", which wraps to two lines on a phone.
+  Under it **Premium Prep leads**
   (Sam, 2026-10-31: B, so a newcomer sees the best option first, not
   only the trial): "New here? Get Premium Prep, best for the exam." /
   "Or Standard Prep · Start your N-day trial" — the home page's own
