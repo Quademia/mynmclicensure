@@ -42,9 +42,12 @@ export default async function LoginPage({
 
   return (
     <SignInFrame>
+      {/* The heading says what the page is, as register, forgot and reset
+          do; "Pick up where you left off." went (Sam, 2026-10-31): it said
+          nothing to a newcomer, and the sign-in is shared with MyTeacher,
+          so the product is named. */}
       <header className="si-head">
-        <h1>Pick up where you left off.</h1>
-        <p>Sign in to your NMC licensure practice.</p>
+        <h1>Sign in to your NMC licensure practice.</h1>
       </header>
 
       {notice ? <p className="si-notice">{notice}</p> : null}

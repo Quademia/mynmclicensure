@@ -460,8 +460,11 @@ opens it (00, The menu).
   SMS code here, before the trial starts (03 F4b).
 - **Sign in, redesigned** (Sam, 2026-10-30; 01): layout B from the
   canvas https://claude.ai/artifact/5vmaSLpvdCZtyxKhchQCTU, after
-  Claude's sign-in page. The shared wordmark (to the home page), "Pick up
-  where you left off." and one line; the card — email, password, Sign in,
+  Claude's sign-in page. The shared wordmark (to the home page), the
+  heading "Sign in to your NMC licensure practice." alone (Sam,
+  2026-10-31: it says what the page is, as the other three do, and names
+  the product the shared sign-in is for; "Pick up where you left off."
+  went); the card — email, password, Sign in,
   "or", Continue with Google and Email me a sign-in code as equal
   buttons; under it Premium Prep leads (Sam, 2026-10-31: B) — "New here?
   Get Premium Prep, best for the exam." / "Or Standard Prep · Start your
@@ -475,7 +478,7 @@ opens it (00, The menu).
   elsewhere: "You were signed out because your account was signed in on
   another device." Gone: the blue "New here?" box, "Register here", the
   faint photo, the email-link box. "This account has been deactivated"
-  (01.1) still to come. Headline and lines Claude's, Sam's to change.
+  (01.1) still to come.
 - **Register, forgot and reset on sign in's look** (Sam, 2026-10-31,
   01.15; drawn on the same canvas): the same frame and photo (one
   download for all four), the photo held in place while register's form
