@@ -1,21 +1,32 @@
-// app/register/register-form.tsx
+// app/register/register-form.tsx — the register card (01.15, Sam
+// 2026-10-31, on the sign-in page's look).
 //
-// The register form and its two touchpoints, from legacy register.html:
-//   1. the "Almost done!" modal — the first submit only opens it; the
-//      account is created after "Create my account".
-//   2. the "Your account is ready!" screen.
-// The programme and school lists arrive as props from the server page.
-// The trial hint under the programme reads `trialDays` per programme;
-// until slice 8 brings `products`, every value is null and the hint
-// stays hidden, exactly as legacy hides it when no days are known.
+//   1. Start your N-day trial only checks the fields and opens "Almost
+//      done!" — the app's own dialog, legacy's words; the account is made
+//      after "Create my account".
+//   2. "Creating your account…" on the please-wait screen (09.14) while
+//      the server makes the login, the profile, the trial and the welcome
+//      email, then signs the student in on this device.
+//   3. Straight in (Sam: in place of "Your account is ready", then signing
+//      in again): the action moves to /router, which shows the welcome
+//      screen on the way to the dashboard.
+//
+// A DROPPED CONNECTION never leaves the screen stuck (AGENTS.md): the call
+// is caught and says so, and the fields are still filled. A move that
+// WORKED also arrives as a thrown signal; isNavigation lets it through.
 
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { PleaseWait } from '@/components/shell/please-wait';
+import { PasswordField } from '@/components/sign-in/password-field';
+import { buildFpHash } from '@/lib/auth/fingerprint';
+import { isNavigation } from '@/lib/auth/is-navigation';
+import { useConfirm } from '@/lib/overlays/shared/confirm-dialog';
 import { Toast } from '@/lib/toast/toast';
 import { registerAction } from './actions';
 
-export type ProgramOption = { program_id: string; program_name: string; trialDays: number | null };
+export type ProgramOption = { program_id: string; program_name: string };
 export type SchoolOption = { id: number; name: string; region: string };
 
 const REFERRALS = [
@@ -28,20 +39,29 @@ const REFERRALS = [
   'Google search',
 ];
 
-export function RegisterForm({ programs, schools }: { programs: ProgramOption[]; schools: SchoolOption[] }) {
+const NO_CONNECTION = 'Could not create your account. Please check your connection and try again.';
+
+export function RegisterForm({
+  programs,
+  schools,
+  days,
+}: {
+  programs: ProgramOption[];
+  schools: SchoolOption[];
+  days: number;
+}) {
   const [error, setError] = useState<string | null>(null);
-  const [email, setEmail] = useState('');
-  const [program, setProgram] = useState('');
   const [school, setSchool] = useState('');
   const [referral, setReferral] = useState('');
-  const [confirming, setConfirming] = useState(false);
+  const [fpHash, setFpHash] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
-  const [done, setDone] = useState<string | null>(null);
-  const [pending, setPending] = useState<FormData | null>(null);
+  const [confirm, confirmDialog] = useConfirm();
 
   const dismiss = useCallback(() => setError(null), []);
 
-  const trialDays = programs.find((p) => p.program_id === program)?.trialDays ?? null;
+  useEffect(() => {
+    buildFpHash().then(setFpHash);
+  }, []);
 
   // Group schools by region, in the order they arrive (region, name).
   const regions: { region: string; items: SchoolOption[] }[] = [];
@@ -51,18 +71,15 @@ export function RegisterForm({ programs, schools }: { programs: ProgramOption[];
     else regions.push({ region: s.region, items: [s] });
   }
 
-  // Legacy validates before opening the modal; the server repeats the
-  // same checks. Here: the checks that need no server, in the same order.
+  // The checks that need no server, in legacy's order and words; the
+  // server repeats them.
   function validate(fd: FormData): string | null {
-    const password = String(fd.get('password') ?? '');
-    const confirm = String(fd.get('confirmPassword') ?? '');
     const phone = String(fd.get('phone') ?? '').trim();
     const schoolVal = String(fd.get('school') ?? '');
     const schoolOther = String(fd.get('schoolOther') ?? '').trim();
     const referralVal = String(fd.get('referral') ?? '');
     const referralOther = String(fd.get('referralOther') ?? '').trim();
 
-    if (password !== confirm) return 'Passwords do not match.';
     if (!String(fd.get('program') ?? '')) return 'Please select your programme.';
     if (phone.replace(/\D/g, '').length < 9) return 'Please enter a valid WhatsApp number.';
     if (!schoolVal) return 'Please select your school.';
@@ -72,10 +89,10 @@ export function RegisterForm({ programs, schools }: { programs: ProgramOption[];
     return null;
   }
 
-  // Touchpoint 1: the first submit only opens the modal. A plain onSubmit,
-  // not a form action: React resets a form after an action runs, and the
-  // fields must still be there if the student taps "Go back".
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  // A plain onSubmit, not a form action: React resets a form after its
+  // action runs, and the fields must still be there after "Go back" or a
+  // dropped connection.
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     setError(null);
@@ -84,113 +101,89 @@ export function RegisterForm({ programs, schools }: { programs: ProgramOption[];
       setError(problem);
       return;
     }
-    setPending(fd);
-    setConfirming(true);
-  }
 
-  async function confirmCreate() {
-    if (!pending) return;
-    setConfirming(false);
+    const email = String(fd.get('email') ?? '').trim();
+    const go = await confirm({
+      title: 'Almost done!',
+      body: (
+        <>
+          <p className="dlg-text">
+            Please remember the <strong>email</strong> and <strong>password</strong>{' '}
+            you just entered — you&apos;ll need them every time you sign in.
+          </p>
+          <p className="si-dlg-email">
+            Your email: <strong>{email}</strong>
+          </p>
+        </>
+      ),
+      confirmLabel: 'Create my account',
+      cancelLabel: 'Go back',
+    });
+    if (!go) return;
+
+    // The dialog has closed by now, so it cannot cover the screen below.
     setCreating(true);
-    const result = await registerAction(pending);
-    setCreating(false);
-    setPending(null);
-    if (result.ok) setDone(result.email);
-    else setError(result.error);
+    try {
+      const result = await registerAction(fd);
+      // On success the action signs in and moves; only failures come back.
+      if (result && !result.ok) {
+        setError(result.error);
+        setCreating(false);
+      }
+    } catch (err) {
+      if (isNavigation(err)) return;
+      setError(NO_CONNECTION);
+      setCreating(false);
+    }
   }
 
   return (
     <>
       <Toast message={error} onDismiss={dismiss} />
+      {confirmDialog}
+      {creating ? (
+        <PleaseWait message="Creating your account…" detail="Setting up your trial. This takes a few seconds." />
+      ) : null}
 
-      <div className={`reg-creating${creating ? ' show' : ''}`} aria-hidden={!creating}>
-        <div className="reg-spinner" />
-        <div className="reg-msg">Creating your account…</div>
-      </div>
+      <form className="card si-card" method="post" onSubmit={handleSubmit}>
+        <input type="hidden" name="fp_hash" value={fpHash ?? ''} />
 
-      {/* Touchpoint 1: confirm before creating */}
-      <div className={`reg-modal-overlay${confirming ? ' show' : ''}`}>
-        <div className="reg-modal" role="dialog" aria-modal="true">
-          <h3>Almost done!</h3>
-          <p>
-            Please remember the <strong>email</strong> and <strong>password</strong>{' '}
-            you just entered — you&apos;ll need them every time you sign in.
-          </p>
-          <p className="reg-modal-email">
-            Your email: <strong>{email}</strong>
-          </p>
-          <div className="reg-modal-actions">
-            <button type="button" className="btn" onClick={() => setConfirming(false)}>
-              Go back
-            </button>
-            <button type="button" className="btn btn-primary" onClick={confirmCreate}>
-              Create my account
-            </button>
+        <div className="si-row-2">
+          <div className="si-field">
+            <label className="si-label" htmlFor="forename">
+              First name
+            </label>
+            <input className="si-input" type="text" id="forename" name="forename" required autoComplete="given-name" />
           </div>
-        </div>
-      </div>
-
-      {/* Touchpoint 2: success screen */}
-      <div className={`reg-success-overlay${done ? ' show' : ''}`}>
-        <div className="reg-success-card">
-          <div className="reg-success-check">&#10003;</div>
-          <h2>Your account is ready!</h2>
-          <p>
-            Your sign-in email is:
-            <br />
-            <strong className="se-email">{done}</strong>
-          </p>
-          <p className="reg-success-sub">We&apos;ve also sent a welcome email to that address.</p>
-          <div className="reg-success-ways">
-            <p className="ways-title">3 ways to sign in next time:</p>
-            <ul>
-              <li>
-                <strong>Password</strong> — the one you just created.
-              </li>
-              <li>
-                <strong>Google</strong> — if you used a Gmail address, just tap &quot;Sign in with Google&quot;.
-              </li>
-              <li>
-                <strong>Magic link</strong> — forgot your password? Get a link sent to your email and tap
-                it. No password needed.
-              </li>
-            </ul>
-          </div>
-          <a className="btn btn-primary reg-success-btn" href="/login">
-            Go to Sign In &rarr;
-          </a>
-        </div>
-      </div>
-
-      <form onSubmit={handleSubmit}>
-        <div className="form-row-2">
-          <div className="form-group">
-            <label htmlFor="forename">First Name</label>
-            <input type="text" id="forename" name="forename" placeholder="First name" required />
-          </div>
-          <div className="form-group">
-            <label htmlFor="surname">Last Name</label>
-            <input type="text" id="surname" name="surname" placeholder="Last name" required />
+          <div className="si-field">
+            <label className="si-label" htmlFor="surname">
+              Last name
+            </label>
+            <input className="si-input" type="text" id="surname" name="surname" required autoComplete="family-name" />
           </div>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="email">Email Address</label>
+        <div className="si-field">
+          <label className="si-label" htmlFor="email">
+            Email
+          </label>
           <input
+            className="si-input"
             type="email"
             id="email"
             name="email"
             placeholder="you@example.com"
             required
             autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value.trim())}
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="phone">WhatsApp Number</label>
+        <div className="si-field">
+          <label className="si-label" htmlFor="phone">
+            WhatsApp number
+          </label>
           <input
+            className="si-input"
             type="tel"
             id="phone"
             name="phone"
@@ -201,9 +194,11 @@ export function RegisterForm({ programs, schools }: { programs: ProgramOption[];
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="program">Programme</label>
-          <select id="program" name="program" required value={program} onChange={(e) => setProgram(e.target.value)}>
+        <div className="si-field">
+          <label className="si-label" htmlFor="program">
+            Programme
+          </label>
+          <select className="si-input" id="program" name="program" required defaultValue="">
             <option value="">Select your programme</option>
             {programs.map((p) => (
               <option key={p.program_id} value={p.program_id}>
@@ -211,14 +206,20 @@ export function RegisterForm({ programs, schools }: { programs: ProgramOption[];
               </option>
             ))}
           </select>
-          {trialDays && trialDays > 0 ? (
-            <div className="form-hint-box">You&apos;ll get a {trialDays}-day free trial — no card required.</div>
-          ) : null}
         </div>
 
-        <div className="form-group">
-          <label htmlFor="school">School</label>
-          <select id="school" name="school" required value={school} onChange={(e) => setSchool(e.target.value)}>
+        <div className="si-field">
+          <label className="si-label" htmlFor="school">
+            School
+          </label>
+          <select
+            className="si-input"
+            id="school"
+            name="school"
+            required
+            value={school}
+            onChange={(e) => setSchool(e.target.value)}
+          >
             <option value="">{schools.length ? 'Select your school' : 'Could not load schools'}</option>
             {regions.map((r) => (
               <optgroup key={r.region} label={r.region}>
@@ -232,13 +233,22 @@ export function RegisterForm({ programs, schools }: { programs: ProgramOption[];
             <option value="__OTHER__">My school isn&apos;t listed</option>
           </select>
           {school === '__OTHER__' ? (
-            <input type="text" className="form-other" name="schoolOther" placeholder="Type your school's name" />
+            <input
+              className="si-input si-other"
+              type="text"
+              name="schoolOther"
+              placeholder="Type your school's name"
+              aria-label="Your school's name"
+            />
           ) : null}
         </div>
 
-        <div className="form-group">
-          <label htmlFor="referral">How did you hear about us?</label>
+        <div className="si-field">
+          <label className="si-label" htmlFor="referral">
+            How did you hear about us?
+          </label>
           <select
+            className="si-input"
             id="referral"
             name="referral"
             required
@@ -254,37 +264,20 @@ export function RegisterForm({ programs, schools }: { programs: ProgramOption[];
             <option value="__OTHER__">Other</option>
           </select>
           {referral === '__OTHER__' ? (
-            <input type="text" className="form-other" name="referralOther" placeholder="Tell us how" />
+            <input
+              className="si-input si-other"
+              type="text"
+              name="referralOther"
+              placeholder="Tell us how"
+              aria-label="How you heard about us"
+            />
           ) : null}
         </div>
 
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Minimum 8 characters"
-            required
-            minLength={8}
-            autoComplete="new-password"
-          />
-        </div>
+        <PasswordField id="password" label="Create a password" disabled={creating} />
 
-        <div className="form-group">
-          <label htmlFor="confirmPassword">Confirm Password</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            placeholder="Repeat your password"
-            required
-            autoComplete="new-password"
-          />
-        </div>
-
-        <button type="submit" className="btn btn-primary" disabled={creating}>
-          {creating ? 'Creating account...' : 'Create Account'}
+        <button type="submit" className="btn btn-primary btn-lg" disabled={creating}>
+          Start your {days}-day trial
         </button>
       </form>
     </>

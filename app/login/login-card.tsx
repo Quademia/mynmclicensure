@@ -21,33 +21,23 @@
 // action call is caught and says so. But a sign-in that WORKS also
 // "throws" — Next settles an action that redirects by rejecting its call
 // with a redirect signal while it moves to /router — so a catch first
-// lets Next's own signals through (isNavigation) and keeps "Signing in…"
-// up while the page changes.
+// lets Next's own signals through (isNavigation, lib/auth) and keeps
+// "Signing in…" up while the page changes.
 
 'use client';
 
-import { unstable_rethrow } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { AppLink } from '@/components/shell/link-pending';
 import { PleaseWait } from '@/components/shell/please-wait';
 import { createClient } from '@/lib/supabase/client';
 import { buildFpHash } from '@/lib/auth/fingerprint';
+import { isNavigation } from '@/lib/auth/is-navigation';
 import { Toast } from '@/lib/toast/toast';
 import { completeExternalLoginAction, loginAction, sendMagicLinkAction } from './actions';
 
 const NO_SIGN_IN = 'Could not sign in. Please check your connection and try again.';
 const NO_LINK = 'Could not send the link. Please check your connection and try again.';
 const GENERIC_ERROR = 'Something went wrong during sign-in. Please try again.';
-
-/** Next's redirect (and its other router signals) arrive as a thrown error. */
-function isNavigation(err: unknown): boolean {
-  try {
-    unstable_rethrow(err);
-    return false;
-  } catch {
-    return true;
-  }
-}
 
 export function LoginCard() {
   const [error, setError] = useState<string | null>(null);

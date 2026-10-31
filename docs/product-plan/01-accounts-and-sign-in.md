@@ -35,8 +35,19 @@ Detail and history: `archive/product-plan/04-access-control.md`,
 
 - One step on the server: the login is made, the profile written, the
   programme's trial granted (after the SMS check, F4b), the welcome
-  email; then a "now sign in" screen. If
-  the profile fails, the login is removed.
+  email; then **the student is signed in on that device** and goes
+  through the welcome screen to the dashboard (Sam, 2026-10-31, in place
+  of signing out to a "now sign in" screen: typing the email and
+  password again straight after making them is a wasted step on weak
+  data). If the profile fails, the login is removed.
+- **The register page** (Sam, 2026-10-31; 01.15) is on the sign-in
+  page's look — the same frame and photo: "Start your N-day trial." /
+  "Then free practice, forever. No card needed.", the button "Start your
+  N-day trial", **the password typed once with Show** (over typing it
+  twice: on a phone, seeing it catches a slip), and legacy's "Almost
+  done!" in the app's own dialog before the account is made. An email
+  already in the sign-in table is told so in our words; one known only
+  to another Quademia app is 01.7's.
 - **A school is required** — the region first, then the school from
   the regulator's list. **Suggested schools** (Sam, 2026-10-20, in
   place of typing a name the admin matches later; settles D50): under
@@ -107,7 +118,10 @@ Detail and history: `archive/product-plan/04-access-control.md`,
 
 - Forgot password answers the same whether or not the email is known.
 - **After a reset the student is signed in straight away** (Sam,
-  2026-09-18). *(to build: 8)*
+  2026-09-18): "Save and sign in" saves the password, signs every other
+  device out and this one in. Forgot and reset are on the sign-in page's
+  look (01.15); forgot answers in the card's place, as the emailed
+  sign-in does, and a used or old link says so with "Send me a new link".
 - The reset, email-link and invite emails come from the app in
   Quademia's own templates (10). *(to build)*
 

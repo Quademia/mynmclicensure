@@ -1,11 +1,13 @@
 /* styles/login.css
  *
- * The sign-in page (01.12; Sam's layout B, 2026-10-30, drawn on the
- * canvas https://claude.ai/artifact/5vmaSLpvdCZtyxKhchQCTU, after
- * Claude's own sign-in page). On a phone: the wordmark, the words and
- * the card, nothing else. From 960px: two halves — the same column on
- * the left, one photo on the right. Below 960px the photo is neither
- * drawn nor downloaded (app/login/page.tsx's <picture>).
+ * The four sign-in pages: sign in (01.12; Sam's layout B, 2026-10-30,
+ * drawn on the canvas https://claude.ai/artifact/5vmaSLpvdCZtyxKhchQCTU,
+ * after Claude's own sign-in page), and register, forgot and reset
+ * password on the same look (01.15, 2026-10-31). On a phone: the
+ * wordmark, the words and the card, nothing else. From 960px: two
+ * halves — the same column on the left, one photo on the right. Below
+ * 960px the photo is neither drawn nor downloaded (the <picture> in
+ * components/sign-in/frame.tsx).
  *
  * On the design system: the shared .card, .btn family and wordmark; the
  * field is the page's own until 09.1 makes one. Tokens only — no colour
@@ -112,6 +114,7 @@
 /* 16px text so a phone does not zoom into the field on a tap. */
 .si-input {
   width: 100%;
+  min-width: 0;
   height: 44px;
   box-sizing: border-box;
   padding: 0 14px;
@@ -128,6 +131,85 @@
   border-color: var(--brand-teal);
   box-shadow: 0 0 0 3px var(--brand-teal-pale);
 }
+.si-input:disabled { background: var(--surface-page); }
+
+/* A list on the same field; grey until something is picked (its empty
+   first choice leaves a required list :invalid). */
+select.si-input { padding: 0 10px; }
+select.si-input:invalid { color: var(--ink-muted); }
+select.si-input option { color: var(--ink); }
+
+/* "Type your school's name", under the list that asked for it. */
+.si-other { margin-top: var(--space-8); }
+
+/* Register's first and last name side by side, on a phone too. */
+.si-row-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-12);
+}
+
+/* A new password with Show (components/sign-in/password-field.tsx). */
+.si-reveal { position: relative; display: flex; }
+.si-reveal .si-input { padding-right: 64px; }
+.si-show {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 44px;
+  min-width: 56px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-ui-weight);
+  color: var(--brand-teal-hover);
+  cursor: pointer;
+}
+.si-show:hover { color: var(--brand-navy); }
+.si-show:focus-visible { outline: 2px solid var(--brand-teal); outline-offset: -2px; }
+
+.si-hint {
+  margin: 0;
+  font-size: var(--type-ui-size);
+  line-height: var(--type-ui-line);
+  color: var(--ink-muted);
+}
+
+/* "← Back to sign in" on forgot and reset. */
+.si-back {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-bottom: calc(var(--space-16) * -1);
+  font-size: 14px;
+  font-weight: var(--type-ui-weight);
+  color: var(--brand-teal-hover);
+  text-decoration: none;
+}
+.si-back:hover { color: var(--brand-navy); text-decoration: none; }
+.si-back-centre { align-self: center; margin-bottom: 0; }
+
+/* Reset's dead link: a way on and a way back, no card. */
+.si-actions { display: flex; flex-direction: column; gap: var(--space-8); }
+.si-actions .btn { width: 100%; }
+
+/* Register's "Almost done!" box: the shared dialog, portalled to <body>,
+   so this rule is not scoped to the page (AGENTS.md). */
+.si-dlg-email {
+  margin: var(--space-12) 0 0;
+  padding: 10px var(--space-12);
+  border-radius: var(--radius);
+  background: var(--brand-teal-pale);
+  color: var(--brand-teal-hover);
+  font-size: 14px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+}
+.si-dlg-email strong { color: var(--ink); font-weight: 600; }
 
 .si-or {
   display: flex;
@@ -163,6 +245,40 @@
   color: var(--ink-muted);
 }
 .si-sent strong { color: var(--ink); font-weight: 600; }
+.si-head strong { color: var(--ink); font-weight: 600; overflow-wrap: anywhere; }
+
+/* Forgot password's answer: what to open, then two ways on. */
+.si-sent-row { display: flex; gap: var(--space-12); align-items: flex-start; }
+.si-sent-icon {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  background: var(--brand-teal-pale);
+  color: var(--brand-teal-hover);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.si-sent .si-sent-row p { color: var(--ink); }
+.si-sent .si-again {
+  padding-top: var(--space-12);
+  border-top: 1px solid var(--border);
+}
+/* A button that reads as a link, inside a sentence. */
+.si-linkbtn {
+  display: inline;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: var(--type-ui-weight);
+  color: var(--brand-teal-hover);
+  cursor: pointer;
+}
+.si-linkbtn:hover { color: var(--brand-navy); }
+.si-linkbtn:disabled { color: var(--ink-muted); cursor: default; }
 
 .si-foot {
   display: flex;
@@ -188,13 +304,17 @@
   .si-head p { font-size: 16px; line-height: 24px; }
   .si-card { padding: var(--space-24); }
 
-  /* The photo fills its half and never sets the page's height: placed
-     inside it, so its own size (taller than a short screen) cannot make
-     the page scroll. */
-  .si-photo { display: block; position: relative; }
+  /* The photo fills one screen of its half and never sets the page's
+     height: one screen tall, so its own size (taller than a short screen)
+     cannot make the page scroll. On a page longer than the screen —
+     register — it stays in view while the column scrolls past it. */
+  .si-photo { display: block; padding: var(--space-24) var(--space-24) var(--space-24) 0; }
   .si-photo picture {
-    position: absolute;
-    inset: var(--space-24) var(--space-24) var(--space-24) 0;
+    display: block;
+    position: sticky;
+    top: var(--space-24);
+    height: calc(100vh - var(--space-24) * 2);
+    height: calc(100dvh - var(--space-24) * 2);
   }
   .si-photo img {
     display: block;

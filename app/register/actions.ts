@@ -2,8 +2,9 @@
 //
 // Registration — legacy register.html's submit handler as ONE server
 // call (rebuild.md §10): validate in the legacy order with the legacy
-// messages → auth signup → profile row → sign out. The browser then
-// shows the "Your account is ready!" screen.
+// messages → auth signup → profile row → trial → welcome email → signed
+// in on this device and on to /router (01.15, Sam 2026-10-31: straight
+// in, in place of signing out to a "now sign in" screen).
 //
 // ⭐ §9 #4: if the profile insert fails, the auth user is deleted with
 // the service role, so no orphan login is left behind (the MyNclex
@@ -17,15 +18,20 @@
 
 'use server';
 
+import { redirect } from 'next/navigation';
+import type { AuthError } from '@supabase/supabase-js';
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { makeUserId } from '@/lib/auth/ids';
+import { logLoginSuccess } from '@/lib/auth/events';
+import { requestInfo } from '@/lib/auth/request-info';
+import { createLoginSession } from '@/lib/auth/sessions';
 import { grantTrialSubscription } from '@/lib/subscriptions/trial';
 import { sendEmail } from '@/lib/email/send';
 import { welcomeStudentEmail } from '@/lib/email/templates/welcome-student';
 import { appOrigin } from '@/lib/site/app-origin';
 import type { ServerSupabaseClient } from '@/lib/access';
 
-type RegisterResult = { ok: true; email: string } | { ok: false; error: string };
+type RegisterResult = { ok: true } | { ok: false; error: string };
 
 export async function registerAction(formData: FormData): Promise<RegisterResult> {
   const forename = str(formData.get('forename'));
@@ -38,13 +44,11 @@ export async function registerAction(formData: FormData): Promise<RegisterResult
   const referralVal = str(formData.get('referral'));
   const referralOther = str(formData.get('referralOther'));
   const password = String(formData.get('password') ?? '');
-  const confirmPassword = String(formData.get('confirmPassword') ?? '');
+  const fpHash = str(formData.get('fp_hash')) || null;
 
   // The browser's `required` attributes cover the empties; these are the
-  // legacy script's own checks, in its order, with its words.
-  if (password !== confirmPassword) {
-    return { ok: false, error: 'Passwords do not match.' };
-  }
+  // legacy script's own checks, in its order, with its words. The password
+  // is typed once, with Show (01.15), so there is no second one to match.
   if (!programId) {
     return { ok: false, error: 'Please select your programme.' };
   }
@@ -85,11 +89,11 @@ export async function registerAction(formData: FormData): Promise<RegisterResult
   if (!programme) return { ok: false, error: 'Please select your programme.' };
   if (!programme.is_open) return { ok: false, error: 'This programme is not open yet.' };
 
-  // Step 1: the Supabase Auth account. Supabase's own message on failure,
-  // as legacy showed it (e.g. "User already registered").
+  // Step 1: the Supabase Auth account, in our words (01.15: legacy showed
+  // Supabase's own, "User already registered").
   const { data, error } = await supabase.auth.signUp({ email, password });
   if (error || !data.user) {
-    return { ok: false, error: error?.message ?? 'Signup failed. Please try again.' };
+    return { ok: false, error: signUpRefusal(error) };
   }
 
   // Step 2: the profile row, through the service role (§8 S10 / D27 —
@@ -136,14 +140,50 @@ export async function registerAction(formData: FormData): Promise<RegisterResult
   // Step 3: the programme trial, service role, non-blocking (legacy too).
   await grantTrialSubscription(userId, programId);
 
-  // Step 5: the welcome email, before the sign-out as legacy sent it.
+  // Step 5: the welcome email.
   await sendWelcomeEmail(supabase, email, forename, programId);
 
-  // Sign out so the student arrives at /login with a clean state, as
-  // legacy did.
-  await supabase.auth.signOut({ scope: 'local' });
+  // Step 6: straight in (01.15). signUp left this browser signed in, so
+  // the sign-in is recorded as any other — the log row and this device's
+  // session, which the gate checks — and /router shows the welcome screen
+  // on the way to the dashboard. With no session (were "Confirm email"
+  // ever turned on) or no device row, the student signs in by hand, and
+  // the sign-in page says the account is ready.
+  let signedIn = false;
+  if (data.session) {
+    try {
+      const info = await requestInfo();
+      await logLoginSuccess(service, {
+        identifier: email.toLowerCase(),
+        fpHash,
+        uaHash: info.uaHash,
+        ipHash: info.ipHash,
+        deviceLabel: info.deviceLabel,
+        userId,
+      });
+      await createLoginSession(userId, 'EMAIL', info);
+      signedIn = true;
+    } catch (err) {
+      console.error('[register] signing in after registering failed:', err);
+    }
+  }
+  if (!signedIn) {
+    await supabase.auth.signOut({ scope: 'local' });
+    redirect('/login?reason=registered');
+  }
+  redirect('/router');
+}
 
-  return { ok: true, email };
+const EXISTS =
+  'An account with this email already exists. Sign in with it, or tap Forgot password on the sign-in page.';
+
+/** Supabase's refusal of a new login, in our words; the rest logged. */
+function signUpRefusal(error: AuthError | null): string {
+  if (error?.code === 'user_already_exists' || /already registered/i.test(error?.message ?? '')) return EXISTS;
+  if (error?.code === 'weak_password') return 'Please choose a longer password: at least 8 characters.';
+  if (error?.code === 'email_address_invalid') return 'Please check your email address.';
+  console.error('[register] sign-up refused:', error?.code ?? error?.status, error?.message);
+  return 'Could not create your account. Please try again.';
 }
 
 // legacy step 5: the forename, the email, the login page, and the

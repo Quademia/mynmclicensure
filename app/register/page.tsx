@@ -1,19 +1,22 @@
-// app/register/page.tsx — legacy/mynmclicensure/register.html.
+// app/register/page.tsx — registering, the trial's door (01; 01.15, Sam
+// 2026-10-31: the sign-in page's look, canvas
+// https://claude.ai/artifact/5vmaSLpvdCZtyxKhchQCTU).
 //
-// The server half: loads the programme list (order program_name, as
-// getPrograms()) and the active listed schools (order region, name) with
-// the anon client — both tables are readable before login — and hands
-// them to the form. A suggested school is never shown with the listed
-// ones (01). The "Signing up for MyTeacher instead?" link is gone with
-// the April split.
+// The server half: the open programmes (order program_name) and the active
+// listed schools (order region, name), both readable before sign-in, and
+// the trial's days, read as on the home and sign-in pages. A suggested
+// school is never shown with the listed ones (01). The only way-in wording
+// is "Start your N-day trial" (Sam, 2026-10-05).
 
 import type { Metadata } from 'next';
+import { AppLink } from '@/components/shell/link-pending';
+import { SignInFrame, TRIAL_DAYS_FALLBACK } from '@/components/sign-in/frame';
+import { getPublicProgrammes } from '@/lib/catalogue/queries';
 import { createClient } from '@/lib/supabase/server';
 import { RegisterForm, type ProgramOption, type SchoolOption } from './register-form';
-import '@/styles/auth.css';
 
 export const metadata: Metadata = {
-  title: 'Register | MyNMCLicensure',
+  title: 'Start your trial | MyNMCLicensure',
 };
 
 export const dynamic = 'force-dynamic';
@@ -21,9 +24,9 @@ export const dynamic = 'force-dynamic';
 export default async function RegisterPage() {
   const supabase = await createClient();
 
-  const [programsRes, schoolsRes] = await Promise.all([
+  const [programsRes, schoolsRes, { trialDays }] = await Promise.all([
     // Open to the public only (02 C5a); the action refuses any other.
-    supabase.from('programs').select('program_id, program_name, trial_product_id').eq('is_open', true).order('program_name'),
+    supabase.from('programs').select('program_id, program_name').eq('is_open', true).order('program_name'),
     supabase
       .from('schools')
       .select('id, name, region')
@@ -31,15 +34,13 @@ export default async function RegisterPage() {
       .eq('status', 'listed')
       .order('region', { ascending: true })
       .order('name', { ascending: true }),
+    getPublicProgrammes(),
   ]);
+  const days = trialDays ?? TRIAL_DAYS_FALLBACK;
 
-  // Trial length comes from products.duration_days — slice 8. Until then
-  // the hint has nothing to say and stays hidden, as legacy does when the
-  // days are unknown.
   const programs: ProgramOption[] = (programsRes.data ?? []).map((p) => ({
     program_id: p.program_id as string,
     program_name: p.program_name as string,
-    trialDays: null,
   }));
   const schools: SchoolOption[] = (schoolsRes.data ?? []).map((s) => ({
     id: s.id as number,
@@ -48,22 +49,19 @@ export default async function RegisterPage() {
   }));
 
   return (
-    <div className="auth-wrapper">
-      <div className="auth-card">
-        <div className="auth-logo">
-          <h1>Quademia</h1>
-          <p>MyNMCLicensure</p>
-        </div>
+    <SignInFrame>
+      <header className="si-head">
+        <h1>Start your {days}-day trial.</h1>
+        <p>Then free practice, forever. No card needed.</p>
+      </header>
 
-        <h2 className="auth-title">Create your account</h2>
-        <p className="auth-subtitle">Join MyNMCLicensure today</p>
+      <RegisterForm programs={programs} schools={schools} days={days} />
 
-        <RegisterForm programs={programs} schools={schools} />
-
-        <div className="auth-footer">
-          Already have an account? <a href="/login">Sign in</a>
-        </div>
+      <div className="si-foot">
+        <p>
+          Already have an account? <AppLink href="/login">Sign in</AppLink>
+        </p>
       </div>
-    </div>
+    </SignInFrame>
   );
 }

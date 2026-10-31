@@ -1,31 +1,29 @@
-// app/forgot-password/page.tsx — legacy/mynmclicensure/forgot-password.html.
+// app/forgot-password/page.tsx — "Forgot password?" from the sign-in card
+// (01.15, Sam 2026-10-31: the sign-in page's look, canvas
+// https://claude.ai/artifact/5vmaSLpvdCZtyxKhchQCTU). The words and the
+// card change when the link is sent, so both live in forgot-form.tsx.
 
 import type { Metadata } from 'next';
+import { SignInFrame, SUPPORT_WHATSAPP } from '@/components/sign-in/frame';
 import { ForgotForm } from './forgot-form';
-import '@/styles/auth.css';
 
 export const metadata: Metadata = {
-  title: 'Forgot Password | MyNMCLicensure',
+  title: 'Forgot password | MyNMCLicensure',
 };
 
 export default function ForgotPasswordPage() {
   return (
-    <div className="auth-wrapper">
-      <div className="auth-card">
-        <div className="auth-logo">
-          <h1>Quademia</h1>
-          <p>MyNMCLicensure</p>
-        </div>
+    <SignInFrame>
+      <ForgotForm />
 
-        <h2 className="auth-title">Reset your password</h2>
-        <p className="auth-subtitle">Enter your email and we&apos;ll send you a reset link</p>
-
-        <ForgotForm />
-
-        <div className="auth-footer">
-          Remembered your password? <a href="/login">Sign in</a>
-        </div>
+      <div className="si-foot">
+        <p>
+          Can&apos;t sign in?{' '}
+          <a href={SUPPORT_WHATSAPP} target="_blank" rel="noopener noreferrer">
+            Message us on WhatsApp
+          </a>
+        </p>
       </div>
-    </div>
+    </SignInFrame>
   );
 }

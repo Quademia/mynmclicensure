@@ -472,10 +472,24 @@ opens it (00, The menu).
   another device." Gone: the blue "New here?" box, "Register here", the
   faint photo, the email-link box. "This account has been deactivated"
   (01.1) still to come. Headline and lines Claude's, Sam's to change.
-- Reset: signed in on success (01).
-- **Check**: the "N-day free trial — no card required" hint never shows;
-  register, forgot and reset keep the old lockup and the private colour
-  tokens until their redesign (01.15).
+- **Register, forgot and reset on sign in's look** (Sam, 2026-10-31,
+  01.15; drawn on the same canvas): the same frame and photo (one
+  download for all four), the photo held in place while register's form
+  scrolls on a computer. Register: "Start your N-day trial." / "Then free
+  practice, forever. No card needed." (the days read; the old per-programme
+  hint, which never showed, gone), first and last name side by side, the
+  password once with Show, "Start your N-day trial", "Almost done!" in the
+  app's dialog, "Creating your account…" on the please-wait screen, then
+  straight in — the welcome screen, the dashboard. Forgot: "← Back to sign
+  in", "Forgot your password?", "Email me a reset link", the answer in the
+  card's place with Send it again and Use another email. Reset: "Set a new
+  password." for the link's email, "Save and sign in" (signed in on
+  success, 01); a used or old link "This link no longer works.", no link
+  "Open the link in your email.", each with "Send me a new link". A
+  dropped connection on any of the three says so and gives the button
+  back. Gone: the old card, lockup and private colours (`styles/auth.css`),
+  the home-made "Almost done!" and "Your account is ready!" overlays, the
+  confirm-password fields, Supabase's own words for a taken email.
 
 ### Packages (the shop) and Premium Prep
 - On a computer, a side panel of tickable filters in place of the chip
