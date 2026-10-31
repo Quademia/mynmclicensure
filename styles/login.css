@@ -185,8 +185,11 @@ select.si-input option { color: var(--ink); }
 .si-suggest .si-linkbtn { padding: 13px 0; margin: -13px 0; }
 
 /* "(remember it to sign in)" in red (Sam, 2026-10-31): forgotten
-   passwords were what sent legacy's students to the admin. */
-.si-remember { color: var(--danger); }
+   passwords were what sent legacy's students to the admin. The same red
+   carries "Please remember the email and password…" in register's
+   "Almost done!" box, which is portalled to <body> — so unscoped. */
+.si-remember,
+.si-remember strong { color: var(--danger); }
 
 /* "← Back to sign in" on forgot and reset. */
 .si-back {

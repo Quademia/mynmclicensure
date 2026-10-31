@@ -117,9 +117,13 @@ export function RegisterForm({
       title: 'Almost done!',
       body: (
         <>
+          {/* The reminder in the red of "(remember it to sign in)" under the
+              password (Sam, 2026-10-31: C); the button stays navy, the way on. */}
           <p className="dlg-text">
-            Please remember the <strong>email</strong> and <strong>password</strong>{' '}
-            you just entered — you&apos;ll need them every time you sign in.
+            <span className="si-remember">
+              Please remember the <strong>email</strong> and <strong>password</strong> you just entered
+            </span>{' '}
+            — you&apos;ll need them every time you sign in.
           </p>
           <p className="si-dlg-email">
             Your email: <strong>{email}</strong>
