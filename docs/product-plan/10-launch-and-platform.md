@@ -15,7 +15,10 @@ Detail and history: `archive/product-plan/rebuild.md` §6, §11, and
 
 1. **Before the day**: security headers; Resend's paid plan; the
    Supabase sign-in settings recorded (redirect list, sender, its
-   QAcademy-branded templates) and the live address added; a check that
+   QAcademy-branded templates; its password rules — the minimum length
+   and whether a signed-in session may change its password without the
+   old one, since our pages' rules do not bind Supabase's own API: found
+   2026-10-31, 10.23) and the live address added; a check that
    sharing the project does not slow prod; whether prod opens with the
    paid packages paused (on prod they are archived today); Sam tests
    prod with a throwaway account.
@@ -45,7 +48,9 @@ announcements start empty.
 ### Security
 
 - **Security headers** — HSTS, framing, nosniff, referrer, a content
-  policy — before going live. *(to build)*
+  policy — before going live. *(to build)* Framing matters first on the
+  sign-in pages: today another site could show them inside its own and
+  catch taps (found 2026-10-31).
 - **Each table gives the browser only what it needs** — usually reading
   named columns, often nothing — table by table as each is touched
   (AGENTS.md rule 9). Payments, devices, the sign-in log, reset

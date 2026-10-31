@@ -40,8 +40,10 @@ before then, and the old list's history, is in
 - ⬜ 01.5 Invite by email — student or admin, optional package, a set-password link; replaces Create User
 - ⬜ 01.6 Last sign-in — written at sign-in, shown in the drawer, a dormant filter on Users
 - ⬜ 01.7 One Quademia account — "sign in to add this product"; "complete your profile"
-- ⬜ 01.8 The email confirmed by a six-digit code at registration — with 01.13; not Supabase's switch (Sam, 10-31)
+- ⬜ 01.8 The email confirmed by a six-digit code at registration — with 01.13; then "already exists" can go
 - ⬜ 01.18 Forgot password by the six-digit code — email, code, new password, same tab; with 01.13 (Sam, 10-31)
+- ⬜ 01.19 A robot check (Cloudflare Turnstile) on register and forgot — fake accounts, trials, welcome emails
+- ⬜ 01.20 Register's limits on the server — text lengths; the school one of the listed (found 10-31)
 - ✅ 01.17 "Did you mean ama@gmail.com?" under register's email — common slips, one tap — 2026-10-31
 - ✅ 01.10 "Can't sign in?" on the sign-in page — WhatsApp, the emails' support number — 2026-10-30
 - ✅ 01.9 (unplanned) A sign-out ends only its own device, not all; a password reset still ends all — 2026-10-17
@@ -240,7 +242,7 @@ before then, and the old list's history, is in
 ## [10 Launch and platform](docs/product-plan/10-launch-and-platform.md)
 
 - ⬜ 16 Going live — the domain, live keys, content copied fresh, old logins deleted, legacy removed
-- ⬜ 10.1 Security headers — HSTS, framing, nosniff, referrer, a content policy
+- ⬜ 10.1 Security headers — HSTS, framing (the sign-in pages first), nosniff, referrer, a content policy
 - ⬜ 10.2 The email outbox — a queue, scheduled retries, an admin Emails page with Retry
 - ⬜ 10.3 The sign-in emails taken over from Supabase — our templates, through the outbox
 - ⬜ 10.4 Supabase's sender set to Resend as the fallback, its templates in neutral Quademia words
@@ -260,5 +262,6 @@ before then, and the old list's history, is in
 - ⬜ 10.18 `db/schema.sql` and `db/rls.sql` brought up to date
 - ⬜ 10.19 A check on prod whether sharing the project slows it
 - ⏸ 10.20 The app's own offline page and a "You're offline" banner — Sam: later (09-29)
+- ⬜ 10.23 Supabase's password rules — minimum length, change without the old one; shared, with 10.6 (10-31)
 - ⏸ 10.22 The app's clock — a timer for scheduled notices to devices, 02.3, D34, 10.9; with the first of them (10-20)
 - ⏸ 10.21 Paystack's live key on prod — waits on the company / Paystack account decision

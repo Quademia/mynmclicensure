@@ -714,6 +714,12 @@ above sit at the repo root; the audience grouping inside them is kept.
   and `getPermissions()` check the file's details and its locked
   settings. A PDF made in Node (pdfmake's own build, a scratchpad script)
   is checked the same way from a scratchpad page on a throwaway port.
+- **A pane tab in the background has no focus** (2026-10-31): moving the
+  focus inside it fires no `blur`, so an `onBlur` never runs (register's
+  "Did you mean …?" looked broken) — dispatch `focusout` on the field to
+  walk it. Its screenshots crop to phone width; read sizes with a script.
+  **Closing the pane's last tab closes the pane** — reopen it with
+  `preview_start` on the page Sam had.
 - **A pane tab opened in the background never shows a page behind a
   `loading.tsx`.** The page arrives (200, its content in a hidden
   `S:1` block and the `$RC` swap in the HTML) but React waits for an

@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-31 — register, forgot and reset on sign in's look (01.15); registering at /trial, straight in; the card's last way on top (01.16)
+  - ↳ same photo · password once + Show, red remember · reset asks twice · no strength rules · Premium leads · Did you mean (01.17) · no /register forward · code for register and reset · Turnstile, framing queued
+
 - 2026-10-30, night — the sign-in page redesigned (01.12) after Claude's: two halves, Sam's photo, his card order; Can't sign in on WhatsApp (01.10)
   - ↳ password on the card over email-first · B over A, C · code over link (01.13) · no header or footer · no photo on a phone · no bare sign-in rows · bumped device told why · redirect rejects the caller · stuck Signing you in
 
