@@ -99,7 +99,11 @@ show the locks *(F2, 11)*.
   form (+233…). A second person on the same phone gets the free account
   and no trial. Arkesel is the closest fit (it checks the code itself);
   mNotify and Hubtel the others; about GHS 35 per 1,000 sign-ups. The
-  company is picked at the build. *(to build: F4b)*
+  company is picked at the build. *(to build: F4b)* ⚠ The email is to be
+  confirmed by a code at registration too (01.8, 2026-10-31); two codes at
+  sign-up is too much, so which one registration asks for is open (01,
+  Open — Claude's lean: email at registration, the phone when the trial
+  is claimed).
 - The welcome trial product (`WELCOME_TRIAL`) is unchanged and not
   granted by registering.
 

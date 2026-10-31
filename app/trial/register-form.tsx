@@ -17,9 +17,10 @@
 
 'use client';
 
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { PleaseWait } from '@/components/shell/please-wait';
 import { PasswordField } from '@/components/sign-in/password-field';
+import { suggestEmail } from '@/lib/auth/email-typo';
 import { buildFpHash } from '@/lib/auth/fingerprint';
 import { isNavigation } from '@/lib/auth/is-navigation';
 import { useConfirm } from '@/lib/overlays/shared/confirm-dialog';
@@ -55,9 +56,18 @@ export function RegisterForm({
   const [referral, setReferral] = useState('');
   const [fpHash, setFpHash] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+  // "Did you mean …?" (01.17): worked out as the student leaves the email
+  // box, gone as soon as they type in it again.
+  const [suggestion, setSuggestion] = useState<string | null>(null);
+  const emailInput = useRef<HTMLInputElement>(null);
   const [confirm, confirmDialog] = useConfirm();
 
   const dismiss = useCallback(() => setError(null), []);
+
+  function takeSuggestion() {
+    if (emailInput.current && suggestion) emailInput.current.value = suggestion;
+    setSuggestion(null);
+  }
 
   useEffect(() => {
     buildFpHash().then(setFpHash);
@@ -168,6 +178,7 @@ export function RegisterForm({
             Email
           </label>
           <input
+            ref={emailInput}
             className="si-input"
             type="email"
             id="email"
@@ -175,7 +186,18 @@ export function RegisterForm({
             placeholder="you@example.com"
             required
             autoComplete="email"
+            onBlur={(e) => setSuggestion(suggestEmail(e.target.value))}
+            onChange={() => setSuggestion(null)}
           />
+          {suggestion ? (
+            <p className="si-hint si-suggest" role="status">
+              Did you mean{' '}
+              <button type="button" className="si-linkbtn" onClick={takeSuggestion}>
+                {suggestion}
+              </button>
+              ?
+            </p>
+          ) : null}
         </div>
 
         <div className="si-field">

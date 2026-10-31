@@ -76,6 +76,21 @@ Detail and history: `archive/product-plan/04-access-control.md`,
   change only the profile's fields. **The phone number is changed
   through the server**, which clears its verification (03; 12, `users`).
   *(to build: F4b)*
+- **A misspelt email is caught as it is typed** (Sam, 2026-10-31; 01.17):
+  leaving the email box with a common slip — `gmial.com`, `gmail.con`,
+  `yaho.com`, the ending left off — shows "Did you mean
+  ama@gmail.com?", one tap to take it. It never changes or refuses an
+  address by itself; a school or work address gets nothing. Why: today a
+  wrong email works until the student needs it — a forgotten password —
+  and then the reset goes nowhere and the student messages the admin.
+- **The email is confirmed by a six-digit code at registration** (Sam,
+  2026-10-31: C), typed in the same tab before the student is let in —
+  the same code as signing in (01.13), sent by the app, not Supabase's
+  "Confirm email" switch (one switch for the whole project, so it would
+  change the old site's and MyTeacher's sign-ups too; a link, which opens
+  inside the Gmail app's browser; Supabase's own sender, a few emails an
+  hour). It catches what the typo check cannot: a fake or borrowed
+  email. *(to build: 01.8, with 01.13)*
 
 ### Signing in
 
@@ -189,9 +204,11 @@ Detail and history: `archive/product-plan/04-access-control.md`,
 
 ## Open
 
-- **Email confirmation at sign-up** — parked under the port's "like for
-  like" rule, which ended on 2026-09-16; the email work (10) already
-  allows for it. To re-rule.
+- **One code at registration, not two** (2026-10-31): the email code
+  (01.8) and the SMS code (03 F4b) would both ask at sign-up, which is
+  too much. Claude's lean: the email code at registration (free, through
+  the app's own email; email is what password resets rest on), the phone
+  checked later, when a trial is claimed. Sam's, when 01.8 is built.
 - **The sign-in check's round trips** — six before a protected page
   shows (D28); the fix is in code, waiting only on Sam's word.
 - **A phone number format check** on register, checkout and profile —

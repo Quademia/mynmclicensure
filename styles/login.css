@@ -177,6 +177,13 @@ select.si-input option { color: var(--ink); }
   line-height: var(--type-ui-line);
   color: var(--ink-muted);
 }
+/* "Did you mean ama@gmail.com?" under register's email (01.17): the
+   address is the tap, and a long one may break anywhere. */
+.si-suggest { color: var(--ink); overflow-wrap: anywhere; }
+/* A 44px tap on an 18px line: padding the finger can hit, taken back by
+   the margin so nothing moves. */
+.si-suggest .si-linkbtn { padding: 13px 0; margin: -13px 0; }
+
 /* "(remember it to sign in)" in red (Sam, 2026-10-31): forgotten
    passwords were what sent legacy's students to the admin. */
 .si-remember { color: var(--danger); }
