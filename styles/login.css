@@ -177,6 +177,9 @@ select.si-input option { color: var(--ink); }
   line-height: var(--type-ui-line);
   color: var(--ink-muted);
 }
+/* "(remember it to sign in)" in red (Sam, 2026-10-31): forgotten
+   passwords were what sent legacy's students to the admin. */
+.si-remember { color: var(--danger); }
 
 /* "← Back to sign in" on forgot and reset. */
 .si-back {

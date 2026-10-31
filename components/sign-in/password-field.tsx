@@ -50,7 +50,7 @@ export function PasswordField({
         </button>
       </div>
       <p className="si-hint" id={`${id}-hint`}>
-        At least 8 characters (remember it to sign in).
+        At least 8 characters <span className="si-remember">(remember it to sign in)</span>.
       </p>
     </div>
   );
