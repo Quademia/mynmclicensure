@@ -35,9 +35,17 @@ export function SignInFrame({ children }: { children: React.ReactNode }) {
   return (
     <div className="si-page">
       <div className="si-main">
-        <AppLink href="/" className="si-home" title="Quademia MyNMCLicensure home">
-          <Wordmark />
-        </AppLink>
+        {/* The wordmark goes home, as on most sign-in pages; "← Home" says
+            so in a word, for a student who does not know that habit (Sam,
+            2026-10-31: B, on trial — to remove if he does not like it). */}
+        <div className="si-top">
+          <AppLink href="/" className="si-home" title="Quademia MyNMCLicensure home">
+            <Wordmark />
+          </AppLink>
+          <AppLink href="/" className="si-tohome">
+            ← Home
+          </AppLink>
+        </div>
 
         <div className="si-centre">
           <div className="si-column">{children}</div>

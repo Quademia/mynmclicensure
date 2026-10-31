@@ -41,6 +41,24 @@
 }
 .si-home:hover { text-decoration: none; }
 
+/* The wordmark and "← Home" on one line (Sam, 2026-10-31: B). */
+.si-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-12);
+}
+.si-tohome {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: var(--type-ui-weight);
+  color: var(--brand-teal-hover);
+  text-decoration: none;
+}
+.si-tohome:hover { color: var(--brand-navy); text-decoration: none; }
+
 .si-centre {
   flex: 1;
   display: flex;
