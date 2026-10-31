@@ -41,8 +41,10 @@ Detail and history: `archive/product-plan/04-access-control.md`,
   password again straight after making them is a wasted step on weak
   data). If the profile fails, the login is removed.
 - **The register page lives at `/trial`** (Sam, 2026-10-31: the address
-  says what the page gives, for links shared on WhatsApp); `/register`
-  forwards there for good, so no link already shared breaks.
+  says what the page gives, for links shared on WhatsApp). `/register`
+  keeps no forward (Sam: the new app is not live, so no student holds a
+  link to it); the old site's `register.html` and its other addresses are
+  going live's forwards to decide (10).
 - **The register page** (Sam, 2026-10-31; 01.15) is on the sign-in
   page's look — the same frame and photo: "Start your N-day trial." /
   "Then free practice, forever. No card needed.", the button "Start your

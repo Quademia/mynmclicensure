@@ -43,12 +43,6 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "3mb",
     },
   },
-  // Registering moved from /register to /trial (Sam, 2026-10-31: the
-  // address says what the page gives, for links shared on WhatsApp). The
-  // old address forwards for good, so no link already shared breaks.
-  async redirects() {
-    return [{ source: "/register", destination: "/trial", permanent: true }];
-  },
 };
 
 export default nextConfig;
