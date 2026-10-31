@@ -44,7 +44,10 @@ Detail and history: `archive/product-plan/04-access-control.md`,
   page's look — the same frame and photo: "Start your N-day trial." /
   "Then free practice, forever. No card needed.", the button "Start your
   N-day trial", **the password typed once with Show** (over typing it
-  twice: on a phone, seeing it catches a slip), and legacy's "Almost
+  twice: on a phone, seeing it catches a slip; its hint "At least 8
+  characters (remember it to sign in)." — no strength rules or meter,
+  Sam 2026-10-31: in legacy the password was one of the main things
+  students struggled with and asked the admin about), and legacy's "Almost
   done!" in the app's own dialog before the account is made. An email
   already in the sign-in table is told so in our words; one known only
   to another Quademia app is 01.7's.

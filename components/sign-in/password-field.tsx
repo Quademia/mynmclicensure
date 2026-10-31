@@ -2,7 +2,9 @@
 // with Show (01.15; Sam, 2026-10-31: one field with Show over typing it
 // twice). On a phone, seeing what was typed catches a slip better than a
 // second field does. Register and reset use it; sign in keeps its plain
-// field.
+// field. No strength rules or meter (Sam, 2026-10-31: in legacy, the
+// password was one of the main things students struggled with and asked
+// the admin about); the hint only asks them to remember it.
 
 'use client';
 
@@ -48,7 +50,7 @@ export function PasswordField({
         </button>
       </div>
       <p className="si-hint" id={`${id}-hint`}>
-        At least 8 characters.
+        At least 8 characters (remember it to sign in).
       </p>
     </div>
   );
