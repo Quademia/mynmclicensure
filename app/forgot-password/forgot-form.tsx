@@ -3,9 +3,10 @@
 // Typed email → "Email me a reset link" → the answer in the card's place,
 // the same whatever the address: "If … has an account here, we've sent
 // it a link" (01: forgot password answers the same whether or not the
-// email is known), as the sign-in card's emailed link answers. From there,
-// Send it again (the server's limit, 3 an hour, still holds) or Use
-// another email. Every call is caught: a dropped connection says so and
+// email is known), as the sign-in card's emailed link answers; then only
+// "Not there after a minute? Look in Spam." and two ways on — Send it
+// again (the server's limit, 3 an hour, still holds) or Use another email
+// (Sam, 2026-10-31: trimmed from about 55 words to 30). Every call is caught: a dropped connection says so and
 // gives the button back (AGENTS.md).
 
 'use client';
@@ -59,7 +60,9 @@ export function ForgotForm() {
   }
 
   async function sendAgain() {
-    if (sentTo && (await send(sentTo))) setNotice("We've sent it again.");
+    // "Only the newest link works" is said here, where a second email
+    // makes it true (Sam, 2026-10-31: B).
+    if (sentTo && (await send(sentTo))) setNotice('Sent again. Use the newest email.');
   }
 
   return (
@@ -77,7 +80,7 @@ export function ForgotForm() {
             <h1>Check your email.</h1>
             <p>
               If <strong>{sentTo}</strong>{' '}
-              has an account here, we&apos;ve sent it a link to set a new password. It can take a minute to arrive.
+              has an account here, we&apos;ve sent it a link to set a new password.
             </p>
           </header>
 
@@ -98,10 +101,9 @@ export function ForgotForm() {
                   <path d="M3.5 6.5l8.5 6 8.5-6" />
                 </svg>
               </span>
-              <p>Open the newest email from Quademia and tap its button. Only the newest link works. Not there? Look in Spam.</p>
+              <p>Not there after a minute? Look in Spam.</p>
             </div>
             <p className="si-again">
-              Didn&apos;t get it?{' '}
               <button type="button" className="si-linkbtn" onClick={sendAgain} disabled={sending}>
                 {sending ? 'Sending…' : 'Send it again'}
               </button>{' '}
