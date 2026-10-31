@@ -1,6 +1,6 @@
 # AGENTS.md — MyNMCLicensure
 
-Last updated: 2026-10-30. Rules for **any** assistant working in this
+Last updated: 2026-10-31. Rules for **any** assistant working in this
 repo — Codex and Claude both. This file holds **rules only**: what to
 do and what to avoid. What happened, and why a rule exists, lives in
 `SESSIONS.md` (the index) and `sessions/` (the log). What the app is
@@ -354,6 +354,11 @@ above sit at the repo root; the audience grouping inside them is kept.
   connection", and give the button back or offer Try again, as the
   runner does. Walk it by making the page's POSTs fail in the pane
   (replace `window.fetch` for `method: 'POST'`, then restore it).
+  **An action that calls `redirect()` rejects too**: Next settles it by
+  rejecting the call with a redirect signal while it moves, so the catch
+  first lets Next's own signals through — `unstable_rethrow(err)` from
+  `next/navigation` inside a small try (the sign-in card's `isNavigation`,
+  2026-10-30) — or every successful sign-in reads as a dropped connection.
 - **A `<form action={fn}>` resets its fields after the action returns**
   (React 19). When the fields must survive — a submit that only opens a
   confirm step — use a plain `onSubmit` + `new FormData(form)`.
@@ -771,6 +776,10 @@ above sit at the repo root; the audience grouping inside them is kept.
   Wrap each part in `coalesce` (the proof run caught it, 2026-10-20). In a
   proof script, hand a JSON string to `$1::text::jsonb`, not `$1::jsonb`,
   which postgres.js encodes a second time.
+
+- **A space after an element can be lost in JSX**: `If <strong>{x}</strong>
+  has an account…` rendered "x has" as "xhas" (the sign-in card,
+  2026-10-30), seen only on screen. Write `{' '}` after the element.
 
 - **Some files here have mixed line endings** (CRLF and LF together), so a
   scripted multi-line find-and-replace that contains `\n` can match

@@ -22,6 +22,9 @@ should stay rich.
 
 ## 2026-10 — [sessions/2026-10.md](sessions/2026-10.md)
 
+- 2026-10-30, night — the sign-in page redesigned (01.12) after Claude's: two halves, Sam's photo, his card order; Can't sign in on WhatsApp (01.10)
+  - ↳ password on the card over email-first · B over A, C · code over link (01.13) · no header or footer · no photo on a phone · no bare sign-in rows · bumped device told why · redirect rejects the caller · stuck Signing you in
+
 - 2026-10-30, evening — 10-05 decisions placed; Standard Prep on dev; Premium goes first (02.13) walked; paused Standard (02.14); home page redesigned (F3)
   - ↳ idea already decided, not in plan · Packages page set aside · 16 packages renamed · no typed prices · C over A/B/D · floor_utc · dev webhook beats localhost · Premium highlighted · photos fade, words still · cards 828→630
 
