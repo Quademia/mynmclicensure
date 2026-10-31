@@ -25,8 +25,13 @@ type ResetResult = { ok: true } | { ok: false; error: string };
 
 export async function completeResetAction(formData: FormData): Promise<ResetResult> {
   const password = String(formData.get('password') ?? '');
+  const confirmPassword = String(formData.get('confirmPassword') ?? '');
   const fpHash = String(formData.get('fp_hash') ?? '').trim() || null;
 
+  // Asked twice on this page (Sam, 2026-10-31); the page checks first.
+  if (password !== confirmPassword) {
+    return { ok: false, error: "The two passwords don't match." };
+  }
   if (password.length < 8) {
     return { ok: false, error: 'Password should be at least 8 characters.' };
   }

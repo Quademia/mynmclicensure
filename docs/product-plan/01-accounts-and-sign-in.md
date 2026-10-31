@@ -160,6 +160,12 @@ Detail and history: `archive/product-plan/04-access-control.md`,
   device out and this one in. Forgot and reset are on the sign-in page's
   look (01.15); forgot answers in the card's place, as the emailed
   sign-in does, and a used or old link says so with "Send me a new link".
+- **The new password is asked twice on reset** (Sam, 2026-10-31: B) —
+  "New password", "Type it again", one Show for both; "The two passwords
+  don't match." at once, before anything is sent. Register keeps one box
+  (a long form for someone new); here the student has already lost one
+  password and is signed in straight after, so a slip would only show at
+  the next sign-in. What Google, Microsoft and Apple do on their resets.
 - **Forgot password moves to the six-digit code** (Sam, 2026-10-31):
   "Forgot your password?", the email, "We sent a code to …" typed in the
   same tab, the new password with Show, signed in — no reset link. Why:

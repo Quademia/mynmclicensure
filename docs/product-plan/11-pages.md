@@ -492,7 +492,8 @@ opens it (00, The menu).
   straight in — the welcome screen, the dashboard. Forgot: "← Back to sign
   in", "Forgot your password?", "Email me a reset link", the answer in the
   card's place with Send it again and Use another email. Reset: "Set a new
-  password." for the link's email, "Save and sign in" (signed in on
+  password." for the link's email, the new password asked twice ("Type it
+  again", one Show for both; Sam, 2026-10-31), "Save and sign in" (signed in on
   success, 01); a used or old link "This link no longer works.", no link
   "Open the link in your email.", each with "Send me a new link". A
   dropped connection on any of the three says so and gives the button

@@ -33,6 +33,7 @@ import { completeResetAction } from './actions';
 type Phase = 'checking' | 'ready' | 'used' | 'none';
 
 const NO_CONNECTION = 'Could not save your new password. Please check your connection and try again.';
+const MISMATCH = "The two passwords don't match.";
 
 export function ResetCard() {
   const [phase, setPhase] = useState<Phase>('checking');
@@ -118,6 +119,12 @@ export function ResetCard() {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     setError(null);
+    // The two boxes must match (Sam, 2026-10-31: B) — said at once, with
+    // no request; the server checks again.
+    if (fd.get('password') !== fd.get('confirmPassword')) {
+      setError(MISMATCH);
+      return;
+    }
     setSaving(true);
     try {
       const result = await completeResetAction(fd);
@@ -155,7 +162,7 @@ export function ResetCard() {
 
           <form className="card si-card" method="post" onSubmit={handleSubmit}>
             <input type="hidden" name="fp_hash" value={fpHash ?? ''} />
-            <PasswordField id="password" label="New password" disabled={saving} />
+            <PasswordField id="password" label="New password" againLabel="Type it again" disabled={saving} />
             <button type="submit" className="btn btn-primary btn-lg" disabled={saving}>
               Save and sign in
             </button>
