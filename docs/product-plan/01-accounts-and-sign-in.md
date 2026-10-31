@@ -160,6 +160,18 @@ Detail and history: `archive/product-plan/04-access-control.md`,
   device out and this one in. Forgot and reset are on the sign-in page's
   look (01.15); forgot answers in the card's place, as the emailed
   sign-in does, and a used or old link says so with "Send me a new link".
+- **Forgot password moves to the six-digit code** (Sam, 2026-10-31):
+  "Forgot your password?", the email, "We sent a code to …" typed in the
+  same tab, the new password with Show, signed in — no reset link. Why:
+  a link tapped in the Gmail app opens in Gmail's own browser and now
+  signs the student in there; a code works across devices (read on the
+  phone, typed on the computer); and one code piece serves signing in
+  (01.13), confirming the email at registration (01.8) and the reset. A
+  code is what Google, Microsoft, Apple, Amazon and the mobile-money apps
+  send, so students know it; code-plus-link in one email (Instagram's)
+  can still be chosen at the build. Until then the link stays. *(to
+  build: 01.18, with 01.13 — the same check first: Supabase's email
+  templates are shared with the old site and MyTeacher)*
 - The reset, email-link and invite emails come from the app in
   Quademia's own templates (10). *(to build)*
 

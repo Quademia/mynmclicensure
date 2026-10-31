@@ -41,6 +41,7 @@ before then, and the old list's history, is in
 - ⬜ 01.6 Last sign-in — written at sign-in, shown in the drawer, a dormant filter on Users
 - ⬜ 01.7 One Quademia account — "sign in to add this product"; "complete your profile"
 - ⬜ 01.8 The email confirmed by a six-digit code at registration — with 01.13; not Supabase's switch (Sam, 10-31)
+- ⬜ 01.18 Forgot password by the six-digit code — email, code, new password, same tab; with 01.13 (Sam, 10-31)
 - ✅ 01.17 "Did you mean ama@gmail.com?" under register's email — common slips, one tap — 2026-10-31
 - ✅ 01.10 "Can't sign in?" on the sign-in page — WhatsApp, the emails' support number — 2026-10-30
 - ✅ 01.9 (unplanned) A sign-out ends only its own device, not all; a password reset still ends all — 2026-10-17
